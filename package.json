@@ -1,0 +1,14 @@
+{
+  "name": "es2015-custom-element",
+  "dependencies": {
+    "ol": "7.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "latest",
+    "vite": "latest"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  }
+}
