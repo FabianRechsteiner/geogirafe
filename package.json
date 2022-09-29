@@ -9,6 +9,6 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build"
+    "build": "vite build && cp -r JSON dist/"
   }
 }
