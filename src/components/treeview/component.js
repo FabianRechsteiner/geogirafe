@@ -2,28 +2,32 @@ class TreeView extends HTMLUListElement {
 
   constructor() {
     super();
-    this.dirJSON = this.getAttribute('json');
     this.data = {};
     this.getJSON();
   }
 
   getJSON() {
+    this.dirJSON = this.getAttribute('json');
     const request = new XMLHttpRequest();
     request.open('GET', this.dirJSON);
     request.responseType = 'json';
     request.send();
     request.onload = () => {
       this.data = request.response;
-      this.data["themes"].forEach(data => {
-        const liParent = document.createElement(`li`);
-        liParent.innerHTML = data.name;
-        this.appendChild(liParent);
-        if (data.children !== undefined) {
-          this.childs(liParent, data);
-          this.hide();
-        }
-      });
+      this.render();
     };
+  }
+
+  render() {
+    this.data["themes"].forEach(data => {
+      const liParent = document.createElement(`li`);
+      liParent.innerHTML = data.name;
+      this.appendChild(liParent);
+      if (data.children !== undefined) {
+        this.childs(liParent, data);
+        this.hide();
+      }
+    });
   }
 
   childs(liParent, data) {

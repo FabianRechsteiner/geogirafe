@@ -1,14 +1,16 @@
 {
-  "name": "es2015-custom-element",
-  "dependencies": {
-    "ol": "7.1.0"
-  },
+  "name": "geogirafe",
+  "description": "Simple Geo Viewer",
+  "author": "Guillaume REMY",
+  "version": "0.1",
   "devDependencies": {
-    "@babel/core": "latest",
-    "vite": "latest"
+    "vite": "^3.1.4"
+  },
+  "dependencies": {
+    "ol": "^7.1.0"
   },
   "scripts": {
-    "start": "vite",
-    "build": "vite build && cp -r JSON dist/"
+    "serve": "cd src && cp --parents -R components/**/*.html static/ && cd .. && vite serve",
+    "build": "cd src && cp --parents -R components/**/*.html static/ && cd .. && vite build"
   }
 }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <script type="module" src="./initialize.js"></script>
+
+    <style>
+      .map {
+        width: 100%;
+        height: 600px;
+      }
+    </style>
+    
+    <title>GeoGirafe</title>
+  </head>
+  <body>
+    <h1>GeoGirafe</h1>
+    <h2>Themes</h2>
+    <ul is="tree-view" json="/Mock/themes.json"></ul>
+    <ol-map id="map" class="map"></ol-map>
+  </body>
+</html>
