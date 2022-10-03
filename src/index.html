@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="/lib/all.min.css" />
+    <!-- <script src="/lib/all.min.js"></script> -->
     <script type="module" src="./initialize.js"></script>
     <title>GeoGirafe</title>
   </head>
   <body>
-    <header></header>
-    <tree-view id="treeview" themes="/Mock/themes.json"></tree-view>
+    <header>
+      <img id="logo" src="https://map.geo.bs.ch/static-ngeo/build/logo.4b8693.png" />
+      <girafe-search id="search"></girafe-search>
+      <div>
+        <i class="fa-xl fa-solid fa-user"></i>
+        <i class="fa-xl fa-regular fa-user"></i>
+      </div>
+    </header>
+    <!-- <tree-view id="treeview" themes="/Mock/themes.json"></tree-view> -->
     <!-- <ul id="treeview" is="tree-view" themes="/Mock/themes.json"></ul> -->
     <ol-map id="map"></ol-map>
     <footer></footer>

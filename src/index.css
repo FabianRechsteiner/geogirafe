@@ -10,10 +10,11 @@ header {
     left:0;
     border-bottom : solid 1px #ddd;
     background : #fff;
-    height : 2.5rem;
+    height : 3.5rem;
     width : 100%;
     z-index:100;
-    padding: 1rem;
+    padding: 0.5rem;
+    display:flex;
 }
 footer {
     position : fixed;
@@ -40,4 +41,14 @@ footer {
     bottom: 50px;
     width: 400px;
     z-index:100;
+}
+
+#logo {
+    height: 3.5rem;
+    margin-right: 3rem;
+    margin-top: -0.2rem;
+}
+
+girafe-search {
+    margin-top: 0.5rem;
 }

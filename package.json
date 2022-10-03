@@ -7,11 +7,12 @@
     "vite": "^3.1.4"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.2.0",
     "ol": "^7.1.0"
   },
   "scripts": {
-    "serve": "cd src && cp --parents -R components/**/*.html static/ && cd .. && cp node_modules/ol/ol.css src/static/components/ol/ && vite serve",
-    "build": "cd src && cp --parents -R components/**/*.html static/ && cd .. && cp node_modules/ol/ol.css src/static/components/ol/ && vite build",
+    "serve": "bash -C './buildtools/prebuild.sh' && vite serve",
+    "build": "bash -C './buildtools/prebuild.sh' && vite build",
     "serve_win": "cd src && xcopy components\\*.html static\\components\\ /S /Y && cd .. && xcopy node_modules\\ol\\ol.css src\\static\\components\\ol\\ /Y && vite serve",
     "build_win": "cd src && xcopy components\\*.html static\\components\\ /S /Y && cd .. && xcopy node_modules\\ol\\ol.css src\\static\\ol\\ /Y && vite build"
   }
