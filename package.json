@@ -12,6 +12,8 @@
   },
   "scripts": {
     "serve": "cd src && cp --parents -R components/**/*.html static/ && cd .. && vite serve",
-    "build": "cd src && cp --parents -R components/**/*.html static/ && cd .. && vite build"
+    "build": "cd src && cp --parents -R components/**/*.html static/ && cd .. && vite build",
+    "serve_win": "cd src && xcopy components\\*.html static\\components\\ /S && cd .. && vite serve",
+    "build_win": "cd src && xcopy components\\*.html static\\components\\ /S && cd .. && vite build"
   }
 }
