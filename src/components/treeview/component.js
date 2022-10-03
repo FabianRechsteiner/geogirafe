@@ -1,3 +1,5 @@
+import GeoEvents from '/models/events.js';
+
 class TreeView extends HTMLUListElement {
 
   constructor() {
@@ -63,9 +65,23 @@ class TreeView extends HTMLUListElement {
           var next = event.target.nextElementSibling;
           if (next.style.display == ``) {
             next.style.display = `none`;
+            window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
+              bubbles: true, cancelable: false, composed: true, 
+              detail: {
+                action: 'leafClosed',
+                leafName: span.innerHTML
+              }
+            }));
           }
           else {
             next.style.display = ``;
+            window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
+              bubbles: true, cancelable: false, composed: true, 
+              detail: {
+                action: 'leafOpened',
+                leafName: span.innerHTML
+              }
+            }));
           }
         }
       }
