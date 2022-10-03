@@ -1,92 +1,108 @@
 import GeoEvents from '/models/events.js';
 
-class TreeView extends HTMLUListElement {
+class TreeViewComponent extends HTMLElement {
+
+  static #template = null;
+  themesUrl = null;
+  themesJson = {};
 
   constructor() {
     super();
-    this.data = {};
-    this.getJSON();
+    this.shadow = this.attachShadow({mode: 'open'});
+    this.themesUrl = this.getAttribute('themes');
   }
 
-  getJSON() {
-    this.dirJSON = this.getAttribute('json');
-    const request = new XMLHttpRequest();
-    request.open('GET', this.dirJSON);
-    request.responseType = 'json';
-    request.send();
-    request.onload = () => {
-      this.data = request.response;
-      this.render();
-    };
+  connectedCallback() {
+    this.loadTemplate()
+      .then(() => this.loadThemes()
+        .then(() => this.render())
+      )
+  }
+
+  async loadThemes() {
+    const response = await fetch(this.themesUrl);
+    const content = await response.json();
+    this.themesJson = content["themes"];
+  }
+
+  async loadTemplate() {
+    if (TreeViewComponent.#template !== null) {
+      // Template was already loaded. Nothing to do.
+      return;
+    }
+    // Otherwise, load the template
+    const response = await fetch('/components/treeview/template.html');
+    const content = await response.text();
+    TreeViewComponent.#template = document.createElement('template');
+    TreeViewComponent.#template.innerHTML = content;
   }
 
   render() {
-    this.data["themes"].forEach(data => {
-      const liParent = document.createElement(`li`);
-      liParent.innerHTML = data.name;
-      this.appendChild(liParent);
-      if (data.children !== undefined) {
-        this.childs(liParent, data);
-        this.hide();
-      }
+
+    this.shadow.appendChild(TreeViewComponent.#template.content.cloneNode(true));
+    const ulRoot = this.shadow.querySelector('#treeview-list');
+
+    this.themesJson.forEach(elem => {
+      this.renderLeaf(ulRoot, elem);
     });
   }
 
-  childs(liParent, data) {
-    // Create a new unordered list for children
-    const childList = document.createElement(`ul`);
-    data.children.forEach(child => {
-      const liChild = document.createElement(`li`);
-      liChild.innerHTML = child.name;
-      childList.appendChild(liChild);
-      if (child.children !== undefined) {
-        this.childs(liChild, child);
-      }
+  renderChilds(liParent, elem) {
+    // Add new sub-list
+    const ulChild = document.createElement('ul');
+    ulChild.style.display = 'none';
+    liParent.appendChild(ulChild);
+    elem.children.forEach(child => {
+      this.renderLeaf(ulChild, child);
     });
-    liParent.appendChild(childList);
   }
 
-  // Hide childs function
-  hide() {
-    var ulChildren = Array.from(this.querySelectorAll(`ul`));
-    var liChildren = Array.from(this.querySelectorAll(`li`));
-    ulChildren.forEach(ul => {
-      ul.style.display = `none`;
-    });
-    liChildren.forEach(li => {
-      var childrenText = li.childNodes[0];
-      if (li.querySelector(`ul`) != null) {
-        const span = document.createElement(`span`);
-        span.textContent = childrenText.textContent;
-        span.style.cursor = `pointer`;
-        childrenText.parentNode.insertBefore(span, childrenText);
-        childrenText.parentNode.removeChild(childrenText);
-        span.onclick = (event) => {
-          var next = event.target.nextElementSibling;
-          if (next.style.display == ``) {
-            next.style.display = `none`;
-            window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
-              bubbles: true, cancelable: false, composed: true, 
-              detail: {
-                action: 'leafClosed',
-                leafName: span.innerHTML
-              }
-            }));
-          }
-          else {
-            next.style.display = ``;
-            window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
-              bubbles: true, cancelable: false, composed: true, 
-              detail: {
-                action: 'leafOpened',
-                leafName: span.innerHTML
-              }
-            }));
-          }
+  renderLeaf(ulParent, elem) {
+
+    // Create new leaf
+    const span = document.createElement(`span`);
+    span.textContent = elem.name;
+    span.style.cursor = 'pointer';
+    span.onclick = (e) => this.toggle(e);
+
+    const li = document.createElement('li');
+    li.appendChild(span);
+    ulParent.appendChild(li);
+
+    // Append childs if any
+    if (elem.children !== undefined) {
+      this.renderChilds(li, elem);
+    }
+  }
+
+  toggle(e) {
+    const ulChild = e.target.nextElementSibling;
+    if (ulChild === null) {
+      // No more child.
+      return;
+    }
+
+    if (ulChild.style.display === 'none') {
+      ulChild.style.display = 'block';
+      window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
+        bubbles: true, cancelable: false, composed: true, 
+        detail: {
+          action: 'leafOpened',
+          leafName: e.target.innerHTML
         }
-      }
-    });
+      }));
+    }
+    else {
+      ulChild.style.display = 'none';
+      window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
+        bubbles: true, cancelable: false, composed: true, 
+        detail: {
+          action: 'leafClosed',
+          leafName: e.target.innerHTML
+        }
+      }));
+    }
   }
 }
 
-customElements.define('tree-view', TreeView, { extends: 'ul' });
+customElements.define('tree-view', TreeViewComponent);

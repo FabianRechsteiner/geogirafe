@@ -1,0 +1,19 @@
+#treeview-list {
+  background : #fff;
+  border-right : solid 1px #333;
+  padding : 1rem;
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+ul li:before {
+  content: "+ ";
+}
+span {
+  display: inline-block;
+  margin: 0.2rem;
+}

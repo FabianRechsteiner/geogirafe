@@ -1,0 +1,43 @@
+* {
+    margin:0;
+    padding:0;
+    font-family: Arial;
+    font-size : 1rem;
+}
+header {
+    position: fixed;
+    top:0;
+    left:0;
+    border-bottom : solid 1px #ddd;
+    background : #fff;
+    height : 2.5rem;
+    width : 100%;
+    z-index:100;
+    padding: 1rem;
+}
+footer {
+    position : fixed;
+    bottom : 0;
+    left : 0;
+    border : none;
+    height : 1.2rem;
+    width : 100%;
+    z-index:100;
+    background-color: #ccc;
+    color: #666;
+}
+#map {
+    position : fixed;
+    top : 4.5rem;
+    left: 0;
+    right:0;
+    bottom: 1.2rem;
+}
+#treeview {
+    position: fixed;
+    left:0;
+    top: 4.5rem;
+    bottom: 50px;
+    width: 400px;
+    z-index:100;
+}

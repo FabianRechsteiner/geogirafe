@@ -1,6 +1,6 @@
 class GeoEvents {
     TreeView = 'GeoGirafe.TreeView';
-    Map = 'GeoGirage.Map';
+    Map = 'GeoGirafe.Map';
 }
 
 export default GeoEvents;

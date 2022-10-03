@@ -3,26 +3,15 @@ import OSM from 'ol/source/OSM';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
 import GeoEvents from '/models/events.js';
-import { makeObservable, observable, computed, action } from "mobx"
 
 class OLComponent extends HTMLElement {
 
   static #template = null;
-  counter = 0;
   
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: 'open'});
     this.registerEvents();
-
-    makeObservable(this, {
-      counter: observable,
-      test: computed
-    });
-  }
-
-  get test() {
-    console.log(this.counter);
   }
 
   registerEvents() {
@@ -60,9 +49,6 @@ class OLComponent extends HTMLElement {
         zoom: 2,
       }),
     });
-
-    let b = this.shadow.querySelector('#test');
-    b.onclick = () => this.counter++;
   }
 
   listenOpenLayersEvents() {
@@ -93,7 +79,7 @@ class OLComponent extends HTMLElement {
     console.log('connectedCallback');
     this.loadTemplate().then(() => {
       this.render();
-      this.listenOpenLayersEvents()
+      this.listenOpenLayersEvents();
     });
   }
 
