@@ -1,4 +1,4 @@
-#searchbox {
+#searchbox, #results {
   background-color: transparent;
   border-right: none;
   height: 2.5rem;
@@ -39,4 +39,10 @@
     -moz-background-origin: content-box;
     -webkit-background-clip: content-box;
     -webkit-background-origin: content-box;
+}
+
+#results {
+  border: solid 1px red;
+  z-index: 1000;
+  position: absolute;
 }

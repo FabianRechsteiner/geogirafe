@@ -1,15 +1,13 @@
 class SearchComponent extends HTMLElement {
 
   static #template = null;
+  searchUrl = null;
+  searchTermPlaceholder = '###SEARCHTERM###';
   
   constructor() {
     super();
+    this.searchUrl = this.getAttribute('search-url');
     this.shadow = this.attachShadow({mode: 'open'});
-    this.registerEvents();
-  }
-
-  registerEvents() {
-    //window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
   }
 
   async loadTemplate() {
@@ -25,16 +23,32 @@ class SearchComponent extends HTMLElement {
   }
 
   render() {
-
     // Clone component template and add it to the dom
     this.shadow.appendChild(SearchComponent.#template.content.cloneNode(true));
+  }
 
+  registerEvents() {
+    //window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
+    const searchbox = this.shadow.querySelector('#search');
+    searchbox.addEventListener('input', (e) => this.doSearch(this, e));
   }
 
   connectedCallback() {
     this.loadTemplate().then(() => {
       this.render();
+      this.registerEvents();
     });
+  }
+
+  doSearch(_this, e) {
+    const term = e.target.value;
+    if (term.length <= 0)
+      return;
+
+    const url = _this.searchUrl.replace(_this.searchTermPlaceholder, term);
+    fetch(url)
+      .then(response => response.json())
+      .then(data => console.log(data));
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {
