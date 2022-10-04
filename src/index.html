@@ -13,13 +13,16 @@
   <body>
     <header>
       <img id="logo" src="https://map.geo.bs.ch/static-ngeo/build/logo.4b8693.png" />
-      <girafe-search id="search"></girafe-search>
-      <div>
-        <i class="fa-xl fa-solid fa-user"></i>
-        <i class="fa-xl fa-regular fa-user"></i>
+      <girafe-search id="search" service="https://search.geo.bs.ch/search?term="></girafe-search>
+      <div id="buttonbar">
+        <!-- <a href="#"><i class="fa-xl fa-solid fa-user"></i></a> -->
+        <a href="#"></a><i class="fa-xl fa-solid fa-user"></i></a>
+        <a href="#"></a><i class="fa-xl fa-solid fa-print"></i></a>
+        <a href="#"></a><i class="fa-xl fa-solid fa-draw-polygon"></i></a>
+        <a href="#"></a><i class="fa-xl fa-solid fa-bars"></i></a>
       </div>
     </header>
-    <!-- <tree-view id="treeview" themes="/Mock/themes.json"></tree-view> -->
+    <tree-view id="treeview" themes="/Mock/themes.json"></tree-view>
     <!-- <ul id="treeview" is="tree-view" themes="/Mock/themes.json"></ul> -->
     <ol-map id="map"></ol-map>
     <footer></footer>

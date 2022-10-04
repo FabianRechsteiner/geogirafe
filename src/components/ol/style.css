@@ -2,3 +2,9 @@
     height: 100%;
     width: 100%;
 }
+
+.ol-zoom {
+    right: 1rem;
+    top: 1rem;
+    left: unset;
+}

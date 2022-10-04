@@ -1,5 +1,4 @@
 node_modules
 public
 src/static/components
-src/static/lib
-src/static/webfonts
+src/static/lib/ol.css
