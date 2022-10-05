@@ -3,6 +3,7 @@ class SearchComponent extends HTMLElement {
   static #template = null;
   searchUrl = null;
   searchTermPlaceholder = '###SEARCHTERM###';
+  initialSearchBoxHeight = this.convertRemToPixels(2.5);
   
   constructor() {
     super();
@@ -25,6 +26,9 @@ class SearchComponent extends HTMLElement {
   render() {
     // Clone component template and add it to the dom
     this.shadow.appendChild(SearchComponent.#template.content.cloneNode(true));
+
+    // Get default height of searchBox
+    const searchBox = this.shadow.querySelector('#searchbox');
   }
 
   registerEvents() {
@@ -40,19 +44,57 @@ class SearchComponent extends HTMLElement {
     });
   }
 
+  clearSearch() {
+    const resultsBox = this.shadow.querySelector('#results');
+    resultsBox.innerHTML = '';
+    this.setSearchBoxHeight(this.initialSearchBoxHeight);
+  }
+
   doSearch(_this, e) {
     const term = e.target.value;
-    if (term.length <= 0)
+    if (term.length <= 0) {
+      this.clearSearch();
       return;
+    }
 
     const url = _this.searchUrl.replace(_this.searchTermPlaceholder, term);
     fetch(url)
       .then(response => response.json())
-      .then(data => console.log(data));
+      .then(data => this.displayResults(data));
+  }
+
+  displayResults(results) {
+    this.clearSearch();
+    if (results.length === 0)
+      return;
+
+    const resultsBox = this.shadow.querySelector('#results');
+    results.forEach(result => {
+      const span = document.createElement(`span`);
+      span.textContent = result.label;
+      span.className = 'result';
+      span.style.cursor = 'pointer';
+      span.onclick = (e) => this.onSelect(e);
+      resultsBox.appendChild(span);
+    });
+    this.setSearchBoxHeight(this.initialSearchBoxHeight + resultsBox.offsetHeight + 20);
+  }
+
+  setSearchBoxHeight(height) {
+    const searchBox = this.shadow.querySelector('#searchbox');
+    searchBox.style.height = height + 'px';
+  }
+
+  onSelect(e) {
+    console.log(e.target.innerHTML);
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {
     console.log('attributeChangedCallback');
+  }
+
+  convertRemToPixels(rem) {    
+    return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
   }
 }
 
