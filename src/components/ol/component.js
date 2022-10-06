@@ -3,6 +3,8 @@ import OSM from 'ol/source/OSM';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
 import GeoEvents from '/models/events.js';
+import { getPointResolution, get as getProjection, transform} from 'ol/proj';
+
 
 class OLComponent extends HTMLElement {
 
@@ -16,6 +18,7 @@ class OLComponent extends HTMLElement {
 
   registerEvents() {
     window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
+    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
   }
 
   async loadTemplate() {
@@ -89,6 +92,40 @@ class OLComponent extends HTMLElement {
 
   onTreeViewEvent(details) {
     console.log(details);
+  }
+
+  onMapEvent(details) {
+    console.log(details);
+    if (details.action === 'projectionChanged') {
+      console.log('NEW PROJ: ' + details.projection);
+      this.onChangeProjection(details.projection);
+    }
+  }
+
+  onChangeProjection(projection) {
+    const newProjection = getProjection(projection);
+    const currentView = this.map.getView();
+    const currentProjection = currentView.getProjection();
+    const currentResolution = currentView.getResolution();
+    const currentCenter = currentView.getCenter();
+    const currentRotation = currentView.getRotation();
+    const newCenter = transform(currentCenter, currentProjection, newProjection);
+    const currentMPU = currentProjection.getMetersPerUnit();
+    const newMPU = newProjection.getMetersPerUnit();
+    const currentPointResolution =
+      getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') *
+      currentMPU;
+    const newPointResolution =
+      getPointResolution(newProjection, 1 / newMPU, newCenter, 'm') * newMPU;
+    const newResolution =
+      (currentResolution * currentPointResolution) / newPointResolution;
+    const newView = new View({
+      center: newCenter,
+      resolution: newResolution,
+      rotation: currentRotation,
+      projection: newProjection,
+    });
+    this.map.setView(newView);
   }
 }
 

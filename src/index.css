@@ -67,3 +67,10 @@ girafe-search {
 #buttonbar a {
     margin : 0.5rem;
 }
+
+girafe-proj-select {
+    z-index: 2000;
+    position: fixed;
+    bottom: 1.2rem;
+    left: 26rem;
+  }
