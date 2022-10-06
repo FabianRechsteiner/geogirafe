@@ -7,7 +7,7 @@ import GeoEvents from '/models/events.js';
 import { getPointResolution, get as getProjection, transform} from 'ol/proj';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 
-class OLComponent extends HTMLElement {
+class MapComponent extends HTMLElement {
 
   static #template = null;
   srid = 'EPSG:3857'; // default projection
@@ -26,21 +26,21 @@ class OLComponent extends HTMLElement {
   }
 
   async loadTemplate() {
-    if (OLComponent.#template !== null) {
+    if (MapComponent.#template !== null) {
       // Template was already loaded. Nothing to do.
       return;
     }
     // Otherwise, load the template
     const response = await fetch('/components/map/template.html');
     const content = await response.text();
-    OLComponent.#template = document.createElement('template');
-    OLComponent.#template.innerHTML = content;
+    MapComponent.#template = document.createElement('template');
+    MapComponent.#template.innerHTML = content;
   }
 
   render() {
 
     // Clone component template and add it to the dom
-    this.shadow.appendChild(OLComponent.#template.content.cloneNode(true));
+    this.shadow.appendChild(MapComponent.#template.content.cloneNode(true));
 
     // Default basemap : OSM
     this.currentBasemap = new TileLayer({
@@ -180,4 +180,4 @@ class OLComponent extends HTMLElement {
   }
 }
 
-customElements.define('ol-map', OLComponent);
+customElements.define('girafe-map', MapComponent);

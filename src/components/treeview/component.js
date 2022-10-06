@@ -105,4 +105,4 @@ class TreeViewComponent extends HTMLElement {
   }
 }
 
-customElements.define('tree-view', TreeViewComponent);
+customElements.define('girafe-tree-view', TreeViewComponent);
