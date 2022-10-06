@@ -13,7 +13,7 @@
   "scripts": {
     "serve": "bash -C './buildtools/prebuild.sh' && vite serve",
     "build": "bash -C './buildtools/prebuild.sh' && vite build",
-    "serve_win": "cd src && xcopy components\\*.html static\\components\\ /S /Y && cd .. && xcopy node_modules\\ol\\ol.css src\\static\\components\\ol\\ /Y && vite serve",
-    "build_win": "cd src && xcopy components\\*.html static\\components\\ /S /Y && cd .. && xcopy node_modules\\ol\\ol.css src\\static\\ol\\ /Y && vite build"
+    "serve-win": "buildtools\\prebuild.cmd && vite serve",
+    "build-win": "buildtools\\prebuild.cmd && vite build"
   }
 }
