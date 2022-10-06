@@ -27,7 +27,7 @@ class OLComponent extends HTMLElement {
       return;
     }
     // Otherwise, load the template
-    const response = await fetch('/components/ol/template.html');
+    const response = await fetch('/components/map/template.html');
     const content = await response.text();
     OLComponent.#template = document.createElement('template');
     OLComponent.#template.innerHTML = content;

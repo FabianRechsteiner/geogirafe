@@ -7,4 +7,4 @@ cd ..
 
 # Copy CSS styles for Libraries (are not included in css bundle)
 mkdir -p src/static/lib/
-cp node_modules/ol/ol.css src/static/lib/
+cp node_modules/ol/ol.css src/static/components/map/

@@ -1,5 +1,5 @@
 import './components/treeview/component.js';
-import './components/ol/component.js';
+import './components/map/component.js';
 import './components/search/component.js';
 import './components/projection/component.js';
 
