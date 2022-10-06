@@ -52,6 +52,11 @@ class OLComponent extends HTMLElement {
         zoom: 2,
       }),
     });
+
+    // TODO REG: This is ugly, but I didn't find any other solution yet.
+    setTimeout(() => {
+      this.map.updateSize();
+    }, 1000);
   }
 
   listenOpenLayersEvents() {

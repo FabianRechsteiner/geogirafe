@@ -27,7 +27,7 @@ footer {
     background-color: #ccc;
     color: #666;
 }
-#map {
+ol-map {
     position : fixed;
     top : 4.5rem;
     left: 0;
@@ -73,4 +73,4 @@ girafe-proj-select {
     position: fixed;
     bottom: 1.2rem;
     left: 26rem;
-  }
+}
