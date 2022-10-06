@@ -1,6 +1,20 @@
 stages:
 - test
+- pages
+
 sast:
   stage: test
 include:
 - template: Security/SAST.gitlab-ci.yml
+
+pages:
+  image: node:18-slim
+  before_script:
+    - apt update && apt -y upgrade
+  script: 
+    - npm i
+    - npm run-script build
+  artifacts:
+    paths:
+      # Directory needs to be named 'public' for GitLab Pages
+      - public
