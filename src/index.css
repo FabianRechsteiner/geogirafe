@@ -74,3 +74,10 @@ girafe-proj-select {
     bottom: 1.2rem;
     left: 26rem;
 }
+
+girafe-basemap-select {
+    z-index: 2000;
+    position: fixed;
+    bottom: 1.2rem;
+    left: 46rem;
+}

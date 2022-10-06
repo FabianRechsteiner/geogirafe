@@ -60,7 +60,7 @@ class TreeViewComponent extends HTMLElement {
   renderLeaf(ulParent, elem) {
 
     // Create new leaf
-    const span = document.createElement(`span`);
+    const span = document.createElement('span');
     span.textContent = elem.name;
     span.style.cursor = 'pointer';
     span.onclick = (e) => this.toggle(e);

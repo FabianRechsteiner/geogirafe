@@ -2,10 +2,10 @@ import './components/treeview/component.js';
 import './components/map/component.js';
 import './components/search/component.js';
 import './components/projection/component.js';
+import './components/basemap/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
-import GeoEvents from '/models/events.js';
 
 // Register custom EPSG
 // https://epsg.io/21781
@@ -16,10 +16,4 @@ register(proj4);
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('App initialized.');
-  // window.dispatchEvent(new CustomEvent(GeoEvents.App, { 
-  //   bubbles: true, cancelable: false, composed: true, 
-  //   detail: {
-  //     action: 'appInitialized'
-  //   }
-  // }));
 });
