@@ -10,10 +10,15 @@ include:
 pages:
   image: node:18-slim
   before_script:
-    - apt update && apt -y upgrade
+    - apt update && apt -y upgrade && apt install -y brotli
   script: 
+    # build
     - npm i
     - npm run-script build
+    # Compress files
+    - find public -type f -regex '.*\.\(html\|css\|json\)' -exec brotli -k -f {} \;
+    - find public -type f -regex '.*\.\(html\|css\|json\)' -exec gzip -k -f {} \;
+
   artifacts:
     paths:
       # Directory needs to be named 'public' for GitLab Pages
