@@ -2,6 +2,7 @@
 REM Copy HTML Templates
 cd src
 xcopy components\*.html static\components\ /S /Y
+xcopy components\*.css static\components\ /S /Y
 cd .. 
 
 REM Copy CSS styles for Libraries (are not included in css bundle)
