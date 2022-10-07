@@ -3,6 +3,7 @@ import './components/map/component.js';
 import './components/search/component.js';
 import './components/projection/component.js';
 import './components/basemap/component.js';
+import './components/themes/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
