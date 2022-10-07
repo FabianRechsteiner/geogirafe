@@ -61,27 +61,55 @@ class TreeViewComponent extends HTMLElement {
   }
 
   renderLeaf(ulParent, elem, parentServer) {
-
     // Create new leaf
-    const span = document.createElement('span');
-    span.textContent = elem.name;
-    span.style.cursor = 'pointer';
-    span.onclick = (e) => this.toggle(this, e);
-
     const li = document.createElement('li');
-    li.appendChild(span);
     ulParent.appendChild(li);
 
+    // Add icons
+    this.renderLeafIcons(li, elem);
+
+    // Add label
     // If a server is defined on this node, we use it.
     // Otherwise, we use the server of the parent
     const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
+    this.renderLeafLabel(li, elem, childServer);
+
+    // Append childs if any
+    if (elem.children !== undefined) {
+      this.renderChilds(li, elem, childServer);
+    }
+  }
+
+  renderLeafIcons(li, elem) {
+    // Add caret or spacer
+    const caret = document.createElement('i');
+    if (!elem.childLayers) {
+      // Add caret
+      caret.className = 'fa fa-caret-right selectable';
+      caret.onclick = (e) => this.expand(this, e);
+    }
+    li.append(caret);
+
+    // Add selection circle
+    const circle = document.createElement('i');
+    circle.className = 'fa-xs fa-regular fa-circle';
+    li.append(circle);
+  }
+  
+  renderLeafLabel(li, elem, server) {
+    // Add label
+    const span = document.createElement('span');
+    span.textContent = elem.name;
+    span.className = 'selectable';
+    span.onclick = (e) => this.toggle(this, e);
+    li.appendChild(span);
 
     if (elem.childLayers) {
       // We are on a layer linked to a server.
       // It means this one can be queried from WMS
       let url = null;
-      if (childServer) {
-        url = this.servers[childServer].url
+      if (server) {
+        url = this.servers[server].url
       }
       else {
         console.log('NOT OGC SERVER FOR ' + elem.name);
@@ -98,31 +126,15 @@ class TreeViewComponent extends HTMLElement {
       };
       this.layers.push(layer);
       span.dataset.value = this.layers.length - 1;
-    }
-
-    // Append childs if any
-    if (elem.children !== undefined) {
-      this.renderChilds(li, elem, childServer);
+      span.dataset.active = false;
     }
   }
 
-  toggle(_this, e) {
-    const ulChild = e.target.nextElementSibling;
-    if (ulChild === null) {
-      // No more child.
-      window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
-        bubbles: true, cancelable: false, composed: true, 
-        detail: {
-          action: 'layerEnabled',
-          layer: _this.layers[e.target.dataset.value]
-        }
-      }));
-      console.log();
-      return;
-    }
-
+  expand(_this, e) {
+    const ulChild = e.target.parentElement.getElementsByTagName('ul')[0];
     if (ulChild.style.display === 'none') {
       ulChild.style.display = 'block';
+      e.target.className = 'fa fa-caret-down selectable';
       window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
         bubbles: true, cancelable: false, composed: true, 
         detail: {
@@ -133,11 +145,42 @@ class TreeViewComponent extends HTMLElement {
     }
     else {
       ulChild.style.display = 'none';
+      e.target.className = 'fa fa-caret-right selectable';
       window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
         bubbles: true, cancelable: false, composed: true, 
         detail: {
           action: 'groupClosed',
           group: e.target.innerHTML
+        }
+      }));
+    }
+  }
+
+  toggle(_this, e) {
+    const li = e.target.parentElement;
+    let action = null;
+    if (e.target.dataset.active === 'true') {
+      // Deactivate layer
+      li.className = '';
+      action = 'layerDisabled';
+      e.target.dataset.active = false;
+    }
+    else {
+      // Activate layer
+      li.className = 'active';
+      action = 'layerEnabled';
+      e.target.dataset.active = true;
+    }
+
+    if (e.target.dataset.value) {
+      // We have data on this layer.
+      // => We are on a leaf with layer infos
+      // We send a message to activate/deactivate this layer
+      window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
+        bubbles: true, cancelable: false, composed: true, 
+        detail: {
+          action: action,
+          layer: _this.layers[e.target.dataset.value]
         }
       }));
     }

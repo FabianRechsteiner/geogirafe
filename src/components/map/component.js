@@ -14,7 +14,8 @@ class MapComponent extends HTMLElement {
   static #template = null;
   srid = 'EPSG:3857'; // default projection
   projection = getProjection(this.srid);
-  currentBasemap = null; 
+  currentBasemap = null;
+  layersByServer = {};
   
   constructor() {
     super();
@@ -153,8 +154,37 @@ class MapComponent extends HTMLElement {
 
   onAddLayer(layerInfos) {
     console.log('New Layer: ' + layerInfos);
-
     if (layerInfos.type === 'WMS') {
+      this.onAddWmsLayer(layerInfos);
+    }
+  }
+
+  onRemoveLayer(layerInfos) {
+    console.log('New Layer: ' + layerInfos);
+    if (layerInfos.type === 'WMS') {
+      this.onRemoveWmsLayer(layerInfos);
+    }
+  }
+
+  onAddWmsLayer(layerInfos) {
+    const key = layerInfos.server + layerInfos.imageType;
+
+    if (key in this.layersByServer) {
+      // Get existing ol layer for this server
+      // and add a new wms layer in the source
+      const layerDef = this.layersByServer[key];
+      layerDef.layerList.push(layerInfos.layer);
+      const source = new ImageWMS({
+        url: layerInfos.url,
+        params: {
+          'LAYERS': layerDef.layerList.join(','),
+          'FORMAT': layerInfos.imageType
+        }
+      });
+      layerDef.layer.setSource(source);
+    }
+    else {
+      // Create a new ol layer
       const layer = new ImageLayer({
         //extent: [-13884991, 2870341, -7455066, 6338219],
         source: new ImageWMS({
@@ -163,17 +193,47 @@ class MapComponent extends HTMLElement {
             'LAYERS': layerInfos.layer, 
             'FORMAT': layerInfos.imageType
           },
-          //ratio: 1,
-          //serverType: '',
         })
       });
-
+      this.layersByServer[key] = {
+        layer: layer,
+        layerList : [layerInfos.layer]
+      };
       this.map.addLayer(layer);
     }
   }
 
-  onRemoveLayer(layer) {
+  onRemoveWmsLayer(layerInfos) {
+    const key = layerInfos.server + layerInfos.imageType;
 
+    if (key in this.layersByServer) {
+      // Get existing ol layer for this server
+      // and add a new wms layer in the source
+      const layerDef = this.layersByServer[key];
+      layerDef.layerList = layerDef.layerList.filter(item => item !== layerInfos.layer);
+
+      if (layerDef.layerList.length > 0) {
+        // There are still layers in the list.
+        // => We update the layer source
+        const source = new ImageWMS({
+          url: layerInfos.url,
+          params: {
+            'LAYERS': layerDef.layerList.join(','),
+            'FORMAT': layerInfos.imageType
+          }
+        });
+        layerDef.layer.setSource(source);
+      }
+      else {
+        // No more layer here.
+        // => We simply remove the whole layer
+        delete this.layersByServer[key];
+        this.map.removeLayer(layerDef.layer);
+      }
+    }
+    else {
+      console.log('Nothing to remove !')
+    }
   }
 
   onChangeBasemap(basemap) {
