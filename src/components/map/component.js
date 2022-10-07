@@ -258,7 +258,8 @@ class MapComponent extends HTMLElement {
           });
 
           this.map.removeLayer(this.currentBasemap)
-          this.map.addLayer(layer);
+          // Always insert in the background
+          this.map.getLayers().insertAt(0, layer);
           this.currentBasemap = layer;
         });
     }
@@ -268,7 +269,8 @@ class MapComponent extends HTMLElement {
       this.currentBasemap = new TileLayer({
         source: new OSM()
       });
-      this.map.addLayer(this.currentBasemap);
+      // Always insert in the background
+      this.map.getLayers().insertAt(0, this.currentBasemap);
     }
   }
 }

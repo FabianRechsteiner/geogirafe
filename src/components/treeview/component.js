@@ -194,7 +194,7 @@ class TreeViewComponent extends HTMLElement {
 
   toggleParent(li) {
     const ul = li.parentElement;
-    if (ul.nodeName !== 'UL') {
+    if (ul.nodeName !== 'UL' || ul.parentElement === null) {
       // We get out the tree-view.
       // Just stop here
       return;
