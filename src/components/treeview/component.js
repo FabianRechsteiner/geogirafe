@@ -4,7 +4,6 @@ class TreeViewComponent extends HTMLElement {
 
   static #template = null;
   themesUrl = null;
-  themesJson = {};
   servers = {};
   layers = [];
 
@@ -12,6 +11,11 @@ class TreeViewComponent extends HTMLElement {
     super();
     this.shadow = this.attachShadow({mode: 'open'});
     this.themesUrl = this.getAttribute('themes');
+    this.registerEvents();
+  }
+
+  registerEvents() {
+    window.addEventListener(GeoEvents.Theme, (e) => this.onThemeEvent(e.detail));
   }
 
   connectedCallback() {
@@ -24,7 +28,6 @@ class TreeViewComponent extends HTMLElement {
   async loadThemes() {
     const response = await fetch(this.themesUrl);
     const content = await response.json();
-    this.themesJson = content["themes"];
     this.servers = content["ogcServers"];
   }
 
@@ -44,10 +47,6 @@ class TreeViewComponent extends HTMLElement {
 
     this.shadow.appendChild(TreeViewComponent.#template.content.cloneNode(true));
     const ulRoot = this.shadow.querySelector('#treeview-list');
-
-    this.themesJson.forEach(elem => {
-      this.renderLeaf(ulRoot, elem, null);
-    });
   }
 
   renderChilds(liParent, elem, parentServer) {
@@ -248,6 +247,24 @@ class TreeViewComponent extends HTMLElement {
       // Recursively call on parent
       this.toggleParent(liParent);
     }
+  }
+
+  onThemeEvent(details) {
+    console.log(details);
+    if (details.action === 'themeChanged') {
+      this.onChangeTheme(details.theme);
+    }
+  }
+
+  onChangeTheme(theme) {
+    const ulRoot = this.shadow.querySelector('#treeview-list');
+    // Clear existing TreeView;
+    ulRoot.innerHTML = '';
+
+    // Add the current theme
+    theme.children.forEach(elem => {
+      this.renderLeaf(ulRoot, elem, null);
+    });
   }
 }
 
