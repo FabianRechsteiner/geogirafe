@@ -73,6 +73,7 @@ class TreeViewComponent extends HTMLElement {
     // Otherwise, we use the server of the parent
     const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
     this.renderLeafLabel(li, elem, childServer);
+    li.dataset.active = false;
 
     // Append childs if any
     if (elem.children !== undefined) {
@@ -126,7 +127,6 @@ class TreeViewComponent extends HTMLElement {
       };
       this.layers.push(layer);
       span.dataset.value = this.layers.length - 1;
-      span.dataset.active = false;
     }
   }
 
@@ -158,19 +158,25 @@ class TreeViewComponent extends HTMLElement {
 
   toggle(_this, e) {
     const li = e.target.parentElement;
+    const circle = li.getElementsByTagName('i')[1];
     let action = null;
-    if (e.target.dataset.active === 'true') {
+    if (li.dataset.active === 'true') {
       // Deactivate layer
       li.className = '';
+      circle.className = 'fa-xs fa-regular fa-circle';
       action = 'layerDisabled';
-      e.target.dataset.active = false;
+      li.dataset.active = false;
     }
     else {
       // Activate layer
       li.className = 'active';
+      circle.className = 'fa-xs fa-solid fa-circle';
       action = 'layerEnabled';
-      e.target.dataset.active = true;
+      li.dataset.active = true;
     }
+
+    // Toggle parent if necessary
+    this.toggleParent(li);
 
     if (e.target.dataset.value) {
       // We have data on this layer.
@@ -183,6 +189,64 @@ class TreeViewComponent extends HTMLElement {
           layer: _this.layers[e.target.dataset.value]
         }
       }));
+    }
+  }
+
+  toggleParent(li) {
+    const ul = li.parentElement;
+    if (ul.nodeName !== 'UL') {
+      // We get out the tree-view.
+      // Just stop here
+      return;
+    }
+
+    let allActive = true;
+    let allInactive = true;
+
+    const childLis = ul.getElementsByTagName('li');
+    for (let i=0; i<childLis.length; i++) {
+      if (childLis[i].dataset.active === 'true') {
+        allInactive = false;
+      }
+      else if (childLis[i].dataset.active === 'false') {
+        allActive = false;
+      }
+      else {
+        // One of the node is in a 'semi' state
+        allActive = false;
+        allInactive = false;
+      }
+    }
+
+    const liParent = ul.parentElement;
+    const circle = liParent.getElementsByTagName('i')[1];
+    
+    let stateChanged = false;
+    if (allActive && liParent.dataset.active !== 'true') {
+      // Activate parent
+      liParent.dataset.active = true;
+      liParent.className = 'active';
+      circle.className = 'fa-xs fa-solid fa-circle';
+      stateChanged = true;
+    }
+    else if (allInactive && liParent.dataset.active !== 'false') {
+      // Deactivate parent
+      liParent.dataset.active = false;
+      liParent.className = '';
+      circle.className = 'fa-xs fa-regular fa-circle';
+      stateChanged = true;
+    }
+    else if (liParent.dataset.active !== 'semi') {
+      // Semi-active
+      liParent.dataset.active = 'semi';
+      liParent.className = '';
+      circle.className = 'fa-xs fa-solid fa-circle-half-stroke';
+      stateChanged = true;
+    }
+
+    if (stateChanged) {
+      // Recursively call on parent
+      this.toggleParent(liParent);
     }
   }
 }
