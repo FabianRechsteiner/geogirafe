@@ -66,7 +66,7 @@ class BasemapComponent extends HTMLElement {
       "url": child.url
     }
     this.basemaps.push(basemap);
-    option.value = this.basemaps.length-1;
+    option.value = this.basemaps.length - 1;
   
     // Add to select
     select.appendChild(option);

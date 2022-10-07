@@ -50,11 +50,16 @@
   width: 30rem;
   max-height: 30rem;
   background-color : #fff;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .result {
   display: inline-block;
-  padding: 0.2rem 1rem;
+  padding: 0.3rem 1rem;
   width: Calc(30rem - 2rem);
+}
+
+.result:hover {
+  background-color: #aaa;
+  color: #fff;
 }

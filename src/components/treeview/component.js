@@ -5,6 +5,8 @@ class TreeViewComponent extends HTMLElement {
   static #template = null;
   themesUrl = null;
   themesJson = {};
+  servers = {};
+  layers = [];
 
   constructor() {
     super();
@@ -23,6 +25,7 @@ class TreeViewComponent extends HTMLElement {
     const response = await fetch(this.themesUrl);
     const content = await response.json();
     this.themesJson = content["themes"];
+    this.servers = content["ogcServers"];
   }
 
   async loadTemplate() {
@@ -43,42 +46,78 @@ class TreeViewComponent extends HTMLElement {
     const ulRoot = this.shadow.querySelector('#treeview-list');
 
     this.themesJson.forEach(elem => {
-      this.renderLeaf(ulRoot, elem);
+      this.renderLeaf(ulRoot, elem, null);
     });
   }
 
-  renderChilds(liParent, elem) {
+  renderChilds(liParent, elem, parentServer) {
     // Add new sub-list
     const ulChild = document.createElement('ul');
     ulChild.style.display = 'none';
     liParent.appendChild(ulChild);
     elem.children.forEach(child => {
-      this.renderLeaf(ulChild, child);
+      this.renderLeaf(ulChild, child, parentServer);
     });
   }
 
-  renderLeaf(ulParent, elem) {
+  renderLeaf(ulParent, elem, parentServer) {
 
     // Create new leaf
     const span = document.createElement('span');
     span.textContent = elem.name;
     span.style.cursor = 'pointer';
-    span.onclick = (e) => this.toggle(e);
+    span.onclick = (e) => this.toggle(this, e);
 
     const li = document.createElement('li');
     li.appendChild(span);
     ulParent.appendChild(li);
 
+    // If a server is defined on this node, we use it.
+    // Otherwise, we use the server of the parent
+    const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
+
+    if (elem.childLayers) {
+      // We are on a layer linked to a server.
+      // It means this one can be queried from WMS
+      let url = null;
+      if (childServer) {
+        url = this.servers[childServer].url
+      }
+      else {
+        console.log('NOT OGC SERVER FOR ' + elem.name);
+      }
+      const layer = {
+        "name": elem.name,
+        "type": elem.type,
+        "server": elem.ogcServer,
+        "url": url,
+        "imageType": elem.imageType,
+        "layer": elem.layers,
+        "minResolution": elem.minResolutionHint,
+        "maxResolution": elem.maxResolutionHint
+      };
+      this.layers.push(layer);
+      span.dataset.value = this.layers.length - 1;
+    }
+
     // Append childs if any
     if (elem.children !== undefined) {
-      this.renderChilds(li, elem);
+      this.renderChilds(li, elem, childServer);
     }
   }
 
-  toggle(e) {
+  toggle(_this, e) {
     const ulChild = e.target.nextElementSibling;
     if (ulChild === null) {
       // No more child.
+      window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
+        bubbles: true, cancelable: false, composed: true, 
+        detail: {
+          action: 'layerEnabled',
+          layer: _this.layers[e.target.dataset.value]
+        }
+      }));
+      console.log();
       return;
     }
 
@@ -87,8 +126,8 @@ class TreeViewComponent extends HTMLElement {
       window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
         bubbles: true, cancelable: false, composed: true, 
         detail: {
-          action: 'leafOpened',
-          leafName: e.target.innerHTML
+          action: 'groupOpened',
+          group: e.target.innerHTML
         }
       }));
     }
@@ -97,8 +136,8 @@ class TreeViewComponent extends HTMLElement {
       window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
         bubbles: true, cancelable: false, composed: true, 
         detail: {
-          action: 'leafClosed',
-          leafName: e.target.innerHTML
+          action: 'groupClosed',
+          group: e.target.innerHTML
         }
       }));
     }

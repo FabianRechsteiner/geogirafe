@@ -5,6 +5,8 @@ import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
 import GeoEvents from '/models/events.js';
 import { getPointResolution, get as getProjection, transform} from 'ol/proj';
+import {Image as ImageLayer} from 'ol/layer';
+import ImageWMS from 'ol/source/ImageWMS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 
 class MapComponent extends HTMLElement {
@@ -102,6 +104,12 @@ class MapComponent extends HTMLElement {
 
   onTreeViewEvent(details) {
     console.log(details);
+    if (details.action === 'layerEnabled') {
+      this.onAddLayer(details.layer);
+    }
+    else if (details.action === 'layerDisabled') {
+      this.onRemoveLayer(details.layer);
+    }
   }
 
   onMapEvent(details) {
@@ -141,6 +149,31 @@ class MapComponent extends HTMLElement {
       projection: this.projection,
     });
     this.map.setView(newView);
+  }
+
+  onAddLayer(layerInfos) {
+    console.log('New Layer: ' + layerInfos);
+
+    if (layerInfos.type === 'WMS') {
+      const layer = new ImageLayer({
+        //extent: [-13884991, 2870341, -7455066, 6338219],
+        source: new ImageWMS({
+          url: layerInfos.url,
+          params: {
+            'LAYERS': layerInfos.layer, 
+            'FORMAT': layerInfos.imageType
+          },
+          //ratio: 1,
+          //serverType: '',
+        })
+      });
+
+      this.map.addLayer(layer);
+    }
+  }
+
+  onRemoveLayer(layer) {
+
   }
 
   onChangeBasemap(basemap) {

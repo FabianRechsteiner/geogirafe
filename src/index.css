@@ -44,7 +44,7 @@ girafe-tree-view {
     border-right: solid 1px #ddd;
     padding: 0.5rem;
     background: #fff;
-    overflow:scroll;
+    overflow: auto;
 }
 
 #logo {
