@@ -99,3 +99,5 @@ class SearchComponent extends HTMLElement {
 }
 
 customElements.define('girafe-search', SearchComponent);
+
+export default SearchComponent;

@@ -12,6 +12,9 @@ import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 class MapComponent extends HTMLElement {
 
   static #template = null;
+
+  map = null;
+
   srid = 'EPSG:3857'; // default projection
   projection = getProjection(this.srid);
   currentBasemap = null;
@@ -24,6 +27,7 @@ class MapComponent extends HTMLElement {
   }
 
   registerEvents() {
+    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
     window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
   }
@@ -75,7 +79,7 @@ class MapComponent extends HTMLElement {
     //this.map.on('error', (e) => console.log(e));
     //this.map.on('loadend', (e) => console.log(e));
     //this.map.on('loadstart', (e) => console.log(e));
-    //this.map.on('moveend', (e) => console.log(e));
+    this.map.on('moveend', (e) => this.onMoveEnd(e));
     //this.map.on('movestart', (e) => console.log(e));
     //this.map.on('pointerdrag', (e) => console.log(e));
     //this.map.on('pointermove', (e) => console.log(e));
@@ -91,12 +95,38 @@ class MapComponent extends HTMLElement {
     //? change:view
   }
 
+  onMoveEnd(e) {
+    const center = this.map.getView().getCenter();
+    const mapX = center[0];
+    const mapY = center[1];
+    const mapZ = this.map.getView().getZoom(); 
+    window.dispatchEvent(new CustomEvent(GeoEvents.Map, { 
+      bubbles: true, cancelable: false, composed: true, 
+      detail: {
+        action: 'coordsChanged',
+        mapX: mapX,
+        mapY: mapY,
+        mapZ, mapZ
+      }
+    }));
+  }
+
   connectedCallback() {
     console.log('connectedCallback');
     this.loadTemplate().then(() => {
       this.render();
       this.listenOpenLayersEvents();
+      this.initialized();
     });
+  }
+
+  initialized() {
+    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
+      bubbles: true, cancelable: false, composed: true, 
+      detail: {
+        action: 'componentInitialized'
+      }
+    }));
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {
@@ -110,6 +140,27 @@ class MapComponent extends HTMLElement {
     }
     else if (details.action === 'layerDisabled') {
       this.onRemoveLayer(details.layer);
+    }
+  }
+
+  onInitEvent(details) {
+    console.log(details);
+    if (details.action === 'initState') {
+      console.log('Initializing Map from state...')
+      if (details.state.projection !== 'null') {
+        this.onChangeProjection(details.state.projection);
+      }
+      if (details.state.basemap !== 'null') {
+        this.onChangeBasemap(details.state.basemap);
+      }
+      if (details.state.mapX !== 'null' && details.state.mapY !== 'null' && details.state.mapZ !== 'null') {
+        const newView = new View({ 
+          center: [parseFloat(details.state.mapX), parseFloat(details.state.mapY)],
+          zoom: parseFloat(details.state.mapZ),
+          projection: this.projection
+        });
+        this.map.setView(newView);
+      }
     }
   }
 
@@ -276,3 +327,5 @@ class MapComponent extends HTMLElement {
 }
 
 customElements.define('girafe-map', MapComponent);
+
+export default MapComponent;

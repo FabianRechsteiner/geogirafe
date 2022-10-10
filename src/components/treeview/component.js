@@ -21,8 +21,20 @@ class TreeViewComponent extends HTMLElement {
   connectedCallback() {
     this.loadTemplate()
       .then(() => this.loadThemes()
-        .then(() => this.render())
+        .then(() => {
+          this.render();
+          this.initialized();
+        })
       )
+  }
+
+  initialized() {
+    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
+      bubbles: true, cancelable: false, composed: true, 
+      detail: {
+        action: 'componentInitialized'
+      }
+    }));
   }
 
   async loadThemes() {
@@ -44,9 +56,7 @@ class TreeViewComponent extends HTMLElement {
   }
 
   render() {
-
     this.shadow.appendChild(TreeViewComponent.#template.content.cloneNode(true));
-    const ulRoot = this.shadow.querySelector('#treeview-list');
   }
 
   renderChilds(liParent, elem, parentServer) {
@@ -269,3 +279,5 @@ class TreeViewComponent extends HTMLElement {
 }
 
 customElements.define('girafe-tree-view', TreeViewComponent);
+
+export default TreeViewComponent;

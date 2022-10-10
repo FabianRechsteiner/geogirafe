@@ -1,16 +1,16 @@
 class State {
-    title = 'GeoGirafe'
-    selectedLayers = []
 
-    constructor(title) {
-        makeObservable(this, {
-            title: observable,
-            setTitle: action
-        })
-        this.title = title
-    }
+  treeviewGroups = [];
+  activeLayers = [];
+  mapX = null;
+  mapY = null;
+  mapZ = null;
+  selectedTheme = null;
+  basemap = null;
+  projection = null;
 
-    setTitle(title) {
-        this.title = title
-    }
+  constructor() {
+  }
 }
+
+export default State;

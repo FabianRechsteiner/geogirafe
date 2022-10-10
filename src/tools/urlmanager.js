@@ -1,0 +1,107 @@
+import GeoEvents from '/models/events.js';
+import State from '/models/state.js';
+
+class UrlManager {
+
+  static #instance = null;
+  static #initializingSingleton = false;
+
+  // How many objects are dependent of the UrlManager
+  dependencyTotalCount = 0;
+  dependencyInitializedCount = 0;
+
+  constructor(dependencyCount) {
+    if (!UrlManager.#initializingSingleton) {
+      // If trying to create another instance
+      throw new Error('This is a singleton. Please use the getInstance() method.');
+    }
+
+    this.dependencyTotalCount = dependencyCount;
+    this.registerEvents();
+  }
+
+  static getInstance(dependentObjects) {
+    if (UrlManager.#instance === null) {
+      // Singleton do not exists 
+      // => create it
+      UrlManager.#initializingSingleton = true;
+      try {
+        UrlManager.#instance = new UrlManager(dependentObjects.length);
+      }
+      finally {
+        UrlManager.#initializingSingleton = false;
+      }
+    }
+
+    return UrlManager.#instance;
+  }
+
+  registerEvents() {
+    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
+    window.addEventListener(GeoEvents.App, (e) => this.onAppEvent(e.detail));
+  }
+
+  manageStartUrl() {
+    const state = this.decodeUrl(window.location.href);
+    if (state != null) {
+      // There is a default state
+      window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
+        bubbles: true, cancelable: false, composed: true, 
+        detail: {
+          action: 'initState',
+          state: state
+        }
+      }));
+    }
+  }
+
+  onInitEvent(details) {
+    if (details.action === 'componentInitialized') {
+      this.dependencyInitializedCount++;
+      console.log(`Component initialized: ${this.dependencyInitializedCount}/${this.dependencyTotalCount}`);
+      if (this.dependencyInitializedCount == this.dependencyTotalCount) {
+        // All dependency are initialized.
+        // => initialize the application from the start URL
+        this.manageStartUrl();
+      }
+      else if (this.dependencyInitializedCount > this.dependencyTotalCount) {
+        throw Error("One or more dependency were not declared. This could lead to initialization errors. Please verify the initialization of UrlManager in initialize.js.");
+      }
+    }
+  }
+
+  onAppEvent(details) {
+    if (details.action === 'stateChanged') {
+      const encodedState = this.encodeState(details.state);
+      window.history.replaceState(null, '', encodedState);
+    }
+  }
+
+  encodeState(state) {
+    const url = `#${state.mapX},${state.mapY},${state.mapZ}|${state.projection}|${state.basemap}`;
+    return url;
+  }
+
+  decodeUrl(url) {
+    if (!url.includes('#')) {
+      // Nothing to decode
+      return null;
+    }
+
+    const encodedState = url.split('#')[1];
+    const params = encodedState.split('|');
+    const coords = params[0].split(',');
+
+    const state = new State();
+    state.mapX = coords[0];
+    state.mapY = coords[1];
+    state.mapZ = coords[2];
+    state.selectedTheme = null;
+    state.basemap = params[2];
+    state.projection = params[1];
+
+    return state;
+  }
+}
+
+export default UrlManager;

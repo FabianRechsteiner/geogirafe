@@ -6,6 +6,7 @@ class BasemapComponent extends HTMLElement {
   themesUrl = null;
   basemapJson = {};
   basemaps = [];
+  basemapSelect = null;
   
   constructor() {
     super();
@@ -29,8 +30,8 @@ class BasemapComponent extends HTMLElement {
     // Clone component template and add it to the dom
     this.shadow.appendChild(BasemapComponent.#template.content.cloneNode(true));
 
-    const select = this.shadow.querySelector('#basemap');
-
+    this.basemapSelect = this.shadow.querySelector('#basemap');
+    
     // Add default OSM Option
     const option = document.createElement('option');
     option.innerHTML = 'OpenStreetMap';
@@ -39,11 +40,11 @@ class BasemapComponent extends HTMLElement {
     }
     this.basemaps.push(basemap);
     option.value = this.basemaps.length-1;
-    select.appendChild(option);
+    this.basemapSelect.appendChild(option);
 
     // Add options from themes
     this.basemapJson.forEach(elem => {
-      this.addOption(select, elem);
+      this.addOption(this.basemapSelect, elem);
     });
   }
 
@@ -73,9 +74,26 @@ class BasemapComponent extends HTMLElement {
   }
 
   registerEvents() {
-    //window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
-    const projectionSelect = this.shadow.querySelector('#basemap');
-    projectionSelect.addEventListener('change', (e) => this.onBasemapChanged(this, e));
+    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
+    this.basemapSelect.addEventListener('change', (e) => this.onBasemapChanged(this, e));
+  }
+
+  onInitEvent(details) {
+    console.log(details);
+    if (details.action === 'initState') {
+      if (details.state.basemap !== 'null') {
+        // Find the basemap id from the name
+        const index = this.basemaps.findIndex(item => item.name === details.state.basemap);
+        this.basemapSelect.value = index;
+        window.dispatchEvent(new CustomEvent(GeoEvents.Map, { 
+          bubbles: true, cancelable: false, composed: true, 
+          detail: {
+            action: 'basemapChanged',
+            basemap: this.basemaps[index]
+          }
+        }));
+      }
+    }
   }
 
   onBasemapChanged(_this, e) {
@@ -95,6 +113,16 @@ class BasemapComponent extends HTMLElement {
       .then(() => {
         this.render();
         this.registerEvents();
+        this.initialized();
+    }));
+  }
+
+  initialized() {
+    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
+      bubbles: true, cancelable: false, composed: true, 
+      detail: {
+        action: 'componentInitialized'
+      }
     }));
   }
 
@@ -106,3 +134,5 @@ class BasemapComponent extends HTMLElement {
 }
 
 customElements.define('girafe-basemap-select', BasemapComponent);
+
+export default BasemapComponent;

@@ -1,9 +1,12 @@
-import './components/treeview/component.js';
-import './components/map/component.js';
-import './components/search/component.js';
-import './components/projection/component.js';
-import './components/basemap/component.js';
-import './components/themes/component.js';
+import UrlManager from './tools/urlmanager.js'
+import StateManager from './tools/statemanager.js'
+
+import TreeViewComponent from  './components/treeview/component.js';
+import MapComponent from './components/map/component.js';
+import SearchComponent from './components/search/component.js';
+import ProjectionComponent from './components/projection/component.js';
+import BasemapComponent from './components/basemap/component.js';
+import ThemeComponent from './components/themes/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
@@ -14,6 +17,10 @@ proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.4395833
 // https://epsg.io/2056
 proj4.defs("EPSG:2056" , '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs');
 register(proj4);
+
+// Initialize the singletons once
+UrlManager.getInstance([TreeViewComponent, MapComponent, ProjectionComponent, BasemapComponent]);
+StateManager.getInstance();
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('App initialized.');

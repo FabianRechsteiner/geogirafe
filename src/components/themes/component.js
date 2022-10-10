@@ -83,3 +83,5 @@ class ThemeComponent extends HTMLElement {
 }
 
 customElements.define('girafe-theme-select', ThemeComponent);
+
+export default ThemeComponent;

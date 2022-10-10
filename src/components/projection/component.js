@@ -3,6 +3,8 @@ import GeoEvents from '/models/events.js';
 class ProjectionComponent extends HTMLElement {
 
   static #template = null;
+
+  projectionSelect = null;
   
   constructor() {
     super();
@@ -24,12 +26,21 @@ class ProjectionComponent extends HTMLElement {
   render() {
     // Clone component template and add it to the dom
     this.shadow.appendChild(ProjectionComponent.#template.content.cloneNode(true));
+    this.projectionSelect = this.shadow.querySelector('#projection');
   }
 
   registerEvents() {
-    //window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
-    const projectionSelect = this.shadow.querySelector('#projection');
-    projectionSelect.addEventListener('change', this.onProjectionChanged);
+    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
+    this.projectionSelect.addEventListener('change', this.onProjectionChanged);
+  }
+
+  onInitEvent(details) {
+    console.log(details);
+    if (details.action === 'initState') {
+      if (details.state.projection !== 'null') {
+        this.projectionSelect.value = details.state.projection;
+      }
+    }
   }
 
   onProjectionChanged(e) {
@@ -47,8 +58,20 @@ class ProjectionComponent extends HTMLElement {
     this.loadTemplate().then(() => {
       this.render();
       this.registerEvents();
+      this.initialized();
     });
+  }
+
+  initialized() {
+    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
+      bubbles: true, cancelable: false, composed: true, 
+      detail: {
+        action: 'componentInitialized'
+      }
+    }));
   }
 }
 
 customElements.define('girafe-proj-select', ProjectionComponent);
+
+export default ProjectionComponent;
