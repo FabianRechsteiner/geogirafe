@@ -1,11 +1,15 @@
 import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
+import VectorSource from 'ol/source/Vector';
 import WMTS, {optionsFromCapabilities} from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
+import VectorLayer from 'ol/layer/Vector';
+import { Modify, Snap } from 'ol/interaction';
+import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
 import View from 'ol/View';
 import GeoEvents from '/models/events.js';
 import { getPointResolution, get as getProjection, transform} from 'ol/proj';
-import {Image as ImageLayer} from 'ol/layer';
+import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 
@@ -19,6 +23,12 @@ class MapComponent extends HTMLElement {
   projection = getProjection(this.srid);
   currentBasemap = null;
   layersByServer = {};
+
+  // For Redlining
+  vectorSource = null;
+  vectorLayer = null;
+  draw = null;
+  snap = null;
   
   constructor() {
     super();
@@ -30,6 +40,7 @@ class MapComponent extends HTMLElement {
     window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
     window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+    window.addEventListener(GeoEvents.Redlining, (e) => this.onRedliningEvent(e.detail));
   }
 
   async loadTemplate() {
@@ -320,6 +331,60 @@ class MapComponent extends HTMLElement {
       // Always insert in the background
       this.map.getLayers().insertAt(0, this.currentBasemap);
     }
+  }
+
+  onRedliningEvent(details) {
+    if (details.action === 'drawToolActivated') {
+      this.activateRedliningTool(details.tool);
+    }
+  }
+
+  activateRedliningTool(tool) {
+    console.log('Activating Redlining Tool...');
+    // First remove existing interaction.
+    if (this.draw) {
+      this.map.removeInteraction(this.draw);
+    }
+    if (this.snap) {
+      this.map.removeInteraction(this.snap);
+    }
+
+    // Then create a new Draw source
+    // TODO REG : Create those objects only once globally.
+    this.vectorSource = new VectorSource();
+    this.vectorLayer = new VectorLayer({
+      source: this.vectorSource,
+      style: {
+        'fill-color': 'rgba(255, 128, 128, 0.5)',
+        'stroke-color': '#ff0000',
+        'stroke-width': 2,
+        'circle-radius': 7,
+        'circle-fill-color': '#ffcc33',
+      },
+    });
+    this.map.addLayer(this.vectorLayer);
+
+    let geometryFunction = null;
+    if (tool === 'Square') {
+      tool = 'Circle';
+      geometryFunction = createRegularPolygon(4);
+    }
+    else if (tool === 'Rectangle') {
+      tool = 'Circle';
+      geometryFunction = createBox();
+    }
+
+    this.draw = new Draw({
+      source: this.vectorSource,
+      type: tool,
+      geometryFunction: geometryFunction
+    });
+    const modify = new Modify({source: this.vectorSource});
+    this.map.addInteraction(modify);
+
+    this.map.addInteraction(this.draw);
+    this.snap = new Snap({source: this.vectorSource});
+    this.map.addInteraction(this.snap);
   }
 }
 

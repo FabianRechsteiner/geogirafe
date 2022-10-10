@@ -13,16 +13,18 @@
     <header>
       <img id="logo" src="https://map.geo.bs.ch/static-ngeo/build/logo.4b8693.png" />
       <girafe-search id="search" search-url="https://search.geo.bs.ch/search?term=###SEARCHTERM###"></girafe-search>
+      <girafe-toolbar></girafe-toolbar>
       <div id="buttonbar">
         <!-- <a href="#"><i class="fa-xl fa-solid fa-user"></i></a> -->
-        <a href="#"></a><i class="fa-xl fa-solid fa-user"></i></a>
-        <a href="#"></a><i class="fa-xl fa-solid fa-print"></i></a>
-        <a href="#"></a><i class="fa-xl fa-solid fa-draw-polygon"></i></a>
-        <a href="#"></a><i class="fa-xl fa-solid fa-bars"></i></a>
+        <i class="fa-xl fa-solid fa-user"></i>
+        <i class="fa-xl fa-solid fa-print"></i>
+        <girafe-button></girafe-button>
+        <i class="fa-xl fa-solid fa-bars"></i>
       </div>
     </header>
     <girafe-tree-view themes="/Mock/themes.json"></girafe-tree-view>
     <girafe-map></girafe-map>
+    
     <footer>
       <girafe-theme-select themes="/Mock/themes.json"></girafe-theme-select>
       <girafe-basemap-select themes="/Mock/themes.json"></girafe-basemap-select>
