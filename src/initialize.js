@@ -1,5 +1,6 @@
 import UrlManager from './tools/urlmanager.js'
 import StateManager from './tools/statemanager.js'
+import I18nManager from './tools/i18nmanager.js'
 
 import TreeViewComponent from  './components/treeview/component.js';
 import MapComponent from './components/map/component.js';
@@ -7,6 +8,7 @@ import SearchComponent from './components/search/component.js';
 import ProjectionComponent from './components/projection/component.js';
 import BasemapComponent from './components/basemap/component.js';
 import ThemeComponent from './components/themes/component.js';
+import LanguageComponent from './components/language/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
@@ -19,8 +21,9 @@ proj4.defs("EPSG:2056" , '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333
 register(proj4);
 
 // Initialize the singletons once
-UrlManager.getInstance([TreeViewComponent, MapComponent, ProjectionComponent, BasemapComponent]);
+UrlManager.getInstance([TreeViewComponent, MapComponent, ProjectionComponent, BasemapComponent, LanguageComponent]);
 StateManager.getInstance();
+I18nManager.getInstance();
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('App initialized.');

@@ -4,6 +4,7 @@ class GeoEvents {
     App = 'GeoGirafe.App';
     Theme = 'GeoGirafe.Theme';
     Init = 'GeoGirafe.Init';
+    Translate = 'GeoGirafe.Translate';
 }
 
 export default GeoEvents;

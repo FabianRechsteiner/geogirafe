@@ -134,7 +134,6 @@ class MapComponent extends HTMLElement {
   }
 
   onTreeViewEvent(details) {
-    console.log(details);
     if (details.action === 'layerEnabled') {
       this.onAddLayer(details.layer);
     }
@@ -144,7 +143,6 @@ class MapComponent extends HTMLElement {
   }
 
   onInitEvent(details) {
-    console.log(details);
     if (details.action === 'initState') {
       console.log('Initializing Map from state...')
       if (details.state.projection !== 'null') {
@@ -165,7 +163,6 @@ class MapComponent extends HTMLElement {
   }
 
   onMapEvent(details) {
-    console.log(details);
     if (details.action === 'projectionChanged') {
       this.onChangeProjection(details.projection);
     }

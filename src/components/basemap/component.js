@@ -79,7 +79,6 @@ class BasemapComponent extends HTMLElement {
   }
 
   onInitEvent(details) {
-    console.log(details);
     if (details.action === 'initState') {
       if (details.state.basemap !== 'null') {
         // Find the basemap id from the name

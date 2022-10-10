@@ -35,7 +35,6 @@ class ProjectionComponent extends HTMLElement {
   }
 
   onInitEvent(details) {
-    console.log(details);
     if (details.action === 'initState') {
       if (details.state.projection !== 'null') {
         this.projectionSelect.value = details.state.projection;

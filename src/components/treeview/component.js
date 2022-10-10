@@ -1,6 +1,7 @@
 import GeoEvents from '/models/events.js';
+import GirafeHTMLElement from '/base/GirafeHTMLElement.js';
 
-class TreeViewComponent extends HTMLElement {
+class TreeViewComponent extends GirafeHTMLElement {
 
   static #template = null;
   themesUrl = null;
@@ -109,6 +110,7 @@ class TreeViewComponent extends HTMLElement {
   renderLeafLabel(li, elem, server) {
     // Add label
     const span = document.createElement('span');
+    span.setAttribute('i18n', 'girafe');
     span.textContent = elem.name;
     span.className = 'selectable';
     span.onclick = (e) => this.toggle(this, e);
@@ -260,7 +262,6 @@ class TreeViewComponent extends HTMLElement {
   }
 
   onThemeEvent(details) {
-    console.log(details);
     if (details.action === 'themeChanged') {
       this.onChangeTheme(details.theme);
     }
