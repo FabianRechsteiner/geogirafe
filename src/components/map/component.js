@@ -1,5 +1,6 @@
 import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
+import Collection from 'ol/Collection';
 import VectorSource from 'ol/source/Vector';
 import WMTS, {optionsFromCapabilities} from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
@@ -25,6 +26,7 @@ class MapComponent extends HTMLElement {
   layersByServer = {};
 
   // For Redlining
+  featuresCollection = null;
   vectorSource = null;
   vectorLayer = null;
   draw = null;
@@ -76,6 +78,12 @@ class MapComponent extends HTMLElement {
       }),
     });
 
+    // Create vector source for drawing
+    this.featuresCollection = new Collection();
+    this.vectorSource = new VectorSource({
+      features: this.featuresCollection
+    });
+
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {
       this.map.updateSize();
@@ -104,6 +112,10 @@ class MapComponent extends HTMLElement {
     //? change:size
     //? change:target
     //? change:view
+
+    // Drawing events
+    this.featuresCollection.on('add', (e) => this.onFeatureAdded(e));
+
   }
 
   onMoveEnd(e) {
@@ -118,6 +130,18 @@ class MapComponent extends HTMLElement {
         mapX: mapX,
         mapY: mapY,
         mapZ, mapZ
+      }
+    }));
+  }
+
+  onFeatureAdded(e) {
+    console.log(e);
+    window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
+      bubbles: true, cancelable: false, composed: true, 
+      detail: {
+        action: 'featureAdded',
+        id: e.element.ol_uid,
+        name: 'new geometry'
       }
     }));
   }
@@ -337,6 +361,21 @@ class MapComponent extends HTMLElement {
     if (details.action === 'drawToolActivated') {
       this.activateRedliningTool(details.tool);
     }
+    else if (details.action === 'deleteFeature') {
+      this.deleteFeature(details.id);
+    }
+  }
+
+  deleteFeature(id) {
+    const toRemove = this.featuresCollection.getArray().find(f => f.ol_uid === id);
+    this.featuresCollection.remove(toRemove);
+    window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
+      bubbles: true, cancelable: false, composed: true, 
+      detail: {
+        action: 'featureRemoved',
+        id: toRemove.ol_uid
+      }
+    }));
   }
 
   activateRedliningTool(tool) {
@@ -351,7 +390,6 @@ class MapComponent extends HTMLElement {
 
     // Then create a new Draw source
     // TODO REG : Create those objects only once globally.
-    this.vectorSource = new VectorSource();
     this.vectorLayer = new VectorLayer({
       source: this.vectorSource,
       style: {

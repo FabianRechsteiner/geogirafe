@@ -38,7 +38,7 @@ class ButtonComponent extends HTMLElement {
     window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
       bubbles: true, cancelable: false, composed: true, 
       detail: {
-        action: 'redliningActivated'
+        action: 'redliningToggled'
       }
     }));
   }

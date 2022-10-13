@@ -13,6 +13,8 @@ class ToolbarComponent extends GirafeDraggableElement {
   polygonButton = null;
   circleButton = null;
   freeButton = null;
+
+  drawingList = null;
   
   constructor() {
     super();
@@ -47,6 +49,8 @@ class ToolbarComponent extends GirafeDraggableElement {
     this.circleButton = this.shadow.querySelector('#circle');
     this.freeButton = this.shadow.querySelector('#free');
 
+    this.drawingList = this.shadow.querySelector('#drawingList');
+
     this.makeDraggable();
   }
 
@@ -80,9 +84,54 @@ class ToolbarComponent extends GirafeDraggableElement {
   }
 
   onRedliningEvent(details) {
-    if (details.action === 'redliningActivated') {
-      this.bar.style.display = 'block';
+    if (details.action === 'redliningToggled') {
+      if (this.bar.style.display == 'block') {
+        this.bar.style.display = 'none';
+      }
+      else {
+        this.bar.style.display = 'block';
+      }
     }
+    else if (details.action === 'featureAdded') {
+      this.addFeatureToList(details.id, details.name);
+    }
+    else if (details.action === 'featureRemoved') {
+      this.removeFeatureFromList(details.id);
+    }
+  }
+
+  addFeatureToList(id, name) {
+
+    const elementId = 'f-' + id;
+    const container = document.createElement('div');
+    container.id = elementId;
+
+    const span = document.createElement('span');
+    span.textContent = name;
+    container.appendChild(span);
+
+    let trash = document.createElement('i');
+    trash.className = 'fa-solid fa-trash';
+    trash.onclick = (e) => this.deleteFeature(id);
+    container.appendChild(trash);
+
+    this.drawingList.appendChild(container);
+  }
+
+  removeFeatureFromList(id) {
+    const elementId = 'f-' + id;
+    const divToRemove = this.shadow.getElementById(elementId);
+    divToRemove.remove();
+  }
+
+  deleteFeature(id) {
+    window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
+      bubbles: true, cancelable: false, composed: true, 
+      detail: {
+        action: 'deleteFeature',
+        id: id
+      }
+    }));
   }
 }
 

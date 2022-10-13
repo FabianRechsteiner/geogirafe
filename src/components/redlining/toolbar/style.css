@@ -35,4 +35,19 @@ span {
 #drawingList {
     min-height: 5rem;
     background-color: #fff;
+    padding-top: 2rem;
+}
+
+#drawingList div {
+    display: inline-block;
+    padding: 0.5rem;
+    margin-top: 0.1rem;
+    background-color: #ddd;
+    text-align: left;
+    width : 100%;
+}
+
+#drawingList i {
+    float: right;
+    cursor: pointer;
 }
