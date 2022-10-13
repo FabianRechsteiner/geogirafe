@@ -1,6 +1,7 @@
 import GeoEvents from '/models/events.js';
+import GirafeHTMLElement from '/base/GirafeHTMLElement.js';
 
-class ProjectionComponent extends HTMLElement {
+class ProjectionComponent extends GirafeHTMLElement {
 
   static #template = null;
 
@@ -31,7 +32,7 @@ class ProjectionComponent extends HTMLElement {
 
   registerEvents() {
     window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    this.projectionSelect.addEventListener('change', this.onProjectionChanged);
+    this.projectionSelect.addEventListener('change', (e) => this.onProjectionChanged(this, e));
   }
 
   onInitEvent(details) {
@@ -42,15 +43,8 @@ class ProjectionComponent extends HTMLElement {
     }
   }
 
-  onProjectionChanged(e) {
-    console.log(e.target.value);
-    window.dispatchEvent(new CustomEvent(GeoEvents.Map, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'projectionChanged',
-        projection: e.target.value
-      }
-    }));
+  onProjectionChanged(_this, e) {
+    _this.messageManager.sendMessage(GeoEvents.Map, {action: 'projectionChanged', projection: e.target.value});
   }
 
   connectedCallback() {
@@ -62,12 +56,7 @@ class ProjectionComponent extends HTMLElement {
   }
 
   initialized() {
-    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'componentInitialized'
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
   }
 }
 

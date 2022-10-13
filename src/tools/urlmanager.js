@@ -1,5 +1,6 @@
 import GeoEvents from '/models/events.js';
 import State from '/models/state.js';
+import MessageManager from '/tools/messagemanager';
 
 class UrlManager {
 
@@ -16,6 +17,7 @@ class UrlManager {
       throw new Error('This is a singleton. Please use the getInstance() method.');
     }
 
+    this.messageManager = MessageManager.getInstance();
     this.dependencyTotalCount = dependencyCount;
     this.registerEvents();
   }
@@ -45,13 +47,7 @@ class UrlManager {
     const state = this.decodeUrl(window.location.href);
     if (state != null) {
       // There is a default state
-      window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
-        bubbles: true, cancelable: false, composed: true, 
-        detail: {
-          action: 'initState',
-          state: state
-        }
-      }));
+      this.messageManager.sendMessage(GeoEvents.Init, {action: 'initState', state: state});
     }
   }
 

@@ -1,4 +1,6 @@
-class SearchComponent extends HTMLElement {
+import GirafeHTMLElement from '/base/GirafeHTMLElement';
+
+class SearchComponent extends GirafeHTMLElement {
 
   static #template = null;
   searchUrl = null;

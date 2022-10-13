@@ -67,13 +67,7 @@ class ToolbarComponent extends GirafeDraggableElement {
   }
 
   activateDraw(tool) {
-    window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'drawToolActivated',
-        tool: tool
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolActivated', tool: tool});
   }
 
   connectedCallback() {
@@ -125,13 +119,7 @@ class ToolbarComponent extends GirafeDraggableElement {
   }
 
   deleteFeature(id) {
-    window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'deleteFeature',
-        id: id
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'deleteFeature', id: id});
   }
 }
 

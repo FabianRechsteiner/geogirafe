@@ -1,6 +1,7 @@
-import UrlManager from './tools/urlmanager.js'
-import StateManager from './tools/statemanager.js'
-import I18nManager from './tools/i18nmanager.js'
+import UrlManager from './tools/urlmanager.js';
+import StateManager from './tools/statemanager.js';
+import I18nManager from './tools/i18nmanager.js';
+import I18MessageManager from './tools/messagemanager.js';
 
 import TreeViewComponent from  './components/treeview/component.js';
 import MapComponent from './components/map/component.js';
@@ -14,6 +15,7 @@ import ToolbarComponent from './components/redlining/toolbar/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
+import MessageManager from './tools/messagemanager.js';
 
 // Register custom EPSG
 // https://epsg.io/21781
@@ -26,6 +28,7 @@ register(proj4);
 UrlManager.getInstance([TreeViewComponent, MapComponent, ProjectionComponent, BasemapComponent, LanguageComponent]);
 StateManager.getInstance();
 I18nManager.getInstance();
+MessageManager.getInstance();
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('App initialized.');

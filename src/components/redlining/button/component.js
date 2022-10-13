@@ -1,6 +1,7 @@
 import GeoEvents from '/models/events.js';
+import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
-class ButtonComponent extends HTMLElement {
+class ButtonComponent extends GirafeHTMLElement {
 
   static #template = null;
 
@@ -35,12 +36,7 @@ class ButtonComponent extends HTMLElement {
   }
 
   displayToolbar(_this, e) {
-    window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'redliningToggled'
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'redliningToggled'});
   }
 
   connectedCallback() {

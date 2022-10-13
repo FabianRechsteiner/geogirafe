@@ -1,5 +1,6 @@
 import GeoEvents from '/models/events.js';
 import State from '/models/state.js';
+import MessageManager from '/tools/messagemanager';
 
 class StateManager {
 
@@ -14,6 +15,7 @@ class StateManager {
       throw new Error('This is a singleton. Please use the getInstance() method.');
     }
 
+    this.messageManager = MessageManager.getInstance();
     this.#state = new State();
     this.registerEvents();
   }
@@ -35,13 +37,7 @@ class StateManager {
   }
 
   sendStateChanged() {
-    window.dispatchEvent(new CustomEvent(GeoEvents.App, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'stateChanged',
-        state: this.#state
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.App, {action: 'stateChanged', state: this.#state});
   }
 
   registerEvents() {

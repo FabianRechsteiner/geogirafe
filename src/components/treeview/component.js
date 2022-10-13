@@ -30,12 +30,7 @@ class TreeViewComponent extends GirafeHTMLElement {
   }
 
   initialized() {
-    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'componentInitialized'
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
   }
 
   async loadThemes() {
@@ -146,24 +141,12 @@ class TreeViewComponent extends GirafeHTMLElement {
     if (ulChild.style.display === 'none') {
       ulChild.style.display = 'block';
       e.target.className = 'fa fa-caret-down selectable';
-      window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
-        bubbles: true, cancelable: false, composed: true, 
-        detail: {
-          action: 'groupOpened',
-          group: e.target.innerHTML
-        }
-      }));
+      this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'groupOpened', group: e.target.innerHTML});
     }
     else {
       ulChild.style.display = 'none';
       e.target.className = 'fa fa-caret-right selectable';
-      window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
-        bubbles: true, cancelable: false, composed: true, 
-        detail: {
-          action: 'groupClosed',
-          group: e.target.innerHTML
-        }
-      }));
+      this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'groupClosed', group: e.target.innerHTML});
     }
   }
 
@@ -193,13 +176,7 @@ class TreeViewComponent extends GirafeHTMLElement {
       // We have data on this layer.
       // => We are on a leaf with layer infos
       // We send a message to activate/deactivate this layer
-      window.dispatchEvent(new CustomEvent(GeoEvents.TreeView, { 
-        bubbles: true, cancelable: false, composed: true, 
-        detail: {
-          action: action,
-          layer: _this.layers[e.target.dataset.value]
-        }
-      }));
+      this.messageManager.sendMessage(GeoEvents.TreeView, {action: action, layer: _this.layers[e.target.dataset.value]});
     }
   }
 

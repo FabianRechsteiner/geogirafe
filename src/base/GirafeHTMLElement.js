@@ -1,10 +1,14 @@
-import GeoEvents from '/models/events.js';
-import I18nManager from '/tools/i18nmanager.js';
+import GeoEvents from '/models/events';
+import I18nManager from '/tools/i18nmanager';
+import MessageManager from '/tools/messagemanager';
 
 class GirafeHTMLElement extends HTMLElement {
 
+  messageManager = null
+
   constructor() {
     super();
+    this.messageManager = MessageManager.getInstance();
     window.addEventListener(GeoEvents.Translate, (e) => this.onTranslateEvent(e.detail));
   }
 

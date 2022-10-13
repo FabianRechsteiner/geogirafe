@@ -13,8 +13,9 @@ import { getPointResolution, get as getProjection, transform} from 'ol/proj';
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
+import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
-class MapComponent extends HTMLElement {
+class MapComponent extends GirafeHTMLElement {
 
   static #template = null;
 
@@ -134,27 +135,11 @@ class MapComponent extends HTMLElement {
     const mapX = center[0];
     const mapY = center[1];
     const mapZ = this.map.getView().getZoom(); 
-    window.dispatchEvent(new CustomEvent(GeoEvents.Map, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'coordsChanged',
-        mapX: mapX,
-        mapY: mapY,
-        mapZ, mapZ
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Init, {action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ});
   }
 
   onFeatureAdded(e) {
-    console.log(e);
-    window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'featureAdded',
-        id: e.element.ol_uid,
-        name: 'new geometry'
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'featureAdded', id: e.element.ol_uid, name: 'new geometry'});
   }
 
   connectedCallback() {
@@ -167,12 +152,7 @@ class MapComponent extends HTMLElement {
   }
 
   initialized() {
-    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'componentInitialized'
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {
@@ -384,13 +364,7 @@ class MapComponent extends HTMLElement {
   deleteFeature(id) {
     const toRemove = this.featuresCollection.getArray().find(f => f.ol_uid === id);
     this.featuresCollection.remove(toRemove);
-    window.dispatchEvent(new CustomEvent(GeoEvents.Redlining, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'featureRemoved',
-        id: toRemove.ol_uid
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'featureRemoved', id: toRemove.ol_uid});
   }
 
   activateRedliningTool(tool) {

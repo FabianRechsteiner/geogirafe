@@ -1,6 +1,7 @@
 import GeoEvents from '/models/events.js';
+import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
-class BasemapComponent extends HTMLElement {
+class BasemapComponent extends GirafeHTMLElement {
 
   static #template = null;
   themesUrl = null;
@@ -84,26 +85,14 @@ class BasemapComponent extends HTMLElement {
         // Find the basemap id from the name
         const index = this.basemaps.findIndex(item => item.name === details.state.basemap);
         this.basemapSelect.value = index;
-        window.dispatchEvent(new CustomEvent(GeoEvents.Map, { 
-          bubbles: true, cancelable: false, composed: true, 
-          detail: {
-            action: 'basemapChanged',
-            basemap: this.basemaps[index]
-          }
-        }));
+        this.messageManager.sendMessage(GeoEvents.Map, {action: 'basemapChanged', basemap: this.basemaps[index]});
       }
     }
   }
 
   onBasemapChanged(_this, e) {
     console.log(e.target.value);
-    window.dispatchEvent(new CustomEvent(GeoEvents.Map, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'basemapChanged',
-        basemap: _this.basemaps[e.target.value]
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'basemapChanged', basemap: _this.basemaps[e.target.value]});
   }
 
   connectedCallback() {
@@ -117,12 +106,7 @@ class BasemapComponent extends HTMLElement {
   }
 
   initialized() {
-    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'componentInitialized'
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
   }
 
   async loadThemes() {

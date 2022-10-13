@@ -1,6 +1,7 @@
 import GeoEvents from '/models/events.js';
+import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
-class LanguageComponent extends HTMLElement {
+class LanguageComponent extends GirafeHTMLElement {
 
   static #template = null;
 
@@ -31,7 +32,7 @@ class LanguageComponent extends HTMLElement {
 
   registerEvents() {
     //window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    this.languageSelect.addEventListener('change', this.onLanguageChanged);
+    this.languageSelect.addEventListener('change', (e) => this.onLanguageChanged(this, e));
   }
 
   // onInitEvent(details) {
@@ -42,15 +43,9 @@ class LanguageComponent extends HTMLElement {
   //   }
   // }
 
-  onLanguageChanged(e) {
+  onLanguageChanged(_this, e) {
     console.log(e.target.value);
-    window.dispatchEvent(new CustomEvent(GeoEvents.Translate, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'languageChanged',
-        language: e.target.value
-      }
-    }));
+    _this.messageManager.sendMessage(GeoEvents.Translate, {action: 'languageChanged', language: e.target.value});
   }
 
   connectedCallback() {
@@ -62,12 +57,7 @@ class LanguageComponent extends HTMLElement {
   }
 
   initialized() {
-    window.dispatchEvent(new CustomEvent(GeoEvents.Init, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'componentInitialized'
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
   }
 }
 

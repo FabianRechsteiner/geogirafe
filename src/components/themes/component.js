@@ -1,6 +1,7 @@
 import GeoEvents from '/models/events.js';
+import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
-class ThemeComponent extends HTMLElement {
+class ThemeComponent extends GirafeHTMLElement {
 
   static #template = null;
   themesUrl = null;
@@ -56,14 +57,7 @@ class ThemeComponent extends HTMLElement {
   }
 
   onThemeChanged(_this, e) {
-    console.log(e.target.value);
-    window.dispatchEvent(new CustomEvent(GeoEvents.Theme, { 
-      bubbles: true, cancelable: false, composed: true, 
-      detail: {
-        action: 'themeChanged',
-        theme: _this.themes[e.target.value]
-      }
-    }));
+    this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: _this.themes[e.target.value]});
   }
 
   connectedCallback() {

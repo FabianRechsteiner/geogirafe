@@ -1,4 +1,5 @@
 import GeoEvents from '/models/events.js';
+import MessageManager from '/tools/messagemanager';
 
 class I18nManager {
 
@@ -13,6 +14,7 @@ class I18nManager {
       throw new Error('This is a singleton. Please use the getInstance() method.');
     }
 
+    this.messageManager = MessageManager.getInstance();
     this.loadTranslations();
     this.registerEvents();
   }
