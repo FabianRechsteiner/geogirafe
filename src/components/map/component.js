@@ -251,6 +251,10 @@ class MapComponent extends HTMLElement {
     if (layerInfos.type === 'WMS') {
       this.onAddWmsLayer(layerInfos);
     }
+
+    // When adding a new layer to the map, 
+    // We still want the vectorLayer (for redlining) to be on top position
+    this.vectorLayer.setZIndex(1001);
   }
 
   onRemoveLayer(layerInfos) {
