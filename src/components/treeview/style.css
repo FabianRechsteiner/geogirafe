@@ -1,6 +1,30 @@
+#panel {
+  position: absolute;
+  top : 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+#gutter {
+  border: none;
+  width: 10px;
+  height: 100%;
+  background: #999;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: col-resize;
+}
+
+#gutter:hover {
+  background: #666;
+}
+
 #treeview-list {
   background : #fff;
-  padding : 1rem;
+  padding : 1.5rem;
   margin: 0;
 }
 

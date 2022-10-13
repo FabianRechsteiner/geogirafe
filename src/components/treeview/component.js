@@ -1,7 +1,7 @@
-import GeoEvents from '/models/events.js';
-import GirafeHTMLElement from '/base/GirafeHTMLElement.js';
+import GeoEvents from '/models/events';
+import GirafeResizableElement from '/base/GirafeResizableElement'
 
-class TreeViewComponent extends GirafeHTMLElement {
+class TreeViewComponent extends GirafeResizableElement {
 
   static #template = null;
   themesUrl = null;
@@ -53,6 +53,7 @@ class TreeViewComponent extends GirafeHTMLElement {
 
   render() {
     this.shadow.appendChild(TreeViewComponent.#template.content.cloneNode(true));
+    this.makeResizable();
   }
 
   renderChilds(liParent, elem, parentServer) {
@@ -182,7 +183,7 @@ class TreeViewComponent extends GirafeHTMLElement {
 
   toggleParent(li) {
     const ul = li.parentElement;
-    if (ul.nodeName !== 'UL' || ul.parentElement === null) {
+    if (ul === null || ul.nodeName !== 'UL' || ul.parentElement === null) {
       // We get out the tree-view.
       // Just stop here
       return;

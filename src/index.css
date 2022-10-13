@@ -42,7 +42,6 @@ girafe-tree-view {
     width: 25rem;
     z-index:90;
     border-right: solid 1px #ddd;
-    padding: 0.5rem;
     background: #fff;
     overflow: auto;
 }

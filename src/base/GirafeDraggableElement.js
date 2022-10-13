@@ -34,28 +34,6 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     super();
   }
 
-  /*async loadTemplate() {
-    if (DraggableComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/draggable/template.html');
-    const content = await response.text();
-    DraggableComponent.#template = document.createElement('template');
-    DraggableComponent.#template.innerHTML = content;
-  }*/
-/*
-  render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(DraggableComponent.#template.content.cloneNode(true));
-    this.div = this.shadow.querySelector('#draggable');
-    this.header = this.shadow.querySelector('#header');
-
-    this.header.onmousedown = (e) => this.dragMouseDown(this, e);
-  }
-*/
-
   makeDraggable() {
     this.div = this.shadow.querySelector('#draggable');
     this.header = this.shadow.querySelector('#header');
