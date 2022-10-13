@@ -1,12 +1,37 @@
-<link rel="stylesheet" href="/lib/all.min.css" />
-<link rel="stylesheet" href="/components/search/style.css" />
+<link rel="stylesheet" href="/lib/font-gis/css/font-gis.css" />
+<link rel="stylesheet" href="/components/redlining/toolbar/style.css" />
 
-<div id="bar">
-    <i id="point" class="fa-sm fa-solid fa-circle"></i>
-    <i id="line" class="fa-xl fa-solid fa-horizontal-rule">LINE</i>
-    <i id="square" class="fa-xl fa-solid fa-draw-square">SQUARE</i>
-    <i id="rectangle" class="fa-xl fa-solid fa-draw-square">RECT</i>
-    <i id="polygon" class="fa-xl fa-solid fa-draw-polygon"></i>
-    <i id="circle" class="fa-xl fa-regular fa-circle"></i>
-    <i id="free" class="fa-xl fa-solid fa-scribble">FREE</i>
+<div id="draggable">
+  <div id="header"></div>
+  <div id="content">
+    <button id="point">
+      <i class="fg-point fg-2x"></i>
+      <span>Point</span>
+    </button>
+    <button id="line" >
+      <i class="fg-polyline-pt fg-2x"></i>
+      <span>Line</span>
+    </button>
+    <button id="polygon" >
+      <i class="fg-polygon-pt fg-2x"></i>
+      <span>Poligon</span>
+    </button>
+    <button id="square" >
+      <i class="fg-square-pt fg-2x"></i>
+      <span>Square</span>
+    </button>
+    <button id="rectangle" >
+      <i class="fg-rectangle-pt fg-2x"></i>
+      <span>Rectangle</span>
+    </button>
+    <button id="circle">
+      <i  class="fg-circle-o fg-2x"></i>
+      <span>Circle</span>
+    </button>
+    <button id="free">
+      <i class="fg-map-edit fg-2x"></i>
+      <span>Freehand</span>
+    </button>
+    <div id="drawingList"></div>
+  </div>
 </div>

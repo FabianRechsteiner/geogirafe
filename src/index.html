@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="stylesheet" href="index.css" />
-    <link rel="stylesheet" href="/lib/all.min.css" />
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/lib/font-gis/css/font-gis.css" />
     <script type="module" src="./initialize.js"></script>
     <title>GeoGirafe</title>
   </head>
@@ -13,9 +14,8 @@
     <header>
       <img id="logo" src="https://map.geo.bs.ch/static-ngeo/build/logo.4b8693.png" />
       <girafe-search id="search" search-url="https://search.geo.bs.ch/search?term=###SEARCHTERM###"></girafe-search>
-      <girafe-toolbar></girafe-toolbar>
       <div id="buttonbar">
-        <!-- <a href="#"><i class="fa-xl fa-solid fa-user"></i></a> -->
+        <i class="fa-xl fa-solid fa-user"></i>
         <i class="fa-xl fa-solid fa-user"></i>
         <i class="fa-xl fa-solid fa-print"></i>
         <girafe-button></girafe-button>
@@ -24,7 +24,8 @@
     </header>
     <girafe-tree-view themes="/Mock/themes.json"></girafe-tree-view>
     <girafe-map></girafe-map>
-    
+    <girafe-toolbar></girafe-toolbar>
+      
     <footer>
       <girafe-theme-select themes="/Mock/themes.json"></girafe-theme-select>
       <girafe-basemap-select themes="/Mock/themes.json"></girafe-basemap-select>

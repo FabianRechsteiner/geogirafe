@@ -1,0 +1,38 @@
+#draggable {
+    position: absolute;
+    z-index: 9000;
+    background-color: #666;
+    text-align: center;
+    width: 10rem;
+}
+
+button {
+    border: none;
+    border-bottom: solid 1px #666;
+    height: 2.2rem;
+    width : 100%;
+    text-align: left;
+    padding: 0;
+    padding-left: 0.5rem;
+    background-color: #fff;
+}
+
+span {
+    margin-left : 0.2rem;
+    position: relative;
+    margin-top : -0.5rem;
+
+}
+
+#header {
+    padding: 0.2rem;
+    min-height : 2rem;
+    cursor: move;
+    background-color: #666;
+    color: #fff;
+}
+
+#drawingList {
+    min-height: 5rem;
+    background-color: #fff;
+}

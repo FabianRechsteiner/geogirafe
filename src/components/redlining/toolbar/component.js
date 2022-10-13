@@ -1,6 +1,7 @@
 import GeoEvents from '/models/events.js';
+import GirafeDraggableElement from '/base/GirafeDraggableElement.js';
 
-class ToolbarComponent extends HTMLElement {
+class ToolbarComponent extends GirafeDraggableElement {
 
   static #template = null;
 
@@ -35,7 +36,7 @@ class ToolbarComponent extends HTMLElement {
     this.shadow.appendChild(ToolbarComponent.#template.content.cloneNode(true));
 
     // Bar is hidden per default
-    this.bar = this.shadow.querySelector('#bar');
+    this.bar = this.shadow.querySelector('#draggable');
     this.bar.style.display = 'none';
 
     this.pointButton = this.shadow.querySelector('#point');
@@ -45,6 +46,8 @@ class ToolbarComponent extends HTMLElement {
     this.polygonButton = this.shadow.querySelector('#polygon');
     this.circleButton = this.shadow.querySelector('#circle');
     this.freeButton = this.shadow.querySelector('#free');
+
+    this.makeDraggable();
   }
 
   registerEvents() {
