@@ -26,6 +26,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
   gutter = null;
   prevX = 0;
   host = null;
+  toggleWidth = 10;
+  lastWidth = 0;
 
   constructor() {
     super();
@@ -36,21 +38,38 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.host = this.panel.getRootNode().host;
     this.gutter = this.shadow.querySelector('#gutter');
     this.gutter.onmousedown = (e) => this.mousedown(this, e);
+    this.gutter.ondblclick = (e) => this.togglePanel(this, e);
   }
 
   mousedown(_this, e) {
 
-    document.onmousemove = (e) => this.mousemove(this, e);
-    document.onmouseup = (e) => this.mouseup(this, e);
+    document.onmousemove = (e) => _this.mousemove(this, e);
+    document.onmouseup = (e) => _this.mouseup(this, e);
 
-    this.prevX = e.x;
-    this.panelRect = this.panel.getBoundingClientRect();
+    _this.prevX = e.x;
+    _this.panelRect = _this.panel.getBoundingClientRect();
+  }
+
+  togglePanel(_this, e) {
+    const width = _this.panel.getBoundingClientRect().width;
+    if (width <= _this.toggleWidth) {
+      // Panel is already hidden.
+      // => We reset it to the last width
+      _this.panel.style.width = _this.lastWidth + 'px';
+      _this.host.style.width = _this.lastWidth + 'px';
+    }
+    else {
+      // Hide the panel
+      _this.lastWidth = width;
+      _this.panel.style.width = _this.toggleWidth + 'px';
+      _this.host.style.width = _this.toggleWidth + 'px';
+    }
   }
 
   mousemove(_this, e) {
-    const newX = this.prevX - e.x;
-    this.panel.style.width = this.panelRect.width - newX + "px";
-    this.host.style.width = this.panelRect.width - newX + "px";
+    const newX = _this.prevX - e.x;
+    _this.panel.style.width = _this.panelRect.width - newX + "px";
+    _this.host.style.width = _this.panelRect.width - newX + "px";
   }
 
   mouseup(_this, e) {
