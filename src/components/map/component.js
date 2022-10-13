@@ -83,6 +83,17 @@ class MapComponent extends HTMLElement {
     this.vectorSource = new VectorSource({
       features: this.featuresCollection
     });
+    this.vectorLayer = new VectorLayer({
+      source: this.vectorSource,
+      style: {
+        'fill-color': 'rgba(255, 128, 128, 0.5)',
+        'stroke-color': '#ff0000',
+        'stroke-width': 2,
+        'circle-radius': 7,
+        'circle-fill-color': '#ffcc33',
+      },
+    });
+    this.map.addLayer(this.vectorLayer);
 
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {
@@ -388,19 +399,7 @@ class MapComponent extends HTMLElement {
       this.map.removeInteraction(this.snap);
     }
 
-    // Then create a new Draw source
-    // TODO REG : Create those objects only once globally.
-    this.vectorLayer = new VectorLayer({
-      source: this.vectorSource,
-      style: {
-        'fill-color': 'rgba(255, 128, 128, 0.5)',
-        'stroke-color': '#ff0000',
-        'stroke-width': 2,
-        'circle-radius': 7,
-        'circle-fill-color': '#ffcc33',
-      },
-    });
-    this.map.addLayer(this.vectorLayer);
+    
 
     let geometryFunction = null;
     if (tool === 'Square') {
