@@ -23,9 +23,16 @@
 }
 
 #treeview-list {
+  position: absolute;
+  top : 0;
+  left: 0;
+  right: 10px;
+  bottom: 0;
   background : #fff;
   padding : 1.5rem;
   margin: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 ul {
