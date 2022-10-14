@@ -6,7 +6,7 @@
     width: 10rem;
 }
 
-button {
+#content button {
     border: none;
     border-bottom: solid 1px #666;
     height: 2.2rem;
@@ -17,7 +17,7 @@ button {
     background-color: #fff;
 }
 
-span {
+#content span {
     margin-left : 0.2rem;
     position: relative;
     margin-top : -0.5rem;
@@ -38,7 +38,7 @@ span {
     padding-top: 2rem;
 }
 
-#drawingList div {
+#drawingList div.girafe {
     display: inline-block;
     padding: 0.5rem;
     margin-top: 0.1rem;
@@ -50,4 +50,5 @@ span {
 #drawingList i {
     float: right;
     cursor: pointer;
+    margin-left: 0.3rem;
 }

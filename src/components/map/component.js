@@ -2,6 +2,10 @@ import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import Collection from 'ol/Collection';
 import VectorSource from 'ol/source/Vector';
+import Style from 'ol/style/Style';
+import Stroke from 'ol/style/Stroke';
+import Text from 'ol/style/Text';
+import Fill from 'ol/style/Fill';
 import WMTS, {optionsFromCapabilities} from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
@@ -32,6 +36,11 @@ class MapComponent extends GirafeHTMLElement {
   vectorLayer = null;
   draw = null;
   snap = null;
+  
+  // Default styles
+  defaultStrokeColor = '#ff0000';
+  defaultStrokeWidth = 2;
+  defaultFillColor = '#ff66667f';
   
   constructor() {
     super();
@@ -86,13 +95,10 @@ class MapComponent extends GirafeHTMLElement {
     });
     this.vectorLayer = new VectorLayer({
       source: this.vectorSource,
-      style: {
-        'fill-color': 'rgba(255, 128, 128, 0.5)',
-        'stroke-color': '#ff0000',
-        'stroke-width': 2,
-        'circle-radius': 7,
-        'circle-fill-color': '#ffcc33',
-      },
+      style: new Style({
+        stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth}),
+        fill: new Fill({color: this.defaultFillColor}),
+      }),
     });
     this.map.addLayer(this.vectorLayer);
 
@@ -139,7 +145,13 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onFeatureAdded(e) {
-    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'featureAdded', id: e.element.ol_uid, name: 'new geometry'});
+    this.messageManager.sendMessage(GeoEvents.Redlining, {
+      action: 'featureAdded', 
+      id: e.element.ol_uid, 
+      name: 'new geometry', 
+      strokeColor: this.defaultStrokeColor,
+      fillColor: this.defaultFillColor
+    });
   }
 
   connectedCallback() {
@@ -359,6 +371,33 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'deleteFeature') {
       this.deleteFeature(details.id);
     }
+    else if (details.action === 'styleChanging') {
+      this.setFeatureStyle(details.id, details.fillColor, details.strokeColor, details.strokeWidth);
+    }
+    else if (details.action === 'styleChanged') {
+      console.log('styleChanged');
+    }
+  }
+
+  setFeatureStyle(id, fillColor, strokeColor, strokeWidth) {
+    const feature = this.featuresCollection.getArray().find(f => f.ol_uid === id);
+
+    let style = feature.getStyle();
+    if (!style) {
+      style = new Style({
+        stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth}),
+        fill: new Fill({color: this.defaultFillColor})
+      });
+    }
+
+    if (fillColor) {
+      style.getFill().setColor(fillColor.hex);
+    }
+    if (strokeColor) {
+      style.getStroke().setColor(strokeColor.hex);
+    }
+
+    feature.setStyle(style);
   }
 
   deleteFeature(id) {

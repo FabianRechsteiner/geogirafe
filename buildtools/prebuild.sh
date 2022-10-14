@@ -11,4 +11,9 @@ cd ..
 
 # Copy CSS styles for Libraries (are not included in css bundle)
 mkdir -p src/static/lib/
+
+mkdir -p src/static/lib/openlayers/
 cp node_modules/ol/ol.css src/static/lib/openlayers/
+
+mkdir -p src/static/lib/vanilla-picker/
+cp node_modules/vanilla-picker/dist/vanilla-picker.csp.css src/static/lib/vanilla-picker/

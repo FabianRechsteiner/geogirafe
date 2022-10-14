@@ -1,5 +1,6 @@
-import GeoEvents from '/models/events.js';
-import GirafeDraggableElement from '/base/GirafeDraggableElement.js';
+import GeoEvents from '/models/events';
+import GirafeDraggableElement from '/base/GirafeDraggableElement';
+import Picker from 'vanilla-picker/csp';
 
 class ToolbarComponent extends GirafeDraggableElement {
 
@@ -87,28 +88,50 @@ class ToolbarComponent extends GirafeDraggableElement {
       }
     }
     else if (details.action === 'featureAdded') {
-      this.addFeatureToList(details.id, details.name);
+      this.addFeatureToList(details.id, details.name, details.fillColor, details.strokeColor);
     }
     else if (details.action === 'featureRemoved') {
       this.removeFeatureFromList(details.id);
     }
   }
 
-  addFeatureToList(id, name) {
+  addFeatureToList(id, name, fillColor, strokeColor) {
 
     const elementId = 'f-' + id;
     const container = document.createElement('div');
+    container.className = 'girafe';
     container.id = elementId;
 
+    // Label
     const span = document.createElement('span');
     span.textContent = name;
+    span.className = 'girafe';
     container.appendChild(span);
 
-    let trash = document.createElement('i');
+    // Trash
+    const trash = document.createElement('i');
     trash.className = 'fa-solid fa-trash';
     trash.onclick = (e) => this.deleteFeature(id);
     container.appendChild(trash);
 
+    // Color Selector (Fill)
+    const fill = document.createElement('i');
+    fill.className = 'fa-solid fa-paint-roller';
+    container.appendChild(fill);
+    const fillPicker = new Picker({parent: fill, color: fillColor});
+    // Message when color changed
+    fillPicker.onChange = (color) => this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'styleChanging', id:id, fillColor: color});
+    fillPicker.onDone = (color) => this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'styleChanging', id:id, fillColor: color});
+
+    // Color Selector (Stroke)
+    const stroke = document.createElement('i');
+    stroke.className = 'fa-solid fa-paintbrush';
+    container.appendChild(stroke);
+    const strokePicker = new Picker({parent: stroke, color: strokeColor});
+    // Message when color changed
+    strokePicker.onChange = (color) => this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'styleChanging', id:id, strokeColor: color});
+    strokePicker.onDone = (color) => this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'styleChanging', id:id, strokeColor: color});
+    
     this.drawingList.appendChild(container);
   }
 
