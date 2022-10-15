@@ -14,7 +14,8 @@ class RedliningComponent extends GirafeResizableElement {
   rectangleButton = null;
   polygonButton = null;
   circleButton = null;
-  freeButton = null;
+  freelineButton = null;
+  freepolygonButton = null;
 
   drawingList = null;
   
@@ -49,7 +50,8 @@ class RedliningComponent extends GirafeResizableElement {
     this.rectangleButton = this.shadow.querySelector('#rectangle');
     this.polygonButton = this.shadow.querySelector('#polygon');
     this.circleButton = this.shadow.querySelector('#circle');
-    this.freeButton = this.shadow.querySelector('#free');
+    this.freelineButton = this.shadow.querySelector('#freeline');
+    this.freepolygonButton = this.shadow.querySelector('#freepolygon');
 
     this.drawingList = this.shadow.querySelector('#drawingList');
 
@@ -66,7 +68,8 @@ class RedliningComponent extends GirafeResizableElement {
     this.rectangleButton.addEventListener('click', (e) => this.activateDraw('Rectangle'));
     this.polygonButton.addEventListener('click', (e) => this.activateDraw('Polygon'));
     this.circleButton.addEventListener('click', (e) => this.activateDraw('Circle'));
-    this.freeButton.addEventListener('click', (e) => this.activateDraw('Free'));
+    this.freelineButton.addEventListener('click', (e) => this.activateDraw('Freeline'));
+    this.freepolygonButton.addEventListener('click', (e) => this.activateDraw('Freepolygon'));
   }
 
   activateDraw(tool) {

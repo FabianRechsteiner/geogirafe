@@ -424,6 +424,7 @@ class MapComponent extends GirafeHTMLElement {
     
 
     let geometryFunction = null;
+    let freehand = false;
     if (tool === 'Square') {
       tool = 'Circle';
       geometryFunction = createRegularPolygon(4);
@@ -432,10 +433,19 @@ class MapComponent extends GirafeHTMLElement {
       tool = 'Circle';
       geometryFunction = createBox();
     }
+    else if (tool === 'Freeline') {
+      tool = 'LineString';
+      freehand = true;
+    }
+    else if (tool === 'Freepolygon') {
+      tool = 'Polygon';
+      freehand = true;
+    }
 
     this.draw = new Draw({
       source: this.vectorSource,
       type: tool,
+      freehand: freehand,
       geometryFunction: geometryFunction
     });
     const modify = new Modify({source: this.vectorSource});
