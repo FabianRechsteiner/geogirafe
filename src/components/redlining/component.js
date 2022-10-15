@@ -156,7 +156,9 @@ class RedliningComponent extends GirafeResizableElement {
   }
 
   deleteFeature(id) {
-    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'deleteFeature', id: id});
+    if (confirm('Do you want to delete this feature?')) {
+      this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'deleteFeature', id: id});
+    }
   }
 }
 
