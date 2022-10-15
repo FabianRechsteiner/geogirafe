@@ -6,6 +6,7 @@ import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
+import Circle from 'ol/style/Circle';
 import WMTS, {optionsFromCapabilities} from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
@@ -98,7 +99,12 @@ class MapComponent extends GirafeHTMLElement {
       style: new Style({
         stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth}),
         fill: new Fill({color: this.defaultFillColor}),
-      }),
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({color: this.defaultFillColor}),
+          stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth})
+        }),
+      })
     });
     this.map.addLayer(this.vectorLayer);
 
@@ -148,7 +154,7 @@ class MapComponent extends GirafeHTMLElement {
     this.messageManager.sendMessage(GeoEvents.Redlining, {
       action: 'featureAdded', 
       id: e.element.ol_uid, 
-      name: 'new geometry', 
+      name: 'new ' + e.element.getGeometry().getType(), 
       strokeColor: this.defaultStrokeColor,
       fillColor: this.defaultFillColor,
       strokeWidth: this.defaultStrokeWidth
