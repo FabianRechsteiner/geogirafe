@@ -10,8 +10,8 @@ import ProjectionComponent from './components/projection/component.js';
 import BasemapComponent from './components/basemap/component.js';
 import ThemeComponent from './components/themes/component.js';
 import LanguageComponent from './components/language/component.js';
-import ButtonComponent from './components/redlining/button/component.js';
-import ToolbarComponent from './components/redlining/toolbar/component.js';
+import ButtonComponent from './components/button/component.js';
+import RedliningComponent from './components/redlining/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';

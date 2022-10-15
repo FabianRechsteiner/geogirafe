@@ -3,12 +3,12 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement.js';
 /*
 Minimal template for a draggable object : 
 It must have 2 divs :
-- One for the whole panel (id="panel")
+- One for the whole panel (id="panel"). Attribute dock is mandatory and can have the values "left" or "right"
 - One for the gutter (id="gutter"). This is where the panel can be resized.
 
 Example:
 
-<div id="panel">
+<div id="panel" dock="left">
   <div id="gutter"></div>
 </div>
 
@@ -24,6 +24,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   panel = null;
   panelRect = null;
   gutter = null;
+  dock = null;
   prevX = 0;
   host = null;
   toggleWidth = 10;
@@ -31,6 +32,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
 
   constructor() {
     super();
+
+    this.dock = this.getAttribute('dock');
   }
 
   makeResizable() {
@@ -68,8 +71,15 @@ class GirafeResizableElement extends GirafeHTMLElement {
 
   mousemove(_this, e) {
     const newX = _this.prevX - e.x;
-    _this.panel.style.width = _this.panelRect.width - newX + "px";
-    _this.host.style.width = _this.panelRect.width - newX + "px";
+    let newWidth = null;
+    if (_this.dock === 'left') {
+      newWidth = _this.panelRect.width - newX;
+    }
+    else if (_this.dock === 'right') {
+      newWidth = _this.panelRect.width + newX;
+    }
+    _this.panel.style.width = newWidth + "px";
+    _this.host.style.width = newWidth + "px";
   }
 
   mouseup(_this, e) {

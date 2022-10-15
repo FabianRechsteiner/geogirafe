@@ -1,0 +1,113 @@
+#panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: visible;
+}
+
+#gutter {
+  border: none;
+  width: 10px;
+  height: 100%;
+  background: #999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: col-resize;
+}
+
+#gutter:hover {
+  background: #666;
+}
+
+#content {
+  position: absolute;
+  top : 0;
+  left: 10px;
+  right: 0;
+  bottom: 0;
+  background : #fff;
+  padding : 1.5rem;
+  margin: 0;
+  overflow: visible;
+}
+
+#content button {
+  border: solid 1px #aaa;
+  color: #666;
+  height: 3rem;
+  width: 3rem;
+  text-align: left;
+  padding: 0;
+  padding-left: 0.5rem;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+#content button:hover {
+  border-color: #000;
+  color: #000;
+}
+
+[tip] .tooltip {
+  position: fixed;
+  font-size: 16px;
+  line-height: 20px;
+  padding: 5px;
+  background: white;
+  border: 1px solid #ccc;
+  visibility: hidden;
+  box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition:
+    opacity 0.3s,
+    visiblity 0s;
+}
+[tip]:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+#drawingList {
+  min-height: 5rem;
+  background-color: #fff;
+  padding-top: 2rem;
+  margin-right: 1rem;
+}
+
+#drawingList div.girafe {
+  display: inline-block;
+  position: relative;
+  padding: 0.5rem;
+  margin-top: 0.1rem;
+  border: solid 1px #999;
+  text-align: left;
+  width: 100%;
+  color: #666;
+}
+
+#drawingList div.girafe:hover {
+  color: #000;
+}
+
+#drawingList span {
+  display:block;
+}
+
+#drawingList i {
+  position: relative;
+  cursor: pointer;
+  margin-right: 1rem;
+  display: inline;
+
+}
+
+input.slider {
+  position: relative;
+  width: 6rem;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 1rem;
+}

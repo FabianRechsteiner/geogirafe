@@ -56,10 +56,17 @@ girafe-search {
     margin-top: 0.5rem;
 }
 
-girafe-toolbar {
-    width : auto;
-    margin-left:auto;
-    margin-right: 3rem;
+girafe-redlining {
+    position: fixed;
+    right:0;
+    top: 4.5rem;
+    bottom: 0;
+    width: 20rem;
+    z-index:90;
+    border-left: solid 1px #ddd;
+    background: #fff;
+    overflow: visible;
+    display: none;
 }
 
 #buttonbar {

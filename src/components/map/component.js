@@ -150,7 +150,8 @@ class MapComponent extends GirafeHTMLElement {
       id: e.element.ol_uid, 
       name: 'new geometry', 
       strokeColor: this.defaultStrokeColor,
-      fillColor: this.defaultFillColor
+      fillColor: this.defaultFillColor,
+      strokeWidth: this.defaultStrokeWidth
     });
   }
 
@@ -395,6 +396,10 @@ class MapComponent extends GirafeHTMLElement {
     }
     if (strokeColor) {
       style.getStroke().setColor(strokeColor.hex);
+    }
+    if (strokeWidth) {
+      console.log(strokeWidth);
+      style.getStroke().setWidth(strokeWidth);
     }
 
     feature.setStyle(style);

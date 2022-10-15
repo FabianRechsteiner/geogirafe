@@ -1,38 +1,31 @@
 <link rel="stylesheet" href="/lib/font-gis/css/font-gis.css" />
 <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
 <link rel="stylesheet" href="/lib/vanilla-picker/vanilla-picker.csp.css" />
-<link rel="stylesheet" href="/components/redlining/toolbar/style.css" />
+<link rel="stylesheet" href="/components/redlining/style.css" />
 
-<div id="draggable">
-  <div id="header"></div>
+<div id="panel">
+  <div id="gutter"></div>
   <div id="content">
-    <button id="point">
+    <button id="point" tip="Point">
       <i class="fg-point fg-2x"></i>
-      <span>Point</span>
     </button>
-    <button id="line" >
+    <button id="line" tip="Line">
       <i class="fg-polyline-pt fg-2x"></i>
-      <span>Line</span>
     </button>
-    <button id="polygon" >
+    <button id="polygon" tip="Polygon">
       <i class="fg-polygon-pt fg-2x"></i>
-      <span>Poligon</span>
     </button>
-    <button id="square" >
+    <button id="square" tip="Square">
       <i class="fg-square-pt fg-2x"></i>
-      <span>Square</span>
     </button>
-    <button id="rectangle" >
+    <button id="rectangle" tip="Rectangle">
       <i class="fg-rectangle-pt fg-2x"></i>
-      <span>Rectangle</span>
     </button>
-    <button id="circle">
+    <button id="circle" tip="Circle">
       <i  class="fg-circle-o fg-2x"></i>
-      <span>Circle</span>
     </button>
-    <button id="free">
+    <button id="free" tip="Freehand">
       <i class="fg-map-edit fg-2x"></i>
-      <span>Freehand</span>
     </button>
     <div id="drawingList"></div>
   </div>

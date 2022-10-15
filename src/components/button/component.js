@@ -18,7 +18,7 @@ class ButtonComponent extends GirafeHTMLElement {
       return;
     }
     // Otherwise, load the template
-    const response = await fetch('/components/redlining/button/template.html');
+    const response = await fetch('/components/button/template.html');
     const content = await response.text();
     ButtonComponent.#template = document.createElement('template');
     ButtonComponent.#template.innerHTML = content;
