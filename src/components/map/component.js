@@ -19,6 +19,7 @@ import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
+import adjectives from 'adjectives';
 
 class MapComponent extends GirafeHTMLElement {
 
@@ -96,15 +97,18 @@ class MapComponent extends GirafeHTMLElement {
     });
     this.vectorLayer = new VectorLayer({
       source: this.vectorSource,
-      style: new Style({
-        stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth}),
-        fill: new Fill({color: this.defaultFillColor}),
-        image: new Circle({
-          radius: 7,
+      style: (feature) => {
+        return new Style({
+          stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth}),
           fill: new Fill({color: this.defaultFillColor}),
-          stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth})
-        }),
-      })
+          image: new Circle({
+            radius: 7,
+            fill: new Fill({color: this.defaultFillColor}),
+            stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth})
+          }),
+          text: new Text({text: feature.get('name')}),
+        })
+      }
     });
     this.map.addLayer(this.vectorLayer);
 
@@ -138,7 +142,7 @@ class MapComponent extends GirafeHTMLElement {
     //? change:view
 
     // Drawing events
-    this.featuresCollection.on('add', (e) => this.onFeatureAdded(e));
+    this.featuresCollection.on('add', (e) => this.onFeatureAdded(this, e));
 
   }
 
@@ -150,11 +154,15 @@ class MapComponent extends GirafeHTMLElement {
     this.messageManager.sendMessage(GeoEvents.Init, {action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ});
   }
 
-  onFeatureAdded(e) {
+  onFeatureAdded(_this, e) {
+    // Set the default feature name
+    const name = adjectives[_this.getRandomInt(0, adjectives.length)] + ' ' + e.element.getGeometry().getType();
+    e.element.set('name', name);
+    // Send message
     this.messageManager.sendMessage(GeoEvents.Redlining, {
       action: 'featureAdded', 
       id: e.element.ol_uid, 
-      name: 'new ' + e.element.getGeometry().getType(), 
+      name: name,
       strokeColor: this.defaultStrokeColor,
       fillColor: this.defaultFillColor,
       strokeWidth: this.defaultStrokeWidth
@@ -162,7 +170,6 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    console.log('connectedCallback');
     this.loadTemplate().then(() => {
       this.render();
       this.listenOpenLayersEvents();
@@ -461,6 +468,14 @@ class MapComponent extends GirafeHTMLElement {
     this.snap = new Snap({source: this.vectorSource});
     this.map.addInteraction(this.snap);
   }
+
+  getRandomInt(min, max) {
+    // The maximum is exclusive and the minimum is inclusive
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+  
 }
 
 customElements.define('girafe-map', MapComponent);
