@@ -394,6 +394,9 @@ class MapComponent extends GirafeHTMLElement {
     if (details.action === 'drawToolActivated') {
       this.activateRedliningTool(details.tool);
     }
+    else if (details.action === 'drawToolDeactivated') {
+      this.deactivateRedliningTool();
+    }
     else if (details.action === 'deleteFeature') {
       this.deleteFeature(details.id);
     }
@@ -449,12 +452,7 @@ class MapComponent extends GirafeHTMLElement {
   activateRedliningTool(tool) {
     console.log('Activating Redlining Tool...');
     // First remove existing interaction.
-    if (this.draw) {
-      this.map.removeInteraction(this.draw);
-    }
-    if (this.snap) {
-      this.map.removeInteraction(this.snap);
-    }
+    this.deactivateRedliningTool();
 
     let geometryFunction = null;
     let freehand = false;
@@ -487,6 +485,15 @@ class MapComponent extends GirafeHTMLElement {
     this.map.addInteraction(this.draw);
     this.snap = new Snap({source: this.vectorSource});
     this.map.addInteraction(this.snap);
+  }
+
+  deactivateRedliningTool() {
+    if (this.draw) {
+      this.map.removeInteraction(this.draw);
+    }
+    if (this.snap) {
+      this.map.removeInteraction(this.snap);
+    }
   }
 
   getRandomInt(min, max) {

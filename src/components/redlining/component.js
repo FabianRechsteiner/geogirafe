@@ -8,6 +8,7 @@ class RedliningComponent extends GirafeResizableElement {
   static #template = null;
 
   panel = null
+  disableButton = null;
   pointButton = null;
   lineButton = null;
   squareButton = null;
@@ -16,6 +17,8 @@ class RedliningComponent extends GirafeResizableElement {
   circleButton = null;
   freelineButton = null;
   freepolygonButton = null;
+
+  toolSelected = null;
 
   drawingList = null;
   
@@ -44,6 +47,7 @@ class RedliningComponent extends GirafeResizableElement {
     this.panel = this.shadow.querySelector('#panel');
     this.panel.style.display = 'none';
 
+    this.disableButton = this.shadow.querySelector('#disable');
     this.pointButton = this.shadow.querySelector('#point');
     this.lineButton = this.shadow.querySelector('#line');
     this.squareButton = this.shadow.querySelector('#square');
@@ -55,6 +59,8 @@ class RedliningComponent extends GirafeResizableElement {
 
     this.drawingList = this.shadow.querySelector('#drawingList');
 
+    this.toolSelected = this.disableButton;
+
     this.makeResizable();
     this.activateTooltips();
   }
@@ -62,18 +68,29 @@ class RedliningComponent extends GirafeResizableElement {
   registerEvents() {
     window.addEventListener(GeoEvents.Redlining, (e) => this.onRedliningEvent(e.detail));
 
-    this.pointButton.addEventListener('click', (e) => this.activateDraw('Point'));
-    this.lineButton.addEventListener('click', (e) => this.activateDraw('LineString'));
-    this.squareButton.addEventListener('click', (e) => this.activateDraw('Square'));
-    this.rectangleButton.addEventListener('click', (e) => this.activateDraw('Rectangle'));
-    this.polygonButton.addEventListener('click', (e) => this.activateDraw('Polygon'));
-    this.circleButton.addEventListener('click', (e) => this.activateDraw('Circle'));
-    this.freelineButton.addEventListener('click', (e) => this.activateDraw('Freeline'));
-    this.freepolygonButton.addEventListener('click', (e) => this.activateDraw('Freepolygon'));
+    this.disableButton.addEventListener('click', (e) => this.deactivateDraw());
+    this.pointButton.addEventListener('click', (e) => this.activateDraw(e, 'Point'));
+    this.lineButton.addEventListener('click', (e) => this.activateDraw(e, 'LineString'));
+    this.squareButton.addEventListener('click', (e) => this.activateDraw(e, 'Square'));
+    this.rectangleButton.addEventListener('click', (e) => this.activateDraw(e, 'Rectangle'));
+    this.polygonButton.addEventListener('click', (e) => this.activateDraw(e, 'Polygon'));
+    this.circleButton.addEventListener('click', (e) => this.activateDraw(e, 'Circle'));
+    this.freelineButton.addEventListener('click', (e) => this.activateDraw(e, 'Freeline'));
+    this.freepolygonButton.addEventListener('click', (e) => this.activateDraw(e, 'Freepolygon'));
   }
 
-  activateDraw(tool) {
+  activateDraw(e, tool) {
+    if (this.toolSelected !== null) {
+      this.toolSelected.className = '';
+    }
+    this.toolSelected = e.target.parentElement;
+    this.toolSelected.className = 'selected';
+
     this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolActivated', tool: tool});
+  }
+
+  deactivateDraw() {
+    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolDeactivated'});
   }
 
   connectedCallback() {
