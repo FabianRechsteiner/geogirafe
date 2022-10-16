@@ -92,8 +92,9 @@
   color: #000;
 }
 
-#drawingList span {
+#drawingList input.name {
   display:block;
+  border:none;
 }
 
 #drawingList i {

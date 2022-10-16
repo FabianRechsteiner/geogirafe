@@ -391,6 +391,14 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'styleChanged') {
       console.log('styleChanged');
     }
+    else if (details.action === 'nameChanging') {
+      this.setFeatureName(details.id, details.name);
+    }
+  }
+
+  setFeatureName(id, name) {
+    const feature = this.featuresCollection.getArray().find(f => f.ol_uid === id);
+    feature.set('name', name);
   }
 
   setFeatureStyle(id, fillColor, strokeColor, strokeWidth) {

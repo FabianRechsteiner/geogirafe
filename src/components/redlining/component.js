@@ -110,10 +110,12 @@ class RedliningComponent extends GirafeResizableElement {
     container.id = elementId;
 
     // Label
-    const span = document.createElement('span');
-    span.textContent = name;
-    span.className = 'girafe';
-    container.appendChild(span);
+    const nameinput = document.createElement('input');
+    nameinput.type = 'text';
+    nameinput.value = name;
+    nameinput.className = 'name';
+    nameinput.oninput = (e) => this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'nameChanging', id:id, name: e.target.value});
+    container.appendChild(nameinput);
 
     // Color Selector (Fill)
     const fill = document.createElement('i');
