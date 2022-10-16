@@ -97,18 +97,7 @@ class MapComponent extends GirafeHTMLElement {
     });
     this.vectorLayer = new VectorLayer({
       source: this.vectorSource,
-      style: (feature) => {
-        return new Style({
-          stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth}),
-          fill: new Fill({color: this.defaultFillColor}),
-          image: new Circle({
-            radius: 7,
-            fill: new Fill({color: this.defaultFillColor}),
-            stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth})
-          }),
-          text: new Text({text: feature.get('name')}),
-        })
-      }
+      //style: (feature) => this.getDefaultStyle(this, feature)
     });
     this.map.addLayer(this.vectorLayer);
 
@@ -116,6 +105,24 @@ class MapComponent extends GirafeHTMLElement {
     setTimeout(() => {
       this.map.updateSize();
     }, 1000);
+  }
+
+  getDefaultStyle(feature) {
+
+    const strokeColor = (feature.get('strokeColor')) ? feature.get('strokeColor') : this.defaultStrokeColor;
+    const strokeWidth = (feature.get('strokeWidth')) ? feature.get('strokeWidth') : this.defaultStrokeWidth;
+    const fillColor = (feature.get('fillColor')) ? feature.get('fillColor') : this.defaultFillColor;
+
+    return new Style({
+      stroke: new Stroke({color: strokeColor, width: strokeWidth}),
+      fill: new Fill({color: fillColor}),
+      image: new Circle({
+        radius: 7,
+        fill: new Fill({color: fillColor}),
+        stroke: new Stroke({color: strokeColor, width: strokeWidth})
+      }),
+      text: new Text({text: feature.get('name')})
+    });
   }
 
   listenOpenLayersEvents() {
@@ -158,6 +165,8 @@ class MapComponent extends GirafeHTMLElement {
     // Set the default feature name
     const name = adjectives[_this.getRandomInt(0, adjectives.length)] + ' ' + e.element.getGeometry().getType();
     e.element.set('name', name);
+    // Add default style as a function, because we want the attributes (for example the name) to be evaluated on display time
+    e.element.setStyle((feature) => this.getDefaultStyle(feature));
     // Send message
     this.messageManager.sendMessage(GeoEvents.Redlining, {
       action: 'featureAdded', 
@@ -397,33 +406,25 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   setFeatureName(id, name) {
+    console.log(id);
     const feature = this.featuresCollection.getArray().find(f => f.ol_uid === id);
+    console.log('old: ' + feature.get('name'));
+    console.log('new: ' + name);
     feature.set('name', name);
   }
 
   setFeatureStyle(id, fillColor, strokeColor, strokeWidth) {
     const feature = this.featuresCollection.getArray().find(f => f.ol_uid === id);
 
-    let style = feature.getStyle();
-    if (!style) {
-      style = new Style({
-        stroke: new Stroke({color: this.defaultStrokeColor, width: this.defaultStrokeWidth}),
-        fill: new Fill({color: this.defaultFillColor})
-      });
-    }
-
     if (fillColor) {
-      style.getFill().setColor(fillColor.hex);
+      feature.set('fillColor', fillColor.hex);
     }
     if (strokeColor) {
-      style.getStroke().setColor(strokeColor.hex);
+      feature.set('strokeColor', strokeColor.hex);
     }
     if (strokeWidth) {
-      console.log(strokeWidth);
-      style.getStroke().setWidth(strokeWidth);
+      feature.set('strokeWidth', strokeWidth);
     }
-
-    feature.setStyle(style);
   }
 
   deleteFeature(id) {
@@ -441,8 +442,6 @@ class MapComponent extends GirafeHTMLElement {
     if (this.snap) {
       this.map.removeInteraction(this.snap);
     }
-
-    
 
     let geometryFunction = null;
     let freehand = false;
