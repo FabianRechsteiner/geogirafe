@@ -43,6 +43,8 @@ class MapComponent extends GirafeHTMLElement {
   defaultStrokeColor = '#ff0000';
   defaultStrokeWidth = 2;
   defaultFillColor = '#ff66667f';
+  defaultTextSize = 12;
+  defaultFont = 'Arial';
   
   constructor() {
     super();
@@ -112,6 +114,7 @@ class MapComponent extends GirafeHTMLElement {
     const strokeColor = (feature.get('strokeColor')) ? feature.get('strokeColor') : this.defaultStrokeColor;
     const strokeWidth = (feature.get('strokeWidth')) ? feature.get('strokeWidth') : this.defaultStrokeWidth;
     const fillColor = (feature.get('fillColor')) ? feature.get('fillColor') : this.defaultFillColor;
+    const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
 
     return new Style({
       stroke: new Stroke({color: strokeColor, width: strokeWidth}),
@@ -121,7 +124,7 @@ class MapComponent extends GirafeHTMLElement {
         fill: new Fill({color: fillColor}),
         stroke: new Stroke({color: strokeColor, width: strokeWidth})
       }),
-      text: new Text({text: feature.get('name')})
+      text: new Text({text: feature.get('name'), font: 'Bold ' + textSize + 'px/1 ' + this.defaultFont})
     });
   }
 
@@ -395,7 +398,7 @@ class MapComponent extends GirafeHTMLElement {
       this.deleteFeature(details.id);
     }
     else if (details.action === 'styleChanging') {
-      this.setFeatureStyle(details.id, details.fillColor, details.strokeColor, details.strokeWidth);
+      this.setFeatureStyle(details.id, details.fillColor, details.strokeColor, details.strokeWidth, details.text);
     }
     else if (details.action === 'styleChanged') {
       console.log('styleChanged');
@@ -413,7 +416,7 @@ class MapComponent extends GirafeHTMLElement {
     feature.set('name', name);
   }
 
-  setFeatureStyle(id, fillColor, strokeColor, strokeWidth) {
+  setFeatureStyle(id, fillColor, strokeColor, strokeWidth, text) {
     const feature = this.featuresCollection.getArray().find(f => f.ol_uid === id);
 
     if (fillColor) {
@@ -424,6 +427,16 @@ class MapComponent extends GirafeHTMLElement {
     }
     if (strokeWidth) {
       feature.set('strokeWidth', strokeWidth);
+    }
+    if (text === 'textbigger') {
+      console.log(text);
+      const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
+      feature.set('textSize', textSize + 1);
+    }
+    if (text === 'textsmaller') {
+      console.log(text);
+      const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
+      feature.set('textSize', textSize - 1);
     }
   }
 

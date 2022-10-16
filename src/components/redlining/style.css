@@ -102,7 +102,12 @@
   cursor: pointer;
   margin-right: 1rem;
   display: inline;
+}
 
+#drawingList .text-opts {
+  position: absolute;
+  right: 0;
+  top: 0.5rem;
 }
 
 input.slider {
