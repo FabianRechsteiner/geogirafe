@@ -17,6 +17,7 @@ class RedliningComponent extends GirafeResizableElement {
   circleButton = null;
   freelineButton = null;
   freepolygonButton = null;
+  undoButton = null;
 
   toolSelected = null;
 
@@ -56,6 +57,7 @@ class RedliningComponent extends GirafeResizableElement {
     this.circleButton = this.shadow.querySelector('#circle');
     this.freelineButton = this.shadow.querySelector('#freeline');
     this.freepolygonButton = this.shadow.querySelector('#freepolygon');
+    this.undoButton = this.shadow.querySelector('#undo');
 
     this.drawingList = this.shadow.querySelector('#drawingList');
 
@@ -68,7 +70,7 @@ class RedliningComponent extends GirafeResizableElement {
   registerEvents() {
     window.addEventListener(GeoEvents.Redlining, (e) => this.onRedliningEvent(e.detail));
 
-    this.disableButton.addEventListener('click', (e) => this.deactivateDraw());
+    this.disableButton.addEventListener('click', () => this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolDeactivated'}));
     this.pointButton.addEventListener('click', (e) => this.activateDraw(e, 'Point'));
     this.lineButton.addEventListener('click', (e) => this.activateDraw(e, 'LineString'));
     this.squareButton.addEventListener('click', (e) => this.activateDraw(e, 'Square'));
@@ -77,6 +79,7 @@ class RedliningComponent extends GirafeResizableElement {
     this.circleButton.addEventListener('click', (e) => this.activateDraw(e, 'Circle'));
     this.freelineButton.addEventListener('click', (e) => this.activateDraw(e, 'Freeline'));
     this.freepolygonButton.addEventListener('click', (e) => this.activateDraw(e, 'Freepolygon'));
+    this.undoButton.addEventListener('click', () => this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'undoDraw'}));
   }
 
   activateDraw(e, tool) {
@@ -87,10 +90,6 @@ class RedliningComponent extends GirafeResizableElement {
     this.toolSelected.className = 'selected';
 
     this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolActivated', tool: tool});
-  }
-
-  deactivateDraw() {
-    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolDeactivated'});
   }
 
   connectedCallback() {

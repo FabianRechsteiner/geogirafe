@@ -409,6 +409,9 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'nameChanging') {
       this.setFeatureName(details.id, details.name);
     }
+    else if (details.action === 'undoDraw') {
+      this.draw.removeLastPoint();
+    }
   }
 
   setFeatureName(id, name) {
