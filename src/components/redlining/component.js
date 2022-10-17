@@ -70,7 +70,7 @@ class RedliningComponent extends GirafeResizableElement {
   registerEvents() {
     window.addEventListener(GeoEvents.Redlining, (e) => this.onRedliningEvent(e.detail));
 
-    this.disableButton.addEventListener('click', () => this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolDeactivated'}));
+    this.disableButton.addEventListener('click', (e) => this.deactivateDraw(e));
     this.pointButton.addEventListener('click', (e) => this.activateDraw(e, 'Point'));
     this.lineButton.addEventListener('click', (e) => this.activateDraw(e, 'LineString'));
     this.squareButton.addEventListener('click', (e) => this.activateDraw(e, 'Square'));
@@ -90,6 +90,16 @@ class RedliningComponent extends GirafeResizableElement {
     this.toolSelected.className = 'selected';
 
     this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolActivated', tool: tool});
+  }
+
+  deactivateDraw(e) {
+    if (this.toolSelected !== null) {
+      this.toolSelected.className = '';
+    }
+    this.toolSelected = e.target.parentElement;
+    this.toolSelected.className = 'selected';
+
+    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'drawToolDeactivated'});
   }
 
   connectedCallback() {
