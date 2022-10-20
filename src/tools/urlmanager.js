@@ -93,8 +93,8 @@ class UrlManager {
     state.mapY = coords[1];
     state.mapZ = coords[2];
     state.projection = params[1];
-    state.basemap = decodeURI(params[2]);
-    state.theme = decodeURI(params[3]);
+    state.basemap = decodeURIComponent(params[2]);
+    state.theme = decodeURIComponent(params[3]);
 
     return state;
   }

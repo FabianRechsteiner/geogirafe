@@ -222,7 +222,7 @@ class MapComponent extends GirafeHTMLElement {
       graphicUrl += '&SLD_Version=1.1.0'
     }
     if (rule !== null && rule !== undefined) {
-      graphicUrl += '&RULE=' + rule;
+      graphicUrl += '&RULE=' + encodeURIComponent(rule);
     }
 
     this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'responseLegendUrl', id: id, url: graphicUrl});
