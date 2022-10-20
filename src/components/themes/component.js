@@ -4,6 +4,7 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement';
 class ThemeComponent extends GirafeHTMLElement {
 
   static #template = null;
+  themesSelect = null;
   themesUrl = null;
   themesJson = {};
   themes = [];
@@ -30,11 +31,11 @@ class ThemeComponent extends GirafeHTMLElement {
     // Clone component template and add it to the dom
     this.shadow.appendChild(ThemeComponent.#template.content.cloneNode(true));
 
-    const select = this.shadow.querySelector('#themes');
+    this.themesSelect = this.shadow.querySelector('#themes');
 
     // Add options from themes
     this.themesJson.forEach(elem => {
-      this.addOption(select, elem);
+      this.addOption(this.themesSelect, elem);
     });
   }
 
@@ -51,9 +52,19 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    //window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
-    const themeSelect = this.shadow.querySelector('#themes');
-    themeSelect.addEventListener('change', (e) => this.onThemeChanged(this, e));
+    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
+    this.themesSelect.addEventListener('change', (e) => this.onThemeChanged(this, e));
+  }
+
+  onInitEvent(details) {
+    if (details.action === 'initState') {
+      if (details.state.theme !== 'null') {
+        // Find the theme id from the name
+        const index = this.themes.findIndex(item => item.name === details.state.theme);
+        this.themesSelect.value = index;
+        this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: this.themes[index]});
+      }
+    }
   }
 
   onThemeChanged(_this, e) {

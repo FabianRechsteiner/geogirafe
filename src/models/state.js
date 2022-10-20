@@ -5,9 +5,9 @@ class State {
   mapX = null;
   mapY = null;
   mapZ = null;
-  selectedTheme = null;
   basemap = null;
   projection = null;
+  theme = null;
 
   constructor() {
   }

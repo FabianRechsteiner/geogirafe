@@ -74,7 +74,7 @@ class UrlManager {
   }
 
   encodeState(state) {
-    const url = `#${state.mapX},${state.mapY},${state.mapZ}|${state.projection}|${state.basemap}`;
+    const url = `#${state.mapX},${state.mapY},${state.mapZ}|${state.projection}|${state.basemap}|${state.theme}`;
     return url;
   }
 
@@ -92,9 +92,9 @@ class UrlManager {
     state.mapX = coords[0];
     state.mapY = coords[1];
     state.mapZ = coords[2];
-    state.selectedTheme = null;
-    state.basemap = params[2];
     state.projection = params[1];
+    state.basemap = decodeURI(params[2]);
+    state.theme = decodeURI(params[3]);
 
     return state;
   }

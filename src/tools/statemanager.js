@@ -44,6 +44,7 @@ class StateManager {
     window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
     window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+    window.addEventListener(GeoEvents.Theme, (e) => this.onThemeEvent(e.detail));
   }
 
   onInitEvent(details) {
@@ -99,6 +100,18 @@ class StateManager {
     this.#state.mapZ = mapZ;
     this.sendStateChanged();
   }
+  
+  onThemeEvent(details) {
+    if (details.action === 'themeChanged') {
+      this.onChangeTheme(details.theme);
+    }
+  }
+ 
+  onChangeTheme(theme) {
+    this.#state.theme = theme.name;
+    this.sendStateChanged();
+  }
+
 }
 
 export default StateManager;
