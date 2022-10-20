@@ -41,7 +41,8 @@ ul {
 }
 
 li {
-  color: #555;
+  color: #999;
+  border-top: solid 1px #ddd;
 }
 
 li.active {
@@ -51,6 +52,10 @@ li.active {
 span {
   display: inline-block;
   margin: 0.2rem;
+}
+
+span.resnok {
+  font-style: italic;
 }
 
 i {

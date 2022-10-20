@@ -18,6 +18,10 @@ class GirafeHTMLElement extends HTMLElement {
     }
   }
 
+  isNullOrUndefined(val) {
+    return (val === undefined || val === null);
+  }
+
   activateTooltips() {
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach(el => {

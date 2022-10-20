@@ -7,6 +7,7 @@ class TreeViewComponent extends GirafeResizableElement {
   themesUrl = null;
   servers = {};
   layers = [];
+  ulRoot = null;
 
   constructor() {
     super();
@@ -18,6 +19,7 @@ class TreeViewComponent extends GirafeResizableElement {
   registerEvents() {
     window.addEventListener(GeoEvents.Theme, (e) => this.onThemeEvent(e.detail));
     window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
+    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
   }
 
   connectedCallback() {
@@ -55,6 +57,8 @@ class TreeViewComponent extends GirafeResizableElement {
   render() {
     this.shadow.appendChild(TreeViewComponent.#template.content.cloneNode(true));
     this.makeResizable();
+
+    this.ulRoot = this.shadow.querySelector('#treeview-list');
   }
 
   renderChilds(liParent, elem, parentServer) {
@@ -217,6 +221,8 @@ class TreeViewComponent extends GirafeResizableElement {
       };
       this.layers.push(layer);
       span.dataset.value = this.layers.length - 1;
+      span.dataset.minResolution = elem.minResolutionHint;
+      span.dataset.maxResolution = elem.maxResolutionHint;
     }
   }
 
@@ -340,19 +346,50 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
+  onMapEvent(details) {
+    if (details.action === 'resolutionChanged') {
+      this.onResolutionChanged(details.resolution);
+    }
+  }
+
+  onResolutionChanged(resolution) {
+    const spans = this.ulRoot.getElementsByTagName('span');
+    for (let i=0; i<spans.length; i++) {
+      const span = spans[i];
+      console.log(span.dataset.maxResolution);
+      let ok = false;
+      if (this.isNullOrUndefined(span.dataset.maxResolution) || this.isNullOrUndefined(span.dataset.minResolution)) {
+        // No resolution. Always visible
+        ok = true;
+      }
+      else if (resolution < span.dataset.maxResolution && resolution > span.dataset.minResolution) {
+        // Layer is visible for the current resolution
+        ok = true;
+      }
+
+      if (ok) {
+        span.classList.add('resok');
+        span.classList.remove('resnok');
+      }
+      else {
+        span.classList.add('resnok');
+        span.classList.remove('resok');
+      }
+    }
+  }
+
   onLegendUrlChanged(id, url) {
     const img = this.shadow.querySelector('#' + id);
     img.src = url;
   }
 
   onChangeTheme(theme) {
-    const ulRoot = this.shadow.querySelector('#treeview-list');
     // Clear existing TreeView;
-    ulRoot.innerHTML = '';
+    this.ulRoot.innerHTML = '';
 
     // Add the current theme
     theme.children.forEach(elem => {
-      this.renderLeaf(ulRoot, elem, null);
+      this.renderLeaf(this.ulRoot, elem, null);
     });
   }
 }

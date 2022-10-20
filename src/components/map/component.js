@@ -157,11 +157,14 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onMoveEnd(e) {
-    const center = this.map.getView().getCenter();
+    const view = this.map.getView();
+    const center = view.getCenter();
     const mapX = center[0];
     const mapY = center[1];
-    const mapZ = this.map.getView().getZoom(); 
-    this.messageManager.sendMessage(GeoEvents.Init, {action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ});
+    const mapZ = view.getZoom(); 
+    const resolution = view.getResolution();
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ});
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'resolutionChanged', resolution: resolution});
   }
 
   onFeatureAdded(_this, e) {
