@@ -164,7 +164,14 @@ class TreeViewComponent extends GirafeResizableElement {
     // We need to get the legendicon URL from openlayer
     // before we can show the legend icon
     // TODO REG : use elem.metadata.legendRule
-    console.log('Get Legend url for ' + elem.layers);
+    const legendId = 'LEG-' + elem.layers;
+    const icon = document.createElement('img');
+    icon.id = legendId;
+    icon.className = 'iconurl';
+    li.append(icon);
+
+    const url = this.servers[server].url
+    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: elem.layers, id: legendId, serverurl: url, rule: elem.metadata.legendRule});
     return false;
   }
 

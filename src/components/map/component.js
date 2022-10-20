@@ -205,11 +205,11 @@ class MapComponent extends GirafeHTMLElement {
       this.onRemoveLayer(details.layer);
     }
     else if (details.action === 'requestLegendUrl') {
-      this.onLegendUrlRequested(details.id, details.layer, details.serverurl);
+      this.onLegendUrlRequested(details.id, details.layer, details.serverurl, details.rule);
     }
   }
 
-  onLegendUrlRequested(id, layer, serverurl) {
+  onLegendUrlRequested(id, layer, serverurl, rule) {
     const wmsSource = new ImageWMS({
       url: serverurl,
       params: {'LAYERS': layer},
@@ -221,6 +221,10 @@ class MapComponent extends GirafeHTMLElement {
       // Add SLD_Version (it is mandatory, but openlayers do not seems to set it in the URL)
       graphicUrl += '&SLD_Version=1.1.0'
     }
+    if (rule !== null && rule !== undefined) {
+      graphicUrl += '&RULE=' + rule;
+    }
+
     this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'responseLegendUrl', id: id, url: graphicUrl});
   }
 
