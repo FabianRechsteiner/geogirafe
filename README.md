@@ -3,20 +3,22 @@
 GeoGirafe is an flexible application to build an online geoportal.
 This repository contains the web-viewer part of the project.
 
+**Please note that GeoGirafe is at its very beginning, can strongly evolve and is therefore not intended for the moment to be used by people other than developers or contributors.**
+
 # KISSSSS
 
-GeoGirafe is based on the latest web standards (Web-Components) and follow the KISSSSS philosophy and is:
-- **S**tupid: GeoGirafe is developed with pure Vanilla-javascript. No complex framework like React or Angular is used.
-- **S**imple: It contains only the core of a geoportal. A Map, a Treeview, and some other central components. Nothing useless.
-- **S**tretchable: Although GeoGirafe contains only the essentials for a geoportal, it can easily be extended with custom web-components.
-- **S**ure: Less dependencies also means less potential security problems.
-- **S**table: We do not want migrations from one version to another to take too much time or ressources. Stability is a key objective.
+GeoGirafe is based on the latest web standards (Web-Components), follow the KISSSSS philosophy and is:
+- Stupid: GeoGirafe is developed with pure Vanilla-javascript. No complex framework like React or Angular is used.
+- Simple: It contains only the core of a geoportal. A Map, a Treeview, and some other central components. Nothing useless.
+- Stretchable: Although GeoGirafe contains only the essentials for a geoportal, it can easily be extended with custom web-components.
+- Sure: Less dependencies also means less potential security problems.
+- Stable: We do not want migrations from one version to another to take too much time or ressources. Stability is a key objective.
 
 # Getting Started
 
 Install dependencies and start the development server:
 
-## On linux
+### On linux
 
 ```bash
 npm install
@@ -25,7 +27,7 @@ npm run-script serve
 
 On Windows:
 
-## On Windows
+### On Windows
 
 ```bash
 npm install
