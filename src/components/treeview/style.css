@@ -70,6 +70,7 @@ i.tool {
 img.iconurl {
   vertical-align: middle;
   margin-top: -0.2rem;
+  max-height: 1.2rem;
 }
 
 .fa-circle, .fa-circle-half-stroke {
