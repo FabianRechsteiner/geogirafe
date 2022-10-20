@@ -12,4 +12,4 @@ if not exist src\static\lib\openlayers mkdir src\static\lib\openlayers
 xcopy node_modules\ol\ol.css src\static\lib\openlayers\ /Y
 
 if not exist src\static\lib\lib\vanilla-picker mkdir src\static\lib\vanilla-picker
-cp node_modules\vanilla-picker\dist\vanilla-picker.csp.css src\static\lib\vanilla-picker\
+xcopy node_modules\vanilla-picker\dist\vanilla-picker.csp.css src\static\lib\vanilla-picker\ /Y
