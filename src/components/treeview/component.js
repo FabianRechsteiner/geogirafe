@@ -121,6 +121,7 @@ class TreeViewComponent extends GirafeResizableElement {
   renderLeafIcons(li, elem, server) {
     // This function returns true if a placeholder for a whole legend mut be added
     // False is not placeholder is needed
+    let legendNeeded = false;
     if (!elem.childLayers) {
       // We are not on a child layer
       // => Add caret and selection icon
@@ -130,53 +131,70 @@ class TreeViewComponent extends GirafeResizableElement {
       li.append(caret);
 
       this.renderSelectionCircle(li)
-      return false;
+    }
+    else {
+      // We are on a child
+      // => Add spacer (replaces the caret)
+      const spacer = document.createElement('i');
+      li.append(spacer);
+
+      // => Add iconUrl if any
+      if (elem.metadata.iconUrl) {
+        // A custom Legend icon has been defined.
+        // => We just use it
+        const icon = document.createElement('img');
+        icon.src = elem.metadata.iconUrl;
+        icon.className = 'iconurl';
+        li.append(icon);
+      }
+      else if (elem.metadata.legend == true) {
+        // A whole legend needs to be display.
+        // => We add a legend button and the legend circle
+        this.renderSelectionCircle(li)
+
+        // Add icon for legend toggle
+        const legendId = 'LEG-' + elem.layers;
+        const legend = document.createElement('i');
+        legend.className = 'fg-map-legend tool selectable';
+        legend.setAttribute('tip', 'Toggle legend');
+        legend.onclick = (e) => this.toggleLegend(this, legendId, e);
+        li.append(legend);
+        legendNeeded = true;
+      }
+      else {
+        // Last case :
+        // We need to get the legendicon URL from openlayer
+        // before we can show the legend icon
+        // TODO REG : use elem.metadata.legendRule
+        const legendId = 'LEG-' + elem.layers;
+        const icon = document.createElement('img');
+        icon.id = legendId;
+        icon.className = 'iconurl';
+        li.append(icon);
+
+        const url = this.servers[server].url
+        this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: elem.layers, id: legendId, serverurl: url, rule: elem.metadata.legendRule});
+      }
+
+      // On the childs, we can have a icon to zoom to the right resolution, where the layer will be visible
+      if (!this.resolutionIsDefault(elem.minResolutionHint, elem.maxResolutionHint)) {
+        const resolutionZoom = document.createElement('i');
+        resolutionZoom.className = 'fg-zoom-in tool selectable';
+        resolutionZoom.setAttribute('tip', 'Zoom to visible resolution');
+        resolutionZoom.onclick = (e) => this.zoomToResolution(elem.minResolutionHint, elem.maxResolutionHint);
+        li.append(resolutionZoom);
+      }
     }
 
-    // We are on a child
-    // => Add spacer (replaces the caret)
-    const spacer = document.createElement('i');
-    li.append(spacer);
+    return legendNeeded;
+  }
 
-    // => Add iconUrl if any
-    if (elem.metadata.iconUrl) {
-      // A custom Legend icon has been defined.
-      // => We just use it
-      const icon = document.createElement('img');
-      icon.src = elem.metadata.iconUrl;
-      icon.className = 'iconurl';
-      li.append(icon);
-      return false;
-    }
-
-    if (elem.metadata.legend == true) {
-      // A whole legend needs to be display.
-      // => We add a legend button and the legend circle
-      this.renderSelectionCircle(li)
-
-      // Add icon for legend toggle
-      const legendId = 'LEG-' + elem.layers;
-      const legend = document.createElement('i');
-      legend.className = 'fg-map-legend tool';
-      legend.onclick = (e) => this.toggleLegend(this, legendId, e);
-      li.append(legend);
-
-      return true;
-    }
-
-    // Last case :
-    // We need to get the legendicon URL from openlayer
-    // before we can show the legend icon
-    // TODO REG : use elem.metadata.legendRule
-    const legendId = 'LEG-' + elem.layers;
-    const icon = document.createElement('img');
-    icon.id = legendId;
-    icon.className = 'iconurl';
-    li.append(icon);
-
-    const url = this.servers[server].url
-    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: elem.layers, id: legendId, serverurl: url, rule: elem.metadata.legendRule});
-    return false;
+  zoomToResolution(minResolution, maxResolution) {
+    // Because of rounding errors (for example 1.59 becomes 1.589999999999998), 
+    // we zoom a bit more than just the max resolution.
+    // For the moment we try with 10% more
+    const resolution = maxResolution - 10/100*maxResolution;
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'zoomToResolution', resolution: resolution });
   }
 
   toggleLegend(_this, legendId, e) {
@@ -221,9 +239,18 @@ class TreeViewComponent extends GirafeResizableElement {
       };
       this.layers.push(layer);
       span.dataset.value = this.layers.length - 1;
-      span.dataset.minResolution = elem.minResolutionHint;
-      span.dataset.maxResolution = elem.maxResolutionHint;
+
+      // Resolutions
+      if (!this.resolutionIsDefault(elem.minResolutionHint, elem.maxResolutionHint))
+      {
+        span.dataset.minResolution = elem.minResolutionHint;
+        span.dataset.maxResolution = elem.maxResolutionHint;
+      }
     }
+  }
+
+  resolutionIsDefault(minResolution, maxResolution) {
+    return (minResolution === 0 && maxResolution === 999999999)
   }
 
   expand(_this, e) {
@@ -353,10 +380,10 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   onResolutionChanged(resolution) {
+    console.log(resolution);
     const spans = this.ulRoot.getElementsByTagName('span');
     for (let i=0; i<spans.length; i++) {
       const span = spans[i];
-      console.log(span.dataset.maxResolution);
       let ok = false;
       if (this.isNullOrUndefined(span.dataset.maxResolution) || this.isNullOrUndefined(span.dataset.minResolution)) {
         // No resolution. Always visible
@@ -391,6 +418,8 @@ class TreeViewComponent extends GirafeResizableElement {
     theme.children.forEach(elem => {
       this.renderLeaf(this.ulRoot, elem, null);
     });
+
+    this.activateTooltips();
   }
 }
 

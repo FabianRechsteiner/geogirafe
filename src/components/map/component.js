@@ -258,6 +258,13 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'basemapChanged') {
       this.onChangeBasemap(details.basemap);
     }
+    else if (details.action === 'zoomToResolution') {
+      this.zoomToResolution(details.resolution);
+    }
+  }
+
+  zoomToResolution(resolution) {
+    this.map.getView().setResolution(resolution);
   }
 
   onChangeProjection(projection) {
