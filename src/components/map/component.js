@@ -204,6 +204,24 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'layerDisabled') {
       this.onRemoveLayer(details.layer);
     }
+    else if (details.action === 'requestLegendUrl') {
+      this.onLegendUrlRequested(details.id, details.layer, details.serverurl);
+    }
+  }
+
+  onLegendUrlRequested(id, layer, serverurl) {
+    const wmsSource = new ImageWMS({
+      url: serverurl,
+      params: {'LAYERS': layer},
+      ratio: 1,
+    });
+    
+    let graphicUrl = wmsSource.getLegendUrl(this.map.getView().getResolution());
+    if (!graphicUrl.toLowerCase().includes('sld_version')) {
+      // Add SLD_Version (it is mandatory, but openlayers do not seems to set it in the URL)
+      graphicUrl += '&SLD_Version=1.1.0'
+    }
+    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'responseLegendUrl', id: id, url: graphicUrl});
   }
 
   onInitEvent(details) {

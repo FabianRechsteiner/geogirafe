@@ -17,6 +17,7 @@ class TreeViewComponent extends GirafeResizableElement {
 
   registerEvents() {
     window.addEventListener(GeoEvents.Theme, (e) => this.onThemeEvent(e.detail));
+    window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
   }
 
   connectedCallback() {
@@ -71,18 +72,21 @@ class TreeViewComponent extends GirafeResizableElement {
     const li = document.createElement('li');
     ulParent.appendChild(li);
 
+    // If a server is defined on this node, we use it.
+    const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
+    
     // Add icons
-    this.renderLeafIcons(li, elem);
+    let needsLegend = this.renderLeafIcons(li, elem, childServer);
 
     // Add label
-    // If a server is defined on this node, we use it.
     // Otherwise, we use the server of the parent
-    const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
     this.renderLeafLabel(li, elem, childServer);
     li.dataset.active = false;
 
-    // Add tool icons
-    this.renderToolsIcons(li, elem);
+    if (needsLegend) {
+      // Add legend
+      this.renderLegend(li, elem, childServer)
+    }
 
     // Append childs if any
     if (elem.children !== undefined) {
@@ -90,46 +94,89 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  renderLeafIcons(li, elem) {
-    // Add caret or spacer
-    const caret = document.createElement('i');
+  renderLegend(li, elem, server) {
+    // Add a image for the legend.
+    const legendId = 'LEG-' + elem.layers;
+    const legendimg = document.createElement('img');
+    legendimg.id = legendId;
+    legendimg.className = 'legend';
+    li.append(legendimg);
+    legendimg.style.display = (elem.metadata.isLegendExpanded) ? 'block' : 'none';
+    const url = this.servers[server].url
+    // Request legend image from openlayers
+    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: elem.layers, id: legendId, serverurl: url});
+  }
+
+  renderSelectionCircle(li) {
+    const circle = document.createElement('i');
+    circle.dataset.circle = true;
+    circle.className = 'fa-xs fa-regular fa-circle';
+    li.append(circle);
+  }
+
+  renderLeafIcons(li, elem, server) {
+    // This function returns true if a placeholder for a whole legend mut be added
+    // False is not placeholder is needed
     if (!elem.childLayers) {
-      // Add caret
+      // We are not on a child layer
+      // => Add caret and selection icon
+      const caret = document.createElement('i');
       caret.className = 'fa fa-caret-right selectable';
       caret.onclick = (e) => this.expand(this, e);
-    }
-    li.append(caret);
+      li.append(caret);
 
-    // Add iconUrl if any
+      this.renderSelectionCircle(li)
+      return false;
+    }
+
+    // We are on a child
+    // => Add spacer (replaces the caret)
+    const spacer = document.createElement('i');
+    li.append(spacer);
+
+    // => Add iconUrl if any
     if (elem.metadata.iconUrl) {
+      // A custom Legend icon has been defined.
+      // => We just use it
       const icon = document.createElement('img');
       icon.src = elem.metadata.iconUrl;
       icon.className = 'iconurl';
       li.append(icon);
+      return false;
+    }
+
+    if (elem.metadata.legend == true) {
+      // A whole legend needs to be display.
+      // => We add a legend button and the legend circle
+      this.renderSelectionCircle(li)
+
+      // Add icon for legend toggle
+      const legendId = 'LEG-' + elem.layers;
+      const legend = document.createElement('i');
+      legend.className = 'fg-map-legend tool';
+      legend.onclick = (e) => this.toggleLegend(this, legendId, e);
+      li.append(legend);
+
+      return true;
+    }
+
+    // Last case :
+    // We need to get the legendicon URL from openlayer
+    // before we can show the legend icon
+    // TODO REG : use elem.metadata.legendRule
+    console.log('Get Legend url for ' + elem.layers);
+    return false;
+  }
+
+  toggleLegend(_this, legendId, e) {
+    console.log('TOGGLE LEGEND ' + legendId);
+    const legend = _this.shadow.querySelector('#' + legendId);
+    if (legend.style.display === 'none') {
+      legend.style.display = 'block';
     }
     else {
-      // Add selection circle
-      const circle = document.createElement('i');
-      circle.dataset.circle = true;
-      circle.className = 'fa-xs fa-regular fa-circle';
-      li.append(circle);
+      legend.style.display = 'none';
     }
-
-  }
-
-  renderToolsIcons(li, elem) {
-    // Add legend icon
-    const legend = document.createElement('i');
-    if (elem.childLayers) {
-      legend.dataset.iconurl = elem.metadata.iconUrl;
-      legend.className = 'fg-map-legend tool';
-      legend.onclick = (e) => this.toggleLegend(this, e);
-    }      
-    li.append(legend);
-  }
-
-  toggleLegend(_this, e) {
-    console.log(e.target.dataset.iconurl);
   }
   
   renderLeafLabel(li, elem, server) {
@@ -278,6 +325,17 @@ class TreeViewComponent extends GirafeResizableElement {
     if (details.action === 'themeChanged') {
       this.onChangeTheme(details.theme);
     }
+  }
+
+  onTreeViewEvent(details) {
+    if (details.action === 'responseLegendUrl') {
+      this.onLegendUrlChanged(details.id, details.url);
+    }
+  }
+
+  onLegendUrlChanged(id, url) {
+    const img = this.shadow.querySelector('#' + id);
+    img.src = url;
   }
 
   onChangeTheme(theme) {

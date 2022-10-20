@@ -75,3 +75,7 @@ img.iconurl {
 .fa-circle, .fa-circle-half-stroke {
   width: 21px;
 }
+
+img.legend {
+  margin-left: 2rem;
+}
