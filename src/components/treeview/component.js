@@ -81,6 +81,9 @@ class TreeViewComponent extends GirafeResizableElement {
     this.renderLeafLabel(li, elem, childServer);
     li.dataset.active = false;
 
+    // Add tool icons
+    this.renderToolsIcons(li, elem);
+
     // Append childs if any
     if (elem.children !== undefined) {
       this.renderChilds(li, elem, childServer);
@@ -97,10 +100,36 @@ class TreeViewComponent extends GirafeResizableElement {
     }
     li.append(caret);
 
-    // Add selection circle
-    const circle = document.createElement('i');
-    circle.className = 'fa-xs fa-regular fa-circle';
-    li.append(circle);
+    // Add iconUrl if any
+    if (elem.metadata.iconUrl) {
+      const icon = document.createElement('img');
+      icon.src = elem.metadata.iconUrl;
+      icon.className = 'iconurl';
+      li.append(icon);
+    }
+    else {
+      // Add selection circle
+      const circle = document.createElement('i');
+      circle.dataset.circle = true;
+      circle.className = 'fa-xs fa-regular fa-circle';
+      li.append(circle);
+    }
+
+  }
+
+  renderToolsIcons(li, elem) {
+    // Add legend icon
+    const legend = document.createElement('i');
+    if (elem.childLayers) {
+      legend.dataset.iconurl = elem.metadata.iconUrl;
+      legend.className = 'fg-map-legend tool';
+      legend.onclick = (e) => this.toggleLegend(this, e);
+    }      
+    li.append(legend);
+  }
+
+  toggleLegend(_this, e) {
+    console.log(e.target.dataset.iconurl);
   }
   
   renderLeafLabel(li, elem, server) {
@@ -153,21 +182,27 @@ class TreeViewComponent extends GirafeResizableElement {
 
   toggle(_this, e) {
     const li = e.target.parentElement;
-    const circle = li.getElementsByTagName('i')[1];
+    const circle = li.querySelector('[data-circle="true"]');
     let action = null;
+    let circleClass = null;
     if (li.dataset.active === 'true') {
       // Deactivate layer
       li.className = '';
-      circle.className = 'fa-xs fa-regular fa-circle';
+      circleClass = 'fa-xs fa-regular fa-circle';
       action = 'layerDisabled';
       li.dataset.active = false;
     }
     else {
       // Activate layer
       li.className = 'active';
-      circle.className = 'fa-xs fa-solid fa-circle';
+      circleClass = 'fa-xs fa-solid fa-circle';
       action = 'layerEnabled';
       li.dataset.active = true;
+    }
+
+    if (circle !== null) {
+      // There is a selection circle (no legend icon)
+      circle.className = circleClass;
     }
 
     // Toggle parent if necessary

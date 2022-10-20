@@ -25,7 +25,7 @@ proj4.defs("EPSG:2056" , '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333
 register(proj4);
 
 // Initialize the singletons once
-UrlManager.getInstance([TreeViewComponent, MapComponent, ProjectionComponent, BasemapComponent, LanguageComponent]);
+UrlManager.getInstance([TreeViewComponent, MapComponent, ProjectionComponent, BasemapComponent, ThemeComponent, LanguageComponent]);
 StateManager.getInstance();
 I18nManager.getInstance();
 MessageManager.getInstance();

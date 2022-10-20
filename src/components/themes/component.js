@@ -77,8 +77,13 @@ class ThemeComponent extends GirafeHTMLElement {
       .then(() => {
         this.render();
         this.registerEvents();
+        this.initialized();
     }));
   }
+
+  initialized() {
+    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
+  }  
 
   async loadThemes() {
     const response = await fetch(this.themesUrl);

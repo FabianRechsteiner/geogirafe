@@ -62,3 +62,16 @@ i {
 .selectable {
   cursor: pointer;
 }
+
+i.tool {
+  float: right;
+}
+
+img.iconurl {
+  vertical-align: middle;
+  margin-top: -0.2rem;
+}
+
+.fa-circle, .fa-circle-half-stroke {
+  width: 21px;
+}
