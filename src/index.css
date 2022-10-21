@@ -48,7 +48,9 @@ girafe-tree-view {
 
 #logo {
     margin-right: 3rem;
-    margin-top: -0.2rem;
+    margin-top: -0.1rem;
+    height: 45px;
+    margin-left: 1rem;
 }
 
 girafe-search {

@@ -9,7 +9,7 @@
 
 #gutter {
   border: none;
-  width: 10px;
+  width: 6px;
   height: 100%;
   background: #999;
   position: absolute;
@@ -25,7 +25,7 @@
 #content {
   position: absolute;
   top : 0;
-  left: 10px;
+  left: 6px;
   right: 0;
   bottom: 0;
   background : #fff;
@@ -35,10 +35,10 @@
 }
 
 #content button {
-  border: solid 1px #ccc;
-  color: #666;
-  height: 3rem;
-  width: 3rem;
+  border: solid 1px #fff;
+  color: #777;
+  height: 2.4rem;
+  width: 2.4rem;
   text-align: left;
   padding: 0;
   padding-left: 0.5rem;
@@ -50,27 +50,6 @@
 #content button.selected {
   border-color: #000;
   color: #000;
-}
-
-[tip] .tooltip {
-  position: fixed;
-  font-size: 1rem;
-  font-style: normal;
-  color: #000;
-  z-index: 9999;
-  padding: 5px;
-  background: white;
-  border: 1px solid #ccc;
-  visibility: hidden;
-  box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
-  opacity: 0;
-  transition:
-    opacity 0.3s,
-    visiblity 0s;
-}
-[tip]:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
 }
 
 #drawingList {
