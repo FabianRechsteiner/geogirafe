@@ -1,3 +1,4 @@
+import Layer from '/models/layer';
 import GeoEvents from '/models/events';
 import GirafeResizableElement from '/base/GirafeResizableElement'
 
@@ -74,22 +75,23 @@ class TreeViewComponent extends GirafeResizableElement {
   renderLeaf(ulParent, elem, parentServer) {
     // Create new leaf
     const li = document.createElement('li');
+    li.dataset.active = false;
     ulParent.appendChild(li);
 
     // If a server is defined on this node, we use it.
-    const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
-    
-    // Add icons
-    let needsLegend = this.renderLeafIcons(li, elem, childServer);
-
-    // Add label
     // Otherwise, we use the server of the parent
-    this.renderLeafLabel(li, elem, childServer);
-    li.dataset.active = false;
+    const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
 
-    if (needsLegend) {
+    // Create Layer
+    const layer = this.createLayer(elem, childServer);
+    // Add icons
+    this.renderLeafIcons(li, layer);
+    // Add label
+    this.renderLeafLabel(li, layer);
+    
+    if (layer.hasLegend) {
       // Add legend
-      this.renderLegend(li, elem, childServer)
+      this.renderLegend(li, layer)
     }
 
     // Append childs if any
@@ -98,17 +100,31 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  renderLegend(li, elem, server) {
+  createLayer(elem, server) {
+      let url = null;
+      if (server) {
+        url = this.servers[server].url
+      }
+      else {
+        console.log('NOT OGC SERVER FOR ' + elem.name);
+      }
+      const layer = new Layer(elem, server, url);
+      this.layers.push(layer);
+
+      // The id is the index of the layer in the layer list
+      layer.id = this.layers.length - 1;
+      return layer;
+  }
+
+  renderLegend(li, layer) {
     // Add a image for the legend.
-    const legendId = 'LEG-' + elem.layers;
     const legendimg = document.createElement('img');
-    legendimg.id = legendId;
+    legendimg.id = layer.legendId;
     legendimg.className = 'legend';
     li.append(legendimg);
-    legendimg.style.display = (elem.metadata.isLegendExpanded) ? 'block' : 'none';
-    const url = this.servers[server].url
+    legendimg.style.display = (layer.isLegendExpanded) ? 'block' : 'none';
     // Request legend image from openlayers
-    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: elem.layers, id: legendId, serverurl: url});
+    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: layer});
   }
 
   renderSelectionCircle(li) {
@@ -118,11 +134,10 @@ class TreeViewComponent extends GirafeResizableElement {
     li.append(circle);
   }
 
-  renderLeafIcons(li, elem, server) {
+  renderLeafIcons(li, layer) {
     // This function returns true if a placeholder for a whole legend mut be added
     // False is not placeholder is needed
-    let legendNeeded = false;
-    if (!elem.childLayers) {
+    if (layer.isGroup) {
       // We are not on a child layer
       // => Add caret and selection icon
       const caret = document.createElement('i');
@@ -139,41 +154,36 @@ class TreeViewComponent extends GirafeResizableElement {
       li.append(spacer);
 
       // => Add iconUrl if any
-      if (elem.metadata.iconUrl) {
+      if (layer.iconUrl) {
         // A custom Legend icon has been defined.
         // => We just use it
         const icon = document.createElement('img');
-        icon.src = elem.metadata.iconUrl;
+        icon.src = layer.iconUrl;
         icon.className = 'iconurl';
         li.append(icon);
       }
-      else if (elem.metadata.legend == true) {
+      else if (layer.hasLegend) {
         // A whole legend needs to be display.
         // => We add a legend button and the legend circle
         this.renderSelectionCircle(li)
 
         // Add icon for legend toggle
-        const legendId = 'LEG-' + elem.layers;
         const legend = document.createElement('i');
         legend.className = 'fg-map-legend tool selectable';
         legend.setAttribute('tip', 'Toggle legend');
-        legend.onclick = (e) => this.toggleLegend(this, legendId, e);
+        legend.onclick = (e) => this.toggleLegend(this, layer.legendId, e);
         li.append(legend);
-        legendNeeded = true;
       }
       else {
         // Last case :
         // We need to get the legendicon URL from openlayer
         // before we can show the legend icon
-        // TODO REG : use elem.metadata.legendRule
-        const legendId = 'LEG-' + elem.layers;
         const icon = document.createElement('img');
-        icon.id = legendId;
+        icon.id = layer.legendId;
         icon.className = 'iconurl';
         li.append(icon);
 
-        const url = this.servers[server].url
-        this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: elem.layers, id: legendId, serverurl: url, rule: elem.metadata.legendRule});
+        this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: layer});
       }
 
       // Add an icon to control the layer opacity
@@ -184,16 +194,14 @@ class TreeViewComponent extends GirafeResizableElement {
       li.append(opacity);*/
 
       // On the childs, we can have a icon to zoom to the right resolution, where the layer will be visible
-      if (!this.resolutionIsDefault(elem.minResolutionHint, elem.maxResolutionHint)) {
+      if (layer.hasRestrictedResolution()) {
         const resolutionZoom = document.createElement('i');
         resolutionZoom.className = 'fg-zoom-in tool selectable';
         resolutionZoom.setAttribute('tip', 'Zoom to visible resolution');
-        resolutionZoom.onclick = (e) => this.zoomToResolution(elem.minResolutionHint, elem.maxResolutionHint);
+        resolutionZoom.onclick = (e) => this.zoomToResolution(layer.minResolution, layer.maxResolution);
         li.append(resolutionZoom);
       }
     }
-
-    return legendNeeded;
   }
 
   zoomToResolution(minResolution, maxResolution) {
@@ -215,50 +223,23 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
   
-  renderLeafLabel(li, elem, server) {
+  renderLeafLabel(li, layer) {
     // Add label
     const span = document.createElement('span');
     span.setAttribute('i18n', 'girafe');
-    span.textContent = elem.name;
+    span.textContent = layer.name;
     span.className = 'selectable';
-    span.onclick = (e) => this.toggle(this, e);
+    span.onclick = (e) => this.toggle(this, e, layer);
     li.appendChild(span);
 
-    if (elem.childLayers) {
+    if (layer.isLayer) {
       // We are on a layer linked to a server.
-      // It means this one can be queried from WMS
-      let url = null;
-      if (server) {
-        url = this.servers[server].url
-      }
-      else {
-        console.log('NOT OGC SERVER FOR ' + elem.name);
-      }
-      const layer = {
-        "name": elem.name,
-        "type": elem.type,
-        "server": elem.ogcServer,
-        "url": url,
-        "imageType": elem.imageType,
-        "layer": elem.layers,
-        "minResolution": elem.minResolutionHint,
-        "maxResolution": elem.maxResolutionHint,
-        "opacity": 1
-      };
-      this.layers.push(layer);
-      span.dataset.value = this.layers.length - 1;
-
-      // Resolutions
-      if (!this.resolutionIsDefault(elem.minResolutionHint, elem.maxResolutionHint))
+      if (layer.hasRestrictedResolution())
       {
-        span.dataset.minResolution = elem.minResolutionHint;
-        span.dataset.maxResolution = elem.maxResolutionHint;
+        span.dataset.minResolution = layer.minResolution;
+        span.dataset.maxResolution = layer.maxResolution;
       }
     }
-  }
-
-  resolutionIsDefault(minResolution, maxResolution) {
-    return (minResolution === 0 && maxResolution === 999999999)
   }
 
   expand(_this, e) {
@@ -275,7 +256,7 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  toggle(_this, e) {
+  toggle(_this, e, layer) {
     const li = e.target.parentElement;
     const circle = li.querySelector('[data-circle="true"]');
     let action = null;
@@ -303,11 +284,11 @@ class TreeViewComponent extends GirafeResizableElement {
     // Toggle parent if necessary
     this.toggleParent(li);
 
-    if (e.target.dataset.value) {
+    if (layer.isLayer) {
       // We have data on this layer.
       // => We are on a leaf with layer infos
       // We send a message to activate/deactivate this layer
-      this.messageManager.sendMessage(GeoEvents.TreeView, {action: action, layer: _this.layers[e.target.dataset.value]});
+      this.messageManager.sendMessage(GeoEvents.TreeView, {action: action, layer: layer});
     }
   }
 

@@ -208,15 +208,15 @@ class MapComponent extends GirafeHTMLElement {
       this.onRemoveLayer(details.layer);
     }
     else if (details.action === 'requestLegendUrl') {
-      this.onLegendUrlRequested(details.id, details.layer, details.serverurl, details.rule);
+      this.onLegendUrlRequested(details.layer);
     }
   }
 
-  onLegendUrlRequested(id, layer, serverurl, rule) {
+  onLegendUrlRequested(layer) {
     const wmsSource = new ImageWMS({
-      url: serverurl,
-      params: {'LAYERS': layer},
-      ratio: 1,
+      url: layer.url,
+      params: {'LAYERS': layer.layers},
+      ratio: 1
     });
     
     let graphicUrl = wmsSource.getLegendUrl(this.map.getView().getResolution());
@@ -224,11 +224,11 @@ class MapComponent extends GirafeHTMLElement {
       // Add SLD_Version (it is mandatory, but openlayers do not seems to set it in the URL)
       graphicUrl += '&SLD_Version=1.1.0'
     }
-    if (rule !== null && rule !== undefined) {
-      graphicUrl += '&RULE=' + encodeURIComponent(rule);
+    if (!this.isNullOrUndefined(layer.legendRule)) {
+      graphicUrl += '&RULE=' + encodeURIComponent(layer.legendRule);
     }
 
-    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'responseLegendUrl', id: id, url: graphicUrl});
+    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'responseLegendUrl', id: layer.legendId, url: graphicUrl});
   }
 
   onInitEvent(details) {
@@ -321,7 +321,7 @@ class MapComponent extends GirafeHTMLElement {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
       const layerDef = this.layersByServer[key];
-      layerDef.layerList.push(layerInfos.layer);
+      layerDef.layerList.push(layerInfos.layers);
       const source = new ImageWMS({
         url: layerInfos.url,
         params: {
@@ -338,14 +338,15 @@ class MapComponent extends GirafeHTMLElement {
         source: new ImageWMS({
           url: layerInfos.url,
           params: {
-            'LAYERS': layerInfos.layer, 
+            'LAYERS': layerInfos.layers, 
             'FORMAT': layerInfos.imageType
           },
-        })
+        }),
+        //opacity: layerInfos.opacity
       });
       this.layersByServer[key] = {
         layer: layer,
-        layerList : [layerInfos.layer]
+        layerList : [layerInfos.layers]
       };
       this.map.addLayer(layer);
     }
@@ -358,7 +359,7 @@ class MapComponent extends GirafeHTMLElement {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
       const layerDef = this.layersByServer[key];
-      layerDef.layerList = layerDef.layerList.filter(item => item !== layerInfos.layer);
+      layerDef.layerList = layerDef.layerList.filter(item => item !== layerInfos.layers);
 
       if (layerDef.layerList.length > 0) {
         // There are still layers in the list.
