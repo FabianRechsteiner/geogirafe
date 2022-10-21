@@ -44,7 +44,6 @@ class LanguageComponent extends GirafeHTMLElement {
   // }
 
   onLanguageChanged(_this, e) {
-    console.log(e.target.value);
     _this.messageManager.sendMessage(GeoEvents.Translate, {action: 'languageChanged', language: e.target.value});
   }
 

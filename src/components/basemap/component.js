@@ -91,7 +91,6 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   onBasemapChanged(_this, e) {
-    console.log(e.target.value);
     this.messageManager.sendMessage(GeoEvents.Map, {action: 'basemapChanged', basemap: _this.basemaps[e.target.value]});
   }
 
