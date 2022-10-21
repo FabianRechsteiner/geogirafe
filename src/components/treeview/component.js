@@ -1,3 +1,4 @@
+import tippy from 'tippy.js';
 import Layer from '/models/layer';
 import GeoEvents from '/models/events';
 import GirafeResizableElement from '/base/GirafeResizableElement'
@@ -187,11 +188,27 @@ class TreeViewComponent extends GirafeResizableElement {
       }
 
       // Add an icon to control the layer opacity
-      /*const opacity = document.createElement('i');
-      opacity.className = 'fg-screen-map-o tool selectable';
+      const opacity = document.createElement('i');
+      opacity.className = 'fg-layer-alt tool selectable';
       opacity.setAttribute('tip', 'Control opacity');
-      opacity.onclick = (e) => this.setOpacity(elem.);
-      li.append(opacity);*/
+      tippy(opacity, {
+        trigger: 'click',
+        arrow: true,
+        interactive: true,
+        theme: 'light',
+        placement: 'bottom-end',
+        content: (reference) => {
+          const slider = document.createElement('input');
+          slider.type = 'range';
+          slider.className = 'slider';
+          slider.min = 0;
+          slider.max = 20;
+          slider.value = layer.opacity*20;
+          slider.oninput = (e) => this.changeOpacity(layer, reference, e);
+          return slider;
+        }
+      });
+      li.append(opacity);
 
       // On the childs, we can have a icon to zoom to the right resolution, where the layer will be visible
       if (layer.hasRestrictedResolution()) {
@@ -202,6 +219,19 @@ class TreeViewComponent extends GirafeResizableElement {
         li.append(resolutionZoom);
       }
     }
+  }
+
+  changeOpacity(layer, reference, e) {
+    layer.opacity = e.target.value/20;
+    if (layer.isTransparent) {
+      reference.classList.remove('fg-layer-alt');
+      reference.classList.add('fg-layer-alt-o');
+    }
+    else {
+      reference.classList.remove('fg-layer-alt-o');
+      reference.classList.add('fg-layer-alt');
+    }
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'opacityChanged', layer: layer});
   }
 
   zoomToResolution(minResolution, maxResolution) {

@@ -57,6 +57,14 @@ class Layer {
   get legendId() {
     return 'LEG-' + this.id;
   }
+
+  get serverUniqueQueryId() {
+    return this.server + this.imageType;
+  }
+
+  get isTransparent() {
+    return (this.opacity !== 1);
+  }
 }
 
 export default Layer;

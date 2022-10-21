@@ -7,14 +7,14 @@ import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
-import WMTS, {optionsFromCapabilities} from 'ol/source/WMTS';
+import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import { Modify, Snap } from 'ol/interaction';
 import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
 import View from 'ol/View';
 import GeoEvents from '/models/events.js';
-import { getPointResolution, get as getProjection, transform} from 'ol/proj';
+import { getPointResolution, get as getProjection, transform } from 'ol/proj';
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
@@ -31,6 +31,7 @@ class MapComponent extends GirafeHTMLElement {
   projection = getProjection(this.srid);
   currentBasemap = null;
   layersByServer = {};
+  transparentLayers = {};
 
   // For Redlining
   featuresCollection = null;
@@ -38,17 +39,17 @@ class MapComponent extends GirafeHTMLElement {
   vectorLayer = null;
   draw = null;
   snap = null;
-  
+
   // Default styles
   defaultStrokeColor = '#ff0000';
   defaultStrokeWidth = 2;
   defaultFillColor = '#ff66667f';
   defaultTextSize = 12;
   defaultFont = 'Arial';
-  
+
   constructor() {
     super();
-    this.shadow = this.attachShadow({mode: 'open'});
+    this.shadow = this.attachShadow({ mode: 'open' });
     this.registerEvents();
   }
 
@@ -85,8 +86,8 @@ class MapComponent extends GirafeHTMLElement {
     let target = this.shadow.querySelector('#ol-map-container');
     this.map = new Map({
       target: target,
-      layers: [ this.currentBasemap ],
-      view: new View({ 
+      layers: [this.currentBasemap],
+      view: new View({
         center: [0, 0],
         zoom: 2,
       }),
@@ -117,14 +118,14 @@ class MapComponent extends GirafeHTMLElement {
     const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
 
     return new Style({
-      stroke: new Stroke({color: strokeColor, width: strokeWidth}),
-      fill: new Fill({color: fillColor}),
+      stroke: new Stroke({ color: strokeColor, width: strokeWidth }),
+      fill: new Fill({ color: fillColor }),
       image: new Circle({
         radius: 7,
-        fill: new Fill({color: fillColor}),
-        stroke: new Stroke({color: strokeColor, width: strokeWidth})
+        fill: new Fill({ color: fillColor }),
+        stroke: new Stroke({ color: strokeColor, width: strokeWidth })
       }),
-      text: new Text({text: feature.get('name'), font: 'Bold ' + textSize + 'px/1 ' + this.defaultFont})
+      text: new Text({ text: feature.get('name'), font: 'Bold ' + textSize + 'px/1 ' + this.defaultFont })
     });
   }
 
@@ -161,10 +162,10 @@ class MapComponent extends GirafeHTMLElement {
     const center = view.getCenter();
     const mapX = center[0];
     const mapY = center[1];
-    const mapZ = view.getZoom(); 
+    const mapZ = view.getZoom();
     const resolution = view.getResolution();
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ});
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'resolutionChanged', resolution: resolution});
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ });
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'resolutionChanged', resolution: resolution });
   }
 
   onFeatureAdded(_this, e) {
@@ -175,8 +176,8 @@ class MapComponent extends GirafeHTMLElement {
     e.element.setStyle((feature) => this.getDefaultStyle(feature));
     // Send message
     this.messageManager.sendMessage(GeoEvents.Redlining, {
-      action: 'featureAdded', 
-      id: e.element.ol_uid, 
+      action: 'featureAdded',
+      id: e.element.ol_uid,
       name: name,
       strokeColor: this.defaultStrokeColor,
       fillColor: this.defaultFillColor,
@@ -193,7 +194,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   initialized() {
-    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
+    this.messageManager.sendMessage(GeoEvents.Init, { action: 'componentInitialized' });
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {
@@ -215,10 +216,10 @@ class MapComponent extends GirafeHTMLElement {
   onLegendUrlRequested(layer) {
     const wmsSource = new ImageWMS({
       url: layer.url,
-      params: {'LAYERS': layer.layers},
+      params: { 'LAYERS': layer.layers },
       ratio: 1
     });
-    
+
     let graphicUrl = wmsSource.getLegendUrl(this.map.getView().getResolution());
     if (!graphicUrl.toLowerCase().includes('sld_version')) {
       // Add SLD_Version (it is mandatory, but openlayers do not seems to set it in the URL)
@@ -228,7 +229,7 @@ class MapComponent extends GirafeHTMLElement {
       graphicUrl += '&RULE=' + encodeURIComponent(layer.legendRule);
     }
 
-    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'responseLegendUrl', id: layer.legendId, url: graphicUrl});
+    this.messageManager.sendMessage(GeoEvents.TreeView, { action: 'responseLegendUrl', id: layer.legendId, url: graphicUrl });
   }
 
   onInitEvent(details) {
@@ -241,7 +242,7 @@ class MapComponent extends GirafeHTMLElement {
         this.onChangeBasemap(details.state.basemap);
       }
       if (details.state.mapX !== 'null' && details.state.mapY !== 'null' && details.state.mapZ !== 'null') {
-        const newView = new View({ 
+        const newView = new View({
           center: [parseFloat(details.state.mapX), parseFloat(details.state.mapY)],
           zoom: parseFloat(details.state.mapZ),
           projection: this.projection
@@ -260,6 +261,9 @@ class MapComponent extends GirafeHTMLElement {
     }
     else if (details.action === 'zoomToResolution') {
       this.zoomToResolution(details.resolution);
+    }
+    else if (details.action === 'opacityChanged') {
+      this.onChangeOpacity(details.layer);
     }
   }
 
@@ -315,12 +319,10 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onAddWmsLayer(layerInfos) {
-    const key = layerInfos.server + layerInfos.imageType;
-
-    if (key in this.layersByServer) {
+    if (layerInfos.serverUniqueQueryId in this.layersByServer) {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
-      const layerDef = this.layersByServer[key];
+      const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
       layerDef.layerList.push(layerInfos.layers);
       const source = new ImageWMS({
         url: layerInfos.url,
@@ -338,27 +340,29 @@ class MapComponent extends GirafeHTMLElement {
         source: new ImageWMS({
           url: layerInfos.url,
           params: {
-            'LAYERS': layerInfos.layers, 
+            'LAYERS': layerInfos.layers,
             'FORMAT': layerInfos.imageType
           },
         }),
-        //opacity: layerInfos.opacity
       });
-      this.layersByServer[key] = {
+      this.layersByServer[layerInfos.serverUniqueQueryId] = {
         layer: layer,
-        layerList : [layerInfos.layers]
+        layerList: [layerInfos.layers]
       };
       this.map.addLayer(layer);
+    }
+
+    // If the layer is transparent, we make it transparent
+    if (layerInfos.isTransparent) {
+      this.onChangeOpacity(layerInfos);
     }
   }
 
   onRemoveWmsLayer(layerInfos) {
-    const key = layerInfos.server + layerInfos.imageType;
-
-    if (key in this.layersByServer) {
+    if (layerInfos.serverUniqueQueryId in this.layersByServer) {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
-      const layerDef = this.layersByServer[key];
+      const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
       layerDef.layerList = layerDef.layerList.filter(item => item !== layerInfos.layers);
 
       if (layerDef.layerList.length > 0) {
@@ -376,12 +380,63 @@ class MapComponent extends GirafeHTMLElement {
       else {
         // No more layer here.
         // => We simply remove the whole layer
-        delete this.layersByServer[key];
+        delete this.layersByServer[layerInfos.serverUniqueQueryId];
         this.map.removeLayer(layerDef.layer);
       }
     }
+    else if (layerInfos.name in this.transparentLayers) {
+      const layerDef = this.transparentLayers[layerInfos.name];
+      delete this.layersByServer[layerInfos.name];
+      this.map.removeLayer(layerDef);
+    }
     else {
-      console.log('Nothing to remove !')
+      console.log('Nothing to remove !');
+    }
+  }
+
+  onChangeOpacity(layerInfos) {
+    if (!layerInfos.isTransparent) {
+      // Back to normal
+      // The opacity was set to 1 again.
+      if (layerInfos.name in this.transparentLayers) {
+        const layerDef = this.transparentLayers[layerInfos.name];
+        // We delete the layer from the transparent layers
+        delete this.transparentLayers[layerInfos.name];
+        this.map.removeLayer(layerDef);
+        // And add it to the normal layer again
+        this.onAddWmsLayer(layerInfos);
+      }
+      else {
+        // Nothing to do.
+        console.log('Nothing to do here');
+      }
+    }
+    else if (layerInfos.name in this.transparentLayers) {
+      // The layer has already a configure opacity
+      // => We just change the opacity
+      const layerDef = this.transparentLayers[layerInfos.name];
+      layerDef.setOpacity(layerInfos.opacity);
+    }
+    else if (layerInfos.serverUniqueQueryId in this.layersByServer) {
+      // First, we remove the layer from the default layer
+      this.onRemoveWmsLayer(layerInfos);
+      // Then, we create a new layer
+      const layer = new ImageLayer({
+        source: new ImageWMS({
+          url: layerInfos.url,
+          params: {
+            'LAYERS': layerInfos.layers,
+            'FORMAT': layerInfos.imageType
+          },
+        }),
+        opacity: layerInfos.opacity
+      });
+      this.transparentLayers[layerInfos.name] = layer;
+      this.map.addLayer(layer);
+    }
+    else {
+      // Nothing to do
+      console.log('Nothing to do!');
     }
   }
 
@@ -482,7 +537,7 @@ class MapComponent extends GirafeHTMLElement {
   deleteFeature(id) {
     const toRemove = this.featuresCollection.getArray().find(f => f.ol_uid === id);
     this.featuresCollection.remove(toRemove);
-    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'featureRemoved', id: toRemove.ol_uid});
+    this.messageManager.sendMessage(GeoEvents.Redlining, { action: 'featureRemoved', id: toRemove.ol_uid });
   }
 
   activateRedliningTool(tool) {
@@ -515,11 +570,11 @@ class MapComponent extends GirafeHTMLElement {
       freehand: freehand,
       geometryFunction: geometryFunction
     });
-    const modify = new Modify({source: this.vectorSource});
+    const modify = new Modify({ source: this.vectorSource });
     this.map.addInteraction(modify);
 
     this.map.addInteraction(this.draw);
-    this.snap = new Snap({source: this.vectorSource});
+    this.snap = new Snap({ source: this.vectorSource });
     this.map.addInteraction(this.snap);
   }
 
@@ -538,7 +593,7 @@ class MapComponent extends GirafeHTMLElement {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min);
   }
-  
+
 }
 
 customElements.define('girafe-map', MapComponent);
