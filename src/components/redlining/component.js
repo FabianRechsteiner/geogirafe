@@ -64,7 +64,7 @@ class RedliningComponent extends GirafeResizableElement {
     this.toolSelected = this.disableButton;
 
     this.makeResizable();
-    this.activateTooltips();
+    this.activateTooltips(false, [800, 0], 'top-end');
   }
 
   registerEvents() {

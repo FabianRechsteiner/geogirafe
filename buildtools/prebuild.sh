@@ -17,3 +17,8 @@ cp node_modules/ol/ol.css src/static/lib/openlayers/
 
 mkdir -p src/static/lib/vanilla-picker/
 cp node_modules/vanilla-picker/dist/vanilla-picker.csp.css src/static/lib/vanilla-picker/
+
+mkdir -p src/static/lib/tippy.js/
+rm -f src/static/lib/tippy.js/tippy.min.css
+TODO REG
+//find node_modules/tippy.js -name *.css | xargs cat {}>>src/static/lib/tippy.js/tippy.min.css

@@ -176,6 +176,13 @@ class TreeViewComponent extends GirafeResizableElement {
         this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: elem.layers, id: legendId, serverurl: url, rule: elem.metadata.legendRule});
       }
 
+      // Add an icon to control the layer opacity
+      /*const opacity = document.createElement('i');
+      opacity.className = 'fg-screen-map-o tool selectable';
+      opacity.setAttribute('tip', 'Control opacity');
+      opacity.onclick = (e) => this.setOpacity(elem.);
+      li.append(opacity);*/
+
       // On the childs, we can have a icon to zoom to the right resolution, where the layer will be visible
       if (!this.resolutionIsDefault(elem.minResolutionHint, elem.maxResolutionHint)) {
         const resolutionZoom = document.createElement('i');
@@ -235,7 +242,8 @@ class TreeViewComponent extends GirafeResizableElement {
         "imageType": elem.imageType,
         "layer": elem.layers,
         "minResolution": elem.minResolutionHint,
-        "maxResolution": elem.maxResolutionHint
+        "maxResolution": elem.maxResolutionHint,
+        "opacity": 1
       };
       this.layers.push(layer);
       span.dataset.value = this.layers.length - 1;
@@ -419,7 +427,7 @@ class TreeViewComponent extends GirafeResizableElement {
       this.renderLeaf(this.ulRoot, elem, null);
     });
 
-    this.activateTooltips();
+    this.activateTooltips(false, [800, 0], 'right');
   }
 }
 

@@ -3,3 +3,4 @@ public
 src/static/components
 src/static/lib/openlayers
 src/static/lib/vanilla-picker
+src/static/lib/tippy.js

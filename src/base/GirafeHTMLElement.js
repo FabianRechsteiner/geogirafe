@@ -1,3 +1,4 @@
+import tippy from 'tippy.js';
 import GeoEvents from '/models/events';
 import I18nManager from '/tools/i18nmanager';
 import MessageManager from '/tools/messagemanager';
@@ -22,23 +23,17 @@ class GirafeHTMLElement extends HTMLElement {
     return (val === undefined || val === null);
   }
 
-  activateTooltips() {
+  activateTooltips(arrow, delay, placement) {
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach(el => {
-      let tip = document.createElement('div');
-      tip.classList.add('tooltip');
-      tip.innerText = el.getAttribute('tip');
-      tip.style.transitionDelay = '0.8s';
-      tip.style.transform =
-        'translate(' +
-          (el.hasAttribute('tip-left') ? 'calc(-100% - 5px)' : '15px') + ', ' +
-          (el.hasAttribute('tip-top') ? '-100%' : '0') +
-        ')';
-      el.appendChild(tip);
-      el.onmousemove = e => {
-        tip.style.left = e.clientX + 'px'
-        tip.style.top = e.clientY + 'px';
-      };
+      tippy(el, {
+        arrow: arrow,
+        delay: delay,
+        placement: placement,
+        //animateFill: false,
+        //animation: 'scale-with-inertia',
+        content: el.getAttribute('tip')
+      })
     });
   }
 }
