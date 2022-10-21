@@ -203,10 +203,16 @@ class MapComponent extends GirafeHTMLElement {
 
   onTreeViewEvent(details) {
     if (details.action === 'layerEnabled') {
-      this.onAddLayer(details.layer);
+      this.onAddLayers([details.layer]);
     }
     else if (details.action === 'layerDisabled') {
-      this.onRemoveLayer(details.layer);
+      this.onRemoveLayers([details.layer]);
+    }
+    if (details.action === 'layerListEnabled') {
+      this.onAddLayers(details.layerList);
+    }
+    else if (details.action === 'layerListDisabled') {
+      this.onRemoveLayers(details.layerList);
     }
     else if (details.action === 'requestLegendUrl') {
       this.onLegendUrlRequested(details.layer);
@@ -300,22 +306,24 @@ class MapComponent extends GirafeHTMLElement {
     this.map.setView(newView);
   }
 
-  onAddLayer(layerInfos) {
-    console.log('New Layer: ' + layerInfos);
-    if (layerInfos.type === 'WMS') {
-      this.onAddWmsLayer(layerInfos);
-    }
+  onAddLayers(layerInfos) {
+    layerInfos.forEach((l) => {
+      if (l.type === 'WMS') {
+        this.onAddWmsLayer(l);
+      }
+    });
 
     // When adding a new layer to the map, 
     // We still want the vectorLayer (for redlining) to be on top position
     this.vectorLayer.setZIndex(1001);
   }
 
-  onRemoveLayer(layerInfos) {
-    console.log('New Layer: ' + layerInfos);
-    if (layerInfos.type === 'WMS') {
-      this.onRemoveWmsLayer(layerInfos);
-    }
+  onRemoveLayers(layerInfos) {
+    layerInfos.forEach((l) => {
+      if (l.type === 'WMS') {
+        this.onRemoveWmsLayer(l);
+      }
+    });
   }
 
   onAddWmsLayer(layerInfos) {

@@ -76,7 +76,6 @@ class TreeViewComponent extends GirafeResizableElement {
   renderLeaf(ulParent, elem, parentServer) {
     // Create new leaf
     const li = document.createElement('li');
-    li.dataset.active = false;
     ulParent.appendChild(li);
 
     // If a server is defined on this node, we use it.
@@ -85,6 +84,9 @@ class TreeViewComponent extends GirafeResizableElement {
 
     // Create Layer
     const layer = this.createLayer(elem, childServer);
+    li.dataset.active = false;
+    li.dataset.layerid = layer.id;
+
     // Add icons
     this.renderLeafIcons(li, layer);
     // Add label
@@ -288,27 +290,15 @@ class TreeViewComponent extends GirafeResizableElement {
 
   toggle(_this, e, layer) {
     const li = e.target.parentElement;
-    const circle = li.querySelector('[data-circle="true"]');
-    let action = null;
-    let circleClass = null;
-    if (li.dataset.active === 'true') {
-      // Deactivate layer
-      li.className = '';
-      circleClass = 'fa-xs fa-regular fa-circle';
-      action = 'layerDisabled';
-      li.dataset.active = false;
-    }
-    else {
-      // Activate layer
-      li.className = 'active';
-      circleClass = 'fa-xs fa-solid fa-circle';
-      action = 'layerEnabled';
-      li.dataset.active = true;
-    }
 
-    if (circle !== null) {
-      // There is a selection circle (no legend icon)
-      circle.className = circleClass;
+    const setActive = !(li.dataset.active === 'true');
+    this.toggleLeaf(li, setActive);
+
+    // Toggle childs
+    if (layer.isGroup) {
+      const toggledLayers = this.toggleChilds(li, setActive);
+      const action = (setActive) ? 'layerListEnabled' : 'layerListDisabled';
+      this.messageManager.sendMessage(GeoEvents.TreeView, {action: action, layerList: toggledLayers});
     }
 
     // Toggle parent if necessary
@@ -318,14 +308,56 @@ class TreeViewComponent extends GirafeResizableElement {
       // We have data on this layer.
       // => We are on a leaf with layer infos
       // We send a message to activate/deactivate this layer
+      const action = (li.dataset.active === 'true') ? 'layerEnabled' : 'layerDisabled';
       this.messageManager.sendMessage(GeoEvents.TreeView, {action: action, layer: layer});
     }
   }
 
+  toggleLeaf(li, setActive) {
+    const circle = li.querySelector('[data-circle="true"]');
+    let circleClass = null;
+    if (setActive) {
+      // Activate layer
+      li.className = 'active';
+      circleClass = 'fa-xs fa-solid fa-circle';
+      li.dataset.active = true;
+    }
+    else {
+      // Deactivate layer
+      li.className = '';
+      circleClass = 'fa-xs fa-regular fa-circle';
+      li.dataset.active = false;
+    }
+
+    if (circle !== null) {
+      // There is a selection circle (no legend icon)
+      circle.className = circleClass;
+    }
+  }
+
+  toggleChilds(li, setActive) {
+    const ul = li.getElementsByTagName('ul')[0];
+    if (this.isNullOrUndefined(ul)) {
+      // We are on the last leaf.
+      // => Stop here
+      return [];
+    }
+
+    let toggledLayers = [];
+    const childLis = ul.getElementsByTagName('li');
+    for (let i=0; i<childLis.length; i++) {
+      const childLi = childLis[i];
+      this.toggleLeaf(childLi, setActive);
+      toggledLayers.push(this.layers[childLi.dataset.layerid]);
+    }
+
+    return toggledLayers;
+  }
+
   toggleParent(li) {
     const ul = li.parentElement;
-    if (ul === null || ul.nodeName !== 'UL' || ul.parentElement === null) {
-      // We get out the tree-view.
+    if (this.isNullOrUndefined(ul) || ul === this.ulRoot) {
+      // We get out the tree-view (or to the root element).
       // Just stop here
       return;
     }
