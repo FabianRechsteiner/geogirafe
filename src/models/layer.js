@@ -18,6 +18,9 @@ class Layer {
   legendRule = null;
   isLegendExpanded = null;
 
+  // To manage the layers position in WMS queries
+  order = 0;
+
   get hasLegend() {
     return ((this.legendRule === null || this.legendRule === undefined) && this.legend)
   }

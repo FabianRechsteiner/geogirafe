@@ -116,6 +116,7 @@ class TreeViewComponent extends GirafeResizableElement {
 
       // The id is the index of the layer in the layer list
       layer.id = this.layers.length - 1;
+      layer.order = layer.id;
       return layer;
   }
 
@@ -431,7 +432,6 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   onResolutionChanged(resolution) {
-    console.log(resolution);
     const spans = this.ulRoot.getElementsByTagName('span');
     for (let i=0; i<spans.length; i++) {
       const span = spans[i];

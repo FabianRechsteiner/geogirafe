@@ -331,11 +331,12 @@ class MapComponent extends GirafeHTMLElement {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
       const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-      layerDef.layerList.push(layerInfos.layers);
+      layerDef.layerList.push(layerInfos);
+      const orderedLayerNames = layerDef.layerList.sort((l1, l2) => { return l2.order - l1.order }).map(l => l.layers);
       const source = new ImageWMS({
         url: layerInfos.url,
         params: {
-          'LAYERS': layerDef.layerList.join(','),
+          'LAYERS': orderedLayerNames,
           'FORMAT': layerInfos.imageType
         }
       });
@@ -344,7 +345,6 @@ class MapComponent extends GirafeHTMLElement {
     else {
       // Create a new ol layer
       const layer = new ImageLayer({
-        //extent: [-13884991, 2870341, -7455066, 6338219],
         source: new ImageWMS({
           url: layerInfos.url,
           params: {
@@ -355,7 +355,7 @@ class MapComponent extends GirafeHTMLElement {
       });
       this.layersByServer[layerInfos.serverUniqueQueryId] = {
         layer: layer,
-        layerList: [layerInfos.layers]
+        layerList: [layerInfos]
       };
       this.map.addLayer(layer);
     }
@@ -371,15 +371,16 @@ class MapComponent extends GirafeHTMLElement {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
       const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-      layerDef.layerList = layerDef.layerList.filter(item => item !== layerInfos.layers);
+      layerDef.layerList = layerDef.layerList.filter(item => item.id !== layerInfos.id);
 
       if (layerDef.layerList.length > 0) {
         // There are still layers in the list.
         // => We update the layer source
+        const orderedLayerNames = layerDef.layerList.sort((l1, l2) => { return l2.order - l1.order }).map(l => l.layers);
         const source = new ImageWMS({
           url: layerInfos.url,
           params: {
-            'LAYERS': layerDef.layerList.join(','),
+            'LAYERS': orderedLayerNames,
             'FORMAT': layerInfos.imageType
           }
         });
@@ -449,8 +450,6 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onChangeBasemap(basemap) {
-    console.log('New Basemap: ' + basemap);
-
     // TODO REG : Use constant
     if (basemap.type === 'WMTS') {
       fetch(basemap.url)
