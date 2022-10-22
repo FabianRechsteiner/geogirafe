@@ -10,18 +10,24 @@ class TreeViewComponent extends GirafeResizableElement {
   servers = {};
   layers = [];
   ulRoot = null;
+  advanced = false;
 
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: 'open'});
     this.themesUrl = this.getAttribute('themes');
-    this.registerEvents();
+    this.themesUrl = this.getAttribute('themes');
   }
 
   registerEvents() {
     window.addEventListener(GeoEvents.Theme, (e) => this.onThemeEvent(e.detail));
     window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+
+    this.optionsButton.addEventListener('click', (e) => this.toggleAdvancedOptions(e));
+    this.swipeButton.addEventListener('click', (e) => this.toggleSwipe(e));
+    this.showLegendsButton.addEventListener('click', (e) => this.showAllLegends(this, e));
+    this.hideLegendsButton.addEventListener('click', (e) => this.hideAllLegends(this, e));
   }
 
   connectedCallback() {
@@ -29,6 +35,7 @@ class TreeViewComponent extends GirafeResizableElement {
       .then(() => this.loadThemes()
         .then(() => {
           this.render();
+          this.registerEvents();
           this.initialized();
         })
       )
@@ -61,6 +68,10 @@ class TreeViewComponent extends GirafeResizableElement {
     this.makeResizable();
 
     this.ulRoot = this.shadow.querySelector('#treeview-list');
+    this.optionsButton = this.shadow.querySelector('#options');
+    this.swipeButton = this.shadow.querySelector('#swipe');
+    this.showLegendsButton = this.shadow.querySelector('#showlegends');
+    this.hideLegendsButton = this.shadow.querySelector('#hidelegends');
   }
 
   renderChilds(liParent, elem, parentServer) {
@@ -174,7 +185,7 @@ class TreeViewComponent extends GirafeResizableElement {
         const legend = document.createElement('i');
         legend.className = 'fg-map-legend tool selectable';
         legend.setAttribute('tip', 'Toggle legend');
-        legend.onclick = (e) => this.toggleLegend(this, layer.legendId, e);
+        legend.onclick = () => this.toggleLegend(this, layer.legendId);
         li.append(legend);
       }
       else {
@@ -191,7 +202,7 @@ class TreeViewComponent extends GirafeResizableElement {
 
       // Add an icon to control the layer opacity
       const opacity = document.createElement('i');
-      opacity.className = 'fg-layer-alt tool selectable';
+      opacity.className = 'fg-layer-alt tool selectable advanced';
       opacity.setAttribute('tip', 'Control opacity');
       tippy(opacity, {
         trigger: 'click',
@@ -244,10 +255,15 @@ class TreeViewComponent extends GirafeResizableElement {
     this.messageManager.sendMessage(GeoEvents.Map, {action: 'zoomToResolution', resolution: resolution });
   }
 
-  toggleLegend(_this, legendId, e) {
-    console.log('TOGGLE LEGEND ' + legendId);
+  toggleLegend(_this, legendId, force=false, visible=false) {
     const legend = _this.shadow.querySelector('#' + legendId);
-    if (legend.style.display === 'none') {
+    if (force && visible) {
+      legend.style.display = 'block';
+    }
+    else if (force && !visible) {
+      legend.style.display = 'none';
+    }
+    else if (legend.style.display === 'none') {
       legend.style.display = 'block';
     }
     else {
@@ -470,13 +486,50 @@ class TreeViewComponent extends GirafeResizableElement {
   onChangeTheme(theme) {
     // Clear existing TreeView;
     this.ulRoot.innerHTML = '';
+    this.layers = [];
 
     // Add the current theme
     theme.children.forEach(elem => {
       this.renderLeaf(this.ulRoot, elem, null);
     });
 
+    this.activateAdvancedMode();
     this.activateTooltips(false, [800, 0], 'right');
+  }
+
+  toggleAdvancedOptions(e) {
+    this.advanced = !this.advanced;
+    if (this.advanced) {
+      e.target.classList.add('selected');
+    }
+    else {
+      e.target.classList.remove('selected');
+    }
+    this.activateAdvancedMode();
+  }
+
+  activateAdvancedMode() {
+    let display = (this.advanced) ? 'block' : 'none';
+    const elements = this.ulRoot.getElementsByClassName('advanced');
+    for (let i=0; i<elements.length; i++) {
+      elements[i].style.display = display;
+    }
+  }
+
+  showAllLegends(_this, e) {
+    _this.layers.forEach(l => {
+      if (l.hasLegend) {
+        _this.toggleLegend(_this, l.legendId, true, true);
+      }
+    });
+  }
+
+  hideAllLegends(_this, e) {
+    _this.layers.forEach(l => {
+      if (l.hasLegend) {
+        _this.toggleLegend(_this, l.legendId, true, false);
+      }
+    });
   }
 }
 
