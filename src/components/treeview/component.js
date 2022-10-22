@@ -84,7 +84,6 @@ class TreeViewComponent extends GirafeResizableElement {
 
     // Create Layer
     const layer = this.createLayer(elem, childServer);
-    li.dataset.active = false;
     li.dataset.layerid = layer.id;
 
     // Add icons
@@ -292,8 +291,8 @@ class TreeViewComponent extends GirafeResizableElement {
   toggle(_this, e, layer) {
     const li = e.target.parentElement;
 
-    const setActive = !(li.dataset.active === 'true');
-    this.toggleLeaf(li, setActive);
+    const setActive = !(layer.active);
+    this.toggleLeaf(li, layer, setActive);
 
     // Toggle childs
     if (layer.isGroup) {
@@ -309,25 +308,23 @@ class TreeViewComponent extends GirafeResizableElement {
       // We have data on this layer.
       // => We are on a leaf with layer infos
       // We send a message to activate/deactivate this layer
-      const action = (li.dataset.active === 'true') ? 'layerEnabled' : 'layerDisabled';
+      const action = (layer.active) ? 'layerEnabled' : 'layerDisabled';
       this.messageManager.sendMessage(GeoEvents.TreeView, {action: action, layer: layer});
     }
   }
 
-  toggleLeaf(li, setActive) {
+  toggleLeaf(li, layer, setActive) {
     const circle = li.querySelector('[data-circle="true"]');
     let circleClass = null;
+
+    layer.active = setActive;
     if (setActive) {
-      // Activate layer
       li.className = 'active';
       circleClass = 'fa-xs fa-solid fa-circle';
-      li.dataset.active = true;
     }
     else {
-      // Deactivate layer
       li.className = '';
       circleClass = 'fa-xs fa-regular fa-circle';
-      li.dataset.active = false;
     }
 
     if (circle !== null) {
@@ -348,8 +345,14 @@ class TreeViewComponent extends GirafeResizableElement {
     const childLis = ul.getElementsByTagName('li');
     for (let i=0; i<childLis.length; i++) {
       const childLi = childLis[i];
-      this.toggleLeaf(childLi, setActive);
-      toggledLayers.push(this.layers[childLi.dataset.layerid]);
+      const layer = this.layers[childLi.dataset.layerid];
+      if ((setActive && !layer.active) || (!setActive && !layer.inactive)) {
+        //The layer is not in the right state yet.
+        this.toggleLeaf(childLi, layer, setActive);
+        if (layer.isLayer) {
+          toggledLayers.push(layer);
+        }
+      }
     }
 
     return toggledLayers;
@@ -368,40 +371,43 @@ class TreeViewComponent extends GirafeResizableElement {
 
     const childLis = ul.getElementsByTagName('li');
     for (let i=0; i<childLis.length; i++) {
-      if (childLis[i].dataset.active === 'true') {
+      const childLi = childLis[i];
+      const layer = this.layers[childLi.dataset.layerid];
+      if (layer.active) {
         allInactive = false;
       }
-      else if (childLis[i].dataset.active === 'false') {
+      else if (layer.inactive) {
         allActive = false;
       }
       else {
-        // One of the node is in a 'semi' state
+        // layer is semi-active
         allActive = false;
         allInactive = false;
       }
     }
 
     const liParent = ul.parentElement;
+    const layerParent = this.layers[liParent.dataset.layerid];
     const circle = liParent.getElementsByTagName('i')[1];
     
     let stateChanged = false;
-    if (allActive && liParent.dataset.active !== 'true') {
+    if (allActive && !layerParent.active) {
       // Activate parent
-      liParent.dataset.active = true;
+      layerParent.active = true;
       liParent.className = 'active';
       circle.className = 'fa-xs fa-solid fa-circle';
       stateChanged = true;
     }
-    else if (allInactive && liParent.dataset.active !== 'false') {
+    else if (allInactive && !layerParent.inactive) {
       // Deactivate parent
-      liParent.dataset.active = false;
+      layerParent.active = false;
       liParent.className = '';
       circle.className = 'fa-xs fa-regular fa-circle';
       stateChanged = true;
     }
-    else if (liParent.dataset.active !== 'semi') {
+    else if (!layerParent.semiactive) {
       // Semi-active
-      liParent.dataset.active = 'semi';
+      layerParent.active = 'semi';
       liParent.className = '';
       circle.className = 'fa-xs fa-solid fa-circle-half-stroke';
       stateChanged = true;

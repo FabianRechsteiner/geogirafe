@@ -10,7 +10,6 @@ class Layer {
   layers = null;
   minResolution = null;
   maxResolution = null;
-  opacity = null;
 
   // Legend properties
   legend = null;
@@ -18,7 +17,9 @@ class Layer {
   legendRule = null;
   isLegendExpanded = null;
 
-  // To manage the layers position in WMS queries
+  // Layer state
+  #activeState = 'off'; // can be 'on', 'off', 'semi'
+  opacity = 1;
   order = 0;
 
   get hasLegend() {
@@ -37,7 +38,6 @@ class Layer {
     this.layers = elem.layers;
     this.minResolution = elem.minResolutionHint;
     this.maxResolution = elem.maxResolutionHint;
-    this.opacity = 1;
     this.iconUrl = elem.metadata.iconUrl
     this.legend = elem.metadata.legend;
     this.legendRule = elem.metadata.legendRule;
@@ -67,6 +67,33 @@ class Layer {
 
   get isTransparent() {
     return (this.opacity !== 1);
+  }
+
+  get active() {
+    return this.#activeState === 'on';
+  }
+
+  get semiActive() {
+    return this.#activeState === 'semi';
+  }
+
+  get inactive() {
+    return this.#activeState === 'off';
+  }
+
+  set active(val) {
+    if (val === true || val === 'on') {
+      this.#activeState = 'on';
+    }
+    else if (val === false || val === 'off') {
+      this.#activeState = 'off';
+    }
+    else if (val === 'semi') {
+      this.#activeState = 'semi';
+    }
+    else {
+      throw Error('Unknown state for layer !');
+    }
   }
 }
 

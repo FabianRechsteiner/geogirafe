@@ -367,7 +367,12 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onRemoveWmsLayer(layerInfos) {
-    if (layerInfos.serverUniqueQueryId in this.layersByServer) {
+    if (layerInfos.name in this.transparentLayers) {
+      const layerDef = this.transparentLayers[layerInfos.name];
+      delete this.transparentLayers[layerInfos.name];
+      this.map.removeLayer(layerDef);
+    }
+    else if (layerInfos.serverUniqueQueryId in this.layersByServer) {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
       const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
@@ -392,11 +397,6 @@ class MapComponent extends GirafeHTMLElement {
         delete this.layersByServer[layerInfos.serverUniqueQueryId];
         this.map.removeLayer(layerDef.layer);
       }
-    }
-    else if (layerInfos.name in this.transparentLayers) {
-      const layerDef = this.transparentLayers[layerInfos.name];
-      delete this.layersByServer[layerInfos.name];
-      this.map.removeLayer(layerDef);
     }
     else {
       console.log('Nothing to remove !');
