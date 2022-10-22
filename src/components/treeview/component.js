@@ -153,13 +153,18 @@ class TreeViewComponent extends GirafeResizableElement {
     // False is not placeholder is needed
     if (layer.isGroup) {
       // We are not on a child layer
-      // => Add caret and selection icon
+      // => Add caret
       const caret = document.createElement('i');
       caret.className = 'fa fa-caret-right selectable';
       caret.onclick = (e) => this.expand(this, e);
       li.append(caret);
-
-      this.renderSelectionCircle(li)
+      // Add selection icon
+      this.renderSelectionCircle(li);
+      // Add delete icon
+      const del = document.createElement('i');
+      del.className = 'fa fa-solid fa-xmark tool selectable';
+      del.onclick = (e) => this.deleteLayer(this, layer, e);
+      li.append(del);
     }
     else {
       // We are on a child
@@ -183,7 +188,8 @@ class TreeViewComponent extends GirafeResizableElement {
 
         // Add icon for legend toggle
         const legend = document.createElement('i');
-        legend.className = 'fg-map-legend tool selectable';
+        //legend.className = 'fg-map-legend tool selectable';
+        legend.className = 'fa-solid fa-bars tool selectable';
         legend.setAttribute('tip', 'Toggle legend');
         legend.onclick = () => this.toggleLegend(this, layer.legendId);
         li.append(legend);
@@ -202,7 +208,8 @@ class TreeViewComponent extends GirafeResizableElement {
 
       // Add an icon to control the layer opacity
       const opacity = document.createElement('i');
-      opacity.className = 'fg-layer-alt tool selectable advanced';
+      //opacity.className = 'fg-layer-alt tool selectable advanced';
+      opacity.className = 'fa-regular fa-sun tool selectable advanced';
       opacity.setAttribute('tip', 'Control opacity');
       tippy(opacity, {
         trigger: 'click',
@@ -234,15 +241,40 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
+  deleteLayer(_this, layer, e) {
+    const li = e.target.parentElement;
+
+    // First deactivate layer
+    if (layer.isGroup) {
+      const toggledLayers = this.toggleChilds(li, false);
+      this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'layerListDisabled', layerList: toggledLayers});
+    }
+
+    // Then set the value in the list to null
+    // Caution : do not filter the list to remove the layer from it, 
+    // because the position in the list is the id of the layer
+    // and is used as reference in the TreeView
+    // TODO REG: change this because this can lead to errors
+    const index = this.layers.indexOf(layer);
+    this.layers[index] = null;
+
+    // Then remove element from treeview
+    li.remove();
+  }
+
   changeOpacity(layer, reference, e) {
     layer.opacity = e.target.value/20;
     if (layer.isTransparent) {
-      reference.classList.remove('fg-layer-alt');
-      reference.classList.add('fg-layer-alt-o');
+      // reference.classList.remove('fg-layer-alt');
+      // reference.classList.add('fg-layer-alt-o');
+      reference.classList.remove('fa-regular');
+      reference.classList.add('fa-solid');
     }
     else {
-      reference.classList.remove('fg-layer-alt-o');
-      reference.classList.add('fg-layer-alt');
+      // reference.classList.remove('fg-layer-alt-o');
+      // reference.classList.add('fg-layer-alt');
+      reference.classList.remove('fa-solid');
+      reference.classList.add('fa-regular');
     }
     this.messageManager.sendMessage(GeoEvents.Map, {action: 'opacityChanged', layer: layer});
   }

@@ -57,6 +57,7 @@ ul {
 li {
   color: #999;
   border-top: solid 1px #ddd;
+  line-height: 1.3rem;
 }
 
 li.active {
@@ -78,12 +79,10 @@ i {
   text-align:center;
 }
 
-#treeview-list i {
-  margin-left: 0.3rem;
-}
-
 #treeview-list i.tool {
   float: right;
+  margin-left: 0.3rem;
+  line-height: 1.5rem;
 }
 
 #treeview-list i.advanced {
