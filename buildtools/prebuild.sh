@@ -20,5 +20,4 @@ cp node_modules/vanilla-picker/dist/vanilla-picker.csp.css src/static/lib/vanill
 
 mkdir -p src/static/lib/tippy.js/
 rm -f src/static/lib/tippy.js/tippy.min.css
-TODO REG
-//find node_modules/tippy.js -name *.css | xargs cat {}>>src/static/lib/tippy.js/tippy.min.css
+find node_modules/tippy.js/ -name *.css -exec cat {} >> src/static/lib/tippy.js/tippy.min.css \;

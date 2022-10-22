@@ -7,10 +7,11 @@ This repository contains the web-viewer part of the project.
 
 # KISSSSS
 
-GeoGirafe is based on the latest web standards (Web-Components), follow the KISSSSS philosophy and is:
-- Stupid: GeoGirafe is developed with pure Vanilla-javascript. No complex framework like React or Angular is used.
+GeoGirafe is based on the latest web standards (Web-Components), follow the KISSSSSS philosophy and is:
+- Stupid: GeoGirafe is developed with pure Vanilla-Javascript. No complex framework like React or Angular is used.
 - Simple: It contains only the core of a geoportal. A Map, a Treeview, and some other central components. Nothing useless.
 - Stretchable: Although GeoGirafe contains only the essentials for a geoportal, it can easily be extended with custom web-components.
+- Scalable: Base on a docker architecture, GeoGirafe is easily scalable by using any container orchestrator.
 - Sure: Less dependencies also means less potential security problems.
 - Stable: We do not want migrations from one version to another to take too much time or ressources. Stability is a key objective.
 
