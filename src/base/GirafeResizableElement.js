@@ -45,7 +45,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   mousedown(_this, e) {
-
+    e.preventDefault();
     document.onmousemove = (e) => _this.mousemove(this, e);
     document.onmouseup = (e) => _this.mouseup(this, e);
 
@@ -70,6 +70,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   mousemove(_this, e) {
+    e.preventDefault();
     const newX = _this.prevX - e.x;
     let newWidth = null;
     if (_this.dock === 'left') {
