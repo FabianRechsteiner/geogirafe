@@ -102,11 +102,6 @@ class TreeViewComponent extends GirafeResizableElement {
     // Add label
     this.renderLeafLabel(li, layer);
     
-    if (layer.hasLegend) {
-      // Add legend
-      this.renderLegend(li, layer)
-    }
-
     // Append childs if any
     if (elem.children !== undefined) {
       this.renderChilds(li, elem, childServer);
@@ -130,22 +125,19 @@ class TreeViewComponent extends GirafeResizableElement {
       return layer;
   }
 
-  renderLegend(li, layer) {
-    // Add a image for the legend.
-    const legendimg = document.createElement('img');
-    legendimg.id = layer.legendId;
-    legendimg.className = 'legend';
-    li.append(legendimg);
-    legendimg.style.display = (layer.isLegendExpanded) ? 'block' : 'none';
-    // Request legend image from openlayers
-    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: layer});
-  }
-
   renderSelectionCircle(li) {
     const circle = document.createElement('i');
     circle.dataset.circle = true;
     circle.className = 'fa-xs fa-regular fa-circle';
     li.append(circle);
+  }
+
+  renderDeleteIcon(li, layer) {
+    const del = document.createElement('i');
+    del.className = 'fa fa-solid fa-xmark tool selectable';
+    del.setAttribute('tip', 'Remove this group');
+    del.onclick = (e) => this.deleteLayer(this, layer, e);
+    li.append(del);
   }
 
   renderLeafIcons(li, layer) {
@@ -161,10 +153,7 @@ class TreeViewComponent extends GirafeResizableElement {
       // Add selection icon
       this.renderSelectionCircle(li);
       // Add delete icon
-      const del = document.createElement('i');
-      del.className = 'fa fa-solid fa-xmark tool selectable';
-      del.onclick = (e) => this.deleteLayer(this, layer, e);
-      li.append(del);
+      this.renderDeleteIcon(li, layer);
     }
     else {
       // We are on a child
@@ -204,6 +193,13 @@ class TreeViewComponent extends GirafeResizableElement {
         li.append(icon);
 
         this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: layer});
+      }
+
+      // If we didn't add any icon for legend, we add a spacer
+      if (!layer.hasLegend) {
+        const legendSpacer = document.createElement('i');
+        legendSpacer.className = 'tool';
+        li.append(legendSpacer);
       }
 
       // Add an icon to control the layer opacity
@@ -525,8 +521,120 @@ class TreeViewComponent extends GirafeResizableElement {
       this.renderLeaf(this.ulRoot, elem, null);
     });
 
+    // Some objects needs to be added at the end of the rendering, 
+    // because they use the siblings fo their configuration (visibility)
+    this.postRender();
+
     this.activateAdvancedMode();
     this.activateTooltips(false, [800, 0], 'right');
+  }
+
+  postRender() {
+    const lis = this.ulRoot.getElementsByTagName('li');
+    for (let i=0; i<lis.length; i++) {
+      const li = lis[i];
+      const layer = this.layers[li.dataset.layerid];
+      if (layer.isLayer) {
+        this.renderMoveIcons(li, layer);
+        if (layer.hasLegend) {
+          this.renderLegend(li, layer);
+        }
+      }
+    }
+  }
+
+  renderLegend(li, layer) {
+    // Add a image for the legend.
+    const legendimg = document.createElement('img');
+    legendimg.id = layer.legendId;
+    legendimg.className = 'legend';
+    li.append(legendimg);
+    legendimg.style.display = (layer.isLegendExpanded) ? 'block' : 'none';
+    // Request legend image from openlayers
+    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: layer});
+  }
+
+  renderMoveIcons(li, layer) {
+
+    // Add move down
+    const movedown = document.createElement('i');
+    movedown.className = 'fa-solid fa-square-caret-down advanced tool selectable movedown';
+    movedown.setAttribute('tip', 'Move this layer down');
+    movedown.onclick = (e) => this.moveLayerDown(this, layer, e);
+    li.append(movedown);
+    // But hide it if we are on the last node
+    if (this.isNullOrUndefined(li.nextElementSibling) || li.nextElementSibling.nodeName !== 'LI') {
+      movedown.style.visibility = 'hidden';
+    }
+
+    // Add move up 
+    const moveup = document.createElement('i');
+    moveup.className = 'fa-solid fa-square-caret-up advanced tool selectable moveup';
+    moveup.setAttribute('tip', 'Move this layer up');
+    moveup.onclick = (e) => this.moveLayerUp(this, layer, e);
+    li.append(moveup);
+    // But hide it if we are on the first node
+    if (this.isNullOrUndefined(li.previousElementSibling) || li.previousElementSibling.nodeName !== 'LI') {
+      moveup.style.visibility = 'hidden';
+    }
+  }
+
+  moveLayerUp(_this, layer, e) {
+    const li = e.target.parentElement;
+    const previousLi = li.previousElementSibling;
+    const previousLayer = _this.layers[previousLi.dataset.layerid];
+    
+    // Switch order values
+    const previousOrder = previousLayer.order;
+    previousLayer.order = layer.order;
+    layer.order = previousOrder;
+
+    // Invert layers in treeview
+    const ul = li.parentElement;
+    ul.insertBefore(li, previousLi);
+
+    // Show or hide moveup and movedown buttons
+    const limoveup = li.getElementsByClassName('moveup')[0];
+    const limovedown = li.getElementsByClassName('movedown')[0];
+    const previouslimoveup = previousLi.getElementsByClassName('moveup')[0];
+    const previouslimovedown = previousLi.getElementsByClassName('movedown')[0];
+    this.switchVisibility(limoveup, previouslimoveup);
+    this.switchVisibility(limovedown, previouslimovedown);
+
+    // Refresh Map
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'orderChanged', layers: [previousLayer, layer]});
+  }
+
+  moveLayerDown(_this, layer, e) {
+    const li = e.target.parentElement;
+    const nextLi = li.nextElementSibling;
+    const nextLayer = _this.layers[nextLi.dataset.layerid];
+    
+    // Switch order values
+    const nextOrder = nextLayer.order;
+    nextLayer.order = layer.order;
+    layer.order = nextOrder;
+
+    // Invert layers in treeview
+    const ul = li.parentElement;
+    ul.insertBefore(nextLi, li);
+
+    // Show or hide moveup and movedown buttons
+    const limoveup = li.getElementsByClassName('moveup')[0];
+    const limovedown = li.getElementsByClassName('movedown')[0];
+    const nextlimoveup = nextLi.getElementsByClassName('moveup')[0];
+    const pnextlimovedown = nextLi.getElementsByClassName('movedown')[0];
+    this.switchVisibility(limoveup, nextlimoveup);
+    this.switchVisibility(limovedown, pnextlimovedown);
+
+    // Refresh Map
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'orderChanged', layers: [nextLayer, layer]});
+  }
+
+  switchVisibility(obj1, obj2) {
+    const temp = obj1.style.visibility;
+    obj1.style.visibility = obj2.style.visibility;
+    obj2.style.visibility = temp;
   }
 
   toggleAdvancedOptions(e) {

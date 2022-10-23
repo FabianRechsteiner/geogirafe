@@ -83,6 +83,7 @@ i {
   float: right;
   margin-left: 0.3rem;
   line-height: 1.5rem;
+  height: 1.5rem;
 }
 
 #treeview-list i.advanced {

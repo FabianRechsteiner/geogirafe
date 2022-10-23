@@ -271,6 +271,9 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'opacityChanged') {
       this.onChangeOpacity(details.layer);
     }
+    else if (details.action === 'orderChanged') {
+      this.onChangeOrder(details.layers);
+    }
   }
 
   zoomToResolution(resolution) {
@@ -326,37 +329,38 @@ class MapComponent extends GirafeHTMLElement {
     });
   }
 
+  onChangeOrder(layers) {
+    layers.forEach(layerInfos => {
+      if (layerInfos.serverUniqueQueryId in this.layersByServer) {
+        const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
+        const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
+        layerDef.layer.setSource(source);
+      }
+      else if (layerInfos.name in this.transparentLayers) {
+        // TODO REG: Here we have to change to order of the layers arround the transparent layer.
+        // This case can be a bit complicated, because the transparent layer can be between non transparent layers
+        // Perhaps we will have to split the non-transparent layers in 2 differents lists ?
+        // Do we really want this ? It sound a bit too much... and can be complicated to implement.
+      }
+    });
+  }
+
   onAddWmsLayer(layerInfos) {
     if (layerInfos.serverUniqueQueryId in this.layersByServer) {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
       const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
       layerDef.layerList.push(layerInfos);
-      const orderedLayerNames = layerDef.layerList.sort((l1, l2) => { return l2.order - l1.order }).map(l => l.layers);
-      const source = new ImageWMS({
-        url: layerInfos.url,
-        params: {
-          'LAYERS': orderedLayerNames,
-          'FORMAT': layerInfos.imageType
-        }
-      });
+      const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
       layerDef.layer.setSource(source);
     }
     else {
       // Create a new ol layer
-      const layer = new ImageLayer({
-        source: new ImageWMS({
-          url: layerInfos.url,
-          params: {
-            'LAYERS': layerInfos.layers,
-            'FORMAT': layerInfos.imageType
-          },
-        }),
-      });
-      this.layersByServer[layerInfos.serverUniqueQueryId] = {
-        layer: layer,
-        layerList: [layerInfos]
-      };
+      const layer = new ImageLayer();
+      const layerDef = { layer: layer, layerList: [layerInfos] };
+      this.layersByServer[layerInfos.serverUniqueQueryId] = layerDef;
+      const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
+      layer.setSource(source);
       this.map.addLayer(layer);
     }
 
@@ -364,6 +368,18 @@ class MapComponent extends GirafeHTMLElement {
     if (layerInfos.isTransparent) {
       this.onChangeOpacity(layerInfos);
     }
+  }
+
+  createImageWMSSource(url, layerList, imageType) {
+    const orderedLayerNames = layerList.sort((l1, l2) => { return l2.order - l1.order }).map(l => l.layers);
+    const source = new ImageWMS({
+      url: url,
+      params: {
+        'LAYERS': orderedLayerNames,
+        'FORMAT': imageType
+      }
+    });
+    return source;
   }
 
   onRemoveWmsLayer(layerInfos) {
@@ -381,14 +397,7 @@ class MapComponent extends GirafeHTMLElement {
       if (layerDef.layerList.length > 0) {
         // There are still layers in the list.
         // => We update the layer source
-        const orderedLayerNames = layerDef.layerList.sort((l1, l2) => { return l2.order - l1.order }).map(l => l.layers);
-        const source = new ImageWMS({
-          url: layerInfos.url,
-          params: {
-            'LAYERS': orderedLayerNames,
-            'FORMAT': layerInfos.imageType
-          }
-        });
+        const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
         layerDef.layer.setSource(source);
       }
       else {
@@ -430,14 +439,9 @@ class MapComponent extends GirafeHTMLElement {
       // First, we remove the layer from the default layer
       this.onRemoveWmsLayer(layerInfos);
       // Then, we create a new layer
+      const source = this.createImageWMSSource(layerInfos.url, [layerInfos], layerInfos.imageType);
       const layer = new ImageLayer({
-        source: new ImageWMS({
-          url: layerInfos.url,
-          params: {
-            'LAYERS': layerInfos.layers,
-            'FORMAT': layerInfos.imageType
-          },
-        }),
+        source: source,
         opacity: layerInfos.opacity
       });
       this.transparentLayers[layerInfos.name] = layer;
