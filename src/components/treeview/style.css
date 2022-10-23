@@ -91,7 +91,7 @@ i {
 }
 
 #menu i {
-  float: left;
+  margin-top: 1rem;
   color: #777;
   margin-right: 0.2rem;
   width: 3rem;

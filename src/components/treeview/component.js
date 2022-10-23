@@ -11,11 +11,12 @@ class TreeViewComponent extends GirafeResizableElement {
   layers = [];
   ulRoot = null;
   advanced = false;
+  allLegendsDisplayed = true;
+  allLayersExpanded = false;
 
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: 'open'});
-    this.themesUrl = this.getAttribute('themes');
     this.themesUrl = this.getAttribute('themes');
   }
 
@@ -25,9 +26,10 @@ class TreeViewComponent extends GirafeResizableElement {
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
 
     this.optionsButton.addEventListener('click', (e) => this.toggleAdvancedOptions(e));
+    this.toggleLegendsButton.addEventListener('click', () => this.toggleAllLegends(this));
+    this.expandAllButton.addEventListener('click', () => this.expandAllLayers(this));
     this.swipeButton.addEventListener('click', (e) => this.toggleSwipe(e));
-    this.showLegendsButton.addEventListener('click', (e) => this.showAllLegends(this, e));
-    this.hideLegendsButton.addEventListener('click', (e) => this.hideAllLegends(this, e));
+    this.deleteButton.addEventListener('click', () => this.deleteAllLayers());
   }
 
   connectedCallback() {
@@ -69,9 +71,10 @@ class TreeViewComponent extends GirafeResizableElement {
 
     this.ulRoot = this.shadow.querySelector('#treeview-list');
     this.optionsButton = this.shadow.querySelector('#options');
+    this.toggleLegendsButton = this.shadow.querySelector('#togglelegends');
+    this.expandAllButton = this.shadow.querySelector('#expandall');
     this.swipeButton = this.shadow.querySelector('#swipe');
-    this.showLegendsButton = this.shadow.querySelector('#showlegends');
-    this.hideLegendsButton = this.shadow.querySelector('#hidelegends');
+    this.deleteButton = this.shadow.querySelector('#delete');
   }
 
   renderChilds(liParent, elem, parentServer) {
@@ -258,17 +261,18 @@ class TreeViewComponent extends GirafeResizableElement {
     li.remove();
   }
 
+  deleteAllLayers() {
+    this.ulRoot.innerHTML = '';
+    this.layers = [];
+  }
+
   changeOpacity(layer, reference, e) {
     layer.opacity = e.target.value/20;
     if (layer.isTransparent) {
-      // reference.classList.remove('fg-layer-alt');
-      // reference.classList.add('fg-layer-alt-o');
       reference.classList.remove('fa-regular');
       reference.classList.add('fa-solid');
     }
     else {
-      // reference.classList.remove('fg-layer-alt-o');
-      // reference.classList.add('fg-layer-alt');
       reference.classList.remove('fa-solid');
       reference.classList.add('fa-regular');
     }
@@ -323,13 +327,46 @@ class TreeViewComponent extends GirafeResizableElement {
     if (ulChild.style.display === 'none') {
       ulChild.style.display = 'block';
       e.target.className = 'fa fa-caret-down selectable';
-      this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'groupOpened', group: e.target.innerHTML});
     }
     else {
       ulChild.style.display = 'none';
       e.target.className = 'fa fa-caret-right selectable';
-      this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'groupClosed', group: e.target.innerHTML});
     }
+  }
+
+  expandAllLayers() {
+    const uls = this.ulRoot.getElementsByTagName('ul');
+    for (let i=0; i<uls.length; i++) {
+      const ul = uls[i];
+      if (this.allLayersExpanded) {
+        // Collapse
+        ul.style.display = 'none';
+      }
+      else {
+        // Expand
+        ul.style.display = 'block';
+      }
+    }
+
+    // Change caret icons
+    let oldStyle = 'fa-caret-right';
+    let newStyle = 'fa-caret-down';
+    if (this.allLayersExpanded) {
+      oldStyle = 'fa-caret-down';
+      newStyle = 'fa-caret-right';
+    }
+    const carets = this.ulRoot.querySelectorAll('.' + oldStyle);
+    for (let i=0; i<carets.length; i++) {
+      const caret = carets[i];
+      console.log(i);
+      console.log(caret);
+      console.log(oldStyle);
+      console.log(newStyle);
+      caret.classList.remove(oldStyle);
+      caret.classList.add(newStyle);
+    }
+
+    this.allLayersExpanded = !this.allLayersExpanded;
   }
 
   toggle(_this, e, layer) {
@@ -512,9 +549,8 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   onChangeTheme(theme) {
-    // Clear existing TreeView;
-    this.ulRoot.innerHTML = '';
-    this.layers = [];
+    // Clear existing TreeView
+    this.deleteAllLayers();
 
     // Add the current theme
     theme.children.forEach(elem => {
@@ -594,10 +630,10 @@ class TreeViewComponent extends GirafeResizableElement {
     ul.insertBefore(li, previousLi);
 
     // Show or hide moveup and movedown buttons
-    const limoveup = li.getElementsByClassName('moveup')[0];
-    const limovedown = li.getElementsByClassName('movedown')[0];
-    const previouslimoveup = previousLi.getElementsByClassName('moveup')[0];
-    const previouslimovedown = previousLi.getElementsByClassName('movedown')[0];
+    const limoveup = li.querySelectorAll('.moveup')[0];
+    const limovedown = li.querySelectorAll('.movedown')[0];
+    const previouslimoveup = previousLi.querySelectorAll('.moveup')[0];
+    const previouslimovedown = previousLi.querySelectorAll('.movedown')[0];
     this.switchVisibility(limoveup, previouslimoveup);
     this.switchVisibility(limovedown, previouslimovedown);
 
@@ -620,10 +656,10 @@ class TreeViewComponent extends GirafeResizableElement {
     ul.insertBefore(nextLi, li);
 
     // Show or hide moveup and movedown buttons
-    const limoveup = li.getElementsByClassName('moveup')[0];
-    const limovedown = li.getElementsByClassName('movedown')[0];
-    const nextlimoveup = nextLi.getElementsByClassName('moveup')[0];
-    const pnextlimovedown = nextLi.getElementsByClassName('movedown')[0];
+    const limoveup = li.querySelectorAll('.moveup')[0];
+    const limovedown = li.querySelectorAll('.movedown')[0];
+    const nextlimoveup = nextLi.querySelectorAll('.moveup')[0];
+    const pnextlimovedown = nextLi.querySelectorAll('.movedown')[0];
     this.switchVisibility(limoveup, nextlimoveup);
     this.switchVisibility(limovedown, pnextlimovedown);
 
@@ -650,26 +686,27 @@ class TreeViewComponent extends GirafeResizableElement {
 
   activateAdvancedMode() {
     let display = (this.advanced) ? 'block' : 'none';
-    const elements = this.ulRoot.getElementsByClassName('advanced');
+    const elements = this.ulRoot.querySelectorAll('.advanced');
     for (let i=0; i<elements.length; i++) {
       elements[i].style.display = display;
     }
   }
 
-  showAllLegends(_this, e) {
+  toggleAllLegends(_this) {
     _this.layers.forEach(l => {
       if (l.hasLegend) {
-        _this.toggleLegend(_this, l.legendId, true, true);
+        if (_this.allLegendsDisplayed) {
+          // Hide
+          _this.toggleLegend(_this, l.legendId, true, false);
+        }
+        else {
+          /// Show
+          _this.toggleLegend(_this, l.legendId, true, true);
+        }
       }
     });
-  }
 
-  hideAllLegends(_this, e) {
-    _this.layers.forEach(l => {
-      if (l.hasLegend) {
-        _this.toggleLegend(_this, l.legendId, true, false);
-      }
-    });
+    _this.allLegendsDisplayed = !_this.allLegendsDisplayed;
   }
 }
 
