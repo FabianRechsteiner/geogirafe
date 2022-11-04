@@ -44,17 +44,25 @@ class Layer {
     this.isLegendExpanded = elem.metadata.isLegendExpanded;
 
     if (elem.childLayers) {
+      // WMS Layer
+      this.isGroup = false;
+      this.isLayer = true;
+    }
+    else if (elem.type === 'WMTS') {
+      // WMTS Layer
       this.isGroup = false;
       this.isLayer = true;
     }
     else {
+      // Other cases: Groups
       this.isGroup = true;
       this.isLayer = false;
     }
   }
 
   hasRestrictedResolution() {
-    return (this.minResolution !== 0 || this.maxResolution !== 999999999);
+    return ((this.minResolution !== undefined && this.minResolution !== 0) 
+         || (this.maxResolution !== undefined && this.maxResolution !== 999999999));
   }
 
   get legendId() {
@@ -67,6 +75,14 @@ class Layer {
 
   get isTransparent() {
     return (this.opacity !== 1);
+  }
+
+  get isWms() {
+    return this.type === 'WMS';
+  }
+
+  get isWmts() {
+    return this.type === 'WMTS';
   }
 
   get active() {

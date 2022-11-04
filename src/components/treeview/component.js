@@ -117,12 +117,20 @@ class TreeViewComponent extends GirafeResizableElement {
 
   createLayer(elem, server) {
       let url = null;
-      if (server) {
-        url = this.servers[server].url
+      if (elem.type === 'WMS') {
+        // WMS Case: there must be an OGC-Server
+        if (server) {
+          url = this.servers[server].url
+        }
+        else {
+          console.log('No OGC server found for layer ' + elem.name);
+        }
       }
-      else {
-        console.log('NOT OGC SERVER FOR ' + elem.name);
+      else if (elem.type === 'WMTS') {
+        // WMTS Case: we take the URL of Capabilities
+        url = elem.url;
       }
+
       const layer = new Layer(elem, server, url);
       this.layers.push(layer);
 
@@ -184,7 +192,7 @@ class TreeViewComponent extends GirafeResizableElement {
         legend.onclick = () => this.toggleLegend(this, layer.legendId);
         container.append(legend);
       }
-      else {
+      else if (layer.isWms){
         // Last case :
         // We need to get the legendicon URL from openlayer
         // before we can show the legend icon
@@ -320,7 +328,8 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   expand(_this, e) {
-    const ulChild = e.target.parentElement.getElementsByTagName('ul')[0];
+    const li = this.getParentLi(e.target);
+    const ulChild = li.getElementsByTagName('ul')[0];
     if (ulChild.style.display === 'none') {
       ulChild.style.display = 'block';
       e.target.classList.remove('fa-caret-right');
@@ -508,7 +517,7 @@ class TreeViewComponent extends GirafeResizableElement {
       // Circle does no exist. Just stop here
       return;
     }
-    
+
     if (active === true) {
       circle.className = 'fa-xs fa-solid fa-circle selcircle';
     }

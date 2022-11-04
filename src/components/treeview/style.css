@@ -93,11 +93,11 @@ i {
 }
 
 i.movedown {
-  order: 9;
+  order: 8;
 }
 
 i.moveup {
-  order: 8;
+  order: 7;
 }
 
 i.selcircle {
@@ -121,11 +121,11 @@ i.spacer {
 }
 
 i.legend {
-  order: 5;
+  order: 10;
 }
 
 i.opacity {
-  order: 7;
+  order: 9;
 }
 
 i.zoomres {

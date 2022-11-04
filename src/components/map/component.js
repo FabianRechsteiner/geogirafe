@@ -30,8 +30,14 @@ class MapComponent extends GirafeHTMLElement {
   srid = 'EPSG:3857'; // default projection
   projection = getProjection(this.srid);
   currentBasemap = null;
+
+  // For WMS Layers
   layersByServer = {};
   transparentLayers = {};
+
+  // For WMTS Layers
+  wmtsCapabilitiesByServer = {};
+  wmtsLayers = {};
 
   // For Redlining
   featuresCollection = null;
@@ -311,8 +317,11 @@ class MapComponent extends GirafeHTMLElement {
 
   onAddLayers(layerInfos) {
     layerInfos.forEach((l) => {
-      if (l.type === 'WMS') {
+      if (l.isWms) {
         this.onAddWmsLayer(l);
+      }
+      else if (l.isWmts) {
+        this.onAddWmtsLayer(l);
       }
     });
 
@@ -323,8 +332,11 @@ class MapComponent extends GirafeHTMLElement {
 
   onRemoveLayers(layerInfos) {
     layerInfos.forEach((l) => {
-      if (l.type === 'WMS') {
+      if (l.isWms) {
         this.onRemoveWmsLayer(l);
+      }
+      else if (l.isWmts) {
+        this.onRemoveWmtsLayer(l);
       }
     });
   }
@@ -370,6 +382,23 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
+  onAddWmtsLayer(layerInfos) {
+    this.getWmtsCapabilities(layerInfos.url, (capabilities) => {
+      const options = optionsFromCapabilities(capabilities, {
+        layer: layerInfos.name,
+        matrixSet: this.srid,
+      });
+
+      const layer = new TileLayer({
+        opacity: layerInfos.opacity,
+        source: new WMTS(options),
+      });
+
+      this.wmtsLayers[layerInfos.name] = layer;
+      this.map.addLayer(layer);
+    });
+  }
+
   createImageWMSSource(url, layerList, imageType) {
     const orderedLayerNames = layerList.sort((l1, l2) => { return l2.order - l1.order }).map(l => l.layers);
     const source = new ImageWMS({
@@ -412,7 +441,35 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
+  onRemoveWmtsLayer(layerInfos) {
+    if (layerInfos.name in this.wmtsLayers) {
+      const layerDef = this.wmtsLayers[layerInfos.name];
+      delete this.wmtsLayers[layerInfos.name];
+      this.map.removeLayer(layerDef);
+    }
+  }
+
   onChangeOpacity(layerInfos) {
+    if (layerInfos.isWms) {
+      this.changeWmsOpacity(layerInfos);
+    }
+    else if (layerInfos.isWmts) {
+      this.changeWmtsOpacity(layerInfos);
+    }
+  }
+
+  changeWmtsOpacity(layerInfos) {
+    if (layerInfos.name in this.wmtsLayers) {
+      const layerDef = this.wmtsLayers[layerInfos.name];
+      layerDef.setOpacity(layerInfos.opacity);
+    }
+    else {
+      // Nothing to do.
+      console.log('Nothing to do here');
+    }
+  }
+
+  changeWmsOpacity(layerInfos) {
     if (!layerInfos.isTransparent) {
       // Back to normal
       // The opacity was set to 1 again.
@@ -456,27 +513,22 @@ class MapComponent extends GirafeHTMLElement {
   onChangeBasemap(basemap) {
     // TODO REG : Use constant
     if (basemap.type === 'WMTS') {
-      fetch(basemap.url)
-        .then(response => response.text())
-        .then(capabilities => {
-          // Create new WMTS Layer from Capabilities
-          const parser = new WMTSCapabilities();
-          const result = parser.read(capabilities);
-          const options = optionsFromCapabilities(result, {
-            layer: basemap.name,
-            matrixSet: this.srid,
-          });
-
-          const layer = new TileLayer({
-            opacity: 1,
-            source: new WMTS(options),
-          });
-
-          this.map.removeLayer(this.currentBasemap)
-          // Always insert in the background
-          this.map.getLayers().insertAt(0, layer);
-          this.currentBasemap = layer;
+      this.getWmtsCapabilities(basemap.url, (capabilities) => {
+        const options = optionsFromCapabilities(capabilities, {
+          layer: basemap.name,
+          matrixSet: this.srid,
         });
+
+        const layer = new TileLayer({
+          opacity: 1,
+          source: new WMTS(options),
+        });
+
+        this.map.removeLayer(this.currentBasemap)
+        // Always insert in the background
+        this.map.getLayers().insertAt(0, layer);
+        this.currentBasemap = layer;
+      });
     }
     else if (basemap.type === 'OSM') {
       // Create OSM layer
@@ -486,6 +538,27 @@ class MapComponent extends GirafeHTMLElement {
       });
       // Always insert in the background
       this.map.getLayers().insertAt(0, this.currentBasemap);
+    }
+  }
+
+  getWmtsCapabilities(url, callback) {
+    if (url in this.wmtsCapabilitiesByServer) {
+      // Capabilities were already loaded
+      const capabilities = this.wmtsCapabilitiesByServer[url];
+      callback(capabilities);
+    }
+    else {
+      // Capabilities were not loaded yet.
+      fetch(url)
+        .then(response => response.text())
+        .then(capabilities => {
+          // Create new WMTS Layer from Capabilities
+          const parser = new WMTSCapabilities();
+          const result = parser.read(capabilities);
+          this.wmtsCapabilitiesByServer[url] = result;
+
+          callback(result);
+        });
     }
   }
 
