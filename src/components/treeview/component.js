@@ -77,11 +77,11 @@ class TreeViewComponent extends GirafeResizableElement {
     this.deleteButton = this.shadow.querySelector('#delete');
   }
 
-  renderChilds(liParent, elem, parentServer) {
+  renderChilds(container, elem, parentServer) {
     // Add new sub-list
     const ulChild = document.createElement('ul');
     ulChild.style.display = 'none';
-    liParent.appendChild(ulChild);
+    container.appendChild(ulChild);
     elem.children.forEach(child => {
       this.renderLeaf(ulChild, child, parentServer);
     });
@@ -92,6 +92,10 @@ class TreeViewComponent extends GirafeResizableElement {
     const li = document.createElement('li');
     ulParent.appendChild(li);
 
+    //Create container div
+    const container = document.createElement('div');
+    li.appendChild(container);
+
     // If a server is defined on this node, we use it.
     // Otherwise, we use the server of the parent
     const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
@@ -101,13 +105,13 @@ class TreeViewComponent extends GirafeResizableElement {
     li.dataset.layerid = layer.id;
 
     // Add icons
-    this.renderLeafIcons(li, layer);
+    this.renderLeafIcons(container, layer);
     // Add label
-    this.renderLeafLabel(li, layer);
+    this.renderLeafLabel(container, layer);
     
     // Append childs if any
     if (elem.children !== undefined) {
-      this.renderChilds(li, elem, childServer);
+      this.renderChilds(container, elem, childServer);
     }
   }
 
@@ -128,41 +132,35 @@ class TreeViewComponent extends GirafeResizableElement {
       return layer;
   }
 
-  renderSelectionCircle(li) {
-    const circle = document.createElement('i');
-    circle.dataset.circle = true;
-    circle.className = 'fa-xs fa-regular fa-circle';
-    li.append(circle);
-  }
-
   renderDeleteIcon(li, layer) {
     const del = document.createElement('i');
-    del.className = 'fa fa-solid fa-xmark tool selectable';
+    del.className = 'fa fa-solid fa-xmark tool selectable del';
     del.setAttribute('tip', 'Remove this group');
     del.onclick = (e) => this.deleteLayer(this, layer, e);
     li.append(del);
   }
 
-  renderLeafIcons(li, layer) {
+  renderLeafIcons(container, layer) {
     // This function returns true if a placeholder for a whole legend mut be added
     // False is not placeholder is needed
     if (layer.isGroup) {
       // We are not on a child layer
       // => Add caret
       const caret = document.createElement('i');
-      caret.className = 'fa fa-caret-right selectable';
+      caret.className = 'fa fa-caret-right selectable expand';
       caret.onclick = (e) => this.expand(this, e);
-      li.append(caret);
+      container.append(caret);
       // Add selection icon
-      this.renderSelectionCircle(li);
+      this.renderSelectionCircle(container);
       // Add delete icon
-      this.renderDeleteIcon(li, layer);
+      this.renderDeleteIcon(container, layer);
     }
     else {
       // We are on a child
       // => Add spacer (replaces the caret)
       const spacer = document.createElement('i');
-      li.append(spacer);
+      spacer.className = 'spacer';
+      container.append(spacer);
 
       // => Add iconUrl if any
       if (layer.iconUrl) {
@@ -171,20 +169,20 @@ class TreeViewComponent extends GirafeResizableElement {
         const icon = document.createElement('img');
         icon.src = layer.iconUrl;
         icon.className = 'iconurl';
-        li.append(icon);
+        container.append(icon);
       }
       else if (layer.hasLegend) {
         // A whole legend needs to be display.
         // => We add a legend button and the legend circle
-        this.renderSelectionCircle(li)
+        this.renderSelectionCircle(container)
 
         // Add icon for legend toggle
         const legend = document.createElement('i');
         //legend.className = 'fg-map-legend tool selectable';
-        legend.className = 'fa-solid fa-bars tool selectable';
+        legend.className = 'fa-solid fa-bars tool selectable legend';
         legend.setAttribute('tip', 'Toggle legend');
         legend.onclick = () => this.toggleLegend(this, layer.legendId);
-        li.append(legend);
+        container.append(legend);
       }
       else {
         // Last case :
@@ -193,7 +191,7 @@ class TreeViewComponent extends GirafeResizableElement {
         const icon = document.createElement('img');
         icon.id = layer.legendId;
         icon.className = 'iconurl';
-        li.append(icon);
+        container.append(icon);
 
         this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: layer});
       }
@@ -201,14 +199,13 @@ class TreeViewComponent extends GirafeResizableElement {
       // If we didn't add any icon for legend, we add a spacer
       if (!layer.hasLegend) {
         const legendSpacer = document.createElement('i');
-        legendSpacer.className = 'tool';
-        li.append(legendSpacer);
+        legendSpacer.className = 'tool spacer';
+        container.append(legendSpacer);
       }
 
       // Add an icon to control the layer opacity
       const opacity = document.createElement('i');
-      //opacity.className = 'fg-layer-alt tool selectable advanced';
-      opacity.className = 'fa-regular fa-sun tool selectable advanced';
+      opacity.className = 'fa-regular fa-sun tool selectable advanced opacity';
       opacity.setAttribute('tip', 'Control opacity');
       tippy(opacity, {
         trigger: 'click',
@@ -227,21 +224,21 @@ class TreeViewComponent extends GirafeResizableElement {
           return slider;
         }
       });
-      li.append(opacity);
+      container.append(opacity);
 
       // On the childs, we can have a icon to zoom to the right resolution, where the layer will be visible
       if (layer.hasRestrictedResolution()) {
         const resolutionZoom = document.createElement('i');
-        resolutionZoom.className = 'fg-zoom-in tool selectable';
+        resolutionZoom.className = 'fg-zoom-in tool selectable zoomres';
         resolutionZoom.setAttribute('tip', 'Zoom to visible resolution');
         resolutionZoom.onclick = (e) => this.zoomToResolution(layer.minResolution, layer.maxResolution);
-        li.append(resolutionZoom);
+        container.append(resolutionZoom);
       }
     }
   }
 
   deleteLayer(_this, layer, e) {
-    const li = e.target.parentElement;
+    const li = this.getParentLi(e.target);
 
     // First deactivate layer
     if (layer.isGroup) {
@@ -303,14 +300,14 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
   
-  renderLeafLabel(li, layer) {
+  renderLeafLabel(container, layer) {
     // Add label
     const span = document.createElement('span');
     span.setAttribute('i18n', 'girafe');
     span.textContent = layer.name;
     span.className = 'selectable';
     span.onclick = (e) => this.toggle(this, e, layer);
-    li.appendChild(span);
+    container.appendChild(span);
 
     if (layer.isLayer) {
       // We are on a layer linked to a server.
@@ -326,11 +323,13 @@ class TreeViewComponent extends GirafeResizableElement {
     const ulChild = e.target.parentElement.getElementsByTagName('ul')[0];
     if (ulChild.style.display === 'none') {
       ulChild.style.display = 'block';
-      e.target.className = 'fa fa-caret-down selectable';
+      e.target.classList.remove('fa-caret-right');
+      e.target.classList.add('fa-caret-down');
     }
     else {
       ulChild.style.display = 'none';
-      e.target.className = 'fa fa-caret-right selectable';
+      e.target.classList.remove('fa-caret-down');
+      e.target.classList.add('fa-caret-right');
     }
   }
 
@@ -370,7 +369,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   toggle(_this, e, layer) {
-    const li = e.target.parentElement;
+    const li = this.getParentLi(e.target);
 
     const setActive = !(layer.active);
     this.toggleLeaf(li, layer, setActive);
@@ -401,16 +400,11 @@ class TreeViewComponent extends GirafeResizableElement {
     layer.active = setActive;
     if (setActive) {
       li.className = 'active';
-      circleClass = 'fa-xs fa-solid fa-circle';
+      this.toggleSelectionCircle(circle, true);
     }
     else {
       li.className = '';
-      circleClass = 'fa-xs fa-regular fa-circle';
-    }
-
-    if (circle !== null) {
-      // There is a selection circle (no legend icon)
-      circle.className = circleClass;
+      this.toggleSelectionCircle(circle, false);
     }
   }
 
@@ -467,7 +461,7 @@ class TreeViewComponent extends GirafeResizableElement {
       }
     }
 
-    const liParent = ul.parentElement;
+    const liParent = this.getParentLi(ul);
     const layerParent = this.layers[liParent.dataset.layerid];
     const circle = liParent.getElementsByTagName('i')[1];
     
@@ -476,27 +470,53 @@ class TreeViewComponent extends GirafeResizableElement {
       // Activate parent
       layerParent.active = true;
       liParent.className = 'active';
-      circle.className = 'fa-xs fa-solid fa-circle';
+      this.toggleSelectionCircle(circle, true);
       stateChanged = true;
     }
     else if (allInactive && !layerParent.inactive) {
       // Deactivate parent
       layerParent.active = false;
       liParent.className = '';
-      circle.className = 'fa-xs fa-regular fa-circle';
+      this.toggleSelectionCircle(circle, false);
       stateChanged = true;
     }
     else if (!layerParent.semiactive) {
       // Semi-active
       layerParent.active = 'semi';
       liParent.className = '';
-      circle.className = 'fa-xs fa-solid fa-circle-half-stroke';
+      this.toggleSelectionCircle(circle, 'semi');
+
       stateChanged = true;
     }
 
     if (stateChanged) {
       // Recursively call on parent
       this.toggleParent(liParent);
+    }
+  }
+
+  renderSelectionCircle(li) {
+    const circle = document.createElement('i');
+    circle.dataset.circle = true;
+    circle.className = 'fa-xs fa-regular fa-circle selcircle';
+    li.append(circle);
+  }
+
+  toggleSelectionCircle(circle, active) {
+    // active can have the values true, false or 'semi'
+    if (this.isNullOrUndefined(circle)) {
+      // Circle does no exist. Just stop here
+      return;
+    }
+    
+    if (active === true) {
+      circle.className = 'fa-xs fa-solid fa-circle selcircle';
+    }
+    else if (active === false) {
+      circle.className = 'fa-xs fa-regular fa-circle selcircle';
+    }
+    else if (active === 'semi') {
+      circle.className = 'fa-xs fa-solid fa-circle-half-stroke selcircle';
     }
   }
 
@@ -592,12 +612,14 @@ class TreeViewComponent extends GirafeResizableElement {
 
   renderMoveIcons(li, layer) {
 
+    const container = li.getElementsByTagName('div')[0];
+
     // Add move down
     const movedown = document.createElement('i');
     movedown.className = 'fa-solid fa-square-caret-down advanced tool selectable movedown';
     movedown.setAttribute('tip', 'Move this layer down');
     movedown.onclick = (e) => this.moveLayerDown(this, layer, e);
-    li.append(movedown);
+    container.append(movedown);
     // But hide it if we are on the last node
     if (this.isNullOrUndefined(li.nextElementSibling) || li.nextElementSibling.nodeName !== 'LI') {
       movedown.style.visibility = 'hidden';
@@ -608,7 +630,7 @@ class TreeViewComponent extends GirafeResizableElement {
     moveup.className = 'fa-solid fa-square-caret-up advanced tool selectable moveup';
     moveup.setAttribute('tip', 'Move this layer up');
     moveup.onclick = (e) => this.moveLayerUp(this, layer, e);
-    li.append(moveup);
+    container.append(moveup);
     // But hide it if we are on the first node
     if (this.isNullOrUndefined(li.previousElementSibling) || li.previousElementSibling.nodeName !== 'LI') {
       moveup.style.visibility = 'hidden';
@@ -616,7 +638,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   moveLayerUp(_this, layer, e) {
-    const li = e.target.parentElement;
+    const li = this.getParentLi(e.target);
     const previousLi = li.previousElementSibling;
     const previousLayer = _this.layers[previousLi.dataset.layerid];
     
@@ -642,7 +664,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   moveLayerDown(_this, layer, e) {
-    const li = e.target.parentElement;
+    const li = this.getParentLi(e.target);
     const nextLi = li.nextElementSibling;
     const nextLayer = _this.layers[nextLi.dataset.layerid];
     
@@ -707,6 +729,15 @@ class TreeViewComponent extends GirafeResizableElement {
     });
 
     _this.allLegendsDisplayed = !_this.allLegendsDisplayed;
+  }
+
+  getParentLi(elem) {
+    const parent = elem.parentElement;
+    if (parent.nodeName === 'LI') {
+      return parent;
+    }
+
+    return this.getParentLi(parent);
   }
 }
 
