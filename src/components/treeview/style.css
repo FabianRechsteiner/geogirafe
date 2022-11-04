@@ -1,3 +1,7 @@
+:host, #panel {
+  min-width: 18rem;
+}
+
 #panel {
   position: absolute;
   top : 0;
