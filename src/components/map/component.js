@@ -17,6 +17,8 @@ import GeoEvents from '/models/events.js';
 import { getPointResolution, get as getProjection, transform } from 'ol/proj';
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
+import { WFS } from 'ol/format';
+import GML3 from 'ol/format/GML3';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
 import adjectives from 'adjectives';
@@ -40,9 +42,9 @@ class MapComponent extends GirafeHTMLElement {
   wmtsLayers = {};
 
   // For Redlining
-  featuresCollection = null;
-  vectorSource = null;
-  vectorLayer = null;
+  redliningFeaturesCollection = new Collection();
+  redliningSource = null;
+  redliningLayer = null;
   draw = null;
   snap = null;
 
@@ -52,6 +54,10 @@ class MapComponent extends GirafeHTMLElement {
   defaultFillColor = '#ff66667f';
   defaultTextSize = 12;
   defaultFont = 'Arial';
+
+  // For object selection
+  selectedFeaturesCollection = new Collection();
+  selectionLayer = null;
 
   constructor() {
     super();
@@ -100,15 +106,34 @@ class MapComponent extends GirafeHTMLElement {
     });
 
     // Create vector source for drawing
-    this.featuresCollection = new Collection();
-    this.vectorSource = new VectorSource({
-      features: this.featuresCollection
+    this.redliningSource = new VectorSource({
+      features: this.redliningFeaturesCollection
     });
-    this.vectorLayer = new VectorLayer({
-      source: this.vectorSource,
+    this.redliningLayer = new VectorLayer({
+      source: this.redliningSource,
       //style: (feature) => this.getDefaultStyle(this, feature)
     });
-    this.map.addLayer(this.vectorLayer);
+    this.map.addLayer(this.redliningLayer);
+    this.redliningLayer.setZIndex(1001);
+
+    // Create layer for selection
+    this.selectionLayer = new VectorLayer({
+      source: new VectorSource({
+        features: this.selectedFeaturesCollection
+      }),
+      // TODO REG: Change default selection color
+      style: new Style({
+        stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth }),
+        fill: new Fill({ color: this.defaultFillColor }),
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({ color: this.defaultFillColor }),
+          stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth })
+        })
+      })
+    });
+    this.map.addLayer(this.selectionLayer);
+    this.selectionLayer.setZIndex(1002);
 
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {
@@ -138,6 +163,7 @@ class MapComponent extends GirafeHTMLElement {
   listenOpenLayersEvents() {
     // https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html
     //this.map.on('change', (e) => console.log(e));
+    this.map.on('singleclick', (e) => this.onClick(e));
     //this.map.on('click', (e) => console.log(e));
     //this.map.on('dblclick', (e) => console.log(e));
     //this.map.on('error', (e) => console.log(e));
@@ -152,14 +178,13 @@ class MapComponent extends GirafeHTMLElement {
     //this.map.on('precompose', (e) => console.log(e));
     //this.map.on('propertychange', (e) => console.log(e));
     //this.map.on('rendercomplete', (e) => console.log(e));
-    //this.map.on('singleclick ', (e) => console.log(e));
     //? change:layerGroup
     //? change:size
     //? change:target
     //? change:view
 
     // Drawing events
-    this.featuresCollection.on('add', (e) => this.onFeatureAdded(this, e));
+    this.redliningFeaturesCollection.on('add', (e) => this.onFeatureAdded(this, e));
 
   }
 
@@ -172,6 +197,63 @@ class MapComponent extends GirafeHTMLElement {
     const resolution = view.getResolution();
     this.messageManager.sendMessage(GeoEvents.Map, { action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ });
     this.messageManager.sendMessage(GeoEvents.Map, { action: 'resolutionChanged', resolution: resolution });
+  }
+
+  onClick(e) {
+    console.log(e);
+    const viewResolution = this.map.getView().getResolution();
+
+    for (let key in this.layersByServer) {
+      const source = this.layersByServer[key].layer.getSource();
+      const queryLayers = source.getParams().LAYERS;
+
+      // WMS GetFatureInfo
+      // const url = source.getFeatureInfoUrl(e.coordinate, viewResolution, this.srid, {'INFO_FORMAT': 'text/plain'/*, 'QUERY_LAYERS': queryLayers*/});
+      // if (url) {
+      //   fetch(url)
+      //     .then((response) => response.text())
+      //     .then((html) => console.log(html));
+      // }
+
+      const topLeftPixel = [e.pixel[0] - 5, e.pixel[1] - 5];
+      const topLeftCoord = this.map.getCoordinateFromPixel(topLeftPixel);
+      const bottomRightPixel = [e.pixel[0] + 5, e.pixel[1] + 5];
+      const bottomRightCoord = this.map.getCoordinateFromPixel(bottomRightPixel);
+      const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
+
+      // WFS GetFeature
+      // TODO REG: read parameters from WFS-Capabilities
+      const featureRequest = new WFS().writeGetFeature({
+        srsName: this.srid,
+        //featureNS: 'http://mapserver.gis.umn.edu/mapserver',
+        //featurePrefix: 'feature',
+        featureTypes: queryLayers,
+        maxFeatures: 200,
+        outputFormat: 'GML3',
+        // TODO REG: get the right geometry column name
+        geometryName: 'the_geom',
+        bbox: extent,
+        //resultType: 'hits'
+        /*filter: andFilter(
+          likeFilter('name', 'Mississippi*'),
+          equalToFilter('waterway', 'riverbank')
+        ),*/
+      });
+
+      fetch('https://wfs.geo.bs.ch', {
+        method: 'POST',
+        body: new XMLSerializer().serializeToString(featureRequest),
+      })
+        .then((response) => { return response.text() })
+        .then((gml) => {
+          // TODO REG: Read the right GML Format (from WFS-Capabilities)
+          const features = new GML3().readFeatures(gml);
+          this.selectedFeaturesCollection.clear();
+          for (let i=0; i<features.length; ++i) {
+            this.selectedFeaturesCollection.push(features[i]);
+          }
+        });
+    }
   }
 
   onFeatureAdded(_this, e) {
@@ -324,10 +406,6 @@ class MapComponent extends GirafeHTMLElement {
         this.onAddWmtsLayer(l);
       }
     });
-
-    // When adding a new layer to the map, 
-    // We still want the vectorLayer (for redlining) to be on top position
-    this.vectorLayer.setZIndex(1001);
   }
 
   onRemoveLayers(layerInfos) {
@@ -588,14 +666,14 @@ class MapComponent extends GirafeHTMLElement {
 
   setFeatureName(id, name) {
     console.log(id);
-    const feature = this.featuresCollection.getArray().find(f => f.ol_uid === id);
+    const feature = this.redliningFeaturesCollection.getArray().find(f => f.ol_uid === id);
     console.log('old: ' + feature.get('name'));
     console.log('new: ' + name);
     feature.set('name', name);
   }
 
   setFeatureStyle(id, fillColor, strokeColor, strokeWidth, text) {
-    const feature = this.featuresCollection.getArray().find(f => f.ol_uid === id);
+    const feature = this.redliningFeaturesCollection.getArray().find(f => f.ol_uid === id);
 
     if (fillColor) {
       feature.set('fillColor', fillColor.hex);
@@ -619,8 +697,8 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   deleteFeature(id) {
-    const toRemove = this.featuresCollection.getArray().find(f => f.ol_uid === id);
-    this.featuresCollection.remove(toRemove);
+    const toRemove = this.redliningFeaturesCollection.getArray().find(f => f.ol_uid === id);
+    this.redliningFeaturesCollection.remove(toRemove);
     this.messageManager.sendMessage(GeoEvents.Redlining, { action: 'featureRemoved', id: toRemove.ol_uid });
   }
 
@@ -649,16 +727,16 @@ class MapComponent extends GirafeHTMLElement {
     }
 
     this.draw = new Draw({
-      source: this.vectorSource,
+      source: this.redliningSource,
       type: tool,
       freehand: freehand,
       geometryFunction: geometryFunction
     });
-    const modify = new Modify({ source: this.vectorSource });
+    const modify = new Modify({ source: this.redliningSource });
     this.map.addInteraction(modify);
 
     this.map.addInteraction(this.draw);
-    this.snap = new Snap({ source: this.vectorSource });
+    this.snap = new Snap({ source: this.redliningSource });
     this.map.addInteraction(this.snap);
   }
 
