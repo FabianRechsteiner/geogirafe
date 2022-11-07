@@ -22,6 +22,9 @@ import GML3 from 'ol/format/GML3';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
 import adjectives from 'adjectives';
+import {getVectorContext} from 'ol/render';
+import {easeOut} from 'ol/easing';
+import {unByKey} from 'ol/Observable';
 
 class MapComponent extends GirafeHTMLElement {
 
@@ -58,6 +61,7 @@ class MapComponent extends GirafeHTMLElement {
   // For object selection
   selectedFeaturesCollection = new Collection();
   selectionLayer = null;
+  selectionAnimation = null;
 
   constructor() {
     super();
@@ -117,10 +121,12 @@ class MapComponent extends GirafeHTMLElement {
     this.redliningLayer.setZIndex(1001);
 
     // Create layer for selection
+    const selectionSource = new VectorSource({
+      features: this.selectedFeaturesCollection
+    });
+    selectionSource.on('addfeature', (e) => { this.flash(e.feature) });
     this.selectionLayer = new VectorLayer({
-      source: new VectorSource({
-        features: this.selectedFeaturesCollection
-      }),
+      source: selectionSource,
       // TODO REG: Change default selection color
       style: new Style({
         stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth }),
@@ -253,6 +259,46 @@ class MapComponent extends GirafeHTMLElement {
             this.selectedFeaturesCollection.push(features[i]);
           }
         });
+    }
+  }
+
+  flash(feature) {
+    const duration = 2000;
+    var start = Date.now();
+    const flashGeom = feature.getGeometry().clone();
+    // First deactivate the current animation
+    // (We only want one animated object)
+    if (this.selectionAnimation !== null) {
+      unByKey(this.selectionAnimation);
+    }
+    this.selectionAnimation = this.selectionLayer.on('postrender', (e) => animate(this, e));
+  
+    function animate(_this, e) {
+      const frameState = e.frameState;
+      const elapsed = frameState.time - start;
+      if (elapsed >= duration) {
+        start = Date.now();
+      }
+      const vectorContext = getVectorContext(e);
+      const elapsedRatio = elapsed / duration;
+      // radius will be 5 at start and 30 at end.
+      const radius = easeOut(elapsedRatio) * 25 + 5;
+      const opacity = easeOut(1 - elapsedRatio);
+  
+      const style = new Style({
+        image: new Circle({
+          radius: radius,
+          stroke: new Stroke({
+            color: 'rgba(255, 0, 0, ' + opacity + ')',
+            width: 0.25 + opacity,
+          }),
+        }),
+      });
+  
+      vectorContext.setStyle(style);
+      vectorContext.drawGeometry(flashGeom);
+      // tell OpenLayers to continue postrender animation
+      _this.map.render();
     }
   }
 
