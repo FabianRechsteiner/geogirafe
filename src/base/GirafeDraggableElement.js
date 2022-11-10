@@ -25,6 +25,8 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   button = null;
   div = null;
   header = null;
+  host = null;
+
   pos1 = 0;
   pos2 = 0;
   pos3 = 0;
@@ -36,6 +38,7 @@ class GirafeDraggableElement extends GirafeHTMLElement {
 
   makeDraggable() {
     this.div = this.shadow.querySelector('#draggable');
+    this.host = this.div.getRootNode().host;
     this.header = this.shadow.querySelector('#header');
     this.header.onmousedown = (e) => this.dragMouseDown(this, e);
   }
@@ -60,8 +63,16 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     _this.pos3 = e.clientX;
     _this.pos4 = e.clientY;
     // set the element's new position:
-    _this.div.style.top = (_this.div.offsetTop - _this.pos2) + "px";
-    _this.div.style.left = (_this.div.offsetLeft - _this.pos1) + "px";
+    const newTop = (_this.host.offsetTop - _this.pos2);
+    if (newTop < 0) {
+      newTop = 0;
+    }
+    _this.host.style.top = newTop + "px";
+    const newLeft = (_this.host.offsetLeft - _this.pos1);
+    if (newLeft < 0) {
+      newLeft = 0;
+    }
+    _this.host.style.left = newLeft + "px";
   }
 
   closeDragElement() {

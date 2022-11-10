@@ -17,8 +17,6 @@ import GeoEvents from '/models/events.js';
 import { getPointResolution, get as getProjection, transform } from 'ol/proj';
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
-import { WFS } from 'ol/format';
-import GML3 from 'ol/format/GML3';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
 import adjectives from 'adjectives';
@@ -62,6 +60,7 @@ class MapComponent extends GirafeHTMLElement {
   selectedFeaturesCollection = new Collection();
   selectionLayer = null;
   selectionAnimation = null;
+  pixelTolerance = 10;
 
   constructor() {
     super();
@@ -206,60 +205,28 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onClick(e) {
-    console.log(e);
-    const viewResolution = this.map.getView().getResolution();
+    const selectionParams = [];
 
     for (let key in this.layersByServer) {
       const source = this.layersByServer[key].layer.getSource();
       const queryLayers = source.getParams().LAYERS;
 
-      // WMS GetFatureInfo
-      // const url = source.getFeatureInfoUrl(e.coordinate, viewResolution, this.srid, {'INFO_FORMAT': 'text/plain'/*, 'QUERY_LAYERS': queryLayers*/});
-      // if (url) {
-      //   fetch(url)
-      //     .then((response) => response.text())
-      //     .then((html) => console.log(html));
-      // }
-
-      const topLeftPixel = [e.pixel[0] - 5, e.pixel[1] - 5];
+      // Build selectionbox using the default tolerance
+      const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
       const topLeftCoord = this.map.getCoordinateFromPixel(topLeftPixel);
-      const bottomRightPixel = [e.pixel[0] + 5, e.pixel[1] + 5];
+      const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
       const bottomRightCoord = this.map.getCoordinateFromPixel(bottomRightPixel);
       const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
 
-      // WFS GetFeature
-      // TODO REG: read parameters from WFS-Capabilities
-      const featureRequest = new WFS().writeGetFeature({
-        srsName: this.srid,
-        //featureNS: 'http://mapserver.gis.umn.edu/mapserver',
-        //featurePrefix: 'feature',
-        featureTypes: queryLayers,
-        maxFeatures: 200,
-        outputFormat: 'GML3',
-        // TODO REG: get the right geometry column name
-        geometryName: 'the_geom',
-        bbox: extent,
-        //resultType: 'hits'
-        /*filter: andFilter(
-          likeFilter('name', 'Mississippi*'),
-          equalToFilter('waterway', 'riverbank')
-        ),*/
+      selectionParams.push({
+        wfsUrl: 'https://wfs.geo.bs.ch',
+        selectionBox: extent,
+        srid: this.srid,
+        featureTypes: queryLayers
       });
-
-      fetch('https://wfs.geo.bs.ch', {
-        method: 'POST',
-        body: new XMLSerializer().serializeToString(featureRequest),
-      })
-        .then((response) => { return response.text() })
-        .then((gml) => {
-          // TODO REG: Read the right GML Format (from WFS-Capabilities)
-          const features = new GML3().readFeatures(gml);
-          this.selectedFeaturesCollection.clear();
-          for (let i=0; i<features.length; ++i) {
-            this.selectedFeaturesCollection.push(features[i]);
-          }
-        });
     }
+
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'selectFeatures', selectionParams: selectionParams });
   }
 
   flash(feature) {
@@ -407,6 +374,22 @@ class MapComponent extends GirafeHTMLElement {
     }
     else if (details.action === 'orderChanged') {
       this.onChangeOrder(details.layers);
+    }
+    else if (details.action === 'clearSelection') {
+      this.onClearSelection();
+    }
+    else if (details.action === 'featuresSelected') {
+      this.onFeaturesSelected(details.features);
+    }
+  }
+
+  onClearSelection() {
+    this.selectedFeaturesCollection.clear();
+  }
+
+  onFeaturesSelected(features) {
+    for (let i=0; i<features.length; ++i) {
+      this.selectedFeaturesCollection.push(features[i]);
     }
   }
 

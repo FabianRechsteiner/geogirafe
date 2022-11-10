@@ -1,0 +1,26 @@
+#header {
+    padding: 1rem;
+    cursor: move;
+    z-index: 10;
+    background-color: #aaa;
+    color: #fff;
+    text-align: center;
+}
+
+#content {
+    padding: 1rem 3rem;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td.label {
+    text-align: right;
+    padding-right: 1rem;
+    color: #666;
+}
+
+td.label:after {
+    content: ' :';
+}

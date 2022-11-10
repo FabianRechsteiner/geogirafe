@@ -7,6 +7,8 @@ class I18nManager {
   static #initializingSingleton = false;
 
   translations = null;
+  // TODO REG : Set default language
+  currentLanguage = null;
 
   constructor() {
     if (!I18nManager.#initializingSingleton) {
@@ -46,6 +48,11 @@ class I18nManager {
   }
 
   translate(dom, language) {
+    this.currentLanguage = language;
+    this.translate(dom);
+  }
+
+  translate(dom) {
     const toTranslate = dom.querySelectorAll('[i18n="girafe"]');
     toTranslate.forEach(item => {
       const key = item.innerHTML;
