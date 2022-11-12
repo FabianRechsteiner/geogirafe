@@ -32,6 +32,7 @@ class ProjectionComponent extends GirafeHTMLElement {
 
   registerEvents() {
     window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
+    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
     this.projectionSelect.addEventListener('change', (e) => this.onProjectionChanged(this, e));
   }
 
@@ -40,6 +41,18 @@ class ProjectionComponent extends GirafeHTMLElement {
       if (details.state.projection !== 'null') {
         this.projectionSelect.value = details.state.projection;
       }
+    }
+  }
+
+  onMapEvent(details) {
+    if (details.action === 'projectionChanged') {
+      this.onChangeProjection(details.projection);
+    }
+  }
+
+  onChangeProjection(projection) {
+    if (this.projectionSelect.value !== projection) {
+      this.projectionSelect.value = projection;
     }
   }
 

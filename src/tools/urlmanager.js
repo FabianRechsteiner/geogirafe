@@ -11,6 +11,10 @@ class UrlManager {
   dependencyTotalCount = 0;
   dependencyInitializedCount = 0;
 
+  get everythingInitialized() {
+    return this.dependencyInitializedCount === this.dependencyTotalCount;
+  }
+
   constructor(dependencyCount) {
     if (!UrlManager.#initializingSingleton) {
       // If trying to create another instance
@@ -55,7 +59,7 @@ class UrlManager {
     if (details.action === 'componentInitialized') {
       this.dependencyInitializedCount++;
       console.log(`Component initialized: ${this.dependencyInitializedCount}/${this.dependencyTotalCount}`);
-      if (this.dependencyInitializedCount == this.dependencyTotalCount) {
+      if (this.everythingInitialized) {
         // All dependency are initialized.
         // => initialize the application from the start URL
         this.manageStartUrl();
@@ -68,8 +72,12 @@ class UrlManager {
 
   onAppEvent(details) {
     if (details.action === 'stateChanged') {
-      const encodedState = this.encodeState(details.state);
-      window.history.replaceState(null, '', encodedState);
+      if (this.everythingInitialized) {
+        // Update URL only if every component have been initialized
+        // Otherwise the URL will be overwritten with partial data
+        const encodedState = this.encodeState(details.state);
+        window.history.replaceState(null, '', encodedState);
+      }
     }
   }
 

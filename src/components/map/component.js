@@ -31,7 +31,11 @@ class MapComponent extends GirafeHTMLElement {
   map = null;
 
   srid = 'EPSG:3857'; // default projection
-  projection = getProjection(this.srid);
+  get projection() {
+    return getProjection(this.srid);
+  }
+
+  // For Basemaps
   currentBasemap = null;
 
   // For WMS Layers
@@ -92,6 +96,11 @@ class MapComponent extends GirafeHTMLElement {
     // Clone component template and add it to the dom
     this.shadow.appendChild(MapComponent.#template.content.cloneNode(true));
 
+    this.srid = this.getAttribute('srid');
+    const defaultextent = this.getAttribute('max-extent').split(',').map(Number);
+    const startcenter = this.getAttribute('center').split(',').map(Number);
+    const startzoom = Number(this.getAttribute('zoom'));
+
     // Default basemap : OSM
     this.currentBasemap = new TileLayer({
       source: new OSM()
@@ -103,8 +112,10 @@ class MapComponent extends GirafeHTMLElement {
       target: target,
       layers: [this.currentBasemap],
       view: new View({
-        center: [0, 0],
-        zoom: 2,
+        center: startcenter,
+        zoom: startzoom,
+        projection: this.srid,
+        extent: defaultextent
       }),
     });
 
@@ -139,6 +150,8 @@ class MapComponent extends GirafeHTMLElement {
     });
     this.map.addLayer(this.selectionLayer);
     this.selectionLayer.setZIndex(1002);
+
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'projectionChanged', projection: this.srid});
 
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {
@@ -352,7 +365,8 @@ class MapComponent extends GirafeHTMLElement {
         const newView = new View({
           center: [parseFloat(details.state.mapX), parseFloat(details.state.mapY)],
           zoom: parseFloat(details.state.mapZ),
-          projection: this.projection
+          projection: this.projection,
+          extent: this.map.getView().get('extent')
         });
         this.map.setView(newView);
       }
@@ -368,6 +382,9 @@ class MapComponent extends GirafeHTMLElement {
     }
     else if (details.action === 'zoomToResolution') {
       this.zoomToResolution(details.resolution);
+    }
+    else if (details.action === 'zoomToExtent') {
+      this.zoomToExtent(details.extent);
     }
     else if (details.action === 'opacityChanged') {
       this.onChangeOpacity(details.layer);
@@ -397,31 +414,46 @@ class MapComponent extends GirafeHTMLElement {
     this.map.getView().setResolution(resolution);
   }
 
-  onChangeProjection(projection) {
-    console.log('New Projection: ' + projection);
-    this.srid = projection;
-    this.projection = getProjection(projection);
+  zoomToExtent(extent) {
+    this.map.getView().fit(extent);
+  }
+
+  onChangeProjection(srid) {
+    if (this.srid === srid) {
+      // Everything is already ok.
+      // => Nothing to do
+      return;
+    }
+
+    this.srid = srid;
 
     const currentView = this.map.getView();
     const currentProjection = currentView.getProjection();
+
+    // Convert old values...
     const currentResolution = currentView.getResolution();
     const currentCenter = currentView.getCenter();
     const currentRotation = currentView.getRotation();
+    const currentExtent = currentView.get('extent');
+
+    // ... to new ones
     const newCenter = transform(currentCenter, currentProjection, this.projection);
     const currentMPU = currentProjection.getMetersPerUnit();
     const newMPU = this.projection.getMetersPerUnit();
-    const currentPointResolution =
-      getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') *
-      currentMPU;
-    const newPointResolution =
-      getPointResolution(this.projection, 1 / newMPU, newCenter, 'm') * newMPU;
-    const newResolution =
-      (currentResolution * currentPointResolution) / newPointResolution;
+    const currentPointResolution = getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') * currentMPU;
+    const newPointResolution = getPointResolution(this.projection, 1 / newMPU, newCenter, 'm') * newMPU;
+    const newResolution = (currentResolution * currentPointResolution) / newPointResolution;
+    const newExtentPoint1 = transform([currentExtent[0], currentExtent[1]], currentProjection, this.projection);
+    const newExtentPoint2 = transform([currentExtent[2], currentExtent[3]], currentProjection, this.projection);
+    const newExtent = [newExtentPoint1[0], newExtentPoint1[1], newExtentPoint2[0], newExtentPoint2[1]];
+
+    // Create new view
     const newView = new View({
       center: newCenter,
       resolution: newResolution,
       rotation: currentRotation,
       projection: this.projection,
+      extent: newExtent
     });
     this.map.setView(newView);
   }
