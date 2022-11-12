@@ -57,22 +57,60 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   elementDrag(_this, e) {
     e = e || window.event;
     e.preventDefault();
-    // calculate the new cursor position:
-    _this.pos1 = _this.pos3 - e.clientX;
-    _this.pos2 = _this.pos4 - e.clientY;
-    _this.pos3 = e.clientX;
-    _this.pos4 = e.clientY;
-    // set the element's new position:
-    const newTop = (_this.host.offsetTop - _this.pos2);
-    if (newTop < 0) {
-      newTop = 0;
-    }
-    _this.host.style.top = newTop + "px";
-    const newLeft = (_this.host.offsetLeft - _this.pos1);
+
+    const hostRect = _this.host.getBoundingClientRect();
+    
+    // Position left
+    const pos1 = _this.pos3 - e.clientX;
+    const newLeft = _this.host.offsetLeft - pos1;
+    const newRight = newLeft + hostRect.width;
     if (newLeft < 0) {
-      newLeft = 0;
+      _this.host.style.left = "0px";
     }
-    _this.host.style.left = newLeft + "px";
+    else if (newRight > this.getBodyWidth()) {
+      _this.host.style.left = (this.getBodyWidth() - hostRect.width) + "px";
+    }
+    else {
+      _this.pos1 = pos1;
+      _this.pos3 = e.clientX;
+      _this.host.style.left = newLeft + "px";
+    }
+    
+    // Position top
+    const pos2 = _this.pos4 - e.clientY;
+    const newTop = _this.host.offsetTop - pos2;
+    const newBottom = newTop + hostRect.height;
+    if (newTop < 0) {
+      _this.host.style.top = "0px";
+    }
+    else if (newBottom > this.getBodyHeight()) {
+      _this.host.style.top = (this.getBodyHeight() - hostRect.height) + "px";
+    }
+    else {
+      _this.pos2 = pos2;
+      _this.pos4 = e.clientY;
+      _this.host.style.top = newTop + "px";
+    }
+  }
+
+  getBodyWidth() {
+    return Math.max(
+      document.body.scrollWidth,
+      document.documentElement.scrollWidth,
+      document.body.offsetWidth,
+      document.documentElement.offsetWidth,
+      document.documentElement.clientWidth
+    );
+  }
+  
+  getBodyHeight() {
+    return Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight,
+      document.documentElement.clientHeight
+    );
   }
 
   closeDragElement() {

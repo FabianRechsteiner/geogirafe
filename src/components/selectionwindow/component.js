@@ -3,7 +3,6 @@ import GirafeDraggableElement from '/base/GirafeDraggableElement';
 import { WFS } from 'ol/format';
 import GML3 from 'ol/format/GML3';
 import I18nManager from '/tools/i18nmanager';
-import { toStringHDMS } from 'ol/coordinate';
 
 class SelectionWindowComponent extends GirafeDraggableElement {
 
