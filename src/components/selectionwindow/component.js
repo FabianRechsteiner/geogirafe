@@ -3,15 +3,20 @@ import GirafeDraggableElement from '/base/GirafeDraggableElement';
 import { WFS } from 'ol/format';
 import GML3 from 'ol/format/GML3';
 import I18nManager from '/tools/i18nmanager';
+import { toStringHDMS } from 'ol/coordinate';
 
 class SelectionWindowComponent extends GirafeDraggableElement {
 
   static #template = null;
 
   maxFeatures = 200;
-  featuresSelected = null;
-  activeFeature = null
+  selectedFeatures = null;
+  focusedIndex = null;
+
   content = null;
+  previousButton = null;
+  nextButton = null;
+  counter = null;
 
   constructor() {
     super();
@@ -34,10 +39,15 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     // Clone component template and add it to the dom
     this.shadow.appendChild(SelectionWindowComponent.#template.content.cloneNode(true));
     this.content = this.shadow.querySelector('#content');
+    this.previousButton = this.shadow.querySelector('#previous');
+    this.nextButton = this.shadow.querySelector('#next');
+    this.counterText = this.shadow.querySelector('#counter');
   }
 
   registerEvents() {
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+    this.previousButton.addEventListener('click', (e) => this.onFocusFeature(this.focusedIndex - 1, e));
+    this.nextButton.addEventListener('click', () => this.onFocusFeature(this.focusedIndex + 1));
   }
 
   onMapEvent(details) {
@@ -89,28 +99,40 @@ class SelectionWindowComponent extends GirafeDraggableElement {
         .then((response) => { return response.text() })
         .then((gml) => {
           // TODO REG: Use the right GML Format (from WFS-Capabilities), not always GML3
-          this.featuresSelected = new GML3().readFeatures(gml);
-          if (this.featuresSelected.length === 0) {
+          this.selectedFeatures = new GML3().readFeatures(gml);
+          if (this.selectedFeatures.length === 0) {
             // No feature selected
             this.host.style.display = 'none';
           }
           else {
             // Select feature on the map
-            this.messageManager.sendMessage(GeoEvents.Map, { action: 'featuresSelected', features: this.featuresSelected });
+            this.messageManager.sendMessage(GeoEvents.Map, { action: 'featuresSelected', features: this.selectedFeatures });
 
             this.host.style.display = 'block';
             this.header.innerHTML = '';
             this.content.innerHTML = '';
 
             // Default, selected the first feature
-            this.activateFeature(this.featuresSelected[0]);
+            this.onFocusFeature(0);
           }
         });
     }
   }
 
-  activateFeature(feature) {
-    this.header.innerHTML += feature.getId();
+  onFocusFeature(index) {
+    console.log('Focus on ' + index);
+    this.focusedIndex = index;
+    this.focusFeature(this.selectedFeatures[this.focusedIndex]);
+  }
+
+  focusFeature(feature) {
+
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'featureFocused', feature: feature });
+
+    // Title (draggable header)
+    this.header.innerHTML = feature.getId();
+
+    // Content
     const properties = feature.getProperties();
     const table = document.createElement('table');
     for (const key in properties) {
@@ -135,10 +157,36 @@ class SelectionWindowComponent extends GirafeDraggableElement {
       }
     }
 
+    this.content.innerHTML = '';
     this.content.appendChild(table);
+
+    // Enable/Disable Previous/next buttons
+    this.enableNavigationButtons();
 
     // Translate data
     I18nManager.getInstance().translate(this.shadow);
+  }
+
+  enableNavigationButtons() {
+    let previousDisplay = 'block';
+    let nextDisplay = 'block';
+    if (this.focusedIndex === 0) {
+      previousDisplay = 'none';
+    }
+    if (this.focusedIndex === this.selectedFeatures.length - 1) {
+      nextDisplay = 'none';
+    }
+
+    this.previousButton.style.display = previousDisplay;
+    this.nextButton.style.display = nextDisplay;
+
+    // Set counter text
+    if (this.selectedFeatures.length === 1) {
+      this.counterText.innerHTML = '';
+    }
+    else {
+      this.counterText.innerHTML = (this.focusedIndex+1) + '/' + this.selectedFeatures.length;
+    }
   }
 
   connectedCallback() {

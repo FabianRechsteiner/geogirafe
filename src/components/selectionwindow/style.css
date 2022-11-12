@@ -24,3 +24,24 @@ td.label {
 td.label:after {
     content: ' :';
 }
+
+#footer {
+    color: #aaa;
+}
+#previous {
+    padding: 0.5rem;
+    float: left;
+    cursor: pointer;
+}
+
+#next  {
+    padding: 0.5rem;
+    float: right;
+    cursor: pointer;
+}
+
+#counter {
+    line-height: 1rem;
+    padding-top: 0.5rem;
+    text-align: center;
+}

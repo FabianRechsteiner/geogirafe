@@ -62,8 +62,10 @@ class MapComponent extends GirafeHTMLElement {
 
   // For object selection
   selectedFeaturesCollection = new Collection();
+  focusedFeaturesCollection = new Collection();
   selectionLayer = null;
-  selectionAnimation = null;
+  focusLayer = null;
+  focusAnimation = null;
   pixelTolerance = 10;
 
   constructor() {
@@ -134,7 +136,6 @@ class MapComponent extends GirafeHTMLElement {
     const selectionSource = new VectorSource({
       features: this.selectedFeaturesCollection
     });
-    selectionSource.on('addfeature', (e) => { this.flash(e.feature) });
     this.selectionLayer = new VectorLayer({
       source: selectionSource,
       // TODO REG: Change default selection color
@@ -150,6 +151,27 @@ class MapComponent extends GirafeHTMLElement {
     });
     this.map.addLayer(this.selectionLayer);
     this.selectionLayer.setZIndex(1002);
+
+    // Create layer for focus
+    const focusSource = new VectorSource({
+      features: this.focusedFeaturesCollection
+    });
+    focusSource.on('addfeature', (e) => { this.flash(e.feature) });
+    this.focusLayer = new VectorLayer({
+      source: selectionSource,
+      // TODO REG: Change default focus color
+      style: new Style({
+        stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth }),
+        fill: new Fill({ color: this.defaultFillColor }),
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({ color: this.defaultFillColor }),
+          stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth })
+        })
+      })
+    });
+    this.map.addLayer(this.focusLayer);
+    this.focusLayer.setZIndex(1003);
 
     this.messageManager.sendMessage(GeoEvents.Map, {action: 'projectionChanged', projection: this.srid});
 
@@ -248,10 +270,10 @@ class MapComponent extends GirafeHTMLElement {
     const flashGeom = feature.getGeometry().clone();
     // First deactivate the current animation
     // (We only want one animated object)
-    if (this.selectionAnimation !== null) {
-      unByKey(this.selectionAnimation);
+    if (this.focusAnimation !== null) {
+      unByKey(this.focusAnimation);
     }
-    this.selectionAnimation = this.selectionLayer.on('postrender', (e) => animate(this, e));
+    this.focusAnimation = this.selectionLayer.on('postrender', (e) => animate(this, e));
   
     function animate(_this, e) {
       const frameState = e.frameState;
@@ -398,6 +420,9 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'featuresSelected') {
       this.onFeaturesSelected(details.features);
     }
+    else if (details.action === 'featureFocused') {
+      this.onFeatureFocused(details.feature);
+    }
   }
 
   onClearSelection() {
@@ -408,6 +433,11 @@ class MapComponent extends GirafeHTMLElement {
     for (let i=0; i<features.length; ++i) {
       this.selectedFeaturesCollection.push(features[i]);
     }
+  }
+
+  onFeatureFocused(feature) {
+    this.focusedFeaturesCollection.clear();
+    this.focusedFeaturesCollection.push(feature);
   }
 
   zoomToResolution(resolution) {
