@@ -10,7 +10,8 @@ import Circle from 'ol/style/Circle';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-import { Modify, Snap } from 'ol/interaction';
+import { Modify, Snap, DragBox } from 'ol/interaction';
+import { platformModifierKeyOnly } from 'ol/events/condition';
 import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
 import View from 'ol/View';
 import GeoEvents from '/models/events.js';
@@ -67,6 +68,7 @@ class MapComponent extends GirafeHTMLElement {
   focusLayer = null;
   focusAnimation = null;
   pixelTolerance = 10;
+  dragbox = null;
 
   constructor() {
     super();
@@ -173,6 +175,13 @@ class MapComponent extends GirafeHTMLElement {
     this.map.addLayer(this.focusLayer);
     this.focusLayer.setZIndex(1003);
 
+    // Add drabos selection interaction
+    this.dragbox = new DragBox({
+      condition: platformModifierKeyOnly,
+    });
+    this.map.addInteraction(this.dragbox);
+    this.dragbox.on('boxend', (e) => this.onDragSelection(e));
+
     this.messageManager.sendMessage(GeoEvents.Map, {action: 'projectionChanged', projection: this.srid});
 
     // TODO REG: This is ugly, but I didn't find any other solution yet.
@@ -252,6 +261,25 @@ class MapComponent extends GirafeHTMLElement {
       const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
       const bottomRightCoord = this.map.getCoordinateFromPixel(bottomRightPixel);
       const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
+
+      selectionParams.push({
+        wfsUrl: 'https://wfs.geo.bs.ch',
+        selectionBox: extent,
+        srid: this.srid,
+        featureTypes: queryLayers
+      });
+    }
+
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'selectFeatures', selectionParams: selectionParams });
+  }
+
+  onDragSelection(e) {
+    const extent = this.dragbox.getGeometry().getExtent();
+    const selectionParams = [];
+
+    for (let key in this.layersByServer) {
+      const source = this.layersByServer[key].layer.getSource();
+      const queryLayers = source.getParams().LAYERS;
 
       selectionParams.push({
         wfsUrl: 'https://wfs.geo.bs.ch',
