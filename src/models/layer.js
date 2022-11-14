@@ -8,8 +8,10 @@ class Layer {
   url = null;
   imageType = null;
   layers = null;
+  queryLayers = null;
   minResolution = null;
   maxResolution = null;
+  queryable = false;
 
   // Legend properties
   legend = null;
@@ -35,7 +37,6 @@ class Layer {
     this.server = server;
     this.url = url;
     this.imageType = elem.imageType;
-    this.layers = elem.layers;
     this.minResolution = elem.minResolutionHint;
     this.maxResolution = elem.maxResolutionHint;
     this.iconUrl = elem.metadata.iconUrl
@@ -47,11 +48,16 @@ class Layer {
       // WMS Layer
       this.isGroup = false;
       this.isLayer = true;
+      this.layers = elem.layers;
+      // TODO REG: Is it possible that 1 childlayer is queryable, and another one not ?
+      this.queryable = elem.childLayers[0].queryable;
+      this.queryLayers = (this.queryable) ? elem.childLayers.map(l => l.name).join(',') : '';
     }
     else if (elem.type === 'WMTS') {
       // WMTS Layer
       this.isGroup = false;
       this.isLayer = true;
+      this.layers = elem.layer;
     }
     else {
       // Other cases: Groups

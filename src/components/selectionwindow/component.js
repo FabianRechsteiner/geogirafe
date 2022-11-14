@@ -129,7 +129,9 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     this.messageManager.sendMessage(GeoEvents.Map, { action: 'featureFocused', feature: feature });
 
     // Title (draggable header)
-    this.header.setAttribute('i18n', feature.getId().split('.')[0]);
+    const id = feature.getId();
+    const featureType = (id === undefined) ? 'UNKNOWN' : id.split('.')[0];
+    this.header.setAttribute('i18n', featureType);
 
     // Content
     const properties = feature.getProperties();

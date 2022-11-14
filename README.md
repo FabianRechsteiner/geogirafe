@@ -34,8 +34,6 @@ npm install
 npm run-script serve
 ```
 
-On Windows:
-
 ### On Windows
 
 ```bash

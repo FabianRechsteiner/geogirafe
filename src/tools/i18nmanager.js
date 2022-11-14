@@ -37,6 +37,7 @@ class I18nManager {
 
   setDefaultLanguage(language) {
     this.currentLanguage = language;
+    this.loadTranslations();
   }
 
   async loadTranslations() {

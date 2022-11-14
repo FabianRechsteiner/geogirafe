@@ -404,7 +404,6 @@ class TreeViewComponent extends GirafeResizableElement {
 
   toggleLeaf(li, layer, setActive) {
     const circle = li.querySelector('[data-circle="true"]');
-    let circleClass = null;
 
     layer.active = setActive;
     if (setActive) {

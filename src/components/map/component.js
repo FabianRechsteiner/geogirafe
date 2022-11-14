@@ -252,8 +252,7 @@ class MapComponent extends GirafeHTMLElement {
     const selectionParams = [];
 
     for (let key in this.layersByServer) {
-      const source = this.layersByServer[key].layer.getSource();
-      const queryLayers = source.getParams().LAYERS;
+      const queryLayers = this.layersByServer[key].queryableList.map(l => l.queryLayers.split(',')).flat(1);
 
       // Build selectionbox using the default tolerance
       const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
@@ -262,6 +261,7 @@ class MapComponent extends GirafeHTMLElement {
       const bottomRightCoord = this.map.getCoordinateFromPixel(bottomRightPixel);
       const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
 
+      // TODO REG: Use the right WFS URL
       selectionParams.push({
         wfsUrl: 'https://wfs.geo.bs.ch',
         selectionBox: extent,
@@ -278,9 +278,9 @@ class MapComponent extends GirafeHTMLElement {
     const selectionParams = [];
 
     for (let key in this.layersByServer) {
-      const source = this.layersByServer[key].layer.getSource();
-      const queryLayers = source.getParams().LAYERS;
+      const queryLayers = this.layersByServer[key].queryableList.map(l => l.queryLayers.split(',')).flat(1);
 
+      // TODO REG: Use the right WFS URL
       selectionParams.push({
         wfsUrl: 'https://wfs.geo.bs.ch',
         selectionBox: extent,
@@ -546,9 +546,9 @@ class MapComponent extends GirafeHTMLElement {
         layerDef.layer.setSource(source);
       }
       else if (layerInfos.name in this.transparentLayers) {
-        // TODO REG: Here we have to change to order of the layers arround the transparent layer.
+        // TODO REG: Here we have to change to order of the layers around the transparent layer.
         // This case can be a bit complicated, because the transparent layer can be between non transparent layers
-        // Perhaps we will have to split the non-transparent layers in 2 differents lists ?
+        // Perhaps we will have to split the non-transparent layers in 2 different lists ?
         // Do we really want this ? It sound a bit too much... and can be complicated to implement.
       }
     });
@@ -560,13 +560,19 @@ class MapComponent extends GirafeHTMLElement {
       // and add a new wms layer in the source
       const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
       layerDef.layerList.push(layerInfos);
+      if (layerInfos.queryable) {
+        layerDef.queryableList.push(layerInfos);
+      }
       const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
       layerDef.layer.setSource(source);
     }
     else {
       // Create a new ol layer
       const layer = new ImageLayer();
-      const layerDef = { layer: layer, layerList: [layerInfos] };
+      const layerDef = { layer: layer, layerList: [layerInfos], queryableList: [] };
+      if (layerInfos.queryable) {
+        layerDef.queryableList.push(layerInfos);
+      }
       this.layersByServer[layerInfos.serverUniqueQueryId] = layerDef;
       const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
       layer.setSource(source);
@@ -684,7 +690,7 @@ class MapComponent extends GirafeHTMLElement {
       }
     }
     else if (layerInfos.name in this.transparentLayers) {
-      // The layer has already a configure opacity
+      // The layer has already a configured opacity
       // => We just change the opacity
       const layerDef = this.transparentLayers[layerInfos.name];
       layerDef.setOpacity(layerInfos.opacity);
