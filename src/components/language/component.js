@@ -1,5 +1,6 @@
 import GeoEvents from '/models/events.js';
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
+import I18nManager from '/tools/i18nmanager';
 
 class LanguageComponent extends GirafeHTMLElement {
 
@@ -28,11 +29,16 @@ class LanguageComponent extends GirafeHTMLElement {
     // Clone component template and add it to the dom
     this.shadow.appendChild(LanguageComponent.#template.content.cloneNode(true));
     this.languageSelect = this.shadow.querySelector('#language');
+
+    // Default language
+    const defaultLanguage = this.getAttribute('default');
+    I18nManager.getInstance().setDefaultLanguage(defaultLanguage);
+    this.languageSelect.value = defaultLanguage;
   }
 
   registerEvents() {
     //window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    this.languageSelect.addEventListener('change', (e) => this.onLanguageChanged(this, e));
+    this.languageSelect.addEventListener('change', (e) => this.onLanguageChanged(e));
   }
 
   // onInitEvent(details) {
@@ -43,8 +49,10 @@ class LanguageComponent extends GirafeHTMLElement {
   //   }
   // }
 
-  onLanguageChanged(_this, e) {
-    _this.messageManager.sendMessage(GeoEvents.Translate, {action: 'languageChanged', language: e.target.value});
+  onLanguageChanged(e) {
+    const language = e.target.value;
+    I18nManager.getInstance().changeLanguage(language);
+    this.messageManager.sendMessage(GeoEvents.Translate, {action: 'languageChanged', language: language});
   }
 
   connectedCallback() {

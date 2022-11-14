@@ -2,6 +2,7 @@ import tippy from 'tippy.js';
 import Layer from '/models/layer';
 import GeoEvents from '/models/events';
 import GirafeResizableElement from '/base/GirafeResizableElement'
+import I18nManager from '/tools/i18nmanager';
 
 class TreeViewComponent extends GirafeResizableElement {
 
@@ -311,8 +312,7 @@ class TreeViewComponent extends GirafeResizableElement {
   renderLeafLabel(container, layer) {
     // Add label
     const span = document.createElement('span');
-    span.setAttribute('i18n', 'girafe');
-    span.textContent = layer.name;
+    span.setAttribute('i18n', layer.name);
     span.className = 'selectable';
     span.onclick = (e) => this.toggle(this, e, layer);
     container.appendChild(span);
@@ -592,6 +592,8 @@ class TreeViewComponent extends GirafeResizableElement {
 
     this.activateAdvancedMode();
     this.activateTooltips(false, [800, 0], 'right');
+
+    I18nManager.getInstance().translate(this.shadow);
   }
 
   postRender() {

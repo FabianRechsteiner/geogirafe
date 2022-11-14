@@ -15,7 +15,7 @@ class GirafeHTMLElement extends HTMLElement {
 
   onTranslateEvent(details) {
     if (details.action === 'languageChanged') {
-      I18nManager.getInstance().translate(this.shadow, details.language);
+      I18nManager.getInstance().translate(this.shadow);
     }
   }
 

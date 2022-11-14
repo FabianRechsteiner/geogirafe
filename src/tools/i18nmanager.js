@@ -6,8 +6,7 @@ class I18nManager {
   static #instance = null;
   static #initializingSingleton = false;
 
-  translations = null;
-  // TODO REG : Set default language
+  translations = {};
   currentLanguage = null;
 
   constructor() {
@@ -17,7 +16,6 @@ class I18nManager {
     }
 
     this.messageManager = MessageManager.getInstance();
-    this.loadTranslations();
     this.registerEvents();
   }
 
@@ -37,29 +35,48 @@ class I18nManager {
     return I18nManager.#instance;
   }
 
-  loadTranslations() {
-    fetch('/Mock/de.json')
-        .then(response => response.json())
-        .then(translations => this.translations = translations);
+  setDefaultLanguage(language) {
+    this.currentLanguage = language;
+  }
+
+  async loadTranslations() {
+    if (this.currentLanguage in this.translations) {
+      // Translation were already loaded.
+      // => stop here
+      return;
+    }
+
+    // Load translations
+    const url = '/Mock/' + this.currentLanguage + '.json';
+    const response = await fetch(url);
+    const content = await response.json();
+    this.translations[this.currentLanguage] = content;
   }
 
   registerEvents() {
     //window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
   }
 
-  translate(dom, language) {
+  changeLanguage(language) {
     this.currentLanguage = language;
-    this.translate(dom);
   }
 
   translate(dom) {
-    const toTranslate = dom.querySelectorAll('[i18n="girafe"]');
-    toTranslate.forEach(item => {
-      const key = item.innerHTML;
-      const translation = this.translations[key];
-      if (translation !== undefined && translation !== null) {
-        item.innerHTML = translation;
-      }
+    this.loadTranslations()
+    .then(() => {
+      const toTranslate = dom.querySelectorAll('[i18n]');
+      toTranslate.forEach(item => {
+        const key = item.getAttribute('i18n');
+        const translation = this.translations[this.currentLanguage][key];
+        if (translation !== undefined && translation !== null) {
+          item.innerHTML = translation;
+        }
+        else {
+          // No translation found. We use the key as translation
+          console.log('no translation for ' + key);
+          item.innerHTML = key;
+        }
+      });
     });
   }
 }
