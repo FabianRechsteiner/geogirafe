@@ -319,7 +319,6 @@ class MapComponent extends GirafeHTMLElement {
       // For lines
       const elapsed2 = frameState.time - startStart;
       const offset = Math.floor(elapsed2 / 100) % 48;
-      console.log(offset);
   
       const style = new Style({
         image: new Circle({

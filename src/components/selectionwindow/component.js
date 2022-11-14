@@ -58,7 +58,9 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   onSelectFeatures(selectionParams) {
 
     this.messageManager.sendMessage(GeoEvents.Map, { action: 'clearSelection' });
+    this.selectedFeatures = [];
 
+    const promises = [];
     for (let i = 0; i < selectionParams.length; ++i) {
       const selectionParam = selectionParams[i];
       // WMS GetFatureInfo
@@ -69,7 +71,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
       //     .then((html) => console.log(html));
       // }
 
-      // TODO REG: read this parameters from WFS-Capabilities
+      // TODO REG: read those parameters from WFS-Capabilities
       const outputFormat = 'GML3';
       const geometryName = 'the_geom';
 
@@ -91,31 +93,37 @@ class SelectionWindowComponent extends GirafeDraggableElement {
         ),*/
       });
 
-      fetch(selectionParam.wfsUrl, {
+      promises.push(fetch(selectionParam.wfsUrl, {
         method: 'POST',
         body: new XMLSerializer().serializeToString(featureRequest),
-      })
-        .then((response) => { return response.text() })
-        .then((gml) => {
-          // TODO REG: Use the right GML Format (from WFS-Capabilities), not always GML3
-          this.selectedFeatures = new GML3().readFeatures(gml);
-          if (this.selectedFeatures.length === 0) {
-            // No feature selected
-            this.host.style.display = 'none';
-          }
-          else {
-            // Select feature on the map
-            this.messageManager.sendMessage(GeoEvents.Map, { action: 'featuresSelected', features: this.selectedFeatures });
-
-            this.host.style.display = 'block';
-            this.header.innerHTML = '';
-            this.content.innerHTML = '';
-
-            // Default, selected the first feature
-            this.onFocusFeature(0);
-          }
-        });
+      }));
     }
+
+    Promise.all(promises)
+      .then(async (responses) => { 
+        for (let i=0; i<responses.length; ++i) {
+          const gml = await responses[i].text();
+          // TODO REG: Use the right GML Format (from WFS-Capabilities), not always GML3
+          const features = new GML3().readFeatures(gml);
+          this.selectedFeatures.push(...features);
+        }
+
+        if (this.selectedFeatures.length === 0) {
+          // No feature selected
+          this.host.style.display = 'none';
+        }
+        else {
+          // Select feature on the map
+          this.messageManager.sendMessage(GeoEvents.Map, { action: 'featuresSelected', features: this.selectedFeatures });
+
+          this.host.style.display = 'block';
+          this.header.innerHTML = '';
+          this.content.innerHTML = '';
+
+          // Default, selected the first feature
+          this.onFocusFeature(0);
+        }
+      });
   }
 
   onFocusFeature(index) {
