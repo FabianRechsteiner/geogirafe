@@ -142,7 +142,7 @@ class MapComponent extends GirafeHTMLElement {
       source: selectionSource,
       // TODO REG: Change default selection color
       style: new Style({
-        stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth }),
+        stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth*2 }),
         fill: new Fill({ color: this.defaultFillColor }),
         image: new Circle({
           radius: 7,
@@ -294,7 +294,8 @@ class MapComponent extends GirafeHTMLElement {
 
   flash(feature) {
     const duration = 2000;
-    var start = Date.now();
+    var startStart = Date.now();
+    var start = startStart;
     const flashGeom = feature.getGeometry().clone();
     // First deactivate the current animation
     // (We only want one animated object)
@@ -314,6 +315,11 @@ class MapComponent extends GirafeHTMLElement {
       // radius will be 5 at start and 30 at end.
       const radius = easeOut(elapsedRatio) * 25 + 5;
       const opacity = easeOut(1 - elapsedRatio);
+
+      // For lines
+      const elapsed2 = frameState.time - startStart;
+      const offset = Math.floor(elapsed2 / 100) % 48;
+      console.log(offset);
   
       const style = new Style({
         image: new Circle({
@@ -323,6 +329,12 @@ class MapComponent extends GirafeHTMLElement {
             width: 0.25 + opacity,
           }),
         }),
+        stroke: new Stroke({
+          color: [255, 0, 0, 1],
+          width: 12,
+          lineDash: [16, 32],
+          lineDashOffset: offset
+        })
       });
   
       vectorContext.setStyle(style);
