@@ -1,3 +1,6 @@
+#draggable {
+}
+
 #header {
     padding: 1rem;
     cursor: move;
@@ -8,17 +11,23 @@
 }
 
 #content {
-    padding: 1rem 3rem;
+    padding: 1rem 2rem;
+    width: 26rem;
+    height: 12rem;
+    overflow-y : auto;
 }
 
 table {
     border-collapse: collapse;
+    width: 100%;
 }
 
 td.label {
     text-align: right;
     padding-right: 1rem;
     color: #666;
+    width: 8rem;
+    vertical-align: top
 }
 
 td.label:after {
@@ -28,15 +37,20 @@ td.label:after {
 #footer {
     color: #aaa;
 }
+
 #previous {
     padding: 0.5rem;
-    float: left;
+    position: absolute;
+    left: 0;
+    bottom: 0;
     cursor: pointer;
 }
 
 #next  {
     padding: 0.5rem;
-    float: right;
+    position: absolute;
+    right: 0;
+    bottom: 0;
     cursor: pointer;
 }
 
