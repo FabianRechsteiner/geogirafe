@@ -1,90 +1,102 @@
 * {
-    margin:0;
-    padding:0;
-    font-family: Arial;
-    font-size : 0.9rem;
+  margin: 0;
+  padding: 0;
+  font-family: Arial;
+  font-size: .9rem
 }
+
 header {
-    position: fixed;
-    top:0;
-    left:0;
-    border-bottom : solid 1px #ddd;
-    background : #fff;
-    height : 3.5rem;
-    width : 100%;
-    z-index:100;
-    padding: 0.5rem;
-    display:flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-bottom: solid 1px #ddd;
+  background: #fff;
+  height: 3.5rem;
+  z-index: 100;
+  padding: .5rem;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
+
 footer {
-    position : fixed;
-    bottom : 0;
-    left : 26rem;
-    border : none;
-    height : 1.5rem;
-    width : 100%;
-    z-index:100;
-    background-color: transparent;
-    padding-left : 0.5rem;
+  position: fixed;
+  bottom: 0;
+  left: 26rem;
+  border: none;
+  height: 1.5rem;
+  width: 100%;
+  z-index: 100;
+  background-color: transparent;
+  padding-left: .5rem
 }
+
 girafe-map {
-    position : fixed;
-    top : 4.5rem;
-    left: 0;
-    right:0;
-    bottom: 0;
+  position: fixed;
+  top: 0.5rem;
+  left: 0;
+  right: 0;
+  bottom: 0
 }
+
 girafe-tree-view {
-    position: fixed;
-    left:0;
-    top: 4.5rem;
-    bottom: 0;
-    width: 25rem;
-    z-index:90;
-    border-right: solid 1px #ddd;
-    background: #fff;
-    overflow: auto;
+  position: fixed;
+  left: 0;
+  top: 4.5rem;
+  bottom: 0;
+  width: 25rem;
+  z-index: 90;
+  background: #fff;
+  overflow: auto;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
 #logo {
-    margin-right: 3rem;
-    margin-top: -0.1rem;
-    height: 45px;
-    margin-left: 1rem;
+  margin-right: 3rem;
+  margin-top: -.1rem;
+  height: 45px;
+  margin-left: 1rem
 }
 
 girafe-search {
-    margin-top: 0.5rem;
+  margin-top: .5rem
 }
 
 girafe-redlining {
-    position: fixed;
-    right:0;
-    top: 4.5rem;
-    bottom: 0;
-    width: 20rem;
-    z-index:90;
-    border-left: solid 1px #ddd;
-    background: #fff;
-    overflow: visible;
-    display: none;
+  position: fixed;
+  right: 0;
+  top: 4.5rem;
+  bottom: 0;
+  width: 20rem;
+  z-index: 90;
+  border-left: solid 1px #ddd;
+  background: #fff;
+  overflow: visible;
+  display: none
 }
 
 girafe-selection-window {
-    position: absolute;
+  position: absolute;
+  z-index: 100;
+  border: solid 1px #000;
+  background: #fff;
+  display: none
+}
+
+girafe-theme-select {
+    position: fixed;
+    left: 1rem;
+    top: 5.5rem;
+    height: 2rem;
     z-index: 100;
-    border: solid 1px #000;
-    background: #fff;
-    display: none;
 }
 
 #buttonbar {
-    width : auto;
-    line-height: 3.5rem;
-    margin-left:auto;
-    margin-right: 3rem;
+  line-height: 3.5rem;
+  margin-right: 3rem
 }
 
 #buttonbar a {
-    margin : 0.5rem;
+  margin: .5rem
 }

@@ -13,17 +13,13 @@
 
 #gutter {
   border: none;
-  width: 6px;
+  width: 5px;
   height: 100%;
-  background: #bbb;
+  background: #fff;
   position: absolute;
   top: 0;
   right: 0;
   cursor: col-resize;
-}
-
-#gutter:hover {
-  background: #666;
 }
 
 #menu {
@@ -44,13 +40,15 @@
   right: 5px;
   bottom: 2.3rem;
   background : #fff;
-  padding-left : 1.5rem;
-  padding-top : 1.5rem;
-  padding-bottom : 3rem;
+  padding-left : 1rem;
+  padding-top : 0;
+  padding-bottom : 1.5rem;
   padding-right : 0.7rem;
   margin: 0;
+  margin-top: 4.5rem;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: thin;
 }
 
 ul {
