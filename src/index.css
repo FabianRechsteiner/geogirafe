@@ -79,7 +79,6 @@ girafe-redlining {
 girafe-selection-window {
   position: absolute;
   z-index: 100;
-  border: solid 1px #000;
   background: #fff;
   display: none
 }
