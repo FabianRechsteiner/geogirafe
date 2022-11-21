@@ -9,6 +9,7 @@ class ThemeComponent extends GirafeHTMLElement {
   themesUrl = null;
   themesJson = {};
   themes = [];
+  ignoreBlur = false;
   
   constructor() {
     super();
@@ -34,9 +35,10 @@ class ThemeComponent extends GirafeHTMLElement {
 
     this.themesButton = this.shadow.querySelector('#select');
     this.themesButton.onclick = () => this.toggleThemesList();
+    this.themesButton.onblur =  () => this.onBlur();
 
     this.themesList = this.shadow.querySelector('#themes');
-    this.themesList.style.display = 'none';
+    this.toggleThemesList(false);
 
     // Add options from themes
     this.themesJson.forEach(elem => {
@@ -44,8 +46,21 @@ class ThemeComponent extends GirafeHTMLElement {
     });
   }
 
-  toggleThemesList() {
-    if (this.themesList.style.display === 'none') {
+  onBlur() {
+    if (!this.ignoreBlur) {
+      this.toggleThemesList(false);
+    }
+  }
+
+  toggleThemesList(forceDisplay=null) {
+    if (forceDisplay === true) {
+      this.themesList.style.display = 'block';
+    }
+    else if (forceDisplay === false) {
+      this.themesList.style.display = 'none';
+    }
+    
+    else if (this.themesList.style.display === 'none') {
       this.themesList.style.display = 'block';
     }
     else {
@@ -67,6 +82,8 @@ class ThemeComponent extends GirafeHTMLElement {
 
     this.themes.push(theme);
     option.dataset['value'] = this.themes.length - 1;
+    // Ignore blur on mouse down to prevent themes from de-rendering before we can process click
+    option.onmousedown = () => { this.ignoreBlur = true };
     option.onclick = (e) => this.onThemeChanged(e);
   
     // Add to select
@@ -93,7 +110,8 @@ class ThemeComponent extends GirafeHTMLElement {
     const div = this.getParentDiv(e.target);
     const index = div.dataset["value"];
     this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: this.themes[index]});
-    this.toggleThemesList();
+    this.toggleThemesList(false);
+    this.ignoreBlur = false;
   }
 
   connectedCallback() {
