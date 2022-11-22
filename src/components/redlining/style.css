@@ -1,3 +1,7 @@
+:host, #panel {
+  min-width: 18rem;
+}
+
 #panel {
   position: absolute;
   top: 0;
@@ -11,15 +15,11 @@
   border: none;
   width: 6px;
   height: 100%;
-  background: #999;
+  background: #fff;
   position: absolute;
   top: 0;
   left: 0;
   cursor: col-resize;
-}
-
-#gutter:hover {
-  background: #666;
 }
 
 #content {
@@ -46,10 +46,14 @@
   cursor: pointer;
 }
 
-#content button:hover, 
+#content button:hover {
+    border: solid 1px #444;
+}
+
 #content button.selected {
-  border-color: #000;
-  color: #000;
+  border: solid 1px #444;
+  background-color: #444;
+  color: #fff;
 }
 
 #drawingList {
@@ -64,9 +68,12 @@
   position: relative;
   padding: 0.5rem;
   margin-top: 0.1rem;
+  margin-right: 0.1rem;
   border: solid 1px #999;
   text-align: left;
   width: 100%;
+  max-width: 16rem;
+  min-width: 13rem;
   color: #666;
 }
 

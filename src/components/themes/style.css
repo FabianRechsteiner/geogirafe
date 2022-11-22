@@ -8,14 +8,18 @@ button {
     border: none;
     width: 4.5rem;
     height: 4.6rem;
-    background-color: #000;
+    background-color: #444;
     color: #fff;
     padding: 0.5rem;
     cursor: pointer;
 }
 
+button:hover {
+    background-color: #000;
+}
+
 ul {
-    border: solid 1px #000;
+    border: solid 1px #444;
     border-radius: 3px;
     background-color: #fff;
     padding: 1rem;
