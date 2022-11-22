@@ -5,16 +5,13 @@
 }
 
 button {
-    border: solid 1px #999;
-    border-radius : 3px;
-    background-color: #fff;
+    border: none;
+    width: 4.5rem;
+    height: 4.6rem;
+    background-color: #000;
+    color: #fff;
     padding: 0.5rem;
-    width: 10rem;
     cursor: pointer;
-}
-
-button:hover {
-    border: solid 1px #000;
 }
 
 ul {
