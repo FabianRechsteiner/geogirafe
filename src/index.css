@@ -53,7 +53,7 @@ girafe-search {
   background-color: #444;
 }
 
-#buttonbar i, #buttonbar girafe-button {
+#buttonbar girafe-button {
   background-color: #444;
   margin:0;
   display: inline-block;

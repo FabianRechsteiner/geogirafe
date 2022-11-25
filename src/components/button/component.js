@@ -28,15 +28,37 @@ class ButtonComponent extends GirafeHTMLElement {
     // Clone component template and add it to the dom
     this.shadow.appendChild(ButtonComponent.#template.content.cloneNode(true));
     this.button = this.shadow.querySelector('#button');
+
+    const iconStyle = this.getAttribute('icon-style');
+    this.button.className = iconStyle;
   }
 
   registerEvents() {
-
-    this.button.addEventListener('click', (e) => this.displayToolbar(this, e));
+    const message = this.getAttribute('message');
+    const geoevent = this.getGeoEventType(message);
+    const action = this.getAttribute('action');
+    this.button.addEventListener('click', (e) => this.messageManager.sendMessage(geoevent, {action: action}));
   }
 
-  displayToolbar(_this, e) {
-    this.messageManager.sendMessage(GeoEvents.Redlining, {action: 'redliningToggled'});
+  getGeoEventType(message) {
+    switch(message) {
+      case 'RedLining':
+        return GeoEvents.RedLining;
+      case 'TreeView':
+        return GeoEvents.TreeView;
+      case 'Map':
+        return GeoEvents.Map;
+      case 'App':
+        return GeoEvents.App;
+      case 'Theme':
+        return GeoEvents.Theme;
+      case 'Init':
+        return GeoEvents.Init;
+      case 'Translate':
+        return GeoEvents.Translate;
+      case 'Redlining':
+        return GeoEvents.Redlining;
+    }
   }
 
   connectedCallback() {

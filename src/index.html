@@ -17,11 +17,9 @@
       <img id="logo" src="/static/images/logo_small.png" />
       <girafe-search id="search" search-url="https://search.geo.bs.ch/search?term=###SEARCHTERM###"></girafe-search>
       <div id="buttonbar">
-        <i class="fa-2xl fa-solid fa-user"></i>
-        <!-- <i class="fa-xl fa-solid fa-user"></i> -->
-        <i class="fa-2xl fa-solid fa-print"></i>
-        <girafe-button></girafe-button>
-        <!-- <i class="fa-xl fa-solid fa-bars"></i> -->
+        <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
+        <girafe-button icon-style="fa-2xl fa-solid fa-print"></girafe-button>
+        <girafe-button icon-style="fa-2xl fa-regular fa-pen-to-square" message="RedLining" action="redliningToggled"></girafe-button>
       </div>
     </header>
     <girafe-tree-view themes="/Mock/themes.json" dock="left"></girafe-tree-view>
