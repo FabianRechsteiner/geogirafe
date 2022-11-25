@@ -627,7 +627,7 @@ class TreeViewComponent extends GirafeResizableElement {
 
     // Add move down
     const movedown = document.createElement('i');
-    movedown.className = 'fa-solid fa-square-caret-down advanced tool selectable movedown';
+    movedown.className = 'fa-solid fa-caret-down advanced tool selectable movedown';
     movedown.setAttribute('tip', 'Move this layer down');
     movedown.onclick = (e) => this.moveLayerDown(this, layer, e);
     container.append(movedown);
@@ -638,7 +638,7 @@ class TreeViewComponent extends GirafeResizableElement {
 
     // Add move up 
     const moveup = document.createElement('i');
-    moveup.className = 'fa-solid fa-square-caret-up advanced tool selectable moveup';
+    moveup.className = 'fa-solid fa-caret-up advanced tool selectable moveup';
     moveup.setAttribute('tip', 'Move this layer up');
     moveup.onclick = (e) => this.moveLayerUp(this, layer, e);
     container.append(moveup);
