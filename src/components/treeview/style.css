@@ -144,6 +144,14 @@ i.zoomres {
   display: none;
 }
 
+#treeview-list i.active {
+  display:block;
+}
+
+#treeview-list.advanced i.advanced {
+  display:block;
+}
+
 #menu i {
   margin-top: 1rem;
   color: #777;

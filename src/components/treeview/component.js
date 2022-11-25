@@ -277,10 +277,12 @@ class TreeViewComponent extends GirafeResizableElement {
     if (layer.isTransparent) {
       reference.classList.remove('fa-regular');
       reference.classList.add('fa-solid');
+      reference.classList.add('active');
     }
     else {
       reference.classList.remove('fa-solid');
       reference.classList.add('fa-regular');
+      reference.classList.remove('active');
     }
     this.messageManager.sendMessage(GeoEvents.Map, {action: 'opacityChanged', layer: layer});
   }
@@ -589,7 +591,6 @@ class TreeViewComponent extends GirafeResizableElement {
     // because they use the siblings fo their configuration (visibility)
     this.postRender();
 
-    this.activateAdvancedMode();
     this.activateTooltips(false, [800, 0], 'right');
 
     I18nManager.getInstance().translate(this.shadow);
@@ -709,18 +710,11 @@ class TreeViewComponent extends GirafeResizableElement {
     this.advanced = !this.advanced;
     if (this.advanced) {
       e.target.classList.add('selected');
+      this.ulRoot.classList.add('advanced');
     }
     else {
       e.target.classList.remove('selected');
-    }
-    this.activateAdvancedMode();
-  }
-
-  activateAdvancedMode() {
-    let display = (this.advanced) ? 'block' : 'none';
-    const elements = this.ulRoot.querySelectorAll('.advanced');
-    for (let i=0; i<elements.length; i++) {
-      elements[i].style.display = display;
+      this.ulRoot.classList.remove('advanced');
     }
   }
 
