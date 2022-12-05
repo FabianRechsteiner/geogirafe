@@ -216,8 +216,8 @@ class MapComponent extends GirafeHTMLElement {
     //this.map.on('click', (e) => console.log(e));
     //this.map.on('dblclick', (e) => console.log(e));
     //this.map.on('error', (e) => console.log(e));
-    //this.map.on('loadend', (e) => console.log(e));
-    //this.map.on('loadstart', (e) => console.log(e));
+    this.map.on('loadstart', (e) => this.onLoadStart(e));
+    this.map.on('loadend', (e) => this.onLoadEnd(e));
     this.map.on('moveend', (e) => this.onMoveEnd(e));
     //this.map.on('movestart', (e) => console.log(e));
     //this.map.on('pointerdrag', (e) => console.log(e));
@@ -226,7 +226,7 @@ class MapComponent extends GirafeHTMLElement {
     //this.map.on('postrender', (e) => console.log(e));
     //this.map.on('precompose', (e) => console.log(e));
     //this.map.on('propertychange', (e) => console.log(e));
-    //this.map.on('rendercomplete', (e) => console.log(e));
+    //this.map.on('rendercomplete', (e) => this.onRenderComplete(e));
     //? change:layerGroup
     //? change:size
     //? change:target
@@ -234,7 +234,14 @@ class MapComponent extends GirafeHTMLElement {
 
     // Drawing events
     this.redliningFeaturesCollection.on('add', (e) => this.onFeatureAdded(this, e));
+  }
 
+  onLoadStart(e) {
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'renderStarted'});
+  }
+
+  onLoadEnd(e) {
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'renderEnded'});
   }
 
   onMoveEnd(e) {

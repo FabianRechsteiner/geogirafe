@@ -14,6 +14,14 @@ button {
     cursor: pointer;
 }
 
+#icon {
+    display: block;
+}
+
+#waiting {
+    display: none;
+}
+
 button:hover {
     background-color: #000;
 }

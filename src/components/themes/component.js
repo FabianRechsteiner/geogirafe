@@ -5,6 +5,8 @@ class ThemeComponent extends GirafeHTMLElement {
 
   static #template = null;
   themesButton = null;
+  layerIcon = null;
+  waitingIcon = null;
   themesList = null;
   themesUrl = null;
   themesJson = {};
@@ -36,6 +38,9 @@ class ThemeComponent extends GirafeHTMLElement {
     this.themesButton = this.shadow.querySelector('#select');
     this.themesButton.onclick = () => this.toggleThemesList();
     this.themesButton.onblur =  () => this.onBlur();
+
+    this.layerIcon = this.shadow.querySelector('#icon');
+    this.waitingIcon = this.shadow.querySelector('#waiting');
 
     this.themesList = this.shadow.querySelector('#themes');
     this.toggleThemesList(false);
@@ -92,6 +97,7 @@ class ThemeComponent extends GirafeHTMLElement {
 
   registerEvents() {
     window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
+    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
     //this.themesList.addEventListener('change', (e) => this.onThemeChanged(this, e));
   }
 
@@ -103,6 +109,17 @@ class ThemeComponent extends GirafeHTMLElement {
         //this.themesList.value = index;
         //this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: this.themes[index]});
       }
+    }
+  }
+
+  onMapEvent(details) {
+    if (details.action === 'renderStarted') {
+      this.layerIcon.style.display = 'none';
+      this.waitingIcon.style.display = 'block';
+    }
+    else if (details.action === 'renderEnded') {
+      this.layerIcon.style.display = 'block';
+      this.waitingIcon.style.display = 'none';
     }
   }
 
