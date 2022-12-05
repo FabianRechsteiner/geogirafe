@@ -55,12 +55,28 @@
   scrollbar-width: thin;
 }
 
-.result {
+.result, .title {
   display: inline-block;
   padding: 0.3rem 1rem;
   width: Calc(36rem - 2rem);
   border-top: solid 1px #ccc;
   line-height: 1.3rem;
+}
+
+.title {
+  background-color: #555;
+  color: #fff;
+  font-weight: 600;
+  line-height: 2.5rem;
+  font-size: 1.2rem;
+}
+
+.result {
+  cursor: pointer;
+}
+
+.title i {
+  margin-right: 1rem;
 }
 
 .result:hover {
