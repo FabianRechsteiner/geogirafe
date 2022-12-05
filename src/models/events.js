@@ -6,6 +6,7 @@ class GeoEvents {
     Init = 'GeoGirafe.Init';
     Translate = 'GeoGirafe.Translate';
     Redlining = 'GeoGirafe.Redlining';
+    Print = 'GeoGirafe.Print';
 }
 
 export default GeoEvents;

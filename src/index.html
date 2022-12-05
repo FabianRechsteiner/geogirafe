@@ -18,13 +18,14 @@
       <girafe-search id="search" search-url="https://search.geo.bs.ch/search?term=###SEARCHTERM###"></girafe-search>
       <div id="buttonbar">
         <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
-        <girafe-button icon-style="fa-2xl fa-solid fa-print"></girafe-button>
+        <girafe-button icon-style="fa-2xl fa-solid fa-print" message="App" action="printToggled"></girafe-button>
         <girafe-button icon-style="fa-2xl fa-regular fa-pen-to-square" message="RedLining" action="redliningToggled"></girafe-button>
       </div>
     </header>
     <girafe-tree-view themes="/Mock/themes.json" dock="left"></girafe-tree-view>
     <girafe-map srid="EPSG:2056" zoom="16" center="2611377,1267643" max-extent="2600972,1262492,2623553,1272772"></girafe-map>
     <girafe-redlining dock="right"></girafe-redlining>
+    <girafe-print print-url="https://pi.paloo.fr/printproxy/" dock="right"></girafe-print>
     <girafe-selection-window></girafe-selection-window>
     <footer>
       <girafe-basemap-select themes="/Mock/themes.json"></girafe-basemap-select>
