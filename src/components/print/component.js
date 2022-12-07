@@ -1,5 +1,6 @@
 import GeoEvents from '/models/events';
 import GirafeResizableElement from '/base/GirafeResizableElement';
+import I18nManager from '/tools/i18nmanager';
 
 class PrintComponent extends GirafeResizableElement {
 
@@ -16,6 +17,7 @@ class PrintComponent extends GirafeResizableElement {
   printList = null;
 
   printUrl = null;
+  defaultLayout = null;
   printApp = null;
   printLayouts = null;
   layoutsByName = {};
@@ -35,19 +37,11 @@ class PrintComponent extends GirafeResizableElement {
     return this.printUrl + 'report.' + format;
   }
   
-  dims = {
-    a0: [1189, 841],
-    a1: [841, 594],
-    a2: [594, 420],
-    a3: [420, 297],
-    a4: [297, 210],
-    a5: [210, 148],
-  };
-
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: 'open'});
     this.printUrl = this.getAttribute('print-url');
+    this.defaultLayout = this.getAttribute('default-layout');
     if (!this.printUrl.endsWith('/')) {
       this.printUrl += '/';
     }
@@ -90,10 +84,17 @@ class PrintComponent extends GirafeResizableElement {
     this.downloadButton = this.shadow.querySelector('#download');
     this.printList = this.shadow.querySelector('#printList');
 
+    // Initialize layout, scales and formats
     this.printLayouts.forEach(elem => {
       this.layoutsByName[elem.name] = elem;
       this.addLayoutOption(this.layoutSelect, elem);
     });
+    if (this.defaultLayout !== null) {
+      this.layoutSelect.value = this.defaultLayout;
+    }
+    const layout = this.layoutsByName[this.layoutSelect.value];
+    const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
+    this.updateScales(clientInfo);
 
     this.printFormats.forEach(elem => {
       this.addFormatOption(this.formatSelect, elem);
@@ -101,6 +102,7 @@ class PrintComponent extends GirafeResizableElement {
 
     this.makeResizable();
     this.activateTooltips(false, [800, 0], 'top-end');
+    I18nManager.getInstance().translate(this.shadow);
   }
 
   addFormatOption(select, elem) {
@@ -114,6 +116,7 @@ class PrintComponent extends GirafeResizableElement {
   addLayoutOption(select, elem) {
     // Create new basemap option
     const option = document.createElement('option');
+    option.setAttribute('i18n', elem.name);
     option.innerHTML = elem.name;
     option.value = elem.name;
     select.appendChild(option);
@@ -132,16 +135,36 @@ class PrintComponent extends GirafeResizableElement {
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
 
     this.layoutSelect.addEventListener('change', (e) => this.onLayoutChanged(e));
+    this.scaleSelect.addEventListener('change', (e) => this.onScaleChanged(e));
     this.exportButton.addEventListener('click', () => this.print());
   }
 
   onLayoutChanged(e) {
     const layout = this.layoutsByName[e.target.value];
+    const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
+    this.updateScales(clientInfo);
+    this.messageManager.sendMessage(GeoEvents.Print, { action: 'layoutChanged', format: [clientInfo.width, clientInfo.height] });
+  }
+
+  onScaleChanged(e) {
+    const scale = e.target.value;
+    this.messageManager.sendMessage(GeoEvents.Print, { action: 'scaleChanged', scale: scale });
+  }
+
+  updateScales(clientInfo) {
     // Update scales
+    const currentSelectedValue = this.scaleSelect.value;
     this.scaleSelect.innerHTML = '';
-    layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo.scales.forEach(scale => {
+    clientInfo.scales.forEach(scale => {
       this.addScaleOption(this.scaleSelect, scale);
     });
+    // Restore previously selected value
+    if (!this.isNullOrUndefinedOrBlank(currentSelectedValue)) {
+      this.scaleSelect.value = currentSelectedValue;
+    }
+    else {
+      this.scaleSelect.value = clientInfo.scales[0];
+    }
   }
 
   connectedCallback() {
@@ -158,10 +181,15 @@ class PrintComponent extends GirafeResizableElement {
       if (this.panel.style.display == 'block') {
         this.panel.style.display = 'none';
         this.panel.getRootNode().host.style.display = 'none';
+        this.messageManager.sendMessage(GeoEvents.Print, { action: 'printDeactivated' })
       }
       else {
         this.panel.style.display = 'block';
         this.panel.getRootNode().host.style.display = 'block';
+        const layout = this.layoutsByName[this.layoutSelect.value];
+        const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
+        const scale = this.scaleSelect.value;
+        this.messageManager.sendMessage(GeoEvents.Print, { action: 'printActivated', format: [clientInfo.width, clientInfo.height], scale: scale });
       }
     }
   }
@@ -229,8 +257,6 @@ class PrintComponent extends GirafeResizableElement {
     })
     .then(r => r.json())
     .then(result => this.managePrintStatus(result));
-
-    //this.messageManager.sendMessage(GeoEvents.Print, { action: 'printStarted', format: format, resolution: resolution, scale: scale, dim: dim })
   }
 
   managePrintStatus(result) {
