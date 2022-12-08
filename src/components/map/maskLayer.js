@@ -35,17 +35,6 @@ class MaskLayer extends Layer {
       return 0;
     }
 
-    getOptimalScale(mapSize, viewResolution) {
-      const mapWidth = mapSize[0] * viewResolution;
-      const mapHeight = mapSize[1] * viewResolution;
-
-      const scaleWidth = (mapWidth * this.INCHES_PER_METER * this.DOTS_PER_INCH) / mapSize[0];
-      const scaleHeight = (mapHeight * this.INCHES_PER_METER * this.DOTS_PER_INCH) / mapSize[1];
-
-      const scale = Math.min(scaleWidth, scaleHeight);
-      return scale;
-    }
-  
     render(frameState) {
       const cwidth = frameState.size[0];
       this.context_.canvas.width = cwidth;

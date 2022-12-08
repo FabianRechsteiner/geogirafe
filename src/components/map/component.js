@@ -792,6 +792,7 @@ class MapComponent extends GirafeHTMLElement {
   onPrintEvent(details) {
     if (details.action === 'printActivated') {
       this.maskLayer.updateSize(details.format);
+      this.maskLayer.updateScale(details.scale);
       this.maskLayer.setMap(this.map);
     }
     else if (details.action === 'printDeactivated') {
@@ -799,9 +800,11 @@ class MapComponent extends GirafeHTMLElement {
     }
     else if (details.action === 'layoutChanged') {
       this.maskLayer.updateSize(details.format);
+      this.map.updateSize();
     }
     else if (details.action === 'scaleChanged') {
       this.maskLayer.updateScale(details.scale);
+      this.map.updateSize();
     }
   }
 

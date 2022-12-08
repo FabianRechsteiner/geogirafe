@@ -188,6 +188,8 @@ class PrintComponent extends GirafeResizableElement {
         this.panel.getRootNode().host.style.display = 'block';
         const layout = this.layoutsByName[this.layoutSelect.value];
         const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
+        //this.setOptimalScale(details.scale);
+
         const scale = this.scaleSelect.value;
         this.messageManager.sendMessage(GeoEvents.Print, { action: 'printActivated', format: [clientInfo.width, clientInfo.height], scale: scale });
       }
