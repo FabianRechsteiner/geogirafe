@@ -23,4 +23,4 @@ rm -f src/static/lib/tippy.js/tippy.min.css
 find node_modules/tippy.js/ -name *.css -exec cat {} >> src/static/lib/tippy.js/tippy.min.css \;
 
 mkdir -p src/static/lib/cesium/
-cp node_modules/cesium/Build/Cesium/* src/static/lib/cesium/
+cp -R node_modules/cesium/Build/Cesium/* src/static/lib/cesium/
