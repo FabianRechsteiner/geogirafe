@@ -7,6 +7,7 @@ import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
+import Overlay from 'ol/Overlay';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
@@ -24,6 +25,7 @@ import adjectives from 'adjectives';
 import {getVectorContext} from 'ol/render';
 import {easeOut} from 'ol/easing';
 import {unByKey} from 'ol/Observable';
+import MaskLayer from './maskLayer';
 import OLCesium from 'olcs/OLCesium.js';
 
 class MapComponent extends GirafeHTMLElement {
@@ -72,6 +74,9 @@ class MapComponent extends GirafeHTMLElement {
   pixelTolerance = 10;
   dragbox = null;
 
+  // For print
+  maskLayer = new MaskLayer({name: 'PrintMask'});
+
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
@@ -83,6 +88,7 @@ class MapComponent extends GirafeHTMLElement {
     window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
     window.addEventListener(GeoEvents.Redlining, (e) => this.onRedliningEvent(e.detail));
+    window.addEventListener(GeoEvents.Print, (e) => this.onPrintEvent(e.detail));
   }
 
   async loadTemplate() {
@@ -797,6 +803,33 @@ class MapComponent extends GirafeHTMLElement {
           callback(result);
         });
     }
+  }
+
+  onPrintEvent(details) {
+    if (details.action === 'printActivated') {
+      this.maskLayer.updateSize(details.format);
+      this.maskLayer.updateScale(details.scale);
+      this.maskLayer.setMap(this.map);
+    }
+    else if (details.action === 'printDeactivated') {
+      this.maskLayer.setMap(null);
+    }
+    else if (details.action === 'layoutChanged') {
+      this.maskLayer.updateSize(details.format);
+      this.map.updateSize();
+    }
+    else if (details.action === 'scaleChanged') {
+      this.maskLayer.updateScale(details.scale);
+      this.map.updateSize();
+    }
+  }
+
+  activatePrintMask(format) {
+    this.map.addLayer(this.maskLayer);
+  }
+
+  deactivatePrintMask() {
+    this.map.removeLayer(this.maskLayer);
   }
 
   onRedliningEvent(details) {
