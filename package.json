@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "adjectives": "^1.0.2",
+    "cesium": "^1.100.0",
     "ol": "^7.1.0",
+    "olcs": "^2.13.1",
     "proj4": "^2.8.0",
     "tippy.js": "^6.3.7",
     "vanilla-picker": "^2.12.1"

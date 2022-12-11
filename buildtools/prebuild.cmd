@@ -17,3 +17,6 @@ xcopy node_modules\vanilla-picker\dist\vanilla-picker.csp.css src\static\lib\van
 if not exist src\static\lib\tippy.js mkdir src\static\lib\tippy.js
 if exist src\static\lib\tippy.js\tippy.min.css del /F src\static\lib\tippy.js\tippy.min.css
 for /F %%f in ('dir /s/b node_modules\tippy.js\*.css') do type %%f>>src\static\lib\tippy.js\tippy.min.css
+
+if not exist src\static\lib\cesium mkdir src\static\lib\cesium
+xcopy node_modules\cesium\Build\Cesium\* src\static\lib\cesium\ /Y

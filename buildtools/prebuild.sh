@@ -21,3 +21,6 @@ cp node_modules/vanilla-picker/dist/vanilla-picker.csp.css src/static/lib/vanill
 mkdir -p src/static/lib/tippy.js/
 rm -f src/static/lib/tippy.js/tippy.min.css
 find node_modules/tippy.js/ -name *.css -exec cat {} >> src/static/lib/tippy.js/tippy.min.css \;
+
+mkdir -p src/static/lib/cesium/
+cp node_modules/cesium/Build/Cesium/* src/static/lib/cesium/

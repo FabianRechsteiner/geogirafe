@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="/lib/font-gis/css/font-gis.css" />
     <link rel="stylesheet" href="/lib/tippy.js/tippy.min.css" />
+    <script type="text/javascript" src="/lib/cesium/Cesium.js"></script>
     <script type="module" src="./initialize.js"></script>
     <title>GeoGirafe</title>
   </head>
@@ -18,6 +19,7 @@
       <girafe-search id="search" search-url="https://pi.paloo.fr/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"></girafe-search>
       <div id="buttonbar">
         <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
+        <girafe-button icon-style="fa-2xl fa-solid fa-globe" message="Map" action="globeToggled"></girafe-button>
         <girafe-button icon-style="fa-2xl fa-solid fa-print" message="App" action="printToggled"></girafe-button>
         <girafe-button icon-style="fa-2xl fa-regular fa-pen-to-square" message="RedLining" action="redliningToggled"></girafe-button>
       </div>

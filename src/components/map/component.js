@@ -24,12 +24,14 @@ import adjectives from 'adjectives';
 import {getVectorContext} from 'ol/render';
 import {easeOut} from 'ol/easing';
 import {unByKey} from 'ol/Observable';
+import OLCesium from 'olcs/OLCesium.js';
 
 class MapComponent extends GirafeHTMLElement {
 
   static #template = null;
 
   map = null;
+  map3d = null;
 
   srid = 'EPSG:3857'; // default projection
   get projection() {
@@ -468,6 +470,20 @@ class MapComponent extends GirafeHTMLElement {
     }
     else if (details.action === 'featureFocused') {
       this.onFeatureFocused(details.feature);
+    }
+    else if (details.action === 'globeToggled') {
+      this.onGlobeToggled();
+    }
+  }
+
+  onGlobeToggled() {
+    if (this.map3d === null || !this.map3d.getEnabled()) {
+      // Globe is not active
+      this.map3d = new OLCesium({map: this.map});
+      this.map3d.setEnabled(true);
+    }
+    else {
+      this.map3d.setEnabled(false);
     }
   }
 
