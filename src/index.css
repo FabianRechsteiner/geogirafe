@@ -50,6 +50,7 @@ girafe-search {
   text-align: right;
   color: #fff;
   background-color: #444;
+  font-size: 0;
 }
 
 #buttonbar girafe-button {
