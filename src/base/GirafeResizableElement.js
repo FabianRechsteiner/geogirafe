@@ -10,6 +10,9 @@ Example:
 
 <div id="panel" dock="left">
   <div id="gutter"></div>
+  <div id="hide">
+    <i class="fa-solid"></i>
+  </div>
 </div>
 
 Then in order to make an component resizable, 
@@ -24,12 +27,13 @@ class GirafeResizableElement extends GirafeHTMLElement {
   panel = null;
   panelRect = null;
   gutter = null;
+  hide = null;
   dock = null;
   prevX = 0;
   host = null;
   toggleWidth = null;
   lastWidth = 0;
-  minWidth = null;
+  hideWidth = 0;
 
   constructor() {
     super();
@@ -41,57 +45,69 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.panel = this.shadow.querySelector('#panel');
     this.host = this.panel.getRootNode().host;
     this.gutter = this.shadow.querySelector('#gutter');
-    this.gutter.onmousedown = (e) => this.mousedown(this, e);
-    this.gutter.ondblclick = (e) => this.togglePanel(this, e);
-    this.minWidth = this.panel.style.minWidth;
+    this.gutter.onmousedown = (e) => this.mousedown(e);
+    this.gutter.ondblclick = (e) => this.togglePanel(e);
+    this.hide = this.shadow.querySelector('#hide');
+    if (!this.isNullOrUndefined(this.hide)) {
+      this.hide.onclick = (e) => this.togglePanel(e);
+    }
   }
 
-  mousedown(_this, e) {
+  mousedown(e) {
     e.preventDefault();
-    document.onmousemove = (e) => _this.mousemove(this, e);
-    document.onmouseup = (e) => _this.mouseup(this, e);
+    document.onmousemove = (e) => this.mousemove(e);
+    document.onmouseup = (e) => this.mouseup(e);
 
-    _this.prevX = e.x;
-    _this.panelRect = _this.panel.getBoundingClientRect();
+    this.prevX = e.x;
+    this.panelRect = this.panel.getBoundingClientRect();
+    this.hideWidth = this.hide.getBoundingClientRect().width;
   }
 
-  togglePanel(_this, e) {
+  togglePanel(e) {
     this.toggleWidth = this.gutter.getBoundingClientRect().width;
 
-    const width = _this.panel.getBoundingClientRect().width;
-    if (width <= _this.toggleWidth) {
+    const width = this.panel.getBoundingClientRect().width;
+    if (width <= this.toggleWidth) {
       // Panel is already hidden.
       // => We reset it to the last width
-      _this.panel.style.width = _this.lastWidth + 'px';
-      _this.host.style.width = _this.lastWidth + 'px';
-      _this.panel.style.minWidth = this.minWidth;
-      _this.host.style.minWidth = this.minWidth;
+      this.panel.style.width = this.lastWidth + 'px';
+      this.host.style.width = this.lastWidth + 'px';
+      this.panel.style.minWidth = "";
+      this.host.style.minWidth = "";
+
+      this.hide.classList.remove('closed');
+      this.hide.style.left = this.panel.getBoundingClientRect().width + "px";
     }
     else {
       // Hide the panel
-      _this.lastWidth = width;
-      _this.panel.style.width = _this.toggleWidth + 'px';
-      _this.host.style.width = _this.toggleWidth + 'px';
-      _this.panel.style.minWidth = 0;
-      _this.host.style.minWidth = 0;
+      this.lastWidth = width;
+      this.panel.style.width = this.toggleWidth + 'px';
+      this.host.style.width = this.toggleWidth + 'px';
+      this.panel.style.minWidth = 0;
+      this.host.style.minWidth = 0;
+
+      this.hide.classList.add('closed');
     }
   }
 
-  mousemove(_this, e) {
+  mousemove(e) {
     e.preventDefault();
-    const newX = _this.prevX - e.x;
+    const newX = this.prevX - e.x;
     let newWidth = null;
-    if (_this.dock === 'left') {
-      newWidth = _this.panelRect.width - newX;
+    if (this.dock === 'left') {
+      newWidth = this.panelRect.width - newX;
     }
-    else if (_this.dock === 'right') {
-      newWidth = _this.panelRect.width + newX;
+    else if (this.dock === 'right') {
+      newWidth = this.panelRect.width + newX;
     }
-    _this.panel.style.width = newWidth + "px";
-    _this.host.style.width = newWidth + "px";
+    this.panel.style.width = newWidth + "px";
+    this.host.style.width = newWidth + "px";
+
+    this.hide.classList.remove('closed');
+    this.hide.style.left = this.panel.getBoundingClientRect().width + "px";
   }
 
-  mouseup(_this, e) {
+  mouseup(e) {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;

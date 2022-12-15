@@ -1,4 +1,8 @@
-:host, #panel {
+:host {
+  min-width: 18rem;
+}
+
+#panel {
   min-width: 18rem;
 }
 
@@ -22,6 +26,39 @@
   cursor: col-resize;
 }
 
+#hide {
+  border: solid 1px #999;
+  border-left: none;
+  color: #999;
+  padding: 0.7rem 0.5rem 0.7rem 0;
+  border-radius: 0 10px 10px 0;
+  width: 0.8rem;
+  height: 2rem;
+  line-height: 2rem;
+  position: fixed;
+  top: 5.8rem;
+  left: 25rem;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+#hide i:before {
+  content: "\f104";
+}
+
+#hide.closed {
+  left: 5px !important;
+}
+
+#hide.closed i:before {
+  content: "\f105";
+}
+
+#hide:hover {
+  border-color: #000;
+  color: #000;
+}
+
 #menu {
   border-top: solid 1px #bbb;
   background-color: #fff;
@@ -41,11 +78,11 @@
   bottom: 2.3rem;
   background : #fff;
   padding-left : 1rem;
-  padding-top : 0;
+  padding-top : 1rem;
   padding-bottom : 1.5rem;
   padding-right : 0.7rem;
   margin: 0;
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;

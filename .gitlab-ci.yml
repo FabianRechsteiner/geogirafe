@@ -9,6 +9,11 @@ include:
 
 pages:
   image: node:18-slim
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
+
   before_script:
     - apt update && apt -y upgrade && apt install -y brotli
   script: 
