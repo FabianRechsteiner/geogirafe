@@ -10,6 +10,7 @@ Example:
 
 <div id="panel" dock="left">
   <div id="gutter"></div>
+  <div id="hide"></div>
 </div>
 
 Then in order to make an component resizable, 
@@ -24,12 +25,14 @@ class GirafeResizableElement extends GirafeHTMLElement {
   panel = null;
   panelRect = null;
   gutter = null;
+  hide = null;
   dock = null;
   prevX = 0;
   host = null;
   toggleWidth = null;
   lastWidth = 0;
   minWidth = null;
+  hideWidth = 0;
 
   constructor() {
     super();
@@ -43,7 +46,12 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.gutter = this.shadow.querySelector('#gutter');
     this.gutter.onmousedown = (e) => this.mousedown(this, e);
     this.gutter.ondblclick = (e) => this.togglePanel(this, e);
+    this.hide = this.shadow.querySelector('#hide');
+    if (!this.isNullOrUndefined(this.hide)) {
+      this.hide.onclick = (e) => this.togglePanel(this, e);
+    }
     this.minWidth = this.panel.style.minWidth;
+    console.log(this.minWidth);
   }
 
   mousedown(_this, e) {
@@ -53,6 +61,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
 
     _this.prevX = e.x;
     _this.panelRect = _this.panel.getBoundingClientRect();
+    _this.hideWidth = this.hide.getBoundingClientRect().width;
   }
 
   togglePanel(_this, e) {
@@ -66,6 +75,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
       _this.host.style.width = _this.lastWidth + 'px';
       _this.panel.style.minWidth = this.minWidth;
       _this.host.style.minWidth = this.minWidth;
+
+      _this.hide.style.left = _this.lastWidth - 8 + "px";
     }
     else {
       // Hide the panel
@@ -74,6 +85,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
       _this.host.style.width = _this.toggleWidth + 'px';
       _this.panel.style.minWidth = 0;
       _this.host.style.minWidth = 0;
+
+      _this.hide.style.left = -8 + "px";
     }
   }
 
@@ -89,6 +102,9 @@ class GirafeResizableElement extends GirafeHTMLElement {
     }
     _this.panel.style.width = newWidth + "px";
     _this.host.style.width = newWidth + "px";
+
+    const newHideLeft = ((newWidth > _this.minWidth) ? newWidth : _this.minWidth) - 5;
+    _this.hide.style.left = newHideLeft + "px";
   }
 
   mouseup(_this, e) {

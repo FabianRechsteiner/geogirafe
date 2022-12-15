@@ -22,6 +22,26 @@
   cursor: col-resize;
 }
 
+#hide {
+  border: solid 1px #999;
+  color: #999;
+  padding: 0.5rem;
+  border-radius: 0 10px 10px 0;
+  width: 0.8rem;
+  position: fixed;
+  top: 5.8rem;
+  left: 24.4rem;
+  background-color: #fff;
+  z-index: -10;
+  cursor: pointer;
+  opacity: 7;
+}
+
+#hide:hover {
+  border-color: #000;
+  color: #000;
+}
+
 #menu {
   border-top: solid 1px #bbb;
   background-color: #fff;
@@ -41,11 +61,11 @@
   bottom: 2.3rem;
   background : #fff;
   padding-left : 1rem;
-  padding-top : 0;
+  padding-top : 1rem;
   padding-bottom : 1.5rem;
   padding-right : 0.7rem;
   margin: 0;
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
