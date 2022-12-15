@@ -53,7 +53,8 @@ girafe-search {
   font-size: 0;
 }
 
-#buttonbar girafe-button {
+#buttonbar girafe-button, 
+#buttonbar girafe-menu-button {
   background-color: #444;
   margin:0;
   display: inline-block;
@@ -65,11 +66,8 @@ girafe-search {
   border-right: solid 1px #fff;
 }
 
-#buttonbar girafe-button {
-  border-top : solid 1px #444;
-}
-
-#buttonbar girafe-button:hover {
+#buttonbar girafe-button:hover,
+#buttonbar girafe-menu-button:hover {
   background-color: #000;
 }
 

@@ -23,8 +23,12 @@
       <div id="buttonbar">
         <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
         <girafe-button icon-style="fa-2xl fa-solid fa-globe" message="Map" action="globeToggled"></girafe-button>
-        <girafe-button icon-style="fa-2xl fa-solid fa-print" message="App" action="printToggled"></girafe-button>
-        <girafe-button icon-style="fa-2xl fa-regular fa-pen-to-square" message="RedLining" action="redliningToggled"></girafe-button>
+        <girafe-menu-button>
+          <div slot="menu-content">
+            <girafe-button icon-style="fa-2xl fa-regular fa-pen-to-square" message="RedLining" action="redliningToggled"></girafe-button>
+            <girafe-button icon-style="fa-2xl fa-solid fa-print" message="App" action="printToggled"></girafe-button>
+          </div>
+        </girafe-menu-button>
       </div>
     </header>
     <girafe-tree-view themes="/Mock/themes.json" dock="left"></girafe-tree-view>

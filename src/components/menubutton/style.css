@@ -1,0 +1,8 @@
+#menu-content {
+    display: none;
+    position: absolute;
+    top: 4.6rem;
+    right: 0;
+    border: solid 1px #fff;
+    width: 4rem;
+}
