@@ -6,7 +6,6 @@ import I18nManager from '/tools/i18nmanager';
 
 class TreeViewComponent extends GirafeResizableElement {
 
-  static #template = null;
   themesUrl = null;
   servers = {};
   layers = [];
@@ -16,8 +15,7 @@ class TreeViewComponent extends GirafeResizableElement {
   allLayersExpanded = false;
 
   constructor() {
-    super();
-    this.shadow = this.attachShadow({mode: 'open'});
+    super('treeview');
     this.themesUrl = this.getAttribute('themes');
   }
 
@@ -54,21 +52,8 @@ class TreeViewComponent extends GirafeResizableElement {
     this.servers = content["ogcServers"];
   }
 
-  async loadTemplate() {
-    if (TreeViewComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/treeview/template.html');
-    const content = await response.text();
-    TreeViewComponent.#template = document.createElement('template');
-    TreeViewComponent.#template.innerHTML = content;
-  }
-
   render() {
-    this.shadow.appendChild(TreeViewComponent.#template.content.cloneNode(true));
-    this.makeResizable();
+    super.render();
 
     this.ulRoot = this.shadow.querySelector('#treeview-list');
     this.optionsButton = this.shadow.querySelector('#options');

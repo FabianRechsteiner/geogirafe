@@ -35,10 +35,14 @@ class GirafeResizableElement extends GirafeHTMLElement {
   lastWidth = 0;
   hideWidth = 0;
 
-  constructor() {
-    super();
-
+  constructor(component) {
+    super(component);
     this.dock = this.getAttribute('dock');
+  }
+
+  render() {
+    super.render();
+    this.makeResizable();
   }
 
   makeResizable() {

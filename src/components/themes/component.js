@@ -3,7 +3,6 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
 class ThemeComponent extends GirafeHTMLElement {
 
-  static #template = null;
   themesButton = null;
   layerIcon = null;
   waitingIcon = null;
@@ -14,26 +13,12 @@ class ThemeComponent extends GirafeHTMLElement {
   ignoreBlur = false;
   
   constructor() {
-    super();
+    super('themes');
     this.themesUrl = this.getAttribute('themes');
-    this.shadow = this.attachShadow({mode: 'open'});
-  }
-
-  async loadTemplate() {
-    if (ThemeComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/themes/template.html');
-    const content = await response.text();
-    ThemeComponent.#template = document.createElement('template');
-    ThemeComponent.#template.innerHTML = content;
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(ThemeComponent.#template.content.cloneNode(true));
+    super.render();
 
     this.themesButton = this.shadow.querySelector('#select');
     this.themesButton.onclick = () => this.toggleThemesList();

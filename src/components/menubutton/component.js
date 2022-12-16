@@ -3,31 +3,15 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
 class MenuButtonComponent extends GirafeHTMLElement {
 
-  static #template = null;
-
   button = null;
   menuContent = null;
   
   constructor() {
-    super();
-    this.shadow = this.attachShadow({mode: 'open'});
-  }
-
-  async loadTemplate() {
-    if (MenuButtonComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/menubutton/template.html');
-    const content = await response.text();
-    MenuButtonComponent.#template = document.createElement('template');
-    MenuButtonComponent.#template.innerHTML = content;
+    super('menubutton');
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(MenuButtonComponent.#template.content.cloneNode(true));
+    super.render();
     this.button = this.shadow.querySelector('#button');
     this.menuContent = this.shadow.querySelector('#menu-content');
   }
@@ -46,7 +30,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    super.loadTemplate().then(() => {
       this.render();
       this.registerEvents();
     });

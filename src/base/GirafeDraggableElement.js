@@ -32,8 +32,8 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   pos3 = 0;
   pos4 = 0;
 
-  constructor() {
-    super();
+  constructor(component) {
+    super(component);
   }
 
   makeDraggable() {

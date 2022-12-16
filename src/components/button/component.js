@@ -3,30 +3,14 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
 class ButtonComponent extends GirafeHTMLElement {
 
-  static #template = null;
-
   button = null;
   
   constructor() {
-    super();
-    this.shadow = this.attachShadow({mode: 'open'});
-  }
-
-  async loadTemplate() {
-    if (ButtonComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/button/template.html');
-    const content = await response.text();
-    ButtonComponent.#template = document.createElement('template');
-    ButtonComponent.#template.innerHTML = content;
+    super('button');
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(ButtonComponent.#template.content.cloneNode(true));
+    super.render();
     this.button = this.shadow.querySelector('#button');
 
     const iconStyle = this.getAttribute('icon-style');

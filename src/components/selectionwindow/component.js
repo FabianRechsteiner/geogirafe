@@ -6,8 +6,6 @@ import I18nManager from '/tools/i18nmanager';
 
 class SelectionWindowComponent extends GirafeDraggableElement {
 
-  static #template = null;
-
   maxFeatures = 200;
   selectedFeatures = null;
   focusedIndex = null;
@@ -18,25 +16,11 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   counter = null;
 
   constructor() {
-    super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-  }
-
-  async loadTemplate() {
-    if (SelectionWindowComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/selectionwindow/template.html');
-    const content = await response.text();
-    SelectionWindowComponent.#template = document.createElement('template');
-    SelectionWindowComponent.#template.innerHTML = content;
+    super('selectionwindow');
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(SelectionWindowComponent.#template.content.cloneNode(true));
+    super.render();
     this.content = this.shadow.querySelector('#content');
     this.previousButton = this.shadow.querySelector('#previous');
     this.nextButton = this.shadow.querySelector('#next');

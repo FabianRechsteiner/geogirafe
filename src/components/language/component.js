@@ -4,30 +4,14 @@ import I18nManager from '/tools/i18nmanager';
 
 class LanguageComponent extends GirafeHTMLElement {
 
-  static #template = null;
-
   languageSelect = null;
   
   constructor() {
-    super();
-    this.shadow = this.attachShadow({mode: 'open'});
-  }
-
-  async loadTemplate() {
-    if (LanguageComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/language/template.html');
-    const content = await response.text();
-    LanguageComponent.#template = document.createElement('template');
-    LanguageComponent.#template.innerHTML = content;
+    super('language');
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(LanguageComponent.#template.content.cloneNode(true));
+    super.render();
     this.languageSelect = this.shadow.querySelector('#language');
 
     // Default language

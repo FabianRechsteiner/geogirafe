@@ -3,30 +3,14 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement.js';
 
 class ProjectionComponent extends GirafeHTMLElement {
 
-  static #template = null;
-
   projectionSelect = null;
   
   constructor() {
-    super();
-    this.shadow = this.attachShadow({mode: 'open'});
-  }
-
-  async loadTemplate() {
-    if (ProjectionComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/projection/template.html');
-    const content = await response.text();
-    ProjectionComponent.#template = document.createElement('template');
-    ProjectionComponent.#template.innerHTML = content;
+    super('projection');
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(ProjectionComponent.#template.content.cloneNode(true));
+    super.render();
     this.projectionSelect = this.shadow.querySelector('#projection');
   }
 

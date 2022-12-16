@@ -7,7 +7,6 @@ import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
-import Overlay from 'ol/Overlay';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
@@ -29,8 +28,6 @@ import MaskLayer from './maskLayer';
 import OLCesium from 'olcs/OLCesium.js';
 
 class MapComponent extends GirafeHTMLElement {
-
-  static #template = null;
 
   map = null;
   map3d = null;
@@ -78,8 +75,7 @@ class MapComponent extends GirafeHTMLElement {
   maskLayer = new MaskLayer({name: 'PrintMask'});
 
   constructor() {
-    super();
-    this.shadow = this.attachShadow({ mode: 'open' });
+    super('map');
     this.registerEvents();
   }
 
@@ -91,22 +87,8 @@ class MapComponent extends GirafeHTMLElement {
     window.addEventListener(GeoEvents.Print, (e) => this.onPrintEvent(e.detail));
   }
 
-  async loadTemplate() {
-    if (MapComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/map/template.html');
-    const content = await response.text();
-    MapComponent.#template = document.createElement('template');
-    MapComponent.#template.innerHTML = content;
-  }
-
   render() {
-
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(MapComponent.#template.content.cloneNode(true));
+    super.render();
 
     this.srid = this.getAttribute('srid');
     const defaultextent = this.getAttribute('max-extent').split(',').map(Number);

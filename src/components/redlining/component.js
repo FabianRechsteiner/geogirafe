@@ -5,8 +5,6 @@ import Picker from 'vanilla-picker/csp';
 
 class RedliningComponent extends GirafeResizableElement {
 
-  static #template = null;
-
   panel = null
   disableButton = null;
   pointButton = null;
@@ -24,25 +22,11 @@ class RedliningComponent extends GirafeResizableElement {
   drawingList = null;
   
   constructor() {
-    super();
-    this.shadow = this.attachShadow({mode: 'open'});
-  }
-
-  async loadTemplate() {
-    if (RedliningComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/redlining/template.html');
-    const content = await response.text();
-    RedliningComponent.#template = document.createElement('template');
-    RedliningComponent.#template.innerHTML = content;
+    super('redlining');
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(RedliningComponent.#template.content.cloneNode(true));
+    super.render();
 
     // Bar is hidden per default
     this.panel = this.shadow.querySelector('#panel');
@@ -63,7 +47,6 @@ class RedliningComponent extends GirafeResizableElement {
 
     this.toolSelected = this.disableButton;
 
-    this.makeResizable();
     this.activateTooltips(false, [800, 0], 'top-end');
   }
 

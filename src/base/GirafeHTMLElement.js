@@ -5,12 +5,44 @@ import MessageManager from '/tools/messagemanager';
 
 class GirafeHTMLElement extends HTMLElement {
 
+  static #templates = {};
+  component = null;
+
+  get templateUrl() {
+    return `/components/${this.component}/template.html`;
+  }
+
+  get template() {
+    return GirafeHTMLElement.#templates[this.component];
+  }
+
   messageManager = null
 
-  constructor() {
+  constructor(component) {
     super();
     this.messageManager = MessageManager.getInstance();
     window.addEventListener(GeoEvents.Translate, (e) => this.onTranslateEvent(e.detail));
+    this.component = component;
+    this.shadow = this.attachShadow({mode: 'open'});
+  }
+
+  async loadTemplate() {
+    if (this.component in GirafeHTMLElement.#templates) {
+      // Template was already loaded. Nothing to do.
+      return;
+    }
+    // Otherwise, load the template
+    const response = await fetch(this.templateUrl);
+    const content = await response.text();
+
+    const template = document.createElement('template');
+    template.innerHTML = content;
+    GirafeHTMLElement.#templates[this.component] = template;
+  }
+
+  render() {
+    // Clone component template and add it to the dom
+    this.shadow.appendChild(this.template.content.cloneNode(true));
   }
 
   onTranslateEvent(details) {

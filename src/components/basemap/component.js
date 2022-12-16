@@ -3,33 +3,18 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
 class BasemapComponent extends GirafeHTMLElement {
 
-  static #template = null;
   themesUrl = null;
   basemapJson = {};
   basemaps = [];
   basemapSelect = null;
   
   constructor() {
-    super();
+    super('basemap');
     this.themesUrl = this.getAttribute('themes');
-    this.shadow = this.attachShadow({mode: 'open'});
-  }
-
-  async loadTemplate() {
-    if (BasemapComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/basemap/template.html');
-    const content = await response.text();
-    BasemapComponent.#template = document.createElement('template');
-    BasemapComponent.#template.innerHTML = content;
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(BasemapComponent.#template.content.cloneNode(true));
+    super.render();
 
     this.basemapSelect = this.shadow.querySelector('#basemap');
     

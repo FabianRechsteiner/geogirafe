@@ -4,8 +4,6 @@ import I18nManager from '/tools/i18nmanager';
 
 class PrintComponent extends GirafeResizableElement {
 
-  static #template = null;
-
   panel = null
   exportButton = null;
   scaleSelect = null;
@@ -38,25 +36,12 @@ class PrintComponent extends GirafeResizableElement {
   }
   
   constructor() {
-    super();
-    this.shadow = this.attachShadow({mode: 'open'});
+    super('print');
     this.printUrl = this.getAttribute('print-url');
     this.defaultLayout = this.getAttribute('default-layout');
     if (!this.printUrl.endsWith('/')) {
       this.printUrl += '/';
     }
-  }
-
-  async loadTemplate() {
-    if (PrintComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/print/template.html');
-    const content = await response.text();
-    PrintComponent.#template = document.createElement('template');
-    PrintComponent.#template.innerHTML = content;
   }
 
   async initializePrint() {
@@ -68,8 +53,7 @@ class PrintComponent extends GirafeResizableElement {
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(PrintComponent.#template.content.cloneNode(true));
+    super.render();
 
     // Bar is hidden per default
     this.panel = this.shadow.querySelector('#panel');
@@ -100,7 +84,6 @@ class PrintComponent extends GirafeResizableElement {
       this.addFormatOption(this.formatSelect, elem);
     });
 
-    this.makeResizable();
     this.activateTooltips(false, [800, 0], 'top-end');
     I18nManager.getInstance().translate(this.shadow);
   }

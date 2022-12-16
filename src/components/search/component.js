@@ -2,7 +2,6 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
 class SearchComponent extends GirafeHTMLElement {
 
-  static #template = null;
   searchUrl = null;
   searchBox = null;
   resultsBox = null;
@@ -12,26 +11,12 @@ class SearchComponent extends GirafeHTMLElement {
   initialSearchBoxHeight = this.convertRemToPixels(2.5);
   
   constructor() {
-    super();
+    super('search');
     this.searchUrl = this.getAttribute('search-url');
-    this.shadow = this.attachShadow({mode: 'open'});
-  }
-
-  async loadTemplate() {
-    if (SearchComponent.#template !== null) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-    // Otherwise, load the template
-    const response = await fetch('/components/search/template.html');
-    const content = await response.text();
-    SearchComponent.#template = document.createElement('template');
-    SearchComponent.#template.innerHTML = content;
   }
 
   render() {
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(SearchComponent.#template.content.cloneNode(true));
+    super.render();
 
     // Get default height of searchBox
     this.searchBox = this.shadow.querySelector('#searchbox');
