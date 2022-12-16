@@ -1,0 +1,21 @@
+#button {
+  border: none;
+  border-right: solid 1px #fff;
+  width: 4rem;
+  height: 4.6rem;
+  background-color: #444;
+  color: #fff;
+  padding: 0;
+  cursor: pointer;
+  margin:0;
+  display: inline-block;
+  line-height: 4rem;
+}
+
+#icon {
+  display: block;
+}
+
+#button:hover {
+  background-color: #000;
+}

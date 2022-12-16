@@ -51,28 +51,10 @@ girafe-search {
   color: #fff;
   background-color: #444;
   font-size: 0;
-}
-
-#buttonbar girafe-button, 
-#buttonbar girafe-menu-button {
-  background-color: #444;
-  margin:0;
-  display: inline-block;
-  padding: 0 1rem;
-  line-height: 4.6rem;
-  width: 2rem;
-  cursor: pointer;
-  text-align: center;
-  border-right: solid 1px #fff;
-}
-
-#buttonbar girafe-button:hover,
-#buttonbar girafe-menu-button:hover {
-  background-color: #000;
-}
-
-#buttonbar i:hover {
-  background-color: #000;
+  padding: 0;
+  display: flex;
+  height: 4.6rem;
+  overflow: visible;
 }
 
 footer {

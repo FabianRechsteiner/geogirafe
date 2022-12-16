@@ -2,9 +2,11 @@
 <link rel="stylesheet" href="/components/menubutton/style.css" />
 
 <slot name="menu-button">
-    <i id="button" class="fa-2xl fa-solid fa-ellipsis-vertical"></i>
+  <button id="button">
+    <i id="icon" class="fa-2xl fa-solid fa-ellipsis-vertical"></i>
+  </button>
 </slot>
 
 <div id="menu-content">
-    <slot name="menu-content"></slot>
+  <slot name="menu-content"></slot>
 </div>
