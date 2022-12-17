@@ -59,6 +59,17 @@ class GirafeHTMLElement extends HTMLElement {
     return (val === undefined || val === null || val === '');
   }
 
+  delayed(functionToWatch, functionToExecute) {
+    const observer = new MutationObserver((mutations, obs) => {
+      if (functionToWatch()) {
+        functionToExecute();
+        obs.disconnect();
+      }
+    });
+    
+    observer.observe(this.shadow, { childList: true, subtree: true });
+  }
+
   activateTooltips(arrow, delay, placement) {
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach(el => {

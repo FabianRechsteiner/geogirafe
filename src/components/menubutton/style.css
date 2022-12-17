@@ -21,8 +21,25 @@
   line-height: 4rem;
 }
 
-#icon {
+span {
+  font-size: 1.3rem;
+}
+
+#button.hybrid {
+  display: flex;
+  flex-direction: column;
+}
+
+#button.hybrid i {
   display: block;
+  height: 50%;
+  line-height: 3.5rem;
+}
+
+#button.hybrid span {
+  font-size: 0.8rem;
+  height: 50%;
+  line-height: 1.5rem;
 }
 
 #button:hover {
