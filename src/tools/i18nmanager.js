@@ -56,10 +56,18 @@ class I18nManager {
 
   registerEvents() {
     //window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
+    window.addEventListener(GeoEvents.Translate, (e) => this.onTranslateEvent(e.detail));
+  }
+
+  onTranslateEvent(details) {
+    if (details.action === 'changeLanguage') {
+      this.changeLanguage(details.language);
+    }
   }
 
   changeLanguage(language) {
     this.currentLanguage = language;
+    this.messageManager.sendMessage(GeoEvents.Translate, {action: 'languageChanged', language: language});
   }
 
   translate(dom) {

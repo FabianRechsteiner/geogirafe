@@ -1,7 +1,10 @@
 <link rel="stylesheet" href="/components/language/style.css" />
 
-<select id="language">
-  <option value="fr" selected>Français</option>
-  <option value="de">Deutsch</option>
-  <option value="en">English</option>
-</select>
+<girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-language">
+  <div slot="menu-content">
+    <girafe-button text="DE" message="Translate" action="changeLanguage" data-language="de"></girafe-button>
+    <girafe-button text="FR" message="Translate" action="changeLanguage" data-language="fr"></girafe-button>
+    <girafe-button text="EN" message="Translate" action="changeLanguage" data-language="en"></girafe-button>
+  </div>
+</girafe-menu-button>
+

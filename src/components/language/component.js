@@ -4,7 +4,7 @@ import I18nManager from '/tools/i18nmanager';
 
 class LanguageComponent extends GirafeHTMLElement {
 
-  languageSelect = null;
+  menuButton = null;
   
   constructor() {
     super('language');
@@ -12,31 +12,32 @@ class LanguageComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    this.languageSelect = this.shadow.querySelector('#language');
+    this.menuButton = this.shadow.querySelector('#menu-button');
 
     // Default language
     const defaultLanguage = this.getAttribute('default');
     I18nManager.getInstance().setDefaultLanguage(defaultLanguage);
-    this.languageSelect.value = defaultLanguage;
+    this.menuButton.setText(defaultLanguage.toUpperCase());
   }
 
   registerEvents() {
-    //window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    this.languageSelect.addEventListener('change', (e) => this.onLanguageChanged(e));
+    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
+    window.addEventListener(GeoEvents.Translate, (e) => this.onTranslateEvent(e.detail));
   }
 
-  // onInitEvent(details) {
-  //   if (details.action === 'initState') {
-  //     if (details.state.projection !== 'null') {
-  //       this.languageSelect.value = details.state.projection;
-  //     }
-  //   }
-  // }
+  onTranslateEvent(details) {
+    if (details.action === 'languageChanged') {
+      this.menuButton.setText(details.language.toUpperCase());
+    }
+  }
 
-  onLanguageChanged(e) {
-    const language = e.target.value;
-    I18nManager.getInstance().changeLanguage(language);
-    this.messageManager.sendMessage(GeoEvents.Translate, {action: 'languageChanged', language: language});
+  onInitEvent(details) {
+    if (details.action === 'initState') {
+      console.log(details.state);
+      if (!this.isNullOrUndefined(details.state.language)) {
+        this.menuButton.setText(details.state.language.toUpperCase());
+      }
+    }
   }
 
   connectedCallback() {

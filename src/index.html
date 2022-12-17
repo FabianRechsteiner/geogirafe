@@ -21,9 +21,10 @@
       <img id="logo" src="/static/images/logo_small.png" />
       <girafe-search id="search" search-url="https://pi.paloo.fr/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"></girafe-search>
       <div id="buttonbar">
+        <girafe-language-select default="de"></girafe-language-select>
         <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
         <girafe-button icon-style="fa-2xl fa-solid fa-globe" message="Map" action="globeToggled"></girafe-button>
-        <girafe-menu-button>
+        <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
           <div slot="menu-content">
             <girafe-button icon-style="fa-2xl fa-regular fa-pen-to-square" message="RedLining" action="redliningToggled"></girafe-button>
             <girafe-button icon-style="fa-2xl fa-solid fa-print" message="App" action="printToggled"></girafe-button>
@@ -39,7 +40,6 @@
     <footer>
       <girafe-basemap-select themes="/Mock/themes.json"></girafe-basemap-select>
       <girafe-proj-select></girafe-proj-select>
-      <girafe-language-select default="de"></girafe-language-select>
     </footer>
   </body>
 </html>
