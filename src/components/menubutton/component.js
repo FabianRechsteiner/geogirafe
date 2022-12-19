@@ -17,6 +17,9 @@ class MenuButtonComponent extends GirafeHTMLElement {
     this.button = this.shadow.querySelector('#button');
     this.menuContent = this.shadow.querySelector('#menu-content');
 
+    let direction = (this.hasAttribute('open')) ? this.getAttribute('open') : 'bottom';
+    this.setOpenDirection(direction);
+
     if (this.hasAttribute('icon-style')) {
       // Add icon
       this.icon = document.createElement('i');
@@ -31,6 +34,17 @@ class MenuButtonComponent extends GirafeHTMLElement {
     }
 
     this.setButtonStyle();
+  }
+
+  setOpenDirection(direction) {
+    switch(direction) {
+      case 'left':
+        this.menuContent.classList.add('open-left');
+        break;
+      default:
+        this.menuContent.classList.add('open-bottom');
+        break;
+    }
   }
 
   registerEvents() {

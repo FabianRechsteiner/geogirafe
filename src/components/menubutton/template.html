@@ -1,10 +1,12 @@
 <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
 <link rel="stylesheet" href="/components/menubutton/style.css" />
 
-<slot name="menu-button">
-  <button id="button"></button>
-</slot>
+<div id="container">
+  <slot name="menu-button">
+    <button id="button"></button>
+  </slot>
 
-<div id="menu-content">
-  <slot name="menu-content"></slot>
+  <div id="menu-content">
+    <slot name="menu-content"></slot>
+  </div>
 </div>
