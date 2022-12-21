@@ -468,6 +468,21 @@ class MapComponent extends GirafeHTMLElement {
     if (this.map3d === null || !this.map3d.getEnabled()) {
       // Globe is not active
       this.map3d = new OLCesium({map: this.map});
+      const scene = this.map3d.getCesiumScene();
+
+      // Add terrain
+      const terrainProvider = new Cesium.CesiumTerrainProvider({
+        url : 'https://pi.paloo.fr/3d/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/'
+      });
+      scene.terrainProvider = terrainProvider;
+
+      // Add 3D-Tiles layer
+      const tileset = new Cesium.Cesium3DTileset({
+        url : 'https://3d.geo.dev.fgi.cloud.bs.ch/cesium/tiles/gebaeude-basel-stadt-25/tileset.json'
+      });
+      scene.primitives.add(tileset);
+
+      // Activate 3D map
       this.map3d.setEnabled(true);
     }
     else {
