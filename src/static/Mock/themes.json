@@ -447,6 +447,14 @@
       "name": "OF_Orthofoto2020Maerz",
       "type": "WMTS",
       "url": "https://wmts.geo.bs.ch/1.0.0/WMTSCapabilities.xml"
+    },
+    {
+      "id": 98986598,
+      "name": "Vector-Tiles (EPSG:3857 only)",
+      "metadata": {},
+      "dimensions": {},
+      "type": "VectorTiles",
+      "style": "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json"
     }
   ],
   "errors": [

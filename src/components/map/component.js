@@ -27,6 +27,9 @@ import {unByKey} from 'ol/Observable';
 import MaskLayer from './maskLayer';
 import OLCesium from 'olcs/OLCesium.js';
 
+import VectorTileLayer from 'ol/layer/VectorTile.js';
+import {applyStyle} from 'ol-mapbox-style';
+
 class MapComponent extends GirafeHTMLElement {
 
   map = null;
@@ -751,7 +754,10 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onChangeBasemap(basemap) {
-    // TODO REG : Use constant
+    // First : Remove current basemap
+    this.map.removeLayer(this.currentBasemap);
+
+    // Then : Create new Basemap
     if (basemap.type === 'WMTS') {
       this.getWmtsCapabilities(basemap.url, (capabilities) => {
         const options = optionsFromCapabilities(capabilities, {
@@ -759,26 +765,32 @@ class MapComponent extends GirafeHTMLElement {
           matrixSet: this.srid,
         });
 
-        const layer = new TileLayer({
+        this.map.removeLayer(this.currentBasemap);
+        this.currentBasemap = new TileLayer({
           opacity: 1,
           source: new WMTS(options),
         });
-
-        this.map.removeLayer(this.currentBasemap)
-        // Always insert in the background
-        this.map.getLayers().insertAt(0, layer);
-        this.currentBasemap = layer;
       });
     }
     else if (basemap.type === 'OSM') {
+      this.map.removeLayer(this.currentBasemap);
       // Create OSM layer
-      this.map.removeLayer(this.currentBasemap)
       this.currentBasemap = new TileLayer({
         source: new OSM()
       });
-      // Always insert in the background
-      this.map.getLayers().insertAt(0, this.currentBasemap);
     }
+    else if (basemap.type === 'VectorTiles') {
+      // Create VectorTiles Layer
+      this.map.removeLayer(this.currentBasemap);
+      this.currentBasemap = new VectorTileLayer({declutter: true});
+      applyStyle(this.currentBasemap, basemap.style);
+    }
+    else {
+      throw 'Unknown basemap type: ' + basemap.type;
+    }
+
+    // Last : insert new basemap (always in the background)
+    this.map.getLayers().insertAt(0, this.currentBasemap);
   }
 
   getWmtsCapabilities(url, callback) {

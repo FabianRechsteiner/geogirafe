@@ -39,19 +39,14 @@ class BasemapComponent extends GirafeHTMLElement {
     const option = document.createElement('option');
     option.innerHTML = elem.name;
 
-    let child = elem;
+    let basemap = elem;
     if (elem.children) {
       // TODO REG: use all children for basemap
-      child = elem.children[0];
+      basemap = elem.children[0];
     }
 
     // fill array with all info about basemaps 
     // (referenced by array index in select.value)
-    const basemap = {
-      "name": child.name,
-      "type": child.type,
-      "url": child.url
-    }
     this.basemaps.push(basemap);
     option.value = this.basemaps.length - 1;
   
