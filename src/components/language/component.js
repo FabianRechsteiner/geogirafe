@@ -28,6 +28,7 @@ class LanguageComponent extends GirafeHTMLElement {
   onTranslateEvent(details) {
     if (details.action === 'languageChanged') {
       this.menuButton.setText(details.language.toUpperCase());
+      this.menuButton.closeMenu();
     }
   }
 

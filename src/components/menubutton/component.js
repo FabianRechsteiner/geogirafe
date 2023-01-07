@@ -51,6 +51,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.button.addEventListener('click', (e) => this.openMenu());
+    this.menuContent.addEventListener('blur', (e) => this.onBlur(e));
   }
 
   setButtonStyle() {
@@ -94,11 +95,77 @@ class MenuButtonComponent extends GirafeHTMLElement {
 
   openMenu() {
     if (this.menuContent.style.display === 'block') {
-      this.menuContent.style.display = 'none';
+      this.closeMenu();
     }
     else {
       this.menuContent.style.display = 'block';
+      this.focusContent();
     }
+  }
+
+  focusContent() {
+    this.menuContent.focus();
+  }
+
+  closeMenu() {
+    this.menuContent.style.display = 'none';
+    // If one of the parents is another menu-button, we give the focus to it
+    const parentMenuButton = this.getParentMenuButton(this.shadow.host.parentNode);
+    if (parentMenuButton !== null) {
+      parentMenuButton.focusContent();
+    }
+  }
+
+  onBlur(e) {
+    if (e.relatedTarget === this.button) {
+      // We clicked on the menu button.
+      // => nothing to do, the menu will be close by the click event
+      return;
+    }
+    if (!this.contains(e.currentTarget, e.relatedTarget)) {
+      // The new focused element is not a child of the menuContent
+      // => We close the menu
+      this.closeMenu();
+    }
+  }
+
+  getParentMenuButton(elem) {
+    // Stop case : we found null or a menu-button object
+    if (elem === null || elem.nodeName === 'GIRAFE-MENU-BUTTON') {
+      return elem;
+    }
+
+    // Otherwise, we try to find a perent recursively
+    let parent = null;
+    if (elem instanceof ShadowRoot) {
+      parent = elem.host;
+    }
+    else {
+      parent = elem.parentNode;
+    }
+
+    return this.getParentMenuButton(parent);
+  }
+
+  contains(parent, child) {
+    // This method returns true if the parent contains the child
+    // The tests are made by tesing all childs, resursively including childs present in slots
+    if (parent.contains(child)) {
+      // Simple HTML, simple case
+      return true;
+    }
+
+    // Otherwise, we check the elements in slots
+    const slot = parent.querySelector('slot[name="menu-content"]');
+    const elements = slot.assignedElements({flatten: true});
+    for (let i=0; i<elements.length; ++i) {
+      if (elements[i].contains(child)) {
+        return true;
+      }
+    }
+
+    // Not found => not a child
+    return false;
   }
 
   connectedCallback() {

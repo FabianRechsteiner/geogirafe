@@ -44,6 +44,7 @@ class ProjectionComponent extends GirafeHTMLElement {
     if (details.action === 'projectionChanged') {
       const text = this.valueToText[details.projection];
       this.menuButton.setText(text);
+      this.menuButton.closeMenu();
     }
   }
 
