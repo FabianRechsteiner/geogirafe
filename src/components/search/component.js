@@ -1,4 +1,5 @@
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
+import GeoEvents from '/models/events.js';
 
 class SearchComponent extends GirafeHTMLElement {
 
@@ -6,6 +7,8 @@ class SearchComponent extends GirafeHTMLElement {
   searchBox = null;
   resultsBox = null;
   ignoreBlur = false;
+
+  resultList = null;
 
   searchTermPlaceholder = '###SEARCHTERM###';
   initialSearchBoxHeight = this.convertRemToPixels(2.5);
@@ -26,17 +29,17 @@ class SearchComponent extends GirafeHTMLElement {
   registerEvents() {
     //window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
     this.searchBox.addEventListener('input', (e) => this.doSearch(this, e));
-    this.searchBox.addEventListener('focusin', (e) => this.onFocusIn(e));
-    this.searchBox.addEventListener('focusout', (e) => this.onFocusOut(e));
+    this.searchBox.addEventListener('focusin', (e) => this.onFocusIn());
+    this.searchBox.addEventListener('focusout', (e) => this.onFocusOut());
   }
 
-  onFocusIn(e) {
+  onFocusIn() {
     this.ignoreBlur = false;
     this.resultsBox.style.display = 'block';
     this.setSearchBoxHeight(this.initialSearchBoxHeight + this.resultsBox.offsetHeight + 20);
   }
 
-  onFocusOut(e) {
+  onFocusOut() {
     if (!this.ignoreBlur) {
       this.resultsBox.style.display = 'none';
       this.setSearchBoxHeight(this.initialSearchBoxHeight);
@@ -51,6 +54,7 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   clearSearch() {
+    this.resultList = [];
     this.resultsBox.innerHTML = '';
     this.setSearchBoxHeight(this.initialSearchBoxHeight);
   }
@@ -109,9 +113,11 @@ class SearchComponent extends GirafeHTMLElement {
       groupedResults[type].forEach(r => {
         const result = document.createElement('div');
         result.className = 'result';
+        this.resultList.push(r.geometry);
+        result.dataset.resultId = this.resultList.length - 1;
+
         result.onmousedown = () => { this.ignoreBlur = true };
-        result.onclick = (e) => { this.ignoreBlur = false; alert(e); };
-    
+        result.onclick = (e) => { this.ignoreBlur = false; this.onSelect(e); };
 
         const text = document.createElement('span');
         text.innerHTML = r.properties.label;
@@ -151,6 +157,23 @@ class SearchComponent extends GirafeHTMLElement {
 
   onSelect(e) {
     console.log(e.target.innerHTML);
+    const div = this.getParentDiv(e.target);
+    const resultGeometry = this.resultList[div.dataset.resultId];
+    if (resultGeometry.type == 'Point') {
+      this.messageManager.sendMessage(GeoEvents.Map, {action: 'panToCoordinate', coordinate: resultGeometry.coordinates });
+      this.onFocusOut();
+    }
+    else {
+      alert('Result-Type not managed yet');
+    }
+  }
+
+  getParentDiv(elem) {
+    if (elem.nodeName === 'DIV') {
+      return elem;
+    }
+
+    return this.getParentDiv(elem.parentElement);
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {

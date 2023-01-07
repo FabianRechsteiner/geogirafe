@@ -443,6 +443,9 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'zoomToExtent') {
       this.zoomToExtent(details.extent);
     }
+    else if (details.action === 'panToCoordinate') {
+      this.panToCoordinate(details.coordinate);
+    }
     else if (details.action === 'opacityChanged') {
       this.onChangeOpacity(details.layer);
     }
@@ -510,6 +513,10 @@ class MapComponent extends GirafeHTMLElement {
 
   zoomToExtent(extent) {
     this.map.getView().fit(extent);
+  }
+
+  panToCoordinate(coordinate) {
+    this.map.getView().setCenter(coordinate);
   }
 
   onChangeProjection(srid) {
