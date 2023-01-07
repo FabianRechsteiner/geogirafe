@@ -5,6 +5,7 @@ class ButtonComponent extends GirafeHTMLElement {
 
   button = null;
   icon = null;
+  textSpan = null;
   text = null;
   
   constructor() {
@@ -23,41 +24,50 @@ class ButtonComponent extends GirafeHTMLElement {
     }
     if (this.hasAttribute('text')) {
       // Add text
-      this.text = document.createElement('span');
-      this.text.innerHTML = this.getAttribute('text');
-      this.button.appendChild(this.text);
+      this.text = this.getAttribute('text');
+      this.textSpan = document.createElement('span');
+      this.textSpan.innerHTML = this.text;
+      this.button.appendChild(this.textSpan);
     }
 
     this.setButtonStyle();
   }
 
   setButtonStyle() {
-    if (this.icon !== null && this.text !== null) {
+    if (this.icon !== null && this.textSpan !== null) {
       // If both icon and text were set, we need to adapt the style in order to make both visible
       this.button.className = "hybrid";
     }
   }
 
   setText(text) {
-    if (this.text !== null && this.isNullOrUndefinedOrBlank(text)) {
+    if (this.textSpan !== null && this.isNullOrUndefinedOrBlank(text)) {
       // Text exists and must be removed from button
-      this.text.remove();
       this.text = null;
+      this.textSpan.remove();
+      this.textSpan = null;
     }
-    else if (this.text === null && !this.isNullOrUndefinedOrBlank(text)) {
+    else if (this.textSpan === null && !this.isNullOrUndefinedOrBlank(text)) {
       // text does not exists yet and has to be created
-      this.text = document.createElement('span');
-      this.text.innerHTML = text;
-      // This function can be called before the component if full initialized
-      // Therefore, we have to delay the execution, because this.button can still be null
-      super.delayed(
-        () => { return this.button !== null }, 
-        () => this.button.appendChild(this.text)
-      );
+      this.text = text;
+      this.textSpan = document.createElement('span');
+      this.textSpan.innerHTML = this.text;
+      if (this.button !== null) {
+        this.button.appendChild(this.textSpan)
+      }
+      else {
+        // This function can be called before the component if full initialized
+        // Therefore, we have to delay the execution, because this.button can still be null
+        super.delayed(
+          () => { return this.button !== null }, 
+          () => this.button.appendChild(this.textSpan)
+        );
+      }
     }
     else {
       // Text already exists and has to be changed
-      this.text.innerHTML = text;
+      this.text = text;
+      this.textSpan.innerHTML = this.text;
     }
     this.setButtonStyle();
   }

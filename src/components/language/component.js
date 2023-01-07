@@ -44,12 +44,8 @@ class LanguageComponent extends GirafeHTMLElement {
     this.loadTemplate().then(() => {
       this.render();
       this.registerEvents();
-      this.initialized();
+      super.initialized();
     });
-  }
-
-  initialized() {
-    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
   }
 }
 

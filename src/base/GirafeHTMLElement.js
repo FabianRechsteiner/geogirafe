@@ -83,6 +83,10 @@ class GirafeHTMLElement extends HTMLElement {
       })
     });
   }
+  
+  initialized() {
+    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
+  }
 }
 
 export default GirafeHTMLElement;

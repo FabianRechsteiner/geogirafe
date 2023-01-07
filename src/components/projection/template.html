@@ -1,7 +1,9 @@
 <link rel="stylesheet" href="/components/projection/style.css" />
 
-<select id="projection">
-  <option value="EPSG:3857" selected>Pseudo-Mercator (EPSG:3857)</option>
-  <option value="EPSG:4326">WGS84 (EPSG:4326)</option>
-  <option value="EPSG:2056">LV95 (EPSG:2056)</option>
-</select>
+<girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-earth-europe" open="left">
+  <div slot="menu-content">
+    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" message="Map" action="changeProjection" data-projection="EPSG:3857"></girafe-button>
+    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" message="Map" action="changeProjection" data-projection="EPSG:4326"></girafe-button>
+    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" message="Map" action="changeProjection" data-projection="EPSG:2056"></girafe-button>
+  </div>
+</girafe-menu-button>

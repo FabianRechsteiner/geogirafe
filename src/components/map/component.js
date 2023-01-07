@@ -364,12 +364,8 @@ class MapComponent extends GirafeHTMLElement {
     this.loadTemplate().then(() => {
       this.render();
       this.listenOpenLayersEvents();
-      this.initialized();
+      super.initialized();
     });
-  }
-
-  initialized() {
-    this.messageManager.sendMessage(GeoEvents.Init, { action: 'componentInitialized' });
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {
@@ -435,7 +431,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onMapEvent(details) {
-    if (details.action === 'projectionChanged') {
+    if (details.action === 'changeProjection') {
       this.onChangeProjection(details.projection);
     }
     else if (details.action === 'basemapChanged') {
@@ -554,6 +550,8 @@ class MapComponent extends GirafeHTMLElement {
       extent: newExtent
     });
     this.map.setView(newView);
+
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'projectionChanged', projection: this.srid});
   }
 
   onAddLayers(layerInfos) {

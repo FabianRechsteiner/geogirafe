@@ -3,7 +3,12 @@ import GirafeHTMLElement from '/base/GirafeHTMLElement.js';
 
 class ProjectionComponent extends GirafeHTMLElement {
 
-  projectionSelect = null;
+  menuButton = null;
+  valueToText = {
+    "EPSG:3857": "W-M",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "LV95"
+  }
   
   constructor() {
     super('projection');
@@ -11,49 +16,43 @@ class ProjectionComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    this.projectionSelect = this.shadow.querySelector('#projection');
+    this.menuButton = this.shadow.querySelector('#menu-button');
+
+    // Get all combinaison text/value from girafe-button objects
+    const allButtons = this.shadow.querySelectorAll('girafe-button');
+    for (let i=0; i<allButtons.length; ++i) {
+      const b = allButtons[i];
+      b.setText(this.valueToText[b.dataset.projection]);
+    }
   }
 
   registerEvents() {
     window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
-    this.projectionSelect.addEventListener('change', (e) => this.onProjectionChanged(this, e));
   }
 
   onInitEvent(details) {
     if (details.action === 'initState') {
-      if (details.state.projection !== 'null') {
-        this.projectionSelect.value = details.state.projection;
+      if (!this.isNullOrUndefined(details.state.projection)) {
+        const text = this.valueToText[details.state.projection];
+        this.menuButton.setText(text);
       }
     }
   }
 
   onMapEvent(details) {
     if (details.action === 'projectionChanged') {
-      this.onChangeProjection(details.projection);
+      const text = this.valueToText[details.projection];
+      this.menuButton.setText(text);
     }
-  }
-
-  onChangeProjection(projection) {
-    if (this.projectionSelect.value !== projection) {
-      this.projectionSelect.value = projection;
-    }
-  }
-
-  onProjectionChanged(_this, e) {
-    _this.messageManager.sendMessage(GeoEvents.Map, {action: 'projectionChanged', projection: e.target.value});
   }
 
   connectedCallback() {
     this.loadTemplate().then(() => {
       this.render();
       this.registerEvents();
-      this.initialized();
+      super.initialized();
     });
-  }
-
-  initialized() {
-    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
   }
 }
 
