@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "adjectives": "^1.0.2",
-    "cesium": "^1.100.0",
+    "cesium": "^1.101.0",
     "ol": "^7.1.0",
     "ol-mapbox-style": "^9.3.0",
     "olcs": "^2.13.1",

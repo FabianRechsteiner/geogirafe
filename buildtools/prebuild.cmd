@@ -19,4 +19,4 @@ if exist src\static\lib\tippy.js\tippy.min.css del /F src\static\lib\tippy.js\ti
 for /F %%f in ('dir /s/b node_modules\tippy.js\*.css') do type %%f>>src\static\lib\tippy.js\tippy.min.css
 
 if not exist src\static\lib\cesium mkdir src\static\lib\cesium
-xcopy node_modules\cesium\Build\Cesium\* src\static\lib\cesium\ /Y
+xcopy node_modules\cesium\Build\Cesium\* src\static\lib\cesium\ /S /Y

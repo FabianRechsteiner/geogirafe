@@ -475,7 +475,7 @@ class MapComponent extends GirafeHTMLElement {
 
       // Add terrain
       const terrainProvider = new Cesium.CesiumTerrainProvider({
-        url : 'https://pi.paloo.fr/3d/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/'
+        url : 'https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/'
       });
       scene.terrainProvider = terrainProvider;
 
