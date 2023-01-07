@@ -47,7 +47,7 @@ span {
 }
 
 #button.hybrid i {
-  display: block;
+  display: inline-block;
   height: 50%;
   line-height: 3.5rem;
 }

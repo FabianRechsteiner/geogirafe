@@ -1,3 +1,7 @@
+:host {
+  display: inline-block;
+}
+
 #button {
   border: none;
   border-right: solid 1px #fff;
@@ -22,7 +26,7 @@ span {
 }
 
 #button.hybrid i {
-  display: block;
+  display: inline-block;
   height: 55%;
   line-height: 3.5rem;
 }
