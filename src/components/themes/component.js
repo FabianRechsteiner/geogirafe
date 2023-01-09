@@ -109,7 +109,7 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   onThemeChanged(e) {
-    const div = this.getParentDiv(e.target);
+    const div = super.getParentOfType('DIV', e.target);
     const index = div.dataset["value"];
     this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: this.themes[index]});
     this.toggleThemesList(false);
@@ -130,14 +130,6 @@ class ThemeComponent extends GirafeHTMLElement {
     const response = await fetch(this.themesUrl);
     const content = await response.json();
     this.themesJson = content["themes"];
-  }
-
-  getParentDiv(elem) {
-    if (elem.nodeName === 'DIV') {
-      return elem;
-    }
-
-    return this.getParentDiv(elem.parentElement);
   }
 }
 

@@ -230,7 +230,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   deleteLayer(_this, layer, e) {
-    const li = this.getParentLi(e.target);
+    const li = super.getParentOfType('LI', e.target);
 
     // First deactivate layer
     if (layer.isGroup) {
@@ -313,7 +313,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   expand(_this, e) {
-    const li = this.getParentLi(e.target);
+    const li = super.getParentOfType('LI', e.target);
     const ulChild = li.getElementsByTagName('ul')[0];
     if (ulChild.style.display === 'none') {
       ulChild.style.display = 'block';
@@ -363,7 +363,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   toggle(_this, e, layer) {
-    const li = this.getParentLi(e.target);
+    const li = super.getParentOfType('LI', e.target);
 
     const setActive = !(layer.active);
     this.toggleLeaf(li, layer, setActive);
@@ -454,7 +454,7 @@ class TreeViewComponent extends GirafeResizableElement {
       }
     }
 
-    const liParent = this.getParentLi(ul);
+    const liParent = super.getParentOfType('LI', ul);
     const layerParent = this.layers[liParent.dataset.layerid];
     const circle = liParent.getElementsByTagName('i')[1];
     
@@ -633,7 +633,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   moveLayerUp(_this, layer, e) {
-    const li = this.getParentLi(e.target);
+    const li = super.getParentOfType('LI', e.target);
     const previousLi = li.previousElementSibling;
     const previousLayer = _this.layers[previousLi.dataset.layerid];
     
@@ -659,7 +659,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   moveLayerDown(_this, layer, e) {
-    const li = this.getParentLi(e.target);
+    const li = super.getParentOfType('LI', e.target);
     const nextLi = li.nextElementSibling;
     const nextLayer = _this.layers[nextLi.dataset.layerid];
     
@@ -717,15 +717,6 @@ class TreeViewComponent extends GirafeResizableElement {
     });
 
     _this.allLegendsDisplayed = !_this.allLegendsDisplayed;
-  }
-
-  getParentLi(elem) {
-    const parent = elem.parentElement;
-    if (parent.nodeName === 'LI') {
-      return parent;
-    }
-
-    return this.getParentLi(parent);
   }
 }
 

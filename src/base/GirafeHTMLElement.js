@@ -70,6 +70,24 @@ class GirafeHTMLElement extends HTMLElement {
     observer.observe(this.shadow, { childList: true, subtree: true });
   }
 
+  getParentOfType(parentNodeName, elem) {
+    // Stop case : we found null or an object of the right type
+    if (elem === null || elem.nodeName === parentNodeName) {
+      return elem;
+    }
+
+    // Otherwise, we try to find a parent recursively
+    let parent = null;
+    if (elem instanceof ShadowRoot) {
+      parent = elem.host;
+    }
+    else {
+      parent = elem.parentNode;
+    }
+
+    return this.getParentOfType(parentNodeName, parent);
+  }
+
   activateTooltips(arrow, delay, placement) {
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach(el => {

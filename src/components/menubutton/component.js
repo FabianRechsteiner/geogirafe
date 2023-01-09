@@ -110,7 +110,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   closeMenu() {
     this.menuContent.style.display = 'none';
     // If one of the parents is another menu-button, we give the focus to it
-    const parentMenuButton = this.getParentMenuButton(this.shadow.host.parentNode);
+    const parentMenuButton = super.getParentOfType(this.nodeName, this.shadow.host.parentNode);
     if (parentMenuButton !== null) {
       parentMenuButton.focusContent();
     }
@@ -127,24 +127,6 @@ class MenuButtonComponent extends GirafeHTMLElement {
       // => We close the menu
       this.closeMenu();
     }
-  }
-
-  getParentMenuButton(elem) {
-    // Stop case : we found null or a menu-button object
-    if (elem === null || elem.nodeName === 'GIRAFE-MENU-BUTTON') {
-      return elem;
-    }
-
-    // Otherwise, we try to find a perent recursively
-    let parent = null;
-    if (elem instanceof ShadowRoot) {
-      parent = elem.host;
-    }
-    else {
-      parent = elem.parentNode;
-    }
-
-    return this.getParentMenuButton(parent);
   }
 
   contains(parent, child) {

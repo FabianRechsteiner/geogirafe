@@ -157,7 +157,7 @@ class SearchComponent extends GirafeHTMLElement {
 
   onSelect(e) {
     console.log(e.target.innerHTML);
-    const div = this.getParentDiv(e.target);
+    const div = super.getParentOfType('DIV', e.target);
     const resultGeometry = this.resultList[div.dataset.resultId];
     if (resultGeometry.type == 'Point') {
       this.messageManager.sendMessage(GeoEvents.Map, {action: 'panToCoordinate', coordinate: resultGeometry.coordinates });
@@ -166,14 +166,6 @@ class SearchComponent extends GirafeHTMLElement {
     else {
       alert('Result-Type not managed yet');
     }
-  }
-
-  getParentDiv(elem) {
-    if (elem.nodeName === 'DIV') {
-      return elem;
-    }
-
-    return this.getParentDiv(elem.parentElement);
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {
