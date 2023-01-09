@@ -109,3 +109,7 @@ girafe-selection-window {
   background: #fff;
   display: none
 }
+
+.border-top {
+  border-top: solid 1px #fff;
+}

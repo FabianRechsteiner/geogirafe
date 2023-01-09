@@ -90,9 +90,9 @@ class ThemeComponent extends GirafeHTMLElement {
     if (details.action === 'initState') {
       if (details.state.theme !== 'null') {
         // Find the theme id from the name
-        //const index = this.themes.findIndex(item => item.name === details.state.theme);
-        //this.themesList.value = index;
-        //this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: this.themes[index]});
+        const index = this.themes.findIndex(item => item.name === details.state.theme);
+        this.themesList.value = index;
+        this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: this.themes[index]});
       }
     }
   }

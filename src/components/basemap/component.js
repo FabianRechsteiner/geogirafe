@@ -22,7 +22,8 @@ class BasemapComponent extends GirafeHTMLElement {
     const option = document.createElement('option');
     option.innerHTML = 'OpenStreetMap';
     const basemap = {
-      "type": 'OSM'
+      "type": 'OSM',
+      "name": "OSM"
     }
     this.basemaps.push(basemap);
     option.value = this.basemaps.length-1;

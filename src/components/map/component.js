@@ -415,9 +415,6 @@ class MapComponent extends GirafeHTMLElement {
       if (details.state.projection !== 'null') {
         this.onChangeProjection(details.state.projection);
       }
-      if (details.state.basemap !== 'null') {
-        this.onChangeBasemap(details.state.basemap);
-      }
       if (details.state.mapX !== 'null' && details.state.mapY !== 'null' && details.state.mapZ !== 'null') {
         const newView = new View({
           center: [parseFloat(details.state.mapX), parseFloat(details.state.mapY)],
@@ -759,11 +756,8 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onChangeBasemap(basemap) {
-    // First : Remove current basemap
-    this.map.removeLayer(this.currentBasemap);
-
-    // Then : Create new Basemap
     if (basemap.type === 'WMTS') {
+      // Create WMTS layer
       this.getWmtsCapabilities(basemap.url, (capabilities) => {
         const options = optionsFromCapabilities(capabilities, {
           layer: basemap.name,
@@ -775,27 +769,27 @@ class MapComponent extends GirafeHTMLElement {
           opacity: 1,
           source: new WMTS(options),
         });
+        this.map.getLayers().insertAt(0, this.currentBasemap);
       });
     }
     else if (basemap.type === 'OSM') {
-      this.map.removeLayer(this.currentBasemap);
       // Create OSM layer
+      this.map.removeLayer(this.currentBasemap);
       this.currentBasemap = new TileLayer({
         source: new OSM()
       });
+      this.map.getLayers().insertAt(0, this.currentBasemap);
     }
     else if (basemap.type === 'VectorTiles') {
       // Create VectorTiles Layer
       this.map.removeLayer(this.currentBasemap);
       this.currentBasemap = new VectorTileLayer({declutter: true});
       applyStyle(this.currentBasemap, basemap.style);
+      this.map.getLayers().insertAt(0, this.currentBasemap);
     }
     else {
       throw 'Unknown basemap type: ' + basemap.type;
     }
-
-    // Last : insert new basemap (always in the background)
-    this.map.getLayers().insertAt(0, this.currentBasemap);
   }
 
   getWmtsCapabilities(url, callback) {
