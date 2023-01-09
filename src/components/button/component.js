@@ -7,6 +7,10 @@ class ButtonComponent extends GirafeHTMLElement {
   icon = null;
   textSpan = null;
   text = null;
+
+  geoevent = null;
+  option = null;
+  href = null;
   
   constructor() {
     super('button');
@@ -29,7 +33,6 @@ class ButtonComponent extends GirafeHTMLElement {
       this.textSpan.innerHTML = this.text;
       this.button.appendChild(this.textSpan);
     }
-
     this.setButtonStyle();
   }
 
@@ -73,19 +76,33 @@ class ButtonComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    const message = this.getAttribute('message');
-    const geoevent = this.getGeoEventType(message);
-    const options = {};
-    options.action = this.getAttribute('action');
-
-    // Get message attributes from dataset if there is any
-    console.log(this.dataset);
-    for (let key in this.dataset) {
-      options[key] = this.dataset[key];
+    if (this.hasAttribute('href')) {
+      this.href = this.getAttribute('href');
     }
-    console.log(options);
+    if (this.hasAttribute('message') && this.hasAttribute('action')) {
+      const message = this.getAttribute('message');
+      this.geoevent = this.getGeoEventType(message);
+      this.options = {};
+      this.options.action = this.getAttribute('action');
 
-    this.button.addEventListener('click', (e) => this.messageManager.sendMessage(geoevent, options));
+      // Get message attributes from dataset if there is any
+      for (let key in this.dataset) {
+        this.options[key] = this.dataset[key];
+      }
+    }
+
+    this.button.addEventListener('click', (e) => this.onClick());
+  }
+
+  onClick() {
+    if (this.href !== null) {
+      // Open link in a new tab
+      window.open(this.href, '_blank');
+    }
+    else if (this.message !== null) {
+      // send message
+      this.messageManager.sendMessage(this.geoevent, this.options);
+    }
   }
 
   getGeoEventType(message) {

@@ -18,17 +18,18 @@
   <body>
     <header>
       <girafe-theme-select themes="/Mock/themes.json"></girafe-theme-select>
-      <img id="logo" src="/static/images/logo_small.png" />
+      <img id="logo" alt="geogirafe-logo" src="/static/images/logo_small.png" />
       <girafe-search id="search" search-url="https://pi.paloo.fr/mapbs/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"></girafe-search>
       <div id="buttonbar">
         <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
         <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
             <div slot="menu-content">
-              <girafe-button icon-style="fa-xl fa-regular fa-pen-to-square" text="DRAW" message="RedLining" action="redliningToggled"></girafe-button>
-              <girafe-button icon-style="fa-xl fa-solid fa-print" text="PRINT" message="App" action="printToggled"></girafe-button>
+              <girafe-button icon-style="fa-xl fa-regular fa-pen-to-square" text="Draw" message="RedLining" action="redliningToggled"></girafe-button>
+              <girafe-button icon-style="fa-xl fa-solid fa-print" text="Print" message="App" action="printToggled"></girafe-button>
               <girafe-proj-select></girafe-proj-select>
               <girafe-language-select default="de"></girafe-language-select>
               <girafe-button icon-style="fa-xl fa-solid fa-globe" text="3D" message="Map" action="globeToggled"></girafe-button>
+              <girafe-button icon-style="fa-xl fa-brands fa-gitlab" text="Source" href="https://gitlab.com/geogirafe/gg_viewer"></girafe-button>
             </div>
           </girafe-menu-button>
       </div>

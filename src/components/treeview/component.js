@@ -158,6 +158,7 @@ class TreeViewComponent extends GirafeResizableElement {
         // => We just use it
         const icon = document.createElement('img');
         icon.src = layer.iconUrl;
+        icon.alt = 'icon for ' + layer.name;
         icon.className = 'iconurl';
         container.append(icon);
       }
@@ -180,6 +181,7 @@ class TreeViewComponent extends GirafeResizableElement {
         // before we can show the legend icon
         const icon = document.createElement('img');
         icon.id = layer.legendId;
+        icon.alt = 'icon for ' + layer.name;
         icon.className = 'iconurl';
         container.append(icon);
 
@@ -595,6 +597,7 @@ class TreeViewComponent extends GirafeResizableElement {
     // Add a image for the legend.
     const legendimg = document.createElement('img');
     legendimg.id = layer.legendId;
+    legendimg.alt = 'legend for ' + layer.name;
     legendimg.className = 'legend';
     li.append(legendimg);
     legendimg.style.display = (layer.isLegendExpanded) ? 'block' : 'none';
