@@ -103,6 +103,30 @@ class ButtonComponent extends GirafeHTMLElement {
       // send message
       this.messageManager.sendMessage(this.geoevent, this.options);
     }
+
+    // Close parent menu-button if any
+    const parentMenuButton = this.getParentMenuButton(this.shadow.host.parentNode);
+    if (parentMenuButton !== null) {
+      parentMenuButton.closeMenu();
+    }
+  }
+
+  getParentMenuButton(elem) {
+    // Stop case : we found null or a menu-button object
+    if (elem === null || elem.nodeName === 'GIRAFE-MENU-BUTTON') {
+      return elem;
+    }
+
+    // Otherwise, we try to find a perent recursively
+    let parent = null;
+    if (elem instanceof ShadowRoot) {
+      parent = elem.host;
+    }
+    else {
+      parent = elem.parentNode;
+    }
+
+    return this.getParentMenuButton(parent);
   }
 
   getGeoEventType(message) {
