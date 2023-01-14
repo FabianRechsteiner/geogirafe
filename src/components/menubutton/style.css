@@ -48,13 +48,15 @@ span {
 
 #button.hybrid i {
   display: inline-block;
-  height: 50%;
+  height: 55%;
+  width: 100%;
   line-height: 3.5rem;
 }
 
 #button.hybrid span {
   font-size: 0.8rem;
-  height: 50%;
+  height: 45%;
+  width: 100%;
   line-height: 1.5rem;
 }
 
