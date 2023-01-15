@@ -1,3 +1,6 @@
+import Polygon from 'ol/geom/Polygon';
+import {buffer, getWidth, getHeight} from 'ol/extent';
+
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
 import GeoEvents from '/models/events.js';
 
@@ -159,13 +162,26 @@ class SearchComponent extends GirafeHTMLElement {
     console.log(e.target.innerHTML);
     const div = super.getParentOfType('DIV', e.target);
     const resultGeometry = this.resultList[div.dataset.resultId];
-    if (resultGeometry.type == 'Point') {
+    if (resultGeometry.type === 'Point') {
       this.messageManager.sendMessage(GeoEvents.Map, {action: 'panToCoordinate', coordinate: resultGeometry.coordinates });
+      this.onFocusOut();
+    }
+    else if (resultGeometry.type === 'Polygon') {
+      this.zoomTo(resultGeometry.coordinates);
       this.onFocusOut();
     }
     else {
       alert('Result-Type not managed yet');
     }
+  }
+
+  zoomTo(coordinates) {
+    const extent = new Polygon(coordinates).getExtent();
+    // We create a buffer around the extent from 50% of the width/height
+    const bufferValue = parseInt(Math.max(getWidth(extent)*50/100, getHeight(extent)*50/100));
+    const bufferedExtent = buffer(extent, bufferValue);
+
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'zoomToExtent', extent: bufferedExtent });
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {
