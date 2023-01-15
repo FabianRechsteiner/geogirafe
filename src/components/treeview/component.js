@@ -97,12 +97,17 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  createLayer(elem, server) {
+  createLayer(elem, serverName) {
       let url = null;
+      let urlWfs = null;
       if (elem.type === 'WMS') {
         // WMS Case: there must be an OGC-Server
-        if (server) {
-          url = this.servers[server].url
+        if (serverName) {
+          const ogcServer = this.servers[serverName];
+          url = ogcServer.url;
+          if (ogcServer.wfsSupport === true) {
+            urlWfs = ogcServer.urlWfs;
+          }
         }
         else {
           console.log('No OGC server found for layer ' + elem.name);
@@ -112,8 +117,11 @@ class TreeViewComponent extends GirafeResizableElement {
         // WMTS Case: we take the URL of Capabilities
         url = elem.url;
       }
+      else {
+        console.log('Unmanaged layer type: ' + elem.type);
+      }
 
-      const layer = new Layer(elem, server, url);
+      const layer = new Layer(elem, serverName, url, urlWfs);
       this.layers.push(layer);
 
       // The id is the index of the layer in the layer list

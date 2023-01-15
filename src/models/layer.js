@@ -31,11 +31,12 @@ class Layer {
   isGroup = null;
   isLayer = null;
 
-  constructor(elem, server, url) {
+  constructor(elem, serverName, url, urlWfs) {
     this.name = elem.name;
     this.type = elem.type;
-    this.server = server;
+    this.server = serverName;
     this.url = url;
+    this.urlWfs = urlWfs;
     this.imageType = elem.imageType;
     this.minResolution = elem.minResolutionHint;
     this.maxResolution = elem.maxResolutionHint;

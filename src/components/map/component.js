@@ -252,7 +252,8 @@ class MapComponent extends GirafeHTMLElement {
     const selectionParams = [];
 
     for (let key in this.layersByServer) {
-      const queryLayers = this.layersByServer[key].queryableList.map(l => l.queryLayers.split(',')).flat(1);
+      const layer = this.layersByServer[key];
+      const queryLayers = layer.queryableList.map(l => l.queryLayers.split(',')).flat(1);
 
       // Build selectionbox using the default tolerance
       const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
@@ -263,7 +264,7 @@ class MapComponent extends GirafeHTMLElement {
 
       // TODO REG: Use the right WFS URL
       selectionParams.push({
-        wfsUrl: 'https://wfs.geo.bs.ch',
+        wfsUrl: layer.urlWfs,
         selectionBox: extent,
         srid: this.srid,
         featureTypes: queryLayers
@@ -278,11 +279,12 @@ class MapComponent extends GirafeHTMLElement {
     const selectionParams = [];
 
     for (let key in this.layersByServer) {
-      const queryLayers = this.layersByServer[key].queryableList.map(l => l.queryLayers.split(',')).flat(1);
+      const layer = this.layersByServer[key];
+      const queryLayers = layer.queryableList.map(l => l.queryLayers.split(',')).flat(1);
 
       // TODO REG: Use the right WFS URL
       selectionParams.push({
-        wfsUrl: 'https://wfs.geo.bs.ch',
+        wfsUrl: layer.urlWfs,
         selectionBox: extent,
         srid: this.srid,
         featureTypes: queryLayers
@@ -611,7 +613,7 @@ class MapComponent extends GirafeHTMLElement {
     else {
       // Create a new ol layer
       const layer = new ImageLayer();
-      const layerDef = { layer: layer, layerList: [layerInfos], queryableList: [] };
+      const layerDef = { layer: layer, url:layerInfos.url, urlWfs: layerInfos.urlWfs, layerList: [layerInfos], queryableList: [] };
       if (layerInfos.queryable) {
         layerDef.queryableList.push(layerInfos);
       }
