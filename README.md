@@ -5,6 +5,8 @@ This repository contains the web-viewer part of the project.
 
 **Please note that GeoGirafe is at its very beginning, can strongly evolve and is therefore not intended for the moment to be used by people other than developers or contributors.**
 
+A demo instance of GeoGirafe can be tested here: [https://geogirafe.paloo.fr](https://geogirafe.paloo.fr).
+
 ## Goal
 
 The goal of GeoGirafe is to allow the easy implementation of a stable, efficient and secure geoportal. GeoGirafe is also meant to be easily extensible, by allowing users to integrate their own plugins.
