@@ -7,7 +7,6 @@ import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
-import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import { Modify, Snap, DragBox } from 'ol/interaction';
@@ -18,7 +17,6 @@ import GeoEvents from '/models/events.js';
 import { getPointResolution, get as getProjection, transform } from 'ol/proj';
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
-import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
 import adjectives from 'adjectives';
 import {getVectorContext} from 'ol/render';
@@ -30,26 +28,26 @@ import OLCesium from 'olcs/OLCesium.js';
 import VectorTileLayer from 'ol/layer/VectorTile.js';
 import {applyStyle} from 'ol-mapbox-style';
 
+import SwipeManager from './swipemanager';
+import WmtsManager from './wmtsmanager';
+
 class MapComponent extends GirafeHTMLElement {
 
   map = null;
   map3d = null;
+  swiper = null;
+  swiperManager = null;
+  wmtsManager = null;
 
   srid = 'EPSG:3857'; // default projection
   get projection() {
     return getProjection(this.srid);
   }
 
-  // For Basemaps
-  currentBasemap = null;
-
   // For WMS Layers
   layersByServer = {};
   transparentLayers = {};
-
-  // For WMTS Layers
-  wmtsCapabilitiesByServer = {};
-  wmtsLayers = {};
+  swipedLayers = {};
 
   // For Redlining
   redliningFeaturesCollection = new Collection();
@@ -79,7 +77,6 @@ class MapComponent extends GirafeHTMLElement {
 
   constructor() {
     super('map');
-    this.registerEvents();
   }
 
   registerEvents() {
@@ -88,6 +85,8 @@ class MapComponent extends GirafeHTMLElement {
     window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
     window.addEventListener(GeoEvents.Redlining, (e) => this.onRedliningEvent(e.detail));
     window.addEventListener(GeoEvents.Print, (e) => this.onPrintEvent(e.detail));
+
+    this.swiper.addEventListener('input', () => this.map.render());
   }
 
   render() {
@@ -99,7 +98,7 @@ class MapComponent extends GirafeHTMLElement {
     const startzoom = Number(this.getAttribute('zoom'));
 
     // Default basemap : OSM
-    this.currentBasemap = new TileLayer({
+    const basemapLayer = new TileLayer({
       source: new OSM()
     });
 
@@ -107,7 +106,7 @@ class MapComponent extends GirafeHTMLElement {
     let target = this.shadow.querySelector('#ol-map-container');
     this.map = new Map({
       target: target,
-      layers: [this.currentBasemap],
+      layers: [basemapLayer],
       view: new View({
         center: startcenter,
         zoom: startzoom,
@@ -115,6 +114,11 @@ class MapComponent extends GirafeHTMLElement {
         extent: defaultextent
       }),
     });
+
+    // Initialize managers
+    this.wmtsManager = new WmtsManager(this.map, this.srid);
+    this.swiper = this.shadow.getElementById('swiper');
+    this.swipeManager = new SwipeManager(this.map, this.swiper, this.wmtsManager);
 
     // Create vector source for drawing
     this.redliningSource = new VectorSource({
@@ -365,6 +369,7 @@ class MapComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadTemplate().then(() => {
       this.render();
+      this.registerEvents();
       this.listenOpenLayersEvents();
       super.initialized();
     });
@@ -462,6 +467,18 @@ class MapComponent extends GirafeHTMLElement {
     }
     else if (details.action === 'globeToggled') {
       this.onGlobeToggled();
+    }
+    else if (details.action === 'activateSwipe') {
+      this.onActivateSwipe(details.layer, details.side);
+    }
+  }
+
+  onActivateSwipe(layerInfos, side) {
+    if (layerInfos.isWms) {
+      this.activateSwipeForWms(layerInfos, side);
+    }
+    else if (layerInfos.isWmts) {
+      this.swipeManager.activateSwipeForWmts(layerInfos.name, side, layerInfos.opacity);
     }
   }
 
@@ -566,7 +583,7 @@ class MapComponent extends GirafeHTMLElement {
         this.onAddWmsLayer(l);
       }
       else if (l.isWmts) {
-        this.onAddWmtsLayer(l);
+        this.wmtsManager.addLayer(l.url, l.name, l.opacity);
       }
     });
   }
@@ -577,7 +594,9 @@ class MapComponent extends GirafeHTMLElement {
         this.onRemoveWmsLayer(l);
       }
       else if (l.isWmts) {
-        this.onRemoveWmtsLayer(l);
+        if (this.wmtsManager.layerExists(l.name)) {
+          this.wmtsManager.removeLayer(l.name);
+        }
       }
     });
   }
@@ -595,6 +614,10 @@ class MapComponent extends GirafeHTMLElement {
         // Perhaps we will have to split the non-transparent layers in 2 different lists ?
         // Do we really want this ? It sound a bit too much... and can be complicated to implement.
       }
+      // TODO REG : Manager swiped layers here
+      /*else if (layerInfos.name in this.swipedLayers) {
+        throw 'This case is not supported yet';
+      }*/
     });
   }
 
@@ -629,23 +652,6 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onAddWmtsLayer(layerInfos) {
-    this.getWmtsCapabilities(layerInfos.url, (capabilities) => {
-      const options = optionsFromCapabilities(capabilities, {
-        layer: layerInfos.name,
-        matrixSet: this.srid,
-      });
-
-      const layer = new TileLayer({
-        opacity: layerInfos.opacity,
-        source: new WMTS(options),
-      });
-
-      this.wmtsLayers[layerInfos.name] = layer;
-      this.map.addLayer(layer);
-    });
-  }
-
   createImageWMSSource(url, layerList, imageType) {
     const orderedLayerNames = layerList.sort((l1, l2) => { return l2.order - l1.order }).map(l => l.layers);
     const source = new ImageWMS({
@@ -662,6 +668,11 @@ class MapComponent extends GirafeHTMLElement {
     if (layerInfos.name in this.transparentLayers) {
       const layerDef = this.transparentLayers[layerInfos.name];
       delete this.transparentLayers[layerInfos.name];
+      this.map.removeLayer(layerDef);
+    }
+    else if (layerInfos.name in this.swipedLayers) {
+      const layerDef = this.swipedLayers[layerInfos.name];
+      delete this.swipedLayers[layerInfos.name];
       this.map.removeLayer(layerDef);
     }
     else if (layerInfos.serverUniqueQueryId in this.layersByServer) {
@@ -688,31 +699,14 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onRemoveWmtsLayer(layerInfos) {
-    if (layerInfos.name in this.wmtsLayers) {
-      const layerDef = this.wmtsLayers[layerInfos.name];
-      delete this.wmtsLayers[layerInfos.name];
-      this.map.removeLayer(layerDef);
-    }
-  }
-
   onChangeOpacity(layerInfos) {
     if (layerInfos.isWms) {
       this.changeWmsOpacity(layerInfos);
     }
     else if (layerInfos.isWmts) {
-      this.changeWmtsOpacity(layerInfos);
-    }
-  }
-
-  changeWmtsOpacity(layerInfos) {
-    if (layerInfos.name in this.wmtsLayers) {
-      const layerDef = this.wmtsLayers[layerInfos.name];
-      layerDef.setOpacity(layerInfos.opacity);
-    }
-    else {
-      // Nothing to do.
-      console.log('Nothing to do here');
+      if (this.wmtsManager.layerExists(layerInfos.name)) {
+        this.wmtsManager.changeOpacity(layerInfos.name, layerInfos.opacity);
+      }
     }
   }
 
@@ -759,59 +753,27 @@ class MapComponent extends GirafeHTMLElement {
 
   onChangeBasemap(basemap) {
     if (basemap.type === 'WMTS') {
-      // Create WMTS layer
-      this.getWmtsCapabilities(basemap.url, (capabilities) => {
-        const options = optionsFromCapabilities(capabilities, {
-          layer: basemap.name,
-          matrixSet: this.srid,
-        });
-
-        this.map.removeLayer(this.currentBasemap);
-        this.currentBasemap = new TileLayer({
-          opacity: 1,
-          source: new WMTS(options),
-        });
-        this.map.getLayers().insertAt(0, this.currentBasemap);
-      });
+      this.wmtsManager.addBasemapLayer(basemap.url, basemap.name);
     }
     else if (basemap.type === 'OSM') {
       // Create OSM layer
-      this.map.removeLayer(this.currentBasemap);
-      this.currentBasemap = new TileLayer({
+      const currentBasemap = this.map.getLayers().getArray()[0];
+      this.map.removeLayer(currentBasemap);
+      const newBasemap = new TileLayer({
         source: new OSM()
       });
-      this.map.getLayers().insertAt(0, this.currentBasemap);
+      this.map.getLayers().insertAt(0, newBasemap);
     }
     else if (basemap.type === 'VectorTiles') {
       // Create VectorTiles Layer
-      this.map.removeLayer(this.currentBasemap);
-      this.currentBasemap = new VectorTileLayer({declutter: true});
-      applyStyle(this.currentBasemap, basemap.style);
-      this.map.getLayers().insertAt(0, this.currentBasemap);
+      const currentBasemap = this.map.getLayers().getArray()[0];
+      this.map.removeLayer(currentBasemap);
+      const newBasemap = new VectorTileLayer({declutter: true});
+      applyStyle(newBasemap, basemap.style);
+      this.map.getLayers().insertAt(0, newBasemap);
     }
     else {
       throw 'Unknown basemap type: ' + basemap.type;
-    }
-  }
-
-  getWmtsCapabilities(url, callback) {
-    if (url in this.wmtsCapabilitiesByServer) {
-      // Capabilities were already loaded
-      const capabilities = this.wmtsCapabilitiesByServer[url];
-      callback(capabilities);
-    }
-    else {
-      // Capabilities were not loaded yet.
-      fetch(url)
-        .then(response => response.text())
-        .then(capabilities => {
-          // Create new WMTS Layer from Capabilities
-          const parser = new WMTSCapabilities();
-          const result = parser.read(capabilities);
-          this.wmtsCapabilitiesByServer[url] = result;
-
-          callback(result);
-        });
     }
   }
 
@@ -958,6 +920,39 @@ class MapComponent extends GirafeHTMLElement {
     return Math.floor(Math.random() * (max - min) + min);
   }
 
+  // TODO REG : move to swipemanager when the wmsmanager has been created
+  activateSwipeForWms(layerInfos, side) {
+    if (layerInfos.name in this.transparentLayers) {
+      // The layer is already configured independently of other layers
+      // => We just activate the swiper
+      const layerDef = this.transparentLayers[layerInfos.name];
+      this.swipeManager.activateSwipeForLayer(layerInfos.name, layerDef, side);
+    }
+    else if (layerInfos.name in this.swipedLayers) {
+      // The layer is already swiped.
+      // => We just reactivate the swiper, the old configuration will be overrriden
+      const layerDef = this.swipedLayers[layerInfos.name];
+      this.swipeManager.activateSwipeForLayer(layerInfos.name, layerDef, side);
+    }
+    else if (layerInfos.serverUniqueQueryId in this.layersByServer) {
+      // First, we remove the layer from the default layer
+      this.onRemoveWmsLayer(layerInfos);
+      
+      // Then, we create a new layer
+      const source = this.createImageWMSSource(layerInfos.url, [layerInfos], layerInfos.imageType);
+      const layer = new ImageLayer({
+        source: source,
+        opacity: layerInfos.opacity
+      });
+      this.swipedLayers[layerInfos.name] = layer;
+      this.swipeManager.activateSwipeForLayer(layerInfos.name, layer, side);
+      this.map.addLayer(layer);
+    }
+    else {
+      // Nothing to do
+      console.log('Nothing to do!');
+    }
+  }
 }
 
 customElements.define('girafe-map', MapComponent);

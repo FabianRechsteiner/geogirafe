@@ -8,3 +8,11 @@
     top: 1rem;
     left: unset;
 }
+
+#swiper {
+    display: none;
+    width: 100%;
+    position:absolute;
+    bottom: 2rem;
+    height: 0.2rem;
+}
