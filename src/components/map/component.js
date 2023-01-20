@@ -22,14 +22,14 @@ import adjectives from 'adjectives';
 import {getVectorContext} from 'ol/render';
 import {easeOut} from 'ol/easing';
 import {unByKey} from 'ol/Observable';
-import MaskLayer from './maskLayer';
+import MaskLayer from './tools/maskLayer';
 import OLCesium from 'olcs/OLCesium.js';
 
 import VectorTileLayer from 'ol/layer/VectorTile.js';
 import {applyStyle} from 'ol-mapbox-style';
 
-import SwipeManager from './swipemanager';
-import WmtsManager from './wmtsmanager';
+import SwipeManager from './tools/swipemanager';
+import WmtsManager from './tools/wmtsmanager';
 
 class MapComponent extends GirafeHTMLElement {
 

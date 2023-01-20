@@ -4,12 +4,14 @@ class SwipeManager {
   map = null;
   swiper = null;
   swiperEventListeners = {};
+  swiperMaxVal = null;
 
   wmtsManager = null;
 
   constructor(map, swiper, wmtsManager) {
     this.map = map;
     this.swiper = swiper;
+    this.swiperMaxVal = parseInt(swiper.getAttribute('max'));
     this.wmtsManager = wmtsManager;
   }
 
@@ -67,7 +69,7 @@ class SwipeManager {
   #prerenderSwipe(event, side) {
     const ctx = event.context;
     const mapSize = this.map.getSize();
-    const width = mapSize[0] * (this.swiper.value / 100)+10;
+    const width = mapSize[0] * (this.swiper.value / this.swiperMaxVal);
 
     let tl = null;
     let tr = null;
