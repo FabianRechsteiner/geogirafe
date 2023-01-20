@@ -4,6 +4,7 @@ import TileLayer from 'ol/layer/Tile';
 
 class WmtsManager {
   map = null;
+  srid = null;
 
   wmtsCapabilitiesByServer = {};
   wmtsLayers = {};
@@ -75,7 +76,7 @@ class WmtsManager {
       olayer.setOpacity(opacity);
     }
     else {
-      throw 'Cannot changeopacity for this layer: it does not exist';
+      throw 'Cannot change opacity for this layer: it does not exist';
     }
   }
 

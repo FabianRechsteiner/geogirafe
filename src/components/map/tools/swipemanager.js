@@ -7,12 +7,14 @@ class SwipeManager {
   swiperMaxVal = null;
 
   wmtsManager = null;
+  wmsManager = null;
 
-  constructor(map, swiper, wmtsManager) {
+  constructor(map, swiper, wmtsManager, wmsManager) {
     this.map = map;
     this.swiper = swiper;
     this.swiperMaxVal = parseInt(swiper.getAttribute('max'));
     this.wmtsManager = wmtsManager;
+    this.wmsManager = wmsManager;
   }
 
   activateSwipeForWmts(layername, side) {
@@ -22,6 +24,18 @@ class SwipeManager {
     }
     else {
       throw 'Cannot swipe this layer: it does not exist.';
+    }
+  }
+
+  activateSwipeForWms(layerInfos, side) {
+    if (this.wmsManager.layerExists(layerInfos)) {
+      this.wmsManager.makeLayerIndependant(layerInfos);
+      const olayer = this.wmsManager.getLayer(layerInfos);
+      this.activateSwipeForLayer(layerInfos.name, olayer, side);
+    }
+    else {
+      // Nothing to do
+      throw 'Layer does not exists. Cannot activate swiper.';
     }
   }
   

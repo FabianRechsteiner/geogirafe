@@ -15,7 +15,6 @@ import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
 import View from 'ol/View';
 import GeoEvents from '/models/events.js';
 import { getPointResolution, get as getProjection, transform } from 'ol/proj';
-import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
 import adjectives from 'adjectives';
@@ -29,6 +28,7 @@ import VectorTileLayer from 'ol/layer/VectorTile.js';
 import {applyStyle} from 'ol-mapbox-style';
 
 import SwipeManager from './tools/swipemanager';
+import WmsManager from './tools/wmsmanager';
 import WmtsManager from './tools/wmtsmanager';
 
 class MapComponent extends GirafeHTMLElement {
@@ -38,16 +38,12 @@ class MapComponent extends GirafeHTMLElement {
   swiper = null;
   swiperManager = null;
   wmtsManager = null;
+  wmsManager = null;
 
   srid = 'EPSG:3857'; // default projection
   get projection() {
     return getProjection(this.srid);
   }
-
-  // For WMS Layers
-  layersByServer = {};
-  transparentLayers = {};
-  swipedLayers = {};
 
   // For Redlining
   redliningFeaturesCollection = new Collection();
@@ -116,9 +112,10 @@ class MapComponent extends GirafeHTMLElement {
     });
 
     // Initialize managers
+    this.wmsManager = new WmsManager(this.map, this.srid);
     this.wmtsManager = new WmtsManager(this.map, this.srid);
     this.swiper = this.shadow.getElementById('swiper');
-    this.swipeManager = new SwipeManager(this.map, this.swiper, this.wmtsManager);
+    this.swipeManager = new SwipeManager(this.map, this.swiper, this.wmtsManager, this.wmsManager);
 
     // Create vector source for drawing
     this.redliningSource = new VectorSource({
@@ -397,6 +394,7 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
+  // TODO REG : move this function to wmsmanager
   onLegendUrlRequested(layer) {
     const wmsSource = new ImageWMS({
       url: layer.url,
@@ -475,7 +473,7 @@ class MapComponent extends GirafeHTMLElement {
 
   onActivateSwipe(layerInfos, side) {
     if (layerInfos.isWms) {
-      this.activateSwipeForWms(layerInfos, side);
+      this.swipeManager.activateSwipeForWms(layerInfos, side);
     }
     else if (layerInfos.isWmts) {
       this.swipeManager.activateSwipeForWmts(layerInfos.name, side, layerInfos.opacity);
@@ -580,7 +578,7 @@ class MapComponent extends GirafeHTMLElement {
   onAddLayers(layerInfos) {
     layerInfos.forEach((l) => {
       if (l.isWms) {
-        this.onAddWmsLayer(l);
+        this.wmsManager.addLayer(l);
       }
       else if (l.isWmts) {
         this.wmtsManager.addLayer(l.url, l.name, l.opacity);
@@ -591,7 +589,7 @@ class MapComponent extends GirafeHTMLElement {
   onRemoveLayers(layerInfos) {
     layerInfos.forEach((l) => {
       if (l.isWms) {
-        this.onRemoveWmsLayer(l);
+        this.wmsManager.removeLayer(l);
       }
       else if (l.isWmts) {
         if (this.wmtsManager.layerExists(l.name)) {
@@ -602,152 +600,35 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onChangeOrder(layers) {
+    // TODO REG : Rewrite this while taking avery layer type in account.
+    /*this.wmsManager.changeOrder(layers);
     layers.forEach(layerInfos => {
       if (layerInfos.serverUniqueQueryId in this.layersByServer) {
         const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
         const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
         layerDef.layer.setSource(source);
       }
-      else if (layerInfos.name in this.transparentLayers) {
+      else if (layerInfos.name in this.independantLayers) {
         // TODO REG: Here we have to change to order of the layers around the transparent layer.
         // This case can be a bit complicated, because the transparent layer can be between non transparent layers
         // Perhaps we will have to split the non-transparent layers in 2 different lists ?
         // Do we really want this ? It sound a bit too much... and can be complicated to implement.
       }
       // TODO REG : Manager swiped layers here
-      /*else if (layerInfos.name in this.swipedLayers) {
+      else if (layerInfos.name in this.swipedLayers) {
         throw 'This case is not supported yet';
-      }*/
-    });
-  }
-
-  onAddWmsLayer(layerInfos) {
-    if (layerInfos.serverUniqueQueryId in this.layersByServer) {
-      // Get existing ol layer for this server
-      // and add a new wms layer in the source
-      const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-      layerDef.layerList.push(layerInfos);
-      if (layerInfos.queryable) {
-        layerDef.queryableList.push(layerInfos);
       }
-      const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
-      layerDef.layer.setSource(source);
-    }
-    else {
-      // Create a new ol layer
-      const layer = new ImageLayer();
-      const layerDef = { layer: layer, url:layerInfos.url, urlWfs: layerInfos.urlWfs, layerList: [layerInfos], queryableList: [] };
-      if (layerInfos.queryable) {
-        layerDef.queryableList.push(layerInfos);
-      }
-      this.layersByServer[layerInfos.serverUniqueQueryId] = layerDef;
-      const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
-      layer.setSource(source);
-      this.map.addLayer(layer);
-    }
-
-    // If the layer is transparent, we make it transparent
-    if (layerInfos.isTransparent) {
-      this.onChangeOpacity(layerInfos);
-    }
-  }
-
-  createImageWMSSource(url, layerList, imageType) {
-    const orderedLayerNames = layerList.sort((l1, l2) => { return l2.order - l1.order }).map(l => l.layers);
-    const source = new ImageWMS({
-      url: url,
-      params: {
-        'LAYERS': orderedLayerNames,
-        'FORMAT': imageType
-      }
-    });
-    return source;
-  }
-
-  onRemoveWmsLayer(layerInfos) {
-    if (layerInfos.name in this.transparentLayers) {
-      const layerDef = this.transparentLayers[layerInfos.name];
-      delete this.transparentLayers[layerInfos.name];
-      this.map.removeLayer(layerDef);
-    }
-    else if (layerInfos.name in this.swipedLayers) {
-      const layerDef = this.swipedLayers[layerInfos.name];
-      delete this.swipedLayers[layerInfos.name];
-      this.map.removeLayer(layerDef);
-    }
-    else if (layerInfos.serverUniqueQueryId in this.layersByServer) {
-      // Get existing ol layer for this server
-      // and add a new wms layer in the source
-      const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-      layerDef.layerList = layerDef.layerList.filter(item => item.id !== layerInfos.id);
-
-      if (layerDef.layerList.length > 0) {
-        // There are still layers in the list.
-        // => We update the layer source
-        const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
-        layerDef.layer.setSource(source);
-      }
-      else {
-        // No more layer here.
-        // => We simply remove the whole layer
-        delete this.layersByServer[layerInfos.serverUniqueQueryId];
-        this.map.removeLayer(layerDef.layer);
-      }
-    }
-    else {
-      console.log('Nothing to remove !');
-    }
+    });*/
   }
 
   onChangeOpacity(layerInfos) {
     if (layerInfos.isWms) {
-      this.changeWmsOpacity(layerInfos);
+      this.wmsManager.changeOpacity(layerInfos);
     }
     else if (layerInfos.isWmts) {
       if (this.wmtsManager.layerExists(layerInfos.name)) {
         this.wmtsManager.changeOpacity(layerInfos.name, layerInfos.opacity);
       }
-    }
-  }
-
-  changeWmsOpacity(layerInfos) {
-    if (!layerInfos.isTransparent) {
-      // Back to normal
-      // The opacity was set to 1 again.
-      if (layerInfos.name in this.transparentLayers) {
-        const layerDef = this.transparentLayers[layerInfos.name];
-        // We delete the layer from the transparent layers
-        delete this.transparentLayers[layerInfos.name];
-        this.map.removeLayer(layerDef);
-        // And add it to the normal layer again
-        this.onAddWmsLayer(layerInfos);
-      }
-      else {
-        // Nothing to do.
-        console.log('Nothing to do here');
-      }
-    }
-    else if (layerInfos.name in this.transparentLayers) {
-      // The layer has already a configured opacity
-      // => We just change the opacity
-      const layerDef = this.transparentLayers[layerInfos.name];
-      layerDef.setOpacity(layerInfos.opacity);
-    }
-    else if (layerInfos.serverUniqueQueryId in this.layersByServer) {
-      // First, we remove the layer from the default layer
-      this.onRemoveWmsLayer(layerInfos);
-      // Then, we create a new layer
-      const source = this.createImageWMSSource(layerInfos.url, [layerInfos], layerInfos.imageType);
-      const layer = new ImageLayer({
-        source: source,
-        opacity: layerInfos.opacity
-      });
-      this.transparentLayers[layerInfos.name] = layer;
-      this.map.addLayer(layer);
-    }
-    else {
-      // Nothing to do
-      console.log('Nothing to do!');
     }
   }
 
@@ -918,40 +799,6 @@ class MapComponent extends GirafeHTMLElement {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min);
-  }
-
-  // TODO REG : move to swipemanager when the wmsmanager has been created
-  activateSwipeForWms(layerInfos, side) {
-    if (layerInfos.name in this.transparentLayers) {
-      // The layer is already configured independently of other layers
-      // => We just activate the swiper
-      const layerDef = this.transparentLayers[layerInfos.name];
-      this.swipeManager.activateSwipeForLayer(layerInfos.name, layerDef, side);
-    }
-    else if (layerInfos.name in this.swipedLayers) {
-      // The layer is already swiped.
-      // => We just reactivate the swiper, the old configuration will be overrriden
-      const layerDef = this.swipedLayers[layerInfos.name];
-      this.swipeManager.activateSwipeForLayer(layerInfos.name, layerDef, side);
-    }
-    else if (layerInfos.serverUniqueQueryId in this.layersByServer) {
-      // First, we remove the layer from the default layer
-      this.onRemoveWmsLayer(layerInfos);
-      
-      // Then, we create a new layer
-      const source = this.createImageWMSSource(layerInfos.url, [layerInfos], layerInfos.imageType);
-      const layer = new ImageLayer({
-        source: source,
-        opacity: layerInfos.opacity
-      });
-      this.swipedLayers[layerInfos.name] = layer;
-      this.swipeManager.activateSwipeForLayer(layerInfos.name, layer, side);
-      this.map.addLayer(layer);
-    }
-    else {
-      // Nothing to do
-      console.log('Nothing to do!');
-    }
   }
 }
 
