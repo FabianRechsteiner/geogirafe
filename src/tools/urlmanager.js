@@ -1,6 +1,6 @@
-import GeoEvents from '/models/events.js';
-import State from '/models/state.js';
-import MessageManager from '/tools/messagemanager';
+import GeoEvents from '../models/events.js';
+import State from '../models/state.js';
+import MessageManager from '../tools/messagemanager';
 
 class UrlManager {
 

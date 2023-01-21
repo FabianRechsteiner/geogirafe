@@ -1,8 +1,8 @@
 import tippy from 'tippy.js';
-import Layer from '/models/layer';
-import GeoEvents from '/models/events';
-import GirafeResizableElement from '/base/GirafeResizableElement'
-import I18nManager from '/tools/i18nmanager';
+import Layer from '../../models/layer';
+import GeoEvents from '../../models/events';
+import GirafeResizableElement from '../../base/GirafeResizableElement'
+import I18nManager from '../../tools/i18nmanager';
 
 class TreeViewComponent extends GirafeResizableElement {
 

@@ -1,8 +1,9 @@
-import GeoEvents from '/models/events.js';
-import GirafeDraggableElement from '/base/GirafeDraggableElement';
 import { WFS } from 'ol/format';
 import GML3 from 'ol/format/GML3';
-import I18nManager from '/tools/i18nmanager';
+
+import GeoEvents from '../../models/events.js';
+import GirafeDraggableElement from '../../base/GirafeDraggableElement';
+import I18nManager from '../../tools/i18nmanager';
 
 class SelectionWindowComponent extends GirafeDraggableElement {
 

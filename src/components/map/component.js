@@ -1,32 +1,36 @@
 import Map from 'ol/Map';
+
 import OSM from 'ol/source/OSM';
-import Collection from 'ol/Collection';
 import VectorSource from 'ol/source/Vector';
+import ImageWMS from 'ol/source/ImageWMS';
+
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
+
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-import { Modify, Snap, DragBox } from 'ol/interaction';
+import VectorTileLayer from 'ol/layer/VectorTile.js';
+
+import Collection from 'ol/Collection';
 import { platformModifierKeyOnly } from 'ol/events/condition';
+import { Modify, Snap, DragBox } from 'ol/interaction';
 import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
 import View from 'ol/View';
-import GeoEvents from '/models/events.js';
 import { getPointResolution, get as getProjection, transform } from 'ol/proj';
-import ImageWMS from 'ol/source/ImageWMS';
-import GirafeHTMLElement from '/base/GirafeHTMLElement';
 import adjectives from 'adjectives';
-import {getVectorContext} from 'ol/render';
-import {easeOut} from 'ol/easing';
-import {unByKey} from 'ol/Observable';
-import MaskLayer from './tools/maskLayer';
+import { getVectorContext } from 'ol/render';
+import { easeOut } from 'ol/easing';
+import { unByKey } from 'ol/Observable';
 import OLCesium from 'olcs/OLCesium.js';
+import { applyStyle } from 'ol-mapbox-style';
 
-import VectorTileLayer from 'ol/layer/VectorTile.js';
-import {applyStyle} from 'ol-mapbox-style';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import GeoEvents from '../../models/events.js';
 
+import MaskLayer from './tools/maskLayer';
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
 import WmtsManager from './tools/wmtsmanager';
@@ -69,7 +73,7 @@ class MapComponent extends GirafeHTMLElement {
   dragbox = null;
 
   // For print
-  maskLayer = new MaskLayer({name: 'PrintMask'});
+  maskLayer = new MaskLayer({ name: 'PrintMask' });
 
   constructor() {
     super('map');
@@ -136,7 +140,7 @@ class MapComponent extends GirafeHTMLElement {
       source: selectionSource,
       // TODO REG: Change default selection color
       style: new Style({
-        stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth*2 }),
+        stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth * 2 }),
         fill: new Fill({ color: this.defaultFillColor }),
         image: new Circle({
           radius: 7,
@@ -176,7 +180,7 @@ class MapComponent extends GirafeHTMLElement {
     this.map.addInteraction(this.dragbox);
     this.dragbox.on('boxend', (e) => this.onDragSelection(e));
 
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'projectionChanged', projection: this.srid});
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'projectionChanged', projection: this.srid });
 
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {
@@ -231,11 +235,11 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onLoadStart(e) {
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'renderStarted'});
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'renderStarted' });
   }
 
   onLoadEnd(e) {
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'renderEnded'});
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'renderEnded' });
   }
 
   onMoveEnd(e) {
@@ -306,7 +310,7 @@ class MapComponent extends GirafeHTMLElement {
       unByKey(this.focusAnimation);
     }
     this.focusAnimation = this.selectionLayer.on('postrender', (e) => animate(this, e));
-  
+
     function animate(_this, e) {
       const frameState = e.frameState;
       const elapsed = frameState.time - start;
@@ -322,7 +326,7 @@ class MapComponent extends GirafeHTMLElement {
       // For lines
       const elapsed2 = frameState.time - startStart;
       const offset = Math.floor(elapsed2 / 100) % 48;
-  
+
       const style = new Style({
         image: new Circle({
           radius: radius,
@@ -338,7 +342,7 @@ class MapComponent extends GirafeHTMLElement {
           lineDashOffset: offset
         })
       });
-  
+
       vectorContext.setStyle(style);
       vectorContext.drawGeometry(flashGeom);
       // tell OpenLayers to continue postrender animation
@@ -483,18 +487,18 @@ class MapComponent extends GirafeHTMLElement {
   onGlobeToggled() {
     if (this.map3d === null || !this.map3d.getEnabled()) {
       // Globe is not active
-      this.map3d = new OLCesium({map: this.map});
+      this.map3d = new OLCesium({ map: this.map });
       const scene = this.map3d.getCesiumScene();
 
       // Add terrain
       const terrainProvider = new Cesium.CesiumTerrainProvider({
-        url : 'https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/'
+        url: 'https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/'
       });
       scene.terrainProvider = terrainProvider;
 
       // Add 3D-Tiles layer
       const tileset = new Cesium.Cesium3DTileset({
-        url : 'https://3d.geo.dev.fgi.cloud.bs.ch/cesium/tiles/gebaeude-basel-stadt-25/tileset.json'
+        url: 'https://3d.geo.dev.fgi.cloud.bs.ch/cesium/tiles/gebaeude-basel-stadt-25/tileset.json'
       });
       scene.primitives.add(tileset);
 
@@ -511,7 +515,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onFeaturesSelected(features) {
-    for (let i=0; i<features.length; ++i) {
+    for (let i = 0; i < features.length; ++i) {
       this.selectedFeaturesCollection.push(features[i]);
     }
   }
@@ -572,7 +576,7 @@ class MapComponent extends GirafeHTMLElement {
     });
     this.map.setView(newView);
 
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'projectionChanged', projection: this.srid});
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'projectionChanged', projection: this.srid });
   }
 
   onAddLayers(layerInfos) {
@@ -649,7 +653,7 @@ class MapComponent extends GirafeHTMLElement {
       // Create VectorTiles Layer
       const currentBasemap = this.map.getLayers().getArray()[0];
       this.map.removeLayer(currentBasemap);
-      const newBasemap = new VectorTileLayer({declutter: true});
+      const newBasemap = new VectorTileLayer({ declutter: true });
       applyStyle(newBasemap, basemap.style);
       this.map.getLayers().insertAt(0, newBasemap);
     }

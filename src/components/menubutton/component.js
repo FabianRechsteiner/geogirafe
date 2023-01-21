@@ -1,4 +1,4 @@
-import GirafeHTMLElement from '/base/GirafeHTMLElement';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class MenuButtonComponent extends GirafeHTMLElement {
 
