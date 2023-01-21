@@ -3,7 +3,11 @@
   "description": "Simple Geo Viewer",
   "author": "Guillaume REMY",
   "version": "0.1",
+  "type": "module",
   "devDependencies": {
+    "jest": "^29.3.1",
+    "jest-environment-jsdom": "^29.3.1",
+    "jsdom": "^21.0.0",
     "vite": "^3.1.4"
   },
   "dependencies": {
@@ -20,6 +24,7 @@
     "serve": "bash -C './buildtools/prebuild.sh' && vite serve",
     "build": "bash -C './buildtools/prebuild.sh' && vite build",
     "serve-win": "buildtools\\prebuild.cmd && vite serve",
-    "build-win": "buildtools\\prebuild.cmd && vite build"
+    "build-win": "buildtools\\prebuild.cmd && vite build",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   }
 }

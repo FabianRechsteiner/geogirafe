@@ -1,5 +1,5 @@
-import GeoEvents from '/models/events.js';
-import MessageManager from '/tools/messagemanager';
+import GeoEvents from '../models/events.js';
+import MessageManager from './messagemanager';
 
 class I18nManager {
 

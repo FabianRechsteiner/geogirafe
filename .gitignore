@@ -1,5 +1,6 @@
 node_modules
 public
+coverage
 src/static/components
 src/static/lib/openlayers
 src/static/lib/vanilla-picker

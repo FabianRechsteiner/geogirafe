@@ -1,7 +1,7 @@
 import tippy from 'tippy.js';
-import GeoEvents from '/models/events';
-import I18nManager from '/tools/i18nmanager';
-import MessageManager from '/tools/messagemanager';
+import GeoEvents from '../models/events';
+import I18nManager from '../tools/i18nmanager';
+import MessageManager from '../tools/messagemanager';
 
 class GirafeHTMLElement extends HTMLElement {
 
