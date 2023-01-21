@@ -1,11 +1,10 @@
 stages:
-- unit
-- sast
+- test
 - pages
 
 # Execute Unit-Tests
 Unit Testing:
-  stage: unit
+  stage: test
   image: node:18-slim
   script: 
     # build
@@ -13,10 +12,10 @@ Unit Testing:
     - npm run-script test
 
 # Static Application Security Testing
-SAST:
-  stage: sast
 include:
 - template: Security/SAST.gitlab-ci.yml
+#SAST:
+#  stage: test
 
 # Publish Demo-Application to GitLab-Pages
 pages:
