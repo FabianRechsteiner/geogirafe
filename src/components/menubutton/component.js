@@ -1,4 +1,3 @@
-import GeoEvents from '/models/events.js';
 import GirafeHTMLElement from '/base/GirafeHTMLElement';
 
 class MenuButtonComponent extends GirafeHTMLElement {
