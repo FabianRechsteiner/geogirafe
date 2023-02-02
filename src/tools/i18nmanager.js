@@ -1,5 +1,6 @@
 import GeoEvents from '../models/events.js';
 import MessageManager from './messagemanager';
+import GeoConfig from '../config';
 
 class I18nManager {
 
@@ -48,10 +49,10 @@ class I18nManager {
     }
 
     // Load translations
-    const url = '/Mock/' + this.currentLanguage + '.json';
+    const url = GeoConfig.languages[this.currentLanguage];
     const response = await fetch(url);
     const content = await response.json();
-    this.translations[this.currentLanguage] = content;
+    this.translations[this.currentLanguage] = content[this.currentLanguage];
   }
 
   registerEvents() {

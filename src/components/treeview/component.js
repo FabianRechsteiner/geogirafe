@@ -3,6 +3,7 @@ import Layer from '../../models/layer';
 import GeoEvents from '../../models/events';
 import GirafeResizableElement from '../../base/GirafeResizableElement'
 import I18nManager from '../../tools/i18nmanager';
+import GeoConfig from '../../config';
 
 class TreeViewComponent extends GirafeResizableElement {
 
@@ -16,7 +17,7 @@ class TreeViewComponent extends GirafeResizableElement {
 
   constructor() {
     super('treeview');
-    this.themesUrl = this.getAttribute('themes');
+    this.themesUrl = GeoConfig.themes.url;
   }
 
   registerEvents() {

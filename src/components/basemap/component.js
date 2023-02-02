@@ -1,5 +1,7 @@
 import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import GeoConfig from '../../config';
+
 
 class BasemapComponent extends GirafeHTMLElement {
 
@@ -10,7 +12,7 @@ class BasemapComponent extends GirafeHTMLElement {
   
   constructor() {
     super('basemap');
-    this.themesUrl = this.getAttribute('themes');
+    this.themesUrl = GeoConfig.themes.url;
   }
 
   render() {

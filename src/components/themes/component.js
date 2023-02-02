@@ -1,5 +1,6 @@
 import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import GeoConfig from '../../config';
 
 class ThemeComponent extends GirafeHTMLElement {
 
@@ -14,7 +15,7 @@ class ThemeComponent extends GirafeHTMLElement {
   
   constructor() {
     super('themes');
-    this.themesUrl = this.getAttribute('themes');
+    this.themesUrl = GeoConfig.themes.url;
   }
 
   render() {

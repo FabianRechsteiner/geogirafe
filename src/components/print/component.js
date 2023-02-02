@@ -1,6 +1,7 @@
 import GeoEvents from '../../models/events';
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import I18nManager from '../../tools/i18nmanager';
+import GeoConfig from '../../config';
 
 class PrintComponent extends GirafeResizableElement {
 
@@ -37,8 +38,8 @@ class PrintComponent extends GirafeResizableElement {
   
   constructor() {
     super('print');
-    this.printUrl = this.getAttribute('print-url');
-    this.defaultLayout = this.getAttribute('default-layout');
+    this.printUrl = GeoConfig.print.url;
+    this.defaultLayout = GeoConfig.print.defaultLayout;
     if (!this.printUrl.endsWith('/')) {
       this.printUrl += '/';
     }

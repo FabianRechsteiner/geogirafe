@@ -34,6 +34,7 @@ import MaskLayer from './tools/maskLayer';
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
 import WmtsManager from './tools/wmtsmanager';
+import GeoConfig from '../../config';
 
 class MapComponent extends GirafeHTMLElement {
 
@@ -44,7 +45,7 @@ class MapComponent extends GirafeHTMLElement {
   wmtsManager = null;
   wmsManager = null;
 
-  srid = 'EPSG:3857'; // default projection
+  srid = null;
   get projection() {
     return getProjection(this.srid);
   }
@@ -92,10 +93,10 @@ class MapComponent extends GirafeHTMLElement {
   render() {
     super.render();
 
-    this.srid = this.getAttribute('srid');
-    const defaultextent = this.getAttribute('max-extent').split(',').map(Number);
-    const startcenter = this.getAttribute('center').split(',').map(Number);
-    const startzoom = Number(this.getAttribute('zoom'));
+    this.srid = GeoConfig.map.srid;
+    const defaultextent = GeoConfig.map.maxExtent.split(',').map(Number);
+    const startcenter = GeoConfig.map.startPosition.split(',').map(Number);
+    const startzoom = Number(GeoConfig.map.startZoom);
 
     // Default basemap : OSM
     const basemapLayer = new TileLayer({

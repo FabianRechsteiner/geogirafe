@@ -3,6 +3,7 @@ import {buffer, getWidth, getHeight} from 'ol/extent';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events.js';
+import GeoConfig from '../../config';
 
 class SearchComponent extends GirafeHTMLElement {
 
@@ -18,7 +19,7 @@ class SearchComponent extends GirafeHTMLElement {
   
   constructor() {
     super('search');
-    this.searchUrl = this.getAttribute('search-url');
+    this.searchUrl = GeoConfig.search.url;
   }
 
   render() {
