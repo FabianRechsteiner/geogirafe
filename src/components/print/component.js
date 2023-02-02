@@ -1,6 +1,6 @@
-import GeoEvents from '/models/events';
-import GirafeResizableElement from '/base/GirafeResizableElement';
-import I18nManager from '/tools/i18nmanager';
+import GeoEvents from '../../models/events';
+import GirafeResizableElement from '../../base/GirafeResizableElement';
+import I18nManager from '../../tools/i18nmanager';
 
 class PrintComponent extends GirafeResizableElement {
 

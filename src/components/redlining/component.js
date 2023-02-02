@@ -1,6 +1,5 @@
-import GeoEvents from '/models/events';
-//import GirafeDraggableElement from '/base/GirafeDraggableElement';
-import GirafeResizableElement from '/base/GirafeResizableElement';
+import GeoEvents from '../../models/events';
+import GirafeResizableElement from '../../base/GirafeResizableElement';
 import Picker from 'vanilla-picker/csp';
 
 class RedliningComponent extends GirafeResizableElement {

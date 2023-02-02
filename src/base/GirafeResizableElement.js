@@ -1,4 +1,4 @@
-import GirafeHTMLElement from '/base/GirafeHTMLElement.js';
+import GirafeHTMLElement from './GirafeHTMLElement.js';
 
 /*
 Minimal template for a draggable object : 

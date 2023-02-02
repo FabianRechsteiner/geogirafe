@@ -1,5 +1,5 @@
-import GeoEvents from '/models/events.js';
-import GirafeHTMLElement from '/base/GirafeHTMLElement';
+import GeoEvents from '../../models/events';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class ButtonComponent extends GirafeHTMLElement {
 

@@ -1,5 +1,5 @@
-import GeoEvents from '/models/events.js';
-import GirafeHTMLElement from '/base/GirafeHTMLElement.js';
+import GeoEvents from '../../models/events.js';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
 
 class ProjectionComponent extends GirafeHTMLElement {
 

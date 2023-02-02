@@ -1,6 +1,6 @@
-import GeoEvents from '/models/events.js';
-import GirafeHTMLElement from '/base/GirafeHTMLElement';
-import I18nManager from '/tools/i18nmanager';
+import GeoEvents from '../../models/events.js';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import I18nManager from '../../tools/i18nmanager';
 
 class LanguageComponent extends GirafeHTMLElement {
 

@@ -1,8 +1,8 @@
 import tippy from 'tippy.js';
-import Layer from '/models/layer';
-import GeoEvents from '/models/events';
-import GirafeResizableElement from '/base/GirafeResizableElement'
-import I18nManager from '/tools/i18nmanager';
+import Layer from '../../models/layer';
+import GeoEvents from '../../models/events';
+import GirafeResizableElement from '../../base/GirafeResizableElement'
+import I18nManager from '../../tools/i18nmanager';
 
 class TreeViewComponent extends GirafeResizableElement {
 
@@ -225,6 +225,19 @@ class TreeViewComponent extends GirafeResizableElement {
         }
       });
       container.append(opacity);
+
+      // Add swiper icons
+      const swipeLeft = document.createElement('i');
+      swipeLeft.className = 'fa-solid fa-arrow-left tool selectable advanced swipe-left';
+      swipeLeft.setAttribute('tip', 'Swipe layer on the left');
+      swipeLeft.onclick = (e) => this.messageManager.sendMessage(GeoEvents.Map, {action: 'activateSwipe', layer: layer, side: 'left'});
+      container.append(swipeLeft);
+
+      const swipeRight = document.createElement('i');
+      swipeRight.className = 'fa-solid fa-arrow-right tool selectable advanced swipe-right';
+      swipeRight.setAttribute('tip', 'Swipe layer on the right');
+      swipeRight.onclick = (e) => this.messageManager.sendMessage(GeoEvents.Map, {action: 'activateSwipe', layer: layer, side: 'right'});
+      container.append(swipeRight);
 
       // On the childs, we can have a icon to zoom to the right resolution, where the layer will be visible
       if (layer.hasRestrictedResolution()) {

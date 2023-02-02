@@ -147,7 +147,7 @@ i.selcircle {
 }
 
 i.del {
-  order: 10;
+  order: 12;
 }
 
 i.expand {
@@ -156,15 +156,23 @@ i.expand {
 }
 
 i.spacer {
-  order: 10;
+  order: 12;
 }
 
 i.legend {
-  order: 10;
+  order: 12;
 }
 
 i.opacity {
   order: 9;
+}
+
+i.swipe-left {
+  order: 10;
+}
+
+i.swipe-right {
+  order: 11;
 }
 
 i.zoomres {
