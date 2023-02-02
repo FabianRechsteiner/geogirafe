@@ -27,9 +27,9 @@ GeoGirafe is developed according to the following principles:
 
 - **Accessibility**: GeoGirafe is doing its best to make web content more accessible to individuals with disabilities: [View Wave Report](https://wave.webaim.org/report#/https://geogirafe.paloo.fr).
 
-# Getting Started
+# Start the development server
 
-Install dependencies and start the development server:
+Install [Node-18](https://nodejs.org/en/download/) and start the development server:
 
 ### On linux
 
@@ -45,8 +45,48 @@ npm install
 npm run-script serve-win
 ```
 
+# Build for Production
+
+### On linux
+
+```bash
+npm install
+npm run-script build
+```
+
+### On Windows
+
+```bash
+npm install
+npm run-script build-win
+```
+
+### Using Docker
+
+```bash
+docker run -v $PWD:/src node:18-slim bash -c "cd /src && npm install && npm run build"
+```
+
+# Deploy
+
+### Using an existing WebServer
+
+After the build, everything that needs to be deployed is in the `public` directory.  
+Copy the `public` directory content to any webserver, for example in the `htdocs` directory.
+
+### Using Docker
+
+You can also use a docker container to serve your GeoGirafe application.  
+For example:
+
+```bash
+docker run --name lighttpd --rm -v $PWD/public:/var/www/localhost/htdocs -p 8080:80 m4rcu5/lighttpd
+```
+
 # Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome.  
+For major changes, please open an issue first to discuss what you would like to change.
+
 
 # License
 
