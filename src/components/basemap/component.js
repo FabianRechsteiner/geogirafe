@@ -20,6 +20,7 @@ class BasemapComponent extends GirafeHTMLElement {
 
     this.basemapSelect = this.shadow.querySelector('#basemap');
     
+    // TODO REG : Configure those 2 default options in themes.json
     // Add default OSM Option
     const option = document.createElement('option');
     option.innerHTML = 'OpenStreetMap';
@@ -30,6 +31,18 @@ class BasemapComponent extends GirafeHTMLElement {
     this.basemaps.push(basemap);
     option.value = this.basemaps.length-1;
     this.basemapSelect.appendChild(option);
+
+    // Add default Vector Tiles
+    const vectorOption = document.createElement('option');
+    vectorOption.innerHTML = 'Vector-Tiles (EPSG:3857 only)';
+    const vectorBasemap = {
+      "name": "Vector-Tiles (EPSG:3857 only)",
+      "type": "VectorTiles",
+      "style": "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json"
+    }
+    this.basemaps.push(vectorBasemap);
+    vectorOption.value = this.basemaps.length-1;
+    this.basemapSelect.appendChild(vectorOption);
 
     // Add options from themes
     this.basemapJson.forEach(elem => {
