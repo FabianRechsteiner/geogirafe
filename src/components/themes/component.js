@@ -66,6 +66,7 @@ class ThemeComponent extends GirafeHTMLElement {
 
     const span = document.createElement('span');
     span.innerHTML = theme.name;
+    span.setAttribute('i18n', theme.name);
     option.appendChild(span);
 
     this.themes.push(theme);
