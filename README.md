@@ -27,6 +27,12 @@ GeoGirafe is developed according to the following principles:
 
 - **Accessibility**: GeoGirafe is doing its best to make web content more accessible to individuals with disabilities: [View Wave Report](https://wave.webaim.org/report#/https://geogirafe.paloo.fr).
 
+# Configure GeoGirafe
+
+The complete configuration of the application is done in the file `static/config.json`.
+This configuration will be loaded dynamically when the applications starts.  
+Therefore it is not necessary to rebuild the project when you modify this file.
+
 # Start the development server
 
 Install [Node-18](https://nodejs.org/en/download/) and start the development server:

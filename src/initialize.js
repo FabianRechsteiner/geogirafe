@@ -1,3 +1,4 @@
+import ConfigManager from './tools/configmanager.js';
 import UrlManager from './tools/urlmanager.js';
 import StateManager from './tools/statemanager.js';
 import I18nManager from './tools/i18nmanager.js';
@@ -28,10 +29,11 @@ proj4.defs("EPSG:2056" , '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333
 register(proj4);
 
 // Initialize the singletons once
+ConfigManager.getInstance().loadConfig();
+MessageManager.getInstance();
 UrlManager.getInstance([TreeViewComponent, MapComponent, ProjectionComponent, BasemapComponent, ThemeComponent, LanguageComponent]);
 StateManager.getInstance();
 I18nManager.getInstance();
-MessageManager.getInstance();
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('App initialized.');

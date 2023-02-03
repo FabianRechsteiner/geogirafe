@@ -3,11 +3,9 @@ import {buffer, getWidth, getHeight} from 'ol/extent';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events.js';
-import GeoConfig from '../../config';
 
 class SearchComponent extends GirafeHTMLElement {
 
-  searchUrl = null;
   searchBox = null;
   resultsBox = null;
   ignoreBlur = false;
@@ -19,7 +17,6 @@ class SearchComponent extends GirafeHTMLElement {
   
   constructor() {
     super('search');
-    this.searchUrl = GeoConfig.search.url;
   }
 
   render() {
@@ -70,7 +67,7 @@ class SearchComponent extends GirafeHTMLElement {
       return;
     }
 
-    const url = _this.searchUrl.replace(_this.searchTermPlaceholder, term);
+    const url = _this.configManager.Config.search.url.replace(_this.searchTermPlaceholder, term);
     fetch(url)
       .then(response => response.json())
       .then(data => this.displayResults(data));

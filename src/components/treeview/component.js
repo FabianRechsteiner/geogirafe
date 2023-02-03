@@ -3,11 +3,9 @@ import Layer from '../../models/layer';
 import GeoEvents from '../../models/events';
 import GirafeResizableElement from '../../base/GirafeResizableElement'
 import I18nManager from '../../tools/i18nmanager';
-import GeoConfig from '../../config';
 
 class TreeViewComponent extends GirafeResizableElement {
 
-  themesUrl = null;
   servers = {};
   layers = [];
   ulRoot = null;
@@ -17,7 +15,6 @@ class TreeViewComponent extends GirafeResizableElement {
 
   constructor() {
     super('treeview');
-    this.themesUrl = GeoConfig.themes.url;
   }
 
   registerEvents() {
@@ -44,7 +41,7 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   async loadThemes() {
-    const response = await fetch(this.themesUrl);
+    const response = await fetch(this.configManager.Config.themes.url);
     const content = await response.json();
     this.servers = content["ogcServers"];
   }

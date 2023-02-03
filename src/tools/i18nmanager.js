@@ -1,6 +1,6 @@
 import GeoEvents from '../models/events.js';
 import MessageManager from './messagemanager';
-import GeoConfig from '../config';
+import ConfigManager from './configmanager';
 
 class I18nManager {
 
@@ -10,12 +10,16 @@ class I18nManager {
   translations = {};
   currentLanguage = null;
 
+  messageManager = null;
+  configManager = null;
+
   constructor() {
     if (!I18nManager.#initializingSingleton) {
       // If trying to create another instance
       throw new Error('This is a singleton. Please use the getInstance() method.');
     }
 
+    this.configManager = ConfigManager.getInstance();
     this.messageManager = MessageManager.getInstance();
     this.registerEvents();
   }
@@ -49,7 +53,8 @@ class I18nManager {
     }
 
     // Load translations
-    const url = GeoConfig.languages[this.currentLanguage];
+    await this.configManager.loadConfig();
+    const url = this.configManager.Config.languages[this.currentLanguage];
     const response = await fetch(url);
     const content = await response.json();
     this.translations[this.currentLanguage] = content[this.currentLanguage];

@@ -1,7 +1,6 @@
 import GeoEvents from '../../models/events';
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import I18nManager from '../../tools/i18nmanager';
-import GeoConfig from '../../config';
 
 class PrintComponent extends GirafeResizableElement {
 
@@ -36,16 +35,25 @@ class PrintComponent extends GirafeResizableElement {
     return this.printUrl + 'report.' + format;
   }
   
+  getDownloadUrl(result) {
+    return this.printUrl + result.downloadURL.substring(result.downloadURL.indexOf('/report') + 1);
+  }
+
+  getStatusUrl(result) {
+    return this.printUrl + result.statusURL.substring(result.statusURL.indexOf('/status') + 1);
+  }
+  
   constructor() {
     super('print');
-    this.printUrl = GeoConfig.print.url;
-    this.defaultLayout = GeoConfig.print.defaultLayout;
-    if (!this.printUrl.endsWith('/')) {
-      this.printUrl += '/';
-    }
   }
 
   async initializePrint() {
+    this.printUrl = this.configManager.Config.print.url;
+    this.defaultLayout = this.configManager.Config.print.defaultLayout;
+    if (!this.printUrl.endsWith('/')) {
+      this.printUrl += '/';
+    }
+
     const response = await fetch(this.capabilitiesUrl);
     const content = await response.json();
     this.printApp = content["app"];
@@ -247,8 +255,8 @@ class PrintComponent extends GirafeResizableElement {
 
   managePrintStatus(result) {
     console.log(result);
-    const downloadUrl = this.printUrl + result.downloadURL.substring(result.downloadURL.indexOf('/report') + 1);
-    const statusUrl = this.printUrl + result.statusURL.substring(result.statusURL.indexOf('/status') + 1);
+    const downloadUrl = this.getDownloadUrl(result);
+    const statusUrl = this.getStatusUrl(result);
 
     const elementId = 'p-' + result.ref.substring(0, result.ref.indexOf('-'));
     this.addPrintToList(elementId);

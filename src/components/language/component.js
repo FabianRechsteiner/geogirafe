@@ -1,7 +1,6 @@
 import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import I18nManager from '../../tools/i18nmanager';
-import GeoConfig from '../../config';
 
 class LanguageComponent extends GirafeHTMLElement {
 
@@ -16,7 +15,7 @@ class LanguageComponent extends GirafeHTMLElement {
     this.menuButton = this.shadow.querySelector('#menu-button');
 
     // Default language
-    const defaultLanguage = GeoConfig.languages.default;
+    const defaultLanguage = this.configManager.Config.languages.default;
     I18nManager.getInstance().setDefaultLanguage(defaultLanguage);
     this.menuButton.setText(defaultLanguage.toUpperCase());
   }

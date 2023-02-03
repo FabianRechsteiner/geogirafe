@@ -1,18 +1,14 @@
 import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import GeoConfig from '../../config';
-
 
 class BasemapComponent extends GirafeHTMLElement {
 
-  themesUrl = null;
   basemapJson = {};
   basemaps = [];
   basemapSelect = null;
   
   constructor() {
     super('basemap');
-    this.themesUrl = GeoConfig.themes.url;
   }
 
   render() {
@@ -101,7 +97,7 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   async loadThemes() {
-    const response = await fetch(this.themesUrl);
+    const response = await fetch(this.configManager.Config.themes.url);
     const content = await response.json();
     this.basemapJson = content["background_layers"];
   }

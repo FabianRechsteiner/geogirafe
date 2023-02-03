@@ -1,6 +1,5 @@
 import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import GeoConfig from '../../config';
 
 class ThemeComponent extends GirafeHTMLElement {
 
@@ -8,14 +7,12 @@ class ThemeComponent extends GirafeHTMLElement {
   layerIcon = null;
   waitingIcon = null;
   themesList = null;
-  themesUrl = null;
   themesJson = {};
   themes = [];
   ignoreBlur = false;
   
   constructor() {
     super('themes');
-    this.themesUrl = GeoConfig.themes.url;
   }
 
   render() {
@@ -128,7 +125,7 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   async loadThemes() {
-    const response = await fetch(this.themesUrl);
+    const response = await fetch(this.configManager.Config.themes.url);
     const content = await response.json();
     this.themesJson = content["themes"];
   }

@@ -34,7 +34,6 @@ import MaskLayer from './tools/maskLayer';
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
 import WmtsManager from './tools/wmtsmanager';
-import GeoConfig from '../../config';
 
 class MapComponent extends GirafeHTMLElement {
 
@@ -93,10 +92,10 @@ class MapComponent extends GirafeHTMLElement {
   render() {
     super.render();
 
-    this.srid = GeoConfig.map.srid;
-    const defaultextent = GeoConfig.map.maxExtent.split(',').map(Number);
-    const startcenter = GeoConfig.map.startPosition.split(',').map(Number);
-    const startzoom = Number(GeoConfig.map.startZoom);
+    this.srid = this.configManager.Config.map.srid;
+    const defaultextent = this.configManager.Config.map.maxExtent.split(',').map(Number);
+    const startcenter = this.configManager.Config.map.startPosition.split(',').map(Number);
+    const startzoom = Number(this.configManager.Config.map.startZoom);
 
     // Default basemap : OSM
     const basemapLayer = new TileLayer({
@@ -493,13 +492,13 @@ class MapComponent extends GirafeHTMLElement {
 
       // Add terrain
       const terrainProvider = new Cesium.CesiumTerrainProvider({
-        url: GeoConfig.map3d.terrainUrl
+        url: this.configManager.Config.map3d.terrainUrl
       });
       scene.terrainProvider = terrainProvider;
 
       // Add 3D-Tiles layer
       const tileset = new Cesium.Cesium3DTileset({
-        url: GeoConfig.map3d.tilesetUrl
+        url: this.configManager.Config.map3d.tilesetUrl
       });
       scene.primitives.add(tileset);
 

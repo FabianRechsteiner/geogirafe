@@ -2,6 +2,7 @@ import tippy from 'tippy.js';
 import GeoEvents from '../models/events';
 import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
+import ConfigManager from '../tools/configmanager';
 
 class GirafeHTMLElement extends HTMLElement {
 
@@ -16,11 +17,14 @@ class GirafeHTMLElement extends HTMLElement {
     return GirafeHTMLElement.#templates[this.component];
   }
 
-  messageManager = null
+  messageManager = null;
+  configManager = null;
 
   constructor(component) {
     super();
+    this.configManager = ConfigManager.getInstance();
     this.messageManager = MessageManager.getInstance();
+
     window.addEventListener(GeoEvents.Translate, (e) => this.onTranslateEvent(e.detail));
     this.component = component;
     this.shadow = this.attachShadow({mode: 'open'});
@@ -31,6 +35,10 @@ class GirafeHTMLElement extends HTMLElement {
       // Template was already loaded. Nothing to do.
       return;
     }
+
+    // Load configuration
+    await this.configManager.loadConfig();
+
     // Otherwise, load the template
     const response = await fetch(this.templateUrl);
     const content = await response.text();
