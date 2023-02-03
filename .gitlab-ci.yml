@@ -30,13 +30,13 @@ pages:
     # build
     - npm i
     - npm run-script build
-    # Compress files
-    - find public -type f -regex '.*\.\(html\|css\|json\)' -exec brotli -k -f {} \;
-    - find public -type f -regex '.*\.\(html\|css\|json\)' -exec gzip -k -f {} \;
     # Create a instance for a sample cartoriviera instance
     - cp -R public cartoriviera && mv cartoriviera public/
     - rm public/cartoriviera/config.json 
     - cp public/config.cartoriviera.json public/cartoriviera/config.json
+    # Compress all files
+    - find public -type f -regex '.*\.\(html\|css\|json\)' -exec brotli -k -f {} \;
+    - find public -type f -regex '.*\.\(html\|css\|json\)' -exec gzip -k -f {} \;
 
   artifacts:
     paths:
