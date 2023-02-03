@@ -38,7 +38,7 @@ class ConfigManager {
     }
     // Load configuration
     console.log('Loading Application Configuration...')
-    const response = await fetch('../config.json');
+    const response = await fetch('config.json');
     ConfigManager.#config = await response.json();
     console.log('Application Configuration loaded.')
   }
