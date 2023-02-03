@@ -33,8 +33,8 @@ const GeoConfig = {
     maxExtent: '2600972,1262492,2623553,1272772'
   },
   map3d: {
-    terrainUrl: 'https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/',
-    tilesetUrl: 'https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json'
+    terrainUrl: 'https://pi.paloo.fr/3d/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/',
+    tilesetUrl: 'https://pi.paloo.fr/3d/static/tiles/30c6266f-bbb7-4a20-8b50-7143dbab5648_19/tileset.json'
   }
 }
 

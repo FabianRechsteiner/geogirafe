@@ -5,32 +5,30 @@
 const GeoConfig = {
   languages: {
     /* List of languages with their corresponding translation-file. */
-    de: 'https://pi.paloo.fr/mapbs/static-ngeo/build/de.json',
-    en: 'https://pi.paloo.fr/mapbs/static-ngeo/build/en.json',
-    fr: 'https://pi.paloo.fr/mapbs/static-ngeo/build/fr.json',
+    fr: 'https://map.cartoriviera.ch/static/dummy/fr.json',
     /* Default language */
-    default: 'de'
+    default: 'fr'
   },
   themes: {
     /* Link to the GeoMapFish-Compliant Themes.json */
-    url: 'https://pi.paloo.fr/mapbs/themes?background=background&interface=desktop'
+    url: 'https://pi.paloo.fr/cartoriviera/themes?background=background&interface=desktop'
   },
   search: {
     /* Link to the GeoMapFish-Compliant Search Service
        The muster <###SEARCHTERM###> will be replaced by the search-term */
-    url: 'https://pi.paloo.fr/mapbs/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###'
+    url: 'https://pi.paloo.fr/cartoriviera/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###'
   },
   print: {
     /* Link to the GeoMapFish-Compliant Print Service */
-    url: 'https://pi.paloo.fr/mapbs/printproxy/',
-    /* The print layout selecteed by default */
-    defaultLayout: 'print_A4_hochformat'
+    url: 'https://pi.paloo.fr/cartoriviera/printproxy/',
+    /* The print layout selected by default */
+    defaultLayout: '1) A4 paysage'
   },
   map: {
     srid: 'EPSG:2056',
-    startZoom: '16',
-    startPosition: '2611377,1267643',
-    maxExtent: '2600972,1262492,2623553,1272772'
+    startZoom: '8',
+    startPosition: '2556000,1145000',
+    maxExtent: '2550000,1133383,2570000,1153233'
   },
   map3d: {
     terrainUrl: 'https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/',
