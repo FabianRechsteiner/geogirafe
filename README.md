@@ -1,3 +1,6 @@
+[![Pipeline Status](https://gitlab.com/geogirafe/gg-viewer/badges/main/pipeline.svg)](https://gitlab.com/geogirafe/gg-viewer/-/pipelines)
+[![Docker Pulls](https://img.shields.io/docker/pulls/geogirafe/gg-viewer.svg)](https://hub.docker.com/r/geogirafe/gg-viewer/)
+
 # GeoGirafe
 
 GeoGirafe is an flexible application to build online geoportals.
