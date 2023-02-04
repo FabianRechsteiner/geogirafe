@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - docker-build
   - pages
 
 # Execute Unit-Tests
@@ -32,7 +33,7 @@ build:
       - public
 
 docker-build:
-  stage: build
+  stage: docker-build
   image: docker:20.10.16
   services:
     - docker:20.10.16-dind
