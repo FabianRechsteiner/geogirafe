@@ -1,5 +1,10 @@
 [![Pipeline Status](https://gitlab.com/geogirafe/gg-viewer/badges/main/pipeline.svg)](https://gitlab.com/geogirafe/gg-viewer/-/pipelines)
 [![Docker Pulls](https://img.shields.io/docker/pulls/geogirafe/viewer.svg)](https://hub.docker.com/r/geogirafe/viewer/)
+![GitLab Contributors](https://img.shields.io/gitlab/contributors/geogirafe/gg-viewer)
+![GitLab Issues](https://img.shields.io/gitlab/issues/open-raw/geogirafe/gg-viewer)
+![GitLab Merge Requests](https://img.shields.io/gitlab/merge-requests/open-raw/geogirafe/gg-viewer)
+![GitLab last commit](https://img.shields.io/gitlab/last-commit/geogirafe/gg-viewer)
+![GitLab License](https://img.shields.io/gitlab/license/geogirafe/gg-viewer)
 
 # GeoGirafe
 
