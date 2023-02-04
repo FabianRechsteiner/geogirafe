@@ -37,11 +37,11 @@ GeoGirafe is developed according to the following principles:
 
 - **Accessibility**: GeoGirafe is doing its best to make web content more accessible to individuals with disabilities: [View Wave Report](https://wave.webaim.org/report#/https://geogirafe.paloo.fr).
 
-# Configure GeoGirafe
+# Getting Started
 
-The complete configuration of the application is done in the file `static/config.json`.  
-This configuration will be loaded dynamically when the applications starts.  
-Therefore it is not necessary to rebuild the project when you modify this file.
+If you want to get started with GeoGirafe, the simplest way is to use the Docker Container : https://hub.docker.com/r/geogirafe/viewer.  
+This will allow you to get a running instance of GeoGirafe with minimum effort.  
+Please follow the small documentation in the DockerHub Readme.
 
 # Work with GeoGirafe
 
@@ -70,6 +70,15 @@ npm run serve
 npm install
 npm run serve-win
 ```
+
+## Configuration
+
+The complete configuration of the application is done in the file `static/config.json`.  
+This configuration will be loaded dynamically when the applications starts.  
+Therefore it is not necessary to rebuild the project when you modify this file.
+
+Please not that today, the GeoGirafe Viewer is using a backend based on GeoMapFish.  
+The services you will have to use in your configuration must therefore be compliant with GeoMapFish.
 
 ## Build for Production
 
