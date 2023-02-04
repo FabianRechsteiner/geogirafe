@@ -1,6 +1,7 @@
 stages:
-- test
-- pages
+  - test
+  - build
+  - pages
 
 # Execute Unit-Tests
 Unit Testing:
@@ -15,10 +16,50 @@ Unit Testing:
 include:
 - template: Security/SAST.gitlab-ci.yml
 
+# Build the application
+build:
+  stage: build
+  image: node:18-slim
+
+  before_script:
+    - apt update && apt -y upgrade
+  script: 
+    - npm i
+    - npm run-script build
+
+  artifacts:
+    paths:
+      - public
+
+docker-build:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  dependencies:
+    - build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
+
+ before_script:
+    - docker info
+    - docker login -u $DOCKERHUB_USERNAME  -p $DOCKERHUB_TOKEN
+
+  script: 
+    # build
+    - docker build -t geogirafe/viewer -f buildtools/Dockerfile .
+    # push
+    - docker push geogirafe/viewer
+
+
 # Publish Demo-Application to GitLab-Pages
 pages:
   stage: pages
-  image: node:18-slim
+  image: debian:stable-slim
+  dependencies:
+    - build
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
@@ -27,9 +68,6 @@ pages:
   before_script:
     - apt update && apt -y upgrade && apt install -y brotli
   script: 
-    # build
-    - npm i
-    - npm run-script build
     # Create a instance for a sample cartoriviera instance
     - cp -R public cartoriviera && mv cartoriviera public/
     - rm public/cartoriviera/config.json 

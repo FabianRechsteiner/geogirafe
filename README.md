@@ -32,29 +32,39 @@ GeoGirafe is developed according to the following principles:
 
 # Configure GeoGirafe
 
-The complete configuration of the application is done in the file `static/config.json`.
+The complete configuration of the application is done in the file `static/config.json`.  
 This configuration will be loaded dynamically when the applications starts.  
 Therefore it is not necessary to rebuild the project when you modify this file.
 
-# Start the development server
+# Work with GeoGirafe
 
-Install [Node-18](https://nodejs.org/en/download/) and start the development server:
+## Development
+
+First, install [Node-18](https://nodejs.org/en/download/).
+
+Then, clone the Repository:
+
+```
+git clone https://gitlab.com/geogirafe/gg-viewer.git
+```
+
+Now you can build the application, and start the development server:
 
 ### On linux
 
 ```bash
 npm install
-npm run-script serve
+npm run serve
 ```
 
 ### On Windows
 
 ```bash
 npm install
-npm run-script serve-win
+npm run serve-win
 ```
 
-# Build for Production
+## Build for Production
 
 ### On linux
 
@@ -76,7 +86,9 @@ npm run-script build-win
 docker run -v $PWD:/src node:18-slim bash -c "cd /src && npm install && npm run build"
 ```
 
-# Deploy
+## Deployment
+
+The deployment can be done in 2 ways:
 
 ### Using an existing WebServer
 
@@ -85,17 +97,20 @@ Copy the `public` directory content to any webserver, for example in the `htdocs
 
 ### Using Docker
 
-You can also use a docker container to serve your GeoGirafe application.  
-For example:
+When the project has been built, you can build a docker image that will contains the application:
+```
+docker build -t <your_name>/gg-viewer -f buildtools/Dockerfile .
+```
 
-```bash
-docker run --name lighttpd --rm -v $PWD/public:/var/www/localhost/htdocs -p 8080:80 m4rcu5/lighttpd
+Then, ou can start it:
+```
+docker run -p 8080:80 -p 8443:443 <your_name>/gg-viewer
 ```
 
 # Contributing
+
 Pull requests are welcome.  
 For major changes, please open an issue first to discuss what you would like to change.
-
 
 # License
 
