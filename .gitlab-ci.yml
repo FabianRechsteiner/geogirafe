@@ -8,9 +8,7 @@ stages:
 Unit Testing:
   stage: test
   image: node:18-slim
-  except:
-    changes:
-      - "*.md"
+  
   script: 
     # build
     - npm i
@@ -24,9 +22,6 @@ include:
 build:
   stage: build
   image: node:18-slim
-  except:
-    changes:
-      - "*.md"
 
   before_script:
     - apt update && apt -y upgrade
@@ -45,9 +40,6 @@ docker-build:
     - docker:20.10.16-dind
   dependencies:
     - build
-  except:
-    changes:
-      - "*.md"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
@@ -68,9 +60,6 @@ docker-build:
 pages:
   stage: pages
   image: debian:stable-slim
-  except:
-    changes:
-      - "*.md"
   dependencies:
     - build
   rules:
