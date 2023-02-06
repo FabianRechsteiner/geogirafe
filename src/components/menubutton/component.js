@@ -107,7 +107,10 @@ class MenuButtonComponent extends GirafeHTMLElement {
   }
 
   closeMenu() {
-    this.menuContent.style.display = 'none';
+    // this.menuContent can be null when the aplication starts.
+    if (this.menuContent != null) {
+      this.menuContent.style.display = 'none';
+    }
     // If one of the parents is another menu-button, we give the focus to it
     const parentMenuButton = super.getParentOfType(this.nodeName, this.shadow.host.parentNode);
     if (parentMenuButton !== null) {
