@@ -54,7 +54,7 @@ class PrintComponent extends GirafeResizableElement {
       this.printUrl += '/';
     }
 
-    const response = await fetch(this.capabilitiesUrl);
+    const response = await fetch(this.capabilitiesUrl, {referrer:''});
     const content = await response.json();
     this.printApp = content["app"];
     this.printLayouts = content["layouts"];
