@@ -53,9 +53,13 @@ class GirafeHTMLElement extends HTMLElement {
     this.shadow.appendChild(this.template.content.cloneNode(true));
   }
 
+  translate() {
+    I18nManager.getInstance().translate(this.shadow);
+  }
+
   onTranslateEvent(details) {
     if (details.action === 'languageChanged') {
-      I18nManager.getInstance().translate(this.shadow);
+      this.translate();
     }
   }
 
