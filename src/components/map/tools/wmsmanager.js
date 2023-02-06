@@ -1,9 +1,13 @@
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
+import MessageManager from '../../../tools/messagemanager';
+import GeoEvents from '../../../models/events.js';
 
 class WmsManager {
   map = null;
   srid = null;
+
+  messageManager = null;
 
   layersByServer = {};
   independantLayers = {};
@@ -12,6 +16,7 @@ class WmsManager {
     this.map = map;
     // TODO REG: use global state for this info, or update when map component is updated.
     this.srid = srid;
+    this.messageManager = MessageManager.getInstance();
   }
 
   addLayer(layerInfos) {
@@ -193,6 +198,25 @@ class WmsManager {
     else {
       throw 'A layer can be made independant only if it has already been added to the map.';
     }
+  }
+
+  selectFeatures(extent) {
+    const selectionParams = [];
+
+    for (let key in this.layersByServer) {
+      const layer = this.layersByServer[key];
+      const queryLayers = layer.queryableList.map(l => l.queryLayers.split(',')).flat(1);
+
+      // TODO REG: Use the right WFS URL
+      selectionParams.push({
+        wfsUrl: layer.urlWfs,
+        selectionBox: extent,
+        srid: this.srid,
+        featureTypes: queryLayers
+      });
+    }
+
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'selectFeatures', selectionParams: selectionParams });
   }
 }
 

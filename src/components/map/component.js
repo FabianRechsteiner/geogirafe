@@ -254,49 +254,22 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onClick(e) {
-    const selectionParams = [];
+    // Build selectionbox using the default tolerance
+    const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
+    const topLeftCoord = this.map.getCoordinateFromPixel(topLeftPixel);
+    const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
+    const bottomRightCoord = this.map.getCoordinateFromPixel(bottomRightPixel);
+    const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
 
-    for (let key in this.layersByServer) {
-      const layer = this.layersByServer[key];
-      const queryLayers = layer.queryableList.map(l => l.queryLayers.split(',')).flat(1);
-
-      // Build selectionbox using the default tolerance
-      const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
-      const topLeftCoord = this.map.getCoordinateFromPixel(topLeftPixel);
-      const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
-      const bottomRightCoord = this.map.getCoordinateFromPixel(bottomRightPixel);
-      const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
-
-      // TODO REG: Use the right WFS URL
-      selectionParams.push({
-        wfsUrl: layer.urlWfs,
-        selectionBox: extent,
-        srid: this.srid,
-        featureTypes: queryLayers
-      });
-    }
-
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'selectFeatures', selectionParams: selectionParams });
+    // Today, only the selection on WMS Layer is managed
+    this.wmsManager.selectFeatures(extent);
   }
 
   onDragSelection(e) {
     const extent = this.dragbox.getGeometry().getExtent();
-    const selectionParams = [];
 
-    for (let key in this.layersByServer) {
-      const layer = this.layersByServer[key];
-      const queryLayers = layer.queryableList.map(l => l.queryLayers.split(',')).flat(1);
-
-      // TODO REG: Use the right WFS URL
-      selectionParams.push({
-        wfsUrl: layer.urlWfs,
-        selectionBox: extent,
-        srid: this.srid,
-        featureTypes: queryLayers
-      });
-    }
-
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'selectFeatures', selectionParams: selectionParams });
+    // Today, only the selection on WMS Layer is managed
+    this.wmsManager.selectFeatures(extent);
   }
 
   flash(feature) {
