@@ -103,7 +103,10 @@ class MenuButtonComponent extends GirafeHTMLElement {
   }
 
   focusContent() {
-    this.menuContent.focus();
+    // this.menuContent can be null when the aplication starts.
+    if (this.menuContent != null) {
+      this.menuContent.focus();
+    }
   }
 
   closeMenu() {
