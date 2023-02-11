@@ -343,6 +343,7 @@ class MapComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadTemplate().then(() => {
       this.render();
+      super.translate();
       this.registerEvents();
       this.listenOpenLayersEvents();
       super.initialized();

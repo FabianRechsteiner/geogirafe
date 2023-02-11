@@ -3,6 +3,7 @@ class ConfigManager {
   static #instance = null;
   static #initializingSingleton = false;
   static #config = null;
+  static #locked = false;
 
   get Config() {
       return ConfigManager.#config;
@@ -32,15 +33,33 @@ class ConfigManager {
   }
 
   async loadConfig() {
-    if (ConfigManager.#config !== null) {
-      // Configuration was already loaded
-      return;
-    }
-    // Load configuration
-    console.log('Loading Application Configuration...')
-    const response = await fetch('config.json');
-    ConfigManager.#config = await response.json();
-    console.log('Application Configuration loaded.')
+    return new Promise(async(resolve) => {
+
+      if (!ConfigManager.#locked) {
+        ConfigManager.#locked = true;
+        try {
+          if (ConfigManager.#config === null) {
+            // Load configuration
+            console.log('Loading Application Configuration...')
+            const response = await fetch('config.json');
+            ConfigManager.#config = await response.json();
+            console.log('Application Configuration loaded.')
+            resolve();
+          }
+          else {
+            resolve();
+          }
+        }
+        finally {
+          ConfigManager.#locked = false;
+        }
+      }
+      else {
+        setTimeout(() =>  {
+          this.loadConfig().then(resolve);
+        }, 100);
+      }
+    });
   }
 }
 

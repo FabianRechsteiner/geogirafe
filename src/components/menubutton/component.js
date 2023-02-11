@@ -158,6 +158,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   connectedCallback() {
     super.loadTemplate().then(() => {
       this.render();
+      super.translate();
       this.registerEvents();
     });
   }

@@ -34,6 +34,7 @@ class TreeViewComponent extends GirafeResizableElement {
       .then(() => this.loadThemes()
         .then(() => {
           this.render();
+          super.translate();
           this.registerEvents();
           super.initialized();
         })

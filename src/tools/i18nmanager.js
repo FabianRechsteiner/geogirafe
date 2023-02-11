@@ -49,15 +49,20 @@ class I18nManager {
     if (this.currentLanguage in this.translations) {
       // Translation were already loaded.
       // => stop here
-      return;
+      return this.translations[this.currentLanguage];
     }
 
     // Load translations
     await this.configManager.loadConfig();
+    if (this.currentLanguage === null) {
+      this.currentLanguage = this.configManager.Config.languages.default;
+    }
+
     const url = this.configManager.Config.languages[this.currentLanguage];
     const response = await fetch(url);
     const content = await response.json();
     this.translations[this.currentLanguage] = content[this.currentLanguage];
+    return this.translations[this.currentLanguage];
   }
 
   registerEvents() {
@@ -78,13 +83,19 @@ class I18nManager {
 
   translate(dom) {
     this.loadTranslations()
-    .then(() => {
+    .then((translations) => {
       const toTranslate = dom.querySelectorAll('[i18n]');
       toTranslate.forEach(item => {
         const key = item.getAttribute('i18n');
-        const translation = this.translations[this.currentLanguage][key];
+        const translation = translations[key];
         if (translation !== undefined && translation !== null) {
-          item.innerHTML = translation;
+          if (item.hasAttribute('placeholder')) {
+            item.setAttribute('placeholder', translation);
+          }
+          else {
+            // Default : simply set innerHTML.
+            item.innerHTML = translation;
+          }
         }
         else {
           // No translation found. We use the key as translation

@@ -135,6 +135,7 @@ class ButtonComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadTemplate().then(() => {
       this.render();
+      super.translate();
       this.registerEvents();
     });
   }

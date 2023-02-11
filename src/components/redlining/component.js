@@ -87,6 +87,7 @@ class RedliningComponent extends GirafeResizableElement {
   connectedCallback() {
     this.loadTemplate().then(() => {
       this.render();
+      super.translate();
       this.registerEvents();
     });
   }

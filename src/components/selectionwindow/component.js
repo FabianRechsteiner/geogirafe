@@ -280,6 +280,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   connectedCallback() {
     this.loadTemplate().then(() => {
       this.render();
+      super.translate();
       this.makeDraggable();
       this.registerEvents();
     });

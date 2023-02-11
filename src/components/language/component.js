@@ -16,7 +16,6 @@ class LanguageComponent extends GirafeHTMLElement {
 
     // Default language
     const defaultLanguage = this.configManager.Config.languages.default;
-    I18nManager.getInstance().setDefaultLanguage(defaultLanguage);
     this.menuButton.setText(defaultLanguage.toUpperCase());
   }
 
@@ -44,6 +43,7 @@ class LanguageComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadTemplate().then(() => {
       this.render();
+      super.translate();
       this.registerEvents();
       super.initialized();
     });
