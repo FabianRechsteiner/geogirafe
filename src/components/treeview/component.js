@@ -133,7 +133,7 @@ class TreeViewComponent extends GirafeResizableElement {
     const del = document.createElement('i');
     del.className = 'fa fa-solid fa-xmark tool selectable del';
     del.setAttribute('tip', 'Remove this group');
-    del.onclick = (e) => this.deleteLayer(this, layer, e);
+    del.onclick = (e) => this.deleteLayer(layer, e);
     li.append(del);
   }
 
@@ -249,9 +249,9 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  deleteLayer(_this, layer, e) {
+  deleteLayer(layer, e) {
     const li = super.getParentOfType('LI', e.target);
-
+  
     // First deactivate layer
     if (layer.isGroup) {
       const toggledLayers = this.toggleChilds(li, false);
@@ -271,6 +271,21 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   deleteAllLayers() {
+    const lis = this.ulRoot.getElementsByTagName('li');
+    let toggledLayers = [];
+    for (let i=0; i<lis.length; i++) {
+      const li = lis[i];
+      const layer = this.layers[li.dataset.layerid];
+
+      if (layer.isGroup) {
+        const toggledChilds =  this.toggleChilds(li, false);
+        toggledLayers = toggledLayers.concat(toggledChilds);
+      }
+    }
+
+    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'layerListDisabled', layerList: toggledLayers});
+
+    // Reset layer list
     this.ulRoot.innerHTML = '';
     this.layers = [];
   }
