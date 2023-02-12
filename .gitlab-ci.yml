@@ -3,9 +3,9 @@ stages:
   - build
   - docker-build
   - pages
+  - scan
 
-# Execute Unit-Tests
-Unit Testing:
+unitests:
   stage: test
   image: node:18-slim
   
@@ -13,6 +13,16 @@ Unit Testing:
     # build
     - npm i
     - npm run-script test
+
+npm-audit:
+  stage: test
+  image: node:18-slim
+  
+  script: 
+    # build
+    - npm i
+    - npm audit
+    - npm audit signatures
 
 # Static Application Security Testing
 include:
@@ -82,3 +92,23 @@ pages:
     paths:
       # Directory needs to be named 'public' for GitLab Pages
       - public
+
+zap-baseline-scan:
+  stage: scan
+  image: owasp/zap2docker-stable
+  dependencies:
+    - pages
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
+
+  script:
+    - mkdir /zap/wrk
+    # TODO REG: By default, all alerts are reported as warnings.
+    # TODO REG: Configure wich ones should be peported as "fail"
+    - /zap/zap-baseline.py -j -I -t https://geogirafe.paloo.fr -r report.html -w report.md -x report.xml -J report.json
+  artifacts:
+    paths:
+      # Directory needs to be named 'public' for GitLab Pages
+      - /zap/wrk
