@@ -9,7 +9,7 @@
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "https://pi.paloo.fr/cartoriviera/themes?background=background&interface=desktop"
+    "url": "Mock/themes.json"
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
