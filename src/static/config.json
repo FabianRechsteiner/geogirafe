@@ -21,7 +21,7 @@
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
     "url": "https://pi.paloo.fr/mapbs/printproxy/",
-    "//comment2": "The print layout selecteed by default",
+    "//comment2": "The print layout selected by default",
     "defaultLayout": "print_A4_hochformat"
   },
   "map": {

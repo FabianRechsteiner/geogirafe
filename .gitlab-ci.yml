@@ -90,8 +90,8 @@ pages:
     - cp public/config.cartolacote.json public/cartolacote/config.json
 
     # Wget themes.json to improve performance on demo instance
+    # (this does not work for cartoriviera.ch, it seems to be blocked)
     - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/Mock/themes.json
-    - curl -v "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --output public/cartoriviera/Mock/themes.json
     - curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --output public/cartolacote/Mock/themes.json
 
     # Compress all files

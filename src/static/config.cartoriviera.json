@@ -9,7 +9,7 @@
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "Mock/themes.json"
+    "url": "https://map.cartoriviera.ch/themes?background=background&interface=desktop"
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
@@ -19,7 +19,7 @@
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
     "url": "https://pi.paloo.fr/cartoriviera/printproxy/",
-    "//comment2": "The print layout selecteed by default",
+    "//comment2": "The print layout selected by default",
     "defaultLayout": "1) A4 paysage"
   },
   "map": {
