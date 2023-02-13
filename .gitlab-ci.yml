@@ -78,7 +78,7 @@ pages:
     - when: never
 
   before_script:
-    - apt update && apt -y upgrade && apt install -y brotli wget
+    - apt update && apt -y upgrade && apt install -y brotli curl
   script: 
     # Create a instance for a sample cartoriviera instance
     - cp -R public cartoriviera && mv cartoriviera public/
@@ -90,9 +90,9 @@ pages:
     - cp public/config.cartolacote.json public/cartolacote/config.json
 
     # Wget themes.json to improve performance on demo instance
-    - wget -O public/Mock/themes.json "https://map.geo.bs.ch/themes?background=background&interface=desktop"
-    - wget -O public/cartoriviera/Mock/themes.json "https://map.cartoriviera.ch/themes?background=background&interface=desktop"
-    - wget -O public/cartolacote/Mock/themes.json "https://map.cartolacote.ch/themes?background=background&interface=desktop"
+    - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/Mock/themes.json
+    - curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --output public/cartoriviera/Mock/themes.json
+    - curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --output public/cartolacote/Mock/themes.json
 
     # Compress all files
     - find public -type f -regex '.*\.\(html\|css\|json\)' -exec brotli -k -f {} \;
