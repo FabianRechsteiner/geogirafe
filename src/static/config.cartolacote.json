@@ -9,24 +9,24 @@
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "Mock/themes.json"
+    "url": "https://map.cartolacote.ch/themes?background=background&interface=desktop"
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
-    "url": "https://pi.paloo.fr/cartolacote/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://map.cartolacote.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "https://pi.paloo.fr/cartolacote/printproxy/",
+    "url": "https://map.cartolacote.ch/printproxy/",
     "//comment2": "The print layout selected by default",
     "defaultLayout": "01 A4 portrait"
   },
   "map": {
     "srid": "EPSG:2056",
-    "startZoom": "8",
-    "startPosition": "2507700 1137700",
-    "maxExtent": "2450900,1197700,2602800,1095300"
+    "startZoom": "11.5",
+    "startPosition": "2507700,1137700",
+    "maxExtent": "2450900,1095300,2602800,1197700"
   }, 	 
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
