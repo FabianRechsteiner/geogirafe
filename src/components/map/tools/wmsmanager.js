@@ -11,12 +11,20 @@ class WmsManager {
 
   layersByServer = {};
   independantLayers = {};
+  basemapLayers = [];
 
   constructor(map, srid) {
     this.map = map;
     // TODO REG: use global state for this info, or update when map component is updated.
     this.srid = srid;
     this.messageManager = MessageManager.getInstance();
+  }
+
+  removeAllBasemapLayers() {
+    this.basemapLayers.forEach((basemap) => {
+      this.map.removeLayer(basemap);
+    });
+    this.basemapLayers = [];
   }
 
   addLayer(layerInfos) {
@@ -72,9 +80,13 @@ class WmsManager {
   }
 
   addBasemapLayer(layerInfos) {
-  }
-
-  #addLayerInternal(layerInfos) {
+    const source = this.#createImageWMSSource(layerInfos.url, [layerInfos], layerInfos.imageType);
+    const olayer = new ImageLayer({
+      source: source,
+      opacity: layerInfos.opacity
+    });
+    this.basemapLayers.push(olayer);
+    this.map.getLayers().insertAt(0, olayer);
   }
 
   removeLayer(layerInfos) {

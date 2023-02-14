@@ -16,6 +16,13 @@
   height: max-content;
 }
 
+#menu-content.open-up {
+  bottom: 100%;
+  right: 0;
+  border-bottom: solid 1px #fff;
+  height: max-content;
+}
+
 #menu-content.open-left {
   right: 100%;
   bottom: 0;
@@ -35,6 +42,12 @@
   margin:0;
   display: inline-block;
   line-height: 4rem;
+}
+
+#button.small {
+  width: 2.3rem;
+  height: 2.3rem;
+  line-height: 2.3rem;
 }
 
 span {

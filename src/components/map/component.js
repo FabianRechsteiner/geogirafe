@@ -1,6 +1,5 @@
 import Map from 'ol/Map';
 
-import OSM from 'ol/source/OSM';
 import VectorSource from 'ol/source/Vector';
 import ImageWMS from 'ol/source/ImageWMS';
 
@@ -12,7 +11,6 @@ import Circle from 'ol/style/Circle';
 
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-import VectorTileLayer from 'ol/layer/VectorTile.js';
 
 import Collection from 'ol/Collection';
 import { platformModifierKeyOnly } from 'ol/events/condition';
@@ -25,7 +23,6 @@ import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
 import { unByKey } from 'ol/Observable';
 import OLCesium from 'olcs/OLCesium.js';
-import { applyStyle } from 'ol-mapbox-style';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events.js';
@@ -33,6 +30,8 @@ import GeoEvents from '../../models/events.js';
 import MaskLayer from './tools/maskLayer';
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
+import OsmManager from './tools/osmmanager';
+import VectorTilesManager from './tools/vectortilesmanager';
 import WmtsManager from './tools/wmtsmanager';
 
 class MapComponent extends GirafeHTMLElement {
@@ -43,6 +42,8 @@ class MapComponent extends GirafeHTMLElement {
   swiperManager = null;
   wmtsManager = null;
   wmsManager = null;
+  osmManager = null;
+  vectorTilesManager = null;
 
   srid = null;
   get projection() {
@@ -97,16 +98,11 @@ class MapComponent extends GirafeHTMLElement {
     const startcenter = this.configManager.Config.map.startPosition.split(',').map(Number);
     const startzoom = Number(this.configManager.Config.map.startZoom);
 
-    // Default basemap : OSM
-    const basemapLayer = new TileLayer({
-      source: new OSM()
-    });
-
     // Create map element
     let target = this.shadow.querySelector('#ol-map-container');
     this.map = new Map({
       target: target,
-      layers: [basemapLayer],
+      layers: [],
       view: new View({
         center: startcenter,
         zoom: startzoom,
@@ -117,9 +113,14 @@ class MapComponent extends GirafeHTMLElement {
 
     // Initialize managers
     this.wmsManager = new WmsManager(this.map, this.srid);
+    this.osmManager = new OsmManager(this.map, this.srid);
+    this.vectorTilesManager = new VectorTilesManager(this.map, this.srid);
     this.wmtsManager = new WmtsManager(this.map, this.srid);
     this.swiper = this.shadow.getElementById('swiper');
     this.swipeManager = new SwipeManager(this.map, this.swiper, this.wmtsManager, this.wmsManager);
+
+    // Default basemap : OSM
+    this.osmManager.addBasemapLayer();
 
     // Create vector source for drawing
     this.redliningSource = new VectorSource({
@@ -414,8 +415,8 @@ class MapComponent extends GirafeHTMLElement {
     if (details.action === 'changeProjection') {
       this.onChangeProjection(details.projection);
     }
-    else if (details.action === 'basemapChanged') {
-      this.onChangeBasemap(details.basemap);
+    else if (details.action === 'changeBasemap') {
+      this.onChangeBasemap(details.basemapList);
     }
     else if (details.action === 'zoomToResolution') {
       this.zoomToResolution(details.resolution);
@@ -610,30 +611,31 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onChangeBasemap(basemap) {
-    if (basemap.type === 'WMTS') {
-      this.wmtsManager.addBasemapLayer(basemap.url, basemap.name);
-    }
-    else if (basemap.type === 'OSM') {
-      // Create OSM layer
-      const currentBasemap = this.map.getLayers().getArray()[0];
-      this.map.removeLayer(currentBasemap);
-      const newBasemap = new TileLayer({
-        source: new OSM()
-      });
-      this.map.getLayers().insertAt(0, newBasemap);
-    }
-    else if (basemap.type === 'VectorTiles') {
-      // Create VectorTiles Layer
-      const currentBasemap = this.map.getLayers().getArray()[0];
-      this.map.removeLayer(currentBasemap);
-      const newBasemap = new VectorTileLayer({ declutter: true });
-      applyStyle(newBasemap, basemap.style);
-      this.map.getLayers().insertAt(0, newBasemap);
-    }
-    else {
-      throw 'Unknown basemap type: ' + basemap.type;
-    }
+  onChangeBasemap(basemapList) {
+    // First, remove all existing basemaps
+    this.wmtsManager.removeAllBasemapLayers();
+    this.wmsManager.removeAllBasemapLayers();
+    this.osmManager.removeAllBasemapLayers();
+    this.vectorTilesManager.removeAllBasemapLayers();
+
+    // Then, add the selected basemaps
+    basemapList.forEach((basemap) => {
+      if (basemap.type === 'WMTS') {
+        this.wmtsManager.addBasemapLayer(basemap);
+      }
+      else if (basemap.type === 'WMS') {
+        this.wmsManager.addBasemapLayer(basemap);
+      }
+      else if (basemap.type === 'OSM') {
+        this.osmManager.addBasemapLayer();
+      }
+      else if (basemap.type === 'VectorTiles') {
+        this.vectorTilesManager.addBasemapLayer(basemap);
+      }
+      else {
+        throw 'Unknown basemap type: ' + basemap.type;
+      }
+    });
   }
 
   onPrintEvent(details) {

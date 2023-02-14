@@ -68,6 +68,7 @@
   left: 0;
   right: 6px;
   z-index: 1;
+  font-size: 0;
 }
 
 #treeview-list {
@@ -224,4 +225,10 @@ img.iconurl {
 
 img.legend {
   margin-left: 2rem;
+}
+
+girafe-basemap {
+  position: absolute;
+  right: 0;
+  top: 0;
 }

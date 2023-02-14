@@ -100,9 +100,13 @@ class GirafeHTMLElement extends HTMLElement {
     return this.getParentOfType(parentNodeName, parent);
   }
 
-  activateTooltips(arrow, delay, placement) {
+  activateTooltips(arrow, delay, defaultPlacement) {
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach(el => {
+      let placement = defaultPlacement;
+      if (el.hasAttribute('tip-placement')) {
+        placement = el.getAttribute('tip-placement');
+      }
       tippy(el, {
         arrow: arrow,
         delay: delay,

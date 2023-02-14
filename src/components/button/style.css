@@ -16,8 +16,28 @@
   line-height: 4rem;
 }
 
+#button.small {
+  width: 2.3rem;
+  height: 2.3rem;
+  line-height: 2.3rem;
+}
+
 span {
   font-size: 1.3rem;
+}
+
+#button.large {
+  width: 100%;
+  height: 2.3rem;
+  line-height: 2.3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: left;
+}
+
+#button.large span {
+  font-size: 0.8rem;
+  display: inline-block;
 }
 
 #button.hybrid {
