@@ -11,7 +11,8 @@
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "Mock/themes.json"
+    "url": "Mock/themes.json",
+    "defaultBasemap": "Grundkarte farbig"
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",

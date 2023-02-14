@@ -8,6 +8,7 @@ class WmtsManager {
 
   wmtsCapabilitiesByServer = {};
   wmtsLayers = {};
+  basemapLayers = [];
 
   constructor(map, srid) {
     this.map = map;
@@ -15,12 +16,19 @@ class WmtsManager {
     this.srid = srid;
   }
 
+  removeAllBasemapLayers() {
+    this.basemapLayers.forEach((basemap) => {
+      this.map.removeLayer(basemap);
+    });
+    this.basemapLayers = [];
+  }
+
   addLayer(url, layername, opacity=1) {
     this.#addLayerInternal(url, layername, opacity, false);
   }
 
-  addBasemapLayer(url, layername, opacity=1) {
-    this.#addLayerInternal(url, layername, opacity, true);
+  addBasemapLayer(basemap) {
+    this.#addLayerInternal(basemap.url, basemap.name, 1, true);
   }
 
   #addLayerInternal(url, layername, opacity, basemap) {
@@ -37,8 +45,7 @@ class WmtsManager {
 
       // Add to map
       if (basemap) {
-        const currentBasemap = this.map.getLayers().getArray()[0];
-        this.map.removeLayer(currentBasemap);
+        this.basemapLayers.push(olayer);
         this.map.getLayers().insertAt(0, olayer);
       }
       else {

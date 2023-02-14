@@ -9,7 +9,8 @@
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "https://map.cartolacote.ch/themes?background=background&interface=desktop"
+    "url": "https://map.cartolacote.ch/themes?background=background&interface=desktop",
+    "defaultBasemap": "plan_ville"
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",

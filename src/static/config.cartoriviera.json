@@ -9,7 +9,8 @@
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "https://map.cartoriviera.ch/themes?background=background&interface=desktop"
+    "url": "https://map.cartoriviera.ch/themes?background=background&interface=desktop",
+    "defaultBasemap": "plan_cadastral"
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
@@ -24,9 +25,9 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "startZoom": "8",
+    "startZoom": "13",
     "startPosition": "2556000,1145000",
-    "maxExtent": "2550000,1133383,2570000,1153233"
+    "maxExtent": "2486355,1105663,2610155,1220113"
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",

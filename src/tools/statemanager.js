@@ -76,9 +76,9 @@ class StateManager {
     if (details.action === 'projectionChanged') {
       this.onChangeProjection(details.projection);
     }
-    else if (details.action === 'basemapChanged') {
-      this.onChangeBasemap(details.basemap);
-    }
+    // else if (details.action === 'changeBasemap') {
+    //   this.onChangeBasemap(details.basemap);
+    // }
     else if (details.action === 'coordsChanged') {
       this.onChangeCoordinates(details.mapX, details.mapY, details.mapZ);
     }
