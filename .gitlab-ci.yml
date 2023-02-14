@@ -88,11 +88,16 @@ pages:
     - cp -R public cartolacote && mv cartolacote public/
     - rm public/cartolacote/config.json 
     - cp public/config.cartolacote.json public/cartolacote/config.json
+    # Create a instance for a sample mapnv instance
+    - cp -R public mapnv && mv mapnv public/
+    - rm public/mapnv/config.json 
+    - cp public/config.mapnv.json public/mapnv/config.json
 
     # Wget themes.json to improve performance on demo instance
     # (this does not work for cartoriviera.ch, it seems to be blocked)
     - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/Mock/themes.json
     - curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --output public/cartolacote/Mock/themes.json
+    - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
 
     # Compress all files
     - find public -type f -regex '.*\.\(html\|css\|json\)' -exec brotli -k -f {} \;

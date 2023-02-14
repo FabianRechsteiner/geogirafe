@@ -1,0 +1,36 @@
+{
+  "//comment1": "This is the whole configuration of the GeoGirafe Viewer.",
+  "//comment2": "Here, you can set the entries according to your environment.",
+  "languages": {
+    "//comment1": "List of languages with their corresponding translation-file.",
+    "fr": "https://mapnv.ch/static/dummy/fr.json",
+    "//comment2": "Default language",
+    "default": "fr"
+  },
+  "themes": {
+    "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
+    "url": "Mock/themes.json",
+    "defaultBasemap": "Plan-couleur"
+  },
+  "search": {
+    "//comment1": "Link to the GeoMapFish-Compliant Search Service",
+    "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
+    "url": "https://mapnv.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+  },
+  "print": {
+    "//comment1": "Link to the GeoMapFish-Compliant Print Service",
+    "url": "https://mapnv.ch/printproxy/",
+    "//comment2": "The print layout selected by default",
+    "defaultLayout": "1 A4 Paysage"
+  },
+  "map": {
+    "srid": "EPSG:2056",
+    "startZoom": "13",
+    "startPosition": "2539050,1181550",
+    "maxExtent": "2491250,1116751,2585455,1206650"
+  },
+  "map3d": {
+    "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
+    "tilesetUrl": "https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"
+  }
+}
