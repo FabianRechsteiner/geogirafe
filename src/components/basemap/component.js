@@ -1,11 +1,13 @@
 import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import ButtonComponent from '../button/component.js';
 
 class BasemapComponent extends GirafeHTMLElement {
 
   basemapJson = {};
   basemaps = [];
   basemapSelect = null;
+  container = null;
   
   constructor() {
     super('basemap');
@@ -14,61 +16,48 @@ class BasemapComponent extends GirafeHTMLElement {
   render() {
     super.render();
 
+    this.container = this.shadow.querySelector('#container');
     this.basemapSelect = this.shadow.querySelector('#basemap');
     
     // TODO REG : Configure those 2 default options in themes.json
     // Add default OSM Option
-    const option = document.createElement('option');
-    option.innerHTML = 'OpenStreetMap';
-    const basemap = {
-      "type": 'OSM',
-      "name": "OSM"
-    }
-    this.basemaps.push(basemap);
-    option.value = this.basemaps.length-1;
-    this.basemapSelect.appendChild(option);
+    const osmBasemap = {"name": "OpenStreetMap", "type": 'OSM', "name": "OSM" }
+    this.basemaps.push(osmBasemap);
+    this.createButton(osmBasemap.name, this.basemaps.length-1);
 
     // Add default Vector Tiles
-    const vectorOption = document.createElement('option');
-    vectorOption.innerHTML = 'Vector-Tiles (EPSG:3857 only)';
     const vectorBasemap = {
-      "name": "Vector-Tiles (EPSG:3857 only)",
+      "name": "Vector-Tiles",
       "type": "VectorTiles",
-      "style": "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json"
+      "style": "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json",
+      "projection": "EPSG:3857"
     }
     this.basemaps.push(vectorBasemap);
-    vectorOption.value = this.basemaps.length-1;
-    this.basemapSelect.appendChild(vectorOption);
+    this.createButton(vectorBasemap.name, this.basemaps.length-1);
 
     // Add options from themes
     this.basemapJson.forEach(elem => {
-      this.addOption(this.basemapSelect, elem);
+      let basemap = elem;
+      if (elem.children) {
+        // TODO REG: use all children for basemap
+        basemap = elem.children[0];
+      }
+      this.basemaps.push(basemap);
+      this.createButton(elem.name, this.basemaps.length-1);
     });
   }
 
-  addOption(select, elem) {
-    // Create new basemap option
-    const option = document.createElement('option');
-    option.innerHTML = elem.name;
-
-    let basemap = elem;
-    if (elem.children) {
-      // TODO REG: use all children for basemap
-      basemap = elem.children[0];
-    }
-
-    // fill array with all info about basemaps 
-    // (referenced by array index in select.value)
-    this.basemaps.push(basemap);
-    option.value = this.basemaps.length - 1;
-  
-    // Add to select
-    select.appendChild(option);
+  createButton(label, basemapId) {
+    const button = new ButtonComponent();
+    button.setAttribute('text', label);
+    button.setAttribute('size', 'large');
+    button.classList.add('border-top');
+    button.onClick = () => this.onBasemapChanged(basemapId);
+    this.container.appendChild(button);
   }
 
   registerEvents() {
     window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    this.basemapSelect.addEventListener('change', (e) => this.onBasemapChanged(this, e));
   }
 
   onInitEvent(details) {
@@ -76,14 +65,18 @@ class BasemapComponent extends GirafeHTMLElement {
       if (details.state.basemap !== 'null') {
         // Find the basemap id from the name
         const index = this.basemaps.findIndex(item => item.name === details.state.basemap);
-        this.basemapSelect.value = index;
         this.messageManager.sendMessage(GeoEvents.Map, {action: 'basemapChanged', basemap: this.basemaps[index]});
       }
     }
   }
 
-  onBasemapChanged(_this, e) {
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'basemapChanged', basemap: _this.basemaps[e.target.value]});
+  onBasemapChanged(index) {
+    const basemap = this.basemaps[index];
+    if (!this.isNullOrUndefined(basemap.projection)) {
+      // Automatically change projection for this background layer
+      this.messageManager.sendMessage(GeoEvents.Map, {action: 'changeProjection', projection: basemap.projection});
+    }
+    this.messageManager.sendMessage(GeoEvents.Map, {action: 'basemapChanged', basemap: basemap});
   }
 
   connectedCallback() {
@@ -104,6 +97,6 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 }
 
-customElements.define('girafe-basemap-select', BasemapComponent);
+customElements.define('girafe-basemap', BasemapComponent);
 
 export default BasemapComponent;

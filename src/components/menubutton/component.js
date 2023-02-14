@@ -31,7 +31,13 @@ class MenuButtonComponent extends GirafeHTMLElement {
       this.text = this.getAttribute('text');
       this.textSpan = document.createElement('span');
       this.textSpan.innerHTML = this.text;
+      this.textSpan.setAttribute('i18n', this.text);
       this.button.appendChild(this.textSpan);
+    }
+    if (this.hasAttribute('size')) {
+      // Add text
+      const size = this.getAttribute('size');
+      this.button.classList.add(size);
     }
 
     this.setButtonStyle();
@@ -41,6 +47,9 @@ class MenuButtonComponent extends GirafeHTMLElement {
     switch(direction) {
       case 'left':
         this.menuContent.classList.add('open-left');
+        break;
+      case 'up':
+        this.menuContent.classList.add('open-up');
         break;
       default:
         this.menuContent.classList.add('open-bottom');
