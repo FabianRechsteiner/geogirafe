@@ -23,42 +23,58 @@ class WmtsManager {
     this.basemapLayers = [];
   }
 
-  addLayer(url, layername, opacity=1) {
-    this.#addLayerInternal(url, layername, opacity, false);
+  addLayer(layer) {
+    this.#addLayerInternal(layer, false);
   }
 
   addBasemapLayer(basemap) {
-    this.#addLayerInternal(basemap.url, basemap.name, 1, true);
+    this.#addLayerInternal(basemap, true);
   }
 
-  #addLayerInternal(url, layername, opacity, basemap) {
-    this.#getWmtsCapabilities(url, (capabilities) => {
+  #addLayerInternal(layer, isBasemap) {
+    this.#getWmtsCapabilities(layer.url, (capabilities) => {
+      // TODO REG : Manage dimensions, because the "layers" can be the same with different dimensions
       const options = optionsFromCapabilities(capabilities, {
-        layer: layername,
-        matrixSet: this.srid,
+        layer: layer.layers,
+        projection: this.srid
       });
 
+      // Set the right dimensions
+      for (let key in layer.dimensions) {
+        if (key in options.dimensions) {
+          // Update value
+          options.dimensions[key] = layer.dimensions[key];
+        }
+        else {
+          console.warn('A dimension ' + key + ' was defined for the WMTS layer ' + layer.layers + ' but the server does not seem to accept it.')
+        }
+      }
+
+      if (options === null) {
+        console.log('Cannot create WMTS layer for layer ' + layer.layers);
+      }
+
       const olayer = new TileLayer({
-        opacity: opacity,
+        opacity: layer.opacity,
         source: new WMTS(options),
       });
 
       // Add to map
-      if (basemap) {
+      if (isBasemap) {
         this.basemapLayers.push(olayer);
         this.map.getLayers().insertAt(0, olayer);
       }
       else {
-        this.wmtsLayers[layername] = olayer;
+        this.wmtsLayers[layer.layerUniqueId] = olayer;
         this.map.addLayer(olayer);
       }
     });
   }
   
-  removeLayer(layername) {
-    if (this.layerExists(layername)) {
-      const olayer = this.wmtsLayers[layername];
-      delete this.wmtsLayers[layername];
+  removeLayer(layer) {
+    if (this.layerExists(layer)) {
+      const olayer = this.wmtsLayers[layer.layerUniqueId];
+      delete this.wmtsLayers[layer.layerUniqueId];
       this.map.removeLayer(olayer);
     }
     else {
@@ -66,20 +82,20 @@ class WmtsManager {
     }
   }
   
-  layerExists(layername) {
-    return (layername in this.wmtsLayers);
+  layerExists(layer) {
+    return (layer.layerUniqueId in this.wmtsLayers);
   }
 
-  getLayer(layername) {
-    if (this.layerExists(layername)) {
-      return this.wmtsLayers[layername];
+  getLayer(layer) {
+    if (this.layerExists(layer)) {
+      return this.wmtsLayers[layer.layerUniqueId];
     }
     return null;
   }
 
-  changeOpacity(layername, opacity) {
-    if (this.layerExists(layername)) {
-      const olayer = this.wmtsLayers[layername];
+  changeOpacity(layer, opacity) {
+    if (this.layerExists(layer)) {
+      const olayer = this.wmtsLayers[layer.layerUniqueId];
       olayer.setOpacity(opacity);
     }
     else {

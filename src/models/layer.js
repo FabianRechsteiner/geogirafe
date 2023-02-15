@@ -14,6 +14,7 @@ class Layer {
   url = null;
   imageType = null;
   layers = null;
+  dimensions = null;
   queryLayers = null;
   minResolution = null;
   maxResolution = null;
@@ -56,6 +57,7 @@ class Layer {
       this.isGroup = false;
       this.isLayer = true;
       this.layers = elem.layer;
+      this.dimensions = elem.dimensions;
     }
     else if (elem.type === 'WMS') {
       this.server = serverName;
@@ -101,6 +103,15 @@ class Layer {
 
   get serverUniqueQueryId() {
     return this.server + this.imageType;
+  }
+
+  get layerUniqueId() {
+    if (this.type === 'WMTS' && this.dimensions !== null) {
+      return this.layers + JSON.stringify(this.dimensions);
+    }
+    
+    // All other cases
+    return this.name;
   }
 
   get isTransparent() {

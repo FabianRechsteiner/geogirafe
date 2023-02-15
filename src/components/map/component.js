@@ -455,7 +455,7 @@ class MapComponent extends GirafeHTMLElement {
       this.swipeManager.activateSwipeForWms(layerInfos, side);
     }
     else if (layerInfos.isWmts) {
-      this.swipeManager.activateSwipeForWmts(layerInfos.name, side, layerInfos.opacity);
+      this.swipeManager.activateSwipeForWmts(layerInfos, side, layerInfos.opacity);
     }
   }
 
@@ -560,7 +560,7 @@ class MapComponent extends GirafeHTMLElement {
         this.wmsManager.addLayer(l);
       }
       else if (l.isWmts) {
-        this.wmtsManager.addLayer(l.url, l.name, l.opacity);
+        this.wmtsManager.addLayer(l);
       }
     });
   }
@@ -571,8 +571,8 @@ class MapComponent extends GirafeHTMLElement {
         this.wmsManager.removeLayer(l);
       }
       else if (l.isWmts) {
-        if (this.wmtsManager.layerExists(l.name)) {
-          this.wmtsManager.removeLayer(l.name);
+        if (this.wmtsManager.layerExists(l)) {
+          this.wmtsManager.removeLayer(l);
         }
       }
     });
@@ -605,8 +605,8 @@ class MapComponent extends GirafeHTMLElement {
       this.wmsManager.changeOpacity(layerInfos);
     }
     else if (layerInfos.isWmts) {
-      if (this.wmtsManager.layerExists(layerInfos.name)) {
-        this.wmtsManager.changeOpacity(layerInfos.name, layerInfos.opacity);
+      if (this.wmtsManager.layerExists(layerInfos)) {
+        this.wmtsManager.changeOpacity(layerInfos, layerInfos.opacity);
       }
     }
   }
