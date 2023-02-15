@@ -165,8 +165,18 @@ class SearchComponent extends GirafeHTMLElement {
       this.messageManager.sendMessage(GeoEvents.Map, {action: 'panToCoordinate', coordinate: resultGeometry.coordinates });
       this.onFocusOut();
     }
+    else if (resultGeometry.type === 'MultiPoint' && resultGeometry.coordinates.length === 1) {
+      // We get a MultiPoint geometry, but this actually is a Point
+      this.messageManager.sendMessage(GeoEvents.Map, {action: 'panToCoordinate', coordinate: resultGeometry.coordinates[0] });
+      this.onFocusOut();
+    }
     else if (resultGeometry.type === 'Polygon') {
       this.zoomTo(resultGeometry.coordinates);
+      this.onFocusOut();
+    }
+    else if (resultGeometry.type === 'MultiPolygon' && resultGeometry.coordinates.length === 1) {
+      // We get a MultiPolygon geometry, but this actually is a Polygon
+      this.zoomTo(resultGeometry.coordinates[0]);
       this.onFocusOut();
     }
     else {
