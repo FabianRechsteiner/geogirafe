@@ -57,31 +57,25 @@ girafe-search {
   overflow: visible;
 }
 
-footer {
-  position: fixed;
+section {
+  position: absolute;
+  display: flex;
+  top: 4.5rem;
   bottom: 0;
   left: 0;
-  border: none;
-  height: 1.5rem;
-  width: 100%;
-  z-index: 10;
-  background-color: transparent;
-  padding-left: .5rem
+  right: 0;
 }
 
 girafe-map {
-  position: fixed;
-  top: 0.5rem;
+  position: absolute;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0
 }
 
 girafe-tree-view {
-  position: fixed;
-  left: 0;
-  top: 4.5rem;
-  bottom: 0;
+  position: relative;
   width: 25rem;
   z-index: 90;
   background: #fff;
@@ -89,8 +83,20 @@ girafe-tree-view {
   box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
+footer {
+  flex: 1;
+  align-self: flex-end;
+  bottom: 0;
+  border: none;
+  height: 1.5rem;
+  z-index: 100000;
+  background-color: red;
+  width: 50rem;
+  height: 3rem;
+}
+
 girafe-redlining, girafe-print {
-  position: fixed;
+  position: absolute;
   right: 0;
   top: 4.5rem;
   bottom: 0;
