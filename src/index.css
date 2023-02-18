@@ -84,15 +84,18 @@ girafe-tree-view {
 }
 
 footer {
-  flex: 1;
+  flex: 0;
   align-self: flex-end;
   bottom: 0;
   border: none;
   height: 1.5rem;
   z-index: 100000;
-  background-color: red;
-  width: 50rem;
-  height: 3rem;
+  min-width: 10rem;
+  height: 2.2rem;
+  line-height: 2.2rem;
+  padding-left: 1rem;
+  background: #ffffff99;
+  font-weight: bold;
 }
 
 girafe-redlining, girafe-print {
