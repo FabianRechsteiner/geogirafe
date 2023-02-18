@@ -56,6 +56,8 @@ class TreeViewComponent extends GirafeResizableElement {
     this.expandAllButton = this.shadow.querySelector('#expandall');
     this.swipeButton = this.shadow.querySelector('#swipe');
     this.deleteButton = this.shadow.querySelector('#delete');
+
+    this.activateTooltips(false, [800, 0], 'right');
   }
 
   renderChilds(container, elem, parentServer) {
