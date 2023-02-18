@@ -86,13 +86,6 @@ class ViewManager {
     const newExtentPoint1 = transform([currentExtent[0], currentExtent[1]], currentProjection, this.projection);
     const newExtentPoint2 = transform([currentExtent[2], currentExtent[3]], currentProjection, this.projection);
     const newExtent = [newExtentPoint1[0], newExtentPoint1[1], newExtentPoint2[0], newExtentPoint2[1]];
-
-    // Convert allowed resolutions
-    /*const newAllowedResolutions = [];
-    this.allowedResolutions.forEach((res) => {
-      const newRes = (res * currentPointResolution) / newPointResolution;
-      newAllowedResolutions.push(newRes);
-    });*/
     this.allowedResolutions = this.scalesToResolutions(this.scales);
 
     const newView = new View({
