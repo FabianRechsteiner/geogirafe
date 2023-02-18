@@ -1,11 +1,9 @@
 import Layer from 'ol/layer/Layer';
 import {createCanvasContext2D} from 'ol/dom';
 import {toRadians} from 'ol/math';
+import GeoConsts from '../../../tools/geoconsts';
 
 class MaskLayer extends Layer {
-
-    INCHES_PER_METER = 39.37;
-    DOTS_PER_INCH = 72;
 
     size = null;
     scale = null
@@ -56,8 +54,8 @@ class MaskLayer extends Layer {
       const scale = this.getScale(frameState);
       const resolution = frameState.viewState.resolution;
   
-      const extentHalfWidth = ((width / this.DOTS_PER_INCH / this.INCHES_PER_METER) * scale) / resolution / 2;
-      const extentHalfHeight = ((height / this.DOTS_PER_INCH / this.INCHES_PER_METER) * scale) / resolution / 2;
+      const extentHalfWidth = ((width / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * scale) / resolution / 2;
+      const extentHalfHeight = ((height / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * scale) / resolution / 2;
   
       const rotation = this.getRotation !== undefined ? toRadians(this.getRotation()) : 0;
   
