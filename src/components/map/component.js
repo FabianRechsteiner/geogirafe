@@ -2,22 +2,17 @@ import Map from 'ol/Map';
 
 import VectorSource from 'ol/source/Vector';
 import ImageWMS from 'ol/source/ImageWMS';
-
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
-
-import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-
 import Collection from 'ol/Collection';
 import { platformModifierKeyOnly } from 'ol/events/condition';
 import { Modify, Snap, DragBox } from 'ol/interaction';
 import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
-import View from 'ol/View';
-import { getPointResolution, get as getProjection, transform } from 'ol/proj';
+import { get as getProjection } from 'ol/proj';
 import adjectives from 'adjectives';
 import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
@@ -26,13 +21,13 @@ import OLCesium from 'olcs/OLCesium.js';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events.js';
-
 import MaskLayer from './tools/maskLayer';
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
 import OsmManager from './tools/osmmanager';
 import VectorTilesManager from './tools/vectortilesmanager';
 import WmtsManager from './tools/wmtsmanager';
+import ViewManager from './tools/viewmanager';
 
 class MapComponent extends GirafeHTMLElement {
 
@@ -43,6 +38,7 @@ class MapComponent extends GirafeHTMLElement {
   wmtsManager = null;
   wmsManager = null;
   osmManager = null;
+  viewManager = null;
   vectorTilesManager = null;
 
   srid = null;
@@ -94,30 +90,26 @@ class MapComponent extends GirafeHTMLElement {
     super.render();
 
     this.srid = this.configManager.Config.map.srid;
-    const defaultextent = this.configManager.Config.map.maxExtent.split(',').map(Number);
-    const startcenter = this.configManager.Config.map.startPosition.split(',').map(Number);
-    const startzoom = Number(this.configManager.Config.map.startZoom);
 
     // Create map element
     let target = this.shadow.querySelector('#ol-map-container');
     this.map = new Map({
       target: target,
-      layers: [],
-      view: new View({
-        center: startcenter,
-        zoom: startzoom,
-        projection: this.srid,
-        extent: defaultextent
-      }),
+      layers: []
     });
 
     // Initialize managers
     this.wmsManager = new WmsManager(this.map, this.srid);
     this.osmManager = new OsmManager(this.map, this.srid);
+    this.viewManager = new ViewManager(this.map, this.srid);
     this.vectorTilesManager = new VectorTilesManager(this.map, this.srid);
     this.wmtsManager = new WmtsManager(this.map, this.srid);
     this.swiper = this.shadow.getElementById('swiper');
     this.swipeManager = new SwipeManager(this.map, this.swiper, this.wmtsManager, this.wmsManager);
+
+    // View
+    const view = this.viewManager.getView();
+    this.map.setView(view);
 
     // Default basemap : OSM
     this.osmManager.addBasemapLayer();
@@ -250,8 +242,9 @@ class MapComponent extends GirafeHTMLElement {
     const mapY = center[1];
     const mapZ = view.getZoom();
     const resolution = view.getResolution();
+    const scale = this.viewManager.getScale();
     this.messageManager.sendMessage(GeoEvents.Map, { action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ });
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'resolutionChanged', resolution: resolution });
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'resolutionChanged', resolution: resolution, scale: scale });
   }
 
   onClick(e) {
@@ -400,12 +393,9 @@ class MapComponent extends GirafeHTMLElement {
         this.onChangeProjection(details.state.projection);
       }
       if (details.state.mapX !== 'null' && details.state.mapY !== 'null' && details.state.mapZ !== 'null') {
-        const newView = new View({
-          center: [parseFloat(details.state.mapX), parseFloat(details.state.mapY)],
-          zoom: parseFloat(details.state.mapZ),
-          projection: this.projection,
-          extent: this.map.getView().get('extent')
-        });
+        this.viewManager.setCenter([parseFloat(details.state.mapX), parseFloat(details.state.mapY)]);
+        this.viewManager.setZoom(parseFloat(details.state.mapZ));
+        const newView = this.viewManager.getView();
         this.map.setView(newView);
       }
     }
@@ -520,35 +510,8 @@ class MapComponent extends GirafeHTMLElement {
     }
 
     this.srid = srid;
-
-    const currentView = this.map.getView();
-    const currentProjection = currentView.getProjection();
-
-    // Convert old values...
-    const currentResolution = currentView.getResolution();
-    const currentCenter = currentView.getCenter();
-    const currentRotation = currentView.getRotation();
-    const currentExtent = currentView.get('extent');
-
-    // ... to new ones
-    const newCenter = transform(currentCenter, currentProjection, this.projection);
-    const currentMPU = currentProjection.getMetersPerUnit();
-    const newMPU = this.projection.getMetersPerUnit();
-    const currentPointResolution = getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') * currentMPU;
-    const newPointResolution = getPointResolution(this.projection, 1 / newMPU, newCenter, 'm') * newMPU;
-    const newResolution = (currentResolution * currentPointResolution) / newPointResolution;
-    const newExtentPoint1 = transform([currentExtent[0], currentExtent[1]], currentProjection, this.projection);
-    const newExtentPoint2 = transform([currentExtent[2], currentExtent[3]], currentProjection, this.projection);
-    const newExtent = [newExtentPoint1[0], newExtentPoint1[1], newExtentPoint2[0], newExtentPoint2[1]];
-
-    // Create new view
-    const newView = new View({
-      center: newCenter,
-      resolution: newResolution,
-      rotation: currentRotation,
-      projection: this.projection,
-      extent: newExtent
-    });
+    // TODO REG : update srid in all manager?
+    const newView = this.viewManager.getViewFromSrid(srid);
     this.map.setView(newView);
 
     this.messageManager.sendMessage(GeoEvents.Map, { action: 'projectionChanged', projection: this.srid });
