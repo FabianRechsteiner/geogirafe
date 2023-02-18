@@ -1,6 +1,10 @@
 {
   "//comment1": "This is the whole configuration of the GeoGirafe Viewer.",
   "//comment2": "Here, you can set the entries according to your environment.",
+  "general": {
+    "//comment1": "Will be used when formating numbers or dates",
+    "locale": "fr-CH"
+  },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
     "fr": "https://map.cartoriviera.ch/static/dummy/fr.json",
@@ -25,9 +29,11 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "startZoom": "13",
-    "startPosition": "2556000,1145000",
-    "maxExtent": "2486355,1105663,2610155,1220113"
+    "startZoom": "1",
+    "startPosition": "2554000,1145000",
+    "maxExtent": "2486355,1105663,2610155,1220113",
+    "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200, 100],
+    "constraintScales": true
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
