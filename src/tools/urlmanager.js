@@ -11,6 +11,8 @@ class UrlManager {
   dependencyTotalCount = 0;
   dependencyInitializedCount = 0;
 
+  updateUrlTimeout = null;
+
   get everythingInitialized() {
     return this.dependencyInitializedCount === this.dependencyTotalCount;
   }
@@ -75,8 +77,18 @@ class UrlManager {
       if (this.everythingInitialized) {
         // Update URL only if every component have been initialized
         // Otherwise the URL will be overwritten with partial data
-        const encodedState = this.encodeState(details.state);
-        window.history.replaceState(null, '', encodedState);
+        
+        // Some times, for example when resizing the window, 
+        // this event can be sent multiple times in the same second.
+        // This can cause an error in the browser, and the URL won't be update any more after that
+        // Therefore, we only want to update the URL every 500 ms
+        if (this.updateUrlTimeout !== null) {
+          clearTimeout(this.updateUrlTimeout);
+        }
+        this.updateUrlTimeout = setTimeout(() => {
+          const encodedState = this.encodeState(details.state);
+          window.history.replaceState(null, '', encodedState);
+        }, 500);
       }
     }
   }
