@@ -212,7 +212,7 @@ class MapComponent extends GirafeHTMLElement {
     this.map.on('moveend', (e) => this.onMoveEnd(e));
     //this.map.on('movestart', (e) => console.log(e));
     //this.map.on('pointerdrag', (e) => console.log(e));
-    //this.map.on('pointermove', (e) => console.log(e));
+    this.map.on('pointermove', (e) => this.onPointerMove(e));
     //this.map.on('postcompose', (e) => console.log(e));
     //this.map.on('postrender', (e) => console.log(e));
     //this.map.on('precompose', (e) => console.log(e));
@@ -233,6 +233,9 @@ class MapComponent extends GirafeHTMLElement {
 
   onLoadEnd(e) {
     this.messageManager.sendMessage(GeoEvents.Map, { action: 'renderEnded' });
+  }
+  onPointerMove(e) {
+    this.messageManager.sendMessage(GeoEvents.Map, { action: 'pointerMove', coordinate: e.coordinate });
   }
 
   onMoveEnd(e) {

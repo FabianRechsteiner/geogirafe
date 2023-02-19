@@ -49,7 +49,6 @@ class ViewManager {
     var unit = this.projection.getUnits();
     var resolution = this.map.getView().getResolution();
     const scale = resolution * METERS_PER_UNIT[unit] * GeoConsts.INCHES_PER_METER * GeoConsts.SCREEN_DOTS_PER_INCH;
-    console.log(scale);
     return scale;
   }
 

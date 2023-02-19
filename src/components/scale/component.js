@@ -13,7 +13,6 @@ class ScaleComponent extends GirafeHTMLElement {
   render() {
     super.render();
     this.scaleSpan = this.shadow.querySelector('#scale');
-
     this.locale = this.configManager.Config.general.locale;
   }
 

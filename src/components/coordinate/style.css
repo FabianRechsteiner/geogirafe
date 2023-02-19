@@ -1,0 +1,11 @@
+#content {
+    background: #ffffffbb;
+    width: fit-content;
+    white-space: nowrap;
+    padding: 0.3rem 0.5rem;
+    font-size: 1.1rem;
+}
+
+span {
+    font-weight: bold;
+}
