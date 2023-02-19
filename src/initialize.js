@@ -13,6 +13,7 @@ import ThemeComponent from './components/themes/component.js';
 import LanguageComponent from './components/language/component.js';
 import ButtonComponent from './components/button/component.js';
 import ScaleComponent from './components/scale/component.js';
+import CoordinateComponent from './components/coordinate/component.js';
 import MenuButtonComponent from './components/menubutton/component.js';
 import RedliningComponent from './components/redlining/component.js';
 import PrintComponent from './components/print/component.js';
