@@ -8,7 +8,6 @@ class BasemapComponent extends GirafeHTMLElement {
   servers = {};
   basemapJson = {};
   basemaps = [];
-  basemapSelect = null;
   container = null;
   
   constructor() {
@@ -19,7 +18,6 @@ class BasemapComponent extends GirafeHTMLElement {
     super.render();
 
     this.container = this.shadow.querySelector('#container');
-    this.basemapSelect = this.shadow.querySelector('#basemap');
 
     const defaultBasemap = this.configManager.Config.themes.defaultBasemap;
     let defaultBasemapIndex;
@@ -80,6 +78,8 @@ class BasemapComponent extends GirafeHTMLElement {
     button.setAttribute('text', label);
     button.setAttribute('size', 'large');
     button.classList.add('border-top');
+    // TODO REG: When using onClick event here instead of message and action attributes, 
+    // the menu won't close autoamtically. Why?
     button.onClick = () => this.onBasemapChanged(basemapId);
     this.container.appendChild(button);
   }

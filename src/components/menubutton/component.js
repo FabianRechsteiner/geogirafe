@@ -7,6 +7,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   text = null;
   textSpan = null;
   menuContent = null;
+  container = null;
   
   constructor() {
     super('menubutton');
@@ -14,6 +15,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
+    this.container = this.shadow.querySelector('#container');
     this.button = this.shadow.querySelector('#button');
     this.menuContent = this.shadow.querySelector('#menu-content');
 
@@ -39,6 +41,8 @@ class MenuButtonComponent extends GirafeHTMLElement {
       const size = this.getAttribute('size');
       this.button.classList.add(size);
     }
+    // Apply all style from host to container
+    this.container.classList = this.classList;
 
     this.setButtonStyle();
   }

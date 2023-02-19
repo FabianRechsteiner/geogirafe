@@ -89,11 +89,7 @@ footer {
   border: none;
   z-index: 10;
   display: flex;
-  flex-direction: column;
-}
-
-footer * {
-  margin: 0.2rem 0.5rem;
+  flex-direction: row;
 }
 
 girafe-redlining, girafe-print {

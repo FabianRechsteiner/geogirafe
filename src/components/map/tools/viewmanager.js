@@ -12,9 +12,12 @@ class ViewManager {
 
   configManager = null;
 
-  center = null;
+  // Those 3 values are linked and can indicate the current zoomlevel/resolution/scale
   zoom = null;
   resolution = null;
+  scale = null;
+
+  center = null;
   extent = null;
   scales = null;
   allowedResolutions = null;
@@ -36,18 +39,23 @@ class ViewManager {
   }
 
   scalesToResolutions(scales) {
-    var unit = this.projection.getUnits();
     const resolutions = [];
     scales.forEach((scale) => {
-      const resolution = scale / METERS_PER_UNIT[unit] / GeoConsts.INCHES_PER_METER / GeoConsts.SCREEN_DOTS_PER_INCH;
+      const resolution = this.scaleToResolution(scale);
       resolutions.push(resolution);
     });
     return resolutions;
   }
 
+  scaleToResolution(scale) {
+    const unit = this.projection.getUnits();
+    const resolution = scale / METERS_PER_UNIT[unit] / GeoConsts.INCHES_PER_METER / GeoConsts.SCREEN_DOTS_PER_INCH;
+    return resolution;
+  }
+
   getScale() {
-    var unit = this.projection.getUnits();
-    var resolution = this.map.getView().getResolution();
+    const unit = this.projection.getUnits();
+    const resolution = this.map.getView().getResolution();
     const scale = resolution * METERS_PER_UNIT[unit] * GeoConsts.INCHES_PER_METER * GeoConsts.SCREEN_DOTS_PER_INCH;
     return scale;
   }
@@ -101,10 +109,25 @@ class ViewManager {
 
   setCenter(center) {
     this.center = center;
+    this.map.getView().setCenter(center);
   }
 
   setZoom(zoom) {
+    // TODO REG : Calculate resolution and scale ?
     this.zoom = zoom;
+  }
+
+  setResolution(resolution) {
+    // TODO REG : Calculate zoom and scale ?
+    this.resolution = resolution;
+    this.map.getView().setResolution(this.resolution);
+  }
+
+  setScale(scale) {
+    // TODO REG : Calculate zoom ?
+    this.scale = scale;
+    this.resolution = this.scaleToResolution(scale);
+    this.map.getView().setResolution(this.resolution);
   }
 }
 

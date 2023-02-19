@@ -8,8 +8,22 @@
 
 label:after {
     content: ":";
+    height: 2.3rem;
+    line-height: 2.3rem;
 }
 
 span {
-    font-weight: bold;
+    font-weight: bold;    
+    height: 2.3rem;
+    line-height: 2.3rem;
+}
+
+girafe-menu-button {
+    display: inline-block;
+}
+
+#container {
+    display: inline-flex;
+    flex-direction: column;
+    width: max-content;
 }

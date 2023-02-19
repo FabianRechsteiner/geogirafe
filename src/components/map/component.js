@@ -411,6 +411,9 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'changeBasemap') {
       this.onChangeBasemap(details.basemapList);
     }
+    else if (details.action === 'changeScale') {
+      this.onChangeScale(details.scale);
+    }
     else if (details.action === 'zoomToResolution') {
       this.zoomToResolution(details.resolution);
     }
@@ -493,8 +496,12 @@ class MapComponent extends GirafeHTMLElement {
     this.focusedFeaturesCollection.push(feature);
   }
 
+  onChangeScale(scale) {
+    this.viewManager.setScale(scale);
+  }
+
   zoomToResolution(resolution) {
-    this.map.getView().setResolution(resolution);
+    this.viewManager.setResolution(resolution);
   }
 
   zoomToExtent(extent) {
@@ -502,7 +509,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   panToCoordinate(coordinate) {
-    this.map.getView().setCenter(coordinate);
+    this.viewManager.setCenter(coordinate);
   }
 
   onChangeProjection(srid) {
