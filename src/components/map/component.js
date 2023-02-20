@@ -92,7 +92,7 @@ class MapComponent extends GirafeHTMLElement {
     this.srid = this.configManager.Config.map.srid;
 
     // Create map element
-    let target = this.shadow.querySelector('#ol-map-container');
+    let target = this.shadow.querySelector('#ol-map');
     this.map = new Map({
       target: target,
       layers: []
