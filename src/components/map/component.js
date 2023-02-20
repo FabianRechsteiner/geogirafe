@@ -444,6 +444,9 @@ class MapComponent extends GirafeHTMLElement {
     else if (details.action === 'activateSwipe') {
       this.onActivateSwipe(details.layer, details.side);
     }
+    else if (details.action === 'deactivateSwipe') {
+      this.onDeactivateSwipe();
+    }
   }
 
   onActivateSwipe(layerInfos, side) {
@@ -453,6 +456,12 @@ class MapComponent extends GirafeHTMLElement {
     else if (layerInfos.isWmts) {
       this.swipeManager.activateSwipeForWmts(layerInfos, side, layerInfos.opacity);
     }
+  }
+
+  onDeactivateSwipe() {
+    // TODO REG: Better manage WMS in order to combine swiped layers again in a unique olayer 
+    // (to minimize the amount of WMS queries that are sent to the server)
+    this.swipeManager.deactivateSwipe();
   }
 
   onGlobeToggled() {

@@ -102,7 +102,20 @@ class ButtonComponent extends GirafeHTMLElement {
       }
     }
 
+    // Observe parent to adapt to attribute chagnes
+    const observer = new MutationObserver(this.parentAttributeChanged.bind(this));
+    observer.observe(this, { attributes: true });
+
     this.button.addEventListener('click', (e) => this.onClick());
+  }
+
+  parentAttributeChanged(mutationList, observer) {
+    mutationList.forEach(mutation => {
+      if (mutation.attributeName === 'class') {
+        // Apply all style from host to container
+        this.container.classList = this.classList;
+      }
+    });
   }
 
   onClick() {

@@ -232,3 +232,7 @@ girafe-basemap {
   right: 0;
   top: 0;
 }
+
+#swipe {
+  display: none;
+}

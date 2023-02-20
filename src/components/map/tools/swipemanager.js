@@ -42,8 +42,11 @@ class SwipeManager {
   #setSwiperVisible() {
     this.swiper.style.display = 'block';
   }
-  
 
+  #hideSwiper() {
+    this.swiper.style.display = 'none';
+  }
+  
   /*deactivateSwipeForWms(layerInfos) {
     if (layerInfos.name in this.swipedLayers) {
       // Back to normal
@@ -70,6 +73,7 @@ class SwipeManager {
     const prerenderHandler = (e) => this.#prerenderSwipe(e, side);
     const postrenderHandler = (e) => this.#postrenderSwipe(e);
     this.swiperEventListeners[layername] = {
+      olayer: olayer,
       prerender: prerenderHandler,
       postrender: postrenderHandler
     };
@@ -77,6 +81,17 @@ class SwipeManager {
     olayer.addEventListener('postrender', postrenderHandler);
 
     this.#setSwiperVisible();
+    this.map.render();
+  }
+
+  deactivateSwipe() {
+    // Remove all events listeners
+    for (const [key, value] of Object.entries(this.swiperEventListeners)) {
+      value.olayer.removeEventListener('prerender', value.prerender);
+      value.olayer.removeEventListener('postrender', value.postrender);
+    }
+
+    this.#hideSwiper();
     this.map.render();
   }
 
