@@ -672,10 +672,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   setFeatureName(id, name) {
-    console.log(id);
     const feature = this.redliningFeaturesCollection.getArray().find(f => f.ol_uid === id);
-    console.log('old: ' + feature.get('name'));
-    console.log('new: ' + name);
     feature.set('name', name);
   }
 
@@ -692,12 +689,10 @@ class MapComponent extends GirafeHTMLElement {
       feature.set('strokeWidth', strokeWidth);
     }
     if (text === 'textbigger') {
-      console.log(text);
       const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
       feature.set('textSize', textSize + 1);
     }
     if (text === 'textsmaller') {
-      console.log(text);
       const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
       feature.set('textSize', textSize - 1);
     }
@@ -710,7 +705,6 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   activateRedliningTool(tool) {
-    console.log('Activating Redlining Tool...');
     // First remove existing interaction.
     this.deactivateRedliningTool();
 

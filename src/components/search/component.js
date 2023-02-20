@@ -158,7 +158,6 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   onSelect(e) {
-    console.log(e.target.innerHTML);
     const div = super.getParentOfType('DIV', e.target);
     const resultGeometry = this.resultList[div.dataset.resultId];
     if (resultGeometry.type === 'Point') {

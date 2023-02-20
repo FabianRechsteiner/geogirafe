@@ -99,7 +99,7 @@ class I18nManager {
         }
         else {
           // No translation found. We use the key as translation
-          console.log('no translation for ' + key);
+          // console.log('no translation for ' + key);
           item.innerHTML = key;
         }
       });

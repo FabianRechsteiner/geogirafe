@@ -33,7 +33,6 @@ class LanguageComponent extends GirafeHTMLElement {
 
   onInitEvent(details) {
     if (details.action === 'initState') {
-      console.log(details.state);
       if (!this.isNullOrUndefined(details.state.language)) {
         this.menuButton.setText(details.state.language.toUpperCase());
       }

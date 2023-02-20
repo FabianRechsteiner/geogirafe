@@ -254,7 +254,6 @@ class PrintComponent extends GirafeResizableElement {
   }
 
   managePrintStatus(result) {
-    console.log(result);
     const downloadUrl = this.getDownloadUrl(result);
     const statusUrl = this.getStatusUrl(result);
 
@@ -301,7 +300,6 @@ class PrintComponent extends GirafeResizableElement {
     fetch(statusUrl)
     .then(r => r.json())
     .then(status => {
-      console.log(status);
       if (!status.done) {
         // We wait maximum 30 seconds
         if (status.elapsedTime > 30000) {

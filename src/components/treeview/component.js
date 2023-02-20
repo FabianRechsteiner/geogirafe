@@ -474,10 +474,6 @@ class TreeViewComponent extends GirafeResizableElement {
     const carets = this.ulRoot.querySelectorAll('.' + oldStyle);
     for (let i=0; i<carets.length; i++) {
       const caret = carets[i];
-      console.log(i);
-      console.log(caret);
-      console.log(oldStyle);
-      console.log(newStyle);
       caret.classList.remove(oldStyle);
       caret.classList.add(newStyle);
     }

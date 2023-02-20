@@ -94,7 +94,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
                 elementTypeToName[type] = name;
               }
               else {
-                console.log('Why happend with this element?');
+                console.log('What happend with this element?');
               }
             }
             // Then, find all "complexType" elements
@@ -207,7 +207,6 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   }
 
   onFocusFeature(index) {
-    console.log('Focus on ' + index);
     this.focusedIndex = index;
     this.focusFeature(this.selectedFeatures[this.focusedIndex]);
   }
