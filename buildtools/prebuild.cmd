@@ -1,8 +1,9 @@
 @echo off
-REM Copy HTML Templates
+REM Copy HTML Templates, CSS and images
 cd src
 xcopy components\*.html static\components\ /S /Y
 xcopy components\*.css static\components\ /S /Y
+xcopy components\*.png static\components\ /S /Y
 cd .. 
 
 REM Copy CSS styles for Libraries (are not included in css bundle)

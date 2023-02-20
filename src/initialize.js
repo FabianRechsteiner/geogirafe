@@ -18,6 +18,7 @@ import MenuButtonComponent from './components/menubutton/component.js';
 import RedliningComponent from './components/redlining/component.js';
 import PrintComponent from './components/print/component.js';
 import SelectionWindowComponent from './components/selectionwindow/component.js';
+import HelpComponent from './components/help/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';

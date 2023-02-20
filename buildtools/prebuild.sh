@@ -1,12 +1,11 @@
 #!/bin/bash
 
-# Copy HTML Templates
+# Copy HTML Templates, CSS and images
 cd src
 rm -Rf static/components
 cp --parents -R components/**/*.html static/
-#cp --parents -R components/**/**/*.html static/
 cp --parents -R components/**/*.css static/
-#cp --parents -R components/**/**/*.css static/
+cp --parents -R components/**/**/*.png static/
 cd .. 
 
 # Copy CSS styles for Libraries (are not included in css bundle)

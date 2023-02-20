@@ -19,10 +19,11 @@
   <body>
     <header>
       <girafe-theme-select></girafe-theme-select>
-      <img id="logo" alt="geogirafe-logo" src="static/images/logo_small.png" />
+      <img id="logo" alt="geogirafe-logo" src="images/logo_small.png" />
       <girafe-search id="search"></girafe-search>
       <div id="buttonbar">
         <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
+        <girafe-button icon-style="fa-2xl fa-solid fa-circle-question" message="Map" action="help"></girafe-button>
         <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
           <div slot="menu-content">
             <girafe-button icon-style="fa-xl fa-regular fa-pen-to-square" text="Draw" message="RedLining" action="redliningToggled"></girafe-button>
@@ -46,5 +47,6 @@
     <girafe-redlining dock="right"></girafe-redlining>
     <girafe-print dock="right"></girafe-print>
     <girafe-selection-window></girafe-selection-window>
+    <girafe-help></girafe-help>
   </body>
 </html>
