@@ -16,6 +16,16 @@
   line-height: 4rem;
 }
 
+#container.transparent #button {
+  background-color: transparent;
+  color: #444;
+}
+
+#container.transparent #button:hover {
+  background-color: transparent;
+  color: #000;
+}
+
 #button.small {
   width: 2.3rem;
   height: 2.3rem;

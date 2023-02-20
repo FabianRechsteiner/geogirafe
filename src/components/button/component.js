@@ -4,6 +4,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 class ButtonComponent extends GirafeHTMLElement {
 
   button = null;
+  container = null;
   icon = null;
   textSpan = null;
   text = null;
@@ -18,6 +19,7 @@ class ButtonComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
+    this.container = this.shadow.querySelector('#container');
     this.button = this.shadow.querySelector('#button');
 
     if (this.hasAttribute('icon-style')) {
@@ -39,6 +41,9 @@ class ButtonComponent extends GirafeHTMLElement {
       const size = this.getAttribute('size');
       this.button.classList.add(size);
     }
+    // Apply all style from host to container
+    this.container.classList = this.classList;
+    
     this.setButtonStyle();
   }
 
