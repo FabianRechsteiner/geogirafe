@@ -100,8 +100,8 @@ pages:
     - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
 
     # Compress all files
-    - find public -type f -regex '.*\.\(html\|css\|json\)' -exec brotli -k -f {} \;
-    - find public -type f -regex '.*\.\(html\|css\|json\)' -exec gzip -k -f {} \;
+    - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
+    - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec gzip -k -f {} \;
 
   artifacts:
     paths:
