@@ -9,6 +9,7 @@ class I18nManager {
 
   translations = {};
   currentLanguage = null;
+  loadingLanguagePromise = null;
 
   messageManager = null;
   configManager = null;
@@ -45,24 +46,35 @@ class I18nManager {
     this.loadTranslations();
   }
 
-  async loadTranslations() {
+  loadTranslations() {
     if (this.currentLanguage in this.translations) {
       // Translation were already loaded.
       // => stop here
-      return this.translations[this.currentLanguage];
+      return Promise.resolve(this.translations[this.currentLanguage]);
+    }
+
+    if (this.loadingLanguagePromise) {
+      // There's already a promise for loading translations
+      // => return it instead of starting another request
+      return this.loadingLanguagePromise;
     }
 
     // Load translations
-    await this.configManager.loadConfig();
+    this.configManager.loadConfig();
     if (this.currentLanguage === null) {
       this.currentLanguage = this.configManager.Config.languages.default;
     }
 
     const url = this.configManager.Config.languages[this.currentLanguage];
-    const response = await fetch(url);
-    const content = await response.json();
-    this.translations[this.currentLanguage] = content[this.currentLanguage];
-    return this.translations[this.currentLanguage];
+    this.loadingLanguagePromise = fetch(url)
+      .then((response) => response.json())
+      .then((content) => {
+        this.translations[this.currentLanguage] = content[this.currentLanguage];
+        this.loadingLanguagePromise = null;
+        return this.translations[this.currentLanguage];
+      });
+    
+      return this.loadingLanguagePromise;
   }
 
   registerEvents() {
