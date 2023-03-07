@@ -38,7 +38,7 @@
     "constraintScales": true
   },
   "map3d": {
-    "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
-    "tilesetUrl": "https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"
+    "terrainUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/",
+    "tilesetUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/cesium/tiles/av-gebaeude-basel-stadt/tileset.json"
   }
 }
