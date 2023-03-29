@@ -7,9 +7,9 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "de": "https://pi.paloo.fr/mapbs/static-ngeo/build/de.json",
-    "en": "https://pi.paloo.fr/mapbs/static-ngeo/build/en.json",
-    "fr": "https://pi.paloo.fr/mapbs/static-ngeo/build/fr.json",
+    "de": "https://map.geo.test.bs.ch/static/dummy/de.json",
+    "en": "https://map.geo.test.bs.ch/static/dummy/en.json",
+    "fr": "https://map.geo.test.bs.ch/static/dummy/fr.json",
     "//comment2": "Default language",
     "default": "de"
   },
@@ -21,11 +21,11 @@
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
-    "url": "https://pi.paloo.fr/mapbs/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+    "url": "https:///map.geo.test.bs.ch/mapbs/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "https://pi.paloo.fr/mapbs/printproxy/",
+    "url": "https:///map.geo.test.bs.ch/mapbs/printproxy/",
     "//comment2": "The print layout selected by default",
     "defaultLayout": "print_A4_hochformat"
   },
