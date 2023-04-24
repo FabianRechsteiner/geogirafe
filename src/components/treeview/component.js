@@ -1,18 +1,14 @@
-import tippy from 'tippy.js';
-import Layer from '../../models/layer';
 import GeoEvents from '../../models/events';
 import GirafeResizableElement from '../../base/GirafeResizableElement'
-import I18nManager from '../../tools/i18nmanager';
+import IconManager from './tools/iconmanager';
+import MenuManager from './tools/menumanager';
 
 class TreeViewComponent extends GirafeResizableElement {
 
-  servers = {};
-  layers = [];
   ulRoot = null;
-  advanced = false;
 
   // To manage if all legends are visible or not
-  #allLegendsDisplayed = true;
+  /*#allLegendsDisplayed = true;
   get allLegendsDisplayed() {
     return this.#allLegendsDisplayed;
   }
@@ -42,10 +38,10 @@ class TreeViewComponent extends GirafeResizableElement {
       this.allLegendsDisplayed = !this.allLegendsDisplayed;
     }
     this.#allLegendsDisplayedCount = value;
-  }
+  }*/
   
   // To manage if all layers are expanded or not
-  #allLayersExpanded = false;
+  /*#allLayersExpanded = false;
   get allLayersExpanded() {
     return this.#allLayersExpanded;
   }
@@ -75,341 +71,112 @@ class TreeViewComponent extends GirafeResizableElement {
       this.allLayersExpanded = !this.allLayersExpanded;
     }
     this.#allLayersExpandedCount = value;
-  }
+  }*/
 
-  advancedOptionsButton = null;
-  toggleLegendsButton = null;
-  expandAllButton = null;
-  swipeButton = null;
-  deleteButton = null;
+
+
+  iconManager = new IconManager(this.shadow);
+  menuManager = new MenuManager(this.shadow);
 
   constructor() {
     super('treeview');
   }
 
-  registerEvents() {
-    window.addEventListener(GeoEvents.Theme, (e) => this.onThemeEvent(e.detail));
-    window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+  // Extract this method and similar to Utils class
+  getLayer(layerId) {
+    return this.state.layers.layersList.find(l => l.id === layerId);
+  }
 
-    this.advancedOptionsButton.addEventListener('click', () => this.toggleAdvancedOptions());
-    this.toggleLegendsButton.addEventListener('click', () => this.toggleAllLegends());
-    this.expandAllButton.addEventListener('click', () => this.expandAllLayers());
-    this.swipeButton.addEventListener('click', (e) => this.hideSwipe(e));
-    this.deleteButton.addEventListener('click', () => this.deleteAllLayers());
+  registerEvents() {
+    this.messageManager.register(this.onCustomGirafeEvent.bind(this));
+
+    this.stateManager.subscribe('position', (oldPosition, newPosition) => this.onResolutionChanged(newPosition.resolution));
+    this.stateManager.subscribe('selectedTheme', (oldTheme, newTheme) => this.onChangeTheme(newTheme));
+    this.stateManager.subscribe('layers.layersList.[0-9]*.isExpanded', (oldValue, newValue, layer) => this.expand(layer, newValue));
+    this.stateManager.subscribe('layers.layersList.[0-9]*.activeState', (oldValue, newValue, layer) => this.activate(layer));
+    this.stateManager.subscribe('layers.layersList.[0-9]*.isLegendExpanded', (oldValue, newValue, layer) => this.toggleLegend(layer));
+
+    this.menuManager.registerEvents();
   }
 
   connectedCallback() {
     this.loadTemplate()
-      .then(() => this.loadThemes()
-        .then(() => {
-          this.render();
-          super.translate();
-          this.registerEvents();
-          super.initialized();
-        })
-      )
-  }
-
-  async loadThemes() {
-    const response = await fetch(this.configManager.Config.themes.url);
-    const content = await response.json();
-    this.servers = content["ogcServers"];
+      .then(() => {
+        this.render();
+        super.translate();
+        this.registerEvents();
+        //super.initialized();
+      });
   }
 
   render() {
     super.render();
 
     this.ulRoot = this.shadow.querySelector('#treeview-list');
-    this.advancedOptionsButton = this.shadow.querySelector('#options');
-    this.toggleLegendsButton = this.shadow.querySelector('#togglelegends');
-    this.expandAllButton = this.shadow.querySelector('#expandall');
-    this.swipeButton = this.shadow.querySelector('#swipe');
-    this.deleteButton = this.shadow.querySelector('#delete');
+
 
     this.activateTooltips(false, [800, 0], 'right');
   }
 
-  renderChilds(container, elem, parentServer) {
-    // Add new sub-list
-    const ulChild = document.createElement('ul');
-    ulChild.style.display = 'none';
-    container.appendChild(ulChild);
-    elem.children.forEach(child => {
-      this.renderLeaf(ulChild, child, parentServer);
-    });
-  }
-
-  renderLeaf(ulParent, elem, parentServer) {
+  renderLeaf(ulParent, layer) {
     // Create new leaf
     const li = document.createElement('li');
+    li.id = layer.id;
     ulParent.appendChild(li);
 
-    //Create container div
+    // Create container div
     const container = document.createElement('div');
     li.appendChild(container);
 
-    // If a server is defined on this node, we use it.
-    // Otherwise, we use the server of the parent
-    const childServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
-
-    // Create Layer
-    const layer = this.createLayer(elem, childServer);
-    li.dataset.layerid = layer.id;
-
     // Add icons
-    this.renderLeafIcons(container, layer);
+    this.iconManager.renderLeafIcons(container, layer);
     // Add label
     this.renderLeafLabel(container, layer);
     
     // Append childs if any
-    if (elem.children !== undefined) {
-      this.renderChilds(container, elem, childServer);
-    }
-  }
+    if (layer.children.length > 0) {
+      const ulChild = document.createElement('ul');
+      ulChild.style.display = 'none';
+      container.appendChild(ulChild);
 
-  createLayer(elem, serverName) {
-      let url = null;
-      let urlWfs = null;
-      if (elem.type === 'WMS') {
-        // WMS Case: there must be an OGC-Server
-        if (serverName) {
-          const ogcServer = this.servers[serverName];
-          url = ogcServer.url;
-          if (ogcServer.wfsSupport === true) {
-            urlWfs = ogcServer.urlWfs;
-          }
-        }
-        else {
-          console.log('No OGC server found for layer ' + elem.name);
-        }
-      }
-      else if (elem.type === 'WMTS') {
-        // WMTS Case: we take the URL of Capabilities
-        url = elem.url;
-      }
-      else {
-        console.log('Unmanaged layer type: ' + elem.type);
-      }
-
-      const layer = new Layer(elem, serverName, url, urlWfs);
-      this.layers.push(layer);
-
-      // The id is the index of the layer in the layer list
-      layer.id = this.layers.length - 1;
-      layer.order = layer.id;
-      return layer;
-  }
-
-  renderDeleteIcon(li, layer) {
-    const del = document.createElement('i');
-    del.className = 'fa fa-solid fa-xmark tool selectable del';
-    del.setAttribute('tip', 'Remove this group');
-    del.onclick = (e) => this.deleteLayer(layer, e);
-    li.append(del);
-  }
-
-  renderLeafIcons(container, layer) {
-    // This function returns true if a placeholder for a whole legend mut be added
-    // False is not placeholder is needed
-    if (layer.isGroup) {
-      // We are not on a child layer
-      // => Add caret
-      const caret = document.createElement('i');
-      caret.className = 'fa fa-caret-right selectable expand';
-      caret.onclick = (e) => this.expand(e);
-      container.append(caret);
-      // Add selection icon
-      this.renderSelectionCircle(container);
-      // Add delete icon
-      this.renderDeleteIcon(container, layer);
-    }
-    else {
-      // We are on a child
-      // => Add spacer (replaces the caret)
-      const spacer = document.createElement('i');
-      spacer.className = 'spacer';
-      container.append(spacer);
-
-      // => Add iconUrl if any
-      if (layer.iconUrl) {
-        // A custom Legend icon has been defined.
-        // => We just use it
-        const icon = document.createElement('img');
-        icon.src = layer.iconUrl;
-        icon.alt = 'icon for ' + layer.name;
-        icon.className = 'iconurl';
-        container.append(icon);
-      }
-      else if (layer.hasLegend) {
-        // A whole legend needs to be display.
-        // => We add a legend button and the legend circle
-        this.renderSelectionCircle(container)
-
-        // Add icon for legend toggle
-        const legend = document.createElement('i');
-        //legend.className = 'fg-map-legend tool selectable';
-        legend.className = 'fa-solid fa-bars tool selectable legend';
-        legend.setAttribute('tip', 'Toggle legend');
-        legend.onclick = () => this.toggleLegend(layer.legendId);
-        container.append(legend);
-      }
-      else if (layer.isWms){
-        // Last case :
-        // We need to get the legendicon URL from openlayer
-        // before we can show the legend icon
-        const icon = document.createElement('img');
-        icon.id = layer.legendId;
-        icon.alt = 'icon for ' + layer.name;
-        icon.className = 'iconurl';
-        container.append(icon);
-
-        this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: layer});
-      }
-
-      // If we didn't add any icon for legend, we add a spacer
-      if (!layer.hasLegend) {
-        const legendSpacer = document.createElement('i');
-        legendSpacer.className = 'tool spacer';
-        container.append(legendSpacer);
-      }
-
-      // Add an icon to control the layer opacity
-      const opacity = document.createElement('i');
-      opacity.className = 'fa-regular fa-sun tool selectable advanced opacity';
-      opacity.setAttribute('tip', 'Control opacity');
-      tippy(opacity, {
-        trigger: 'click',
-        arrow: true,
-        interactive: true,
-        theme: 'light',
-        placement: 'bottom-end',
-        content: (reference) => {
-          const slider = document.createElement('input');
-          slider.type = 'range';
-          slider.className = 'slider';
-          slider.min = 0;
-          slider.max = 20;
-          slider.value = layer.opacity*20;
-          slider.oninput = (e) => this.changeOpacity(layer, reference, e);
-          return slider;
-        }
+      layer.children.forEach(childLayer => {
+        this.renderLeaf(ulChild, childLayer);
       });
-      container.append(opacity);
-
-      // Add swiper icons
-      const swipeLeft = document.createElement('i');
-      swipeLeft.className = 'fa-solid fa-arrow-left tool selectable advanced swipe-left';
-      swipeLeft.setAttribute('tip', 'Swipe layer on the left');
-      swipeLeft.onclick = () => this.swipeLayer(layer, 'left');
-      container.append(swipeLeft);
-
-      const swipeRight = document.createElement('i');
-      swipeRight.className = 'fa-solid fa-arrow-right tool selectable advanced swipe-right';
-      swipeRight.setAttribute('tip', 'Swipe layer on the right');
-      swipeRight.onclick = () => this.swipeLayer(layer, 'right');
-      container.append(swipeRight);
-
-      // On the childs, we can have a icon to zoom to the right resolution, where the layer will be visible
-      if (layer.hasRestrictedResolution()) {
-        const resolutionZoom = document.createElement('i');
-        resolutionZoom.className = 'fg-zoom-in tool selectable zoomres';
-        resolutionZoom.setAttribute('tip', 'Zoom to visible resolution');
-        resolutionZoom.onclick = (e) => this.zoomToResolution(layer.minResolution, layer.maxResolution);
-        container.append(resolutionZoom);
-      }
     }
   }
 
-  swipeLayer(layer, side) {
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'activateSwipe', layer: layer, side: side});
-    this.swipeButton.style.display = 'inline-block';
-  }
-
-  hideSwipe() {
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'deactivateSwipe'});
-    this.swipeButton.style.display = 'none';
-  }
-
-  deleteLayer(layer, e) {
-    const li = super.getParentOfType('LI', e.target);
+  // deleteLayer(layer, e) {
+  //   const li = super.getParentOfType('LI', e.target);
   
-    // First deactivate layer
-    if (layer.isGroup) {
-      const toggledLayers = this.toggleChilds(li, false);
-      this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'layerListDisabled', layerList: toggledLayers});
-    }
+  //   // First deactivate layer
+  //   if (layer.isGroup) {
+  //     this.toggleChilds(li, false);
+  //   }
 
-    // Then set the value in the list to null
-    // Caution : do not filter the list to remove the layer from it, 
-    // because the position in the list is the id of the layer
-    // and is used as reference in the TreeView
-    // TODO REG: change this because this can lead to errors
-    const index = this.layers.indexOf(layer);
-    this.layers[index] = null;
+  //   // Then delete it from list
+  //   const index = this.state.layers.layersList.indexOf(layer);
+  //   this.state.layers.layersList.splice(index, 1);
 
-    // Then remove element from treeview
-    li.remove();
-  }
 
-  deleteAllLayers() {
-    const lis = this.ulRoot.getElementsByTagName('li');
-    let toggledLayers = [];
-    for (let i=0; i<lis.length; i++) {
-      const li = lis[i];
-      const layer = this.layers[li.dataset.layerid];
-
-      if (layer.isGroup) {
-        const toggledChilds =  this.toggleChilds(li, false);
-        toggledLayers = toggledLayers.concat(toggledChilds);
-      }
-    }
-
-    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'layerListDisabled', layerList: toggledLayers});
-
-    // Reset layer list
-    this.ulRoot.innerHTML = '';
-    this.layers = [];
-  }
-
-  changeOpacity(layer, reference, e) {
-    layer.opacity = e.target.value/20;
-    if (layer.isTransparent) {
-      reference.classList.remove('fa-regular');
-      reference.classList.add('fa-solid');
-      reference.classList.add('active');
-    }
-    else {
-      reference.classList.remove('fa-solid');
-      reference.classList.add('fa-regular');
-      reference.classList.remove('active');
-    }
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'opacityChanged', layer: layer});
-  }
+  // }
 
   zoomToResolution(minResolution, maxResolution) {
     // Because of rounding errors (for example 1.59 becomes 1.589999999999998), 
     // we zoom a bit more than just the max resolution.
     // For the moment we try with 10% more
     const resolution = maxResolution - 10/100*maxResolution;
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'zoomToResolution', resolution: resolution });
+    this.state.position.resolution = resolution;
   }
 
-  toggleLegend(legendId, force=false, visible=false) {
-    const legend = this.shadow.querySelector('#' + legendId);
-    if (force && visible) {
+  toggleLegend(layer, force=false, visible=false) {
+    const legend = this.shadow.getElementById(layer.legendId);
+    if (layer.isLegendExpanded) {
       legend.style.display = 'block';
-    }
-    else if (force && !visible) {
-      legend.style.display = 'none';
-    }
-    else if (legend.style.display === 'none') {
-      legend.style.display = 'block';
-      this.allLegendsDisplayedCount++;
+      //this.allLegendsDisplayedCount++;
     }
     else {
       legend.style.display = 'none';
-      this.allLegendsDisplayedCount--;
+      //this.allLegendsDisplayedCount--;
     }
   }
   
@@ -431,93 +198,50 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  expand(e) {
-    const li = super.getParentOfType('LI', e.target);
+  expand(layer, isExpanded) {
+    const li = this.shadow.getElementById(layer.id);
     const ulChild = li.getElementsByTagName('ul')[0];
-    if (ulChild.style.display === 'none') {
-      // Expand
-      ulChild.style.display = 'block';
-      e.target.classList.remove('fa-caret-right');
-      e.target.classList.add('fa-caret-down');
-      this.allLayersExpandedCount++;
-    }
-    else {
-      // Collapse
-      ulChild.style.display = 'none';
-      e.target.classList.remove('fa-caret-down');
-      e.target.classList.add('fa-caret-right');
-      this.allLayersExpandedCount--;
-    }
-  }
-
-  expandAllLayers() {
-    const uls = this.ulRoot.getElementsByTagName('ul');
-    for (let i=0; i<uls.length; i++) {
-      const ul = uls[i];
-      if (this.allLayersExpanded) {
-        // Collapse
-        ul.style.display = 'none';
+    if (layer.isGroup) {
+      this.iconManager.toggleCaretIcon(layer);
+      if (isExpanded) {
+        // Expand
+        ulChild.style.display = 'block';
+        //this.allLayersExpandedCount++;
       }
       else {
-        // Expand
-        ul.style.display = 'block';
+        // Collapse
+        ulChild.style.display = 'none';
+        //this.allLayersExpandedCount--;
       }
     }
-
-    // Change caret icons
-    let oldStyle = 'fa-caret-right';
-    let newStyle = 'fa-caret-down';
-    if (this.allLayersExpanded) {
-      oldStyle = 'fa-caret-down';
-      newStyle = 'fa-caret-right';
-    }
-    const carets = this.ulRoot.querySelectorAll('.' + oldStyle);
-    for (let i=0; i<carets.length; i++) {
-      const caret = carets[i];
-      caret.classList.remove(oldStyle);
-      caret.classList.add(newStyle);
-    }
-
-    this.allLayersExpanded = !this.allLayersExpanded;
-    this.#allLayersExpandedCount = 0;
   }
 
   toggle(e, layer) {
     const li = super.getParentOfType('LI', e.target);
-
-    const setActive = !(layer.active);
-    this.toggleLeaf(li, layer, setActive);
+    if (layer.active) {
+      this.getLayer(layer.id).activeState = 'off';
+    }
+    else {
+      this.getLayer(layer.id).activeState = 'on';
+    }
 
     // Toggle childs
     if (layer.isGroup) {
-      const toggledLayers = this.toggleChilds(li, setActive);
-      const action = (setActive) ? 'layerListEnabled' : 'layerListDisabled';
-      this.messageManager.sendMessage(GeoEvents.TreeView, {action: action, layerList: toggledLayers});
+      this.toggleChilds(li, layer.active);
     }
 
     // Toggle parent if necessary
     this.toggleParent(li);
-
-    if (layer.isLayer) {
-      // We have data on this layer.
-      // => We are on a leaf with layer infos
-      // We send a message to activate/deactivate this layer
-      const action = (layer.active) ? 'layerEnabled' : 'layerDisabled';
-      this.messageManager.sendMessage(GeoEvents.TreeView, {action: action, layer: layer});
-    }
   }
 
-  toggleLeaf(li, layer, setActive) {
-    const circle = li.querySelector('[data-circle="true"]');
-
-    layer.active = setActive;
-    if (setActive) {
+  activate(layer) {
+    this.iconManager.toggleSelectionCircleIcon(layer);
+    const li = this.shadow.getElementById(layer.id);
+    if (layer.active) {
       li.className = 'active';
-      this.toggleSelectionCircle(circle, true);
     }
     else {
       li.className = '';
-      this.toggleSelectionCircle(circle, false);
     }
   }
 
@@ -529,21 +253,18 @@ class TreeViewComponent extends GirafeResizableElement {
       return [];
     }
 
-    let toggledLayers = [];
     const childLis = ul.getElementsByTagName('li');
     for (let i=0; i<childLis.length; i++) {
       const childLi = childLis[i];
-      const layer = this.layers[childLi.dataset.layerid];
-      if ((setActive && !layer.active) || (!setActive && !layer.inactive)) {
+      const layer = this.state.layers.layersList.find(l => l.id === parseInt(childLi.id));
+      if (setActive && !layer.active) {
+        this.getLayer(layer.id).activeState = 'on';
+      }
+      else if (!setActive && !layer.inactive) {
         //The layer is not in the right state yet.
-        this.toggleLeaf(childLi, layer, setActive);
-        if (layer.isLayer) {
-          toggledLayers.push(layer);
-        }
+        this.getLayer(layer.id).activeState = 'off';
       }
     }
-
-    return toggledLayers;
   }
 
   toggleParent(li) {
@@ -560,7 +281,7 @@ class TreeViewComponent extends GirafeResizableElement {
     const childLis = ul.getElementsByTagName('li');
     for (let i=0; i<childLis.length; i++) {
       const childLi = childLis[i];
-      const layer = this.layers[childLi.dataset.layerid];
+      const layer = this.state.layers.layersList.find(l => l.id === parseInt(childLi.id));
       if (layer.active) {
         allInactive = false;
       }
@@ -575,30 +296,22 @@ class TreeViewComponent extends GirafeResizableElement {
     }
 
     const liParent = super.getParentOfType('LI', ul);
-    const layerParent = this.layers[liParent.dataset.layerid];
-    const circle = liParent.getElementsByTagName('i')[1];
+    const layerParent = this.state.layers.layersList.find(l => l.id === parseInt(liParent.id));
     
     let stateChanged = false;
     if (allActive && !layerParent.active) {
       // Activate parent
-      layerParent.active = true;
-      liParent.className = 'active';
-      this.toggleSelectionCircle(circle, true);
+      this.getLayer(layerParent.id).activeState = 'on';
       stateChanged = true;
     }
     else if (allInactive && !layerParent.inactive) {
       // Deactivate parent
-      layerParent.active = false;
-      liParent.className = '';
-      this.toggleSelectionCircle(circle, false);
+      this.getLayer(layerParent.id).activeState = 'off';
       stateChanged = true;
     }
     else if (!layerParent.semiactive) {
       // Semi-active
-      layerParent.active = 'semi';
-      liParent.className = '';
-      this.toggleSelectionCircle(circle, 'semi');
-
+      this.getLayer(layerParent.id).activeState = 'semi';
       stateChanged = true;
     }
 
@@ -608,46 +321,9 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  renderSelectionCircle(li) {
-    const circle = document.createElement('i');
-    circle.dataset.circle = true;
-    circle.className = 'fa-xs fa-regular fa-circle selcircle';
-    li.append(circle);
-  }
-
-  toggleSelectionCircle(circle, active) {
-    // active can have the values true, false or 'semi'
-    if (this.isNullOrUndefined(circle)) {
-      // Circle does no exist. Just stop here
-      return;
-    }
-
-    if (active === true) {
-      circle.className = 'fa-xs fa-solid fa-circle selcircle';
-    }
-    else if (active === false) {
-      circle.className = 'fa-xs fa-regular fa-circle selcircle';
-    }
-    else if (active === 'semi') {
-      circle.className = 'fa-xs fa-solid fa-circle-half-stroke selcircle';
-    }
-  }
-
-  onThemeEvent(details) {
-    if (details.action === 'themeChanged') {
-      this.onChangeTheme(details.theme);
-    }
-  }
-
-  onTreeViewEvent(details) {
-    if (details.action === 'responseLegendUrl') {
+  onCustomGirafeEvent(details) {
+    if (details.action === GeoEvents.responseLegendUrl) {
       this.onLegendUrlChanged(details.id, details.url);
-    }
-  }
-
-  onMapEvent(details) {
-    if (details.action === 'resolutionChanged') {
-      this.onResolutionChanged(details.resolution);
     }
   }
 
@@ -683,11 +359,11 @@ class TreeViewComponent extends GirafeResizableElement {
 
   onChangeTheme(theme) {
     // Clear existing TreeView
-    this.deleteAllLayers();
+    this.ulRoot.innerHTML = '';
 
     // Add the current theme
-    theme.children.forEach(elem => {
-      this.renderLeaf(this.ulRoot, elem, null);
+    theme.layersTree.forEach(layer => {
+      this.renderLeaf(this.ulRoot, layer);
     });
 
     // Some objects needs to be added at the end of the rendering, 
@@ -696,16 +372,16 @@ class TreeViewComponent extends GirafeResizableElement {
 
     this.activateTooltips(false, [800, 0], 'right');
 
-    I18nManager.getInstance().translate(this.shadow);
+    super.translate();
   }
 
   postRender() {
     const lis = this.ulRoot.getElementsByTagName('li');
     for (let i=0; i<lis.length; i++) {
       const li = lis[i];
-      const layer = this.layers[li.dataset.layerid];
+      const layer = this.state.layers.layersList.find(l => l.id === parseInt(li.id));
       if (layer.isLayer) {
-        this.renderMoveIcons(li, layer);
+        this.iconManager.renderMoveIcons(li, layer);
         if (layer.hasLegend) {
           this.renderLegend(li, layer);
         }
@@ -722,124 +398,7 @@ class TreeViewComponent extends GirafeResizableElement {
     li.append(legendimg);
     legendimg.style.display = (layer.isLegendExpanded) ? 'block' : 'none';
     // Request legend image from openlayers
-    this.messageManager.sendMessage(GeoEvents.TreeView, {action: 'requestLegendUrl', layer: layer});
-  }
-
-  renderMoveIcons(li, layer) {
-
-    const container = li.getElementsByTagName('div')[0];
-
-    // Add move down
-    const movedown = document.createElement('i');
-    movedown.className = 'fa-solid fa-caret-down advanced tool selectable movedown';
-    movedown.setAttribute('tip', 'Move this layer down');
-    movedown.onclick = (e) => this.moveLayerDown(this, layer, e);
-    container.append(movedown);
-    // But hide it if we are on the last node
-    if (this.isNullOrUndefined(li.nextElementSibling) || li.nextElementSibling.nodeName !== 'LI') {
-      movedown.style.visibility = 'hidden';
-    }
-
-    // Add move up 
-    const moveup = document.createElement('i');
-    moveup.className = 'fa-solid fa-caret-up advanced tool selectable moveup';
-    moveup.setAttribute('tip', 'Move this layer up');
-    moveup.onclick = (e) => this.moveLayerUp(this, layer, e);
-    container.append(moveup);
-    // But hide it if we are on the first node
-    if (this.isNullOrUndefined(li.previousElementSibling) || li.previousElementSibling.nodeName !== 'LI') {
-      moveup.style.visibility = 'hidden';
-    }
-  }
-
-  moveLayerUp(_this, layer, e) {
-    const li = super.getParentOfType('LI', e.target);
-    const previousLi = li.previousElementSibling;
-    const previousLayer = _this.layers[previousLi.dataset.layerid];
-    
-    // Switch order values
-    const previousOrder = previousLayer.order;
-    previousLayer.order = layer.order;
-    layer.order = previousOrder;
-
-    // Invert layers in treeview
-    const ul = li.parentElement;
-    ul.insertBefore(li, previousLi);
-
-    // Show or hide moveup and movedown buttons
-    const limoveup = li.querySelectorAll('.moveup')[0];
-    const limovedown = li.querySelectorAll('.movedown')[0];
-    const previouslimoveup = previousLi.querySelectorAll('.moveup')[0];
-    const previouslimovedown = previousLi.querySelectorAll('.movedown')[0];
-    this.switchVisibility(limoveup, previouslimoveup);
-    this.switchVisibility(limovedown, previouslimovedown);
-
-    // Refresh Map
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'orderChanged', layers: [previousLayer, layer]});
-  }
-
-  moveLayerDown(_this, layer, e) {
-    const li = super.getParentOfType('LI', e.target);
-    const nextLi = li.nextElementSibling;
-    const nextLayer = _this.layers[nextLi.dataset.layerid];
-    
-    // Switch order values
-    const nextOrder = nextLayer.order;
-    nextLayer.order = layer.order;
-    layer.order = nextOrder;
-
-    // Invert layers in treeview
-    const ul = li.parentElement;
-    ul.insertBefore(nextLi, li);
-
-    // Show or hide moveup and movedown buttons
-    const limoveup = li.querySelectorAll('.moveup')[0];
-    const limovedown = li.querySelectorAll('.movedown')[0];
-    const nextlimoveup = nextLi.querySelectorAll('.moveup')[0];
-    const pnextlimovedown = nextLi.querySelectorAll('.movedown')[0];
-    this.switchVisibility(limoveup, nextlimoveup);
-    this.switchVisibility(limovedown, pnextlimovedown);
-
-    // Refresh Map
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'orderChanged', layers: [nextLayer, layer]});
-  }
-
-  switchVisibility(obj1, obj2) {
-    const temp = obj1.style.visibility;
-    obj1.style.visibility = obj2.style.visibility;
-    obj2.style.visibility = temp;
-  }
-
-  toggleAdvancedOptions() {
-    this.advanced = !this.advanced;
-    if (this.advanced) {
-      this.advancedOptionsButton.classList.add('selected');
-      this.ulRoot.classList.add('advanced');
-    }
-    else {
-      this.advancedOptionsButton.classList.remove('selected');
-      this.ulRoot.classList.remove('advanced');
-    }
-  }
-
-  toggleAllLegends() {
-    this.layers.forEach(l => {
-      if (l.hasLegend) {
-        if (this.allLegendsDisplayed) {
-          // Hide
-          this.toggleLegend(l.legendId, true, false);
-          this.toggleLegendsButton.classList.remove('selected');
-        }
-        else {
-          /// Show
-          this.toggleLegend(l.legendId, true, true);
-          this.toggleLegendsButton.classList.add('selected');
-        }
-      }
-    });
-
-    this.allLegendsDisplayed = !this.allLegendsDisplayed;
-    this.#allLegendsDisplayedCount = 0;
+    this.messageManager.sendMessage({action: GeoEvents.requestLegendUrl, layer: layer});
   }
 }
 

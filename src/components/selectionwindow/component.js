@@ -3,12 +3,10 @@ import GML3 from 'ol/format/GML3';
 
 import GeoEvents from '../../models/events.js';
 import GirafeDraggableElement from '../../base/GirafeDraggableElement';
-import I18nManager from '../../tools/i18nmanager';
 
 class SelectionWindowComponent extends GirafeDraggableElement {
 
   maxFeatures = 200;
-  selectedFeatures = null;
   focusedIndex = null;
 
   content = null;
@@ -32,19 +30,19 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   }
 
   registerEvents() {
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
-    this.previousButton.addEventListener('click', (e) => this.onFocusFeature(this.focusedIndex - 1, e));
+    this.messageManager.register(this.onCustomGirafeEvent.bind(this));
+    this.previousButton.addEventListener('click', () => this.onFocusFeature(this.focusedIndex - 1));
     this.nextButton.addEventListener('click', () => this.onFocusFeature(this.focusedIndex + 1));
   }
 
-  onMapEvent(details) {
-    if (details.action === 'selectFeatures') {
+  onCustomGirafeEvent(details) {
+    if (details.action === GeoEvents.selectFeatures) {
       this.onSelectFeatures(details.selectionParams);
     }
   }
 
   getDescribeFeatureTypeUrl(wfsUrl) {
-    const url = new URL(wfsUrl.toLowerCase());
+    const url = new URL(wfsUrl);
     url.searchParams.set('service', 'WFS');
     url.searchParams.set('request', 'DescribeFeatureType');
     // TODO REG: Manage different WFS versions
@@ -55,9 +53,10 @@ class SelectionWindowComponent extends GirafeDraggableElement {
 
   onSelectFeatures(selectionParams) {
 
+    this.state.loading = true;
+
     // Reset current selection
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'clearSelection' });
-    this.selectedFeatures = [];
+    this.state.selectedFeatures = [];
 
     // First, we have to load the DescribeFeatureType for this WFS server is this wasn't done yet
     const wfsToInitialize = [];
@@ -181,20 +180,21 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     // Wait the result of all promises to display responses
     Promise.all(promises)
       .then(async (responses) => { 
+        const selectedFeatures = [];
         for (let i=0; i<responses.length; ++i) {
           const gml = await responses[i].text();
           // TODO REG: Do we always want to use the format GML3 here ?
           const features = new GML3().readFeatures(gml);
-          this.selectedFeatures.push(...features);
+          selectedFeatures.push(...features);
         }
 
-        if (this.selectedFeatures.length === 0) {
+        if (selectedFeatures.length === 0) {
           // No feature selected
           this.host.style.display = 'none';
         }
         else {
           // Select feature on the map
-          this.messageManager.sendMessage(GeoEvents.Map, { action: 'featuresSelected', features: this.selectedFeatures });
+          this.state.selectedFeatures = selectedFeatures;
 
           this.host.style.display = 'block';
           this.header.innerHTML = '';
@@ -203,25 +203,22 @@ class SelectionWindowComponent extends GirafeDraggableElement {
           // Default, selected the first feature
           this.onFocusFeature(0);
         }
+
+        this.state.loading = false;
       });
   }
 
   onFocusFeature(index) {
     this.focusedIndex = index;
-    this.focusFeature(this.selectedFeatures[this.focusedIndex]);
-  }
-
-  focusFeature(feature) {
-
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'featureFocused', feature: feature });
+    this.state.focusedFeature = this.state.selectedFeatures[index];
 
     // Title (draggable header)
-    const id = feature.getId();
+    const id = this.state.focusedFeature.getId();
     const featureType = (id === undefined) ? 'UNKNOWN' : id.split('.')[0];
     this.header.setAttribute('i18n', featureType);
 
     // Content
-    const properties = feature.getProperties();
+    const properties = this.state.focusedFeature.getProperties();
     const table = document.createElement('table');
     for (const key in properties) {
 
@@ -251,7 +248,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     this.enableNavigationButtons();
 
     // Translate data
-    I18nManager.getInstance().translate(this.shadow);
+    super.translate();
   }
 
   enableNavigationButtons() {
@@ -260,7 +257,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     if (this.focusedIndex === 0) {
       previousDisplay = 'none';
     }
-    if (this.focusedIndex === this.selectedFeatures.length - 1) {
+    if (this.focusedIndex === this.state.selectedFeatures.length - 1) {
       nextDisplay = 'none';
     }
 
@@ -268,11 +265,11 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     this.nextButton.style.display = nextDisplay;
 
     // Set counter text
-    if (this.selectedFeatures.length === 1) {
+    if (this.state.selectedFeatures.length === 1) {
       this.counterText.innerHTML = '';
     }
     else {
-      this.counterText.innerHTML = (this.focusedIndex+1) + '/' + this.selectedFeatures.length;
+      this.counterText.innerHTML = (this.focusedIndex+1) + '/' + this.state.selectedFeatures.length;
     }
   }
 

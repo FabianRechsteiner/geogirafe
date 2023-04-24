@@ -1,12 +1,12 @@
-class GeoEvents {
-    TreeView = 'GeoGirafe.TreeView';
-    Map = 'GeoGirafe.Map';
-    App = 'GeoGirafe.App';
-    Theme = 'GeoGirafe.Theme';
-    Init = 'GeoGirafe.Init';
-    Translate = 'GeoGirafe.Translate';
-    Redlining = 'GeoGirafe.Redlining';
-    Print = 'GeoGirafe.Print';
+const GeoEvents = {
+
+    CustomEventType: 'GeoGirafe.App',
+    
+    responseLegendUrl: 'responseLegendUrl',
+    selectFeatures: 'selectFeatures',
+    undoDraw: 'undoDraw',
+    zoomToExtent: 'zoomToExtent',
+    requestLegendUrl: 'requestLegendUrl',
 }
 
 export default GeoEvents;

@@ -228,7 +228,7 @@ class WmsManager {
       });
     }
 
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'selectFeatures', selectionParams: selectionParams });
+    this.messageManager.sendMessage({ action: GeoEvents.selectFeatures, selectionParams: selectionParams });
   }
 }
 

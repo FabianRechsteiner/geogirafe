@@ -1,7 +1,7 @@
-class ConfigManager {
+import GirafeSingleton from "../base/GirafeSingleton";
 
-  static #instance = null;
-  static #initializingSingleton = false;
+class ConfigManager extends GirafeSingleton {
+
   static #config = null;
   static #locked = false;
 
@@ -9,29 +9,7 @@ class ConfigManager {
       return ConfigManager.#config;
   }
 
-  constructor() {
-    if (!ConfigManager.#initializingSingleton) {
-      // If trying to create another instance
-      throw new Error('This is a singleton. Please use the getInstance() method.');
-    }
-  }
-
-  static getInstance() {
-    if (ConfigManager.#instance === null) {
-      // Singleton do not exists 
-      // => create it
-      ConfigManager.#initializingSingleton = true;
-      try {
-        ConfigManager.#instance = new ConfigManager();
-      }
-      finally {
-        ConfigManager.#initializingSingleton = false;
-      }
-    }
-
-    return ConfigManager.#instance;
-  }
-
+  // TODO REG: Use the same async schema for loadConfig (like loadTranslation)
   async loadConfig() {
     return new Promise(async(resolve) => {
 

@@ -1,6 +1,4 @@
-import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import I18nManager from '../../tools/i18nmanager';
 
 class LanguageComponent extends GirafeHTMLElement {
 
@@ -13,30 +11,15 @@ class LanguageComponent extends GirafeHTMLElement {
   render() {
     super.render();
     this.menuButton = this.shadow.querySelector('#menu-button');
-
-    // Default language
-    const defaultLanguage = this.configManager.Config.languages.default;
-    this.menuButton.setText(defaultLanguage.toUpperCase());
   }
 
   registerEvents() {
-    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    window.addEventListener(GeoEvents.Translate, (e) => this.onTranslateEvent(e.detail));
+    this.stateManager.subscribe('language', (oldLanguage, newLanguage) => this.onTranslate(newLanguage));
   }
 
-  onTranslateEvent(details) {
-    if (details.action === 'languageChanged') {
-      this.menuButton.setText(details.language.toUpperCase());
-      this.menuButton.closeMenu();
-    }
-  }
-
-  onInitEvent(details) {
-    if (details.action === 'initState') {
-      if (!this.isNullOrUndefined(details.state.language)) {
-        this.menuButton.setText(details.state.language.toUpperCase());
-      }
-    }
+  onTranslate(language) {
+    this.menuButton.setText(language.toUpperCase());
+    this.menuButton.closeMenu();
   }
 
   connectedCallback() {
@@ -44,7 +27,6 @@ class LanguageComponent extends GirafeHTMLElement {
       this.render();
       super.translate();
       this.registerEvents();
-      super.initialized();
     });
   }
 }

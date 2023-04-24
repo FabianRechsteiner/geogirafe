@@ -1,4 +1,3 @@
-import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
 
 class HelpComponent extends GirafeHTMLElement {
@@ -15,22 +14,16 @@ class HelpComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
-
-    this.content.addEventListener('click', () => this.closeHelp());
+    this.stateManager.subscribe('interface.helpVisible', (oldValue, newValue) => this.toggleHelp(newValue));
+    this.content.addEventListener('click', () => { this.state.interface.helpVisible = false });
   }
 
-  closeHelp() {
-    this.content.style.display = 'none';
-  }
-
-  showHelp() {
-    this.content.style.display = 'block';
-  }
-
-  onMapEvent(details) {
-    if (details.action === 'help') {
-      this.showHelp();
+  toggleHelp(visible) {
+    if (visible) {
+      this.content.style.display = 'block';
+    }
+    else {
+      this.content.style.display = 'none';
     }
   }
 

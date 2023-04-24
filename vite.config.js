@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 // https://v2.vitejs.dev/config/
 export default defineConfig({
     root: './src',
-    base: '/',
+    base: './',
     publicDir: './static',
     build: {
         outDir: '../public',

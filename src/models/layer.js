@@ -5,6 +5,10 @@ class Layer {
   name = null;
   type = null;
 
+  // For hierarchy management
+  children = [];
+  parent = null;
+
   // VectorTiles
   style = null;
   projection = null;
@@ -27,7 +31,7 @@ class Layer {
   isLegendExpanded = null;
 
   // Layer state
-  #activeState = 'off'; // can be 'on', 'off', 'semi'
+  activeState = 'off'; // can be 'on', 'off', 'semi'
   opacity = 1;
   order = 0;
 
@@ -41,16 +45,19 @@ class Layer {
   isGroup = null;
   isLayer = null;
 
-  constructor(elem, serverName, url, urlWfs) {
+  isExpanded = false;
+
+  constructor(elem, serverName, url, urlWfs, order) {
+    this.id = elem.id;
     this.name = elem.name;
     this.type = elem.type;
+    this.order = order;
 
     if (elem.type === 'OSM') {
       // Nothing more to do
     }
     else if (elem.type === 'VectorTiles') {
       this.style = elem.style;
-      this.projection = elem.projection;
     }
     else if (elem.type === 'WMTS') {
       this.url = elem.url;
@@ -127,31 +134,28 @@ class Layer {
   }
 
   get active() {
-    return this.#activeState === 'on';
+    return this.activeState === 'on';
   }
 
   get semiActive() {
-    return this.#activeState === 'semi';
+    return this.activeState === 'semi';
   }
 
   get inactive() {
-    return this.#activeState === 'off';
+    return this.activeState === 'off';
   }
 
-  set active(val) {
-    if (val === true || val === 'on') {
-      this.#activeState = 'on';
-    }
-    else if (val === false || val === 'off') {
-      this.#activeState = 'off';
-    }
-    else if (val === 'semi') {
-      this.#activeState = 'semi';
-    }
-    else {
-      throw Error('Unknown state for layer !');
-    }
-  }
+  // activate() {
+  //   this.activeState = 'on';
+  // }
+
+  // deactivate() {
+  //   this.activeState = 'off';
+  // }
+
+  // semiactivate() {
+  //   this.activeState = 'semi';
+  // }
 }
 
 export default Layer;

@@ -7,34 +7,51 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "fr": "https://map.cartoriviera.ch/static/dummy/fr.json",
+    "fr": "https://map.cartolacote.ch/static/dummy/fr.json",
     "//comment2": "Default language",
     "default": "fr"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "https://map.cartoriviera.ch/themes?background=background&interface=desktop",
-    "defaultBasemap": "plan_cadastral"
+    "url": "Mock/themes.json",
+    "defaultBasemap": "plan_ville",
+    "OSMBasemap": true,
+    "SwissTopoVectorTilesBasemap": true
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
-    "url": "https://map.cartoriviera.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://map.cartolacote.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "https://map.cartoriviera.ch/printproxy/",
+    "url": "https://map.cartolacote.ch/printproxy/",
     "//comment2": "The print layout selected by default",
-    "defaultLayout": "1) A4 paysage"
+    "defaultLayout": "01 A4 portrait"
+  },
+  "selection": {
+    "defaultFillColor": "#ff66667f",
+    "defaultStrokeColor": "#ff3333",
+    "defaultStrokeWidth": 4,
+    "defaultFocusFillColor": "#ff33337f",
+    "defaultFocusStrokeColor": "#ff0000",
+    "defaultFocusStrokeWidth": 4
+  },
+  "redlining": {
+    "defaultFillColor": "#6666ff7f",
+    "defaultStrokeColor": "#0000ff",
+    "defaultStrokeWidth": 2,
+    "defaultTextSize": 12,
+    "defaultFont": "Arial"
   },
   "map": {
     "srid": "EPSG:2056",
-    "startZoom": "1",
-    "startPosition": "2554000,1145000",
-    "maxExtent": "2486355,1105663,2610155,1220113",
-    "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200, 100],
+    "startZoom": "0",
+    "startPosition": "2492000,1140000",
+    "maxExtent": "2450900,1095300,2602800,1197700",
+    "scales": [200000, 80000, 40000, 20000, 10000, 8000, 4000, 2000, 1000, 500, 200, 100],
     "constraintScales": true
-  },
+  }, 	 
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
     "tilesetUrl": "https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"

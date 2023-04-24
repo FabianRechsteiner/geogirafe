@@ -23,14 +23,14 @@
       <girafe-search id="search"></girafe-search>
       <div id="buttonbar">
         <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
-        <girafe-button icon-style="fa-2xl fa-solid fa-circle-question" message="Map" action="help"></girafe-button>
+        <girafe-button icon-style="fa-2xl fa-solid fa-circle-question" state-action="interface.helpVisible" data-value="true"></girafe-button>
         <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
           <div slot="menu-content">
-            <girafe-button icon-style="fa-xl fa-regular fa-pen-to-square" text="Draw" message="RedLining" action="redliningToggled"></girafe-button>
-            <girafe-button icon-style="fa-xl fa-solid fa-print" text="Print" message="App" action="printToggled"></girafe-button>
+            <girafe-button icon-style="fa-xl fa-regular fa-pen-to-square" text="Draw" state-action="interface.redliningPanelVisible"></girafe-button>
+            <girafe-button icon-style="fa-xl fa-solid fa-print" text="Print" state-action="interface.printPanelVisible"></girafe-button>
             <girafe-proj-select></girafe-proj-select>
             <girafe-language-select></girafe-language-select>
-            <girafe-button icon-style="fa-xl fa-solid fa-globe" text="3D" message="Map" action="globeToggled"></girafe-button>
+            <girafe-button icon-style="fa-xl fa-solid fa-globe" text="3D" state-action="globe.enabled"></girafe-button>
             <girafe-button icon-style="fa-xl fa-brands fa-gitlab" text="Source" class="border-top" href="https://gitlab.com/geogirafe/gg-viewer"></girafe-button>
           </div>
         </girafe-menu-button>

@@ -1,9 +1,11 @@
 import GeoEvents from '../models/events.js';
-import State from '../models/state.js';
+import State from '../tools/state/state.js';
 import MessageManager from '../tools/messagemanager';
+import StateManager from './state/statemanager.js';
+import GirafeSingleton from '../base/GirafeSingleton.js';
 
-class UrlManager {
-
+class UrlManager extends GirafeSingleton {
+/*
   static #instance = null;
   static #initializingSingleton = false;
 
@@ -117,7 +119,7 @@ class UrlManager {
     state.theme = decodeURIComponent(params[3]);
 
     return state;
-  }
+  }*/
 }
 
 export default UrlManager;

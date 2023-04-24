@@ -1,9 +1,9 @@
-import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
 
 class ProjectionComponent extends GirafeHTMLElement {
 
   menuButton = null;
+  // TODO REG : manage in config.json
   valueToText = {
     "EPSG:3857": "W-M",
     "EPSG:4326": "WGS84",
@@ -22,30 +22,19 @@ class ProjectionComponent extends GirafeHTMLElement {
     const allButtons = this.shadow.querySelectorAll('girafe-button');
     for (let i=0; i<allButtons.length; ++i) {
       const b = allButtons[i];
-      b.setText(this.valueToText[b.dataset.projection]);
+      b.setText(this.valueToText[b.dataset.value]);
     }
   }
 
   registerEvents() {
-    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+    this.stateManager.subscribe('projection', (oldProjection, newProjection) => this.onChangeProjection(newProjection));
   }
 
-  onInitEvent(details) {
-    if (details.action === 'initState') {
-      if (!this.isNullOrUndefined(details.state.projection)) {
-        const text = this.valueToText[details.state.projection];
-        this.menuButton.setText(text);
-      }
-    }
-  }
-
-  onMapEvent(details) {
-    if (details.action === 'projectionChanged') {
-      const text = this.valueToText[details.projection];
-      this.menuButton.setText(text);
-      this.menuButton.closeMenu();
-    }
+  onChangeProjection(projection) {
+    console.log('projection changed');
+    const text = this.valueToText[projection];
+    this.menuButton.setText(text);
+    this.menuButton.closeMenu();
   }
 
   connectedCallback() {
@@ -53,7 +42,6 @@ class ProjectionComponent extends GirafeHTMLElement {
       this.render();
       super.translate();
       this.registerEvents();
-      super.initialized();
     });
   }
 }

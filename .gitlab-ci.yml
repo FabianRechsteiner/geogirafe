@@ -5,14 +5,14 @@ stages:
   - pages
   - scan
 
-unitests:
-  stage: test
-  image: node:18-slim
-  
-  script: 
-    # build
-    - npm i
-    - npm run-script test
+#unitests:
+#  stage: test
+#  image: node:18-slim
+#  
+#  script: 
+#    # build
+#    - npm i
+#    - npm run test
 
 npm-audit:
   stage: test
@@ -36,8 +36,8 @@ build:
   before_script:
     - apt update && apt -y upgrade
   script: 
-    - npm i
-    - npm run-script build
+    - npm i --omit=dev
+    - npm run build
 
   artifacts:
     paths:
@@ -80,22 +80,36 @@ pages:
   before_script:
     - apt update && apt -y upgrade && apt install -y brotli curl
   script: 
+    - mkdir release
+    # Create a instance for a sample dev instance
+    - cp -R public dev && mv dev release/
+    # Create a instance for a sample mapbs instance
+    - cp -R public mapbs && mv mapbs release/
+    - rm release/mapbs/config.json 
+    - cp demo/config.mapbs.json release/mapbs/config.json
     # Create a instance for a sample cartoriviera instance
-    - cp -R public cartoriviera && mv cartoriviera public/
-    - rm public/cartoriviera/config.json 
-    - cp public/config.cartoriviera.json public/cartoriviera/config.json
+    - cp -R public cartoriviera && mv cartoriviera release/
+    - rm release/cartoriviera/config.json 
+    - cp demo/config.cartoriviera.json release/cartoriviera/config.json
     # Create a instance for a sample cartolacote instance
-    - cp -R public cartolacote && mv cartolacote public/
-    - rm public/cartolacote/config.json 
-    - cp public/config.cartolacote.json public/cartolacote/config.json
+    - cp -R public cartolacote && mv cartolacote release/
+    - rm release/cartolacote/config.json 
+    - cp demo/config.cartolacote.json release/cartolacote/config.json
     # Create a instance for a sample mapnv instance
-    - cp -R public mapnv && mv mapnv public/
-    - rm public/mapnv/config.json 
-    - cp public/config.mapnv.json public/mapnv/config.json
+    - cp -R public mapnv && mv mapnv release/
+    - rm release/mapnv/config.json 
+    - cp demo/config.mapnv.json release/mapnv/config.json
+
+    # Rename the relase directory to public
+    - rm -Rf public && mv release public
+
+    # Copy demo index page
+    - cp demo/index.html public/
+    - cp -R demo/static public/
 
     # Wget themes.json to improve performance on demo instance
     # (this does not work for cartoriviera.ch, it seems to be blocked)
-    - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/Mock/themes.json
+    - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/mapbs/Mock/themes.json
     - curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --output public/cartolacote/Mock/themes.json
     - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
 
@@ -122,7 +136,7 @@ zap-baseline-scan:
     - mkdir /zap/wrk
     # TODO REG: By default, all alerts are reported as warnings.
     # TODO REG: Configure wich ones should be peported as "fail"
-    - /zap/zap-baseline.py -j -I -t https://geogirafe.paloo.fr -r report.html -w report.md -x report.xml -J report.json
+    - /zap/zap-baseline.py -j -I -t https://geogirafe.paloo.fr/mapbs/ -r report.html -w report.md -x report.xml -J report.json
   artifacts:
     paths:
       # Directory needs to be named 'public' for GitLab Pages

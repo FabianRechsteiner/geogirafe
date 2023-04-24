@@ -22,6 +22,31 @@
   cursor: col-resize;
 }
 
+#close {
+  border: solid 1px #999;
+  border-right: none;
+  color: #999;
+  padding: 0.7rem 0 0.7rem 0.5rem;
+  border-radius: 10px 0  0 10px;
+  width: 0.8rem;
+  height: 2rem;
+  line-height: 2rem;
+  position: fixed;
+  top: 5.8rem;
+  right: 22rem;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+#close i:before {
+  content: "\f00d";
+}
+
+#close:hover {
+  border-color: #000;
+  color: #000;
+}
+
 #content {
   position: absolute;
   top : 0;
