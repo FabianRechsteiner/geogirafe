@@ -1,8 +1,8 @@
 import tippy from 'tippy.js';
-import GeoEvents from '../models/events';
 import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
 import ConfigManager from '../tools/configmanager';
+import StateManager from '../tools/state/statemanager';
 
 class GirafeHTMLElement extends HTMLElement {
 
@@ -10,7 +10,7 @@ class GirafeHTMLElement extends HTMLElement {
   component = null;
 
   get templateUrl() {
-    return `/components/${this.component}/template.html`;
+    return `./components/${this.component}/template.html`;
   }
 
   get template() {
@@ -19,15 +19,21 @@ class GirafeHTMLElement extends HTMLElement {
 
   messageManager = null;
   configManager = null;
+  stateManager = null;
+  get state() {
+    return this.stateManager.state;
+  }
 
   constructor(component) {
     super();
     this.configManager = ConfigManager.getInstance();
     this.messageManager = MessageManager.getInstance();
+    this.stateManager = StateManager.getInstance();
 
-    window.addEventListener(GeoEvents.Translate, (e) => this.onTranslateEvent(e.detail));
     this.component = component;
     this.shadow = this.attachShadow({mode: 'open'});
+
+    this.stateManager.subscribe('language', (oldLanguage, newLanguage) => this.translate());
   }
 
   async loadTemplate() {
@@ -55,12 +61,6 @@ class GirafeHTMLElement extends HTMLElement {
 
   translate() {
     I18nManager.getInstance().translate(this.shadow);
-  }
-
-  onTranslateEvent(details) {
-    if (details.action === 'languageChanged') {
-      this.translate();
-    }
   }
 
   isNullOrUndefined(val) {
@@ -116,10 +116,6 @@ class GirafeHTMLElement extends HTMLElement {
         content: el.getAttribute('tip')
       })
     });
-  }
-  
-  initialized() {
-    this.messageManager.sendMessage(GeoEvents.Init, {action: 'componentInitialized'});
   }
 }
 

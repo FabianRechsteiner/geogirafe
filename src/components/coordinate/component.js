@@ -1,4 +1,3 @@
-import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
 
 class CoordinateComponent extends GirafeHTMLElement {
@@ -17,18 +16,12 @@ class CoordinateComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+    this.stateManager.subscribe('mouseCoordinates', (oldCoordinates, newCoordinates) => this.onChangeCoordinates(newCoordinates));
   }
 
-  onMapEvent(details) {
-    if (details.action === 'pointerMove') {
-      this.formatCoordinate(details.coordinate);
-    }
-  }
-
-  formatCoordinate(coord) {
-    const east = Math.round(coord[0], 3).toLocaleString(this.locale);
-    const nord = Math.round(coord[1], 3).toLocaleString(this.locale);
+  onChangeCoordinates(coord) {
+    const east = (Math.round(coord[0] * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
+    const nord = (Math.round(coord[1] * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
     this.coordsSpan.innerHTML = `E ${east} / N ${nord}`;
   }
 
@@ -37,7 +30,6 @@ class CoordinateComponent extends GirafeHTMLElement {
       this.render();
       super.translate();
       this.registerEvents();
-      //super.initialized();
     });
   }
 }

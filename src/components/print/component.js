@@ -94,7 +94,11 @@ class PrintComponent extends GirafeResizableElement {
     });
 
     this.activateTooltips(false, [800, 0], 'top-end');
-    I18nManager.getInstance().translate(this.shadow);
+    super.translate();
+  }
+
+  closePanel() {
+    this.state.interface.printPanelVisible = false;
   }
 
   addFormatOption(select, elem) {
@@ -123,8 +127,7 @@ class PrintComponent extends GirafeResizableElement {
   }
 
   registerEvents() {
-    window.addEventListener(GeoEvents.App, (e) => this.onAppEvent(e.detail));
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+    this.stateManager.subscribe('interface.printPanelVisible', (oldValue, newValue) => this.#togglePanel(newValue));
 
     this.layoutSelect.addEventListener('change', (e) => this.onLayoutChanged(e));
     this.scaleSelect.addEventListener('change', (e) => this.onScaleChanged(e));
@@ -135,12 +138,11 @@ class PrintComponent extends GirafeResizableElement {
     const layout = this.layoutsByName[e.target.value];
     const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
     this.updateScales(clientInfo);
-    this.messageManager.sendMessage(GeoEvents.Print, { action: 'layoutChanged', format: [clientInfo.width, clientInfo.height] });
+    this.state.print.format = [clientInfo.width, clientInfo.height];
   }
 
   onScaleChanged(e) {
-    const scale = e.target.value;
-    this.messageManager.sendMessage(GeoEvents.Print, { action: 'scaleChanged', scale: scale });
+    this.state.print.scale = e.target.value
   }
 
   updateScales(clientInfo) {
@@ -152,6 +154,7 @@ class PrintComponent extends GirafeResizableElement {
     });
     // Restore previously selected value
     if (!this.isNullOrUndefinedOrBlank(currentSelectedValue)) {
+      this.scaleSelect.value = currentSelectedValue;
       this.scaleSelect.value = currentSelectedValue;
     }
     else {
@@ -168,32 +171,19 @@ class PrintComponent extends GirafeResizableElement {
     }));
   }
 
-  onAppEvent(details) {
-    if (details.action === 'printToggled') {
-      if (this.panel.style.display == 'block') {
-        this.panel.style.display = 'none';
-        this.panel.getRootNode().host.style.display = 'none';
-        this.messageManager.sendMessage(GeoEvents.Print, { action: 'printDeactivated' })
-      }
-      else {
-        this.panel.style.display = 'block';
-        this.panel.getRootNode().host.style.display = 'block';
-        const layout = this.layoutsByName[this.layoutSelect.value];
-        const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
-        //this.setOptimalScale(details.scale);
-
-        const scale = this.scaleSelect.value;
-        this.messageManager.sendMessage(GeoEvents.Print, { action: 'printActivated', format: [clientInfo.width, clientInfo.height], scale: scale });
-      }
+  #togglePanel(visible) {
+    if (visible) {
+      this.panel.style.display = 'block';
+      this.panel.getRootNode().host.style.display = 'block';
+      // Set default print state
+      const layout = this.layoutsByName[this.layoutSelect.value];
+      const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
+      this.state.print.scale = this.scaleSelect.value;
+      this.state.print.format = [clientInfo.width, clientInfo.height];
     }
-  }
-
-  onMapEvent(details) {
-    if (details.action === 'projectionChanged') {
-      this.projection = details.projection;
-    }
-    else if (details.action === 'coordsChanged') {
-      this.centerCoords = [details.mapX, details.mapY];
+    else {
+      this.panel.style.display = 'none';
+      this.panel.getRootNode().host.style.display = 'none';
     }
   }
 
@@ -207,8 +197,8 @@ class PrintComponent extends GirafeResizableElement {
           "map": {
               "dpi": 254,
               "rotation": 0,
-              "center": this.centerCoords,
-              "projection": this.projection,
+              "center": [this.state.position.center[0], this.state.position.center[1]],
+              "projection": this.state.projection,
               "scale": scale,
               "useNearestScale": false,
               "layers": [

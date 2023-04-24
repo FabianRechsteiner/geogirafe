@@ -25,21 +25,18 @@ class ScaleComponent extends GirafeHTMLElement {
       const button = new ButtonComponent();
       button.setAttribute('text', this.formatScale(scale));
       button.setAttribute('size', 'large');
-      button.setAttribute('message', 'Map');
-      button.setAttribute('action', 'changeScale');
-      button.dataset.scale = scale;
+      button.setAttribute('state-action', 'position.scale');
+      button.dataset.value = scale;
       this.container.appendChild(button);
     });
   }
 
   registerEvents() {
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
+    this.stateManager.subscribe('position', (oldPosition, newPosition) => this.onPositionChange(newPosition));
   }
 
-  onMapEvent(details) {
-    if (details.action === 'resolutionChanged') {
-      this.scaleSpan.innerHTML = this.formatScale(details.scale);
-    }
+  onPositionChange(position) {
+    this.scaleSpan.innerHTML = this.formatScale(position.scale)
   }
 
   formatScale(scale) {

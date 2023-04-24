@@ -28,6 +28,7 @@ import OsmManager from './tools/osmmanager';
 import VectorTilesManager from './tools/vectortilesmanager';
 import WmtsManager from './tools/wmtsmanager';
 import ViewManager from './tools/viewmanager';
+import RedliningFeature from '../../tools/state/redliningfeature';
 
 class MapComponent extends GirafeHTMLElement {
 
@@ -53,13 +54,6 @@ class MapComponent extends GirafeHTMLElement {
   draw = null;
   snap = null;
 
-  // Default styles
-  defaultStrokeColor = '#ff0000';
-  defaultStrokeWidth = 2;
-  defaultFillColor = '#ff66667f';
-  defaultTextSize = 12;
-  defaultFont = 'Arial';
-
   // For object selection
   selectedFeaturesCollection = new Collection();
   focusedFeaturesCollection = new Collection();
@@ -77,13 +71,31 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
-    window.addEventListener(GeoEvents.Redlining, (e) => this.onRedliningEvent(e.detail));
-    window.addEventListener(GeoEvents.Print, (e) => this.onPrintEvent(e.detail));
+    this.messageManager.register(this.onCustomGirafeEvent.bind(this));
 
     this.swiper.addEventListener('input', () => this.map.render());
+
+    this.stateManager.subscribe('activeBasemap', (oldBasemap, newBasemap) => this.onChangeBasemap(newBasemap));
+    this.stateManager.subscribe('projection', (oldProjection, newProjection) => this.onChangeProjection(newProjection));
+    this.stateManager.subscribe('position.scale', (oldScale, newScale) => this.onChangeScale(newScale));
+    this.stateManager.subscribe('position.resolution', (oldResolution, newResolution) => this.zoomToResolution(newResolution));
+    this.stateManager.subscribe('position.center', (oldCenter, newCenter) => this.panToCoordinate(newCenter));
+    this.stateManager.subscribe('selectedFeatures', (oldFeatures, newFeatures) => this.onFeaturesSelected(newFeatures));
+    this.stateManager.subscribe('focusedFeature', (oldFeature, newFeature) => this.onFeatureFocused(newFeature));
+    this.stateManager.subscribe('layers.swipedLayers', (oldLayers, newLayers) => this.onSwipedLayersChanged(newLayers));
+
+    this.stateManager.subscribe('redlining.activeTool', (oldTool, newTool) => this.onRedliningToolChanged(newTool));
+    this.stateManager.subscribe('redlining.features', (oldFeatures, newFeatures) => this.onFeaturesChanged(oldFeatures, newFeatures));
+
+    this.stateManager.subscribe('interface.printPanelVisible', (oldValue, newValue) => this.onPrintPanelToggled(newValue));
+    this.stateManager.subscribe('print.*', () => this.onPrintStateChanged());
+
+    this.stateManager.subscribe('globe.enabled', () => this.onGlobeToggled());
+
+    //this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) => this.onLayersChanged(oldLayers, newLayers));
+    this.stateManager.subscribe('layers.layersList.[0-9]*.activeState', (oldActive, newActive, layer) => this.onLayerToggled(layer));
+    this.stateManager.subscribe('layers.layersList.[0-9]*.opacity', (oldActive, newActive, layer) => this.onChangeOpacity(layer));
+    this.stateManager.subscribe('layers.layersList.[0-9]*.order', () => this.onChangeOrder());
   }
 
   render() {
@@ -111,16 +123,13 @@ class MapComponent extends GirafeHTMLElement {
     const view = this.viewManager.getView();
     this.map.setView(view);
 
-    // Default basemap : OSM
-    this.osmManager.addBasemapLayer();
-
     // Create vector source for drawing
     this.redliningSource = new VectorSource({
       features: this.redliningFeaturesCollection
     });
     this.redliningLayer = new VectorLayer({
       source: this.redliningSource,
-      //style: (feature) => this.getDefaultStyle(this, feature)
+      //style: (feature) => this.getDefaultStyle(feature)
     });
     this.map.addLayer(this.redliningLayer);
     this.redliningLayer.setZIndex(1001);
@@ -129,51 +138,52 @@ class MapComponent extends GirafeHTMLElement {
     const selectionSource = new VectorSource({
       features: this.selectedFeaturesCollection
     });
-    this.selectionLayer = new VectorLayer({
-      source: selectionSource,
-      // TODO REG: Change default selection color
-      style: new Style({
-        stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth * 2 }),
-        fill: new Fill({ color: this.defaultFillColor }),
-        image: new Circle({
-          radius: 7,
-          fill: new Fill({ color: this.defaultFillColor }),
-          stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth })
-        })
-      })
-    });
-    this.map.addLayer(this.selectionLayer);
-    this.selectionLayer.setZIndex(1002);
 
-    // Create layer for focus
-    const focusSource = new VectorSource({
-      features: this.focusedFeaturesCollection
-    });
-    focusSource.on('addfeature', (e) => { this.flash(e.feature) });
-    this.focusLayer = new VectorLayer({
-      source: selectionSource,
-      // TODO REG: Change default focus color
-      style: new Style({
-        stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth }),
-        fill: new Fill({ color: this.defaultFillColor }),
-        image: new Circle({
-          radius: 7,
-          fill: new Fill({ color: this.defaultFillColor }),
-          stroke: new Stroke({ color: this.defaultStrokeColor, width: this.defaultStrokeWidth })
+    this.configManager.loadConfig().then(() => { 
+      this.selectionLayer = new VectorLayer({
+        source: selectionSource,
+        // TODO REG: Change default selection color
+        style: new Style({
+          stroke: new Stroke({ color: this.configManager.Config.selection.defaultStrokeColor, width: this.configManager.Config.selection.defaultStrokeWidth }),
+          fill: new Fill({ color: this.configManager.Config.selection.defaultFillColor }),
+          image: new Circle({
+            radius: 7,
+            fill: new Fill({ color: this.configManager.Config.selection.defaultFillColor }),
+            stroke: new Stroke({ color: this.configManager.Config.selection.defaultStrokeColor, width: this.configManager.Config.selection.defaultStrokeWidth })
+          })
         })
-      })
-    });
-    this.map.addLayer(this.focusLayer);
-    this.focusLayer.setZIndex(1003);
+      });
+      this.map.addLayer(this.selectionLayer);
+      this.selectionLayer.setZIndex(1002);
 
-    // Add drabos selection interaction
+      // Create layer for focus
+      const focusSource = new VectorSource({
+        features: this.focusedFeaturesCollection
+      });
+      focusSource.on('addfeature', (e) => { this.flash(e.feature) });
+      this.focusLayer = new VectorLayer({
+        source: selectionSource,
+        // TODO REG: Change default focus color
+        style: new Style({
+          stroke: new Stroke({ color: this.configManager.Config.selection.defaultFocusStrokeColor, width: this.configManager.Config.selection.defaultFocusStrokeWidth }),
+          fill: new Fill({ color: this.configManager.Config.selection.defaultFocusFillColor }),
+          image: new Circle({
+            radius: 7,
+            fill: new Fill({ color: this.configManager.Config.selection.defaultFocusFillColor }),
+            stroke: new Stroke({ color: this.configManager.Config.selection.defaultFocusStrokeColor, width: this.configManager.Config.selection.defaultFocusStrokeWidth })
+          })
+        })
+      });
+      this.map.addLayer(this.focusLayer);
+      this.focusLayer.setZIndex(1003);
+    });
+
+    // Add drabox selection interaction
     this.dragbox = new DragBox({
       condition: platformModifierKeyOnly,
     });
     this.map.addInteraction(this.dragbox);
     this.dragbox.on('boxend', (e) => this.onDragSelection(e));
-
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'projectionChanged', projection: this.srid });
 
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {
@@ -183,10 +193,15 @@ class MapComponent extends GirafeHTMLElement {
 
   getDefaultStyle(feature) {
 
-    const strokeColor = (feature.get('strokeColor')) ? feature.get('strokeColor') : this.defaultStrokeColor;
-    const strokeWidth = (feature.get('strokeWidth')) ? feature.get('strokeWidth') : this.defaultStrokeWidth;
-    const fillColor = (feature.get('fillColor')) ? feature.get('fillColor') : this.defaultFillColor;
-    const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
+    const strokeColor = (feature.get('strokeColor')) ? feature.get('strokeColor') : this.configManager.Config.redlining.defaultStrokeColor;
+    const strokeWidth = (feature.get('strokeWidth')) ? feature.get('strokeWidth') : this.configManager.Config.redlining.defaultStrokeWidth;
+    const fillColor = (feature.get('fillColor')) ? feature.get('fillColor') : this.configManager.Config.redlining.defaultFillColor;
+    const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.configManager.Config.redlining.defaultTextSize;
+
+    feature.set('strokeColor', strokeColor);
+    feature.set('strokeWidth', strokeWidth);
+    feature.set('fillColor', fillColor);
+    feature.set('textSize', textSize);
 
     return new Style({
       stroke: new Stroke({ color: strokeColor, width: strokeWidth }),
@@ -196,7 +211,7 @@ class MapComponent extends GirafeHTMLElement {
         fill: new Fill({ color: fillColor }),
         stroke: new Stroke({ color: strokeColor, width: strokeWidth })
       }),
-      text: new Text({ text: feature.get('name'), font: 'Bold ' + textSize + 'px/1 ' + this.defaultFont })
+      text: new Text({ text: feature.get('name'), font: 'Bold ' + textSize + 'px/1 ' + this.configManager.Config.redlining.defaultFont })
     });
   }
 
@@ -224,30 +239,30 @@ class MapComponent extends GirafeHTMLElement {
     //? change:view
 
     // Drawing events
-    this.redliningFeaturesCollection.on('add', (e) => this.onFeatureAdded(this, e));
+    this.redliningFeaturesCollection.on('add', (e) => this.onFeatureAdded(e));
   }
 
   onLoadStart(e) {
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'renderStarted' });
+    this.state.loading = true;
   }
 
   onLoadEnd(e) {
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'renderEnded' });
+    this.state.loading = false;
   }
+
   onPointerMove(e) {
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'pointerMove', coordinate: e.coordinate });
+    this.state.mouseCoordinates = e.coordinate;
   }
 
   onMoveEnd(e) {
     const view = this.map.getView();
     const center = view.getCenter();
-    const mapX = center[0];
-    const mapY = center[1];
-    const mapZ = view.getZoom();
-    const resolution = view.getResolution();
-    const scale = this.viewManager.getScale();
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'coordsChanged', mapX: mapX, mapY: mapY, mapZ: mapZ });
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'resolutionChanged', resolution: resolution, scale: scale });
+    this.state.position = {
+      center: center,
+      zoom: view.getZoom(),
+      resolution: view.getResolution(),
+      scale: this.viewManager.getScale()
+    }
   }
 
   onClick(e) {
@@ -320,21 +335,15 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onFeatureAdded(_this, e) {
+  onFeatureAdded(e) {
     // Set the default feature name
-    const name = adjectives[_this.getRandomInt(0, adjectives.length)] + ' ' + e.element.getGeometry().getType();
+    const name = adjectives[this.getRandomInt(0, adjectives.length)] + ' ' + e.element.getGeometry().getType();
     e.element.set('name', name);
     // Add default style as a function, because we want the attributes (for example the name) to be evaluated on display time
     e.element.setStyle((feature) => this.getDefaultStyle(feature));
-    // Send message
-    this.messageManager.sendMessage(GeoEvents.Redlining, {
-      action: 'featureAdded',
-      id: e.element.ol_uid,
-      name: name,
-      strokeColor: this.defaultStrokeColor,
-      fillColor: this.defaultFillColor,
-      strokeWidth: this.defaultStrokeWidth
-    });
+    
+    const feature = new RedliningFeature(e.element);
+    this.state.redlining.features.push(feature);
   }
 
   connectedCallback() {
@@ -343,7 +352,6 @@ class MapComponent extends GirafeHTMLElement {
       super.translate();
       this.registerEvents();
       this.listenOpenLayersEvents();
-      super.initialized();
     });
   }
 
@@ -351,21 +359,34 @@ class MapComponent extends GirafeHTMLElement {
     console.log('attributeChangedCallback');
   }
 
-  onTreeViewEvent(details) {
-    if (details.action === 'layerEnabled') {
-      this.onAddLayers([details.layer]);
+  onPrintStateChanged() {
+    if (!this.isNullOrUndefined(this.state.print.format)) {
+      this.maskLayer.updateSize(this.state.print.format);
     }
-    else if (details.action === 'layerDisabled') {
-      this.onRemoveLayers([details.layer]);
+    if (!this.isNullOrUndefined(this.state.print.scale)) {
+      this.maskLayer.updateScale(this.state.print.scale);
     }
-    if (details.action === 'layerListEnabled') {
-      this.onAddLayers(details.layerList);
+    this.map.updateSize();
+  }
+
+  onPrintPanelToggled(visible) {
+    if (visible) {
+      this.maskLayer.setMap(this.map);
     }
-    else if (details.action === 'layerListDisabled') {
-      this.onRemoveLayers(details.layerList);
+    else {
+      this.maskLayer.setMap(null);
     }
-    else if (details.action === 'requestLegendUrl') {
+  }
+
+  onCustomGirafeEvent(details) {
+    if (details.action === GeoEvents.requestLegendUrl) {
       this.onLegendUrlRequested(details.layer);
+    }
+    else if (details.action === GeoEvents.zoomToExtent) {
+      this.zoomToExtent(details.extent);
+    }
+    else if (details.action === GeoEvents.undoDraw) {
+      this.draw.removeLastPoint();
     }
   }
 
@@ -386,87 +407,35 @@ class MapComponent extends GirafeHTMLElement {
       graphicUrl += '&RULE=' + encodeURIComponent(layer.legendRule);
     }
 
-    this.messageManager.sendMessage(GeoEvents.TreeView, { action: 'responseLegendUrl', id: layer.legendId, url: graphicUrl });
+    this.messageManager.sendMessage({ action: GeoEvents.responseLegendUrl, id: layer.legendId, url: graphicUrl });
   }
 
-  onInitEvent(details) {
-    if (details.action === 'initState') {
-      console.log('Initializing Map from state...')
-      if (details.state.projection !== 'null') {
-        this.onChangeProjection(details.state.projection);
+  onSwipedLayersChanged(swipedLayers) {
+    if (swipedLayers.left.length === 0 && swipedLayers.right.length === 0) {
+      // TODO REG: Better manage WMS in order to combine swiped layers again in a unique olayer 
+      // (to minimize the amount of WMS queries that are sent to the server)
+      this.swipeManager.deactivateSwipe();
+    }
+    else {
+      this.swipeLayersOnSide(swipedLayers.left, 'left');
+      this.swipeLayersOnSide(swipedLayers.right, 'right');
+    }
+  }
+
+  swipeLayersOnSide(layers, side) {
+    for (let i=0; i<layers.length; ++i) {
+      const layer = layers[i];
+      if (layer.isWms) {
+        this.swipeManager.activateSwipeForWms(layer, side);
       }
-      if (details.state.mapX !== 'null' && details.state.mapY !== 'null' && details.state.mapZ !== 'null') {
-        this.viewManager.setCenter([parseFloat(details.state.mapX), parseFloat(details.state.mapY)]);
-        this.viewManager.setZoom(parseFloat(details.state.mapZ));
-        const newView = this.viewManager.getView();
-        this.map.setView(newView);
+      else if (layer.isWmts) {
+        this.swipeManager.activateSwipeForWmts(layer, side, layer.opacity);
       }
     }
-  }
-
-  onMapEvent(details) {
-    if (details.action === 'changeProjection') {
-      this.onChangeProjection(details.projection);
-    }
-    else if (details.action === 'changeBasemap') {
-      this.onChangeBasemap(details.basemapList);
-    }
-    else if (details.action === 'changeScale') {
-      this.onChangeScale(details.scale);
-    }
-    else if (details.action === 'zoomToResolution') {
-      this.zoomToResolution(details.resolution);
-    }
-    else if (details.action === 'zoomToExtent') {
-      this.zoomToExtent(details.extent);
-    }
-    else if (details.action === 'panToCoordinate') {
-      this.panToCoordinate(details.coordinate);
-    }
-    else if (details.action === 'opacityChanged') {
-      this.onChangeOpacity(details.layer);
-    }
-    else if (details.action === 'orderChanged') {
-      this.onChangeOrder(details.layers);
-    }
-    else if (details.action === 'clearSelection') {
-      this.onClearSelection();
-    }
-    else if (details.action === 'featuresSelected') {
-      this.onFeaturesSelected(details.features);
-    }
-    else if (details.action === 'featureFocused') {
-      this.onFeatureFocused(details.feature);
-    }
-    else if (details.action === 'globeToggled') {
-      this.onGlobeToggled();
-    }
-    else if (details.action === 'activateSwipe') {
-      this.onActivateSwipe(details.layer, details.side);
-    }
-    else if (details.action === 'deactivateSwipe') {
-      this.onDeactivateSwipe();
-    }
-  }
-
-  onActivateSwipe(layerInfos, side) {
-    if (layerInfos.isWms) {
-      this.swipeManager.activateSwipeForWms(layerInfos, side);
-    }
-    else if (layerInfos.isWmts) {
-      this.swipeManager.activateSwipeForWmts(layerInfos, side, layerInfos.opacity);
-    }
-  }
-
-  onDeactivateSwipe() {
-    // TODO REG: Better manage WMS in order to combine swiped layers again in a unique olayer 
-    // (to minimize the amount of WMS queries that are sent to the server)
-    this.swipeManager.deactivateSwipe();
   }
 
   onGlobeToggled() {
-    if (this.map3d === null || !this.map3d.getEnabled()) {
-      // Globe is not active
+    if (this.state.globe.enabled && this.map3d === null) {
       this.map3d = new OLCesium({ map: this.map });
       const scene = this.map3d.getCesiumScene();
 
@@ -481,20 +450,15 @@ class MapComponent extends GirafeHTMLElement {
         url: this.configManager.Config.map3d.tilesetUrl
       });
       scene.primitives.add(tileset);
-
-      // Activate 3D map
-      this.map3d.setEnabled(true);
     }
-    else {
-      this.map3d.setEnabled(false);
-    }
-  }
 
-  onClearSelection() {
-    this.selectedFeaturesCollection.clear();
+    if (this.map3d !== null) {
+      this.map3d.setEnabled(this.state.globe.enabled);
+    }
   }
 
   onFeaturesSelected(features) {
+    this.selectedFeaturesCollection.clear();
     for (let i = 0; i < features.length; ++i) {
       this.selectedFeaturesCollection.push(features[i]);
     }
@@ -532,8 +496,17 @@ class MapComponent extends GirafeHTMLElement {
     // TODO REG : update srid in all manager?
     const newView = this.viewManager.getViewFromSrid(srid);
     this.map.setView(newView);
+  }
 
-    this.messageManager.sendMessage(GeoEvents.Map, { action: 'projectionChanged', projection: this.srid });
+  onLayerToggled(layer) {
+    if (layer.isLayer) {
+      if (layer.active) {
+        this.onAddLayers([layer]);
+      }
+      else {
+        this.onRemoveLayers([layer]);
+      }
+    }
   }
 
   onAddLayers(layerInfos) {
@@ -561,6 +534,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onChangeOrder(layers) {
+    alert('Not Implemented yet');
     // TODO REG : Rewrite this while taking avery layer type in account.
     /*this.wmsManager.changeOrder(layers);
     layers.forEach(layerInfos => {
@@ -593,7 +567,7 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onChangeBasemap(basemapList) {
+  onChangeBasemap(basemap) {
     // First, remove all existing basemaps
     this.wmtsManager.removeAllBasemapLayers();
     this.wmsManager.removeAllBasemapLayers();
@@ -601,42 +575,23 @@ class MapComponent extends GirafeHTMLElement {
     this.vectorTilesManager.removeAllBasemapLayers();
 
     // Then, add the selected basemaps
-    basemapList.forEach((basemap) => {
-      if (basemap.type === 'WMTS') {
-        this.wmtsManager.addBasemapLayer(basemap);
+    basemap.layersList.forEach((layer) => {
+      if (layer.type === 'WMTS') {
+        this.wmtsManager.addBasemapLayer(layer);
       }
-      else if (basemap.type === 'WMS') {
-        this.wmsManager.addBasemapLayer(basemap);
+      else if (layer.type === 'WMS') {
+        this.wmsManager.addBasemapLayer(layer);
       }
-      else if (basemap.type === 'OSM') {
+      else if (layer.type === 'OSM') {
         this.osmManager.addBasemapLayer();
       }
-      else if (basemap.type === 'VectorTiles') {
-        this.vectorTilesManager.addBasemapLayer(basemap);
+      else if (layer.type === 'VectorTiles') {
+        this.vectorTilesManager.addBasemapLayer(layer);
       }
       else {
-        throw 'Unknown basemap type: ' + basemap.type;
+        throw 'Unknown basemap type: ' + layer.type;
       }
     });
-  }
-
-  onPrintEvent(details) {
-    if (details.action === 'printActivated') {
-      this.maskLayer.updateSize(details.format);
-      this.maskLayer.updateScale(details.scale);
-      this.maskLayer.setMap(this.map);
-    }
-    else if (details.action === 'printDeactivated') {
-      this.maskLayer.setMap(null);
-    }
-    else if (details.action === 'layoutChanged') {
-      this.maskLayer.updateSize(details.format);
-      this.map.updateSize();
-    }
-    else if (details.action === 'scaleChanged') {
-      this.maskLayer.updateScale(details.scale);
-      this.map.updateSize();
-    }
   }
 
   activatePrintMask(format) {
@@ -647,61 +602,81 @@ class MapComponent extends GirafeHTMLElement {
     this.map.removeLayer(this.maskLayer);
   }
 
-  onRedliningEvent(details) {
-    if (details.action === 'drawToolActivated') {
-      this.activateRedliningTool(details.tool);
+  onLayersChanged(oldLayers, newLayers) {
+    let deletedLayers = [];
+    let addedLayers = [];
+
+    const oldActiveLayers = oldLayers.filter(layer => layer.active);
+    const newActiveLayers = newLayers.filter(layer => layer.active);
+
+    deletedLayers = oldActiveLayers.filter(oldLayer => !newActiveLayers.find(newLayer => newLayer.id === oldLayer.id));
+    addedLayers = newActiveLayers.filter(newLayer => !oldActiveLayers.find(oldLayer => oldLayer.id === newLayer.id));
+
+    this.onRemoveLayers(deletedLayers);
+    this.onAddLayers(addedLayers);
+
+    /*if (Array.isArray(newLayers)) {
+      // We recieved a list of features
+
+      deletedLayers = oldLayers.filter(oldLayer => !newLayers.find(newLayer => newLayer.id === oldLayer.id));
+      addedLayers = newLayers.filter(newLayer => !oldLayers.find(oldLayer => oldLayer.id === newLayer.id));
     }
-    else if (details.action === 'drawToolDeactivated') {
+    else {
+      if (!this.isNullOrUndefined(oldLayers)) {
+        deletedLayers.push(oldLayers);
+      }
+      if (!this.isNullOrUndefined(newLayers)) {
+        addedLayers.push(newLayers);
+      }
+    }*/
+
+
+  }
+
+  onFeaturesChanged(oldFeatures, newFeatures) {
+    let deletedFeatures = [];
+    let addedFeatures = [];
+    if (Array.isArray(newFeatures)) {
+      // We recieved a list of features
+      deletedFeatures = oldFeatures.filter(oldFeature => !newFeatures.find(newFeature => newFeature.id === oldFeature.id));
+      addedFeatures = newFeatures.filter(newFeature => !oldFeatures.find(oldFeature => oldFeature.id === newFeature.id));
+    }
+    else {
+      if (!this.isNullOrUndefined(oldFeatures)) {
+        deletedFeatures.push(oldFeatures);
+      }
+      if (!this.isNullOrUndefined(newFeatures)) {
+        addedFeatures.push(newFeatures);
+      }
+    }
+
+    deletedFeatures.forEach(feature => {
+      this.deleteFeature(feature);
+    });
+
+    addedFeatures.forEach(feature => {
+      this.addFeature(feature);
+    });
+  }
+
+  deleteFeature(feature) {
+    const toRemove = this.redliningFeaturesCollection.getArray().find(f => f.ol_uid === feature.id);
+    this.redliningFeaturesCollection.remove(toRemove);
+  }
+
+  addFeature(feature) {
+    // TODO REG : This has to be corretly implemented if we want to add object from state
+    // But at the moment only drawing in OpenLayer is supported
+    //this.redliningFeaturesCollection.push(feature);
+  }
+
+  onRedliningToolChanged(tool) {
+    if (tool === null) {
       this.deactivateRedliningTool();
     }
-    else if (details.action === 'deleteFeature') {
-      this.deleteFeature(details.id);
+    else {
+      this.activateRedliningTool(tool);
     }
-    else if (details.action === 'styleChanging') {
-      this.setFeatureStyle(details.id, details.fillColor, details.strokeColor, details.strokeWidth, details.text);
-    }
-    else if (details.action === 'styleChanged') {
-      console.log('styleChanged');
-    }
-    else if (details.action === 'nameChanging') {
-      this.setFeatureName(details.id, details.name);
-    }
-    else if (details.action === 'undoDraw') {
-      this.draw.removeLastPoint();
-    }
-  }
-
-  setFeatureName(id, name) {
-    const feature = this.redliningFeaturesCollection.getArray().find(f => f.ol_uid === id);
-    feature.set('name', name);
-  }
-
-  setFeatureStyle(id, fillColor, strokeColor, strokeWidth, text) {
-    const feature = this.redliningFeaturesCollection.getArray().find(f => f.ol_uid === id);
-
-    if (fillColor) {
-      feature.set('fillColor', fillColor.hex);
-    }
-    if (strokeColor) {
-      feature.set('strokeColor', strokeColor.hex);
-    }
-    if (strokeWidth) {
-      feature.set('strokeWidth', strokeWidth);
-    }
-    if (text === 'textbigger') {
-      const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
-      feature.set('textSize', textSize + 1);
-    }
-    if (text === 'textsmaller') {
-      const textSize = (feature.get('textSize')) ? feature.get('textSize') : this.defaultTextSize;
-      feature.set('textSize', textSize - 1);
-    }
-  }
-
-  deleteFeature(id) {
-    const toRemove = this.redliningFeaturesCollection.getArray().find(f => f.ol_uid === id);
-    this.redliningFeaturesCollection.remove(toRemove);
-    this.messageManager.sendMessage(GeoEvents.Redlining, { action: 'featureRemoved', id: toRemove.ol_uid });
   }
 
   activateRedliningTool(tool) {

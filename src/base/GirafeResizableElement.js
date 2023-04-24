@@ -13,6 +13,9 @@ Example:
   <div id="hide">
     <i class="fa-solid"></i>
   </div>
+  <div id="close">
+    <i class="fa-solid"></i>
+  </div>
 </div>
 
 Then in order to make an component resizable, 
@@ -27,7 +30,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
   panel = null;
   panelRect = null;
   gutter = null;
-  hide = null;
+  hideButton = null;
+  closeButton = null;
   dock = null;
   prevX = 0;
   host = null;
@@ -49,25 +53,35 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.panel = this.shadow.querySelector('#panel');
     this.host = this.panel.getRootNode().host;
     this.gutter = this.shadow.querySelector('#gutter');
-    this.gutter.onmousedown = (e) => this.mousedown(e);
-    this.gutter.ondblclick = (e) => this.togglePanel(e);
-    this.hide = this.shadow.querySelector('#hide');
-    if (!this.isNullOrUndefined(this.hide)) {
-      this.hide.onclick = (e) => this.togglePanel(e);
+    this.gutter.onmousedown = (e) => this.#mousedown(e);
+    this.gutter.ondblclick = (e) => this.#togglePanel(e);
+    this.hideButton = this.shadow.getElementById('hide');
+    if (!this.isNullOrUndefined(this.hideButton)) {
+      this.hideButton.onclick = () => this.#togglePanel();
+    }
+    this.closeButton = this.shadow.getElementById('close');
+    if (!this.isNullOrUndefined(this.closeButton)) {
+      this.closeButton.onclick = () => this.closePanel();
     }
   }
 
-  mousedown(e) {
+  #mousedown(e) {
     e.preventDefault();
-    document.onmousemove = (e) => this.mousemove(e);
-    document.onmouseup = (e) => this.mouseup(e);
+    document.onmousemove = (e) => this.#mousemove(e);
+    document.onmouseup = (e) => this.#mouseup(e);
 
     this.prevX = e.x;
     this.panelRect = this.panel.getBoundingClientRect();
-    this.hideWidth = this.hide.getBoundingClientRect().width;
+    if (!this.isNullOrUndefined(this.hideButton)) {
+      this.hideWidth = this.hideButton.getBoundingClientRect().width;
+    }
   }
 
-  togglePanel(e) {
+  closePanel() {
+    throw 'This function must be overriden to close the associated panel';
+  }
+
+  #togglePanel() {
     this.toggleWidth = this.gutter.getBoundingClientRect().width;
 
     const width = this.panel.getBoundingClientRect().width;
@@ -79,8 +93,15 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.panel.style.minWidth = "";
       this.host.style.minWidth = "";
 
-      this.hide.classList.remove('closed');
-      this.hide.style.left = this.panel.getBoundingClientRect().width + "px";
+      if (!this.isNullOrUndefined(this.hideButton)) {
+        this.hideButton.classList.remove('closed');
+        if (this.dock === 'left') {
+          this.hideButton.style.left = this.panel.getBoundingClientRect().width + "px";
+        }
+        else if (this.dock === 'right') {
+          this.hideButton.style.right = this.panel.getBoundingClientRect().width + "px";
+        }
+      }
     }
     else {
       // Hide the panel
@@ -88,30 +109,47 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.panel.style.width = this.toggleWidth + 'px';
       this.host.style.width = this.toggleWidth + 'px';
       this.panel.style.minWidth = 0;
+      this.panel.style.overflow = 'hidden';
       this.host.style.minWidth = 0;
 
-      this.hide.classList.add('closed');
+      if (!this.isNullOrUndefined(this.hideButton)) {
+        this.hideButton.classList.add('closed');
+      }
     }
   }
 
-  mousemove(e) {
+  #mousemove(e) {
     e.preventDefault();
     const newX = this.prevX - e.x;
     let newWidth = null;
+    let hideLeft = null;
     if (this.dock === 'left') {
       newWidth = this.panelRect.width - newX;
+      if (!this.isNullOrUndefined(this.hideButton)) {
+        this.hideButton.style.left = this.panel.getBoundingClientRect().width + "px";
+      }
+      if (!this.isNullOrUndefined(this.closeButton)) {
+        this.closeButton.style.left = this.panel.getBoundingClientRect().width + "px";
+      }
     }
     else if (this.dock === 'right') {
       newWidth = this.panelRect.width + newX;
+      if (!this.isNullOrUndefined(this.hideButton)) {
+        this.hideButton.style.right = this.panel.getBoundingClientRect().width + "px";
+      }
+      if (!this.isNullOrUndefined(this.closeButton)) {
+        this.closeButton.style.right = this.panel.getBoundingClientRect().width + "px";
+      }
     }
     this.panel.style.width = newWidth + "px";
     this.host.style.width = newWidth + "px";
 
-    this.hide.classList.remove('closed');
-    this.hide.style.left = this.panel.getBoundingClientRect().width + "px";
+    if (!this.isNullOrUndefined(this.hideButton)) {
+      this.hideButton.classList.remove('closed');
+    }
   }
 
-  mouseup(e) {
+  #mouseup(e) {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;

@@ -7,8 +7,7 @@
   "devDependencies": {
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
-    "jsdom": "^21.0.0",
-    "vite": "^3.1.4"
+    "jsdom": "^21.0.0"
   },
   "dependencies": {
     "adjectives": "^1.0.2",
@@ -16,9 +15,11 @@
     "ol": "^7.1.0",
     "ol-mapbox-style": "^9.3.0",
     "olcs": "^2.13.1",
+    "on-change": "^4.0.2",
     "proj4": "^2.8.0",
     "tippy.js": "^6.3.7",
-    "vanilla-picker": "^2.12.1"
+    "vanilla-picker": "^2.12.1",
+    "vite": "^3.1.4"
   },
   "scripts": {
     "serve": "bash -C './buildtools/prebuild.sh' && vite serve",

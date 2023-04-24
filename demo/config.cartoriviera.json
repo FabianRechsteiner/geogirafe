@@ -7,32 +7,49 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "fr": "https://mapnv.ch/static/dummy/fr.json",
+    "fr": "https://map.cartoriviera.ch/static/dummy/fr.json",
     "//comment2": "Default language",
     "default": "fr"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "Mock/themes.json",
-    "defaultBasemap": "Plan-couleur"
+    "url": "https://map.cartoriviera.ch/themes?background=background&interface=desktop",
+    "defaultBasemap": "plan_cadastral",
+    "OSMBasemap": true,
+    "SwissTopoVectorTilesBasemap": true
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
-    "url": "https://mapnv.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://map.cartoriviera.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "https://mapnv.ch/printproxy/",
+    "url": "https://map.cartoriviera.ch/printproxy/",
     "//comment2": "The print layout selected by default",
-    "defaultLayout": "1 A4 Paysage"
+    "defaultLayout": "1) A4 paysage"
+  },
+  "selection": {
+    "defaultFillColor": "#ff66667f",
+    "defaultStrokeColor": "#ff3333",
+    "defaultStrokeWidth": 4,
+    "defaultFocusFillColor": "#ff33337f",
+    "defaultFocusStrokeColor": "#ff0000",
+    "defaultFocusStrokeWidth": 4
+  },
+  "redlining": {
+    "defaultFillColor": "#6666ff7f",
+    "defaultStrokeColor": "#0000ff",
+    "defaultStrokeWidth": 2,
+    "defaultTextSize": 12,
+    "defaultFont": "Arial"
   },
   "map": {
     "srid": "EPSG:2056",
     "startZoom": "1",
-    "startPosition": "2534000,1181000",
-    "maxExtent": "2491250,1116751,2585455,1206650",
-    "scales": [300000, 100000, 50000, 25000, 10000, 5000, 2500, 2000, 1000, 500, 250, 200, 100, 50],
+    "startPosition": "2554000,1145000",
+    "maxExtent": "2486355,1105663,2610155,1220113",
+    "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200, 100],
     "constraintScales": true
   },
   "map3d": {

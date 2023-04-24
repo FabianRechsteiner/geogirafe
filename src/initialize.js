@@ -1,6 +1,6 @@
 import ConfigManager from './tools/configmanager.js';
 import UrlManager from './tools/urlmanager.js';
-import StateManager from './tools/statemanager.js';
+import StateManager from './tools/state/statemanager.js';
 import I18nManager from './tools/i18nmanager.js';
 import I18MessageManager from './tools/messagemanager.js';
 
@@ -22,7 +22,7 @@ import HelpComponent from './components/help/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
-import MessageManager from './tools/messagemanager.js';
+import ThemesManager from './tools/themesmanager.js';
 
 // Register custom EPSG
 // https://epsg.io/21781
@@ -31,13 +31,5 @@ proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.4395833
 proj4.defs("EPSG:2056" , '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs');
 register(proj4);
 
-// Initialize the singletons once
-ConfigManager.getInstance().loadConfig();
-MessageManager.getInstance();
-UrlManager.getInstance([TreeViewComponent, MapComponent, ProjectionComponent, BasemapComponent, ThemeComponent, LanguageComponent]);
-StateManager.getInstance();
-I18nManager.getInstance();
-
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('App initialized.');
-});
+// Initialize the themes manager, in order to load the themes
+ThemesManager.getInstance();

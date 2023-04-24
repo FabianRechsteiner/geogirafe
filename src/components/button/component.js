@@ -1,4 +1,3 @@
-import GeoEvents from '../../models/events';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class ButtonComponent extends GirafeHTMLElement {
@@ -9,7 +8,6 @@ class ButtonComponent extends GirafeHTMLElement {
   textSpan = null;
   text = null;
 
-  geoevent = null;
   option = null;
   href = null;
   
@@ -90,9 +88,8 @@ class ButtonComponent extends GirafeHTMLElement {
     if (this.hasAttribute('href')) {
       this.href = this.getAttribute('href');
     }
-    if (this.hasAttribute('message') && this.hasAttribute('action')) {
+    else if (this.hasAttribute('message') && this.hasAttribute('action')) {
       const message = this.getAttribute('message');
-      this.geoevent = this.getGeoEventType(message);
       this.options = {};
       this.options.action = this.getAttribute('action');
 
@@ -101,12 +98,44 @@ class ButtonComponent extends GirafeHTMLElement {
         this.options[key] = this.dataset[key];
       }
     }
+    // TODO REG : When stateManager is integrated everywhere, the code with message and action should be removed.
+    else if (this.hasAttribute('state-action')) {
+      this.actionState = this.getAttribute('state-action');
+      this.actionValue = this.getActionValue();
+    }
 
-    // Observe parent to adapt to attribute chagnes
+    // Observe parent to adapt to attribute changes
     const observer = new MutationObserver(this.parentAttributeChanged.bind(this));
     observer.observe(this, { attributes: true });
 
     this.button.addEventListener('click', (e) => this.onClick());
+  }
+
+  getActionValue() {
+    if (Object.keys(this.dataset).length > 1) {
+      // Only one parameter is authorized here, because the state method is invoked dynamically
+      // And we cannot control the order of the parameters for the state update in the onClick() method.
+      // So for now, we send an error if more than 1 parameter is set.
+      throw 'Maximum 1 parameter is allowed here.';
+    }
+
+    if (Object.keys(this.dataset).length === 0) {
+      // No value was defined here.
+      // We consider it as a "boolean switch"
+      return null;
+    }
+
+    // There is a value. We use it as a value
+    const value = Object.values(this.dataset)[0];
+    // Manage booleans
+    if (value === 'true') {
+      return true;
+    }
+    if (value === 'false') {
+      return false;
+    }
+
+    return value;
   }
 
   parentAttributeChanged(mutationList, observer) {
@@ -119,40 +148,40 @@ class ButtonComponent extends GirafeHTMLElement {
   }
 
   onClick() {
-    if (this.href !== null) {
+    if (!this.isNullOrUndefined(this.href)) {
       // Open link in a new tab
       window.open(this.href, '_blank');
     }
-    else if (this.message !== null) {
+    else if (!this.isNullOrUndefined(this.message)) {
       // send message
-      this.messageManager.sendMessage(this.geoevent, this.options);
+      this.messageManager.sendMessage(this.options);
+    }
+    else if (!this.isNullOrUndefined(this.actionState)) {
+      // update state
+      const keys = this.actionState.split('.');
+      let state = this.state;
+      for (let i=0; i<keys.length-1; ++i) {
+        state = state[keys[i]];
+      }
+
+      if (this.actionValue === null) {
+        if (typeof state[keys[keys.length-1]] !== 'boolean') {
+          // The value is not a boolean, and no action-value was defined
+          // In this case, we should "invert" the boolean.
+          // => we cannt do this, because it isn't a boolean
+          throw "Cannot invert boolean value : it isn't a boolean";
+        }
+        state[keys[keys.length-1]] = !state[keys[keys.length-1]];
+      }
+      else {
+        state[keys[keys.length-1]] = this.actionValue;
+      }
     }
 
     // Close parent menu-button if any
     const parentMenuButton = super.getParentOfType('GIRAFE-MENU-BUTTON', this.shadow.host.parentNode);
     if (parentMenuButton !== null) {
       parentMenuButton.closeMenu();
-    }
-  }
-
-  getGeoEventType(message) {
-    switch(message) {
-      case 'RedLining':
-        return GeoEvents.RedLining;
-      case 'TreeView':
-        return GeoEvents.TreeView;
-      case 'Map':
-        return GeoEvents.Map;
-      case 'App':
-        return GeoEvents.App;
-      case 'Theme':
-        return GeoEvents.Theme;
-      case 'Init':
-        return GeoEvents.Init;
-      case 'Translate':
-        return GeoEvents.Translate;
-      case 'Redlining':
-        return GeoEvents.Redlining;
     }
   }
 

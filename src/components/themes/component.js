@@ -1,4 +1,3 @@
-import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class ThemeComponent extends GirafeHTMLElement {
@@ -27,11 +26,19 @@ class ThemeComponent extends GirafeHTMLElement {
 
     this.themesList = this.shadow.querySelector('#themes');
     this.toggleThemesList(false);
+  }
 
+  registerEvents() {
+    this.stateManager.subscribe('loading', (oldValue, newValue) => this.onLoading(newValue));
+    this.stateManager.subscribe('themes', (oldThemes, newThemes) => this.onThemesLoaded(newThemes));
+  }
+
+  onThemesLoaded(themes) {
     // Add options from themes
-    this.themesJson.forEach(elem => {
-      this.addOption(this.themesList, elem);
+    Object.values(themes).forEach(theme => {
+      this.addOption(theme);
     });
+    super.translate();
   }
 
   onBlur() {
@@ -56,7 +63,7 @@ class ThemeComponent extends GirafeHTMLElement {
     }
   }
 
-  addOption(select, theme) {
+  addOption(theme) {
     // Create new theme option
     const option = document.createElement('div');
 
@@ -69,39 +76,21 @@ class ThemeComponent extends GirafeHTMLElement {
     span.setAttribute('i18n', theme.name);
     option.appendChild(span);
 
-    this.themes.push(theme);
-    option.dataset['value'] = this.themes.length - 1;
+    option.dataset['value'] = theme.id;
     // Ignore blur on mouse down to prevent themes from de-rendering before we can process click
     option.onmousedown = () => { this.ignoreBlur = true };
     option.onclick = (e) => this.onThemeChanged(e);
   
     // Add to select
-    select.appendChild(option);
+    this.themesList.appendChild(option);
   }
 
-  registerEvents() {
-    window.addEventListener(GeoEvents.Init, (e) => this.onInitEvent(e.detail));
-    window.addEventListener(GeoEvents.Map, (e) => this.onMapEvent(e.detail));
-    //this.themesList.addEventListener('change', (e) => this.onThemeChanged(this, e));
-  }
-
-  onInitEvent(details) {
-    if (details.action === 'initState') {
-      if (details.state.theme !== 'null') {
-        // Find the theme id from the name
-        const index = this.themes.findIndex(item => item.name === details.state.theme);
-        this.themesList.value = index;
-        this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: this.themes[index]});
-      }
-    }
-  }
-
-  onMapEvent(details) {
-    if (details.action === 'renderStarted') {
+  onLoading(loading) {
+    if (loading) {
       this.layerIcon.style.display = 'none';
       this.waitingIcon.style.display = 'block';
     }
-    else if (details.action === 'renderEnded') {
+    else {
       this.layerIcon.style.display = 'block';
       this.waitingIcon.style.display = 'none';
     }
@@ -110,26 +99,17 @@ class ThemeComponent extends GirafeHTMLElement {
   onThemeChanged(e) {
     const div = super.getParentOfType('DIV', e.target);
     const index = div.dataset["value"];
-    this.messageManager.sendMessage(GeoEvents.Theme, {action: 'themeChanged', theme: this.themes[index]});
+    this.state.selectedTheme = this.state.themes[index];
     this.toggleThemesList(false);
     this.ignoreBlur = false;
   }
 
   connectedCallback() {
     this.loadTemplate()
-    .then(() => this.loadThemes()
       .then(() => {
         this.render();
-        super.translate();
         this.registerEvents();
-        super.initialized();
-    }));
-  }
-
-  async loadThemes() {
-    const response = await fetch(this.configManager.Config.themes.url);
-    const content = await response.json();
-    this.themesJson = content["themes"];
+      });
   }
 }
 

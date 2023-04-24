@@ -28,7 +28,6 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    //window.addEventListener(GeoEvents.TreeView, (e) => this.onTreeViewEvent(e.detail));
     this.searchBox.addEventListener('input', (e) => this.doSearch(this, e));
     this.searchBox.addEventListener('focusin', (e) => this.onFocusIn());
     this.searchBox.addEventListener('focusout', (e) => this.onFocusOut());
@@ -161,12 +160,12 @@ class SearchComponent extends GirafeHTMLElement {
     const div = super.getParentOfType('DIV', e.target);
     const resultGeometry = this.resultList[div.dataset.resultId];
     if (resultGeometry.type === 'Point') {
-      this.messageManager.sendMessage(GeoEvents.Map, {action: 'panToCoordinate', coordinate: resultGeometry.coordinates });
+      this.state.position.center = resultGeometry.coordinates;
       this.onFocusOut();
     }
     else if (resultGeometry.type === 'MultiPoint' && resultGeometry.coordinates.length === 1) {
       // We get a MultiPoint geometry, but this actually is a Point
-      this.messageManager.sendMessage(GeoEvents.Map, {action: 'panToCoordinate', coordinate: resultGeometry.coordinates[0] });
+      this.state.position.center = resultGeometry.coordinates[0];
       this.onFocusOut();
     }
     else if (resultGeometry.type === 'Polygon') {
@@ -189,7 +188,7 @@ class SearchComponent extends GirafeHTMLElement {
     const bufferValue = parseInt(Math.max(getWidth(extent)*50/100, getHeight(extent)*50/100));
     const bufferedExtent = buffer(extent, bufferValue);
 
-    this.messageManager.sendMessage(GeoEvents.Map, {action: 'zoomToExtent', extent: bufferedExtent });
+    this.messageManager.sendMessage({action: GeoEvents.zoomToExtent, extent: bufferedExtent });
   }
 
   attributeChangedCallback(name, oldValue, newValue, namespace) {

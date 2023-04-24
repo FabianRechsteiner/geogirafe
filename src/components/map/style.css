@@ -11,6 +11,11 @@
   left: unset;
 }
 
+.ol-rotate {
+  right: 1rem;
+  top: 4rem;
+}
+
 #swiper {
   display: none;
   width: 99%;
@@ -26,12 +31,17 @@ input[type=range] {
 }
 
 /* Webkit/Chrome specific */
+input[type=range]::-webkit-slider-runnable-track {
+  height: 0;
+}
+
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   border: 2px solid #444;
   height: 0;
-  padding-top: 50%;
-  padding-bottom: 50%;
+  margin-top: -1000px;
+  padding-top: 1000px;
+  padding-bottom: 1000px;
   width: 6px;
   cursor: e-resize;
   background: #FFFFFF;
@@ -42,8 +52,8 @@ input[type=range]::-webkit-slider-thumb {
 input[type=range]::-moz-range-thumb {
   border: 2px solid #444;
   height: 0;
-  padding-top: 40%;
-  padding-bottom: 40%;
+  padding-top: 1000px;
+  padding-bottom: 1000px;
   width: 3px;
   cursor: e-resize;
   background: #FFFFFF;
