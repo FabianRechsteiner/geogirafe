@@ -57,10 +57,30 @@ girafe-search {
   overflow: visible;
 }
 
-section {
+#content {
   position: absolute;
   display: flex;
+  flex-direction: column;
   top: 4.5rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#content-map {
+  position: relative;
+  flex: 1;
+}
+
+#content-bottom {
+  position: relative;
+  flex: 0;
+}
+
+#content-map section {
+  position: absolute;
+  display: flex;
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0;
@@ -92,10 +112,15 @@ footer {
   flex-direction: row;
 }
 
+girafe-selection-grid {
+  position: relative;
+  display: block;
+}
+
 girafe-redlining, girafe-print {
   position: absolute;
   right: 0;
-  top: 4.5rem;
+  top: 0;
   bottom: 0;
   width: 20rem;
   z-index: 90;

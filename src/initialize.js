@@ -18,11 +18,13 @@ import MenuButtonComponent from './components/menubutton/component.js';
 import RedliningComponent from './components/redlining/component.js';
 import PrintComponent from './components/print/component.js';
 import SelectionWindowComponent from './components/selectionwindow/component.js';
+import SelectionGridComponent from './components/selectiongrid/component.js';
 import HelpComponent from './components/help/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
 import ThemesManager from './tools/themesmanager.js';
+import WfsManager from './tools/wfsmanager.js';
 
 // Register custom EPSG
 // https://epsg.io/21781
@@ -33,3 +35,4 @@ register(proj4);
 
 // Initialize the themes manager, in order to load the themes
 ThemesManager.getInstance();
+WfsManager.getInstance();

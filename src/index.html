@@ -36,17 +36,31 @@
         </girafe-menu-button>
       </div>
     </header>
-    <section>
-      <girafe-tree-view dock="left"></girafe-tree-view>
-      <girafe-map></girafe-map>
-      <footer>
-        <girafe-scale></girafe-scale>
-        <girafe-coordinate></girafe-coordinate>
-      </footer>
-    </section>
-    <girafe-redlining dock="right"></girafe-redlining>
-    <girafe-print dock="right"></girafe-print>
-    <girafe-selection-window></girafe-selection-window>
-    <girafe-help></girafe-help>
+
+    <div id="content">
+
+      <div id="content-map">
+        <section>
+          <girafe-tree-view dock="left"></girafe-tree-view>
+          <girafe-map></girafe-map>
+          <footer>
+            <girafe-scale></girafe-scale>
+            <girafe-coordinate></girafe-coordinate>
+          </footer>
+        </section>
+        <girafe-redlining dock="right"></girafe-redlining>
+        <girafe-print dock="right"></girafe-print>
+        <!-- <girafe-selection-window></girafe-selection-window> -->
+        <girafe-help></girafe-help>
+      </div>
+
+      <div id="content-bottom">
+        <girafe-selection-grid dock="bottom"></girafe-selection-grid>
+      </div>
+
+    </div>
+
+    
+
   </body>
 </html>

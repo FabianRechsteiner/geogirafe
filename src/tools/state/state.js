@@ -25,7 +25,8 @@ class State {
   interface = {
     helpVisible: false,
     redliningPanelVisible: false,
-    printPanelVisible: false
+    printPanelVisible: false,
+    selectionGridVisible: false
   }
 
   // Current language

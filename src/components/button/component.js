@@ -88,17 +88,15 @@ class ButtonComponent extends GirafeHTMLElement {
     if (this.hasAttribute('href')) {
       this.href = this.getAttribute('href');
     }
-    else if (this.hasAttribute('message') && this.hasAttribute('action')) {
-      const message = this.getAttribute('message');
+    else if (this.hasAttribute('message')) {
       this.options = {};
-      this.options.action = this.getAttribute('action');
+      this.options.message = this.getAttribute('message');
 
       // Get message attributes from dataset if there is any
       for (let key in this.dataset) {
         this.options[key] = this.dataset[key];
       }
     }
-    // TODO REG : When stateManager is integrated everywhere, the code with message and action should be removed.
     else if (this.hasAttribute('state-action')) {
       this.actionState = this.getAttribute('state-action');
       this.actionValue = this.getActionValue();
@@ -133,6 +131,12 @@ class ButtonComponent extends GirafeHTMLElement {
     }
     if (value === 'false') {
       return false;
+    }
+    // Manage arrays
+    if (value.startsWith('[') && value.endsWith(']')) {
+      const content = value.substring(1, value.length - 1);
+      const array = content.split(',').map(item => parseFloat(item) ? parseFloat(item) : item);
+      return array;
     }
 
     return value;

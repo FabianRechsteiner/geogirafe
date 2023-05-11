@@ -44,6 +44,15 @@ class I18nManager extends GirafeSingleton {
       return this.loadingLanguagePromise;
   }
 
+  getTranslation(key) {
+    const translation = this.translations[this.stateManager.state.language][key];
+    if (translation !== undefined && translation !== null) {
+      return translation;
+    }
+    // console.log('no translation for ' + key);
+    return key;
+  }
+
   translate(dom) {
     if (this.stateManager.state.language != null) {
       this.#loadTranslations(this.stateManager.state.language)
@@ -51,20 +60,13 @@ class I18nManager extends GirafeSingleton {
           const toTranslate = dom.querySelectorAll('[i18n]');
           toTranslate.forEach(item => {
             const key = item.getAttribute('i18n');
-            const translation = translations[key];
-            if (translation !== undefined && translation !== null) {
-              if (item.hasAttribute('placeholder')) {
-                item.setAttribute('placeholder', translation);
-              }
-              else {
-                // Default : simply set innerHTML.
-                item.innerHTML = translation;
-              }
+            const translation = this.getTranslation(key);
+            if (item.hasAttribute('placeholder')) {
+              item.setAttribute('placeholder', translation);
             }
             else {
-              // No translation found. We use the key as translation
-              // console.log('no translation for ' + key);
-              item.innerHTML = key;
+              // Default : simply set innerHTML.
+              item.innerHTML = translation;
             }
           });
         });
