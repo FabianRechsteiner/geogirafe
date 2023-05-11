@@ -12,6 +12,7 @@
   "dependencies": {
     "adjectives": "^1.0.2",
     "cesium": "^1.101.0",
+    "gridjs": "^6.0.6",
     "ol": "^7.1.0",
     "ol-mapbox-style": "^9.3.0",
     "olcs": "^2.13.1",

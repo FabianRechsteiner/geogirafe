@@ -34,6 +34,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   closeButton = null;
   dock = null;
   prevX = 0;
+  prevY = 0;
   host = null;
   toggleWidth = null;
   lastWidth = 0;
@@ -71,6 +72,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
     document.onmouseup = (e) => this.#mouseup(e);
 
     this.prevX = e.x;
+    this.prevY = e.y;
     this.panelRect = this.panel.getBoundingClientRect();
     if (!this.isNullOrUndefined(this.hideButton)) {
       this.hideWidth = this.hideButton.getBoundingClientRect().width;
@@ -82,6 +84,15 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   #togglePanel() {
+    if (this.dock === 'left' || this.dock === 'right') {
+      this.#togglePanelVertically();
+    }
+    else {
+      this.#togglePanelHorizontally();
+    }
+  }
+
+  #togglePanelVertically() {
     this.toggleWidth = this.gutter.getBoundingClientRect().width;
 
     const width = this.panel.getBoundingClientRect().width;
@@ -118,31 +129,81 @@ class GirafeResizableElement extends GirafeHTMLElement {
     }
   }
 
+  #togglePanelHorizontally() {
+    this.toggleWidth = this.gutter.getBoundingClientRect().height;
+
+    const height = this.panel.getBoundingClientRect().height;
+    if (height <= this.toggleWidth) {
+      // Panel is already hidden.
+      // => We reset it to the last width
+      this.panel.style.height = this.lastWidth + 'px';
+      this.host.style.height = this.lastWidth + 'px';
+      this.panel.style.minHeight = "";
+      this.host.style.minHeight = "";
+
+      if (!this.isNullOrUndefined(this.hideButton)) {
+        this.hideButton.classList.remove('closed');
+        if (this.dock === 'bottom') {
+          this.hideButton.style.bottom = this.panel.getBoundingClientRect().height + "px";
+        }
+        // else if (this.dock === 'right') {
+        //   this.hideButton.style.right = this.panel.getBoundingClientRect().width + "px";
+        // }
+      }
+    }
+    else {
+      // Hide the panel
+      this.lastWidth = height;
+      this.panel.style.height = this.toggleWidth + 'px';
+      this.host.style.height = this.toggleWidth + 'px';
+      this.panel.style.minHeight = 0;
+      this.panel.style.overflow = 'hidden';
+      this.host.style.minHeight = 0;
+
+      if (!this.isNullOrUndefined(this.hideButton)) {
+        this.hideButton.classList.add('closed');
+      }
+    }
+  }
+
   #mousemove(e) {
     e.preventDefault();
     const newX = this.prevX - e.x;
-    let newWidth = null;
-    let hideLeft = null;
+    const newY = this.prevY - e.y;
     if (this.dock === 'left') {
-      newWidth = this.panelRect.width - newX;
+      let newWidth = this.panelRect.width - newX;
       if (!this.isNullOrUndefined(this.hideButton)) {
         this.hideButton.style.left = this.panel.getBoundingClientRect().width + "px";
       }
       if (!this.isNullOrUndefined(this.closeButton)) {
         this.closeButton.style.left = this.panel.getBoundingClientRect().width + "px";
       }
+      this.panel.style.width = newWidth + "px";
+      this.host.style.width = newWidth + "px";
     }
     else if (this.dock === 'right') {
-      newWidth = this.panelRect.width + newX;
+      let newWidth = this.panelRect.width + newX;
       if (!this.isNullOrUndefined(this.hideButton)) {
         this.hideButton.style.right = this.panel.getBoundingClientRect().width + "px";
       }
       if (!this.isNullOrUndefined(this.closeButton)) {
         this.closeButton.style.right = this.panel.getBoundingClientRect().width + "px";
       }
+      this.panel.style.width = newWidth + "px";
+      this.host.style.width = newWidth + "px";
     }
-    this.panel.style.width = newWidth + "px";
-    this.host.style.width = newWidth + "px";
+    else if (this.dock === 'bottom') {
+      let newHeight = this.panelRect.height + newY;
+      /*if (!this.isNullOrUndefined(this.hideButton)) {
+        this.hideButton.style.bottom = this.panel.getBoundingClientRect().width + "px";
+      }*/
+      /*if (!this.isNullOrUndefined(this.closeButton)) {
+        this.closeButton.style.right = this.panel.getBoundingClientRect().width + "px";
+      }*/
+      this.panel.style.height = newHeight + "px";
+      this.host.style.height = newHeight + "px";
+    }
+    
 
     if (!this.isNullOrUndefined(this.hideButton)) {
       this.hideButton.classList.remove('closed');

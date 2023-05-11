@@ -55,6 +55,8 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   render() {
+    // First, clear the old shadow content
+    this.shadow.innerHTML = '';
     // Clone component template and add it to the dom
     this.shadow.appendChild(this.template.content.cloneNode(true));
   }
