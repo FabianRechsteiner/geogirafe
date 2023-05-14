@@ -1,0 +1,6 @@
+{
+  "//Comment": "This file will be automatically overwritten during the build process in the GitLab Pipeline",
+  "version": "X.Y",
+  "build": "DEV",
+  "date" : "DD/MM/YYYY"
+}

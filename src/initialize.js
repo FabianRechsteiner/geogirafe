@@ -20,6 +20,7 @@ import PrintComponent from './components/print/component.js';
 import SelectionWindowComponent from './components/selectionwindow/component.js';
 import SelectionGridComponent from './components/selectiongrid/component.js';
 import HelpComponent from './components/help/component.js';
+import AboutComponent from './components/about/component.js';
 
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';

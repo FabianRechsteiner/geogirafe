@@ -1,9 +1,16 @@
 {
   "name": "geogirafe",
-  "description": "Simple Geo Viewer",
+  "description": "Simple GeoViewer",
   "author": "Guillaume REMY",
-  "version": "0.1",
+  "version": "0.2",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/geogirafe/gg-viewer"
+  },
+  "keywords": ["geogirafe", "gis", "geoviewer", "geoportal", "webgis", "geomapfish"],
+  "license": "undefined yet",
+  "homepage": "https://geogirafe.paloo.fr",
   "devDependencies": {
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
