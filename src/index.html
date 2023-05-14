@@ -31,7 +31,7 @@
             <girafe-proj-select></girafe-proj-select>
             <girafe-language-select></girafe-language-select>
             <girafe-button icon-style="fa-xl fa-solid fa-globe" text="3D" state-action="globe.enabled"></girafe-button>
-            <girafe-button icon-style="fa-xl fa-brands fa-gitlab" text="Source" class="border-top" href="https://gitlab.com/geogirafe/gg-viewer"></girafe-button>
+            <girafe-button icon-style="fa-xl fa-solid fa-circle-info" class="border-top" text="about" state-action="interface.aboutVisible" data-value="true"></girafe-button>
           </div>
         </girafe-menu-button>
       </div>
@@ -50,6 +50,7 @@
         </section>
         <girafe-redlining dock="right"></girafe-redlining>
         <girafe-print dock="right"></girafe-print>
+        <girafe-about></girafe-about>
         <!-- <girafe-selection-window></girafe-selection-window> -->
         <girafe-help></girafe-help>
       </div>

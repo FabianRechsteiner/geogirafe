@@ -32,7 +32,6 @@ class HelpComponent extends GirafeHTMLElement {
       this.render();
       super.translate();
       this.registerEvents();
-      //super.initialized();
     });
   }
 }

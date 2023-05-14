@@ -9,7 +9,12 @@ It must have 2 divs :
 Example:
 
 <div id="draggable">
-  <div id="header">Click here to move</div>
+  <div id="header">
+    Click here to move
+    <div id="close">
+      <i class="fa-solid"></i>
+    </div>
+  </div>
   <!-- PLACE CONTENT HERE -->
 </div>
 
@@ -26,6 +31,7 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   div = null;
   header = null;
   host = null;
+  closeButton = null;
 
   pos1 = 0;
   pos2 = 0;
@@ -41,6 +47,15 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     this.host = this.div.getRootNode().host;
     this.header = this.shadow.querySelector('#header');
     this.header.onmousedown = (e) => this.dragMouseDown(this, e);
+
+    this.closeButton = this.shadow.getElementById('close');
+    if (!this.isNullOrUndefined(this.closeButton)) {
+      this.closeButton.onclick = () => this.closeWindow();
+    }
+  }
+
+  closeWindow() {
+    throw 'This function must be overriden to close the associated window';
   }
 
   dragMouseDown(_this, e) {

@@ -34,13 +34,15 @@ build:
   image: node:18-slim
 
   before_script:
-    - apt update && apt -y upgrade
+    - apt update && apt -y install jq
   script: 
     - npm i --omit=dev
     - npm run build
     # List all dependencies
     - npm list --all --omit=dev
-
+    # Generate Version Number
+    - version=$(jq -r '.version' package.json)
+    - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > public/about.json
   artifacts:
     paths:
       - public

@@ -135,7 +135,17 @@ girafe-selection-window {
   position: absolute;
   z-index: 100;
   background: #fff;
-  display: none
+  display: none;
+}
+
+girafe-about {
+  position: absolute;
+  z-index: 100;
+  background: #fff;
+  display: none;
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .border-top {

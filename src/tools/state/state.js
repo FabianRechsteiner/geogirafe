@@ -26,7 +26,8 @@ class State {
     helpVisible: false,
     redliningPanelVisible: false,
     printPanelVisible: false,
-    selectionGridVisible: false
+    selectionGridVisible: false,
+    aboutVisible: false
   }
 
   // Current language
