@@ -103,6 +103,10 @@ pages:
     - cp -R public mapnv && mv mapnv release/
     - rm release/mapnv/config.json 
     - cp demo/config.mapnv.json release/mapnv/config.json
+    # Create a instance for a sample schwyz instance
+    - cp -R public schwyz && mv schwyz release/
+    - rm release/schwyz/config.json 
+    - cp demo/config.schwyz.json release/schwyz/config.json
 
     # Rename the relase directory to public
     - rm -Rf public && mv release public
@@ -116,6 +120,7 @@ pages:
     - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/mapbs/Mock/themes.json
     - curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --output public/cartolacote/Mock/themes.json
     - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
+    - curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output public/schwyz/Mock/themes.json
 
     # Compress all files
     - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
