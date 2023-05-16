@@ -304,6 +304,9 @@ class TreeViewComponent extends GirafeResizableElement {
       if (layer.isDefaultChecked) {
         layer.activeState = 'on';
       }
+      if (layer.isGroup && layer.isDefaultExpanded) {
+        layer.isExpanded = true;
+      }
     }
   }
 

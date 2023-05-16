@@ -135668,7 +135668,8 @@
               "Achsen",
               "Fluss",
               "Bach"
-            ]
+            ],
+            "isExpanded": true
           },
           "mixed": false,
           "name": "Gew\u00e4ssernetz",

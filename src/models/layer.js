@@ -6,6 +6,9 @@ class Layer {
   type = null;
   isDefaultChecked = null;
 
+  // Group properties
+  isDefaultExpanded = null;
+
   // For hierarchy management
   children = [];
   parent = null;
@@ -96,6 +99,7 @@ class Layer {
       // Other cases: Groups
       this.isGroup = true;
       this.isLayer = false;
+      this.isDefaultExpanded = (elem.metadata && elem.metadata.isExpanded);
     }
 
     // }
