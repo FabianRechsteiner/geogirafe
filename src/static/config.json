@@ -21,7 +21,7 @@
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
-    "show" : false,
+    "show" : true,
     "//comment2": "Name of the default basemap.",
     "defaultBasemap": "Grundkarte farbig",
     "//comment3" : "special basemaps that can be activated or not",
