@@ -478,7 +478,9 @@ class MapComponent extends GirafeHTMLElement {
     }
     else {
       // 3d map is not visible
-      this.map3d.setEnabled(false);
+      if (this.map3d !== null) {
+        this.map3d.setEnabled(false);
+      }
       this.mapTarget.style.display = 'block';
       this.mapTarget.style.width = '100%';
       this.map3dTarget.style.display = 'none';
