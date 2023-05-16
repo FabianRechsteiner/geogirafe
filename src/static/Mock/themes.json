@@ -135626,7 +135626,8 @@
               "layers": "GZ_Eindolung",
               "maxResolutionHint": 999999999.0,
               "metadata": {
-                "legendRule": "Eindolung"
+                "legendRule": "Eindolung",
+                "isChecked": true
               },
               "minResolutionHint": 0.0,
               "name": "GZ_Eindolung",
@@ -135646,7 +135647,8 @@
               "layers": "GZ_Gewaesserachse",
               "maxResolutionHint": 999999999.0,
               "metadata": {
-                "legendRule": "Gew\u00e4sserachse"
+                "legendRule": "Gew\u00e4sserachse",
+                "isChecked": true
               },
               "minResolutionHint": 0.0,
               "name": "GZ_Gewaesserachse",
@@ -135736,6 +135738,7 @@
                 ],
                 "isLegendExpanded": true,
                 "legend": true,
+                "isChecked": true,
                 "metadataUrl": "/metadata/4058"
               },
               "minResolutionHint": 0.0,

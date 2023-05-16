@@ -4,6 +4,7 @@ class Layer {
   id = null;
   name = null;
   type = null;
+  isDefaultChecked = null;
 
   // For hierarchy management
   children = [];
@@ -52,6 +53,7 @@ class Layer {
     this.name = elem.name;
     this.type = elem.type;
     this.order = order;
+    this.isDefaultChecked = (elem.metadata && elem.metadata.isChecked);
 
     if (elem.type === 'OSM') {
       // Nothing more to do
@@ -93,6 +95,7 @@ class Layer {
       this.isGroup = true;
       this.isLayer = false;
     }
+
     // }
     // else {
     //   throw 'Unmanaged layer type: ' + elem.type;
@@ -145,17 +148,25 @@ class Layer {
     return this.activeState === 'off';
   }
 
-  // activate() {
-  //   this.activeState = 'on';
-  // }
+  get areAllChildrenActive() {
+    let allActive = true;
+    for (let i=0; i<this.children.length; ++i) {
+      if (!this.children[i].active) {
+        allActive = false;
+      }
+    }
+    return allActive;
+  }
 
-  // deactivate() {
-  //   this.activeState = 'off';
-  // }
-
-  // semiactivate() {
-  //   this.activeState = 'semi';
-  // }
+  get areAllChildrenInactive() {
+    let allInactive = true;
+    for (let i=0; i<this.children.length; ++i) {
+      if (!this.children[i].inactive) {
+        allInactive = false;
+      }
+    }
+    return allInactive;
+  }
 }
 
 export default Layer;

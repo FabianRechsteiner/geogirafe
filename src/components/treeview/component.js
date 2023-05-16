@@ -93,7 +93,7 @@ class TreeViewComponent extends GirafeResizableElement {
     this.stateManager.subscribe('position', (oldPosition, newPosition) => this.onResolutionChanged(newPosition.resolution));
     this.stateManager.subscribe('selectedTheme', (oldTheme, newTheme) => this.onChangeTheme(newTheme));
     this.stateManager.subscribe('layers.layersList.[0-9]*.isExpanded', (oldValue, newValue, layer) => this.expand(layer, newValue));
-    this.stateManager.subscribe('layers.layersList.[0-9]*.activeState', (oldValue, newValue, layer) => this.activate(layer));
+    this.stateManager.subscribe('layers.layersList.[0-9]*.activeState', (oldValue, newValue, layer) => this.activateStateChanged(layer));
     this.stateManager.subscribe('layers.layersList.[0-9]*.isLegendExpanded', (oldValue, newValue, layer) => this.toggleLegend(layer));
 
     this.menuManager.registerEvents();
@@ -145,21 +145,6 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  // deleteLayer(layer, e) {
-  //   const li = super.getParentOfType('LI', e.target);
-  
-  //   // First deactivate layer
-  //   if (layer.isGroup) {
-  //     this.toggleChilds(li, false);
-  //   }
-
-  //   // Then delete it from list
-  //   const index = this.state.layers.layersList.indexOf(layer);
-  //   this.state.layers.layersList.splice(index, 1);
-
-
-  // }
-
   zoomToResolution(minResolution, maxResolution) {
     // Because of rounding errors (for example 1.59 becomes 1.589999999999998), 
     // we zoom a bit more than just the max resolution.
@@ -185,7 +170,7 @@ class TreeViewComponent extends GirafeResizableElement {
     const span = document.createElement('span');
     span.setAttribute('i18n', layer.name);
     span.className = 'selectable';
-    span.onclick = (e) => this.toggle(e, layer);
+    span.onclick = (e) => this.toggle(layer);
     container.appendChild(span);
 
     if (layer.isLayer) {
@@ -216,25 +201,20 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  toggle(e, layer) {
-    const li = super.getParentOfType('LI', e.target);
-    if (layer.active) {
+  toggle(layer, forcedState=null) {
+    if (forcedState !== null) {
+      this.getLayer(layer.id).activeState = forcedState;
+    }
+    else if (layer.active) {
       this.getLayer(layer.id).activeState = 'off';
     }
     else {
       this.getLayer(layer.id).activeState = 'on';
     }
-
-    // Toggle childs
-    if (layer.isGroup) {
-      this.toggleChilds(li, layer.active);
-    }
-
-    // Toggle parent if necessary
-    this.toggleParent(li);
   }
 
-  activate(layer) {
+  activateStateChanged(layer) {
+    console.log(`Layer ${layer.name} has state ${layer.activeState}`);
     this.iconManager.toggleSelectionCircleIcon(layer);
     const li = this.shadow.getElementById(layer.id);
     if (layer.active) {
@@ -243,81 +223,26 @@ class TreeViewComponent extends GirafeResizableElement {
     else {
       li.className = '';
     }
-  }
-
-  toggleChilds(li, setActive) {
-    const ul = li.getElementsByTagName('ul')[0];
-    if (this.isNullOrUndefined(ul)) {
-      // We are on the last leaf.
-      // => Stop here
-      return [];
-    }
-
-    const childLis = ul.getElementsByTagName('li');
-    for (let i=0; i<childLis.length; i++) {
-      const childLi = childLis[i];
-      const layer = this.state.layers.layersList.find(l => l.id === parseInt(childLi.id));
-      if (setActive && !layer.active) {
-        this.getLayer(layer.id).activeState = 'on';
-      }
-      else if (!setActive && !layer.inactive) {
-        //The layer is not in the right state yet.
-        this.getLayer(layer.id).activeState = 'off';
+    
+    // Toggle childs
+    if (layer.isGroup && !layer.semiActive) {
+      const forcedState = (layer.active) ? 'on' : 'off';
+      for (let i=0; i<layer.children.length; ++i) {
+        this.toggle(layer.children[i], forcedState);
       }
     }
-  }
 
-  toggleParent(li) {
-    const ul = li.parentElement;
-    if (this.isNullOrUndefined(ul) || ul === this.ulRoot) {
-      // We get out the tree-view (or to the root element).
-      // Just stop here
-      return;
-    }
-
-    let allActive = true;
-    let allInactive = true;
-
-    const childLis = ul.getElementsByTagName('li');
-    for (let i=0; i<childLis.length; i++) {
-      const childLi = childLis[i];
-      const layer = this.state.layers.layersList.find(l => l.id === parseInt(childLi.id));
-      if (layer.active) {
-        allInactive = false;
+    // Toggle parent if necessary
+    if (layer.parent != null) {
+      if (layer.parent.areAllChildrenActive) {
+        this.toggle(layer.parent, 'on');
       }
-      else if (layer.inactive) {
-        allActive = false;
+      else if (layer.parent.areAllChildrenInactive) {
+        this.toggle(layer.parent, 'off');
       }
       else {
-        // layer is semi-active
-        allActive = false;
-        allInactive = false;
+        this.toggle(layer.parent, 'semi');
       }
-    }
-
-    const liParent = super.getParentOfType('LI', ul);
-    const layerParent = this.state.layers.layersList.find(l => l.id === parseInt(liParent.id));
-    
-    let stateChanged = false;
-    if (allActive && !layerParent.active) {
-      // Activate parent
-      this.getLayer(layerParent.id).activeState = 'on';
-      stateChanged = true;
-    }
-    else if (allInactive && !layerParent.inactive) {
-      // Deactivate parent
-      this.getLayer(layerParent.id).activeState = 'off';
-      stateChanged = true;
-    }
-    else if (!layerParent.semiactive) {
-      // Semi-active
-      this.getLayer(layerParent.id).activeState = 'semi';
-      stateChanged = true;
-    }
-
-    if (stateChanged) {
-      // Recursively call on parent
-      this.toggleParent(liParent);
     }
   }
 
@@ -371,8 +296,15 @@ class TreeViewComponent extends GirafeResizableElement {
     this.postRender();
 
     this.activateTooltips(false, [800, 0], 'right');
-
     super.translate();
+
+    // Active default checked layers
+    for (let i=0; i<this.state.layers.layersList.length; ++i) {
+      const layer = this.state.layers.layersList[i];
+      if (layer.isDefaultChecked) {
+        layer.activeState = 'on';
+      }
+    }
   }
 
   postRender() {

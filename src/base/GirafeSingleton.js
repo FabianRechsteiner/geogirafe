@@ -28,6 +28,14 @@ class GirafeSingleton {
 
     return GirafeSingleton.#instances[type];
   }
+
+  isNullOrUndefined(val) {
+    return (val === undefined || val === null);
+  }
+
+  isNullOrUndefinedOrBlank(val) {
+    return (val === undefined || val === null || val === '');
+  }
 }
 
 export default GirafeSingleton;

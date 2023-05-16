@@ -7,6 +7,13 @@ import StateManager from "./state/statemanager";
 
 class ThemesManager extends GirafeSingleton {
 
+  configManager = null;
+  stateManager = null;
+
+  get state() {
+    return this.stateManager.state;
+  }
+
   constructor(type) {
     super(type);
 
@@ -23,9 +30,25 @@ class ThemesManager extends GirafeSingleton {
   async loadThemes() {
     const response = await fetch(this.configManager.Config.themes.url);
     const content = await response.json();
-    this.stateManager.state.ogcServers = content["ogcServers"];
-    this.stateManager.state.basemaps = this.prepareBasemaps(content["background_layers"]);
-    this.stateManager.state.themes = this.prepareThemes(content["themes"]);
+    this.state.ogcServers = content["ogcServers"];
+    this.state.basemaps = this.prepareBasemaps(content["background_layers"]);
+    this.state.themes = this.prepareThemes(content["themes"]);
+
+    this.setDefaultTheme();
+  }
+
+  setDefaultTheme() {
+    // Set default theme if any
+    if (!this.isNullOrUndefinedOrBlank(this.configManager.Config.themes.defaultTheme)) {
+      const defaultTheme = Object.values(this.state.themes).find(t => t.name === this.configManager.Config.themes.defaultTheme);
+      if (!this.isNullOrUndefined(defaultTheme)) {
+        this.state.selectedTheme = defaultTheme;
+      }
+      else {
+        // The default theme was not found
+        console.warn(`The default theme ${this.configManager.Config.themes.defaultTheme} could not be found.`);
+      }
+    }
   }
 
   prepareBasemaps(basemapJson) {
@@ -120,7 +143,7 @@ class ThemesManager extends GirafeSingleton {
     if (elem.type === 'WMS') {
       // WMS Case: there must be an OGC-Server
       if (ocgServerName) {
-        const ogcServer = this.stateManager.state.ogcServers[ocgServerName];
+        const ogcServer = this.state.ogcServers[ocgServerName];
         url = ogcServer.url;
         if (ogcServer.wfsSupport === true) {
           urlWfs = ogcServer.urlWfs;
@@ -143,9 +166,9 @@ class ThemesManager extends GirafeSingleton {
   }
 
   onChangeTheme(theme) {
-    // Deactivate all acive layers
-    for (let i=0; i<this.stateManager.state.layers.layersList.length; ++i) {
-      this.stateManager.state.layers.layersList[i].activeState = 'off';
+    // Deactivate all active layers
+    for (let i=0; i<this.state.layers.layersList.length; ++i) {
+      this.state.layers.layersList[i].activeState = 'off';
     }
 
     // Add the current theme
@@ -155,7 +178,7 @@ class ThemesManager extends GirafeSingleton {
     });
 
     // Update state only once at the end of the process to prevent 1000 of events to be sent
-    this.stateManager.state.layers.layersList = layersList;
+    this.state.layers.layersList = layersList;
   }
 
   addLayerToLoadedList(layersList, layer) {
