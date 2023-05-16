@@ -29,6 +29,7 @@ class Layer {
   legend = null;
   iconUrl = null;
   legendRule = null;
+  legendImage = null;
   isLegendExpanded = null;
 
   // Layer state
@@ -79,6 +80,7 @@ class Layer {
       this.legend = elem.metadata.legend;
       this.legendRule = elem.metadata.legendRule;
       this.isLegendExpanded = elem.metadata.isLegendExpanded;
+      this.legendImage = elem.metadata.legendImage;
 
       if (elem.childLayers) {
         // WMS Layer

@@ -329,8 +329,17 @@ class TreeViewComponent extends GirafeResizableElement {
     legendimg.className = 'legend';
     li.append(legendimg);
     legendimg.style.display = (layer.isLegendExpanded) ? 'block' : 'none';
-    // Request legend image from openlayers
-    this.messageManager.sendMessage({action: GeoEvents.requestLegendUrl, layer: layer});
+    if (!this.isNullOrUndefinedOrBlank(layer.legendImage)) {
+      // We can simply set the url
+      legendimg.src = layer.legendImage;
+    }
+    else if (!this.isNullOrUndefinedOrBlank(layer.legendRule)) {
+      // Request legend image from openlayers
+      this.messageManager.sendMessage({action: GeoEvents.requestLegendUrl, layer: layer});
+    }
+    else {
+      console.log(`No legendRule or legendImage found for layer ${layer.name}`);
+    }
   }
 }
 
