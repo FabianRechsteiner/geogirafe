@@ -76,7 +76,8 @@ class State {
 
   // Current 3D-Globe state
   globe = {
-    enabled: false
+    // Possible values : ['full, 'side', 'none']
+    display: 'none',
   }
 
   // To manage selected and focused features
