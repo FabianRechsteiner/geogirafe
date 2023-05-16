@@ -34,7 +34,7 @@ build:
   image: node:18-slim
 
   before_script:
-    - apt update && apt -y install jq
+    - apt update && apt -y install jq brotli
   script: 
     - npm i --omit=dev
     - npm run build
@@ -43,6 +43,9 @@ build:
     # Generate Version Number
     - version=$(jq -r '.version' package.json)
     - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > public/about.json
+    # Compress all files
+    - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
+    - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec gzip -k -f {} \;
   artifacts:
     paths:
       - public
@@ -82,32 +85,42 @@ pages:
     - when: never
 
   before_script:
-    - apt update && apt -y upgrade && apt install -y brotli curl
+    - apt update && apt install -y brotli curl
   script: 
     - mkdir release
     # Create a instance for a sample dev instance
     - cp -R public dev && mv dev release/
     # Create a instance for a sample mapbs instance
     - cp -R public mapbs && mv mapbs release/
-    - rm release/mapbs/config.json 
+    - rm release/mapbs/config.json
     - cp demo/config.mapbs.json release/mapbs/config.json
+    - gzip -k -f release/mapbs/config.json
+    - brotli -k -f release/mapbs/config.json
     # Create a instance for a sample cartoriviera instance
     - cp -R public cartoriviera && mv cartoriviera release/
     - rm release/cartoriviera/config.json 
     - cp demo/config.cartoriviera.json release/cartoriviera/config.json
+    - gzip -k -f release/cartoriviera/config.json
+    - brotli -k -f release/cartoriviera/config.json
     # Create a instance for a sample cartolacote instance
     - cp -R public cartolacote && mv cartolacote release/
     - rm release/cartolacote/config.json 
     - cp demo/config.cartolacote.json release/cartolacote/config.json
+    - gzip -k -f release/cartolacote/config.json
+    - brotli -k -f release/cartolacote/config.json
     # Create a instance for a sample mapnv instance
     - cp -R public mapnv && mv mapnv release/
     - rm release/mapnv/config.json 
     - cp demo/config.mapnv.json release/mapnv/config.json
+    - gzip -k -f release/mapnv/config.json
+    - brotli -k -f release/mapnv/config.json
     # Create a instance for a sample schwyz instance
     - cp -R public schwyz && mv schwyz release/
     - rm release/schwyz/config.json 
     - cp demo/config.schwyz.json release/schwyz/config.json
-
+    - gzip -k -f release/schwyz/config.json
+    - brotli -k -f release/schwyz/config.json
+    
     # Rename the relase directory to public
     - rm -Rf public && mv release public
 
@@ -118,13 +131,17 @@ pages:
     # Wget themes.json to improve performance on demo instance
     # (this does not work for cartoriviera.ch, it seems to be blocked)
     - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/mapbs/Mock/themes.json
+    - gzip -k -f public/mapbs/Mock/themes.json
+    - brotli -k -f public/mapbs/Mock/themes.json
     - curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --output public/cartolacote/Mock/themes.json
+    - gzip -k -f public/cartolacote/Mock/themes.json
+    - brotli -k -f public/cartolacote/Mock/themes.json
     - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
+    - gzip -k -f public/mapnv/Mock/themes.json
+    - brotli -k -f public/mapnv/Mock/themes.json
     - curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output public/schwyz/Mock/themes.json
-
-    # Compress all files
-    - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
-    - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec gzip -k -f {} \;
+    - gzip -k -f public/schwyz/Mock/themes.json
+    - brotli -k -f public/schwyz/Mock/themes.json
 
   artifacts:
     paths:
