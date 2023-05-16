@@ -33,7 +33,9 @@ import RedliningFeature from '../../tools/state/redliningfeature';
 class MapComponent extends GirafeHTMLElement {
 
   map = null;
+  mapTarget = null
   map3d = null;
+  map3dTarget = null;
   swiper = null;
   swiperManager = null;
   wmtsManager = null;
@@ -90,7 +92,7 @@ class MapComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('interface.printPanelVisible', (oldValue, newValue) => this.onPrintPanelToggled(newValue));
     this.stateManager.subscribe('print.*', () => this.onPrintStateChanged());
 
-    this.stateManager.subscribe('globe.enabled', () => this.onGlobeToggled());
+    this.stateManager.subscribe('globe.display', () => this.onGlobeToggled());
 
     //this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) => this.onLayersChanged(oldLayers, newLayers));
     this.stateManager.subscribe('layers.layersList.[0-9]*.activeState', (oldActive, newActive, layer) => this.onLayerToggled(layer));
@@ -104,9 +106,10 @@ class MapComponent extends GirafeHTMLElement {
     this.srid = this.configManager.Config.map.srid;
 
     // Create map element
-    let target = this.shadow.querySelector('#ol-map');
+    this.mapTarget = this.shadow.getElementById('ol-map');
+    this.map3dTarget = this.shadow.getElementById('cs-map');
     this.map = new Map({
-      target: target,
+      target: this.mapTarget,
       layers: []
     });
 
@@ -434,9 +437,9 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onGlobeToggled() {
-    if (this.state.globe.enabled && this.map3d === null) {
-      this.map3d = new OLCesium({ map: this.map });
+  create3dMap() {
+    if (this.map3d === null) {
+      this.map3d = new OLCesium({ map: this.map, target: this.map3dTarget });
       const scene = this.map3d.getCesiumScene();
 
       // Add terrain
@@ -451,9 +454,34 @@ class MapComponent extends GirafeHTMLElement {
       });
       scene.primitives.add(tileset);
     }
+  }
 
-    if (this.map3d !== null) {
-      this.map3d.setEnabled(this.state.globe.enabled);
+  onGlobeToggled() {
+    if (this.state.globe.display === 'full') {
+      // Full screen globe has been enabled
+      this.create3dMap();
+      this.mapTarget.style.display = 'none';
+      this.map3dTarget.style.display = 'block';
+      this.map3dTarget.style.left = '0';
+      this.map3dTarget.style.width = '100%';
+      this.map3d.setEnabled(true);
+    }
+    else if (this.state.globe.display === 'side') {
+      // Side by side has been enabled
+      this.create3dMap();
+      this.mapTarget.style.display = 'block';
+      this.mapTarget.style.width = '60%';
+      this.map3dTarget.style.display = 'block';
+      this.map3dTarget.style.left = '55%';
+      this.map3dTarget.style.width = '45%';
+      this.map3d.setEnabled(true);
+    }
+    else {
+      // 3d map is not visible
+      this.map3d.setEnabled(false);
+      this.mapTarget.style.display = 'block';
+      this.mapTarget.style.width = '100%';
+      this.map3dTarget.style.display = 'none';
     }
   }
 

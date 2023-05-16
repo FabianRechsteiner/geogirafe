@@ -5,6 +5,17 @@
   overflow:hidden;
 }
 
+#cs-map {
+  background-color: #fff;
+  position: absolute;
+  height: 100%;
+  overflow: hidden;
+  left: 60%;
+  width: 40%;
+  display: none;
+  border-left: solid 3px #444;
+}
+
 .ol-zoom {
   right: 1rem;
   top: 1rem;

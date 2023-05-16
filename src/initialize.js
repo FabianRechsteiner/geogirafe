@@ -8,6 +8,7 @@ import TreeViewComponent from  './components/treeview/component.js';
 import MapComponent from './components/map/component.js';
 import SearchComponent from './components/search/component.js';
 import ProjectionComponent from './components/projection/component.js';
+import GlobeComponent from './components/globe/component.js';
 import BasemapComponent from './components/basemap/component.js';
 import ThemeComponent from './components/themes/component.js';
 import LanguageComponent from './components/language/component.js';
