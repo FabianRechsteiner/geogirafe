@@ -114,6 +114,12 @@ pages:
     - cp demo/config.mapnv.json release/mapnv/config.json
     - gzip -k -f release/mapnv/config.json
     - brotli -k -f release/mapnv/config.json
+    # Create a instance for a sample sitn instance
+    - cp -R public sitn && mv sitn release/
+    - rm release/sitn/config.json 
+    - cp demo/config.sitn.json release/sitn/config.json
+    - gzip -k -f release/sitn/config.json
+    - brotli -k -f release/sitn/config.json
     # Create a instance for a sample schwyz instance
     - cp -R public schwyz && mv schwyz release/
     - rm release/schwyz/config.json 
@@ -139,6 +145,9 @@ pages:
     - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
     - gzip -k -f public/mapnv/Mock/themes.json
     - brotli -k -f public/mapnv/Mock/themes.json
+    - curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --output public/sitn/Mock/themes.json
+    - gzip -k -f public/sitn/Mock/themes.json
+    - brotli -k -f public/sitn/Mock/themes.json
     - curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output public/schwyz/Mock/themes.json
     - gzip -k -f public/schwyz/Mock/themes.json
     - brotli -k -f public/schwyz/Mock/themes.json
@@ -161,7 +170,7 @@ zap-baseline-scan:
   script:
     - mkdir /zap/wrk
     # TODO REG: By default, all alerts are reported as warnings.
-    # TODO REG: Configure wich ones should be peported as "fail"
+    # TODO REG: Configure which ones should be reported as "fail"
     - /zap/zap-baseline.py -j -I -t https://geogirafe.paloo.fr/mapbs/ -r report.html -w report.md -x report.xml -J report.json
   artifacts:
     paths:
