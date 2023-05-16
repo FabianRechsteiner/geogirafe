@@ -12,7 +12,7 @@ class State {
   // Dictionary where the key is the name of the server
   ogcServers = {};
   
-  // Currentlt active basemap
+  // Current active basemap
   activeBasemap = null;
 
   // Current projection

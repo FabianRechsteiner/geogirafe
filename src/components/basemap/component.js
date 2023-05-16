@@ -14,14 +14,20 @@ class BasemapComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    this.container = this.shadow.querySelector('#container');
+    this.container = this.shadow.getElementById('container');
+
+    this.configManager.loadConfig().then(() => { 
+      if (!this.configManager.Config.basemaps.show) {
+        this.container.getRootNode().host.style.display = 'none';
+      }
+    });
   }
 
   onBasemapsLoaded(basemaps) {
     let defaultBasemap = null;
     Object.values(basemaps).forEach(basemap => {
       this.createButton(basemap);
-      if (basemap.name === this.configManager.Config.themes.defaultBasemap) {
+      if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
         defaultBasemap = basemap;
       }
     });

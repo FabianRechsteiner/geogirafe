@@ -54,7 +54,7 @@ class ThemesManager extends GirafeSingleton {
   prepareBasemaps(basemapJson) {
     const basemaps = {};
 
-    if (this.configManager.Config.themes.OSMBasemap) {
+    if (this.configManager.Config.basemaps.OSM) {
       // Add default OSM Option
       const osmBasemap = new Basemap({"id": "-1", "name": "OpenStreetMap"});
       basemaps[osmBasemap.id] = osmBasemap;
@@ -66,7 +66,7 @@ class ThemesManager extends GirafeSingleton {
       osmBasemap.layersList.push(new Layer(data, null, null, null, 0));
     }
 
-    if (this.configManager.Config.themes.SwissTopoVectorTilesBasemap) {
+    if (this.configManager.Config.basemaps.SwissTopoVectorTiles) {
       // Add default Vector Tiles
       const vectorBasemap = new Basemap({"id": "-2", "name": "Vector-Tiles", "projection": "EPSG:3857"});
       basemaps[vectorBasemap.id] = vectorBasemap;
