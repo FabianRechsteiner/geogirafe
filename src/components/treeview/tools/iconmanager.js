@@ -74,7 +74,7 @@ class IconManager {
     const circle = document.createElement('i');
     circle.id = this.getSelectionCircleId(layer);
     circle.dataset.circle = true;
-    circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square selcircle' : 'fa-xs fa-regular fa-circle selcircle';
+    circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square selbox' : 'fa-xs fa-regular fa-circle selcircle';
     container.append(circle);
   }
 
@@ -88,13 +88,13 @@ class IconManager {
 
     // active can have the values true, false or 'semi'
     if (layer.active) {
-      circle.className = this.useCheckboxes ? 'fa-lg fa-solid fa-square-check selcircle' : 'fa-xs fa-solid fa-circle selcircle';
+      circle.className = this.useCheckboxes ? 'fa-lg fa-solid fa-square-check selbox' : 'fa-xs fa-solid fa-circle selcircle';
     }
     else if (layer.inactive) {
-      circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square selcircle' : 'fa-xs fa-regular fa-circle selcircle';
+      circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square selbox' : 'fa-xs fa-regular fa-circle selcircle';
     }
     else if (layer.semiActive) {
-      circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square-check selcircle' : 'fa-xs fa-solid fa-circle-half-stroke selcircle';
+      circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square-check selbox' : 'fa-xs fa-solid fa-circle-half-stroke selcircle';
     }
   }
 
@@ -135,9 +135,9 @@ class IconManager {
     container.append(del);
   }
 
-  renderSpacerIcon(container, isTool=false) {
+  renderSpacerIcon(container, type) {
     const spacer = document.createElement('i');
-    spacer.className = isTool ? 'tool spacer' : 'spacer';
+    spacer.className = 'spacer ' + type;
     container.append(spacer);
   }
 
@@ -200,7 +200,7 @@ class IconManager {
     }
     else {
       // Spacer (replaces the caret)
-      this.renderSpacerIcon(container);
+      this.renderSpacerIcon(container, 'caret');
 
       // Manage legend (3 possible cases)
       if (layer.iconUrl && !this.useCheckboxes) {
@@ -228,7 +228,7 @@ class IconManager {
 
       if (!layer.hasLegend) {
         // If we didn't add any icon for legend, we add a spacer
-        this.renderSpacerIcon(container, true);
+        this.renderSpacerIcon(container, 'tool');
       }
 
       this.renderOpacityIcon(container, layer);
