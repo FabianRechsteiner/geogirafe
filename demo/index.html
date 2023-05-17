@@ -23,10 +23,21 @@
                 <div class="img-container">
                   <img src="./static/logo_mapbs.jpg" alt="" class="u-expanded-width u-image u-image-default u-image-1">
                 </div>
-                <h4 class="u-text u-text-default u-text-palette-4-base u-text-2">V. 0.2</h4>
+                <h4 id="mapbs-version" class="u-text u-text-default u-text-palette-4-base u-text-2">V. 0.2</h4>
                 <h5 class="u-text u-text-default u-text-3">MapBS&nbsp;</h5>
                 <p class="u-text u-text-default u-text-4">Demo based on data from Basel-Stadt. This application is automatically updated with the latest development version.</p>
                 <a href="https://geogirafe.paloo.fr/mapbs" class="u-border-none u-btn u-btn-round u-button-style u-palette-4-base u-radius-50 u-btn-1">Demo</a>
+              </div>
+            </div>
+            <div class="u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-1">
+              <div class="u-container-layout u-similar-container u-container-layout-1">
+                <div class="img-container">
+                  <img src="./static/logo_sitn.png" alt="" class="u-expanded-width u-image u-image-default u-image-1">
+                </div>
+                <h4 id="sitn-version" class="u-text u-text-default u-text-palette-4-base u-text-2">V. 0.2</h4>
+                <h5 class="u-text u-text-default u-text-3">SITN&nbsp;</h5>
+                <p class="u-text u-text-default u-text-4">Demo based on data from the SITN Neuchâtel. This application is automatically updated with the latest development version.</p>
+                <a href="https://geogirafe.paloo.fr/sitn" class="u-border-none u-btn u-btn-round u-button-style u-palette-4-base u-radius-50 u-btn-1">Demo</a>
               </div>
             </div>
             <div class="u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-2">
@@ -34,7 +45,7 @@
                 <div class="img-container">
                 <img src="./static/logo_cartoriviera.png" alt="" class="u-expanded-width u-image u-image-default u-image-2" data-image-width="1380" data-image-height="920">
               </div>
-                <h4 class="u-text u-text-default u-text-palette-4-base u-text-5">V. 0.2</h4>
+                <h4 id="cartoriviera-version" class="u-text u-text-default u-text-palette-4-base u-text-5">V. 0.2</h4>
                 <h5 class="u-text u-text-default u-text-6">Cartoriviera</h5>
                 <p class="u-text u-text-default u-text-7">Demo based on data from Cartoriviera. This application is automatically updated with the latest development version.</p>
                 <a href="https://geogirafe.paloo.fr/cartoriviera" class="u-border-none u-btn u-btn-round u-button-style u-palette-4-base u-radius-50 u-btn-2">Demo</a>
@@ -45,7 +56,7 @@
                 <div class="img-container">
                 <img src="./static/logo_cartolacote.png" alt="" class="u-expanded-width u-image u-image-default u-image-3" data-image-width="700" data-image-height="467">
               </div>
-                <h4 class="u-text u-text-default u-text-palette-4-base u-text-8">V. 0.2</h4>
+                <h4 id="cartolacote-version" class="u-text u-text-default u-text-palette-4-base u-text-8">V. 0.2</h4>
                 <h5 class="u-text u-text-default u-text-9">Cartolacôte</h5>
                 <p class="u-text u-text-default u-text-10">Demo based on data from Cartolacôte. This application is automatically updated with the latest development version.</p>
                 <a href="https://geogirafe.paloo.fr/cartolacote" class="u-border-none u-btn u-btn-round u-button-style u-palette-4-base u-radius-50 u-btn-3">Demo</a>
@@ -56,7 +67,7 @@
                 <div class="img-container">
                 <img src="./static/logo_mapnv.png" alt="" class="u-expanded-width u-image u-image-default u-image-4" data-image-width="700" data-image-height="700">
               </div>
-                <h4 class="u-text u-text-default u-text-palette-4-base u-text-11">V. 0.2</h4>
+                <h4 id="mapnv-version" class="u-text u-text-default u-text-palette-4-base u-text-11">V. 0.2</h4>
                 <h5 class="u-text u-text-default u-text-12">MapNV</h5>
                 <p class="u-text u-text-default u-text-13">Demo based on data from MapNv. This application is automatically updated with the latest development version.</p>
                 <a href="https://geogirafe.paloo.fr/mapnv" class="u-border-none u-btn u-btn-round u-button-style u-palette-4-base u-radius-50 u-btn-4">Demo</a>
@@ -72,5 +83,24 @@
         <span>GeoGirafe</span>
       </a>
     </section>
+
+    <script>
+      function updateVersion(baseUrl, elementId) {
+        fetch(baseUrl + '/about.json')
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById(elementId).innerHTML = `v. ${data.version}<span>.${data.build}</span>`;
+        });
+      }
+        
+      window.addEventListener("DOMContentLoaded", (event) => {
+        updateVersion('https://geogirafe.paloo.fr/mapbs', 'mapbs-version');
+        updateVersion('https://geogirafe.paloo.fr/sitn', 'sitn-version');
+        updateVersion('https://geogirafe.paloo.fr/cartoriviera', 'cartoriviera-version');
+        updateVersion('https://geogirafe.paloo.fr/cartolacote', 'cartolacote-version');
+        updateVersion('https://geogirafe.paloo.fr/mapnv', 'mapnv-version');
+      });
+    </script>
   
-<style>.u-disable-duration * {transition-duration: 0s !important;}</style></body></html>
+  </body>
+</html>
