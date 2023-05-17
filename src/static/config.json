@@ -28,6 +28,9 @@
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
+  "treeview": {
+    "useCheckboxes": false
+  },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",

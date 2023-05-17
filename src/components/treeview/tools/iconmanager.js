@@ -2,12 +2,24 @@ import tippy from "tippy.js";
 import GeoEvents from "../../../models/events";
 import MessageManager from "../../../tools/messagemanager";
 import StateManager from "../../../tools/state/statemanager";
+import ConfigManager from "../../../tools/configmanager";
 
 class IconManager {
 
   shadow = null;
+  useCheckboxes = false;
+  configManager = null;
+
   constructor(shadow) {
     this.shadow = shadow;
+
+    this.configManager = ConfigManager.getInstance();
+
+    this.configManager.loadConfig().then(() => { 
+      if (this.configManager.Config.treeview.useCheckboxes) {
+        this.useCheckboxes = true;
+      }
+    });
   }
 
   get state() {
@@ -62,7 +74,7 @@ class IconManager {
     const circle = document.createElement('i');
     circle.id = this.getSelectionCircleId(layer);
     circle.dataset.circle = true;
-    circle.className = 'fa-xs fa-regular fa-circle selcircle';
+    circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square selcircle' : 'fa-xs fa-regular fa-circle selcircle';
     container.append(circle);
   }
 
@@ -76,13 +88,13 @@ class IconManager {
 
     // active can have the values true, false or 'semi'
     if (layer.active) {
-      circle.className = 'fa-xs fa-solid fa-circle selcircle';
+      circle.className = this.useCheckboxes ? 'fa-lg fa-solid fa-square-check selcircle' : 'fa-xs fa-solid fa-circle selcircle';
     }
     else if (layer.inactive) {
-      circle.className = 'fa-xs fa-regular fa-circle selcircle';
+      circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square selcircle' : 'fa-xs fa-regular fa-circle selcircle';
     }
     else if (layer.semiActive) {
-      circle.className = 'fa-xs fa-solid fa-circle-half-stroke selcircle';
+      circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square-check selcircle' : 'fa-xs fa-solid fa-circle-half-stroke selcircle';
     }
   }
 
@@ -191,8 +203,8 @@ class IconManager {
       this.renderSpacerIcon(container);
 
       // Manage legend (3 possible cases)
-      if (layer.iconUrl) {
-        // A custom legend icon has been defined.
+      if (layer.iconUrl && !this.useCheckboxes) {
+        // A custom legend icon has been defined
         this.renderLegendIcon(container, layer);
       }
       else if (layer.hasLegend) {
@@ -200,10 +212,18 @@ class IconManager {
         this.renderSelectionCircleIcon(container, layer);
         this.renderLegendToggleIcon(container, layer);
       }
-      else if (layer.isWms){
+      else if (layer.isWms && !this.useCheckboxes) {
         // We need to get the legendicon URL from openlayer
         this.renderWmsLegendIcon(container, layer);
         MessageManager.getInstance().sendMessage({action: GeoEvents.requestLegendUrl, layer: layer});
+      }
+      else if (this.useCheckboxes) {
+        // Last case : we want to use checkboxes
+        this.renderSelectionCircleIcon(container, layer);
+      }
+      else {
+        // Unmanaged case : this whould not happen
+        throw 'Something does not work with the legends.';
       }
 
       if (!layer.hasLegend) {

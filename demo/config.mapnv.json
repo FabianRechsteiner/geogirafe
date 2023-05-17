@@ -15,7 +15,7 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : ""
+    "defaultTheme" : "plan_de_ville"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
@@ -25,6 +25,9 @@
     "//comment3" : "special basemaps that can be activated or not",
     "OSM": true,
     "SwissTopoVectorTiles": true
+  },
+  "treeview": {
+    "useCheckboxes": true
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",

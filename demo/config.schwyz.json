@@ -26,11 +26,13 @@
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
+  "treeview": {
+    "useCheckboxes": false
+  },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
     "url": "https://map.geo.sz.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###"
-            
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
