@@ -336,12 +336,9 @@ class TreeViewComponent extends GirafeResizableElement {
       // We can simply set the url
       legendimg.src = layer.legendImage;
     }
-    else if (!this.isNullOrUndefinedOrBlank(layer.legendRule)) {
+    else {
       // Request legend image from openlayers
       this.messageManager.sendMessage({action: GeoEvents.requestLegendUrl, layer: layer});
-    }
-    else {
-      console.log(`No legendRule or legendImage found for layer ${layer.name}`);
     }
   }
 }
