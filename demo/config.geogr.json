@@ -7,7 +7,7 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "de": "https://edit.geo.gr.ch/static-ngeo/build/de.json",
+    "de": "Mock/de.json",
     "//comment2": "Default language",
     "default": "de"
   },
@@ -15,7 +15,7 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : "Demo_Edit"
+    "defaultTheme" : "Basisinfo"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
@@ -36,7 +36,7 @@
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "https://edit.geo.gr.ch/printproxy/",
+    "url": "Mock/",
     "//comment2": "The print layout selected by default",
     "defaultLayout": "1 A4 portrait"
   },
@@ -57,8 +57,8 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "startZoom": "0",
-    "startPosition": "2760000,1170000",
+    "startZoom": "1",
+    "startPosition": "2742000,1170000",
     "maxExtent": "2465000,1031000,2931000,1346000",
        
     "scales": [800000, 500000, 200000, 100000, 50000, 25000, 20000, 10000, 7500, 5000, 2500, 2000, 1000, 750, 500, 250, 200, 100, 50],
