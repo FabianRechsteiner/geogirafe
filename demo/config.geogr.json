@@ -3,42 +3,42 @@
   "//comment2": "Here, you can set the entries according to your environment.",
   "general": {
     "//comment1": "Will be used when formating numbers or dates",
-    "locale": "fr-CH"
+    "locale": "de-CH"
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "fr": "https://sitn.ne.ch/static/dummy/fr.json",
+    "de": "https://edit.geo.gr.ch/static-ngeo/build/de.json",
     "//comment2": "Default language",
-    "default": "fr"
+    "default": "de"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : "main"
+    "defaultTheme" : "Demo_Edit"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
-    "show" : false,
+    "show" : true,
     "//comment2": "Name of the default basemap.",
-    "defaultBasemap": "OpenStreetMap",
+    "defaultBasemap": "Karte grau",
     "//comment3" : "special basemaps that can be activated or not",
-    "OSM": false,
-    "SwissTopoVectorTiles": false
+    "OSM": true,
+    "SwissTopoVectorTiles": true
   },
   "treeview": {
-    "useCheckboxes": true
+    "useCheckboxes": false
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
-    "url": "https://sitn.ne.ch/search?limit=100&partitionlimit=40&interface=desktop&query=###SEARCHTERM###&lang=fr"
+    "url": "https://edit.geo.gr.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###"
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "Mock/",
+    "url": "https://edit.geo.gr.ch/printproxy/",
     "//comment2": "The print layout selected by default",
-    "defaultLayout": "1 A4 Paysage"
+    "defaultLayout": "1 A4 portrait"
   },
   "selection": {
     "defaultFillColor": "#ff66667f",
@@ -57,10 +57,11 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "startZoom": "1",
-    "startPosition": "2551300,1206630",
-    "maxExtent": "2420000,1030000,2900000,1360000",
-    "scales": [1000000, 400000, 200000, 80000, 40000, 20000, 10000, 8000, 6000, 4000, 2000, 1000, 500, 250, 100, 50],
+    "startZoom": "0",
+    "startPosition": "2760000,1170000",
+    "maxExtent": "2465000,1031000,2931000,1346000",
+       
+    "scales": [800000, 500000, 200000, 100000, 50000, 25000, 20000, 10000, 7500, 5000, 2500, 2000, 1000, 750, 500, 250, 200, 100, 50],
     "constraintScales": true
   },
   "map3d": {

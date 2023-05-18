@@ -91,8 +91,15 @@ class Layer {
         this.isLayer = true;
         this.layers = elem.layers;
         // TODO REG: Is it possible that 1 childlayer is queryable, and another one not ?
-        this.queryable = elem.childLayers[0].queryable;
-        this.queryLayers = (this.queryable) ? elem.childLayers.map(l => l.name).join(',') : '';
+        if (elem.childLayers.length === 0) {
+          // We are on a WMS Layer, but it doesn't have any childlayer.
+          // TODO REG : Is this a configuration error in the backend ?
+          console.warn(`Layer ${elem.name} has no childlayer`);
+        }
+        else {
+          this.queryable = elem.childLayers[0].queryable;
+          this.queryLayers = (this.queryable) ? elem.childLayers.map(l => l.name).join(',') : '';
+        }
       }
     }
     else {

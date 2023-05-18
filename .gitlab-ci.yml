@@ -126,6 +126,12 @@ pages:
     - cp demo/config.schwyz.json release/schwyz/config.json
     - gzip -k -f release/schwyz/config.json
     - brotli -k -f release/schwyz/config.json
+    # Create a instance for a sample geogr instance
+    - cp -R public geogr && mv geogr release/
+    - rm release/geogr/config.json 
+    - cp demo/config.geogr.json release/geogr/config.json
+    - gzip -k -f release/geogr/config.json
+    - brotli -k -f release/geogr/config.json
     
     # Rename the relase directory to public
     - rm -Rf public && mv release public
@@ -136,21 +142,33 @@ pages:
 
     # Wget themes.json to improve performance on demo instance
     # (this does not work for cartoriviera.ch, it seems to be blocked)
+    # MapBS
     - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/mapbs/Mock/themes.json
     - gzip -k -f public/mapbs/Mock/themes.json
     - brotli -k -f public/mapbs/Mock/themes.json
+    # Cartolacote
     - curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --output public/cartolacote/Mock/themes.json
     - gzip -k -f public/cartolacote/Mock/themes.json
     - brotli -k -f public/cartolacote/Mock/themes.json
+    # MapNV
     - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
     - gzip -k -f public/mapnv/Mock/themes.json
     - brotli -k -f public/mapnv/Mock/themes.json
+    # SITN
     - curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --output public/sitn/Mock/themes.json
-    - gzip -k -f public/sitn/Mock/themes.json
-    - brotli -k -f public/sitn/Mock/themes.json
+    - curl "https://sitn.ne.ch/printproxy/capabilities.json" --output public/sitn/Mock/capabilities.json
+    - gzip -k -f public/sitn/Mock/themes.json public/sitn/Mock/capabilities.json
+    - brotli -k -f public/sitn/Mock/themes.json public/sitn/Mock/capabilities.json
+    # Schwyz
     - curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output public/schwyz/Mock/themes.json
     - gzip -k -f public/schwyz/Mock/themes.json
     - brotli -k -f public/schwyz/Mock/themes.json
+    # GeoGR
+    - curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --output public/geogr/Mock/themes.json
+    - curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --output public/geogr/Mock/de.json
+    - curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --output public/geogr/Mock/capabilities.json
+    - gzip -k -f public/geogr/Mock/themes.json public/geogr/Mock/de.json public/geogr/Mock/capabilities.json
+    - brotli -k -f public/geogr/Mock/themes.json public/geogr/Mock/de.json public/geogr/Mock/capabilities.json
 
   artifacts:
     paths:
