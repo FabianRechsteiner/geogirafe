@@ -35,6 +35,7 @@
     "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile .",
     "serve-win": "buildtools\\prebuild.cmd && vite serve",
     "build-win": "buildtools\\prebuild.cmd && vite build",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "configure-demo" : "bash -C './buildtools/configure-demo.sh'"
   }
 }

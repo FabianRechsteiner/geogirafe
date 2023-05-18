@@ -38,7 +38,7 @@
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
     "url": "Mock/",
     "//comment2": "The print layout selected by default",
-    "defaultLayout": "1 A4 Paysage"
+    "defaultLayout": "1 A4 paysage"
   },
   "selection": {
     "defaultFillColor": "#ff66667f",
