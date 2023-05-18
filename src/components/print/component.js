@@ -203,7 +203,7 @@ class PrintComponent extends GirafeResizableElement {
               "useNearestScale": false,
               "layers": [
                   {
-                      "baseURL": "https://map.geo.test.bs.ch/mapserv_proxy",
+                      "baseURL": "https://map.geo.bs.ch/mapserv_proxy",
                       "imageFormat": "image/png",
                       "layers": [
                           "Stadt- und Parzellenplan farbig"
