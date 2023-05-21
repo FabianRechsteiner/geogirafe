@@ -87,6 +87,7 @@ pages:
   before_script:
     - apt update && apt install -y brotli curl
   script: 
+    - mkdir -p public/Mock
     - mkdir release
     # Create a instance for a sample mapbs instance
     - cp -R public mapbs && mv mapbs release/
