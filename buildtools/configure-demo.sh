@@ -30,9 +30,10 @@ then
     curl "https://map.geo.llv.li/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
 
 else
-    echo "Possible options environments: ['mapbs', 'sitn', 'geogr', 'lie']"
-    echo "Usage example: ./configure-demo sitn"
-    echo "Usage example with npm: npm run configure-demo sitn"
+    echo "Usage: ./configure-demo <environment>"
+    echo "Possible environments: ['mapbs', 'sitn', 'geogr', 'lie']"
+    echo "Usage example: ./configure-demo mapbs"
+    echo "Usage example with npm: npm run configure-demo mapbs"
 
 fi
 

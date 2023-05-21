@@ -77,8 +77,19 @@ The complete configuration of the application is done in the file `static/config
 This configuration will be loaded dynamically when the applications starts.  
 Therefore it is not necessary to rebuild the project when you modify this file.
 
-Please not that today, the GeoGirafe Viewer is using a backend based on GeoMapFish.  
-The services you will have to use in your configuration must therefore be compliant with GeoMapFish.
+The file `static/config.json` does not exists by default.
+The simplest way to create one is to pick up an existing one in the *demo* directory, and to adapt the content to your needs.
+
+You can also preconfigure GeoGirafe for an existing demo configuration by using:
+
+```bash
+npm run configure-demo <environment>
+```
+
+This will automatically copy the `config.yaml`file in the right place, and download the needed Mock objects.
+
+> Please not that today, the GeoGirafe Viewer is using a backend based on GeoMapFish.  
+> The services you will have to use in your configuration must therefore be compliant with GeoMapFish.
 
 ## Build for Production
 
@@ -86,14 +97,14 @@ The services you will have to use in your configuration must therefore be compli
 
 ```bash
 npm install
-npm run-script build
+npm run build
 ```
 
 ### On Windows
 
 ```bash
 npm install
-npm run-script build-win
+npm run build-win
 ```
 
 ### Using Docker
