@@ -1,0 +1,70 @@
+{
+  "//comment1": "This is the whole configuration of the GeoGirafe Viewer.",
+  "//comment2": "Here, you can set the entries according to your environment.",
+  "general": {
+    "//comment1": "Will be used when formating numbers or dates",
+    "locale": "de-CH"
+  },
+  "languages": {
+    "//comment1": "List of languages with their corresponding translation-file.",
+    "de": "Mock/de.json",
+    "//comment2": "Default language",
+    "default": "de"
+  },
+  "themes": {
+    "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
+    "url": "Mock/themes.json",
+    "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
+    "defaultTheme" : ""
+  },
+  "basemaps": {
+    "//comment1": "Display the Basemap control or not",
+    "show" : true,
+    "//comment2": "Name of the default basemap.",
+    "defaultBasemap": "ch.swisstopo.pixelkarte-grau",
+    "//comment3" : "special basemaps that can be activated or not",
+    "OSM": true,
+    "SwissTopoVectorTiles": true
+  },
+  "treeview": {
+    "useCheckboxes": false
+  },
+  "search": {
+    "//comment1": "Link to the GeoMapFish-Compliant Search Service",
+    "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
+    "url": "https://map.geo.llv.li/search?limit=50&partitionlimit=11&interface=desktop&query=###SEARCHTERM###"
+  },
+  "print": {
+    "//comment1": "Link to the GeoMapFish-Compliant Print Service",
+    "url": "Mock/",
+    "//comment2": "The print layout selected by default",
+    "defaultLayout": "1 A4 Hochformat"
+  },
+  "selection": {
+    "defaultFillColor": "#ff66667f",
+    "defaultStrokeColor": "#ff3333",
+    "defaultStrokeWidth": 4,
+    "defaultFocusFillColor": "#ff33337f",
+    "defaultFocusStrokeColor": "#ff0000",
+    "defaultFocusStrokeWidth": 4
+  },
+  "redlining": {
+    "defaultFillColor": "#6666ff7f",
+    "defaultStrokeColor": "#0000ff",
+    "defaultStrokeWidth": 2,
+    "defaultTextSize": 12,
+    "defaultFont": "Arial"
+  },
+  "map": {
+    "srid": "EPSG:2056",
+    "scales": [200000, 150000, 100000, 50000, 35000, 25000, 20000, 15000, 10000, 5000, 3500, 2000, 1500, 1000, 500, 350, 250, 150],
+    "startPosition": "2760000,1225000",
+    "startZoom": "1",
+    "maxExtent": "2500000,1150000,3020000,1300000",    
+    "constraintScales": true
+  },
+  "map3d": {
+    "terrainUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/",
+    "tilesetUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/cesium/tiles/av-gebaeude-basel-stadt/tileset.json"
+  }
+}
