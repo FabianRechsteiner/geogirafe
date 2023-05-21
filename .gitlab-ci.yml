@@ -88,53 +88,43 @@ pages:
     - apt update && apt install -y brotli curl
   script: 
     - mkdir release
-    # Create a instance for a sample dev instance
-    - cp -R public dev && mv dev release/
     # Create a instance for a sample mapbs instance
     - cp -R public mapbs && mv mapbs release/
-    - rm release/mapbs/config.json
     - cp demo/config.mapbs.json release/mapbs/config.json
     - gzip -k -f release/mapbs/config.json
     - brotli -k -f release/mapbs/config.json
     # Create a instance for a sample cartoriviera instance
     - cp -R public cartoriviera && mv cartoriviera release/
-    - rm release/cartoriviera/config.json 
     - cp demo/config.cartoriviera.json release/cartoriviera/config.json
     - gzip -k -f release/cartoriviera/config.json
     - brotli -k -f release/cartoriviera/config.json
     # Create a instance for a sample cartolacote instance
     - cp -R public cartolacote && mv cartolacote release/
-    - rm release/cartolacote/config.json 
     - cp demo/config.cartolacote.json release/cartolacote/config.json
     - gzip -k -f release/cartolacote/config.json
     - brotli -k -f release/cartolacote/config.json
     # Create a instance for a sample mapnv instance
     - cp -R public mapnv && mv mapnv release/
-    - rm release/mapnv/config.json 
     - cp demo/config.mapnv.json release/mapnv/config.json
     - gzip -k -f release/mapnv/config.json
     - brotli -k -f release/mapnv/config.json
     # Create a instance for a sample sitn instance
     - cp -R public sitn && mv sitn release/
-    - rm release/sitn/config.json 
     - cp demo/config.sitn.json release/sitn/config.json
     - gzip -k -f release/sitn/config.json
     - brotli -k -f release/sitn/config.json
     # Create a instance for a sample schwyz instance
     - cp -R public schwyz && mv schwyz release/
-    - rm release/schwyz/config.json 
     - cp demo/config.schwyz.json release/schwyz/config.json
     - gzip -k -f release/schwyz/config.json
     - brotli -k -f release/schwyz/config.json
     # Create a instance for a sample geogr instance
     - cp -R public geogr && mv geogr release/
-    - rm release/geogr/config.json 
     - cp demo/config.geogr.json release/geogr/config.json
     - gzip -k -f release/geogr/config.json
     - brotli -k -f release/geogr/config.json
     # Create a instance for a sample lie instance
     - cp -R public lie && mv lie release/
-    - rm release/lie/config.json 
     - cp demo/config.lie.json release/lie/config.json
     - gzip -k -f release/lie/config.json
     - brotli -k -f release/lie/config.json
