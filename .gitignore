@@ -7,4 +7,4 @@ src/static/lib/vanilla-picker
 src/static/lib/tippy.js
 src/static/lib/cesium
 src/static/lib/gridjs
-src/static/Mock/
+src/static/Mock/*

@@ -8,6 +8,7 @@ class IconManager {
 
   shadow = null;
   useCheckboxes = false;
+  useLegendIcons = false;
   configManager = null;
 
   constructor(shadow) {
@@ -18,6 +19,9 @@ class IconManager {
     this.configManager.loadConfig().then(() => { 
       if (this.configManager.Config.treeview.useCheckboxes) {
         this.useCheckboxes = true;
+      }
+      if (this.configManager.Config.treeview.useLegendIcons) {
+        this.useLegendIcons = true;
       }
     });
   }
@@ -202,33 +206,48 @@ class IconManager {
       // Spacer (replaces the caret)
       this.renderSpacerIcon(container, 'caret');
 
-      // Manage legend (3 possible cases)
-      if (layer.iconUrl && !this.useCheckboxes) {
-        // A custom legend icon has been defined
-        this.renderLegendIcon(container, layer);
-      }
-      else if (layer.hasLegend) {
-        // A whole legend needs to be display.
+      // Manage legend 
+      if (layer.isWmts) {
         this.renderSelectionCircleIcon(container, layer);
-        this.renderLegendToggleIcon(container, layer);
+        this.renderSpacerIcon(container, 'tool');
       }
-      else if (layer.isWms && !this.useCheckboxes) {
-        // We need to get the legendicon URL from openlayer
-        this.renderWmsLegendIcon(container, layer);
-        MessageManager.getInstance().sendMessage({action: GeoEvents.requestLegendUrl, layer: layer});
-      }
-      else if (this.useCheckboxes) {
-        // Last case : we want to use checkboxes
-        this.renderSelectionCircleIcon(container, layer);
+      else if (layer.isWms) {
+        // Manage icon before the text
+        if (this.useCheckboxes) {
+          // We only want checkboxes, no icon at all
+          this.renderSelectionCircleIcon(container, layer);
+        }
+        else if (!this.useLegendIcons) {
+          // We do not want any legend icon at all
+          this.renderSelectionCircleIcon(container, layer);
+        }
+        else if (layer.iconUrl) {
+          // A custom legend icon has been defined and can be displayed
+          this.renderLegendIcon(container, layer);
+        }
+        else if (!layer.hasLegend) {
+          // We need to get the legendicon URL from openlayer
+          this.renderWmsLegendIcon(container, layer);
+          this.renderSpacerIcon(container, 'tool');
+          MessageManager.getInstance().sendMessage({action: GeoEvents.requestLegendUrl, layer: layer});
+        }
+        else {
+          // All other cases, just render selection icon
+          this.renderSelectionCircleIcon(container, layer);
+        }
+
+        // Manage legend
+        if (layer.hasLegend) {
+          // A whole legend needs to be display.
+          this.renderLegendToggleIcon(container, layer);
+        }
+        else {
+          this.renderSpacerIcon(container, 'tool');
+        }
       }
       else {
         // Unmanaged case : this whould not happen
-        throw 'Something does not work with the legends.';
-      }
-
-      if (!layer.hasLegend) {
-        // If we didn't add any icon for legend, we add a spacer
-        this.renderSpacerIcon(container, 'tool');
+        throw 'Unmanage case in the legend icon calculation.';
       }
 
       this.renderOpacityIcon(container, layer);
