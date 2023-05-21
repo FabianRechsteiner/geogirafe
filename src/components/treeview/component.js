@@ -202,14 +202,24 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   toggle(layer, forcedState=null) {
+    const stateLayer = this.getLayer(layer.id);
     if (forcedState !== null) {
-      this.getLayer(layer.id).activeState = forcedState;
+      stateLayer.activeState = forcedState;
     }
     else if (layer.active) {
-      this.getLayer(layer.id).activeState = 'off';
+      stateLayer.activeState = 'off';
     }
     else {
-      this.getLayer(layer.id).activeState = 'on';
+      stateLayer.activeState = 'on';
+      if (stateLayer.parent != null && stateLayer.parent.isExclusiveGroup) {
+        // Deactivate all other layers
+        for (let i = 0; i < stateLayer.parent.children.length; i++) {
+          const otherLayer = this.getLayer(stateLayer.parent.children[i].id);
+          if (otherLayer.id !== stateLayer.id && otherLayer.active) {
+            otherLayer.activeState = 'off';
+          }
+        }
+      }
     }
   }
 
@@ -226,22 +236,40 @@ class TreeViewComponent extends GirafeResizableElement {
     
     // Toggle childs
     if (layer.isGroup && !layer.semiActive) {
-      const forcedState = (layer.active) ? 'on' : 'off';
-      for (let i=0; i<layer.children.length; ++i) {
-        this.toggle(layer.children[i], forcedState);
+      if (layer.active && layer.isExclusiveGroup && layer.children.length >= 1) {
+        // We activate a group, but this group is an exclusive group.
+        // => Activate only the first layer
+        this.toggle(layer.children[0], 'on');
+      }
+      else {
+        // In all other cases, we activate/deactivate all children
+        const forcedState = (layer.active) ? 'on' : 'off';
+        for (let i=0; i<layer.children.length; ++i) {
+          this.toggle(layer.children[i], forcedState);
+        }
       }
     }
 
     // Toggle parent if necessary
     if (layer.parent != null) {
-      if (layer.parent.areAllChildrenActive) {
-        this.toggle(layer.parent, 'on');
-      }
-      else if (layer.parent.areAllChildrenInactive) {
-        this.toggle(layer.parent, 'off');
+      if (layer.parent.isExclusiveGroup) {
+        if (layer.parent.isAnyChildActive) {
+          this.toggle(layer.parent, 'on');
+        }
+        else {
+          this.toggle(layer.parent, 'off');
+        }
       }
       else {
-        this.toggle(layer.parent, 'semi');
+        if (layer.parent.areAllChildrenActive) {
+          this.toggle(layer.parent, 'on');
+        }
+        else if (layer.parent.areAllChildrenInactive) {
+          this.toggle(layer.parent, 'off');
+        }
+        else {
+          this.toggle(layer.parent, 'semi');
+        }
       }
     }
   }

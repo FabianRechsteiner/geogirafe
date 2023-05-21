@@ -107,6 +107,7 @@ class Layer {
       this.isGroup = true;
       this.isLayer = false;
       this.isDefaultExpanded = (elem.metadata && elem.metadata.isExpanded);
+      this.exclusiveGroup = (elem.metadata && elem.metadata.exclusiveGroup);
     }
 
     // }
@@ -161,6 +162,14 @@ class Layer {
     return this.activeState === 'off';
   }
 
+  get isExclusiveGroup() {
+    if (!this.isGroup) {
+      throw 'This method should not be called on leafs, only on groups.';
+    }
+
+    return (this.exclusiveGroup === true);
+  }
+
   get areAllChildrenActive() {
     let allActive = true;
     for (let i=0; i<this.children.length; ++i) {
@@ -179,6 +188,15 @@ class Layer {
       }
     }
     return allInactive;
+  }
+
+  get isAnyChildActive() {
+    for (let i=0; i<this.children.length; ++i) {
+      if (this.children[i].active) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
