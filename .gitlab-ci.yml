@@ -132,6 +132,12 @@ pages:
     - cp demo/config.geogr.json release/geogr/config.json
     - gzip -k -f release/geogr/config.json
     - brotli -k -f release/geogr/config.json
+    # Create a instance for a sample lie instance
+    - cp -R public lie && mv lie release/
+    - rm release/lie/config.json 
+    - cp demo/config.lie.json release/lie/config.json
+    - gzip -k -f release/lie/config.json
+    - brotli -k -f release/lie/config.json
     
     # Rename the relase directory to public
     - rm -Rf public && mv release public
@@ -169,6 +175,12 @@ pages:
     - curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --output public/geogr/Mock/capabilities.json
     - gzip -k -f public/geogr/Mock/themes.json public/geogr/Mock/de.json public/geogr/Mock/capabilities.json
     - brotli -k -f public/geogr/Mock/themes.json public/geogr/Mock/de.json public/geogr/Mock/capabilities.json
+    # Liechtenstein
+    - curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --output public/lie/Mock/themes.json
+    - curl "https://map.geo.llv.li/static/X/de.json" --output public/lie/Mock/de.json
+    - curl "https://map.geo.llv.li/printproxy/capabilities.json" --output public/lie/Mock/capabilities.json
+    - gzip -k -f public/lie/Mock/themes.json public/lie/Mock/de.json public/lie/Mock/capabilities.json
+    - brotli -k -f public/lie/Mock/themes.json public/lie/Mock/de.json public/lie/Mock/capabilities.json
 
   artifacts:
     paths:
