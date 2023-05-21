@@ -1,6 +1,12 @@
 OUTPUTDIR="src/static/Mock"
 
-if [ "$1" = 'sitn' ];
+if [ "$1" = 'mapbs' ];
+then
+    echo "Preparing environment MAPBS..."
+    cp demo/config.mapbs.json src/static/config.json
+    curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
+
+elif [ "$1" = 'sitn' ];
 then
     echo "Preparing environment SITN..."
     cp demo/config.sitn.json src/static/config.json
@@ -24,7 +30,7 @@ then
     curl "https://map.geo.llv.li/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
 
 else
-    echo "Possible options environments: ['sitn', 'geogr', 'lie']"
+    echo "Possible options environments: ['mapbs', 'sitn', 'geogr', 'lie']"
     echo "Usage example: ./configure-demo sitn"
     echo "Usage example with npm: npm run configure-demo sitn"
 

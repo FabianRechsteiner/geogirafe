@@ -27,7 +27,8 @@
     "SwissTopoVectorTiles": true
   },
   "treeview": {
-    "useCheckboxes": true
+    "useCheckboxes": true,
+    "useLegendIcons": true
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
