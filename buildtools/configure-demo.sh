@@ -1,4 +1,5 @@
 OUTPUTDIR="src/static/Mock"
+mkdir -p "$OUTPUTDIR"
 
 if [ "$1" = 'mapbs' ];
 then

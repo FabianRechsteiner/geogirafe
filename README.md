@@ -82,11 +82,19 @@ The simplest way to create one is to pick up an existing one in the *demo* direc
 
 You can also preconfigure GeoGirafe for an existing demo configuration by using:
 
+### On linux
+
 ```bash
 npm run configure-demo <environment>
 ```
 
-This will automatically copy the `config.yaml`file in the right place, and download the needed Mock objects.
+### On Windows
+
+```bash
+npm run configure-demo-win <environment>
+```
+
+This will automatically copy the `config.yaml` file in the right place, and download the needed Mock objects.
 
 > Please not that today, the GeoGirafe Viewer is using a backend based on GeoMapFish.  
 > The services you will have to use in your configuration must therefore be compliant with GeoMapFish.
