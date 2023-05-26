@@ -82,7 +82,7 @@ class Layer {
       this.iconUrl = elem.metadata.iconUrl
       this.legend = elem.metadata.legend;
       this.legendRule = elem.metadata.legendRule;
-      this.isLegendExpanded = elem.metadata.isLegendExpanded;
+      this.isLegendExpanded = (elem.metadata.isLegendExpanded !== undefined) ? elem.metadata.isLegendExpanded : false;
       this.legendImage = elem.metadata.legendImage;
 
       if (elem.childLayers) {

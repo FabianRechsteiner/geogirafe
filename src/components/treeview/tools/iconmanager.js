@@ -79,6 +79,7 @@ class IconManager {
     circle.id = this.getSelectionCircleId(layer);
     circle.dataset.circle = true;
     circle.className = this.useCheckboxes ? 'fa-lg fa-regular fa-square selbox' : 'fa-xs fa-regular fa-circle selcircle';
+    circle.onclick = (e) => this.toggle(layer);
     container.append(circle);
   }
 
@@ -366,9 +367,40 @@ class IconManager {
     this.state.layers.swipedLayers = newSwipedLayers;
   }
 
+  zoomToResolution(minResolution, maxResolution) {
+    // Because of rounding errors (for example 1.59 becomes 1.589999999999998), 
+    // we zoom a bit more than just the max resolution.
+    // For the moment we try with 10% more
+    const resolution = maxResolution - 10/100*maxResolution;
+    this.state.position.resolution = resolution;
+  }
+
   // TODO REG: extract this method to a Utils class
   isNullOrUndefined(val) {
     return (val === undefined || val === null);
+  }
+
+  // TODO REG : Merge with the same function in treeview and move to LayerManager (when it will be created)
+  toggle(layer, forcedState=null) {
+    const stateLayer = this.getLayer(layer.id);
+    if (forcedState !== null) {
+      stateLayer.activeState = forcedState;
+    }
+    else if (layer.active) {
+      stateLayer.activeState = 'off';
+    }
+    else {
+      stateLayer.activeState = 'on';
+      if (stateLayer.parent != null && stateLayer.parent.isExclusiveGroup) {
+        // Deactivate all other layers
+        for (let i = 0; i < stateLayer.parent.children.length; i++) {
+          const otherLayer = this.getLayer(stateLayer.parent.children[i].id);
+          if (otherLayer.id !== stateLayer.id && otherLayer.active) {
+            otherLayer.activeState = 'off';
+          }
+        }
+      }
+    }
   }
 }
 

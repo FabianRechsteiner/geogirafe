@@ -28,7 +28,8 @@
   },
   "treeview": {
     "useCheckboxes": true,
-    "useLegendIcons": true
+    "useLegendIcons": true,
+    "hideLegendWhenLayerIsDeactivated": true
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",

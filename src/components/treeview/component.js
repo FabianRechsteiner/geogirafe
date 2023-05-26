@@ -6,6 +6,8 @@ import MenuManager from './tools/menumanager';
 class TreeViewComponent extends GirafeResizableElement {
 
   ulRoot = null;
+  hideLegendWhenLayerIsDeactivated = false;
+  previousLegendState = {};
 
   // To manage if all legends are visible or not
   /*#allLegendsDisplayed = true;
@@ -80,6 +82,12 @@ class TreeViewComponent extends GirafeResizableElement {
 
   constructor() {
     super('treeview');
+
+    this.configManager.loadConfig().then(() => { 
+      if (this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated) {
+        this.hideLegendWhenLayerIsDeactivated = true;
+      }
+    });
   }
 
   // Extract this method and similar to Utils class
@@ -145,23 +153,17 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
-  zoomToResolution(minResolution, maxResolution) {
-    // Because of rounding errors (for example 1.59 becomes 1.589999999999998), 
-    // we zoom a bit more than just the max resolution.
-    // For the moment we try with 10% more
-    const resolution = maxResolution - 10/100*maxResolution;
-    this.state.position.resolution = resolution;
-  }
-
   toggleLegend(layer, force=false, visible=false) {
     const legend = this.shadow.getElementById(layer.legendId);
-    if (layer.isLegendExpanded) {
-      legend.style.display = 'block';
-      //this.allLegendsDisplayedCount++;
-    }
-    else {
-      legend.style.display = 'none';
-      //this.allLegendsDisplayedCount--;
+    if (!this.isNullOrUndefined(legend)) {
+      if (layer.isLegendExpanded) {
+        legend.style.display = 'block';
+        //this.allLegendsDisplayedCount++;
+      }
+      else {
+        legend.style.display = 'none';
+        //this.allLegendsDisplayedCount--;
+      }
     }
   }
   
@@ -201,6 +203,7 @@ class TreeViewComponent extends GirafeResizableElement {
     }
   }
 
+  // TODO REG : Merge with the same function in iconmanager and move to LayerManager (when it will be created)
   toggle(layer, forcedState=null) {
     const stateLayer = this.getLayer(layer.id);
     if (forcedState !== null) {
@@ -232,6 +235,22 @@ class TreeViewComponent extends GirafeResizableElement {
     }
     else {
       li.className = '';
+    }
+
+    // Hide the legend when the layer is deactivated (if configured so)
+    if (layer.isLayer && this.hideLegendWhenLayerIsDeactivated) {
+      // TODO REG : I think we should interate a layerManager object here.
+      // Because those constraints should not be manager in a specific component
+      if (layer.active) {
+        if (layer.id in this.previousLegendState) {
+          // If there is not previous state, we change nothing to the legend state
+          layer.isLegendExpanded = this.previousLegendState[layer.id];
+        }
+      }
+      else { 
+        this.previousLegendState[layer.id] = layer.isLegendExpanded;
+        layer.isLegendExpanded = false;
+      }
     }
     
     // Toggle childs
@@ -359,7 +378,7 @@ class TreeViewComponent extends GirafeResizableElement {
     legendimg.alt = 'legend for ' + layer.name;
     legendimg.className = 'legend';
     li.append(legendimg);
-    legendimg.style.display = (layer.isLegendExpanded) ? 'block' : 'none';
+    legendimg.style.display = (layer.isDefaultChecked && layer.isLegendExpanded) ? 'block' : 'none';
     if (!this.isNullOrUndefinedOrBlank(layer.legendImage)) {
       // We can simply set the url
       legendimg.src = layer.legendImage;

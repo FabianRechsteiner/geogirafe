@@ -160,6 +160,7 @@ i.selbox {
   padding-top: 0.75rem;
   margin-left: 0.2rem;
   margin-right: 0.3rem;
+  cursor: pointer;
 }
 
 i.del {
