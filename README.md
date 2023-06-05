@@ -35,7 +35,7 @@ GeoGirafe is developed according to the following principles:
 
 - **Agility**: GeoGirafe is being developed according to the Agile methodology. We value individuals collaboration, and change responsiveness more than processes, tools and plans.
 
-- **Accessibility**: GeoGirafe is doing its best to make web content more accessible to individuals with disabilities: [View Wave Report](https://wave.webaim.org/report#/https://geogirafe.paloo.fr).
+- **Accessibility**: GeoGirafe is doing its best to make web content more accessible to individuals with disabilities: [View Wave Report](https://wave.webaim.org/report#/https://geogirafe.paloo.fr/mapbs/).
 
 # Getting Started
 

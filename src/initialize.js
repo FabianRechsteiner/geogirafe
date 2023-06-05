@@ -24,7 +24,7 @@ import HelpComponent from './components/help/component.js';
 import AboutComponent from './components/about/component.js';
 
 import proj4 from 'proj4';
-import {register} from 'ol/proj/proj4';
+import { register } from 'ol/proj/proj4';
 import ThemesManager from './tools/themesmanager.js';
 import WfsManager from './tools/wfsmanager.js';
 
