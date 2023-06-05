@@ -43,6 +43,7 @@ class RedliningFeature {
   
     get geometry() {
       console.warn('not implemented yet');
+      return null;
     }
 
     constructor(olFeature) {
