@@ -29,7 +29,7 @@ GeoGirafe is developed according to the following principles:
 
 - **KISS**: GeoGirafe is simple. It is developed with pure Vanilla-Javascript. No complex framework like React or Angular is used. If you know javascript, you can understand how it works.
 
-- **DevSecOps**: Geogirafe is baking security in at every phase of the software lifecycle, in order to deliver a secure-by-design application.
+- **DevSecOps**: Geogirafe is baking security in at every phase of the software lifecycle, in order to deliver a secure-by-design application. Quality, readability, reliability and security are checked by the SonarCloud platform during our continuous integration processes: [View SonarCloud Reports](https://sonarcloud.io/project/overview?id=geogirafe_gg-viewer)
 
 - **Reactivity**: GeoGirafe is meant to be responsive, resilient, elastic and message driven according to the [Reactive Manifesto](https://www.reactivemanifesto.org).
 
