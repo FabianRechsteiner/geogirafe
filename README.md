@@ -144,8 +144,9 @@ docker run -p 8080:80 -p 8443:443 <your_name>/gg-viewer
 
 # Contributing
 
-Pull requests are welcome.  
-For major changes, please open an issue first to discuss what you would like to change.
+Merge-Requests are welcome.  
+For major changes, please open an issue first to discuss what you would like to change.  
+Contribution Guidelines are available here: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 # License
 
