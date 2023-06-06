@@ -5,10 +5,14 @@ stages:
   - pages
   - scan
 
+#################################
+# Define pipeline variables
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
   GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
 
+#################################
+# run unittests
 #unitests:
 #  stage: test
 #  image: node:18-slim
@@ -18,6 +22,8 @@ variables:
 #    - npm i
 #    - npm run test
 
+#################################
+# Audit NPM dependencies to find any known vulnerability 
 npm-audit:
   stage: test
   image: node:18-slim
@@ -28,6 +34,8 @@ npm-audit:
     - npm audit
     - npm audit signatures
 
+#################################
+# Quality, readability, reliability and security checks with Sonarcloud 
 sonarcloud-check:
   stage: test
   image:
@@ -44,11 +52,13 @@ sonarcloud-check:
     - main
     - sonarcloud
 
-# Static Application Security Testing
+#################################
+# Static Application Security Testing with GitLab
 include:
 - template: Security/SAST.gitlab-ci.yml
 
-# Build the application
+#################################
+# Build the application for production
 build:
   stage: build
   image: node:18-slim
@@ -70,6 +80,8 @@ build:
     paths:
       - public
 
+#################################
+# Create a docker image with the production build
 docker-build:
   stage: docker-build
   image: docker:20.10.16
@@ -92,7 +104,16 @@ docker-build:
     # push
     - docker push geogirafe/viewer
 
-# Publish Demo-Application to GitLab-Pages
+#################################
+# Some tool functions to simplify demo configuration and publication
+.prepare_demo: &prepare_demo |
+  cp -R public $demo && mv $demo release/
+  cp demo/config.$demo.json release/$demo/config.json
+  gzip -k -f release/$demo/config.json
+  brotli -k -f release/$demo/config.json
+
+#################################
+# Publish demo applications to GitLab-Pages
 pages:
   stage: pages
   image: debian:stable-slim
@@ -105,53 +126,26 @@ pages:
 
   before_script:
     - apt update && apt install -y brotli curl
-  script: 
     - mkdir -p public/Mock
     - mkdir release
-    # Create a instance for a sample mapbs instance
-    - cp -R public mapbs && mv mapbs release/
-    - cp demo/config.mapbs.json release/mapbs/config.json
-    - gzip -k -f release/mapbs/config.json
-    - brotli -k -f release/mapbs/config.json
-    # Create a instance for a sample cartoriviera instance
-    - cp -R public cartoriviera && mv cartoriviera release/
-    - cp demo/config.cartoriviera.json release/cartoriviera/config.json
-    - gzip -k -f release/cartoriviera/config.json
-    - brotli -k -f release/cartoriviera/config.json
-    # Create a instance for a sample cartolacote instance
-    - cp -R public cartolacote && mv cartolacote release/
-    - cp demo/config.cartolacote.json release/cartolacote/config.json
-    - gzip -k -f release/cartolacote/config.json
-    - brotli -k -f release/cartolacote/config.json
-    # Create a instance for a sample mapnv instance
-    - cp -R public mapnv && mv mapnv release/
-    - cp demo/config.mapnv.json release/mapnv/config.json
-    - gzip -k -f release/mapnv/config.json
-    - brotli -k -f release/mapnv/config.json
-    # Create a instance for a sample sitn instance
-    - cp -R public sitn && mv sitn release/
-    - cp demo/config.sitn.json release/sitn/config.json
-    - gzip -k -f release/sitn/config.json
-    - brotli -k -f release/sitn/config.json
-    # Create a instance for a sample schwyz instance
-    - cp -R public schwyz && mv schwyz release/
-    - cp demo/config.schwyz.json release/schwyz/config.json
-    - gzip -k -f release/schwyz/config.json
-    - brotli -k -f release/schwyz/config.json
-    # Create a instance for a sample geogr instance
-    - cp -R public geogr && mv geogr release/
-    - cp demo/config.geogr.json release/geogr/config.json
-    - gzip -k -f release/geogr/config.json
-    - brotli -k -f release/geogr/config.json
-    # Create a instance for a sample lie instance
-    - cp -R public lie && mv lie release/
-    - cp demo/config.lie.json release/lie/config.json
-    - gzip -k -f release/lie/config.json
-    - brotli -k -f release/lie/config.json
-    
-    # Rename the relase directory to public
+  script: 
+    # Prepare all demo environments
+    - demo='mapbs'
+    - *prepare_demo
+    - demo='cartoriviera'
+    - *prepare_demo
+    - demo='cartolacote'
+    - *prepare_demo
+    - demo='mapnv'
+    - *prepare_demo
+    - demo='sitn'
+    - *prepare_demo
+    - demo='schwyz'
+    - *prepare_demo
+    - demo='lie'
+    - *prepare_demo
+    # Rename the release directory to public
     - rm -Rf public && mv release public
-
     # Copy demo index page
     - cp demo/index.html public/
     - cp -R demo/static public/
@@ -179,12 +173,6 @@ pages:
     - curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output public/schwyz/Mock/themes.json
     - gzip -k -f public/schwyz/Mock/themes.json
     - brotli -k -f public/schwyz/Mock/themes.json
-    # GeoGR
-    - curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --output public/geogr/Mock/themes.json
-    - curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --output public/geogr/Mock/de.json
-    - curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --output public/geogr/Mock/capabilities.json
-    - gzip -k -f public/geogr/Mock/themes.json public/geogr/Mock/de.json public/geogr/Mock/capabilities.json
-    - brotli -k -f public/geogr/Mock/themes.json public/geogr/Mock/de.json public/geogr/Mock/capabilities.json
     # Liechtenstein
     - curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --output public/lie/Mock/themes.json
     - curl "https://map.geo.llv.li/static/X/de.json" --output public/lie/Mock/de.json
@@ -197,6 +185,8 @@ pages:
       # Directory needs to be named 'public' for GitLab Pages
       - public
 
+#################################
+# Perform a baseline security scan of the application using ZAP-Proxy
 zap-baseline-scan:
   stage: scan
   image: owasp/zap2docker-stable
@@ -214,5 +204,4 @@ zap-baseline-scan:
     - /zap/zap-baseline.py -j -I -t https://geogirafe.paloo.fr/mapbs/ -r report.html -w report.md -x report.xml -J report.json
   artifacts:
     paths:
-      # Directory needs to be named 'public' for GitLab Pages
       - /zap/wrk
