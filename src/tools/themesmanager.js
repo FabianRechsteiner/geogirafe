@@ -27,11 +27,16 @@ class ThemesManager extends GirafeSingleton {
     this.stateManager.subscribe('selectedTheme', (oldTheme, newTheme) => this.onChangeTheme(newTheme));
   }
 
+  /**
+   * Load themes from backend and configures background layers if needed
+   */
   async loadThemes() {
     const response = await fetch(this.configManager.Config.themes.url);
     const content = await response.json();
     this.state.ogcServers = content["ogcServers"];
-    this.state.basemaps = this.prepareBasemaps(content["background_layers"]);
+    if (this.configManager.Config.basemaps.show) {
+      this.state.basemaps = this.prepareBasemaps(content["background_layers"]);
+    }
     this.state.themes = this.prepareThemes(content["themes"]);
 
     this.setDefaultTheme();
