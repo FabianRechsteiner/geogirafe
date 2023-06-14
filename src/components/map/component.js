@@ -437,8 +437,23 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  create3dMap() {
+  async create3dMap() {
     if (this.map3d === null) {
+      // First : Lazy loading of cesium
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'lib/cesium/Cesium.js';
+  
+        script.onload = resolve;
+        script.onerror = reject;
+  
+        document.body.appendChild(script);
+      }).catch((error) => {
+        console.error('Error while loading Cesium', error);
+      });
+
+      // Initialize the 3D Map
       this.map3d = new OLCesium({ map: this.map, target: this.map3dTarget });
       const scene = this.map3d.getCesiumScene();
 
@@ -456,10 +471,10 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onGlobeToggled() {
+  async onGlobeToggled() {
     if (this.state.globe.display === 'full') {
       // Full screen globe has been enabled
-      this.create3dMap();
+      await this.create3dMap();
       this.mapTarget.style.display = 'none';
       this.map3dTarget.style.display = 'block';
       this.map3dTarget.style.left = '0';
@@ -468,7 +483,7 @@ class MapComponent extends GirafeHTMLElement {
     }
     else if (this.state.globe.display === 'side') {
       // Side by side has been enabled
-      this.create3dMap();
+      await this.create3dMap();
       this.mapTarget.style.display = 'block';
       this.mapTarget.style.width = '60%';
       this.map3dTarget.style.display = 'block';
