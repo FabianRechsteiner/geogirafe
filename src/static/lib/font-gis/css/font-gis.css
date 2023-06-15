@@ -13,6 +13,8 @@
     url('../fonts/font-gis.svg#font-gis') format('svg');
   font-weight: normal;
   font-style: normal;
+  /* NOTE REG : The attribute font-display was added for performance reason */
+  font-display: swap;
 }
 
 .font-gis {
@@ -507,4 +509,4 @@
 .fg-screen-dub2:before { content: "\eb55"; }
 .fg-screen-dub-o:before { content: "\eb56"; }
 .fg-screen-mag-o:before { content: "\eb57"; }
-.fg-screen-mag-alt:before { content: "\eb58"; }
+.fg-screen-mag-alt:before { content: "\eb58"; }
