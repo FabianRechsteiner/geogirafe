@@ -7,6 +7,13 @@ export default defineConfig({
     publicDir: './static',
     build: {
         outDir: '../public',
-        emptyOutDir: true
+        emptyOutDir: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    lazy: ['gridjs', 'vanilla-picker', 'adjectives', 'tippy.js']
+                }
+            }
+        }
     }
 });
