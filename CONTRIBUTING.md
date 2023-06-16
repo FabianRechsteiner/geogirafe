@@ -75,9 +75,9 @@ You can contact us through the following channels:
 
 A big thank to all the contributors of GeoGirafe, in alphabetical order:
 
-- Bovard Rémi (Cartoriviera)
-- Fanguin Pauline (Cartolacote)
-- Gnerre Daniel (Cartoriviera)
-- Malta e Sousa Stéphane (SITN Neuchâtel)
-- Monod Olivier (Yverdon-les-bains)
-- Remy Guillaume (Basel-Stadt)
+- Rémi Bovard @rbovard (Cartoriviera)
+- Pauline Fanguin (Cartolacote)
+- Daniel Gnerre (Cartoriviera)
+- Stéphane Malta e Sousa @maltaesousa (SITN Neuchâtel)
+- Olivier Monod (Yverdon-les-bains)
+- Guillaume Remy @remyguillaume (Basel-Stadt)
