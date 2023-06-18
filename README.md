@@ -15,7 +15,7 @@ This repository contains the web-viewer part of the project.
 
 **Please note that GeoGirafe is at its very beginning, can strongly evolve and is therefore not intended for the moment to be used by people other than developers or contributors.**
 
-The project documentation can be found here: https://geogirafe.gitlab.io/gg-doc/.
+The project documentation can be found here: https://geogirafe.gitlab.io/gg-doc/.  
 The demo instances of GeoGirafe can be tested here: https://geogirafe.paloo.fr.
 
 ## Goal
