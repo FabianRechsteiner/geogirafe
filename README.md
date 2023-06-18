@@ -15,7 +15,8 @@ This repository contains the web-viewer part of the project.
 
 **Please note that GeoGirafe is at its very beginning, can strongly evolve and is therefore not intended for the moment to be used by people other than developers or contributors.**
 
-A demo instance of GeoGirafe can be tested here: [https://geogirafe.paloo.fr](https://geogirafe.paloo.fr).
+The project documentation can be found here: https://geogirafe.gitlab.io/gg-doc/.
+The demo instances of GeoGirafe can be tested here: https://geogirafe.paloo.fr.
 
 ## Goal
 
@@ -36,6 +37,10 @@ GeoGirafe is developed according to the following principles:
 - **Agility**: GeoGirafe is being developed according to the Agile methodology. We value individuals collaboration, and change responsiveness more than processes, tools and plans.
 
 - **Accessibility**: GeoGirafe is doing its best to make web content more accessible to individuals with disabilities: [View Wave Report](https://wave.webaim.org/report#/https://geogirafe.paloo.fr/mapbs/).
+
+## Architecture
+
+Architectural choices made for the GeoGirafe project, including strategic objectives and technological choices, is explained in details here: https://geogirafe.gitlab.io/gg-doc/docs/architecture.
 
 # Getting Started
 
