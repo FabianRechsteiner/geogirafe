@@ -109,13 +109,13 @@ class ThemesManager extends GirafeSingleton {
   prepareThemes(themesJson) {
     const themes = {};
     const order = { value: 0 };
-    themesJson.forEach(themeJson => {
+    themesJson.forEach((themeJson, index) => {
       const theme = new Theme(themeJson);
       themeJson.children.forEach(layerJson => {
         const layer = this.createLayer(layerJson, null, order);
         theme.layersTree.push(layer);
       });
-      themes[theme.id] = theme;
+      themes[index] = theme;
     });
 
     return themes;
