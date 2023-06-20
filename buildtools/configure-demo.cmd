@@ -18,6 +18,14 @@ if "%1"=="sitn" (
     goto :end
 )
 
+if "%1"=="cartoriviera" (
+    echo "Preparing environment Cartoriviera..."
+    copy demo\config.cartoriviera.json src\static\config.json /Y
+    curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output %OUTPUTDIR%\themes.json
+    curl "https://map.cartoriviera.ch/printproxy/capabilities.json" --silent --output %OUTPUTDIR%\capabilities.json
+    goto :end
+)
+
 if "%1"=="geogr" (
     echo "Preparing environment GEOGR..."
     copy demo\config.geogr.json src\static\config.json /Y
@@ -37,9 +45,8 @@ if "%1"=="lie" (
 )
 
 echo "Usage: ./configure-demo <environment>"
-echo "Possible environments: ['mapbs', 'sitn', 'geogr', 'lie']"
+echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie']"
 echo "Usage example: ./configure-demo mapbs"
 echo "Usage example with npm: npm run configure-demo mapbs"
 
 :end
-

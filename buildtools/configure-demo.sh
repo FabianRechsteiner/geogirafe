@@ -14,6 +14,13 @@ then
     curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
     curl "https://sitn.ne.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
 
+elif [ "$1" = 'cartoriviera' ];
+then
+    echo "Preparing environment Cartoriviera..."
+    cp demo/config.cartoriviera.json src/static/config.json
+    curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
+    curl "https://map.cartoriviera.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+
 elif [ "$1" = 'geogr' ];
 then
     echo "Preparing environment GEOGR..."
@@ -32,9 +39,8 @@ then
 
 else
     echo "Usage: ./configure-demo <environment>"
-    echo "Possible environments: ['mapbs', 'sitn', 'geogr', 'lie']"
+    echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie']"
     echo "Usage example: ./configure-demo mapbs"
     echo "Usage example with npm: npm run configure-demo mapbs"
 
 fi
-
