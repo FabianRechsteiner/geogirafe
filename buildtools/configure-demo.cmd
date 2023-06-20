@@ -44,9 +44,9 @@ if "%1"=="lie" (
     goto :end
 )
 
-echo "Usage: ./configure-demo <environment>"
+echo "Usage: ./configure-demo-win <environment>"
 echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie']"
-echo "Usage example: ./configure-demo mapbs"
-echo "Usage example with npm: npm run configure-demo mapbs"
+echo "Usage example: ./configure-demo-win mapbs"
+echo "Usage example with npm: npm run configure-demo-win mapbs"
 
 :end
