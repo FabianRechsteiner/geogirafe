@@ -9,7 +9,7 @@ class ThemeComponent extends GirafeHTMLElement {
   themesJson = {};
   themes = [];
   ignoreBlur = false;
-  
+
   constructor() {
     super('themes');
   }
@@ -54,7 +54,7 @@ class ThemeComponent extends GirafeHTMLElement {
     else if (forceDisplay === false) {
       this.themesList.style.display = 'none';
     }
-    
+
     else if (this.themesList.style.display === 'none') {
       this.themesList.style.display = 'block';
     }
@@ -80,7 +80,7 @@ class ThemeComponent extends GirafeHTMLElement {
     // Ignore blur on mouse down to prevent themes from de-rendering before we can process click
     option.onmousedown = () => { this.ignoreBlur = true };
     option.onclick = (e) => this.onThemeChanged(e);
-  
+
     // Add to select
     this.themesList.appendChild(option);
   }
@@ -98,8 +98,19 @@ class ThemeComponent extends GirafeHTMLElement {
 
   onThemeChanged(e) {
     const div = super.getParentOfType('DIV', e.target);
-    const index = div.dataset["value"];
-    this.state.selectedTheme = this.state.themes[index];
+    const id = parseInt(div.dataset["value"]);
+    const themes = this.state.themes;
+
+    for (const index in themes) {
+      if (themes.hasOwnProperty(index)) {
+        const theme = themes[index];
+        if (theme.id === id) {
+          this.state.selectedTheme = theme;
+          break;
+        }
+      }
+    }
+
     this.toggleThemesList(false);
     this.ignoreBlur = false;
   }
