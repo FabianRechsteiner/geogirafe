@@ -11,6 +11,10 @@ class HelpComponent extends GirafeHTMLElement {
   render() {
     super.render();
     this.content = this.shadow.querySelector('#content');
+    if (!this.configManager.Config.basemaps.show) {
+      this.shadow.querySelector('#basemap').style.display = 'none';
+      this.shadow.querySelector('#basemap-descr').style.display = 'none';
+    }
   }
 
   registerEvents() {
