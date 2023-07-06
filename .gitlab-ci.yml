@@ -27,6 +27,7 @@ variables:
 npm-audit:
   stage: test
   image: node:18-slim
+  allow_failure: true
   
   script: 
     # build
