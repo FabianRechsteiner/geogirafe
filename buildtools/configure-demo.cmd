@@ -44,8 +44,17 @@ if "%1"=="lie" (
     goto :end
 )
 
+if "%1"=="sigip" (
+    echo "Preparing environment SIGIP..."
+    copy demo\config.sigip.json src\static\config.json /Y
+    curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output %OUTPUTDIR%\themes.json
+    curl "https://www.sigip.ch/static/dummy/fr.json" --silent --output %OUTPUTDIR%\fr.json
+    curl "https://www.sigip.ch/printproxy/capabilities.json" --silent --output %OUTPUTDIR%\capabilities.json
+    goto :end
+)
+
 echo "Usage: ./configure-demo-win <environment>"
-echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie']"
+echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip']"
 echo "Usage example: ./configure-demo-win mapbs"
 echo "Usage example with npm: npm run configure-demo-win mapbs"
 

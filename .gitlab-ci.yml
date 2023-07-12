@@ -145,6 +145,8 @@ pages:
     - *prepare_demo
     - demo='lie'
     - *prepare_demo
+    - demo='sigip'
+    - *prepare_demo
     # Rename the release directory to public
     - rm -Rf public && mv release public
     # Copy demo index page
@@ -180,6 +182,12 @@ pages:
     - curl "https://map.geo.llv.li/printproxy/capabilities.json" --output public/lie/Mock/capabilities.json
     - gzip -k -f public/lie/Mock/themes.json public/lie/Mock/de.json public/lie/Mock/capabilities.json
     - brotli -k -f public/lie/Mock/themes.json public/lie/Mock/de.json public/lie/Mock/capabilities.json
+    # SIGIP
+    - curl "https://www.sigip.ch/themes?background=background&interface=desktop" --output public/sigip/Mock/themes.json
+    - curl "https://www.sigip.ch/static/X/fr.json" --output public/sigip/Mock/de.json
+    - curl "https://www.sigip.ch/printproxy/capabilities.json" --output public/sigip/Mock/capabilities.json
+    - gzip -k -f public/sigip/Mock/themes.json public/sigip/Mock/de.json public/sigip/Mock/capabilities.json
+    - brotli -k -f public/sigip/Mock/themes.json public/sigip/Mock/de.json public/sigip/Mock/capabilities.json
 
   artifacts:
     paths:

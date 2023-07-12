@@ -37,9 +37,17 @@ then
     curl "https://map.geo.llv.li/static/X/de.json" --silent --output $OUTPUTDIR/de.json
     curl "https://map.geo.llv.li/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
 
+elif [ "$1" = 'sigip' ];
+then
+    echo "Preparing environment SIGIP..."
+    cp demo/config.sigip.json src/static/config.json
+    curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
+    curl "https://www.sigip.ch/static/X/fr.json" --silent --output $OUTPUTDIR/fr.json
+    curl "https://www.sigip.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+
 else
     echo "Usage: ./configure-demo <environment>"
-    echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie']"
+    echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip']"
     echo "Usage example: ./configure-demo mapbs"
     echo "Usage example with npm: npm run configure-demo mapbs"
 
