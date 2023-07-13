@@ -1,62 +1,58 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import ButtonComponent from '../button/component.js';
 
 class BasemapComponent extends GirafeHTMLElement {
+
+  templateUrl = './template.html';
+  styleUrl = './style.css';
 
   servers = {};
   basemapJson = {};
   basemaps = [];
-  container = null;
   
   constructor() {
     super('basemap');
+
+    this.configManager.loadConfig().then(() => { 
+      if (!this.configManager.Config.basemaps.show) {
+        this.hide();
+      }
+    });
   }
 
   render() {
     super.render();
-    this.container = this.shadow.getElementById('container');
-
-    this.configManager.loadConfig().then(() => { 
-      if (!this.configManager.Config.basemaps.show) {
-        this.container.getRootNode().host.style.display = 'none';
-      }
-    });
   }
 
   onBasemapsLoaded(basemaps) {
-    let defaultBasemap = null;
-    Object.values(basemaps).forEach(basemap => {
-      this.createButton(basemap);
-      if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
-        defaultBasemap = basemap;
-      }
-    });
+    super.render();
 
-    if (!this.isNullOrUndefined(defaultBasemap)) {
-      this.state.activeBasemap = defaultBasemap;
+    // Configure default basemap
+    for (const basemap of Object.values(basemaps)) {
+      if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
+        this.state.activeBasemap = basemap;
+        break;
+      }
     }
   }
 
-  createButton(basemap) {
-    const button = new ButtonComponent();
-    button.setAttribute('text', basemap.name);
-    button.setAttribute('size', 'large');
-    button.classList.add('border-top');
-    button.onClick = () => {
-      if (!this.isNullOrUndefined(basemap.projection)) {
-        this.state.projection = basemap.projection;
-      }
-      this.state.activeBasemap = basemap;
+  changeBasemap(basemap) {
+    if (!this.isNullOrUndefined(basemap.projection)) {
+      this.state.projection = basemap.projection;
     }
-    this.container.appendChild(button);
+    this.state.activeBasemap = basemap;
   }
 
   registerEvents() {
     this.stateManager.subscribe('basemaps', (oldBasemaps, newBasemaps) => this.onBasemapsLoaded(newBasemaps));
+    this.stateManager.subscribe('olMap', (oldMap, newMap) => this.test(newMap));
+  }
+
+  test(map) {
+    console.log('toto');
   }
 
   connectedCallback() {
-    this.loadTemplate()
+    this.loadConfig()
       .then(() => {
         this.render();
         super.translate();

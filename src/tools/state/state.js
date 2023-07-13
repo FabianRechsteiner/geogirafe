@@ -80,6 +80,12 @@ class State {
     display: 'none',
   }
 
+  // The openlayer map
+  // Keep in mind that you shoudn't use it directly to add layers or drawings, 
+  // because the components are not listening to olMap changes, and the application will be desynchronized.
+  // => Consider using the other properties of the state, which components are listening to
+  olMap = null;
+
   // To manage selected and focused features
   selectedFeatures = [];
   focusedFeature = null;

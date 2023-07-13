@@ -7,6 +7,9 @@ import { LineString, Point, Polygon } from 'ol/geom';
 
 class SelectionGridComponent extends GirafeResizableElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   locale = null;
 
   panel = null;
@@ -197,7 +200,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();

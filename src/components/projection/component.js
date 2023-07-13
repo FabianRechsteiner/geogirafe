@@ -2,6 +2,9 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
 
 class ProjectionComponent extends GirafeHTMLElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   menuButton = null;
   // TODO REG : manage in config.json
   valueToText = {
@@ -38,7 +41,7 @@ class ProjectionComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();

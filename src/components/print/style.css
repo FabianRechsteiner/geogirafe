@@ -164,7 +164,7 @@ select, #title, #comment {
 }
 
 .select::after {
-  content: '\25BC';
+  content: "\25bc";
   position: absolute;
   top: 0;
   right: 0;

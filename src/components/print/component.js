@@ -1,8 +1,9 @@
-import GeoEvents from '../../models/events';
 import GirafeResizableElement from '../../base/GirafeResizableElement';
-import I18nManager from '../../tools/i18nmanager';
 
 class PrintComponent extends GirafeResizableElement {
+
+  templateUrl = './template.html';
+  styleUrl = './style.css';
 
   panel = null
   exportButton = null;
@@ -163,12 +164,12 @@ class PrintComponent extends GirafeResizableElement {
   }
 
   connectedCallback() {
-    this.loadTemplate()
-    .then(() => this.initializePrint()
-      .then(() => {
+    this.loadConfig().then(() => 
+      this.initializePrint().then(() => {
         this.render();
         this.registerEvents();
-    }));
+      })
+    );
   }
 
   #togglePanel(visible) {

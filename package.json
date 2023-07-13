@@ -8,7 +8,14 @@
     "type": "git",
     "url": "https://gitlab.com/geogirafe/gg-viewer"
   },
-  "keywords": ["geogirafe", "gis", "geoviewer", "geoportal", "webgis", "geomapfish"],
+  "keywords": [
+    "geogirafe",
+    "gis",
+    "geoviewer",
+    "geoportal",
+    "webgis",
+    "geomapfish"
+  ],
   "license": "undefined yet",
   "homepage": "https://geogirafe.paloo.fr",
   "devDependencies": {
@@ -26,6 +33,7 @@
     "on-change": "^4.0.2",
     "proj4": "^2.8.0",
     "tippy.js": "^6.3.7",
+    "uhtml": "^3.1.0",
     "vanilla-picker": "^2.12.1",
     "vite": "^3.1.4"
   },
@@ -36,7 +44,7 @@
     "serve-win": "buildtools\\prebuild.cmd && vite serve",
     "build-win": "buildtools\\prebuild.cmd && vite build",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "configure-demo" : "bash -C './buildtools/configure-demo.sh'",
-    "configure-demo-win" : "buildtools\\configure-demo.cmd"
+    "configure-demo": "bash -C './buildtools/configure-demo.sh'",
+    "configure-demo-win": "buildtools\\configure-demo.cmd"
   }
 }

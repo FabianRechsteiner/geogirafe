@@ -2,6 +2,9 @@ import GirafeDraggableElement from '../../base/GirafeDraggableElement';
 
 class SelectionWindowComponent extends GirafeDraggableElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   maxFeatures = 200;
   focusedIndex = null;
 
@@ -93,7 +96,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.makeDraggable();

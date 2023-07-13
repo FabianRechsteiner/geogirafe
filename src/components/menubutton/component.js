@@ -2,6 +2,9 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class MenuButtonComponent extends GirafeHTMLElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   button = null;
   icon = null;
   text = null;
@@ -169,7 +172,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    super.loadTemplate().then(() => {
+    super.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();

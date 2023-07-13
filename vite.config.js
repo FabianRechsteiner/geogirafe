@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite'
 
+
+import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
+import RestartPlugin from './buildtools/vite-restart-plugin';
+
 // https://v2.vitejs.dev/config/
 export default defineConfig({
     root: './src',
@@ -15,5 +19,9 @@ export default defineConfig({
                 }
             }
         }
-    }
+    },
+    plugins: [
+      InlineTemplatesPlugin(),
+      RestartPlugin()
+    ]
 });

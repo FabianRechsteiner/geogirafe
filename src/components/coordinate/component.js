@@ -2,8 +2,12 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
 
 class CoordinateComponent extends GirafeHTMLElement {
 
-  coordsSpan = null;
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   locale = null;
+  east = null;
+  north = null;
 
   constructor() {
     super('coordinate');
@@ -11,7 +15,6 @@ class CoordinateComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    this.coordsSpan = this.shadow.querySelector('#coords');
     this.locale = this.configManager.Config.general.locale;
   }
 
@@ -20,13 +23,14 @@ class CoordinateComponent extends GirafeHTMLElement {
   }
 
   onChangeCoordinates(coord) {
-    const east = (Math.round(coord[0] * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
-    const nord = (Math.round(coord[1] * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
-    this.coordsSpan.innerHTML = `E ${east} / N ${nord}`;
+    this.east = (Math.round(coord[0] * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
+    this.north = (Math.round(coord[1] * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
+
+    this.render();
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();

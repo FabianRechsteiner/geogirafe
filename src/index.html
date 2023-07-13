@@ -34,15 +34,23 @@
       <girafe-search id="search"></girafe-search>
       <div id="buttonbar">
         <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
-        <girafe-button icon-style="fa-2xl fa-solid fa-circle-question" state-action="interface.helpVisible" data-value="true"></girafe-button>
+        <girafe-button icon-style="fa-2xl fa-solid fa-circle-question"
+                       onclick="document.state.interface.helpVisible = true">
+        </girafe-button>
         <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
           <div slot="menu-content">
-            <girafe-button icon-style="fa-xl fa-regular fa-pen-to-square" text="Draw" state-action="interface.redliningPanelVisible"></girafe-button>
-            <girafe-button icon-style="fa-xl fa-solid fa-print" text="Print" state-action="interface.printPanelVisible"></girafe-button>
+            <girafe-button icon-style="fa-xl fa-regular fa-pen-to-square" text="Draw" 
+                           onclick="document.state.interface.redliningPanelVisible = !document.state.interface.redliningPanelVisible">
+            </girafe-button>
+            <girafe-button icon-style="fa-xl fa-solid fa-print" text="Print"
+                           onclick="document.state.interface.printPanelVisible = !document.state.interface.printPanelVisible">
+            </girafe-button>
             <girafe-proj-select></girafe-proj-select>
             <girafe-language-select></girafe-language-select>
             <girafe-globe-select></girafe-globe-select>
-            <girafe-button icon-style="fa-xl fa-solid fa-circle-info" class="border-top" text="about" state-action="interface.aboutVisible" data-value="true"></girafe-button>
+            <girafe-button icon-style="fa-xl fa-solid fa-circle-info" class="border-top" text="about"
+                           onclick="document.state.interface.aboutVisible = true">
+            </girafe-button>
           </div>
         </girafe-menu-button>
       </div>

@@ -6,6 +6,9 @@ import GeoEvents from '../../models/events.js';
 
 class SearchComponent extends GirafeHTMLElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   searchBox = null;
   resultsBox = null;
   ignoreBlur = false;
@@ -47,7 +50,7 @@ class SearchComponent extends GirafeHTMLElement {
   }
   
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();

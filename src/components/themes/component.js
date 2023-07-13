@@ -2,6 +2,9 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class ThemeComponent extends GirafeHTMLElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   themesButton = null;
   layerIcon = null;
   waitingIcon = null;
@@ -116,7 +119,7 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadTemplate()
+    this.loadConfig()
       .then(() => {
         this.render();
         this.registerEvents();
