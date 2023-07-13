@@ -101,7 +101,7 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   hide() {
-    this.getRootNode().host.style.display = 'none';
+    this.style.display = 'none';
   }
 }
 
