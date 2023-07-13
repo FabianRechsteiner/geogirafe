@@ -32,6 +32,9 @@ import RedliningFeature from '../../tools/state/redliningfeature';
 
 class MapComponent extends GirafeHTMLElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   map = null;
   mapTarget = null
   map3d = null;
@@ -112,6 +115,8 @@ class MapComponent extends GirafeHTMLElement {
       target: this.mapTarget,
       layers: []
     });
+    // Share the map among the state
+    this.state.olMap = this.map;
 
     // Initialize managers
     this.wmsManager = new WmsManager(this.map, this.srid);
@@ -350,7 +355,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();

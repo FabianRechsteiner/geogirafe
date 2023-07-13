@@ -38,3 +38,6 @@ register(proj4);
 // Initialize the themes manager, in order to load the themes
 ThemesManager.getInstance();
 WfsManager.getInstance();
+
+// Add the state to document, so that it will be accessible everywhere
+document.state = StateManager.getInstance().state;

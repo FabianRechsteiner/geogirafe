@@ -30,8 +30,11 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   button = null;
   div = null;
   header = null;
-  host = null;
   closeButton = null;
+
+  get host() {
+    return this.shadow.getRootNode().host;
+  }
 
   pos1 = 0;
   pos2 = 0;
@@ -44,7 +47,6 @@ class GirafeDraggableElement extends GirafeHTMLElement {
 
   makeDraggable() {
     this.div = this.shadow.querySelector('#draggable');
-    this.host = this.div.getRootNode().host;
     this.header = this.shadow.querySelector('#header');
     this.header.onmousedown = (e) => this.dragMouseDown(this, e);
 
@@ -132,13 +134,6 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;
-  }
-
-  connectedCallback() {
-    this.loadTemplate().then(() => {
-      this.render();
-      //this.registerEvents();
-    });
   }
 }
 

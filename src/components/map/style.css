@@ -19,7 +19,7 @@
 .ol-zoom {
   right: 1rem;
   top: 1rem;
-  left: unset;
+  left: unset !important;
 }
 
 .ol-rotate {

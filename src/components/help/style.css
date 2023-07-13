@@ -15,7 +15,7 @@
     left: 0;
     width: 150px;
     height: 120px;
-    background-image: url(images/arrow_white.webp);
+    background-image: url(components/help/images/arrow_white.webp);
     background-repeat: no-repeat;
     transform: rotateY(0deg) rotateX(0deg) rotateZ(90deg);
     background-position: bottom -50px left -60px;
@@ -27,7 +27,7 @@
     left: 45%;
     width: 180px;
     height: 70px;
-    background-image: url(images/arrow_white.webp);
+    background-image: url(components/help/images/arrow_white.webp);
     background-repeat: no-repeat;
     transform: rotateY(0deg) rotateX(0deg) rotateZ(90deg);
     background-position: -60px -30px;
@@ -39,7 +39,7 @@
     right: 0;
     width: 150px;
     height: 120px;
-    background-image: url(images/arrow_white.webp);
+    background-image: url(components/help/images/arrow_white.webp);
     background-repeat: no-repeat;
     transform: rotateY(180deg) rotateX(0deg) rotateZ(90deg);
     background-position: bottom -50px left -60px;
@@ -51,7 +51,7 @@
     left: 21rem;
     width: 150px;
     height: 120px;
-    background-image: url(images/arrow_white.webp);
+    background-image: url(components/help/images/arrow_white.webp);
     background-repeat: no-repeat;
     transform: rotateY(0deg) rotateX(180deg) rotateZ(90deg);
     background-position: bottom -50px left -60px;

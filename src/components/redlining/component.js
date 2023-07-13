@@ -4,6 +4,9 @@ import Picker from 'vanilla-picker/csp';
 
 class RedliningComponent extends GirafeResizableElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   panel = null
   disableButton = null;
   pointButton = null;
@@ -86,7 +89,7 @@ class RedliningComponent extends GirafeResizableElement {
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();

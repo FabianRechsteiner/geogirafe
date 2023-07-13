@@ -5,6 +5,9 @@ import MenuManager from './tools/menumanager';
 
 class TreeViewComponent extends GirafeResizableElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   ulRoot = null;
   hideLegendWhenLayerIsDeactivated = false;
   previousLegendState = {};
@@ -108,12 +111,11 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   connectedCallback() {
-    this.loadTemplate()
+    this.loadConfig()
       .then(() => {
         this.render();
         super.translate();
         this.registerEvents();
-        //super.initialized();
       });
   }
 

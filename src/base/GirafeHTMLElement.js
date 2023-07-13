@@ -1,3 +1,4 @@
+import { render as uRender } from 'uhtml';
 import tippy from 'tippy.js';
 import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
@@ -6,59 +7,34 @@ import StateManager from '../tools/state/statemanager';
 
 class GirafeHTMLElement extends HTMLElement {
 
-  static #templates = {};
+  templateUrl = null;
+  styleUrl = null;
+  template = null;
   component = null;
-
-  get templateUrl() {
-    return `./components/${this.component}/template.html`;
-  }
-
-  get template() {
-    return GirafeHTMLElement.#templates[this.component];
-  }
 
   messageManager = null;
   configManager = null;
   stateManager = null;
+  
   get state() {
     return this.stateManager.state;
   }
 
   constructor(component) {
     super();
+    this.component = component;
+
     this.configManager = ConfigManager.getInstance();
     this.messageManager = MessageManager.getInstance();
     this.stateManager = StateManager.getInstance();
 
-    this.component = component;
     this.shadow = this.attachShadow({mode: 'open'});
 
     this.stateManager.subscribe('language', (oldLanguage, newLanguage) => this.translate());
   }
 
-  async loadTemplate() {
-    if (this.component in GirafeHTMLElement.#templates) {
-      // Template was already loaded. Nothing to do.
-      return;
-    }
-
-    // Load configuration
+  async loadConfig() {
     await this.configManager.loadConfig();
-
-    // Otherwise, load the template
-    const response = await fetch(this.templateUrl);
-    const content = await response.text();
-
-    const template = document.createElement('template');
-    template.innerHTML = content;
-    GirafeHTMLElement.#templates[this.component] = template;
-  }
-
-  render() {
-    // First, clear the old shadow content
-    this.shadow.innerHTML = '';
-    // Clone component template and add it to the dom
-    this.shadow.appendChild(this.template.content.cloneNode(true));
   }
 
   translate() {
@@ -118,6 +94,14 @@ class GirafeHTMLElement extends HTMLElement {
         content: el.getAttribute('tip')
       })
     });
+  }
+
+  render() {
+    uRender(this.shadow, this.template);
+  }
+
+  hide() {
+    this.getRootNode().host.style.display = 'none';
   }
 }
 

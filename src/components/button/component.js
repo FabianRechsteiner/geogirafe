@@ -2,6 +2,9 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class ButtonComponent extends GirafeHTMLElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   button = null;
   container = null;
   icon = null;
@@ -190,7 +193,7 @@ class ButtonComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();

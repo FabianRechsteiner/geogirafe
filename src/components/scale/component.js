@@ -4,6 +4,9 @@ import ButtonComponent from '../button/component.js';
 
 class ScaleComponent extends GirafeHTMLElement {
 
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
   scaleSpan = null;
   locale = null;
   container = null;
@@ -44,11 +47,10 @@ class ScaleComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadTemplate().then(() => {
+    this.loadConfig().then(() => {
       this.render();
       super.translate();
       this.registerEvents();
-      //super.initialized();
     });
   }
 }

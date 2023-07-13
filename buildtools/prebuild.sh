@@ -3,8 +3,6 @@
 # Copy HTML Templates, CSS and images
 cd src
 rm -Rf static/components
-cp --parents -R components/**/*.html static/
-cp --parents -R components/**/*.css static/
 cp --parents -R components/**/**/*.png static/
 cp --parents -R components/**/**/*.webp static/
 cd .. 

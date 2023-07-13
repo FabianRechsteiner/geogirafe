@@ -1,9 +1,13 @@
-<link rel="stylesheet" href="components/globe/style.css" />
-
 <girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-globe" text="2D / 3D" open="left">
   <div slot="menu-content">
-    <girafe-button icon-style="fa-xl fa-solid fa-map" text="2D" state-action="globe.display" data-value="none"></girafe-button>
-    <girafe-button icon-style="fa-xl fa-solid fa-right-left" text="Both" state-action="globe.display" data-value="side"></girafe-button>
-    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" text="3D" state-action="globe.display" data-value="full"></girafe-button>
+    <girafe-button icon-style="fa-xl fa-solid fa-map" text="2D" 
+                   onclick="this.state.globe.display='none'">
+    </girafe-button>
+    <girafe-button icon-style="fa-xl fa-solid fa-right-left" text="Both" 
+                   onclick="this.state.globe.display='side'">
+    </girafe-button>
+    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" text="3D" 
+                   onclick="this.state.globe.display='full'">
+    </girafe-button>
   </div>
 </girafe-menu-button>

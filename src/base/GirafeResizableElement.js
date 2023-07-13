@@ -35,10 +35,13 @@ class GirafeResizableElement extends GirafeHTMLElement {
   dock = null;
   prevX = 0;
   prevY = 0;
-  host = null;
   toggleWidth = null;
   lastWidth = 0;
   hideWidth = 0;
+
+  get host() {
+    return this.shadow.getRootNode().host;
+  }
 
   constructor(component) {
     super(component);
@@ -52,7 +55,6 @@ class GirafeResizableElement extends GirafeHTMLElement {
 
   makeResizable() {
     this.panel = this.shadow.querySelector('#panel');
-    this.host = this.panel.getRootNode().host;
     this.gutter = this.shadow.querySelector('#gutter');
     this.gutter.onmousedown = (e) => this.#mousedown(e);
     this.gutter.ondblclick = (e) => this.#togglePanel(e);
@@ -214,12 +216,6 @@ class GirafeResizableElement extends GirafeHTMLElement {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;
-  }
-
-  connectedCallback() {
-    this.loadTemplate().then(() => {
-      this.render();
-    });
   }
 }
 

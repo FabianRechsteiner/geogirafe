@@ -1,7 +1,9 @@
-<link rel="stylesheet" href="components/basemap/style.css" />
-
 <girafe-menu-button icon-style="fa-sm fa-solid fa-layer-group" size="small" open="up" class="transparent">
   <div slot="menu-content">
-    <div id="container"></div>
+    <div id="container">
+      ${Object.values(this.state.basemaps).map(basemap => uHtml.for(basemap)`
+        <girafe-button text="${basemap.name}" size="large" class="border-top" onclick="${() => this.changeBasemap(basemap)}"></girafe-button>`
+      )}
+    </div>
   </div>
 </girafe-menu-button>
