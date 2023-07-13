@@ -11,6 +11,7 @@ export default defineConfig({
     publicDir: './static',
     build: {
         outDir: '../public',
+        sourcemap: true,
         emptyOutDir: true,
         rollupOptions: {
             output: {
