@@ -62,7 +62,7 @@ class AboutComponent extends GirafeDraggableElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      this.translate();
+      this.girafeTranslate();
       this.makeDraggable();
       this.registerEvents();
     });

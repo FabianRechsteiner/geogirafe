@@ -30,14 +30,14 @@ class GirafeHTMLElement extends HTMLElement {
 
     this.shadow = this.attachShadow({mode: 'open'});
 
-    this.stateManager.subscribe('language', (oldLanguage, newLanguage) => this.translate());
+    this.stateManager.subscribe('language', (oldLanguage, newLanguage) => this.girafeTranslate());
   }
 
   async loadConfig() {
     await this.configManager.loadConfig();
   }
 
-  translate() {
+  girafeTranslate() {
     I18nManager.getInstance().translate(this.shadow);
   }
 

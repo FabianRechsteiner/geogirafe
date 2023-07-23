@@ -41,7 +41,7 @@ class ThemeComponent extends GirafeHTMLElement {
     Object.values(themes).forEach(theme => {
       this.addOption(theme);
     });
-    super.translate();
+    super.girafeTranslate();
   }
 
   onBlur() {

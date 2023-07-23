@@ -55,7 +55,7 @@ class BasemapComponent extends GirafeHTMLElement {
     this.loadConfig()
       .then(() => {
         this.render();
-        super.translate();
+        super.girafeTranslate();
         this.registerEvents();
     });
   }

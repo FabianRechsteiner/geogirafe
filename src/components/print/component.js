@@ -95,7 +95,7 @@ class PrintComponent extends GirafeResizableElement {
     });
 
     this.activateTooltips(false, [800, 0], 'top-end');
-    super.translate();
+    super.girafeTranslate();
   }
 
   closePanel() {
