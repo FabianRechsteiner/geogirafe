@@ -1,4 +1,4 @@
-import GirafeSingleton from '../../base/GirafeSingleton.js';
+import GirafeSingleton from '../../base/GirafeSingleton';
 import State from './state.js';
 import ConfigManager from '../configmanager';
 import onChange from 'on-change';

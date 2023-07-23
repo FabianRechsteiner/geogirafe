@@ -1,6 +1,6 @@
 import ConfigManager from './configmanager';
 import StateManager from './state/statemanager';
-import GirafeSingleton from '../base/GirafeSingleton.js';
+import GirafeSingleton from '../base/GirafeSingleton';
 
 class I18nManager extends GirafeSingleton {
 

@@ -2,7 +2,7 @@ import GeoEvents from '../models/events.js';
 import State from '../tools/state/state';
 import MessageManager from '../tools/messagemanager';
 import StateManager from './state/statemanager';
-import GirafeSingleton from '../base/GirafeSingleton.js';
+import GirafeSingleton from '../base/GirafeSingleton';
 
 class UrlManager extends GirafeSingleton {
 /*
