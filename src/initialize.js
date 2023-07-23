@@ -1,4 +1,4 @@
-import ConfigManager from './tools/configmanager.js';
+import ConfigManager from './tools/configmanager';
 import UrlManager from './tools/urlmanager.js';
 import StateManager from './tools/state/statemanager';
 import I18nManager from './tools/i18nmanager.js';

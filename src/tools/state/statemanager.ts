@@ -1,6 +1,6 @@
 import GirafeSingleton from '../../base/GirafeSingleton.js';
 import State from './state.js';
-import ConfigManager from '../configmanager.js';
+import ConfigManager from '../configmanager';
 import onChange from 'on-change';
 
 class StateManager extends GirafeSingleton {
