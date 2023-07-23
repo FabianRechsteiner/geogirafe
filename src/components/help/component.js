@@ -1,4 +1,4 @@
-import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class HelpComponent extends GirafeHTMLElement {
 

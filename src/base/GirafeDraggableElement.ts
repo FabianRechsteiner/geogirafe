@@ -1,4 +1,4 @@
-import GirafeHTMLElement from './GirafeHTMLElement.js';
+import GirafeHTMLElement from './GirafeHTMLElement';
 
 /*
 Minimal template for a draggable object : 
@@ -27,13 +27,13 @@ That's it, it should work.
 
 class GirafeDraggableElement extends GirafeHTMLElement {
 
-  button = null;
-  div = null;
-  header = null;
-  closeButton = null;
+  button?: HTMLElement;
+  div?: HTMLElement;
+  header?: HTMLElement;
+  closeButton?: HTMLElement;
 
-  get host() {
-    return this.shadow.getRootNode().host;
+  get host(): HTMLElement {
+    return (this.shadow.getRootNode() as ShadowRoot).host as HTMLElement;
   }
 
   pos1 = 0;
@@ -41,16 +41,16 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   pos3 = 0;
   pos4 = 0;
 
-  constructor(component) {
+  constructor(component: string) {
     super(component);
   }
 
   makeDraggable() {
-    this.div = this.shadow.querySelector('#draggable');
-    this.header = this.shadow.querySelector('#header');
+    this.div = this.shadow.querySelector('#draggable')!;
+    this.header = this.shadow.querySelector('#header')!;
     this.header.onmousedown = (e) => this.dragMouseDown(this, e);
 
-    this.closeButton = this.shadow.getElementById('close');
+    this.closeButton = this.shadow.getElementById('close')!;
     if (!this.isNullOrUndefined(this.closeButton)) {
       this.closeButton.onclick = () => this.closeWindow();
     }
@@ -60,19 +60,17 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     throw 'This function must be overriden to close the associated window';
   }
 
-  dragMouseDown(_this, e) {
-    e = e || window.event;
+  dragMouseDown(_this: GirafeDraggableElement, e: MouseEvent) {
     e.preventDefault();
     // get the mouse cursor position at startup:
     _this.pos3 = e.clientX;
     _this.pos4 = e.clientY;
-    document.onmouseup = (e) => _this.closeDragElement(_this, e);
+    document.onmouseup = () => _this.closeDragElement();
     // call a function whenever the cursor moves:
     document.onmousemove = (e) => _this.elementDrag(_this, e);
   }
 
-  elementDrag(_this, e) {
-    e = e || window.event;
+  elementDrag(_this: GirafeDraggableElement, e: MouseEvent) {
     e.preventDefault();
 
     const hostRect = _this.host.getBoundingClientRect();

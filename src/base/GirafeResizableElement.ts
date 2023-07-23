@@ -1,4 +1,4 @@
-import GirafeHTMLElement from './GirafeHTMLElement.js';
+import GirafeHTMLElement from './GirafeHTMLElement';
 
 /*
 Minimal template for a draggable object : 
@@ -27,25 +27,26 @@ That's it.
 
 class GirafeResizableElement extends GirafeHTMLElement {
 
-  panel = null;
-  panelRect = null;
-  gutter = null;
-  hideButton = null;
-  closeButton = null;
-  dock = null;
+  panel?: HTMLElement;
+  panelRect?: DOMRect;
+  gutter?: HTMLElement;
+  hideButton?: HTMLElement;
+  closeButton?: HTMLElement;
+  // TODO: why not use an enum?
+  dock: string;
   prevX = 0;
   prevY = 0;
-  toggleWidth = null;
+  toggleWidth?: number;
   lastWidth = 0;
   hideWidth = 0;
 
-  get host() {
-    return this.shadow.getRootNode().host;
+  get host(): HTMLElement {
+    return (this.shadow.getRootNode() as ShadowRoot).host as HTMLElement;
   }
 
-  constructor(component) {
+  constructor(component: string) {
     super(component);
-    this.dock = this.getAttribute('dock');
+    this.dock = this.getAttribute('dock') || 'right';
   }
 
   render() {
@@ -54,30 +55,30 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   makeResizable() {
-    this.panel = this.shadow.querySelector('#panel');
-    this.gutter = this.shadow.querySelector('#gutter');
+    this.panel = this.shadow.querySelector('#panel')!;
+    this.gutter = this.shadow.querySelector('#gutter')!;
     this.gutter.onmousedown = (e) => this.#mousedown(e);
-    this.gutter.ondblclick = (e) => this.#togglePanel(e);
-    this.hideButton = this.shadow.getElementById('hide');
+    this.gutter.ondblclick = () => this.#togglePanel();
+    this.hideButton = this.shadow.getElementById('hide')!;
     if (!this.isNullOrUndefined(this.hideButton)) {
       this.hideButton.onclick = () => this.#togglePanel();
     }
-    this.closeButton = this.shadow.getElementById('close');
+    this.closeButton = this.shadow.getElementById('close')!;
     if (!this.isNullOrUndefined(this.closeButton)) {
       this.closeButton.onclick = () => this.closePanel();
     }
   }
 
-  #mousedown(e) {
+  #mousedown(e: MouseEvent) {
     e.preventDefault();
     document.onmousemove = (e) => this.#mousemove(e);
-    document.onmouseup = (e) => this.#mouseup(e);
+    document.onmouseup = () => this.#mouseup();
 
     this.prevX = e.x;
     this.prevY = e.y;
-    this.panelRect = this.panel.getBoundingClientRect();
+    this.panelRect = this.panel!.getBoundingClientRect();
     if (!this.isNullOrUndefined(this.hideButton)) {
-      this.hideWidth = this.hideButton.getBoundingClientRect().width;
+      this.hideWidth = this.hideButton!.getBoundingClientRect().width;
     }
   }
 
@@ -95,6 +96,9 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   #togglePanelVertically() {
+    if (!this.panel || !this.gutter || !this.hideButton) {
+      throw new Error("GirafeResizableElement.makeResizable() must be called before this function");
+    }
     this.toggleWidth = this.gutter.getBoundingClientRect().width;
 
     const width = this.panel.getBoundingClientRect().width;
@@ -121,9 +125,9 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.lastWidth = width;
       this.panel.style.width = this.toggleWidth + 'px';
       this.host.style.width = this.toggleWidth + 'px';
-      this.panel.style.minWidth = 0;
+      this.panel.style.minWidth = '0';
       this.panel.style.overflow = 'hidden';
-      this.host.style.minWidth = 0;
+      this.host.style.minWidth = '0';
 
       if (!this.isNullOrUndefined(this.hideButton)) {
         this.hideButton.classList.add('closed');
@@ -132,6 +136,9 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   #togglePanelHorizontally() {
+    if (!this.panel || !this.gutter || !this.hideButton) {
+      throw new Error("GirafeResizableElement.makeResizable() must be called before this function");
+    }
     this.toggleWidth = this.gutter.getBoundingClientRect().height;
 
     const height = this.panel.getBoundingClientRect().height;
@@ -158,9 +165,9 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.lastWidth = height;
       this.panel.style.height = this.toggleWidth + 'px';
       this.host.style.height = this.toggleWidth + 'px';
-      this.panel.style.minHeight = 0;
+      this.panel.style.minHeight = '0';
       this.panel.style.overflow = 'hidden';
-      this.host.style.minHeight = 0;
+      this.host.style.minHeight = '0';
 
       if (!this.isNullOrUndefined(this.hideButton)) {
         this.hideButton.classList.add('closed');
@@ -168,7 +175,10 @@ class GirafeResizableElement extends GirafeHTMLElement {
     }
   }
 
-  #mousemove(e) {
+  #mousemove(e: MouseEvent) {
+    if (!this.panel || !this.panelRect || !this.closeButton || !this.hideButton) {
+      throw new Error("GirafeResizableElement.makeResizable() must be called before this function");
+    }
     e.preventDefault();
     const newX = this.prevX - e.x;
     const newY = this.prevY - e.y;
@@ -212,7 +222,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
     }
   }
 
-  #mouseup(e) {
+  #mouseup() {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;

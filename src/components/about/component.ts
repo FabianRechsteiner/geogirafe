@@ -1,5 +1,5 @@
-import GirafeDraggableElement from '../../base/GirafeDraggableElement.js';
-import StateManager from '../../tools/state/statemanager.js';
+import GirafeDraggableElement from '../../base/GirafeDraggableElement';
+import StateManager from '../../tools/state/statemanager';
 
 class AboutComponent extends GirafeDraggableElement {
 
