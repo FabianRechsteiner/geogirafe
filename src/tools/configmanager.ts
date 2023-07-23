@@ -1,8 +1,62 @@
 import GirafeSingleton from "../base/GirafeSingleton";
 
+export type GirafeConfig = {
+  general?: {
+    locale?: string;
+  };
+  languages?: {
+    [key: string]: string;
+  };
+  themes?: {
+    url?: string;
+    defaultTheme?: string;
+  };
+  basemaps?: Object;
+  treeview?: {
+    useCheckboxes?: boolean;
+    useLegendIcons?: boolean;
+    hideLegendWhenLayerIsDeactivated?: boolean;
+  };
+  search?: {
+    url?: string;
+  };
+  print?: {
+    url?: string;
+    defaultLayout?: string;
+  };
+  selection?: {
+    defaultFillColor?: string;
+    defaultStrokeColor?: string;
+    defaultStrokeWidth?: number;
+    defaultFocusFillColor?: string;
+    defaultFocusStrokeColor?: string;
+    defaultFocusStrokeWidth?: number;
+  };
+  redlining?: {
+    defaultFillColor?: string;
+    defaultStrokeColor?: string;
+    defaultStrokeWidth?: number;
+    defaultTextSize?: number;
+    defaultFont?: string;
+  };
+  map?: {
+    srid?: string;
+    startZoom?: string;
+    startPosition?: string;
+    maxExtent?: string;
+    scales?: number[];
+    constraintScales?: boolean;
+  };
+  map3d?: {
+    terrainUrl?: string;
+    tilesetUrl?: string;
+  };
+};
+
+
 class ConfigManager extends GirafeSingleton {
 
-  static #config = null;
+  static #config: GirafeConfig | null = null;
   static #locked = false;
 
   get Config() {

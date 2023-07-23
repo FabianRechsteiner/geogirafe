@@ -13,7 +13,7 @@ class StateManager extends GirafeSingleton {
   
   #callbacks = new Map();
 
-  configManager = null;
+  configManager: ConfigManager | null = null;
 
   constructor(type) {
     super(type);
@@ -34,10 +34,10 @@ class StateManager extends GirafeSingleton {
 
   setDefaultValues() {
     // Set default values
-    this.configManager.loadConfig().then(() => {
-      if (this.state) {
-        this.state.projection = this.configManager.Config.map.srid;
-        this.state.language = this.configManager.Config.languages.default;
+    this.configManager?.loadConfig().then(() => {
+      if (this.state && this.configManager?.Config) {
+        this.state.projection = this.configManager.Config.map!.srid!;
+        this.state.language = this.configManager.Config.languages!.default;
       }
     });
   }
