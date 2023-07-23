@@ -5,8 +5,8 @@ import onChange from 'on-change';
 
 class StateManager extends GirafeSingleton {
 
-  #state = null;
-  #stateProxy = null;
+  #state: State | null = null;
+  #stateProxy: State | null = null;
   get state() {
     return this.#stateProxy;
   }
@@ -34,9 +34,11 @@ class StateManager extends GirafeSingleton {
 
   setDefaultValues() {
     // Set default values
-    this.configManager.loadConfig().then(() => { 
-      this.state.projection = this.configManager.Config.map.srid;
-      this.state.language = this.configManager.Config.languages.default;
+    this.configManager.loadConfig().then(() => {
+      if (this.state) {
+        this.state.projection = this.configManager.Config.map.srid;
+        this.state.language = this.configManager.Config.languages.default;
+      }
     });
   }
 

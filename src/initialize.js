@@ -1,6 +1,6 @@
 import ConfigManager from './tools/configmanager.js';
 import UrlManager from './tools/urlmanager.js';
-import StateManager from './tools/state/statemanager.js';
+import StateManager from './tools/state/statemanager';
 import I18nManager from './tools/i18nmanager.js';
 import I18MessageManager from './tools/messagemanager.js';
 
