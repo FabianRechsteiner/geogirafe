@@ -24,6 +24,7 @@
     "jsdom": "^21.0.0"
   },
   "dependencies": {
+    "typescript": "^5.0.2",
     "adjectives": "^1.0.2",
     "cesium": "^1.101.0",
     "gridjs": "^6.0.6",
@@ -38,11 +39,11 @@
     "vite": "^3.1.4"
   },
   "scripts": {
-    "serve": "bash -C './buildtools/prebuild.sh' && vite serve",
-    "build": "bash -C './buildtools/prebuild.sh' && vite build",
+    "serve": "bash -C './buildtools/prebuild.sh' && tsc && vite serve",
+    "build": "bash -C './buildtools/prebuild.sh' && tsc && vite build",
     "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile .",
-    "serve-win": "buildtools\\prebuild.cmd && vite serve",
-    "build-win": "buildtools\\prebuild.cmd && vite build",
+    "serve-win": "buildtools\\prebuild.cmd && tsc && vite serve",
+    "build-win": "buildtools\\prebuild.cmd && tsc && vite build",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "configure-demo": "bash -C './buildtools/configure-demo.sh'",
     "configure-demo-win": "buildtools\\configure-demo.cmd"
