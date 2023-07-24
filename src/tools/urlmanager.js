@@ -1,4 +1,4 @@
-import GeoEvents from '../models/events.js';
+import GeoEvents from '../models/events';
 import State from '../tools/state/state';
 import MessageManager from '../tools/messagemanager';
 import StateManager from './state/statemanager';

@@ -1,6 +1,6 @@
 import { html, fixture, expect } from '@open-wc/testing';
 import LanguageComponent from '../src/components/language/component';
-import GeoEvents from '../src//models/events.js';
+import GeoEvents from '../src//models/events';
 import I18nManager from '../src/tools/i18nmanager';
 
 describe('LanguageComponent', () => {

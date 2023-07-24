@@ -1,7 +1,7 @@
 import { WFS } from 'ol/format';
 import GML3 from 'ol/format/GML3';
 
-import GeoEvents from '../models/events.js';
+import GeoEvents from '../models/events';
 import GirafeSingleton from "../base/GirafeSingleton";
 import ConfigManager from "./configmanager";
 import MessageManager from "./messagemanager";
