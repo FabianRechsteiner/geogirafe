@@ -1,4 +1,3 @@
-import GeoEvents from '../../models/events.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ButtonComponent from '../button/component.js';
 

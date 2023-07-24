@@ -2,7 +2,7 @@ import Polygon from 'ol/geom/Polygon';
 import {buffer, getWidth, getHeight} from 'ol/extent';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import GeoEvents from '../../models/events.js';
+import GeoEvents from '../../models/events';
 
 class SearchComponent extends GirafeHTMLElement {
 
