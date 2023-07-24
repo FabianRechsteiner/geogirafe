@@ -1,15 +1,18 @@
 import GirafeDraggableElement from '../../base/GirafeDraggableElement.js';
+import StateManager from '../../tools/state/statemanager.js';
 
 class AboutComponent extends GirafeDraggableElement {
 
+  // @ts-ignore
   templateUrl = './template.html';
+  // @ts-ignore
   styleUrl = './style.css';
 
   loaded = false;
-  content = null;
-  version = null;
-  build = null;
-  date = null;
+  content!: HTMLElement;
+  version!: HTMLElement;
+  build!: HTMLElement;
+  date!: HTMLElement;
 
   constructor() {
     super('about');
@@ -33,19 +36,22 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('interface.aboutVisible', (oldValue, newValue) => this.toggleAbout(newValue));
+    (this.stateManager! as StateManager).subscribe(
+      'interface.aboutVisible', (_oldValue: boolean, newValue: boolean) => this.toggleAbout(newValue)
+    );
   }
 
-  toggleAbout(visible) {
+  toggleAbout(visible: boolean) {
+    // @ts-ignore
     this.content = this.shadow.getElementById('content');
     if (visible) {
       this.loadVersionInfos()
         .then(() => { 
-          this.content.getRootNode().host.style.display = 'block';
+          ((this.content.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'block';
         });
     }
     else {
-      this.content.getRootNode().host.style.display = 'none';
+      ((this.content.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'none';
     }
   }
 
@@ -63,6 +69,6 @@ class AboutComponent extends GirafeDraggableElement {
   }
 }
 
-customElements.define('girafe-about', AboutComponent);
+customElements.define('girafe-about', AboutComponent as any);
 
 export default AboutComponent;

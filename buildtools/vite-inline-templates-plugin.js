@@ -6,7 +6,7 @@ const InlineTemplatesPlugin = function() {
     name: 'girafe-inline-templates',
     transform(code, id) {
       let newCode = code;
-      if (id.includes('src/components/') && (id.endsWith('.js'))) {
+      if (id.includes('src/components/') && (id.endsWith('.js') || id.endsWith('.ts'))) {
 
         const htmlRegex = new RegExp(`templateUrl *= *['"](.*)['"] *;?`);
         if (htmlRegex.test(code)) {
