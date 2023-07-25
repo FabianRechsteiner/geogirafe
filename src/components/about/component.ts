@@ -3,9 +3,7 @@ import StateManager from '../../tools/state/statemanager';
 
 class AboutComponent extends GirafeDraggableElement {
 
-  // @ts-ignore
   templateUrl = './template.html';
-  // @ts-ignore
   styleUrl = './style.css';
 
   loaded = false;
@@ -56,7 +54,7 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   closeWindow() {
-    this.state.interface.aboutVisible = false;
+    this.state!.interface.aboutVisible = false;
   }
 
   connectedCallback() {

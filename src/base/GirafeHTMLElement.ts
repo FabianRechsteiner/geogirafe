@@ -1,4 +1,5 @@
-import { Renderable, render as uRender } from 'uhtml';
+import { render as uRender } from 'uhtml';
+import { Renderable } from '../typings/uhtml';
 import tippy from 'tippy.js';
 import { Placement, Content } from 'tippy.js';
 import I18nManager from '../tools/i18nmanager';
