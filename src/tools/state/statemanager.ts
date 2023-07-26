@@ -5,7 +5,7 @@ import onChange from 'on-change';
 
 class StateManager extends GirafeSingleton {
 
-  #state: State | null = null;
+  #girafeState: State | null = null;
   #stateProxy: State | null = null;
   get state() {
     return this.#stateProxy;
@@ -23,14 +23,14 @@ class StateManager extends GirafeSingleton {
 
     this.configManager = ConfigManager.getInstance();
 
-    this.#state = new State();
-    this.#stateProxy = onChange(this.#state, (path, value, oldValue, _applyData) => {
+    this.#girafeState = new State();
+    this.#stateProxy = onChange(this.#girafeState, (path, value, oldValue, _applyData) => {
       console.log(`${path} has changed.`);
       this.onChange(path, oldValue, value);
     });
 
     // Prevent extensions of the State Object.
-    Object.preventExtensions(this.#state);
+    Object.preventExtensions(this.#girafeState);
 
     this.setDefaultValues();
   }
