@@ -11,7 +11,7 @@ class GirafeHTMLElement extends HTMLElement {
 
   templateUrl: string | null = null;
   styleUrl: string | null = null;
-  template: Renderable | (() => Renderable);
+  template?: Renderable | (() => Renderable);
   component: string;
   shadow: ShadowRoot;
 
