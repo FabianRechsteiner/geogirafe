@@ -14,11 +14,7 @@ button {
     cursor: pointer;
 }
 
-#icon {
-    display: block;
-}
-
-#waiting {
+div.hidden {
     display: none;
 }
 
