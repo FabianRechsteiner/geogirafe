@@ -60,11 +60,11 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.gutter.onmousedown = (e) => this.#mousedown(e);
     this.gutter.ondblclick = () => this.#togglePanel();
     this.hideButton = this.shadow.getElementById('hide')!;
-    if (!this.isNullOrUndefined(this.hideButton)) {
+    if (this.hideButton) {
       this.hideButton.onclick = () => this.#togglePanel();
     }
     this.closeButton = this.shadow.getElementById('close')!;
-    if (!this.isNullOrUndefined(this.closeButton)) {
+    if (this.closeButton) {
       this.closeButton.onclick = () => this.closePanel();
     }
   }
@@ -77,8 +77,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.prevX = e.x;
     this.prevY = e.y;
     this.panelRect = this.panel!.getBoundingClientRect();
-    if (!this.isNullOrUndefined(this.hideButton)) {
-      this.hideWidth = this.hideButton!.getBoundingClientRect().width;
+    if (this.hideButton) {
+      this.hideWidth = this.hideButton.getBoundingClientRect().width;
     }
   }
 
@@ -96,8 +96,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   #togglePanelVertically() {
-    if (!this.panel || !this.gutter || !this.hideButton) {
-      throw new Error("GirafeResizableElement.makeResizable() must be called before this function");
+    if (!this.panel || !this.gutter) {
+      throw new Error("GirafeResizableElement.makeResizable() must be called before togglePanelVertically()");
     }
     this.toggleWidth = this.gutter.getBoundingClientRect().width;
 
@@ -110,7 +110,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.panel.style.minWidth = "";
       this.host.style.minWidth = "";
 
-      if (!this.isNullOrUndefined(this.hideButton)) {
+      if (this.hideButton) {
         this.hideButton.classList.remove('closed');
         if (this.dock === 'left') {
           this.hideButton.style.left = this.panel.getBoundingClientRect().width + "px";
@@ -129,15 +129,15 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.panel.style.overflow = 'hidden';
       this.host.style.minWidth = '0';
 
-      if (!this.isNullOrUndefined(this.hideButton)) {
+      if (this.hideButton) {
         this.hideButton.classList.add('closed');
       }
     }
   }
 
   #togglePanelHorizontally() {
-    if (!this.panel || !this.gutter || !this.hideButton) {
-      throw new Error("GirafeResizableElement.makeResizable() must be called before this function");
+    if (!this.panel || !this.gutter) {
+      throw new Error("GirafeResizableElement.makeResizable() must be called before togglePanelHorizontally()");
     }
     this.toggleWidth = this.gutter.getBoundingClientRect().height;
 
@@ -150,7 +150,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.panel.style.minHeight = "";
       this.host.style.minHeight = "";
 
-      if (!this.isNullOrUndefined(this.hideButton)) {
+      if (this.hideButton) {
         this.hideButton.classList.remove('closed');
         if (this.dock === 'bottom') {
           this.hideButton.style.bottom = this.panel.getBoundingClientRect().height + "px";
@@ -169,25 +169,25 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.panel.style.overflow = 'hidden';
       this.host.style.minHeight = '0';
 
-      if (!this.isNullOrUndefined(this.hideButton)) {
+      if (this.hideButton) {
         this.hideButton.classList.add('closed');
       }
     }
   }
 
   #mousemove(e: MouseEvent) {
-    if (!this.panel || !this.panelRect || !this.closeButton || !this.hideButton) {
-      throw new Error("GirafeResizableElement.makeResizable() must be called before this function");
+    if (!this.panel || !this.panelRect) {
+      throw new Error("GirafeResizableElement.makeResizable() must be called before this mousemove()");
     }
     e.preventDefault();
     const newX = this.prevX - e.x;
     const newY = this.prevY - e.y;
     if (this.dock === 'left') {
       let newWidth = this.panelRect.width - newX;
-      if (!this.isNullOrUndefined(this.hideButton)) {
+      if (this.hideButton) {
         this.hideButton.style.left = this.panel.getBoundingClientRect().width + "px";
       }
-      if (!this.isNullOrUndefined(this.closeButton)) {
+      if (this.closeButton) {
         this.closeButton.style.left = this.panel.getBoundingClientRect().width + "px";
       }
       this.panel.style.width = newWidth + "px";
@@ -195,10 +195,10 @@ class GirafeResizableElement extends GirafeHTMLElement {
     }
     else if (this.dock === 'right') {
       let newWidth = this.panelRect.width + newX;
-      if (!this.isNullOrUndefined(this.hideButton)) {
+      if (this.hideButton) {
         this.hideButton.style.right = this.panel.getBoundingClientRect().width + "px";
       }
-      if (!this.isNullOrUndefined(this.closeButton)) {
+      if (this.closeButton) {
         this.closeButton.style.right = this.panel.getBoundingClientRect().width + "px";
       }
       this.panel.style.width = newWidth + "px";
@@ -217,7 +217,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
     }
     
 
-    if (!this.isNullOrUndefined(this.hideButton)) {
+    if (this.hideButton) {
       this.hideButton.classList.remove('closed');
     }
   }
