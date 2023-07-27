@@ -1,5 +1,7 @@
 import { render as uRender } from 'uhtml';
+import { Renderable } from '../typings/uhtml';
 import tippy from 'tippy.js';
+import { Placement, Content } from 'tippy.js';
 import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
 import ConfigManager from '../tools/configmanager';
@@ -7,20 +9,21 @@ import StateManager from '../tools/state/statemanager';
 
 class GirafeHTMLElement extends HTMLElement {
 
-  templateUrl = null;
-  styleUrl = null;
-  template = null;
-  component = null;
+  templateUrl: string | null = null;
+  styleUrl: string | null = null;
+  template?: Renderable | (() => Renderable);
+  component: string;
+  shadow: ShadowRoot;
 
-  messageManager = null;
-  configManager = null;
-  stateManager = null;
+  messageManager: MessageManager;
+  configManager: ConfigManager;
+  stateManager: StateManager;
   
   get state() {
     return this.stateManager.state;
   }
 
-  constructor(component) {
+  constructor(component: string) {
     super();
     this.component = component;
 
@@ -30,27 +33,32 @@ class GirafeHTMLElement extends HTMLElement {
 
     this.shadow = this.attachShadow({mode: 'open'});
 
-    this.stateManager.subscribe('language', (oldLanguage, newLanguage) => this.translate());
+    this.stateManager.subscribe('language', (_oldLanguage: string, _newLanguage: string) => this.girafeTranslate());
   }
 
   async loadConfig() {
     await this.configManager.loadConfig();
   }
 
-  translate() {
+  girafeTranslate() {
     I18nManager.getInstance().translate(this.shadow);
   }
 
-  isNullOrUndefined(val) {
+  /**
+   * TODO: Why not use truthy?
+   * @param val 
+   * @returns 
+   */
+  isNullOrUndefined(val: any): boolean {
     return (val === undefined || val === null);
   }
 
-  isNullOrUndefinedOrBlank(val) {
+  isNullOrUndefinedOrBlank(val: any): boolean {
     return (val === undefined || val === null || val === '');
   }
 
-  delayed(functionToWatch, functionToExecute) {
-    const observer = new MutationObserver((mutations, obs) => {
+  delayed(functionToWatch: Function, functionToExecute: Function) {
+    const observer = new MutationObserver((_mutations, obs) => {
       if (functionToWatch()) {
         functionToExecute();
         obs.disconnect();
@@ -60,14 +68,14 @@ class GirafeHTMLElement extends HTMLElement {
     observer.observe(this.shadow, { childList: true, subtree: true });
   }
 
-  getParentOfType(parentNodeName, elem) {
+  getParentOfType(parentNodeName: string, elem: Node | null): Node | null {
     // Stop case : we found null or an object of the right type
     if (elem === null || elem.nodeName === parentNodeName) {
       return elem;
     }
 
     // Otherwise, we try to find a parent recursively
-    let parent = null;
+    let parent: ParentNode | null = null;
     if (elem instanceof ShadowRoot) {
       parent = elem.host;
     }
@@ -78,20 +86,17 @@ class GirafeHTMLElement extends HTMLElement {
     return this.getParentOfType(parentNodeName, parent);
   }
 
-  activateTooltips(arrow, delay, defaultPlacement) {
+  activateTooltips(arrow: boolean, delay: [number, number], defaultPlacement: Placement) {
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach(el => {
-      let placement = defaultPlacement;
-      if (el.hasAttribute('tip-placement')) {
-        placement = el.getAttribute('tip-placement');
-      }
+      let placement = el.getAttribute('tip-placement') as Placement || defaultPlacement ;
       tippy(el, {
         arrow: arrow,
         delay: delay,
         placement: placement,
         //animateFill: false,
         //animation: 'scale-with-inertia',
-        content: el.getAttribute('tip')
+        content: el.getAttribute('tip') as Content
       })
     });
   }

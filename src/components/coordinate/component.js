@@ -1,4 +1,4 @@
-import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class CoordinateComponent extends GirafeHTMLElement {
 
@@ -32,7 +32,7 @@ class CoordinateComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.translate();
+      super.girafeTranslate();
       this.registerEvents();
     });
   }

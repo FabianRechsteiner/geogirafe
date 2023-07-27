@@ -70,7 +70,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     this.enableNavigationButtons();
 
     // Translate data
-    super.translate();
+    super.girafeTranslate();
   }
 
   enableNavigationButtons() {
@@ -98,7 +98,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.translate();
+      super.girafeTranslate();
       this.makeDraggable();
       this.registerEvents();
     });

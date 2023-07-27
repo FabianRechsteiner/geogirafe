@@ -1,3 +1,49 @@
+import Map from 'ol/Map';
+
+type GraphicalInterface = {
+  helpVisible: boolean,
+  redliningPanelVisible: boolean,
+  printPanelVisible: boolean,
+  selectionGridVisible: boolean,
+  aboutVisible: boolean
+}
+
+type MapPosition = {
+  center: number[];
+  zoom: number | null;
+  resolution: number | null;
+  scale: number | null;
+}
+
+type LayersConfig = {
+  layersList: string[];
+  swipedLayers: {
+    left: string[];
+    right: string[];
+  }
+}
+
+type RedliningConfig = {
+  activeTool: boolean | null;
+  features: Object[];
+}
+
+type TreeviewConfig = {
+  advanced: boolean;
+}
+
+// Current Print state
+type PrintConfig = {
+  format: string | null;
+  scale: number | null;
+}
+
+
+// Current 3D-Globe state
+type GlobeConfig = {
+  display: 'none' | 'full' | 'side';
+}
+
 class State {
 
   // All themes from themes.json
@@ -13,16 +59,16 @@ class State {
   ogcServers = {};
   
   // Current active basemap
-  activeBasemap = null;
+  activeBasemap: string | null = null;
 
   // Current projection
-  projection = null;
+  projection: string | null = null;
 
   // Current mouse coordinates
-  mouseCoordinates = [];
+  mouseCoordinates: number[] = [];
 
   // Interface configuration (visible panels, ...)
-  interface = {
+  interface: GraphicalInterface = {
     helpVisible: false,
     redliningPanelVisible: false,
     printPanelVisible: false,
@@ -31,14 +77,14 @@ class State {
   }
 
   // Current language
-  language = null;
+  language: string | null = null;
 
   // Is the application currently loading data ?
   loading = false;
 
   // Current position configuration of the map
   // TODO REG : When zoom, resolution or scale is changed, calculate the other values
-  position = {
+  position: MapPosition = {
     center: [],
     zoom: null,
     resolution: null,
@@ -49,7 +95,7 @@ class State {
   selectedTheme = {};
 
   // Current layers configuration
-  layers = {
+  layers: LayersConfig = {
     layersList: [],
     swipedLayers: {
       left: [],
@@ -58,24 +104,24 @@ class State {
   }
   
   // Current redlining state
-  redlining = {
+  redlining: RedliningConfig = {
     activeTool: null,
     features: []
   }
 
   // Current Treeview state
-  treeview = {
+  treeview: TreeviewConfig = {
     advanced: false
   }
 
   // Current Print state
-  print = {
+  print: PrintConfig = {
     format: null,
     scale: null
   }
 
   // Current 3D-Globe state
-  globe = {
+  globe: GlobeConfig = {
     // Possible values : ['full, 'side', 'none']
     display: 'none',
   }
@@ -84,19 +130,13 @@ class State {
   // Keep in mind that you shoudn't use it directly to add layers or drawings, 
   // because the components are not listening to olMap changes, and the application will be desynchronized.
   // => Consider using the other properties of the state, which components are listening to
-  olMap = null;
+  olMap: Map | null = null;
 
   // To manage selected and focused features
-  selectedFeatures = [];
-  focusedFeature = null;
+  selectedFeatures: Object[] = [];
+  focusedFeature: Object | null = null;
 
-
-
-
-  
-
-
-  theme = null;
+  theme: Object | null = null;
 
   // The State object is defined as <not extensible> by the StateManager.
   // This property can be used by third-parts components or extensions 

@@ -1,52 +1,57 @@
-import GirafeSingleton from '../../base/GirafeSingleton.js';
+import GirafeSingleton from '../../base/GirafeSingleton';
 import State from './state.js';
-import ConfigManager from '../configmanager.js';
+import ConfigManager from '../configmanager';
 import onChange from 'on-change';
 
 class StateManager extends GirafeSingleton {
 
-  #state = null;
-  #stateProxy = null;
+  #girafeState: State | null = null;
+  #stateProxy: State | null = null;
   get state() {
     return this.#stateProxy;
   }
-  
-  #callbacks = new Map();
 
-  configManager = null;
+  // TODO: If Map() needs to be used, it needs some change in the code.
+  // with set and get.
+  //#callbacks: Map<string, Function[]> = new Map();
+  #callbacks: {[key: string]: Function[]} = {};
 
-  constructor(type) {
+  configManager: ConfigManager | null = null;
+
+  constructor(type: string) {
     super(type);
 
     this.configManager = ConfigManager.getInstance();
 
-    this.#state = new State();
-    this.#stateProxy = onChange(this.#state, (path, value, oldValue, applyData) => {
+    this.#girafeState = new State();
+    this.#stateProxy = onChange(this.#girafeState, (path, value, oldValue, _applyData) => {
       console.log(`${path} has changed.`);
       this.onChange(path, oldValue, value);
     });
 
     // Prevent extensions of the State Object.
-    Object.preventExtensions(this.#state);
+    Object.preventExtensions(this.#girafeState);
 
     this.setDefaultValues();
   }
 
   setDefaultValues() {
     // Set default values
-    this.configManager.loadConfig().then(() => { 
-      this.state.projection = this.configManager.Config.map.srid;
-      this.state.language = this.configManager.Config.languages.default;
+    this.configManager?.loadConfig().then(() => {
+      if (this.state && this.configManager?.Config) {
+        this.state.projection = this.configManager.Config.map!.srid!;
+        this.state.language = this.configManager.Config.languages!.default;
+      }
     });
   }
 
-  onChange(property, oldValue, value) {
+  onChange(property: string, oldValue: any, value: any) {
     const path = property.trim();
     for (const key in this.#callbacks) {
       const regex = new RegExp('^' + key + '$');
       if (path.match(regex)) {
         const callbacks = this.#callbacks[key];
-        for (let i=0; i<callbacks.length; ++i) {
+        for (let i=0; i < callbacks.length; ++i) {
           // We find the parent object and send it in the callback
           const parentPath = path.substring(0, path.lastIndexOf('.'));
           const parentObject = this.getPropertyByPath(this.state, parentPath);
@@ -59,7 +64,7 @@ class StateManager extends GirafeSingleton {
     }
   }
 
-  subscribe(path, callback) {
+  subscribe(path: string, callback: Function) {
     if (!(path in this.#callbacks)) {
       this.#callbacks[path] = [];
     }
@@ -86,7 +91,7 @@ class StateManager extends GirafeSingleton {
     }
   }
 
-  unsubscribe(callback) {
+  unsubscribe(callback: Function) {
     for (const path in this.#callbacks) {
       const callbacks = this.#callbacks[path];
       const index = callbacks.indexOf(callback);
@@ -97,7 +102,7 @@ class StateManager extends GirafeSingleton {
     }
   }
 
-  getPropertyByPath(obj, path) {
+  getPropertyByPath(obj: any, path: any) {
     let currentObj = obj;
     if (path.trim() !== '') {
       const keys = path.split(".");

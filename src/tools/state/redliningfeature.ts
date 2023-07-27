@@ -1,10 +1,19 @@
+import { getUid } from 'ol/util';
+import Feature from 'ol/Feature';
+
+
 class RedliningFeature {
 
-    olFeature = null;
-    
+    olFeature: Feature;
+
+    constructor(olFeature: Feature) {
+        this.olFeature = olFeature;
+    }
+
     get name() {
       return this.olFeature.get('name');
     }
+
     set name(value) {
       this.olFeature.set('name', value); 
     }
@@ -12,6 +21,7 @@ class RedliningFeature {
     get strokeColor() {
       return this.olFeature.get('strokeColor');
     }
+
     set strokeColor(value) {
       this.olFeature.set('strokeColor', value); 
     }
@@ -36,20 +46,15 @@ class RedliningFeature {
     set textSize(value) {
       this.olFeature.set('textSize', value); 
     }
-  
+
     get id() {
-      return this.olFeature.ol_uid;
+      return getUid(this.olFeature);
     }
-  
+
     get geometry() {
       console.warn('not implemented yet');
       return null;
     }
+}
 
-    constructor(olFeature) {
-      this.olFeature = olFeature;
-    }
-  }
-  
-  export default RedliningFeature;
-  
+export default RedliningFeature;

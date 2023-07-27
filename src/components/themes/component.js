@@ -21,7 +21,7 @@ class ThemeComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.stateManager.subscribe('loading', () => super.render());
-    this.stateManager.subscribe('themes', () => { super.render(); super.translate(); });
+    this.stateManager.subscribe('themes', () => { super.render(); super.girafeTranslate(); });
   }
 
   onBlur() {

@@ -1,4 +1,4 @@
-import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class ProjectionComponent extends GirafeHTMLElement {
 
@@ -43,7 +43,7 @@ class ProjectionComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.translate();
+      super.girafeTranslate();
       this.registerEvents();
     });
   }
