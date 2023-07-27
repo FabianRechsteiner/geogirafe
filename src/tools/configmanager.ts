@@ -65,33 +65,25 @@ class ConfigManager extends GirafeSingleton {
 
   // TODO REG: Use the same async schema for loadConfig (like loadTranslation)
   async loadConfig(): Promise<void> {
-    return new Promise<void>(async(resolve) => {
-
-      if (!ConfigManager.#locked) {
-        ConfigManager.#locked = true;
-        try {
-          if (ConfigManager.#config === null) {
-            // Load configuration
-            console.log('Loading Application Configuration...')
-            const response = await fetch('config.json');
-            ConfigManager.#config = await response.json();
-            console.log('Application Configuration loaded.')
-            resolve();
-          }
-          else {
-            resolve();
-          }
-        }
-        finally {
-          ConfigManager.#locked = false;
+    if (!ConfigManager.#locked) {
+      ConfigManager.#locked = true;
+      try {
+        if (ConfigManager.#config === null) {
+          // Load configuration
+          console.log('Loading Application Configuration...')
+          const response = await fetch('config.json');
+          ConfigManager.#config = await response.json();
+          console.log('Application Configuration loaded.');
         }
       }
-      else {
-        setTimeout(() =>  {
-          this.loadConfig().then(resolve);
-        }, 100);
+      finally {
+        ConfigManager.#locked = false;
       }
-    });
+    }
+    else {
+      await new Promise<void>((resolve) => setTimeout(resolve, 100));
+      await this.loadConfig();
+    }
   }
 }
 
