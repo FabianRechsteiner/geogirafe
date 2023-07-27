@@ -34,7 +34,7 @@ then
     echo "Preparing environment LIE..."
     cp demo/config.lie.json src/static/config.json
     curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://map.geo.llv.li/static/X/de.json" --silent --output $OUTPUTDIR/de.json
+    curl "https://map.geo.llv.li/static/dummy/de.json" --silent --output $OUTPUTDIR/de.json
     curl "https://map.geo.llv.li/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
 
 elif [ "$1" = 'sigip' ];
@@ -42,12 +42,20 @@ then
     echo "Preparing environment SIGIP..."
     cp demo/config.sigip.json src/static/config.json
     curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://www.sigip.ch/static/X/fr.json" --silent --output $OUTPUTDIR/fr.json
+    curl "https://www.sigip.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
     curl "https://www.sigip.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+
+elif [ "$1" = 'ticino' ];
+then
+    echo "Preparing environment TICINO..."
+    cp demo/config.ticino.json src/static/config.json
+    curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
+    curl "https://map.geo.ti.ch/static/dummy/en.json" --silent --output $OUTPUTDIR/en.json
+    curl "https://map.geo.ti.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
 
 else
     echo "Usage: ./configure-demo <environment>"
-    echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip']"
+    echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip', 'ticino']"
     echo "Usage example: ./configure-demo mapbs"
     echo "Usage example with npm: npm run configure-demo mapbs"
 

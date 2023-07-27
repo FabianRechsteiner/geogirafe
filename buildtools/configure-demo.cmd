@@ -53,8 +53,17 @@ if "%1"=="sigip" (
     goto :end
 )
 
+if "%1"=="ticino" (
+    echo "Preparing environment TICINO..."
+    copy demo\config.ticino.json src\static\config.json /Y
+    curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --silent --output %OUTPUTDIR%\themes.json
+    curl "https://map.geo.ti.ch/static/dummy/en.json" --silent --output %OUTPUTDIR%\en.json
+    curl "https://map.geo.ti.ch/printproxy/capabilities.json" --silent --output %OUTPUTDIR%\capabilities.json
+    goto :end
+)
+
 echo "Usage: ./configure-demo-win <environment>"
-echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip']"
+echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip', 'ticino']"
 echo "Usage example: ./configure-demo-win mapbs"
 echo "Usage example with npm: npm run configure-demo-win mapbs"
 

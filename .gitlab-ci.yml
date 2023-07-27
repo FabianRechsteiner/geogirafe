@@ -147,6 +147,8 @@ pages:
     - *prepare_demo
     - demo='sigip'
     - *prepare_demo
+    - demo='ticino'
+    - *prepare_demo
     # Rename the release directory to public
     - rm -Rf public && mv release public
     # Copy demo index page
@@ -188,6 +190,12 @@ pages:
     - curl "https://www.sigip.ch/printproxy/capabilities.json" --output public/sigip/Mock/capabilities.json
     - gzip -k -f public/sigip/Mock/themes.json public/sigip/Mock/fr.json public/sigip/Mock/capabilities.json
     - brotli -k -f public/sigip/Mock/themes.json public/sigip/Mock/fr.json public/sigip/Mock/capabilities.json
+    # Ticino
+    - curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --output public/ticino/Mock/themes.json
+    - curl "https://map.geo.ti.ch/static/dummy/en.json" --output public/ticino/Mock/en.json
+    - curl "https://map.geo.ti.ch/printproxy/capabilities.json" --output public/ticino/Mock/capabilities.json
+    - gzip -k -f public/ticino/Mock/themes.json public/ticino/Mock/en.json public/ticino/Mock/capabilities.json
+    - brotli -k -f public/ticino/Mock/themes.json public/ticino/Mock/en.json public/ticino/Mock/capabilities.json
 
   artifacts:
     paths:
