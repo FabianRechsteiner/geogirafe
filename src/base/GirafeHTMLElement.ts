@@ -1,7 +1,6 @@
 import { render as uRender } from 'uhtml';
 import { Renderable } from '../typings/uhtml';
-import tippy from 'tippy.js';
-import { Placement, Content } from 'tippy.js';
+import tippy, { Placement, Content } from 'tippy.js';
 import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
 import ConfigManager from '../tools/configmanager';
@@ -18,7 +17,7 @@ class GirafeHTMLElement extends HTMLElement {
   messageManager: MessageManager;
   configManager: ConfigManager;
   stateManager: StateManager;
-  
+
   get state() {
     return this.stateManager.state;
   }
@@ -46,8 +45,8 @@ class GirafeHTMLElement extends HTMLElement {
 
   /**
    * TODO: Why not use truthy?
-   * @param val 
-   * @returns 
+   * @param val
+   * @returns
    */
   isNullOrUndefined(val: any): boolean {
     return (val === undefined || val === null);
@@ -64,7 +63,7 @@ class GirafeHTMLElement extends HTMLElement {
         obs.disconnect();
       }
     });
-    
+
     observer.observe(this.shadow, { childList: true, subtree: true });
   }
 
