@@ -1,5 +1,4 @@
 import GirafeDraggableElement from '../../base/GirafeDraggableElement';
-import StateManager from '../../tools/state/statemanager';
 
 class AboutComponent extends GirafeDraggableElement {
 
@@ -34,7 +33,7 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   registerEvents() {
-    (this.stateManager! as StateManager).subscribe(
+    (this.stateManager).subscribe(
       'interface.aboutVisible', (_oldValue: boolean, newValue: boolean) => this.toggleAbout(newValue)
     );
   }
@@ -44,7 +43,7 @@ class AboutComponent extends GirafeDraggableElement {
     this.content = this.shadow.getElementById('content');
     if (visible) {
       this.loadVersionInfos()
-        .then(() => { 
+        .then(() => {
           ((this.content.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'block';
         });
     }
