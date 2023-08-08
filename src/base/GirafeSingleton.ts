@@ -8,7 +8,7 @@ type GirafeSingletonInitializing = {
   [type: string]: boolean;
 }
 
-type Constructor<T> = { new (type: string): T }
+type Constructor<T> = new (type: string) => T
 
 class GirafeSingleton {
 
@@ -24,7 +24,7 @@ class GirafeSingleton {
   static getInstance<T>(this: Constructor<T>): T {
     const type = this.name;
     if (!(type in GirafeSingleton.instances)) {
-      // Singleton do not exists 
+      // Singleton do not exists
       // => create it
       GirafeSingleton.initializingSingletons[type] = true;
       try {

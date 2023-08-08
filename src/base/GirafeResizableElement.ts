@@ -1,7 +1,7 @@
 import GirafeHTMLElement from './GirafeHTMLElement';
 
 /*
-Minimal template for a draggable object : 
+Minimal template for a draggable object :
 It must have 2 divs :
 - One for the whole panel (id="panel"). Attribute dock is mandatory and can have the values "left" or "right"
 - One for the gutter (id="gutter"). This is where the panel can be resized.
@@ -18,7 +18,7 @@ Example:
   </div>
 </div>
 
-Then in order to make an component resizable, 
+Then in order to make an component resizable,
 the base method makeResizable() must be called after rendering the template.
 
 That's it.
@@ -46,7 +46,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
 
   constructor(component: string) {
     super(component);
-    this.dock = this.getAttribute('dock') || 'right';
+    this.dock = this.getAttribute('dock') ?? 'right';
   }
 
   render() {
@@ -215,7 +215,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
       this.panel.style.height = newHeight + "px";
       this.host.style.height = newHeight + "px";
     }
-    
+
 
     if (this.hideButton) {
       this.hideButton.classList.remove('closed');
