@@ -1,5 +1,4 @@
-import GeoEvents from '../../models/events.js';
-import GirafeHTMLElement from '../../base/GirafeHTMLElement.js';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ButtonComponent from '../button/component.js';
 
 class ScaleComponent extends GirafeHTMLElement {
@@ -49,7 +48,7 @@ class ScaleComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.translate();
+      super.girafeTranslate();
       this.registerEvents();
     });
   }

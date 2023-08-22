@@ -1,7 +1,21 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
-<button id="select" title="Theme Selection">
-    <i id="icon" class="fa-2x fa-solid fa-layer-group"></i>
-    <i id="waiting" class="fa-2x fa-solid fa-circle-notch fa-spin"></i>
+<button title="Theme Selection" 
+        onclick="${() => this.toggleThemesList()}" 
+        onblur="${() => this.onBlur()}">
+  <div class="${(this.state.loading ? 'hidden' : '')}">
+    <i class="fa-2x fa-solid fa-layer-group"></i>
+  </div>
+  <div class="${(this.state.loading ? '' : 'hidden')}">
+    <i class="fa-2x fa-solid fa-circle-notch fa-spin"></i>
+  </div>
 </button>
-<ul id="themes"></ul>
+<ul id="themes">
+  ${Object.values(this.state.themes ?? {}).map(theme => uHtml.for(theme)`
+  <div onmousedown="${() => this.ignoreBlur()}" 
+       onclick="${() => this.onThemeChanged(theme)}">
+    <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
+    <span i18n="${theme.name}">${theme.name}</span>
+  </div>
+  `)}
+</ul>

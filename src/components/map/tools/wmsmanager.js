@@ -1,7 +1,7 @@
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import MessageManager from '../../../tools/messagemanager';
-import GeoEvents from '../../../models/events.js';
+import GeoEvents from '../../../models/events';
 
 class WmsManager {
   map = null;

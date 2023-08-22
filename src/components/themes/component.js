@@ -5,13 +5,8 @@ class ThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  themesButton = null;
-  layerIcon = null;
-  waitingIcon = null;
   themesList = null;
-  themesJson = {};
-  themes = [];
-  ignoreBlur = false;
+  #ignoreBlur = false;
 
   constructor() {
     super('themes');
@@ -20,32 +15,17 @@ class ThemeComponent extends GirafeHTMLElement {
   render() {
     super.render();
 
-    this.themesButton = this.shadow.querySelector('#select');
-    this.themesButton.onclick = () => this.toggleThemesList();
-    this.themesButton.onblur =  () => this.onBlur();
-
-    this.layerIcon = this.shadow.querySelector('#icon');
-    this.waitingIcon = this.shadow.querySelector('#waiting');
-
     this.themesList = this.shadow.querySelector('#themes');
     this.toggleThemesList(false);
   }
 
   registerEvents() {
-    this.stateManager.subscribe('loading', (oldValue, newValue) => this.onLoading(newValue));
-    this.stateManager.subscribe('themes', (oldThemes, newThemes) => this.onThemesLoaded(newThemes));
-  }
-
-  onThemesLoaded(themes) {
-    // Add options from themes
-    Object.values(themes).forEach(theme => {
-      this.addOption(theme);
-    });
-    super.translate();
+    this.stateManager.subscribe('loading', () => super.render());
+    this.stateManager.subscribe('themes', () => { super.render(); super.girafeTranslate(); });
   }
 
   onBlur() {
-    if (!this.ignoreBlur) {
+    if (!this.#ignoreBlur) {
       this.toggleThemesList(false);
     }
   }
@@ -66,56 +46,14 @@ class ThemeComponent extends GirafeHTMLElement {
     }
   }
 
-  addOption(theme) {
-    // Create new theme option
-    const option = document.createElement('div');
-
-    const img = document.createElement('img');
-    img.src = theme.icon;
-    option.appendChild(img);
-
-    const span = document.createElement('span');
-    span.innerHTML = theme.name;
-    span.setAttribute('i18n', theme.name);
-    option.appendChild(span);
-
-    option.dataset['value'] = theme.id;
-    // Ignore blur on mouse down to prevent themes from de-rendering before we can process click
-    option.onmousedown = () => { this.ignoreBlur = true };
-    option.onclick = (e) => this.onThemeChanged(e);
-
-    // Add to select
-    this.themesList.appendChild(option);
+  ignoreBlur() {
+    this.#ignoreBlur = true;
   }
 
-  onLoading(loading) {
-    if (loading) {
-      this.layerIcon.style.display = 'none';
-      this.waitingIcon.style.display = 'block';
-    }
-    else {
-      this.layerIcon.style.display = 'block';
-      this.waitingIcon.style.display = 'none';
-    }
-  }
-
-  onThemeChanged(e) {
-    const div = super.getParentOfType('DIV', e.target);
-    const id = parseInt(div.dataset["value"]);
-    const themes = this.state.themes;
-
-    for (const index in themes) {
-      if (themes.hasOwnProperty(index)) {
-        const theme = themes[index];
-        if (theme.id === id) {
-          this.state.selectedTheme = theme;
-          break;
-        }
-      }
-    }
-
+  onThemeChanged(theme) {
+    this.state.selectedTheme = theme;
     this.toggleThemesList(false);
-    this.ignoreBlur = false;
+    this.#ignoreBlur = false;
   }
 
   connectedCallback() {

@@ -20,7 +20,7 @@ import { unByKey } from 'ol/Observable';
 import OLCesium from 'olcs/OLCesium.js';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import GeoEvents from '../../models/events.js';
+import GeoEvents from '../../models/events';
 import MaskLayer from './tools/maskLayer';
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
@@ -357,7 +357,7 @@ class MapComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.translate();
+      super.girafeTranslate();
       this.registerEvents();
       this.listenOpenLayersEvents();
     });

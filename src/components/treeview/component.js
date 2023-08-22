@@ -114,7 +114,7 @@ class TreeViewComponent extends GirafeResizableElement {
     this.loadConfig()
       .then(() => {
         this.render();
-        super.translate();
+        super.girafeTranslate();
         this.registerEvents();
       });
   }
@@ -345,7 +345,7 @@ class TreeViewComponent extends GirafeResizableElement {
     this.postRender();
 
     this.activateTooltips(false, [800, 0], 'right');
-    super.translate();
+    super.girafeTranslate();
 
     // Active default checked layers
     for (let i=0; i<this.state.layers.layersList.length; ++i) {

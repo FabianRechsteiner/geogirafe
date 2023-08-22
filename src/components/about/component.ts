@@ -1,11 +1,8 @@
-import GirafeDraggableElement from '../../base/GirafeDraggableElement.js';
-import StateManager from '../../tools/state/statemanager.js';
+import GirafeDraggableElement from '../../base/GirafeDraggableElement';
 
 class AboutComponent extends GirafeDraggableElement {
 
-  // @ts-ignore
   templateUrl = './template.html';
-  // @ts-ignore
   styleUrl = './style.css';
 
   loaded = false;
@@ -36,7 +33,7 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   registerEvents() {
-    (this.stateManager! as StateManager).subscribe(
+    (this.stateManager).subscribe(
       'interface.aboutVisible', (_oldValue: boolean, newValue: boolean) => this.toggleAbout(newValue)
     );
   }
@@ -46,7 +43,7 @@ class AboutComponent extends GirafeDraggableElement {
     this.content = this.shadow.getElementById('content');
     if (visible) {
       this.loadVersionInfos()
-        .then(() => { 
+        .then(() => {
           ((this.content.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'block';
         });
     }
@@ -56,13 +53,13 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   closeWindow() {
-    this.state.interface.aboutVisible = false;
+    this.state!.interface.aboutVisible = false;
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      this.translate();
+      this.girafeTranslate();
       this.makeDraggable();
       this.registerEvents();
     });
