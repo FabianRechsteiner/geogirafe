@@ -53,9 +53,17 @@ then
     curl "https://map.geo.ti.ch/static/dummy/en.json" --silent --output $OUTPUTDIR/en.json
     curl "https://map.geo.ti.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
 
+elif [ "$1" = 'lausanne' ];
+then
+    echo "Preparing environment LAUSANNE..."
+    cp demo/config.lausanne.json src/static/config.json
+    curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
+    curl "https://map.lausanne.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
+    curl "https://map.lausanne.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+
 else
     echo "Usage: ./configure-demo <environment>"
-    echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip', 'ticino']"
+    echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip', 'ticino', 'lausanne']"
     echo "Usage example: ./configure-demo mapbs"
     echo "Usage example with npm: npm run configure-demo mapbs"
 

@@ -149,6 +149,8 @@ pages:
     - *prepare_demo
     - demo='ticino'
     - *prepare_demo
+    - demo='lausanne'
+    - *prepare_demo
     # Rename the release directory to public
     - rm -Rf public && mv release public
     # Copy demo index page
@@ -196,6 +198,12 @@ pages:
     - curl "https://map.geo.ti.ch/printproxy/capabilities.json" --output public/ticino/Mock/capabilities.json
     - gzip -k -f public/ticino/Mock/themes.json public/ticino/Mock/en.json public/ticino/Mock/capabilities.json
     - brotli -k -f public/ticino/Mock/themes.json public/ticino/Mock/en.json public/ticino/Mock/capabilities.json
+    # Lausanne
+    - curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --output public/lausanne/Mock/themes.json
+    - curl "https://map.lausanne.ch/static/dummy/fr.json" --output public/lausanne/Mock/fr.json
+    - curl "https://map.lausanne.ch/printproxy/capabilities.json" --output public/lausanne/Mock/capabilities.json
+    - gzip -k -f public/lausanne/Mock/themes.json public/lausanne/Mock/fr.json public/lausanne/Mock/capabilities.json
+    - brotli -k -f public/lausanne/Mock/themes.json public/lausanne/Mock/fr.json public/lausanne/Mock/capabilities.json
 
   artifacts:
     paths:

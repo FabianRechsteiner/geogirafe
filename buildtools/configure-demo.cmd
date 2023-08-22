@@ -1,4 +1,4 @@
-@echo off
+REM @echo off
 
 set OUTPUTDIR="src\static\Mock"
 if not exist %OUTPUTDIR% mkdir %OUTPUTDIR%
@@ -62,8 +62,17 @@ if "%1"=="ticino" (
     goto :end
 )
 
+if "%1"=="lausanne" (
+    echo "Preparing environment LAUSANNE..."
+    copy demo\config.lausanne.json src\static\config.json /Y
+    curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --silent --output %OUTPUTDIR%\themes.json
+    curl "https://map.lausanne.ch/static/dummy/fr.json" --silent --output %OUTPUTDIR%\fr.json
+    curl "https://map.lausanne.ch/printproxy/capabilities.json" --silent --output %OUTPUTDIR%\capabilities.json
+    goto :end
+)
+
 echo "Usage: ./configure-demo-win <environment>"
-echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip', 'ticino']"
+echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip', 'ticino', 'lausanne']"
 echo "Usage example: ./configure-demo-win mapbs"
 echo "Usage example with npm: npm run configure-demo-win mapbs"
 
