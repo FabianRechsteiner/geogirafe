@@ -6,7 +6,7 @@ import onChange from 'on-change';
 class StateManager extends GirafeSingleton {
 
   #girafeState: State | null = null;
-  #stateProxy: State | null = null;
+  #stateProxy: State;
   get state() {
     return this.#stateProxy;
   }

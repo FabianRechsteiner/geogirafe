@@ -9,3 +9,4 @@ src/static/lib/cesium
 src/static/lib/gridjs
 src/static/Mock
 src/static/config.json
+src/static/config_*.json

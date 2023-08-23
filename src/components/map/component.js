@@ -509,8 +509,10 @@ class MapComponent extends GirafeHTMLElement {
 
   onFeaturesSelected(features) {
     this.selectedFeaturesCollection.clear();
-    for (let i = 0; i < features.length; ++i) {
-      this.selectedFeaturesCollection.push(features[i]);
+    if (features) {
+      for (let i = 0; i < features.length; ++i) {
+        this.selectedFeaturesCollection.push(features[i]);
+      }
     }
   }
 

@@ -36,7 +36,8 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   changeBasemap(basemap) {
-    if (!this.isNullOrUndefined(basemap.projection)) {
+    console.log('change basemap', basemap);
+    if (basemap.projection) {
       this.state.projection = basemap.projection;
     }
     this.state.activeBasemap = basemap;
