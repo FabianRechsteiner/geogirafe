@@ -1,4 +1,6 @@
 import Map from 'ol/Map';
+import Layer from '../../models/layer';
+import Feature from 'ol/Feature';
 
 type GraphicalInterface = {
   helpVisible: boolean,
@@ -16,7 +18,7 @@ type MapPosition = {
 }
 
 type LayersConfig = {
-  layersList: string[];
+  layersList: Layer[];
   swipedLayers: {
     left: string[];
     right: string[];
@@ -56,7 +58,13 @@ class State {
 
   // All OCG Servers from themes.json
   // Dictionary where the key is the name of the server
-  ogcServers = {};
+  ogcServers: {
+    [key: string]: {
+      url: string;
+      wfsSupport: boolean;
+      urlWfs: string;
+    }
+  } = {};
   
   // Current active basemap
   activeBasemap: string | null = null;
@@ -133,8 +141,8 @@ class State {
   olMap: Map | null = null;
 
   // To manage selected and focused features
-  selectedFeatures: Object[] = [];
-  focusedFeature: Object | null = null;
+  selectedFeatures: Feature[] = [];
+  focusedFeature: Feature | null = null;
 
   theme: Object | null = null;
 

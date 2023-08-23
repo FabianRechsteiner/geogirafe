@@ -2,19 +2,20 @@ import GirafeSingleton from "../base/GirafeSingleton";
 import Basemap from "../models/basemap";
 import Layer from "../models/layer";
 import Theme from "../models/theme";
+import { GMFBackgroundLayer, GMFTheme, GMFTreeItem} from "../models/gmf";
 import ConfigManager from "./configmanager";
 import StateManager from "./state/statemanager";
 
 class ThemesManager extends GirafeSingleton {
 
-  configManager = null;
-  stateManager = null;
+  configManager: ConfigManager;
+  stateManager: StateManager;
 
   get state() {
     return this.stateManager.state;
   }
 
-  constructor(type) {
+  constructor(type: string) {
     super(type);
 
     this.configManager = ConfigManager.getInstance();
@@ -24,7 +25,7 @@ class ThemesManager extends GirafeSingleton {
       .then(() => { this.loadThemes(); })
       .then(() => { console.log('Themes were loaded'); });
 
-    this.stateManager.subscribe('selectedTheme', (oldTheme, newTheme) => this.onChangeTheme(newTheme));
+    this.stateManager.subscribe('selectedTheme', (_oldTheme: Theme, newTheme: Theme) => this.onChangeTheme(newTheme));
   }
 
   /**
@@ -45,8 +46,9 @@ class ThemesManager extends GirafeSingleton {
   setDefaultTheme() {
     // Set default theme if any
     if (!this.isNullOrUndefinedOrBlank(this.configManager.Config.themes.defaultTheme)) {
-      const defaultTheme = Object.values(this.state.themes).find(t => t.name === this.configManager.Config.themes.defaultTheme);
-      if (!this.isNullOrUndefined(defaultTheme)) {
+      const themes = Object.values(this.state.themes) as Theme[];
+      const defaultTheme = themes.find((t) => t.name === this.configManager.Config.themes.defaultTheme);
+      if (defaultTheme) {
         this.state.selectedTheme = defaultTheme;
       }
       else {
@@ -56,12 +58,12 @@ class ThemesManager extends GirafeSingleton {
     }
   }
 
-  prepareBasemaps(basemapJson) {
-    const basemaps = {};
+  prepareBasemaps(basemapJson: GMFBackgroundLayer[]) {
+    const basemaps: { [key: number]: Basemap } = {};
 
     if (this.configManager.Config.basemaps.OSM) {
       // Add default OSM Option
-      const osmBasemap = new Basemap({"id": "-1", "name": "OpenStreetMap"});
+      const osmBasemap = new Basemap({"id": -1, "name": "OpenStreetMap"});
       basemaps[osmBasemap.id] = osmBasemap;
       const data = {
         "id" : "-1",
@@ -73,18 +75,19 @@ class ThemesManager extends GirafeSingleton {
 
     if (this.configManager.Config.basemaps.SwissTopoVectorTiles) {
       // Add default Vector Tiles
-      const vectorBasemap = new Basemap({"id": "-2", "name": "Vector-Tiles", "projection": "EPSG:3857"});
+      const vectorBasemap = new Basemap({"id": -2, "name": "Vector-Tiles"});
       basemaps[vectorBasemap.id] = vectorBasemap;
       const data = {
         "id" : "-2",
         "name": "Vector-Tiles",
         "type": "VectorTiles",
-        "style": "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json"
+        "style": "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json",
+        "projection": "EPSG:3857"
       };
       vectorBasemap.layersList.push(new Layer(data, null, null, null, 0));
     }
 
-    basemapJson.forEach(elem => {
+    basemapJson.forEach((elem: GMFBackgroundLayer) => {
       // Create basemap
       const basemap = new Basemap(elem);
       basemaps[basemap.id] = basemap;
@@ -93,29 +96,29 @@ class ThemesManager extends GirafeSingleton {
       const order = { value: 0 };
       if (elem.children) {
         // Multiple layers
-        elem.children.forEach(child => {
-          basemap.layersList.push(this.createLayer(child, null, order));
+        elem.children.forEach((child: GMFTreeItem) => {
+          basemap.layersList.push(this.createTreeItem(child, null, order));
         });
       }
       else {
         // Only one layer in this basemap
-        basemap.layersList.push(this.createLayer(elem, null, order));
+        basemap.layersList.push(this.createTreeItem(elem, null, order));
       }
     });
 
     return basemaps;
   }
 
-  prepareThemes(themesJson) {
-    const themes = {};
+  prepareThemes(themesJson: GMFTheme[]) {
+    const themes: { [key: number]: Theme} = {};
     const order = { value: 0 };
-    themesJson.forEach((themeJson, index) => {
-      if (!themeJson.icon.startsWith('http') && !this.isNullOrUndefined(this.configManager.Config.themes.imagesUrlPrefix)) {
+    themesJson.forEach((themeJson: GMFTheme, index: number) => {
+      if (!themeJson.icon.startsWith('http') && !this.configManager.Config.themes.imagesUrlPrefix) {
         themeJson.icon = this.configManager.Config.themes.imagesUrlPrefix + themeJson.icon;
       }
       const theme = new Theme(themeJson);
-      themeJson.children.forEach(layerJson => {
-        const layer = this.createLayer(layerJson, null, order);
+      themeJson.children.forEach((layerJson: GMFTreeItem) => {
+        const layer = this.createTreeItem(layerJson, null, order);
         theme.layersTree.push(layer);
       });
       themes[index] = theme;
@@ -124,19 +127,26 @@ class ThemesManager extends GirafeSingleton {
     return themes;
   }
 
-  createLayer(elem, parentServer, order) {
+  /**
+   * Will create layer and child layers if elem passed is a group of layers
+   * @param elem either a layer or a group of layers
+   * @param parentServer in case children are not mixed layers, the parentServer will apply for all children
+   * @param order the order in the layer list
+   * @returns the created girafe layer
+   */
+  createTreeItem(elem: GMFTreeItem, parentServer: string | null, order: {value: number}) {
     // If a server is defined on this node, we use it.
     // Otherwise, we use the server of the parent
     const ogcServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
 
     // Create Layer
-    const layer = this.createLayerObject(elem, ogcServer, order.value);
+    const layer = this.createLayer(elem, ogcServer, order.value);
     order.value = order.value + 1;
 
     // Append childs if any
-    if (elem.children !== undefined) {
-      elem.children.forEach(child => {
-        const childLayer = this.createLayer(child, ogcServer, order);
+    if (elem.children) {
+      elem.children.forEach((child: GMFTreeItem) => {
+        const childLayer = this.createTreeItem(child, ogcServer, order);
         childLayer.parent = layer;
         layer.children.push(childLayer);
       });
@@ -145,7 +155,14 @@ class ThemesManager extends GirafeSingleton {
     return layer;
   }
 
-  createLayerObject(elem, ocgServerName, order) {
+  /**
+   * Creates the WMS or WMTS Layer
+   * @param elem the layer info with its type defining if WMS or WMTS
+   * @param ocgServerName an optional ogc server name
+   * @param order the order in the layertree
+   * @returns a girafe Layer
+   */
+  createLayer(elem: GMFTreeItem, ocgServerName: string | null, order: number): Layer {
     let url = null;
     let urlWfs = null;
     if (elem.type === 'WMS') {
@@ -163,6 +180,9 @@ class ThemesManager extends GirafeSingleton {
     }
     else if (elem.type === 'WMTS') {
       // WMTS Case: we take the URL of Capabilities
+      if (!elem.url) {
+        throw new Error("No URL defined for WMTS layer " + elem.name);
+      }
       url = elem.url;
     }
     else {
@@ -173,14 +193,14 @@ class ThemesManager extends GirafeSingleton {
     return layer;
   }
 
-  onChangeTheme(theme) {
+  onChangeTheme(theme: Theme) {
     // Deactivate all active layers
     for (let i=0; i<this.state.layers.layersList.length; ++i) {
       this.state.layers.layersList[i].activeState = 'off';
     }
 
     // Add the current theme
-    const layersList = [];
+    const layersList: Layer[] = [];
     theme.layersTree.forEach(layer => {
       this.addLayerToLoadedList(layersList, layer);
     });
@@ -189,7 +209,7 @@ class ThemesManager extends GirafeSingleton {
     this.state.layers.layersList = layersList;
   }
 
-  addLayerToLoadedList(layersList, layer) {
+  addLayerToLoadedList(layersList: Layer[], layer: Layer) {
     layersList.push(layer);
     layer.children.forEach(child => {
       this.addLayerToLoadedList(layersList, child);

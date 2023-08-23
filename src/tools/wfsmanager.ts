@@ -1,24 +1,28 @@
 import { WFS } from 'ol/format';
 import GML3 from 'ol/format/GML3';
 
-import GeoEvents from '../models/events';
+import { SelectFeaturesActionDetails, SelectionParams } from '../models/events';
 import GirafeSingleton from "../base/GirafeSingleton";
-import ConfigManager from "./configmanager";
+//import ConfigManager from "./configmanager";
 import MessageManager from "./messagemanager";
 import StateManager from "./state/statemanager";
+import GeoEvents from '../models/events';
 
 class WfsManager extends GirafeSingleton {
 
-  messageManager = null;
-  stateManager = null;
+  messageManager: MessageManager;
+  stateManager: StateManager;
   get state() {
     return this.stateManager.state;
   }
 
-  wfsUrlLoaded = [];
-  featureTypeToGeometryAttributeName = {};
+  //TODO: make this configurable
+  maxFeatures: number = 10000;
 
-  constructor(type) {
+  wfsUrlLoaded: string[] = [];
+  featureTypeToGeometryAttributeName: { [key: string]: string; } = {};
+
+  constructor(type: string) {
     super(type);
 
    /* this.configManager = ConfigManager.getInstance();*/
@@ -33,21 +37,21 @@ class WfsManager extends GirafeSingleton {
     this.messageManager.register(this.onCustomGirafeEvent.bind(this));
   }
 
-  onCustomGirafeEvent(details) {
+  onCustomGirafeEvent(details: SelectFeaturesActionDetails) {
     if (details.action === GeoEvents.selectFeatures) {
       this.onSelectFeatures(details.selectionParams);
     }
   }
 
-  onSelectFeatures(selectionParams) {
+  onSelectFeatures(selectionParams: SelectionParams[]) {
 
     this.state.loading = true;
 
     // Reset current selection
     this.state.selectedFeatures = [];
 
-    // First, we have to load the DescribeFeatureType for this WFS server is this wasn't done yet
-    const wfsToInitialize = [];
+    // First, we have to load the DescribeFeatureType for this WFS server if this wasn't done yet
+    const wfsToInitialize: string[] = [];
     for (let i = 0; i < selectionParams.length; ++i) {
       if (!this.wfsUrlLoaded.includes(selectionParams[i].wfsUrl)) {
         wfsToInitialize.push(selectionParams[i].wfsUrl);
@@ -68,17 +72,19 @@ class WfsManager extends GirafeSingleton {
           .then(str => {
             const xml = new DOMParser().parseFromString(str, "text/xml");
             // First find all direct "element" childs
-            const elementTypeToName = {};
+            const elementTypeToName: {[key: string]: string} = {};
             const elements = xml.querySelectorAll(':scope>element');
             for (let j = 0; j < elements.length; ++j) {
               const element = elements[j];
               if (element.hasAttribute('name') && element.hasAttribute('type')) {
                 const name = element.getAttribute('name');
                 let type = element.getAttribute('type');
-                if (type.includes(':')) {
-                  type = type.split(':')[1];
+                if (type && name) {
+                  if (type.includes(':')) {
+                    type = type.split(':')[1];
+                  }
+                  elementTypeToName[type] = name;
                 }
-                elementTypeToName[type] = name;
               }
               else {
                 console.log('What happend with this element?');
@@ -89,15 +95,20 @@ class WfsManager extends GirafeSingleton {
             for (let i=0; i<tags.length; i++) {
               const tag = tags[i];
               const typeName = tag.getAttribute('name');
+              if (!typeName) {
+                throw new Error('Could not find a name for the complex type');
+              }
               const featureType = elementTypeToName[typeName];
               const elements = tag.getElementsByTagName('sequence')[0].getElementsByTagName('element');
               for (let j=0; j<=elements.length; ++j) {
                 const element = elements[j];
                 const type = element.getAttribute('type');
-                if (type.startsWith('gml:')) {
+                if (type && type.startsWith('gml:')) {
                   // We are on the geometry attribute
                   const geometryAttributeName = element.getAttribute('name');
-                  this.featureTypeToGeometryAttributeName[featureType] = geometryAttributeName;
+                  if (geometryAttributeName) {
+                    this.featureTypeToGeometryAttributeName[featureType] = geometryAttributeName;
+                  }
                   break;
                 }
               }
@@ -121,7 +132,7 @@ class WfsManager extends GirafeSingleton {
     }
   }
 
-  getDescribeFeatureTypeUrl(wfsUrl) {
+  getDescribeFeatureTypeUrl(wfsUrl: string) {
     const url = new URL(wfsUrl);
     url.searchParams.set('service', 'WFS');
     url.searchParams.set('request', 'DescribeFeatureType');
@@ -131,14 +142,14 @@ class WfsManager extends GirafeSingleton {
     return url.href;
   }
 
-  wfsQuery(selectionParams) {
+  wfsQuery(selectionParams: SelectionParams[]) {
     const promises = [];
 
     for (let i = 0; i < selectionParams.length; ++i) {
       const selectionParam = selectionParams[i];
 
-      // Test if all layers have the same geometry colmn name
-      const columnNameToFeatureType = {};
+      // Test if all layers have the same geometry column name
+      const columnNameToFeatureType: {[key: string]: string[]} = {};
       for (let j = 0; j < selectionParam.featureTypes.length; ++j) {
         const featureType = selectionParam.featureTypes[j];
         const geometryColumnName = this.featureTypeToGeometryAttributeName[featureType];
@@ -152,8 +163,9 @@ class WfsManager extends GirafeSingleton {
         // WFS GetFeature
         const featureRequest = new WFS().writeGetFeature({
           srsName: selectionParam.srid,
-          //featureNS: 'http://mapserver.gis.umn.edu/mapserver',
-          //featurePrefix: 'feature',
+          // TODO: this should be configurable
+          featureNS: 'https://mapserver.gis.umn.edu/mapserver',
+          featurePrefix: 'feature',
           featureTypes: featureTypes,
           maxFeatures: this.maxFeatures,
           // TODO REG: Do we always want to use the format GML3 here ?

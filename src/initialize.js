@@ -1,8 +1,8 @@
 import ConfigManager from './tools/configmanager';
-import UrlManager from './tools/urlmanager.js';
+import UrlManager from './tools/urlmanager';
 import StateManager from './tools/state/statemanager';
-import I18nManager from './tools/i18nmanager.js';
-import I18MessageManager from './tools/messagemanager.js';
+import I18nManager from './tools/i18nmanager';
+import I18MessageManager from './tools/messagemanager';
 
 import TreeViewComponent from  './components/treeview/component.js';
 import MapComponent from './components/map/component.js';
@@ -25,8 +25,8 @@ import AboutComponent from './components/about/component.ts';
 
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
-import ThemesManager from './tools/themesmanager.js';
-import WfsManager from './tools/wfsmanager.js';
+import ThemesManager from './tools/themesmanager';
+import WfsManager from './tools/wfsmanager';
 
 // Register custom EPSG
 // https://epsg.io/21781

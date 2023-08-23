@@ -1,42 +1,44 @@
 class Layer {
 
   // Base properties
-  id = null;
-  name = null;
-  type = null;
-  isDefaultChecked = null;
+  id: string | null = null;
+  name: string | null = null;
+  type: string | null = null;
+  isDefaultChecked: boolean | null = null;
+  private _isExclusiveGroup = false;
 
   // Group properties
-  isDefaultExpanded = null;
+  isDefaultExpanded: boolean | null = null;
 
   // For hierarchy management
-  children = [];
-  parent = null;
+  children: Layer[] = [];
+  parent: Layer | null = null;
 
   // VectorTiles
-  style = null;
-  projection = null;
+  style: any = null;
+  projection?: string;
 
   // WMS & WMTS
-  server = null;
-  url = null;
-  imageType = null;
-  layers = null;
-  dimensions = null;
-  queryLayers = null;
-  minResolution = null;
-  maxResolution = null;
+  server: string | null = null;
+  url: string | null = null;
+  urlWfs: string | null = null;
+  imageType: string | null = null;
+  layers: string | null = null;
+  dimensions: string | null = null;
+  queryLayers: string | null = null;
+  minResolution: number | null = null;
+  maxResolution: number | null = null;
   queryable = false;
 
   // Legend properties
-  legend = null;
-  iconUrl = null;
-  legendRule = null;
-  legendImage = null;
-  isLegendExpanded = null;
+  legend: string | null = null;
+  iconUrl: string | null = null;
+  legendRule: string | null = null;
+  legendImage: string | null = null;
+  isLegendExpanded: boolean | null = null;
 
   // Layer state
-  activeState = 'off'; // can be 'on', 'off', 'semi'
+  activeState: 'on' | 'off' | 'semi' = 'off';
   opacity = 1;
   order = 0;
 
@@ -44,15 +46,15 @@ class Layer {
   basemap = false;
 
   get hasLegend() {
-    return ((this.legendRule === null || this.legendRule === undefined) && this.legend)
+    return ((this.legendRule === null || this.legendRule === undefined) && this.legend);
   }
 
-  isGroup = null;
-  isLayer = null;
+  isGroup: boolean | null = null;
+  isLayer: boolean | null = null;
 
   isExpanded = false;
 
-  constructor(elem, serverName, url, urlWfs, order) {
+  constructor(elem: any, serverName: string | null, url: string | null, urlWfs: string | null, order: number) {
     this.id = elem.id;
     this.name = elem.name;
     this.type = elem.type;
@@ -64,6 +66,7 @@ class Layer {
     }
     else if (elem.type === 'VectorTiles') {
       this.style = elem.style;
+      this.projection = elem.projection;
     }
     else if (elem.type === 'WMTS') {
       this.url = elem.url;
@@ -98,7 +101,7 @@ class Layer {
         }
         else {
           this.queryable = elem.childLayers[0].queryable;
-          this.queryLayers = (this.queryable) ? elem.childLayers.map(l => l.name).join(',') : '';
+          this.queryLayers = (this.queryable) ? elem.childLayers.map((l: any) => l.name).join(',') : '';
         }
       }
     }
@@ -107,7 +110,7 @@ class Layer {
       this.isGroup = true;
       this.isLayer = false;
       this.isDefaultExpanded = (elem.metadata && elem.metadata.isExpanded);
-      this.exclusiveGroup = (elem.metadata && elem.metadata.exclusiveGroup);
+      this._isExclusiveGroup = (elem.metadata && elem.metadata.exclusiveGroup);
     }
 
     // }
@@ -126,7 +129,10 @@ class Layer {
   }
 
   get serverUniqueQueryId() {
-    return this.server + this.imageType;
+    if (this.server) {
+      return this.server + this.imageType;
+    }
+    return null
   }
 
   get layerUniqueId() {
@@ -166,8 +172,7 @@ class Layer {
     if (!this.isGroup) {
       throw 'This method should not be called on leafs, only on groups.';
     }
-
-    return (this.exclusiveGroup === true);
+    return (this._isExclusiveGroup);
   }
 
   get areAllChildrenActive() {

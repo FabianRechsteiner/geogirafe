@@ -1,9 +1,10 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import { Grid, html } from "gridjs";
 import I18nManager from '../../tools/i18nmanager';
+import { niceCoordinates } from '../../tools/geometrytools';
 import Geometry from 'ol/geom/Geometry.js';
 import {getCenter} from 'ol/extent';
-import { LineString, Point, Polygon } from 'ol/geom';
+import { LineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
 
 class SelectionGridComponent extends GirafeResizableElement {
 
@@ -119,21 +120,34 @@ class SelectionGridComponent extends GirafeResizableElement {
     if (geometry instanceof Point) {
       icons = '<i class="geo-type fg-point fg-lg"></i>';
       coords = geometry.getFlatCoordinates();
-      const east = (Math.round(coords[0] * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
-      const nord = (Math.round(coords[1] * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
-      icons += `<span>E ${east} / N ${nord}</span>`;     
+      const niceCoords = niceCoordinates(coords);
+      icons += `<span>E ${niceCoords[0]} / N ${niceCoords[1]}</span>`;
     }
-    else if (geometry instanceof LineString) {
+    else if (geometry instanceof MultiPoint) {
+      icons = '<i class="geo-type fg-multipoint fg-lg"></i>';
+      if (geometry.getPoints.length === 1) {
+        coords = geometry.getPoint(0).getFlatCoordinates();
+        const niceCoords = niceCoordinates(coords);
+        icons += `<span>E ${niceCoords[0]} / N ${niceCoords[1]}</span>`;
+      } else {
+        coords = getCenter(geometry.getExtent());
+        icons += `<span>Multipoint</span>`;
+      }
+    }
+    else if (geometry instanceof LineString || geometry instanceof Polygon) {
       icons = '<i class="geo-type fg-polyline-pt fg-lg"></i>';
       const length = (Math.round(geometry.getLength() * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
       icons += `<span>${length}&nbsp;m</span>`;
       coords = getCenter(geometry.getExtent());
     }
-    else if (geometry instanceof Polygon) {
+    else if (geometry instanceof Polygon || geometry instanceof MultiPolygon) {
       icons = '<i class="geo-type fg-polygon-pt fg-lg"></i>';
       const area = (Math.round(geometry.getArea() * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
       icons += `<span>${area}&nbsp;m<sup>2</sup></span>`;
       coords = getCenter(geometry.getExtent());
+    } else {
+      console.error('Unknown geometry type', geometry.getType());
+      return
     }
 
     icons += `<girafe-button icon-style="fa-sm fa-solid fa-magnifying-glass" 
