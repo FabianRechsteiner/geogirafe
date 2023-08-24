@@ -24,7 +24,7 @@ class BasemapComponent extends GirafeHTMLElement {
     super.render();
   }
 
-  onBasemapsLoaded(basemaps: Basemap) {
+  onBasemapsLoaded(basemaps: {[key: number]: Basemap}) {
     super.render();
 
     // Configure default basemap
@@ -45,7 +45,7 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('basemaps', (_oldBasemaps: Basemap, newBasemaps: Basemap) => this.onBasemapsLoaded(newBasemaps));
+    this.stateManager.subscribe('basemaps', (_oldBasemaps: {[key: number]: Basemap}, newBasemaps: {[key: number]: Basemap}) => this.onBasemapsLoaded(newBasemaps));
     this.stateManager.subscribe('olMap', (_oldMap: Basemap, newMap: Basemap) => this.testBasemap(newMap));
   }
 

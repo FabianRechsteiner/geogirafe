@@ -5,7 +5,7 @@ class Basemap {
   // Layers
   layersList: any[] = [];
 
-  constructor(elem: { id: number, name: string}) {
+  constructor(elem: { id: number, name: string }) {
     this.id = elem.id;
     this.name = elem.name;
   }

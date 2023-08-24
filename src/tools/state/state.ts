@@ -55,7 +55,9 @@ class State {
 
   // All basemaps from themes.json
   // Dictionary where the key is the id of the basemap
-  basemaps = {};
+  basemaps: {
+    [key: number]: Basemap
+  } = {};
 
   // All OCG Servers from themes.json
   // Dictionary where the key is the name of the server
