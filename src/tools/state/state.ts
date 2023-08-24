@@ -1,6 +1,7 @@
 import Map from 'ol/Map';
 import Layer from '../../models/layer';
 import Feature from 'ol/Feature';
+import Basemap from '../../models/basemap';
 
 type GraphicalInterface = {
   helpVisible: boolean,
@@ -65,9 +66,9 @@ class State {
       urlWfs: string;
     }
   } = {};
-  
+
   // Current active basemap
-  activeBasemap: string | null = null;
+  activeBasemap: Basemap | null = null;
 
   // Current projection
   projection: string | null = null;
@@ -110,7 +111,7 @@ class State {
       right: []
     }
   }
-  
+
   // Current redlining state
   redlining: RedliningConfig = {
     activeTool: null,
@@ -135,7 +136,7 @@ class State {
   }
 
   // The openlayer map
-  // Keep in mind that you shoudn't use it directly to add layers or drawings, 
+  // Keep in mind that you shoudn't use it directly to add layers or drawings,
   // because the components are not listening to olMap changes, and the application will be desynchronized.
   // => Consider using the other properties of the state, which components are listening to
   olMap: Map | null = null;
@@ -147,8 +148,8 @@ class State {
   theme: Object | null = null;
 
   // The State object is defined as <not extensible> by the StateManager.
-  // This property can be used by third-parts components or extensions 
-  // to add custom attributes to the state.  
+  // This property can be used by third-parts components or extensions
+  // to add custom attributes to the state.
   extendedState = {};
 }
 

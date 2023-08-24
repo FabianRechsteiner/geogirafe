@@ -1,4 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import Basemap from '../../models/basemap';
 
 class BasemapComponent extends GirafeHTMLElement {
 
@@ -8,11 +9,11 @@ class BasemapComponent extends GirafeHTMLElement {
   servers = {};
   basemapJson = {};
   basemaps = [];
-  
+
   constructor() {
     super('basemap');
 
-    this.configManager.loadConfig().then(() => { 
+    this.configManager.loadConfig().then(() => {
       if (!this.configManager.Config.basemaps.show) {
         this.hide();
       }
@@ -23,7 +24,7 @@ class BasemapComponent extends GirafeHTMLElement {
     super.render();
   }
 
-  onBasemapsLoaded(basemaps) {
+  onBasemapsLoaded(basemaps: Basemap) {
     super.render();
 
     // Configure default basemap
@@ -35,7 +36,7 @@ class BasemapComponent extends GirafeHTMLElement {
     }
   }
 
-  changeBasemap(basemap) {
+  changeBasemap(basemap: Basemap) {
     console.log('change basemap', basemap);
     if (basemap.projection) {
       this.state.projection = basemap.projection;
@@ -44,12 +45,12 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('basemaps', (oldBasemaps, newBasemaps) => this.onBasemapsLoaded(newBasemaps));
-    this.stateManager.subscribe('olMap', (oldMap, newMap) => this.test(newMap));
+    this.stateManager.subscribe('basemaps', (_oldBasemaps: Basemap, newBasemaps: Basemap) => this.onBasemapsLoaded(newBasemaps));
+    this.stateManager.subscribe('olMap', (_oldMap: Basemap, newMap: Basemap) => this.testBasemap(newMap));
   }
 
-  test(map) {
-    console.log('toto');
+  testBasemap(map: Basemap) {
+    console.log('test basemap', map);
   }
 
   connectedCallback() {
