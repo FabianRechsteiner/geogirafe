@@ -12,7 +12,7 @@ import ProjectionComponent from './components/projection/component.js';
 import GlobeComponent from './components/globe/component.js';
 import BasemapComponent from './components/basemap/component';
 import ThemeComponent from './components/themes/component.js';
-import LanguageComponent from './components/language/component.js';
+import LanguageComponent from './components/language/component';
 import ButtonComponent from './components/button/component.js';
 import ScaleComponent from './components/scale/component.js';
 import CoordinateComponent from './components/coordinate/component';
