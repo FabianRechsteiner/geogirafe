@@ -4,24 +4,25 @@ import StateManager from './tools/state/statemanager';
 import I18nManager from './tools/i18nmanager';
 import I18MessageManager from './tools/messagemanager';
 
+// TODO: Migrate all these components to TypeScript
 import TreeViewComponent from  './components/treeview/component.js';
 import MapComponent from './components/map/component.js';
 import SearchComponent from './components/search/component.js';
 import ProjectionComponent from './components/projection/component.js';
 import GlobeComponent from './components/globe/component.js';
-import BasemapComponent from './components/basemap/component.ts';
+import BasemapComponent from './components/basemap/component';
 import ThemeComponent from './components/themes/component.js';
 import LanguageComponent from './components/language/component.js';
 import ButtonComponent from './components/button/component.js';
 import ScaleComponent from './components/scale/component.js';
-import CoordinateComponent from './components/coordinate/component.js';
+import CoordinateComponent from './components/coordinate/component';
 import MenuButtonComponent from './components/menubutton/component.js';
 import RedliningComponent from './components/redlining/component.js';
 import PrintComponent from './components/print/component.js';
 import SelectionWindowComponent from './components/selectionwindow/component.js';
 import SelectionGridComponent from './components/selectiongrid/component.js';
 import HelpComponent from './components/help/component.js';
-import AboutComponent from './components/about/component.ts';
+import AboutComponent from './components/about/component';
 
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
