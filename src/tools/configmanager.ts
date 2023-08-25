@@ -60,7 +60,7 @@ class GirafeConfig {
 
   /**
    * Creates the configuration of the app validating the json passed or giving default values.
-   * 
+   *
    * Every property of config that is not complying with GirafeConfig type is ignored.
    * @param config the configuration
    */
