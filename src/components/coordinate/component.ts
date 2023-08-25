@@ -6,7 +6,7 @@ class CoordinateComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  locale!: string;
+  #locale?: string;
   east: string | null = null;
   north: string | null = null;
 
@@ -14,9 +14,16 @@ class CoordinateComponent extends GirafeHTMLElement {
     super('coordinate');
   }
 
+  get locale() {
+    if (!this.#locale) {
+      throw new Error('You called locale before render');
+    }
+    return this.#locale;
+  }
+
   render() {
     super.render();
-    this.locale = this.configManager.Config.general.locale;
+    this.#locale = this.configManager.Config.general.locale;
   }
 
   registerEvents() {
