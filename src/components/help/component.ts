@@ -5,7 +5,7 @@ class HelpComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  content = null;
+  content!: HTMLElement;
 
   constructor() {
     super('help');
@@ -13,19 +13,20 @@ class HelpComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
+    // @ts-ignore
     this.content = this.shadow.querySelector('#content');
     if (!this.configManager.Config.basemaps.show) {
-      this.shadow.querySelector('#basemap').style.display = 'none';
-      this.shadow.querySelector('#basemap-descr').style.display = 'none';
+      (this.shadow.querySelector('#basemap') as HTMLElement).style.display = 'none';
+      (this.shadow.querySelector('#basemap-descr') as HTMLElement).style.display = 'none';
     }
   }
 
   registerEvents() {
-    this.stateManager.subscribe('interface.helpVisible', (oldValue, newValue) => this.toggleHelp(newValue));
+    this.stateManager.subscribe('interface.helpVisible', (_oldValue: boolean, newValue: boolean) => this.toggleHelp(newValue));
     this.content.addEventListener('click', () => { this.state.interface.helpVisible = false });
   }
 
-  toggleHelp(visible) {
+  toggleHelp(visible: boolean) {
     if (visible) {
       this.content.style.display = 'block';
     }

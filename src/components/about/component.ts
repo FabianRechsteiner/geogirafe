@@ -6,7 +6,6 @@ class AboutComponent extends GirafeDraggableElement {
   styleUrl = './style.css';
 
   loaded = false;
-  // TODO: Remove the `!`
   content!: HTMLElement;
   version!: HTMLElement;
   build!: HTMLElement;

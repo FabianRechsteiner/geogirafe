@@ -21,7 +21,7 @@ import RedliningComponent from './components/redlining/component.js';
 import PrintComponent from './components/print/component.js';
 import SelectionWindowComponent from './components/selectionwindow/component.js';
 import SelectionGridComponent from './components/selectiongrid/component.js';
-import HelpComponent from './components/help/component.js';
+import HelpComponent from './components/help/component';
 import AboutComponent from './components/about/component';
 
 import proj4 from 'proj4';
