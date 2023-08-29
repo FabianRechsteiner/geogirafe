@@ -21,15 +21,15 @@ class LanguageComponent extends GirafeHTMLElement {
   }
 
   render() {
-    super.render();
-    this.#menuButton = this.shadow.querySelector('#menu-button')!;
-
     // Get languages list and store it
     for (const key in this.configManager.Config.languages) {
       if (!key.startsWith("//") && key !== 'default') {
         this.languages.push(key);
       }
     }
+
+    super.render();
+    this.#menuButton = this.shadow.querySelector('#menu-button')!;
   }
 
   changeLanguage(language: string) {

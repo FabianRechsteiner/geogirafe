@@ -1,7 +1,7 @@
 <girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-language" open="left">
   <div slot="menu-content">
-    ${Object.values(this.languages).map(language => uHtml.for(language)`
-      <girafe-button text="${language}" icon-style="fa-xl fa-solid fa-language" onclick="${() => this.changeLanguage(language)}"></girafe-button>
-    `)}
+    ${this.languages.map((language, i) => uHtml`
+      <girafe-button text="${language.toUpperCase()}" icon-style="fa-xl fa-solid fa-language" onclick="${() => this.changeLanguage(language)}"></girafe-button>`
+    )}
   </div>
 </girafe-menu-button>
