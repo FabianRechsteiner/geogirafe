@@ -1,13 +1,15 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import ButtonComponent from '../menubutton/component'
+import MenuButtonComponent from '../menubutton/component'
 
 class ProjectionComponent extends GirafeHTMLElement {
 
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  menuButton = null;
+  #menuButton?: MenuButtonComponent;
   // TODO REG : manage in config.json
-  valueToText = {
+  valueToText: Record<string, string> = {
     "EPSG:3857": "W-M",
     "EPSG:4326": "WGS84",
     "EPSG:2056": "LV95"
@@ -17,20 +19,27 @@ class ProjectionComponent extends GirafeHTMLElement {
     super('projection');
   }
 
+  get menuButton() {
+    if (!this.#menuButton) {
+      throw new Error('You called menuButton before render');
+    }
+    return this.#menuButton;
+  }
+
   render() {
     super.render();
-    this.menuButton = this.shadow.querySelector('#menu-button');
+    this.#menuButton = this.shadow.querySelector('#menu-button')!;
 
     // Get all combinaison text/value from girafe-button objects
     const allButtons = this.shadow.querySelectorAll('girafe-button');
     for (let i=0; i<allButtons.length; ++i) {
-      const button = allButtons[i];
+      const button = allButtons[i] as ButtonComponent;
       const projection = button.id.toUpperCase();
       button.setText(this.valueToText[projection]);
     }
   }
 
-  changeProjection(projection) {
+  changeProjection(projection: string) {
     console.log('change projection', projection);
     if (projection) {
       this.state.projection = projection;
@@ -38,10 +47,10 @@ class ProjectionComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('projection', (oldProjection, newProjection) => this.onChangeProjection(newProjection));
+    this.stateManager.subscribe('projection', (_oldProjection: string, newProjection: string) => this.onChangeProjection(newProjection));
   }
 
-  onChangeProjection(projection) {
+  onChangeProjection(projection: string) {
     console.log('projection changed');
     const text = this.valueToText[projection];
     this.menuButton.setText(text);
