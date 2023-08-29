@@ -12,7 +12,7 @@ class ProjectionComponent extends GirafeHTMLElement {
     "EPSG:4326": "WGS84",
     "EPSG:2056": "LV95"
   }
-  
+
   constructor() {
     super('projection');
   }
@@ -24,8 +24,16 @@ class ProjectionComponent extends GirafeHTMLElement {
     // Get all combinaison text/value from girafe-button objects
     const allButtons = this.shadow.querySelectorAll('girafe-button');
     for (let i=0; i<allButtons.length; ++i) {
-      const b = allButtons[i];
-      b.setText(this.valueToText[b.dataset.value]);
+      const button = allButtons[i];
+      const projection = button.id.toUpperCase();
+      button.setText(this.valueToText[projection]);
+    }
+  }
+
+  changeProjection(projection) {
+    console.log('change projection', projection);
+    if (projection) {
+      this.state.projection = projection;
     }
   }
 

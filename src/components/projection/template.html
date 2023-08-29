@@ -1,7 +1,7 @@
 <girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-earth-europe" open="left">
   <div slot="menu-content">
-    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" state-action="projection" data-value="EPSG:3857"></girafe-button>
-    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" state-action="projection" data-value="EPSG:4326"></girafe-button>
-    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" state-action="projection" data-value="EPSG:2056"></girafe-button>
+    <girafe-button id="epsg:3857" icon-style="fa-xl fa-solid fa-earth-europe" onclick="${() => this.changeProjection('EPSG:3857')}"></girafe-button>
+    <girafe-button id="epsg:4326" icon-style="fa-xl fa-solid fa-earth-europe" onclick="${() => this.changeProjection('EPSG:4326')}"></girafe-button>
+    <girafe-button id="epsg:2056" icon-style="fa-xl fa-solid fa-earth-europe" onclick="${() => this.changeProjection('EPSG:2056')}"></girafe-button>
   </div>
 </girafe-menu-button>
