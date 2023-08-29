@@ -1,7 +1,7 @@
 <girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-language" open="left">
   <div slot="menu-content">
-    <girafe-button text="DE" icon-style="fa-xl fa-solid fa-language" state-action="language" data-value="de"></girafe-button>
-    <girafe-button text="FR" icon-style="fa-xl fa-solid fa-language" state-action="language" data-value="fr"></girafe-button>
-    <girafe-button text="EN" icon-style="fa-xl fa-solid fa-language" state-action="language" data-value="en"></girafe-button>
+    <girafe-button text="DE" icon-style="fa-xl fa-solid fa-language" onclick="${() => this.changeLanguage('de')}"></girafe-button>
+    <girafe-button text="FR" icon-style="fa-xl fa-solid fa-language" onclick="${() => this.changeLanguage('fr')}"></girafe-button>
+    <girafe-button text="EN" icon-style="fa-xl fa-solid fa-language" onclick="${() => this.changeLanguage('en')}"></girafe-button>
   </div>
 </girafe-menu-button>

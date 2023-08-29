@@ -24,6 +24,13 @@ class LanguageComponent extends GirafeHTMLElement {
     this.#menuButton = this.shadow.querySelector('#menu-button')!;
   }
 
+  changeLanguage(language: string) {
+    console.log('change language', language);
+    if (language) {
+      this.state.language = language;
+    }
+  }
+
   registerEvents() {
     this.stateManager.subscribe('language', (_oldLanguage: string, newLanguage: string) => this.onTranslate(newLanguage));
   }
