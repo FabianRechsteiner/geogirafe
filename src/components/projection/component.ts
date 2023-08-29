@@ -1,6 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import ButtonComponent from '../menubutton/component'
-import MenuButtonComponent from '../menubutton/component'
+import ButtonComponent from '../menubutton/component';
+import MenuButtonComponent from '../menubutton/component';
 
 class ProjectionComponent extends GirafeHTMLElement {
 
@@ -41,9 +41,7 @@ class ProjectionComponent extends GirafeHTMLElement {
 
   changeProjection(projection: string) {
     console.log('change projection', projection);
-    if (projection) {
-      this.state.projection = projection;
-    }
+    this.state.projection = projection;
   }
 
   registerEvents() {
