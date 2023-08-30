@@ -28,8 +28,11 @@ class LanguageComponent extends GirafeHTMLElement {
       }
     }
 
-    super.render();
-    this.#menuButton = this.shadow.querySelector('#menu-button')!;
+    // Only display menu button if several languages
+    if (this.languages.length > 1) {
+      super.render();
+      this.#menuButton = this.shadow.querySelector('#menu-button')!;
+    }
   }
 
   changeLanguage(language: string) {
