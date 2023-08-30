@@ -4,7 +4,7 @@ import I18nManager from '../../tools/i18nmanager';
 import { niceCoordinates } from '../../tools/geometrytools';
 import Geometry from 'ol/geom/Geometry.js';
 import {getCenter} from 'ol/extent';
-import { LineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
+import { LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
 
 class SelectionGridComponent extends GirafeResizableElement {
 
@@ -134,7 +134,7 @@ class SelectionGridComponent extends GirafeResizableElement {
         icons += `<span>Multipoint</span>`;
       }
     }
-    else if (geometry instanceof LineString || geometry instanceof Polygon) {
+    else if (geometry instanceof LineString || geometry instanceof MultiLineString) {
       icons = '<i class="geo-type fg-polyline-pt fg-lg"></i>';
       const length = (Math.round(geometry.getLength() * 100) / 100).toLocaleString(this.locale, {minimumFractionDigits: 2});
       icons += `<span>${length}&nbsp;m</span>`;

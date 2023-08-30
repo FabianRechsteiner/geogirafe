@@ -17,7 +17,7 @@ import adjectives from 'adjectives';
 import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
 import { unByKey } from 'ol/Observable';
-import OLCesium from 'olcs/OLCesium.js';
+import OLCesium from 'olcs/OLCesium';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events';

@@ -1,20 +1,21 @@
+import { Map } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 
 class OsmManager {
-  map = null;
-  srid = null;
+  map: Map;
+  srid: string;
 
-  basemapLayers = [];
+  basemapLayers: TileLayer<OSM>[] = [];
 
-  constructor(map, srid) {
+  constructor(map: Map, srid: string) {
     this.map = map;
     // TODO REG: use global state for this info, or update when map component is updated.
     this.srid = srid;
   }
 
   removeAllBasemapLayers() {
-    this.basemapLayers.forEach((basemap) => {
+    this.basemapLayers.forEach((basemap: TileLayer<OSM>) => {
       this.map.removeLayer(basemap);
     });
     this.basemapLayers = [];

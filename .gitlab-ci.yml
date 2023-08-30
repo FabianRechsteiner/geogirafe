@@ -36,6 +36,18 @@ npm-audit:
     - npm audit signatures
 
 #################################
+# Audit NPM dependencies to find any known vulnerability 
+npm-outdated:
+  stage: test
+  image: node:18-slim
+  allow_failure: true
+  
+  script: 
+    # build
+    - npm i
+    - npm outdated
+
+#################################
 # Quality, readability, reliability and security checks with Sonarcloud 
 sonarcloud-check:
   stage: test
@@ -67,7 +79,7 @@ build:
   before_script:
     - apt update && apt -y install jq brotli
   script: 
-    - npm i --omit=dev
+    - npm i
     - npm run build
     # List all dependencies
     - npm list --all --omit=dev
@@ -226,7 +238,7 @@ zap-baseline-scan:
     - mkdir /zap/wrk
     # TODO REG: By default, all alerts are reported as warnings.
     # TODO REG: Configure which ones should be reported as "fail"
-    - /zap/zap-baseline.py -j -I -t https://geogirafe.paloo.fr/mapbs/ -r report.html -w report.md -x report.xml -J report.json
+    - /zap/zap-baseline.py -j -I -t https://demo.geomapfish.dev/mapbs/ -r report.html -w report.md -x report.xml -J report.json
   artifacts:
     paths:
       - /zap/wrk
