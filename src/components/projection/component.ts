@@ -30,7 +30,6 @@ class ProjectionComponent extends GirafeHTMLElement {
     }
 
     // Only display menu button if several projections
-    console.log("projection", this.projections, Object.keys(this.projections).length)
     if (Object.keys(this.projections).length > 1) {
       super.render();
       this.#menuButton = this.shadow.querySelector('#menu-button')!;
