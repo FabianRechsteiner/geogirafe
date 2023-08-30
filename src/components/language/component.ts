@@ -23,7 +23,7 @@ class LanguageComponent extends GirafeHTMLElement {
   render() {
     // Get languages list and store it
     for (const key in this.configManager.Config.languages) {
-      if (!key.startsWith("//") && key !== 'defaultLanguage') {
+      if (!key.startsWith('//') && key !== 'defaultLanguage') {
         this.languages.push(key);
       }
     }
