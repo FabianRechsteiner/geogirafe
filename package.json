@@ -31,7 +31,7 @@
     "cesium": "1.108.0",
     "gridjs": "6.0.6",
     "ol": "7.5.1",
-    "ol-mapbox-style": "11.0.1",
+    "ol-mapbox-style": "11.0.3",
     "olcs": "2.15.2",
     "on-change": "4.0.2",
     "proj4": "2.9.0",
