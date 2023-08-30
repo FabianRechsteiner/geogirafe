@@ -9,7 +9,7 @@
     "//comment1": "List of languages with their corresponding translation-file.",
     "fr": "https://map.cartolacote.ch/static/dummy/fr.json",
     "//comment2": "Default language",
-    "default": "fr"
+    "defaultLanguage": "fr"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
@@ -64,7 +64,7 @@
     "maxExtent": "2450900,1095300,2602800,1197700",
     "scales": [200000, 80000, 40000, 20000, 10000, 8000, 4000, 2000, 1000, 500, 200, 100],
     "constraintScales": true
-  }, 	 
+  },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
     "tilesetUrl": "https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"

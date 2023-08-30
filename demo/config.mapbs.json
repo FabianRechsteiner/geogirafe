@@ -11,7 +11,7 @@
     "en": "https://map.geo.bs.ch/static/X/en.json",
     "fr": "https://map.geo.bs.ch/static/X/fr.json",
     "//comment2": "Default language",
-    "default": "de"
+    "defaultLanguage": "de"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",

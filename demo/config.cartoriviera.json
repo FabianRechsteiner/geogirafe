@@ -9,7 +9,7 @@
     "//comment1": "List of languages with their corresponding translation-file.",
     "fr": "https://map.cartoriviera.ch/static/dummy/fr.json",
     "//comment2": "Default language",
-    "default": "fr"
+    "defaultLanguage": "fr"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",

@@ -73,7 +73,7 @@ class GirafeConfig {
     };
 
     if (!config.languages) {
-      throw new Error(`general.locale is required`);
+      throw new Error(`languages is required`);
     }
     this.languages = config.languages;
 
