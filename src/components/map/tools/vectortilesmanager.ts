@@ -1,14 +1,15 @@
-
+import { Map } from 'ol';
 import VectorTileLayer from 'ol/layer/VectorTile.js';
 import { applyStyle } from 'ol-mapbox-style';
+import Layer from '../../../models/layer';
 
 class VectorTilesManager {
-  map = null;
-  srid = null;
+  map: Map;
+  srid: string;
 
-  basemapLayers = [];
+  basemapLayers: VectorTileLayer[] = [];
 
-  constructor(map, srid) {
+  constructor(map: Map, srid: string) {
     this.map = map;
     // TODO REG: use global state for this info, or update when map component is updated.
     this.srid = srid;
@@ -21,7 +22,7 @@ class VectorTilesManager {
     this.basemapLayers = [];
   }
 
-  addBasemapLayer(basemap) {
+  addBasemapLayer(basemap:Layer) {
     const olayer = new VectorTileLayer({ declutter: true });
     applyStyle(olayer, basemap.style);
     this.basemapLayers.push(olayer);

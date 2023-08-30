@@ -6,7 +6,6 @@ class AboutComponent extends GirafeDraggableElement {
   styleUrl = './style.css';
 
   loaded = false;
-  content!: HTMLElement;
   version!: HTMLElement;
   build!: HTMLElement;
   date!: HTMLElement;
@@ -39,16 +38,14 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   toggleAbout(visible: boolean) {
-    // @ts-ignore
-    this.content = this.shadow.getElementById('content');
     if (visible) {
       this.loadVersionInfos()
         .then(() => {
-          ((this.content.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'block';
+          ((this.shadow.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'block';
         });
     }
     else {
-      ((this.content.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'none';
+      ((this.shadow.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'none';
     }
   }
 

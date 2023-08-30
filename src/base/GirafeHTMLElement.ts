@@ -1,6 +1,6 @@
 import { render as uRender } from 'uhtml';
 import { Renderable } from '../typings/uhtml';
-import tippy, { Placement, Content } from 'tippy.js';
+import tippy from 'tippy.js';
 import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
 import ConfigManager from '../tools/configmanager';
@@ -44,7 +44,13 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   /**
-   * TODO: Why not use truthy?
+   * NOTE REG: We cannot just use truthy here, because javascript comparaison table is really problematic.
+   * For example:
+   *   0  == false
+   *   [] == false
+   *   "" == false
+   * And there are cases where we want to check null or undefined, because 0 can be a right value.
+   * More here : https://dorey.github.io/JavaScript-Equality-Table/
    * @param val
    * @returns
    */
@@ -85,17 +91,17 @@ class GirafeHTMLElement extends HTMLElement {
     return this.getParentOfType(parentNodeName, parent);
   }
 
-  activateTooltips(arrow: boolean, delay: [number, number], defaultPlacement: Placement) {
+  activateTooltips(arrow: boolean, delay: [number, number], defaultPlacement: string) {
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach(el => {
-      let placement = el.getAttribute('tip-placement') as Placement || defaultPlacement ;
+      let placement = el.getAttribute('tip-placement') ?? defaultPlacement ;
       tippy(el, {
         arrow: arrow,
         delay: delay,
         placement: placement,
         //animateFill: false,
         //animation: 'scale-with-inertia',
-        content: el.getAttribute('tip') as Content
+        content: el.getAttribute('tip')
       })
     });
   }

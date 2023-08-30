@@ -13,14 +13,14 @@ import GlobeComponent from './components/globe/component.js';
 import BasemapComponent from './components/basemap/component';
 import ThemeComponent from './components/themes/component.js';
 import LanguageComponent from './components/language/component';
-import ButtonComponent from './components/button/component.js';
+import ButtonComponent from './components/button/component';
 import ScaleComponent from './components/scale/component.js';
 import CoordinateComponent from './components/coordinate/component';
 import MenuButtonComponent from './components/menubutton/component.js';
 import RedliningComponent from './components/redlining/component.js';
-import PrintComponent from './components/print/component.js';
-import SelectionWindowComponent from './components/selectionwindow/component.js';
-import SelectionGridComponent from './components/selectiongrid/component.js';
+import PrintComponent from './components/print/component';
+import SelectionWindowComponent from './components/selectionwindow/component';
+import SelectionGridComponent from './components/selectiongrid/component';
 import HelpComponent from './components/help/component';
 import AboutComponent from './components/about/component';
 

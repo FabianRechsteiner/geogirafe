@@ -1,5 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import ButtonComponent from '../button/component.js';
+import ButtonComponent from '../button/component';
 
 class ScaleComponent extends GirafeHTMLElement {
 
