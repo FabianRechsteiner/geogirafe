@@ -40,7 +40,7 @@ class StateManager extends GirafeSingleton {
     this.configManager?.loadConfig().then(() => {
       if (this.state && this.configManager?.Config) {
         this.state.projection = this.configManager.Config.map!.srid!;
-        this.state.language = this.configManager.Config.languages!.default;
+        this.state.language = this.configManager.Config.languages!.defaultLanguage;
       }
     });
   }
@@ -76,9 +76,9 @@ class StateManager extends GirafeSingleton {
     // We immediately call the callback.
     const obj = this.getPropertyByPath(this.state, path);
     if (obj.found) {
-      if (obj.object === null || 
-          obj.object === undefined || 
-          (Array.isArray(obj.object) && obj.object.length === 0) || 
+      if (obj.object === null ||
+          obj.object === undefined ||
+          (Array.isArray(obj.object) && obj.object.length === 0) ||
           (obj.object instanceof Object && Object.keys(obj.object).length === 0)) {
         // Empry object => nothing to do
       }
@@ -106,7 +106,7 @@ class StateManager extends GirafeSingleton {
     let currentObj = obj;
     if (path.trim() !== '') {
       const keys = path.split(".");
-    
+
       for (let i = 0; i < keys.length; i++) {
         if (keys[i] in currentObj) {
           currentObj = currentObj[keys[i]];

@@ -9,7 +9,7 @@
     "//comment1": "List of languages with their corresponding translation-file.",
     "fr": "https://mapnv.ch/static/dummy/fr.json",
     "//comment2": "Default language",
-    "default": "fr"
+    "defaultLanguage": "fr"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
@@ -56,6 +56,12 @@
     "defaultStrokeWidth": 2,
     "defaultTextSize": 12,
     "defaultFont": "Arial"
+  },
+  "projections": {
+    "//comment1": "List of projections with their corresponding abbreviation",
+    "EPSG:3857": "W-M",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "MN95"
   },
   "map": {
     "srid": "EPSG:2056",

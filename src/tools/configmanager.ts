@@ -45,6 +45,9 @@ class GirafeConfig {
     defaultTextSize: number;
     defaultFont: string;
   };
+  projections: {
+    [key: string]: string;
+  };
   map: {
     srid: string;
     startZoom: string;
@@ -73,7 +76,7 @@ class GirafeConfig {
     };
 
     if (!config.languages) {
-      throw new Error(`general.locale is required`);
+      throw new Error(`languages is required`);
     }
     this.languages = config.languages;
 
@@ -141,6 +144,11 @@ class GirafeConfig {
       }
     }
     this.redlining = config.redlining;
+
+    if (!config.projections) {
+      throw new Error(`projections is required`);
+    }
+    this.projections = config.projections;
 
     if (!config.map.srid) {
       throw new Error(`map.srid is required`);

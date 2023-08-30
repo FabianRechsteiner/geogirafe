@@ -9,7 +9,7 @@
     "//comment1": "List of languages with their corresponding translation-file.",
     "en": "Mock/en.json",
     "//comment2": "Default language",
-    "default": "en"
+    "defaultLanguage": "en"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
@@ -58,6 +58,12 @@
     "defaultTextSize": 12,
     "defaultFont": "Arial"
   },
+  "projections": {
+    "//comment1": "List of projections with their corresponding abbreviation",
+    "EPSG:3857": "W-M",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "MN95"
+  },
   "map": {
     "srid": "EPSG:2056",
     "startZoom": "1",
@@ -65,7 +71,7 @@
     "maxExtent": "2420000,1030000,2900000,1350000",
     "scales": [1000000, 350000, 200000, 75000, 40000, 20000, 7500, 3500, 2000, 1000, 500, 200],
     "constraintScales": true
-  }, 	 
+  },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
     "tilesetUrl": "https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"

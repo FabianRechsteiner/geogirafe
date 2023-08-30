@@ -1,11 +1,12 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import MenuButtonComponent from '../menubutton/component'
+import MenuButtonComponent from '../menubutton/component';
 
 class LanguageComponent extends GirafeHTMLElement {
 
   templateUrl = './template.html';
   styleUrl = './style.css';
 
+  languages: string[] = [];
   #menuButton?: MenuButtonComponent;
 
   constructor() {
@@ -20,8 +21,23 @@ class LanguageComponent extends GirafeHTMLElement {
   }
 
   render() {
-    super.render();
-    this.#menuButton = this.shadow.querySelector('#menu-button')!;
+    // Get languages list and store it
+    for (const key in this.configManager.Config.languages) {
+      if (!key.startsWith('//') && key !== 'defaultLanguage') {
+        this.languages.push(key);
+      }
+    }
+
+    // Only display menu button if several languages
+    if (this.languages.length > 1) {
+      super.render();
+      this.#menuButton = this.shadow.querySelector('#menu-button')!;
+    }
+  }
+
+  changeLanguage(language: string) {
+    console.log('change language', language);
+    this.state.language = language;
   }
 
   registerEvents() {

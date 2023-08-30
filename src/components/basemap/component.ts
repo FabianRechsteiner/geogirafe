@@ -8,7 +8,6 @@ class BasemapComponent extends GirafeHTMLElement {
 
   servers = {};
   basemapJson = {};
-  basemaps = [];
 
   constructor() {
     super('basemap');
