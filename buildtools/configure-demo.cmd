@@ -1,4 +1,4 @@
-REM @echo off
+@echo off
 
 set OUTPUTDIR="src\static\Mock"
 if not exist %OUTPUTDIR% mkdir %OUTPUTDIR%
