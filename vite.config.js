@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 
-
+import Terminal  from 'vite-plugin-terminal'
 import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
 import RestartPlugin from './buildtools/vite-restart-plugin';
 
@@ -23,6 +23,9 @@ export default defineConfig({
     },
     plugins: [
       InlineTemplatesPlugin(),
-      RestartPlugin()
+      RestartPlugin(),
+      Terminal ({
+        console: 'terminal'
+      })
     ]
 });
