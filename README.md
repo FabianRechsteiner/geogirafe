@@ -101,7 +101,7 @@ npm run configure-demo-win <environment>
 
 This will automatically copy the `config.yaml` file in the right place, and download the needed Mock objects.
 
-> Please not that today, the GeoGirafe Viewer is using a backend based on GeoMapFish.
+> Please note that today, the GeoGirafe Viewer is using a backend based on GeoMapFish.
 > The services you will have to use in your configuration must therefore be compliant with GeoMapFish.
 
 ## Build for Production
