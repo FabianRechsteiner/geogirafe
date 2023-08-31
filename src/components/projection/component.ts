@@ -29,10 +29,12 @@ class ProjectionComponent extends GirafeHTMLElement {
       }
     }
 
-    // Only display menu button if several projections
-    if (Object.keys(this.projections).length > 1) {
-      super.render();
-      this.#menuButton = this.shadow.querySelector('#menu-button')!;
+    super.render();
+    this.#menuButton = this.shadow.querySelector('#menu-button')!;
+
+    // Hide menu button if only one projection
+    if (Object.keys(this.projections).length == 1) {
+      this.menuButton.hide();
     }
   }
 
