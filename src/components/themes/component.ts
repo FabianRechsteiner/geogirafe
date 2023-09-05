@@ -46,13 +46,11 @@ class ThemeComponent extends GirafeHTMLElement {
       this.themesList.style.display = 'none';
     }
 
+    else if (this.themesList.style.display === 'none') {
+      this.themesList.style.display = 'block';
+    }
     else {
-      if (this.themesList.style.display === 'none') {
-        this.themesList.style.display = 'block';
-      }
-      else {
-        this.themesList.style.display = 'none';
-      }
+      this.themesList.style.display = 'none';
     }
   }
 
