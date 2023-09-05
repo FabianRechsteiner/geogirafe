@@ -11,7 +11,7 @@ import SearchComponent from './components/search/component.js';
 import ProjectionComponent from './components/projection/component';
 import GlobeComponent from './components/globe/component.js';
 import BasemapComponent from './components/basemap/component';
-import ThemeComponent from './components/themes/component.js';
+import ThemeComponent from './components/themes/component';
 import LanguageComponent from './components/language/component';
 import ButtonComponent from './components/button/component';
 import ScaleComponent from './components/scale/component.js';

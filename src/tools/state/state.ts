@@ -2,6 +2,7 @@ import Map from 'ol/Map';
 import Layer from '../../models/layer';
 import Feature from 'ol/Feature';
 import Basemap from '../../models/basemap';
+import Theme from '../../models/theme';
 
 type GraphicalInterface = {
   helpVisible: boolean,
@@ -51,7 +52,9 @@ class State {
 
   // All themes from themes.json
   // Dictionary where the key is the id of the theme
-  themes = {};
+  themes: {
+    [key: number]: Theme
+  } = {};
 
   // All basemaps from themes.json
   // Dictionary where the key is the id of the basemap

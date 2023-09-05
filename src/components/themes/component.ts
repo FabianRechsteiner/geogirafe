@@ -1,21 +1,29 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import Theme from '../../models/theme';
 
 class ThemeComponent extends GirafeHTMLElement {
 
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  themesList = null;
+  #themesList?: HTMLElement;
   #ignoreBlur = false;
 
   constructor() {
     super('themes');
   }
 
+  get themesList() {
+    if (!this.#themesList) {
+      throw new Error('You called themesList before render');
+    }
+    return this.#themesList;
+  }
+
   render() {
     super.render();
 
-    this.themesList = this.shadow.querySelector('#themes');
+    this.#themesList = this.shadow.querySelector('#themes')!;
     this.toggleThemesList(false);
   }
 
@@ -30,7 +38,7 @@ class ThemeComponent extends GirafeHTMLElement {
     }
   }
 
-  toggleThemesList(forceDisplay=null) {
+  toggleThemesList(forceDisplay: null | undefined | boolean = null) {
     if (forceDisplay === true) {
       this.themesList.style.display = 'block';
     }
@@ -38,11 +46,13 @@ class ThemeComponent extends GirafeHTMLElement {
       this.themesList.style.display = 'none';
     }
 
-    else if (this.themesList.style.display === 'none') {
-      this.themesList.style.display = 'block';
-    }
     else {
-      this.themesList.style.display = 'none';
+      if (this.themesList.style.display === 'none') {
+        this.themesList.style.display = 'block';
+      }
+      else {
+        this.themesList.style.display = 'none';
+      }
     }
   }
 
@@ -50,7 +60,7 @@ class ThemeComponent extends GirafeHTMLElement {
     this.#ignoreBlur = true;
   }
 
-  onThemeChanged(theme) {
+  onThemeChanged(theme: Theme) {
     this.state.selectedTheme = theme;
     this.toggleThemesList(false);
     this.#ignoreBlur = false;
