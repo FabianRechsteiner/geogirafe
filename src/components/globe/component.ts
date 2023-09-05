@@ -1,19 +1,27 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import MenuButtonComponent from '../menubutton/component';
 
 class GlobeComponent extends GirafeHTMLElement {
 
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  menuButton = null;
-  
+  #menuButton?: MenuButtonComponent;
+
   constructor() {
     super('globe');
   }
 
+  get menuButton() {
+    if (!this.#menuButton) {
+      throw new Error('You called menuButton before render');
+    }
+    return this.#menuButton;
+  }
+
   render() {
     super.render();
-    this.menuButton = this.shadow.querySelector('#menu-button');
+    this.#menuButton = this.shadow.querySelector('#menu-button')!;
   }
 
   registerEvents() {
