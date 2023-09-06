@@ -28,10 +28,12 @@ class LanguageComponent extends GirafeHTMLElement {
       }
     }
 
-    // Only display menu button if several languages
-    if (this.languages.length > 1) {
-      super.render();
-      this.#menuButton = this.shadow.querySelector('#menu-button')!;
+    super.render();
+    this.#menuButton = this.shadow.querySelector('#menu-button')!;
+
+    // Hide menu button if only one language
+    if (this.languages.length == 1) {
+      this.menuButton.hide();
     }
   }
 
