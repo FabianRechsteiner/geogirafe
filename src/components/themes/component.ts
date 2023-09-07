@@ -6,7 +6,7 @@ class ThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  #themesList?: HTMLElement;
+  #themesList?: HTMLUListElement;
   #ignoreBlur = false;
 
   constructor() {
@@ -38,7 +38,7 @@ class ThemeComponent extends GirafeHTMLElement {
     }
   }
 
-  toggleThemesList(forceDisplay: null | undefined | boolean = null) {
+  toggleThemesList(forceDisplay: null | boolean = null) {
     if (forceDisplay === true) {
       this.themesList.style.display = 'block';
     }
