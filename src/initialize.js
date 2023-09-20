@@ -7,7 +7,7 @@ import I18MessageManager from './tools/messagemanager';
 // TODO: Migrate all these components to TypeScript
 import TreeViewComponent from  './components/treeview/component.js';
 import MapComponent from './components/map/component.js';
-import SearchComponent from './components/search/component.js';
+import SearchComponent from './components/search/component';
 import ProjectionComponent from './components/projection/component';
 import GlobeComponent from './components/globe/component';
 import BasemapComponent from './components/basemap/component';
