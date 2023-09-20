@@ -5,11 +5,11 @@ class MessageManager extends GirafeSingleton {
 
   translations = null;
 
-  sendMessage(detail: string) {
+  sendMessage(detail: Record<string, any>) {
     window.dispatchEvent(
       new CustomEvent(GeoEvents.CustomEventType, {
-                      bubbles: true, 
-                      cancelable: false, 
+                      bubbles: true,
+                      cancelable: false,
                       composed: true,
                       detail
     }));

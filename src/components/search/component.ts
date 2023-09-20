@@ -1,39 +1,53 @@
-import Polygon from 'ol/geom/Polygon';
-import {buffer, getWidth, getHeight} from 'ol/extent';
+import {buffer, getWidth, getHeight, Extent} from 'ol/extent';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events';
+import SearchResult from '../../models/searchresult';
 
 class SearchComponent extends GirafeHTMLElement {
 
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  searchBox = null;
-  resultsBox = null;
+  #searchBox?: HTMLElement;
+  #resultsBox?: HTMLElement;
   ignoreBlur = false;
 
-  resultList = null;
+  resultList: any[] = [];
 
   searchTermPlaceholder = '###SEARCHTERM###';
   initialSearchBoxHeight = this.convertRemToPixels(2.5);
-  
+
   constructor() {
     super('search');
+  }
+
+  get searchBox() {
+    if (!this.#searchBox) {
+      throw new Error('You called searchBox before render');
+    }
+    return this.#searchBox;
+  }
+
+  get resultsBox() {
+    if (!this.#resultsBox) {
+      throw new Error('You called resultsBox before render');
+    }
+    return this.#resultsBox;
   }
 
   render() {
     super.render();
 
     // Get default height of searchBox
-    this.searchBox = this.shadow.querySelector('#searchbox');
-    this.resultsBox = this.shadow.querySelector('#results');
+    this.#searchBox = this.shadow.querySelector('#searchbox')!;
+    this.#resultsBox = this.shadow.querySelector('#results')!;
   }
 
   registerEvents() {
-    this.searchBox.addEventListener('input', (e) => this.doSearch(this, e));
-    this.searchBox.addEventListener('focusin', (e) => this.onFocusIn());
-    this.searchBox.addEventListener('focusout', (e) => this.onFocusOut());
+    this.searchBox.addEventListener('input', (e) => this.doSearch(e));
+    this.searchBox.addEventListener('focusin', (_e) => this.onFocusIn());
+    this.searchBox.addEventListener('focusout', (_e) => this.onFocusOut());
   }
 
   onFocusIn() {
@@ -48,7 +62,7 @@ class SearchComponent extends GirafeHTMLElement {
       this.setSearchBoxHeight(this.initialSearchBoxHeight);
     }
   }
-  
+
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
@@ -63,36 +77,37 @@ class SearchComponent extends GirafeHTMLElement {
     this.setSearchBoxHeight(this.initialSearchBoxHeight);
   }
 
-  doSearch(_this, e) {
-    const term = e.target.value;
-    if (term.length <= 0) {
-      this.clearSearch();
-      return;
-    }
+  doSearch(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (target) {
+      const term: string = target.value;
+      if (term.length <= 0) {
+        this.clearSearch();
+        return;
+      }
 
-    const url = _this.configManager.Config.search.url.replace(_this.searchTermPlaceholder, term);
-    fetch(url)
-      .then(response => response.json())
-      .then(data => this.displayResults(data));
+      const url = this.configManager.Config.search.url.replace(this.searchTermPlaceholder, term);
+      fetch(url)
+        .then(response => response.json())
+        .then(data => this.displayResults(data));
+    }
   }
 
-  displayResults(results) {
-
+  displayResults(results: { type: string, features: SearchResult[] }) {
     // First, group the results
-    const groupedResults = {}
+    const groupedResults: Record<string, any[]> = {}
     results.features.forEach(result => {
       const type = result.properties.layer_name;
 
-      let resultList = null;
       if (type in groupedResults) {
-        resultList = groupedResults[type];
+        this.resultList = groupedResults[type];
       }
       else {
-        resultList = [];
-        groupedResults[type] = resultList;
+        this.resultList = [];
+        groupedResults[type] = this.resultList;
       }
 
-      resultList.push(result);
+      this.resultList.push(result);
     });
 
     // Then, display the results by group
@@ -106,9 +121,9 @@ class SearchComponent extends GirafeHTMLElement {
       const icon = document.createElement('i');
       icon.className = this.getIconClassName(type);
       title.appendChild(icon);
-      
+
       const titleText = document.createElement('span');
-      titleText.innerHTML = type;
+      titleText.innerHTML = type; // TODO: Translate `type`
       title.appendChild(titleText);
 
       this.resultsBox.appendChild(title);
@@ -117,8 +132,8 @@ class SearchComponent extends GirafeHTMLElement {
       groupedResults[type].forEach(r => {
         const result = document.createElement('div');
         result.className = 'result';
-        this.resultList.push(r.geometry);
-        result.dataset.resultId = this.resultList.length - 1;
+        this.resultList.push(r.bbox);
+        result.dataset.resultId = String(this.resultList.length - 1);
 
         result.onmousedown = () => { this.ignoreBlur = true };
         result.onclick = (e) => { this.ignoreBlur = false; this.onSelect(e); };
@@ -134,7 +149,8 @@ class SearchComponent extends GirafeHTMLElement {
     this.setSearchBoxHeight(this.initialSearchBoxHeight + this.resultsBox.offsetHeight + 20);
   }
 
-  getIconClassName(type) {
+  getIconClassName(type: string) {
+    // TODO: Do not hardcode values here
     switch(type) {
       case 'Adresse':
         return 'fa-solid fa-location-dot';
@@ -155,50 +171,34 @@ class SearchComponent extends GirafeHTMLElement {
     }
   }
 
-  setSearchBoxHeight(height) {
+  setSearchBoxHeight(height: number) {
     this.searchBox.style.height = height + 'px';
   }
 
-  onSelect(e) {
-    const div = super.getParentOfType('DIV', e.target);
-    const resultGeometry = this.resultList[div.dataset.resultId];
-    if (resultGeometry.type === 'Point') {
-      this.state.position.center = resultGeometry.coordinates;
+  onSelect(e: MouseEvent) {
+    const target = e.target as HTMLSpanElement;
+    if (target) {
+      const div = super.getParentOfType('DIV', target) as HTMLDivElement;
+      const resultGeometry = this.resultList[parseInt(div.dataset.resultId!)];
+
+      this.zoomTo(resultGeometry);
       this.onFocusOut();
-    }
-    else if (resultGeometry.type === 'MultiPoint' && resultGeometry.coordinates.length === 1) {
-      // We get a MultiPoint geometry, but this actually is a Point
-      this.state.position.center = resultGeometry.coordinates[0];
-      this.onFocusOut();
-    }
-    else if (resultGeometry.type === 'Polygon') {
-      this.zoomTo(resultGeometry.coordinates);
-      this.onFocusOut();
-    }
-    else if (resultGeometry.type === 'MultiPolygon' && resultGeometry.coordinates.length === 1) {
-      // We get a MultiPolygon geometry, but this actually is a Polygon
-      this.zoomTo(resultGeometry.coordinates[0]);
-      this.onFocusOut();
-    }
-    else {
-      alert('Result-Type not managed yet');
     }
   }
 
-  zoomTo(coordinates) {
-    const extent = new Polygon(coordinates).getExtent();
+  zoomTo(extent: Extent) {
     // We create a buffer around the extent from 50% of the width/height
-    const bufferValue = parseInt(Math.max(getWidth(extent)*50/100, getHeight(extent)*50/100));
+    const bufferValue = Math.max(getWidth(extent)*50/100, getHeight(extent)*50/100);
     const bufferedExtent = buffer(extent, bufferValue);
 
-    this.messageManager.sendMessage({action: GeoEvents.zoomToExtent, extent: bufferedExtent });
+    this.messageManager.sendMessage({action: GeoEvents.zoomToExtent, extent: bufferedExtent});
   }
 
-  attributeChangedCallback(name, oldValue, newValue, namespace) {
+  attributeChangedCallback(_name: string, _oldValue: string, _newValue: string, _namespace: string) {
     console.log('attributeChangedCallback');
   }
 
-  convertRemToPixels(rem) {    
+  convertRemToPixels(rem: number) {
     return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
   }
 }
