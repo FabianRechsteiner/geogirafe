@@ -141,8 +141,10 @@ pages:
     - apt update && apt install -y brotli curl
     - mkdir -p public/Mock
     - mkdir release
-  script: 
+  script:
     # Prepare all demo environments
+    - demo='c2c'
+    - *prepare_demo
     - demo='mapbs'
     - *prepare_demo
     - demo='cartoriviera'
