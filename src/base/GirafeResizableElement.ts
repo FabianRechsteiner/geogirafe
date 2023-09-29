@@ -83,7 +83,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   closePanel() {
-    throw 'This function must be overriden to close the associated panel';
+    throw new Error('This function must be overriden to close the associated panel');
   }
 
   #togglePanel() {

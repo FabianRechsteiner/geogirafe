@@ -1,16 +1,19 @@
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import TileLayer from 'ol/layer/Tile';
+import { Map } from 'ol';
+import Layer from '../../../models/layer';
+import { Layer as OLayer } from 'ol/layer';
 
 class WmtsManager {
-  map = null;
-  srid = null;
+  map: Map;
+  srid: string;
 
-  wmtsCapabilitiesByServer = {};
-  wmtsLayers = {};
-  basemapLayers = [];
+  wmtsCapabilitiesByServer: Record<string, {}> = {};
+  wmtsLayers: Record<string, OLayer> = {};
+  basemapLayers: OLayer[] = [];
 
-  constructor(map, srid) {
+  constructor(map: Map, srid: string) {
     this.map = map;
     // TODO REG: use global state for this info, or update when map component is updated.
     this.srid = srid;
@@ -23,21 +26,26 @@ class WmtsManager {
     this.basemapLayers = [];
   }
 
-  addLayer(layer) {
+  addLayer(layer: Layer) {
     this.#addLayerInternal(layer, false);
   }
 
-  addBasemapLayer(basemap) {
+  addBasemapLayer(basemap: Layer) {
     this.#addLayerInternal(basemap, true);
   }
 
-  #addLayerInternal(layer, isBasemap) {
-    this.#getWmtsCapabilities(layer.url, (capabilities) => {
+  #addLayerInternal(layer: Layer, isBasemap: boolean) {
+    this.#getWmtsCapabilities(layer.url!, (capabilities: string) => {
       // TODO REG : Manage dimensions, because the "layers" can be the same with different dimensions
       const options = optionsFromCapabilities(capabilities, {
         layer: layer.layers,
         projection: this.srid
       });
+
+      if (options === null) {
+        console.log('Cannot create WMTS layer for layer ' + layer.layers);
+        return;
+      }
 
       // Set the right dimensions
       for (let key in layer.dimensions) {
@@ -50,9 +58,6 @@ class WmtsManager {
         }
       }
 
-      if (options === null) {
-        console.log('Cannot create WMTS layer for layer ' + layer.layers);
-      }
 
       const olayer = new TileLayer({
         opacity: layer.opacity,
@@ -71,39 +76,39 @@ class WmtsManager {
     });
   }
   
-  removeLayer(layer) {
+  removeLayer(layer: Layer) {
     if (this.layerExists(layer)) {
       const olayer = this.wmtsLayers[layer.layerUniqueId];
       delete this.wmtsLayers[layer.layerUniqueId];
       this.map.removeLayer(olayer);
     }
     else {
-      throw 'Cannot remove this layer: it does not exist';
+      throw new Error('Cannot remove this layer: it does not exist');
     }
   }
   
-  layerExists(layer) {
+  layerExists(layer: Layer) {
     return (layer.layerUniqueId in this.wmtsLayers);
   }
 
-  getLayer(layer) {
+  getLayer(layer: Layer) {
     if (this.layerExists(layer)) {
       return this.wmtsLayers[layer.layerUniqueId];
     }
     return null;
   }
 
-  changeOpacity(layer, opacity) {
+  changeOpacity(layer: Layer, opacity: number) {
     if (this.layerExists(layer)) {
       const olayer = this.wmtsLayers[layer.layerUniqueId];
       olayer.setOpacity(opacity);
     }
     else {
-      throw 'Cannot change opacity for this layer: it does not exist';
+      throw new Error('Cannot change opacity for this layer: it does not exist');
     }
   }
 
-  #getWmtsCapabilities(url, callback) {
+  #getWmtsCapabilities(url: string, callback: Function) {
     if (url in this.wmtsCapabilitiesByServer) {
       // Capabilities were already loaded
       const capabilities = this.wmtsCapabilitiesByServer[url];

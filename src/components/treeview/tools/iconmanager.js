@@ -248,7 +248,7 @@ class IconManager {
       }
       else {
         // Unmanaged case : this whould not happen
-        throw 'Unmanage case in the legend icon calculation.';
+        throw new Error('Unmanage case in the legend icon calculation.');
       }
 
       this.renderOpacityIcon(container, layer);

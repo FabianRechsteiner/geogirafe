@@ -1,3 +1,5 @@
+import { METERS_PER_UNIT as ol_METERS_PER_UNIT } from 'ol/proj';
+
 class GeoConsts {
     static INCHES_PER_METER = 39.37;
 
@@ -12,6 +14,8 @@ class GeoConsts {
     // shouldn't we read this information from the current display? (desktop, mobile, ...)
     // https://www.infobyip.com/detectmonitordpi.php
     static SCREEN_DOTS_PER_INCH = 96;
+
+    static METERS_PER_UNIT = ol_METERS_PER_UNIT;
 }
 
 export default GeoConsts;

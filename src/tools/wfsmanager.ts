@@ -115,7 +115,7 @@ class WfsManager extends GirafeSingleton {
               // If we didn't find any geometry attribute for this featureType, then we have a problem
               // Because the wfs query won't be possible
               if (!(featureType in this.featureTypeToGeometryAttributeName)) {
-                throw 'No Geometry column for the type ' + featureType;
+                throw new Error('No Geometry column for the type ' + featureType);
               }
             }
 

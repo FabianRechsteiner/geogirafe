@@ -57,7 +57,7 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   }
 
   closeWindow() {
-    throw 'This function must be overriden to close the associated window';
+    throw new Error('This function must be overriden to close the associated window');
   }
 
   dragMouseDown(_this: GirafeDraggableElement, e: MouseEvent) {
