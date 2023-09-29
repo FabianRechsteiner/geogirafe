@@ -24,7 +24,7 @@ class VectorTilesManager {
 
   addBasemapLayer(basemap:Layer) {
     const olayer = new VectorTileLayer({ declutter: true });
-    applyStyle(olayer, basemap.style);
+    applyStyle(olayer, basemap.style, basemap.source);
     this.basemapLayers.push(olayer);
     this.map.getLayers().insertAt(0, olayer);
   }

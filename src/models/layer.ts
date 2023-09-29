@@ -2,7 +2,7 @@ class Layer {
 
   // Base properties
   id: string | null = null;
-  name: string | null = null;
+  name: string;
   type: string | null = null;
   isDefaultChecked: boolean | null = null;
   private _isExclusiveGroup = false;
@@ -17,6 +17,7 @@ class Layer {
   // VectorTiles
   style: any = null;
   projection?: string;
+  source?: string;
 
   // WMS & WMTS
   server: string | null = null;
@@ -24,7 +25,7 @@ class Layer {
   urlWfs: string | null = null;
   imageType: string | null = null;
   layers: string | null = null;
-  dimensions: string | null = null;
+  dimensions: Record<string, {}> = {};
   queryLayers: string | null = null;
   minResolution: number | null = null;
   maxResolution: number | null = null;
@@ -67,6 +68,7 @@ class Layer {
     else if (elem.type === 'VectorTiles') {
       this.style = elem.style;
       this.projection = elem.projection;
+      this.source = elem.source;
     }
     else if (elem.type === 'WMTS') {
       this.url = elem.url;
@@ -115,7 +117,7 @@ class Layer {
 
     // }
     // else {
-    //   throw 'Unmanaged layer type: ' + elem.type;
+    //   throw new Error('Unmanaged layer type: ' + elem.type);
     // }
   }
 
@@ -170,7 +172,7 @@ class Layer {
 
   get isExclusiveGroup() {
     if (!this.isGroup) {
-      throw 'This method should not be called on leafs, only on groups.';
+      throw new Error('This method should not be called on leafs, only on groups.');
     }
     return (this._isExclusiveGroup);
   }

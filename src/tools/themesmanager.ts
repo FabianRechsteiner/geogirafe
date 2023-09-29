@@ -82,6 +82,7 @@ class ThemesManager extends GirafeSingleton {
         "name": "Vector-Tiles",
         "type": "VectorTiles",
         "style": "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json",
+        "source": "leichtebasiskarte_v3.0.0",
         "projection": "EPSG:3857"
       };
       vectorBasemap.layersList.push(new Layer(data, null, null, null, 0));

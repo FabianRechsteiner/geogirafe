@@ -2,6 +2,7 @@ import Map from 'ol/Map';
 import Layer from '../../models/layer';
 import Feature from 'ol/Feature';
 import Basemap from '../../models/basemap';
+import { Coordinate } from 'ol/coordinate';
 import Theme from '../../models/theme';
 
 type GraphicalInterface = {
@@ -9,11 +10,12 @@ type GraphicalInterface = {
   redliningPanelVisible: boolean,
   printPanelVisible: boolean,
   selectionGridVisible: boolean,
-  aboutVisible: boolean
+  aboutVisible: boolean,
+  darkMode: boolean
 }
 
 type MapPosition = {
-  center: number[];
+  center: Coordinate;
   zoom: number | null;
   resolution: number | null;
   scale: number | null;
@@ -38,7 +40,7 @@ type TreeviewConfig = {
 
 // Current Print state
 type PrintConfig = {
-  format: string | null;
+  format: [number, number] | null;
   scale: number | null;
 }
 
@@ -87,7 +89,8 @@ class State {
     redliningPanelVisible: false,
     printPanelVisible: false,
     selectionGridVisible: false,
-    aboutVisible: false
+    aboutVisible: false,
+    darkMode: false
   }
 
   // Current language
