@@ -13,7 +13,6 @@ class StateManager extends GirafeSingleton {
 
   // TODO: If Map() needs to be used, it needs some change in the code.
   // with set and get.
-  //#callbacks: Map<string, Function[]> = new Map();
   #callbacks: {[key: string]: Function[]} = {};
 
   configManager: ConfigManager | null = null;
@@ -25,7 +24,10 @@ class StateManager extends GirafeSingleton {
 
     this.#girafeState = new State();
     this.#stateProxy = onChange(this.#girafeState, (path, value, oldValue, _applyData) => {
-      console.log(`${path} has changed.`);
+      if (path !== 'mouseCoordinates') {
+        // TODO REG: This test is not very beautiful, but mouseCoordinates generate far too many logs.
+        console.log(`${path} has changed.`);
+      }
       this.onChange(path, oldValue, value);
     });
 
@@ -50,14 +52,15 @@ class StateManager extends GirafeSingleton {
     for (const key in this.#callbacks) {
       const regex = new RegExp('^' + key + '$');
       if (path.match(regex)) {
+        // We find the parent object and send it in the callback
+        const parentPath = path.substring(0, path.lastIndexOf('.'));
+        const parentObject = this.getPropertyByPath(this.state, parentPath);
+        if (!parentObject.found) {
+          console.warn('Parent object could not be found in the state');
+        }
+        
         const callbacks = this.#callbacks[key];
         for (let i=0; i < callbacks.length; ++i) {
-          // We find the parent object and send it in the callback
-          const parentPath = path.substring(0, path.lastIndexOf('.'));
-          const parentObject = this.getPropertyByPath(this.state, parentPath);
-          if (!parentObject.found) {
-            console.warn('Parent object could no be found in the state');
-          }
           callbacks[i](oldValue, value, parentObject.object);
         }
       }
@@ -69,7 +72,7 @@ class StateManager extends GirafeSingleton {
       this.#callbacks[path] = [];
     }
     this.#callbacks[path].push(callback);
-    console.log(`Subscribing to ${path}. ${this.#callbacks[path].length} currently suscribing ${path}.`);
+    console.log(`Subscribing to ${path}. ${this.#callbacks[path].length} are currently subscribing ${path}.`);
 
     // At the application start, perhaps the value in state was initialized before the subscribe method was called
     // Therefore, if the subscribed value os not null, undefined or an empty object or array
@@ -80,10 +83,10 @@ class StateManager extends GirafeSingleton {
           obj.object === undefined ||
           (Array.isArray(obj.object) && obj.object.length === 0) ||
           (obj.object instanceof Object && Object.keys(obj.object).length === 0)) {
-        // Empry object => nothing to do
+        // Empty object => nothing to do
       }
       else {
-        // Object is not null during the subscribe. => we cann the callback
+        // Object is not null during the subscribe. => we call the callback
         const parentPath = path.substring(0, path.lastIndexOf('.'));
         const parentObject = this.getPropertyByPath(this.state, parentPath);
         callback(null, obj.object, parentObject);

@@ -155,6 +155,11 @@ class ButtonComponent extends GirafeHTMLElement {
         // Apply all style from host to container
         this.container.classList.add(...this.classList);
       }
+      if (mutation.attributeName === 'icon-style') {
+        if (this.icon) {
+          this.icon.className = this.getAttribute('icon-style') as string;
+        }
+      }
     });
   }
 

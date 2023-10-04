@@ -1,0 +1,190 @@
+import ImageWMS from 'ol/source/ImageWMS';
+import tippy from "tippy.js";
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import Layer from '../../models/layer';
+import LayerManager from '../../tools/layermanager';
+
+class TreeViewItemComponent extends GirafeHTMLElement {
+
+  templateUrl = './template.html';
+  styleUrl = './style.css';
+
+  layerManager: LayerManager;
+
+  layer: Layer;
+  iconUrl: string | null = null;
+  legendUrls: Record<string, string> = {};
+
+  constructor(layer: Layer) {
+    super('treeviewitem');
+
+    this.layerManager = LayerManager.getInstance();
+    this.layer = layer;
+  }
+
+  render() {
+    // If we come from an  html element, the layer was not defined in the constructor
+    // And we have to set the layer using the id passed to the layerid attribute
+    const layerId = this.getAttribute('layerid');
+    if (layerId) {
+      this.layer = this.layerManager.getLayer(parseInt(layerId));
+      // Get Legend Url
+      this.setLegend();
+    }
+    super.render();
+    this.createOpacityTooltip();
+    this.activateTooltips(false, [800, 0], 'right');
+  }
+
+  setLegend() {
+    // Manage Icon URL
+    if (this.layer.iconUrl) {
+      // A custom legend icon has been defined and can be displayed
+      this.iconUrl = this.layer.iconUrl;
+    }
+    else if (this.layer.legendRule) {
+      // We need to get the legend icon URL from WMS
+      this.iconUrl = Object.values(this.getLegendImageUrlFromWms(true))[0];
+    }
+    else {
+      // All other cases, we do not have any icon for the layer
+      // => A simple selection icon will be rendered
+      this.iconUrl = null;
+    }
+
+    // Manage Legend
+    if (this.layer.legend) {
+      if (this.layer.legendImage) {
+        // TODO REG : remove this ! when a reactoring of the Layer class has been done
+        this.legendUrls[this.layer.layers!] = this.layer.legendImage;
+      }
+      else {
+        this.legendUrls = this.getLegendImageUrlFromWms(false);
+      }
+    }
+  }
+
+  getLegendImageUrlFromWms(iconOnly: boolean): Record<string, string> {
+    if (!this.layer.url) {
+      throw new Error('If legend URL ist null, this method should not be called.')
+    }
+
+    const legends: Record<string, string> = {};
+    // TODO REG : remove this ! when a reactoring of the Layer class has been done
+    for (const l of this.layer.layers!.split(',')) {
+      const wmsSource = new ImageWMS({
+        url: this.layer.url,
+        params: { 'LAYERS': l },
+        ratio: 1
+      });
+
+      let graphicUrl = wmsSource.getLegendUrl(this.state.position.resolution);
+      if (!graphicUrl) {
+        console.error(`The URL for legend of layer ${l} could not be calculated.`);
+        legends[l] = '';
+        continue;
+      }
+
+      if (!graphicUrl.toLowerCase().includes('sld_version')) {
+        // Add SLD_Version (it is mandatory, but openlayers do not seems to set it in the URL)
+        graphicUrl += '&SLD_Version=1.1.0'
+      }
+
+      if (iconOnly) {
+        if (!this.isNullOrUndefined(this.layer.legendRule)) {
+          graphicUrl += '&RULE=' + encodeURIComponent(this.layer.legendRule!);
+        }
+        graphicUrl += '&HEIGHT=' + this.configManager.Config.treeview.defaultIconSize.height;
+        graphicUrl += '&WIDTH=' + this.configManager.Config.treeview.defaultIconSize.width;
+      }
+
+      legends[l] = graphicUrl;
+    }
+
+    return legends;
+  }
+
+  createOpacityTooltip() {
+    const el = this.shadow.getElementById('opacity');
+    tippy(el, {
+      trigger: 'click',
+      arrow: true,
+      interactive: true,
+      theme: 'light',
+      placement: 'bottom-end',
+      content: (_reference: any) => {
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.className = 'slider';
+        slider.min = '0';
+        slider.max = '20';
+        slider.value = (this.layer.opacity*20).toString();
+        slider.oninput = (_e) => this.layer.opacity = parseInt(slider.value)/20;
+        return slider;
+      }
+    });
+  }
+
+  registerEvents() {
+    this.stateManager.subscribe('layers\.layersList\..*\.isLegendExpanded', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
+    this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
+    this.stateManager.subscribe('treeview\.advanced', () =>  super.render());
+    this.stateManager.subscribe('position\.resolution', () =>  this.refreshLegends());
+  }
+
+  refreshLegends() {
+    this.setLegend();
+    super.render();
+  }
+
+  refreshRender(layer: Layer) {
+    if (layer === this.layer) {
+      super.render()
+    }
+  }
+
+  toggle(state: 'on' | 'off') {
+    this.layerManager.toggleLayer(this.layer, state);
+  }
+
+  zoomToVisibleResolution() {
+    // Because of rounding errors (for example 1.59 becomes 1.589999999999998), 
+    // we zoom a bit more than just the max resolution.
+    // For the moment we try with 10% more
+    if (this.layer.maxResolution !== null) {
+      const resolution = this.layer.maxResolution - 10/100*this.layer.maxResolution;
+      this.state.position.resolution = resolution;
+    }
+  }
+
+  swipeLayer(side: 'left' | 'right') {
+    if (this.layer.activeState === 'off') {
+      this.toggle('on');
+    }
+
+    const otherSide = (side === 'left') ? 'right' : 'left';
+    const newSwipedLayers: Record<'left' | 'right', Array<Layer>> = {
+      left: [],
+      right: []
+    };
+    // If the object is already present in the other side, we remove it
+    newSwipedLayers[otherSide] = this.state.layers.swipedLayers[otherSide].filter((l:Layer) => { return l.id !== this.layer.id; });
+    // Then, we add it to right side
+    newSwipedLayers[side] = [...this.state.layers.swipedLayers[side]];
+    newSwipedLayers[side].push(this.layer);
+    // Lastly, we update the state
+    this.state.layers.swipedLayers = newSwipedLayers;
+  }
+
+  connectedCallback() {
+    this.loadConfig().then(() => {
+      this.render();
+      super.girafeTranslate();
+      this.registerEvents();
+    });
+  }
+}
+
+customElements.define('girafe-tree-view-item', TreeViewItemComponent);
+
+export default TreeViewItemComponent;

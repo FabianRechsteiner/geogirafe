@@ -31,7 +31,11 @@
   "treeview": {
     "useCheckboxes": false,
     "useLegendIcons": true,
-    "hideLegendWhenLayerIsDeactivated": false
+    "hideLegendWhenLayerIsDeactivated": false,
+    "defaultIconSize": {
+      "width": "20",
+      "height": "20"
+    }
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",

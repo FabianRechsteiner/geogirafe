@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="lib/font-gis/css/font-gis.css" />
+<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="lib/tippy.js/tippy.min.css" />
+
+<div class="${this.state.treeview.advanced ? 'item advanced' : 'item'}" >
+
+  <!-- Bullet or Checkbox or Icon -->
+  <img class="${this.layer.isWms && !this.configManager.Config.treeview.useCheckboxes && this.configManager.Config.treeview.useLegendIcons && this.iconUrl ? 'legend-icon' : 'legend-icon hidden'}" 
+       alt="${'Icon for ' + this.layer.name}" onclick="${() => this.toggle()}"
+       src="${this.iconUrl}">
+  <div class="${(!this.layer.isWms || !this.configManager.Config.treeview.useLegendIcons || !this.iconUrl || this.configManager.Config.treeview.useCheckboxes) && this.layer.activeState === 'off' ? 'circle-off selectable' : 'circle-off hidden'}"
+       onclick="${() => this.toggle()}">
+    <i class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-regular fa-square selbox' : 'fa-xs fa-regular fa-circle selcircle'}"></i>
+  </div>
+  <div class="${(!this.layer.isWms || !this.configManager.Config.treeview.useLegendIcons || !this.iconUrl || this.configManager.Config.treeview.useCheckboxes) && this.layer.activeState === 'on' ? 'circle-on selected' : 'circle-on hidden'}" 
+       onclick="${() => this.toggle()}">
+    <i class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-solid fa-square-check selbox' : 'fa-xs fa-solid fa-circle selcircle'}"></i>
+  </div>
+
+  <!-- Label -->
+  <span i18n="${this.layer.name}" 
+        class="${this.layer.activeState === 'on' ? 'text selected' : 'text selectable'}" 
+        onclick="${() => this.toggle()}">${this.layer.name}</span>
+
+  <i class="${this.layer.hasRestrictedResolution() ? 'fa-solid fa-magnifying-glass tool selectable resolution' : 'resolution hidden'}" tip="Zoom to visible resolution"
+     onclick="${() => this.zoomToVisibleResolution()}"></i>
+
+  <!-- swipe icons -->
+  <i class="fa-solid fa-arrow-left tool selectable swipe-left advanced" tip="Swipe layer on the left"
+     onclick="${() => this.swipeLayer('left')}"></i>
+  <i class="fa-solid fa-arrow-right tool selectable swipe-right advanced" tip="Swipe layer on the right"
+     onclick="${() => this.swipeLayer('right')}"></i>
+
+  <!-- move icons -->
+  <i class="fa-solid fa-caret-down advanced tool movedown selectable" tip="Move this layer down"></i>
+  <i class="fa-solid fa-caret-up advanced tool moveup selectable" tip="Move this layer up"></i>
+  
+  <i id="opacity" class="fa-regular fa-sun tool selectable opacity advanced" tip="Control opacity"></i>
+
+  <i tip="Toggle legend" class="${this.layer.isWms && this.layer.legend ? 'fa-solid fa-bars tool legend selectable' : 'legend invisible'}"
+     onclick="${() => this.layer.isLegendExpanded = !this.layer.isLegendExpanded}"></i>
+</div>
+
+${this.layer.layers?.split(',').map(l => 
+   uHtml`<img class="${this.layer.isWms && this.layer.legend && this.layer.isLegendExpanded ? 'legend-image' : 'legend-image hidden'}" 
+              alt="${'Legend for ' + l}"
+              src="${this.legendUrls[l]}">`
+)}
