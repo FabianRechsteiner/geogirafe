@@ -1,7 +1,7 @@
 class Layer {
 
   // Base properties
-  id: string | null = null;
+  id: number;
   name: string;
   type: string | null = null;
   isDefaultChecked: boolean | null = null;
@@ -36,7 +36,7 @@ class Layer {
   iconUrl: string | null = null;
   legendRule: string | null = null;
   legendImage: string | null = null;
-  isLegendExpanded: boolean | null = null;
+  isLegendExpanded: boolean = false;
 
   // Layer state
   activeState: 'on' | 'off' | 'semi' = 'off';
@@ -46,12 +46,8 @@ class Layer {
   // Is this layer used as basemap ?
   basemap = false;
 
-  get hasLegend() {
-    return ((this.legendRule === null || this.legendRule === undefined) && this.legend);
-  }
-
-  isGroup: boolean | null = null;
-  isLayer: boolean | null = null;
+  isGroup: boolean = false;
+  isLayer: boolean = false;
 
   isExpanded = false;
 
@@ -69,10 +65,10 @@ class Layer {
       this.style = elem.style;
       this.projection = elem.projection;
       this.source = elem.source;
+      this.isLayer = true;
     }
     else if (elem.type === 'WMTS') {
       this.url = elem.url;
-      this.isGroup = false;
       this.isLayer = true;
       this.layers = elem.layer;
       this.dimensions = elem.dimensions;
@@ -92,7 +88,6 @@ class Layer {
 
       if (elem.childLayers) {
         // WMS Layer
-        this.isGroup = false;
         this.isLayer = true;
         this.layers = elem.layers;
         // TODO REG: Is it possible that 1 childlayer is queryable, and another one not ?
@@ -110,15 +105,9 @@ class Layer {
     else {
       // Other cases: Groups
       this.isGroup = true;
-      this.isLayer = false;
       this.isDefaultExpanded = (elem.metadata && elem.metadata.isExpanded);
       this._isExclusiveGroup = (elem.metadata && elem.metadata.exclusiveGroup);
     }
-
-    // }
-    // else {
-    //   throw new Error('Unmanaged layer type: ' + elem.type);
-    // }
   }
 
   hasRestrictedResolution() {
@@ -175,35 +164,6 @@ class Layer {
       throw new Error('This method should not be called on leafs, only on groups.');
     }
     return (this._isExclusiveGroup);
-  }
-
-  get areAllChildrenActive() {
-    let allActive = true;
-    for (let i=0; i<this.children.length; ++i) {
-      if (!this.children[i].active) {
-        allActive = false;
-      }
-    }
-    return allActive;
-  }
-
-  get areAllChildrenInactive() {
-    let allInactive = true;
-    for (let i=0; i<this.children.length; ++i) {
-      if (!this.children[i].inactive) {
-        allInactive = false;
-      }
-    }
-    return allInactive;
-  }
-
-  get isAnyChildActive() {
-    for (let i=0; i<this.children.length; ++i) {
-      if (this.children[i].active) {
-        return true;
-      }
-    }
-    return false;
   }
 }
 

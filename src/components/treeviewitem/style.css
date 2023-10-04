@@ -1,0 +1,99 @@
+.item {
+  color: #999;
+  border-top: solid 1px #ddd;
+  line-height: 1.3rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.hidden {
+  display: none;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.selectable {
+  cursor: pointer;
+}
+
+.selectable:hover {
+  color: #000;
+}
+
+.selected {
+  cursor: pointer;
+  color: #000;
+}
+
+i {
+  width: 0.8rem;
+  text-align:center;
+  min-width: 0;
+  padding-top: 0.45rem;
+  margin-left: 0.3rem;
+}
+
+.circle-on, .circle-off {
+  order: 1;
+  padding-top: 0.25rem;
+  margin-left: 0.2rem;
+  margin-right: 0.1rem;
+  cursor: pointer;
+}
+
+.legend-icon {
+  order: 1;
+  max-height: 1rem;
+  padding-top: 0.25rem;
+  margin-left: 0.2rem;
+  cursor: pointer;
+}
+
+.text {
+  order: 2;
+  display: inline-block;
+  margin: 0.2rem;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 0;
+}
+
+.resolution {
+  order: 3;
+}
+
+.swipe-left {
+  order: 4;
+}
+
+.swipe-right {
+  order: 5;
+}
+
+.movedown {
+  order: 6;
+}
+
+.moveup {
+  order: 7;
+}
+
+.opacity {
+  order: 8;
+}
+
+.legend {
+  order: 9;
+}
+
+.item i.advanced {
+  display: none;
+}
+
+.item.advanced i.advanced {
+  display: block;
+}

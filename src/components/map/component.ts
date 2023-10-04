@@ -1,7 +1,6 @@
 import Map from 'ol/Map';
 
 import VectorSource from 'ol/source/Vector';
-import ImageWMS from 'ol/source/ImageWMS';
 import Style, { StyleLike } from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
@@ -114,10 +113,9 @@ class MapComponent extends GirafeHTMLElement {
 
     this.stateManager.subscribe('globe.display', () => this.onGlobeToggled());
 
-    //this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) => this.onLayersChanged(oldLayers, newLayers));
-    this.stateManager.subscribe('layers.layersList.[0-9]*.activeState', (_oldActive: boolean, _newActive: boolean, layer: Layer) => this.onLayerToggled(layer));
-    this.stateManager.subscribe('layers.layersList.[0-9]*.opacity', (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer));
-    this.stateManager.subscribe('layers.layersList.[0-9]*.order', () => this.onChangeOrder([]));
+    this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldActive: boolean, _newActive: boolean, layer: Layer) => this.onLayerToggled(layer));
+    this.stateManager.subscribe('layers\.layersList\..*\.opacity', (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer));
+    this.stateManager.subscribe('layers\.layersList\..*\.order', () => this.onChangeOrder([]));
   }
 
   render() {
@@ -282,12 +280,10 @@ class MapComponent extends GirafeHTMLElement {
   onMoveEnd(_e: MapEvent) {
     const view = this.map.getView();
     const center = view.getCenter()!;
-    this.state.position = {
-      center: center,
-      zoom: view.getZoom()!,
-      resolution: view.getResolution()!,
-      scale: this.viewManager.getScale()
-    }
+    this.state.position.center = center;
+    this.state.position.resolution = view.getResolution()!;
+    this.state.position.scale = this.viewManager.getScale();
+    this.state.position.zoom = view.getZoom()!;
   }
 
   onClick(e: MapBrowserEvent<UIEvent>) {
@@ -403,35 +399,12 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onCustomGirafeEvent(details: {action: string, layer: Layer, extent: Extent}) {
-    if (details.action === GeoEvents.requestLegendUrl) {
-      this.onLegendUrlRequested(details.layer);
-    }
-    else if (details.action === GeoEvents.zoomToExtent) {
+    if (details.action === GeoEvents.zoomToExtent) {
       this.zoomToExtent(details.extent);
     }
     else if (details.action === GeoEvents.undoDraw) {
       this.draw!.removeLastPoint();
     }
-  }
-
-  // TODO REG : move this function to wmsmanager
-  onLegendUrlRequested(layer: Layer) {
-    const wmsSource = new ImageWMS({
-      url: layer.url!,
-      params: { 'LAYERS': layer.layers },
-      ratio: 1
-    });
-
-    let graphicUrl = wmsSource.getLegendUrl(this.map.getView().getResolution())!;
-    if (!graphicUrl.toLowerCase().includes('sld_version')) {
-      // Add SLD_Version (it is mandatory, but openlayers do not seems to set it in the URL)
-      graphicUrl += '&SLD_Version=1.1.0'
-    }
-    if (!this.isNullOrUndefined(layer.legendRule)) {
-      graphicUrl += '&RULE=' + encodeURIComponent(layer.legendRule!);
-    }
-
-    this.messageManager.sendMessage({ action: GeoEvents.responseLegendUrl, id: layer.legendId, url: graphicUrl });
   }
 
   onSwipedLayersChanged(swipedLayers: { left: Layer[]; right: Layer[]; }) {
@@ -672,37 +645,6 @@ class MapComponent extends GirafeHTMLElement {
   deactivatePrintMask() {
     this.map.removeLayer(this.maskLayer);
   }*/
-
-  onLayersChanged(oldLayers: Layer[], newLayers: Layer[]) {
-    let deletedLayers = [];
-    let addedLayers = [];
-
-    const oldActiveLayers = oldLayers.filter(layer => layer.active);
-    const newActiveLayers = newLayers.filter(layer => layer.active);
-
-    deletedLayers = oldActiveLayers.filter(oldLayer => !newActiveLayers.find(newLayer => newLayer.id === oldLayer.id));
-    addedLayers = newActiveLayers.filter(newLayer => !oldActiveLayers.find(oldLayer => oldLayer.id === newLayer.id));
-
-    this.onRemoveLayers(deletedLayers);
-    this.onAddLayers(addedLayers);
-
-    /*if (Array.isArray(newLayers)) {
-      // We recieved a list of features
-
-      deletedLayers = oldLayers.filter(oldLayer => !newLayers.find(newLayer => newLayer.id === oldLayer.id));
-      addedLayers = newLayers.filter(newLayer => !oldLayers.find(oldLayer => oldLayer.id === newLayer.id));
-    }
-    else {
-      if (!this.isNullOrUndefined(oldLayers)) {
-        deletedLayers.push(oldLayers);
-      }
-      if (!this.isNullOrUndefined(newLayers)) {
-        addedLayers.push(newLayers);
-      }
-    }*/
-
-
-  }
 
   onFeaturesChanged(oldFeatures: RedliningFeature[], newFeatures: RedliningFeature[]) {
     let deletedFeatures: RedliningFeature[] = [];

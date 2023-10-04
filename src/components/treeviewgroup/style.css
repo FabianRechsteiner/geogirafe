@@ -1,0 +1,69 @@
+.group {
+  color: #999;
+  border-top: solid 1px #ddd;
+  line-height: 1.3rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.hidden {
+  display: none;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.selectable {
+  cursor: pointer;
+}
+
+.selectable:hover {
+  color: #000;
+}
+
+.selected {
+  cursor: pointer;
+  color: #000;
+}
+
+i {
+  width: 0.8rem;
+  text-align:center;
+  min-width: 0;
+}
+
+.expand, .collapse {
+  order: 1;
+  padding-top: 0.15rem;
+}
+
+.circle-on, .circle-off, .circle-semi {
+  order: 2;
+  padding-top: 0.20rem;
+  margin-left: 0.2rem;
+  margin-right: 0.1rem;
+  cursor: pointer;
+}
+
+.text {
+  order: 3;
+  display: inline-block;
+  margin: 0.2rem;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space:nowrap;
+  width: 0;
+}
+
+.delete {
+  order: 4;
+  padding-top: 0.45rem;
+}
+
+.sublayers {
+  padding-left: 1rem;
+  flex-basis: 100%;
+  order: 10;
+}

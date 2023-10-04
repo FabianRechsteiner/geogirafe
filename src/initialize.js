@@ -5,7 +5,9 @@ import I18nManager from './tools/i18nmanager';
 import I18MessageManager from './tools/messagemanager';
 
 // TODO: Migrate all these components to TypeScript
-import TreeViewComponent from  './components/treeview/component.js';
+import TreeViewComponent from  './components/treeview/component';
+import TreeViewGroupComponent from  './components/treeviewgroup/component';
+import TreeViewItemComponent from  './components/treeviewitem/component';
 import MapComponent from './components/map/component';
 import SearchComponent from './components/search/component';
 import ProjectionComponent from './components/projection/component';

@@ -107,6 +107,7 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   render() {
+    console.log('uHtml rendering');
     uRender(this.shadow, this.template);
   }
 

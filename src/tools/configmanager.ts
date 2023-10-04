@@ -22,6 +22,10 @@ class GirafeConfig {
     useCheckboxes: boolean;
     useLegendIcons: boolean;
     hideLegendWhenLayerIsDeactivated: boolean;
+    defaultIconSize: {
+      width: number,
+      height: number
+    }
   };
   search: {
     url: string;
@@ -103,6 +107,10 @@ class GirafeConfig {
       useCheckboxes: config.treeview.useCheckboxes ?? false,
       useLegendIcons: config.treeview.useLegendIcons ?? false,
       hideLegendWhenLayerIsDeactivated: config.treeview.hideLegendWhenLayerIsDeactivated ?? false,
+      defaultIconSize: {
+        height: config.treeview.defaultIconSize.height ?? 20,
+        width: config.treeview.defaultIconSize.width ?? 20
+      }
     };
 
     if (!config.search) {

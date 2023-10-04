@@ -17,15 +17,15 @@ type GraphicalInterface = {
 type MapPosition = {
   center: Coordinate;
   zoom: number | null;
-  resolution: number | null;
+  resolution: number;
   scale: number | null;
 }
 
 type LayersConfig = {
   layersList: Layer[];
-  swipedLayers: {
-    left: string[];
-    right: string[];
+  swipedLayers:  {
+    left: Layer[];
+    right: Layer[];
   }
 }
 
@@ -104,12 +104,12 @@ class State {
   position: MapPosition = {
     center: [],
     zoom: null,
-    resolution: null,
+    resolution: 100, /* dummy default value because it should never be null. It will be recalculated when the map will be created */
     scale: null
   }
 
   // Lastly selected theme
-  selectedTheme = {};
+  selectedTheme: Theme | null = null;
 
   // Current layers configuration
   layers: LayersConfig = {
