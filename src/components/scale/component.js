@@ -34,11 +34,16 @@ class ScaleComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('position', (oldPosition, newPosition) => this.onPositionChange(newPosition));
+    this.stateManager.subscribe('position\.scale', () => this.onScaleChanged());
   }
 
-  onPositionChange(position) {
-    this.scaleSpan.innerHTML = this.formatScale(position.scale)
+  onScaleChanged() {
+    if (this.state.position.scale !== null) {
+      this.scaleSpan.innerHTML = this.formatScale(this.state.position.scale)
+    }
+    else {
+      this.scaleSpan.innerHTML = '';
+    }
   }
 
   formatScale(scale) {

@@ -8,7 +8,7 @@
                    size="small" tip="Advanced options" tip-placement="top" class="options transparent"
                    onclick="${() => this.state.treeview.advanced = !this.state.treeview.advanced}"></girafe-button>
 
-    <girafe-button icon-style="${this.areAllLegendExpanded ? 'fa-sm fa-solid fa-bars selectable fa-rotate-90' : 'fa-sm fa-solid fa-bars selectable'}" 
+    <girafe-button icon-style="${this.areAllLegendExpanded ? 'fa-sm fa-solid fa-bars selectable fa-rotate-270' : 'fa-sm fa-solid fa-bars selectable'}" 
                    size="small" tip="Toggle all legends" tip-placement="top" class="togglelegends transparent"
                    onclick="${() => this.toggleAllLegends()}"></girafe-button>
     
@@ -28,8 +28,8 @@
   </div>
   <div class="treeview-list">
     ${this.state.layers.layersList.map(layer => 
-        layer.isGroup ? uHtml.for(layer)`<girafe-tree-view-group groupid="${layer.id}"></girafe-tree-view-group>`
-                      : uHtml`<girafe-tree-view-item layerid="${layer.id}"></girafe-tree-view-item>`
+        (layer instanceof GroupLayer) ? uHtml.for(layer)`<girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>`
+                                      : uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>`
       )}
   </div>
   <div id="gutter" class="gutter"></div>

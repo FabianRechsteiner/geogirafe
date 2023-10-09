@@ -1,10 +1,16 @@
 import GirafeSingleton from "../base/GirafeSingleton";
 import Basemap from "../models/basemap";
-import Layer from "../models/layer";
+import Layer from "../models/layers/layer";
 import Theme from "../models/theme";
 import { GMFBackgroundLayer, GMFTheme, GMFTreeItem} from "../models/gmf";
 import ConfigManager from "./configmanager";
 import StateManager from "./state/statemanager";
+import GroupLayer from "../models/layers/layergroup";
+import BaseLayer from "../models/layers/baselayer";
+import LayerOsm from "../models/layers/layerosm";
+import LayerVectorTiles from "../models/layers/layervectortiles";
+import LayerWmts from "../models/layers/layerwmts";
+import LayerWms from "../models/layers/layerwms";
 
 class ThemesManager extends GirafeSingleton {
 
@@ -70,7 +76,7 @@ class ThemesManager extends GirafeSingleton {
         "name" : "OpenStreetMap",
         "type" : "OSM"
       };
-      osmBasemap.layersList.push(new Layer(data, null, null, null, 0));
+      osmBasemap.layersList.push(new LayerOsm(data, 0));
     }
 
     if (this.configManager.Config.basemaps.SwissTopoVectorTiles) {
@@ -82,10 +88,10 @@ class ThemesManager extends GirafeSingleton {
         "name": "Vector-Tiles",
         "type": "VectorTiles",
         "style": "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json",
-        "source": "leichtebasiskarte_v3.0.0",
+        "source": "leichtebasiskarte_v3.0.1",
         "projection": "EPSG:3857"
       };
-      vectorBasemap.layersList.push(new Layer(data, null, null, null, 0));
+      vectorBasemap.layersList.push(new LayerVectorTiles(data, 0));
     }
 
     basemapJson.forEach((elem: GMFBackgroundLayer) => {
@@ -98,12 +104,12 @@ class ThemesManager extends GirafeSingleton {
       if (elem.children) {
         // Multiple layers
         elem.children.forEach((child: GMFTreeItem) => {
-          basemap.layersList.push(this.createTreeItem(child, null, order));
+          basemap.layersList.push(this.prepareThemeLayer(child, null, order));
         });
       }
       else {
         // Only one layer in this basemap
-        basemap.layersList.push(this.createTreeItem(elem, null, order));
+        basemap.layersList.push(this.prepareThemeLayer(elem, null, order));
       }
     });
 
@@ -119,7 +125,7 @@ class ThemesManager extends GirafeSingleton {
       }
       const theme = new Theme(themeJson);
       themeJson.children.forEach((layerJson: GMFTreeItem) => {
-        const layer = this.createTreeItem(layerJson, null, order);
+        const layer = this.prepareThemeLayer(layerJson, null, order);
         theme.layersTree.push(layer);
       });
       themes[index] = theme;
@@ -135,62 +141,54 @@ class ThemesManager extends GirafeSingleton {
    * @param order the order in the layer list
    * @returns the created girafe layer
    */
-  createTreeItem(elem: GMFTreeItem, parentServer: string | null, order: {value: number}) {
+  prepareThemeLayer(elem: GMFTreeItem, parentServer: string | null, order: {value: number}) {
     // If a server is defined on this node, we use it.
     // Otherwise, we use the server of the parent
-    const ogcServer = (elem.ogcServer) ? elem.ogcServer : parentServer;
+    const ogcServerName = (elem.ogcServer) ? elem.ogcServer : parentServer;
 
     // Create Layer
-    const layer = this.createLayer(elem, ogcServer, order.value);
-    order.value = order.value + 1;
+    let layer: BaseLayer;
+    switch (elem.type) {
+      case 'OSM':
+        layer = new LayerOsm(elem, order.value);
+        break;
 
-    // Append childs if any
-    if (elem.children) {
-      elem.children.forEach((child: GMFTreeItem) => {
-        const childLayer = this.createTreeItem(child, ogcServer, order);
-        childLayer.parent = layer;
-        layer.children.push(childLayer);
-      });
-    }
+      case 'VectorTiles':
+        layer = new LayerVectorTiles(elem, order.value);
+        break;
 
-    return layer;
-  }
+      case 'WMTS':
+        layer = new LayerWmts(elem, order.value);
+        break;
 
-  /**
-   * Creates the WMS or WMTS Layer
-   * @param elem the layer info with its type defining if WMS or WMTS
-   * @param ocgServerName an optional ogc server name
-   * @param order the order in the layertree
-   * @returns a girafe Layer
-   */
-  createLayer(elem: GMFTreeItem, ocgServerName: string | null, order: number): Layer {
-    let url = null;
-    let urlWfs = null;
-    if (elem.type === 'WMS') {
-      // WMS Case: there must be an OGC-Server
-      if (ocgServerName) {
-        const ogcServer = this.state.ogcServers[ocgServerName];
-        url = ogcServer.url;
-        if (ogcServer.wfsSupport === true) {
-          urlWfs = ogcServer.urlWfs;
+      case 'WMS':
+        if (ogcServerName) {
+          const ogcServer = this.state.ogcServers[ogcServerName];
+          const urlWfs = ogcServer.wfsSupport ? ogcServer.urlWfs : null;
+          layer = new LayerWms(elem, ogcServerName, ogcServer.url, urlWfs, order.value);
         }
-      }
-      else {
-        console.log('No OGC server found for layer ' + elem.name);
-      }
-    }
-    else if (elem.type === 'WMTS') {
-      // WMTS Case: we take the URL of Capabilities
-      if (!elem.url) {
-        throw new Error("No URL defined for WMTS layer " + elem.name);
-      }
-      url = elem.url;
-    }
-    else {
-      console.log('Unmanaged layer type: ' + elem.type);
+        else {
+          layer = new Layer(elem, order.value);
+          layer.setError(`No OGC-Server was found for layer ${elem.name}, please Verify the backend configuration.`);
+        }
+        break;
+
+      default:
+        // Group
+        const group = new GroupLayer(elem, order.value);
+        
+        // Append childs
+        if (elem.children) {
+          elem.children.forEach((child: GMFTreeItem) => {
+            const childLayer = this.prepareThemeLayer(child, ogcServerName, order);
+            childLayer.parent = group;
+            group.children.push(childLayer);
+          });
+        }        
+        layer = group;
     }
 
-    const layer = new Layer(elem, ocgServerName, url, urlWfs, order);
+    order.value = order.value + 1;
     return layer;
   }
 
@@ -210,11 +208,13 @@ class ThemesManager extends GirafeSingleton {
     this.state.layers.layersList = layersList;
   }
 
-  addLayerToLoadedList(layersList: Layer[], layer: Layer) {
+  addLayerToLoadedList(layersList: BaseLayer[], layer: BaseLayer) {
     layersList.push(layer);
-    layer.children.forEach(child => {
-      this.addLayerToLoadedList(layersList, child);
-    });
+    if (layer instanceof GroupLayer) {
+      layer.children.forEach(child => {
+        this.addLayerToLoadedList(layersList, child);
+      });
+    }
   }
 }
 

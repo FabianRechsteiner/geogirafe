@@ -71,8 +71,17 @@ if "%1"=="lausanne" (
     goto :end
 )
 
+if "%1"=="mapnv" (
+    echo "Preparing environment MAPNV..."
+    copy demo\config.mapnv.json src\static\config.json /Y
+    curl "https://mapnv.ch/themes?background=background&interface=desktop" --silent --output %OUTPUTDIR%\themes.json
+    curl "https://mapnv.ch/static/dummy/fr.json" --silent --output %OUTPUTDIR%\fr.json
+    curl "https://mapnv.ch/printproxy/capabilities.json" --silent --output %OUTPUTDIR%\capabilities.json
+    goto :end
+)
+
 echo "Usage: ./configure-demo-win <environment>"
-echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip', 'ticino', 'lausanne']"
+echo "Possible environments: ['mapbs', 'sitn', 'cartoriviera', 'geogr', 'lie', 'sigip', 'ticino', 'lausanne', 'mapnv']"
 echo "Usage example: ./configure-demo-win mapbs"
 echo "Usage example with npm: npm run configure-demo-win mapbs"
 

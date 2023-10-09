@@ -2,8 +2,8 @@ import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import TileLayer from 'ol/layer/Tile';
 import { Map } from 'ol';
-import Layer from '../../../models/layer';
 import { Layer as OLayer } from 'ol/layer';
+import LayerWmts from '../../../models/layers/layerwmts';
 
 class WmtsManager {
   map: Map;
@@ -26,15 +26,15 @@ class WmtsManager {
     this.basemapLayers = [];
   }
 
-  addLayer(layer: Layer) {
+  addLayer(layer: LayerWmts) {
     this.#addLayerInternal(layer, false);
   }
 
-  addBasemapLayer(basemap: Layer) {
+  addBasemapLayer(basemap: LayerWmts) {
     this.#addLayerInternal(basemap, true);
   }
 
-  #addLayerInternal(layer: Layer, isBasemap: boolean) {
+  #addLayerInternal(layer: LayerWmts, isBasemap: boolean) {
     this.#getWmtsCapabilities(layer.url!, (capabilities: string) => {
       // TODO REG : Manage dimensions, because the "layers" can be the same with different dimensions
       const options = optionsFromCapabilities(capabilities, {
@@ -76,7 +76,7 @@ class WmtsManager {
     });
   }
   
-  removeLayer(layer: Layer) {
+  removeLayer(layer: LayerWmts) {
     if (this.layerExists(layer)) {
       const olayer = this.wmtsLayers[layer.layerUniqueId];
       delete this.wmtsLayers[layer.layerUniqueId];
@@ -87,18 +87,18 @@ class WmtsManager {
     }
   }
   
-  layerExists(layer: Layer) {
+  layerExists(layer: LayerWmts) {
     return (layer.layerUniqueId in this.wmtsLayers);
   }
 
-  getLayer(layer: Layer) {
+  getLayer(layer: LayerWmts) {
     if (this.layerExists(layer)) {
       return this.wmtsLayers[layer.layerUniqueId];
     }
     return null;
   }
 
-  changeOpacity(layer: Layer, opacity: number) {
+  changeOpacity(layer: LayerWmts, opacity: number) {
     if (this.layerExists(layer)) {
       const olayer = this.wmtsLayers[layer.layerUniqueId];
       olayer.setOpacity(opacity);

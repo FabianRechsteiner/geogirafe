@@ -1,4 +1,4 @@
-import Layer from "./layer";
+import BaseLayer from "./layers/baselayer";
 
 class Theme {
   // Properties
@@ -7,7 +7,7 @@ class Theme {
   name: string;
 
   // Layers
-  layersTree: Layer[] = [];
+  layersTree: BaseLayer[] = [];
 
   constructor(elem: { id: number, name: string, icon: string }) {
     this.id = elem.id;
