@@ -1,6 +1,8 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement'
-import Layer from '../../models/layer';
+import BaseLayer from '../../models/layers/baselayer';
+import GroupLayer from '../../models/layers/layergroup';
 import LayerManager from '../../tools/layermanager';
+import LayerWms from '../../models/layers/layerwms';
 
 class TreeViewComponent extends GirafeResizableElement {
 
@@ -9,8 +11,6 @@ class TreeViewComponent extends GirafeResizableElement {
 
   layerManager: LayerManager;
 
-  hideLegendWhenLayerIsDeactivated: boolean = false;
-  previousLegendState: Record<number, boolean> = {};
   isAllExpanded: boolean = false;
   areAllLegendExpanded: boolean = true;
 
@@ -22,12 +22,6 @@ class TreeViewComponent extends GirafeResizableElement {
     super('treeview');
 
     this.layerManager = LayerManager.getInstance();
-
-    this.configManager.loadConfig().then(() => { 
-      if (this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated) {
-        this.hideLegendWhenLayerIsDeactivated = true;
-      }
-    });
   }
 
   registerEvents() {
@@ -35,15 +29,27 @@ class TreeViewComponent extends GirafeResizableElement {
     this.stateManager.subscribe('layers\.layersList', () => super.render());
     this.stateManager.subscribe('layers\.swipedLayers', () => super.render());
     this.stateManager.subscribe('treeview\.advanced', () =>  super.render());
-    this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.activateStateChanged(layer));
   }
 
   onThemeChanged() {
     if (this.state.selectedTheme != null) {
       this.state.layers.layersList = [...this.state.selectedTheme.layersTree];
+      this.activateDefaultLayers(this.state.layers.layersList);
     }
     else {
       this.state.layers.layersList = [];
+    }
+  }
+
+  activateDefaultLayers(layers: BaseLayer[]) {
+    for (const layer of layers) {
+      this.layerManager.activateIfDefaultChecked(layer);
+      if (layer instanceof LayerWms) {
+        this.layerManager.initializeLegends(layer);
+      }
+      if (layer instanceof GroupLayer) {
+        this.activateDefaultLayers(layer.children);
+      }
     }
   }
 
@@ -61,31 +67,15 @@ class TreeViewComponent extends GirafeResizableElement {
     this.activateTooltips(false, [800, 0], 'right');
   }
 
-  activateStateChanged(layer: Layer) {
-    // Hide the legend when the layer is deactivated (if configured so)
-    if (layer.isLayer && this.hideLegendWhenLayerIsDeactivated) {
-      if (layer.active) {
-        if (layer.id in this.previousLegendState) {
-          // If there is not previous state, we change nothing to the legend state
-          layer.isLegendExpanded = this.previousLegendState[layer.id];
-        }
-      }
-      else { 
-        this.previousLegendState[layer.id] = layer.isLegendExpanded;
-        layer.isLegendExpanded = false;
-      }
-    }
-  }
-
   expandAll() {
     this.isAllExpanded = !this.isAllExpanded;
     this.#expandAllRecursive(this.state.layers.layersList);
     super.render();
   }
 
-  #expandAllRecursive(layers: Layer[]) {
+  #expandAllRecursive(layers: BaseLayer[]) {
     for (const layer of layers) {
-      if (layer.isGroup) {
+      if (layer instanceof GroupLayer) {
         layer.isExpanded = this.isAllExpanded;
         this.#expandAllRecursive(layer.children);
       }
@@ -98,12 +88,12 @@ class TreeViewComponent extends GirafeResizableElement {
     super.render();
   }
 
-  #toggleAllLegendsRecursive(layers: Layer[]) {
+  #toggleAllLegendsRecursive(layers: BaseLayer[]) {
     for (const layer of layers) {
-      if (layer.isLayer && layer.legend) {
+      if (layer instanceof LayerWms && layer.legend) {
         layer.isLegendExpanded = this.areAllLegendExpanded;
       }
-      else if (layer.isGroup) {
+      else if (layer instanceof GroupLayer) {
         this.#toggleAllLegendsRecursive(layer.children);
       }
     }

@@ -3,7 +3,7 @@ import ImageWMS from 'ol/source/ImageWMS';
 import MessageManager from '../../../tools/messagemanager';
 import GeoEvents from '../../../models/events';
 import { Map } from 'ol';
-import Layer from '../../../models/layer';
+import LayerWms from '../../../models/layers/layerwms';
 
 class WmsManager {
   map: Map;
@@ -15,8 +15,8 @@ class WmsManager {
     olayer: OLayer, 
     url: string, 
     urlWfs: string | null, 
-    layerList: Layer[], 
-    queryableList: Layer[]
+    layerList: LayerWms[], 
+    queryableList: LayerWms[]
   }> = {};
   independentLayers: Record<string, any> = {};
   basemapLayers: ImageLayer<any>[] = [];
@@ -35,7 +35,7 @@ class WmsManager {
     this.basemapLayers = [];
   }
 
-  addLayer(layerInfos: Layer) {
+  addLayer(layerInfos: LayerWms) {
     if (layerInfos.isTransparent) {
       const source = this.#createImageWMSSource(layerInfos.url!, [layerInfos], layerInfos.imageType!);
       const layer = new ImageLayer({
@@ -59,7 +59,7 @@ class WmsManager {
     else {
       // Create a new ol layer and add it to the right server
       const olayer = new ImageLayer();
-      const layerDef = { olayer: olayer, url:layerInfos.url!, urlWfs: layerInfos.urlWfs, layerList: [layerInfos], queryableList: [] as Layer[] };
+      const layerDef = { olayer: olayer, url:layerInfos.url!, urlWfs: layerInfos.urlWfs, layerList: [layerInfos], queryableList: [] as LayerWms[] };
       if (layerInfos.queryable) {
         layerDef.queryableList.push(layerInfos);
       }
@@ -75,9 +75,9 @@ class WmsManager {
     }
   }
 
-  #createImageWMSSource(url: string, layerList: Layer[], imageType: string) {
-    const orderedLayers = layerList.slice().sort((l1: Layer, l2: Layer) => { return l2.order - l1.order });
-    const orderedLayerNames = orderedLayers.map((l: Layer) => l.layers);
+  #createImageWMSSource(url: string, layerList: LayerWms[], imageType: string) {
+    const orderedLayers = layerList.slice().sort((l1: LayerWms, l2: LayerWms) => { return l2.order - l1.order });
+    const orderedLayerNames = orderedLayers.map((l: LayerWms) => l.layers);
     const source = new ImageWMS({
       url: url,
       params: {
@@ -88,7 +88,7 @@ class WmsManager {
     return source;
   }
 
-  addBasemapLayer(layerInfos: Layer) {
+  addBasemapLayer(layerInfos: LayerWms) {
     const source = this.#createImageWMSSource(layerInfos.url!, [layerInfos], layerInfos.imageType!);
     const olayer = new ImageLayer({
       source: source,
@@ -98,7 +98,7 @@ class WmsManager {
     this.map.getLayers().insertAt(0, olayer);
   }
 
-  removeLayer(layerInfos: Layer) {
+  removeLayer(layerInfos: LayerWms) {
     if (this.layerExists(layerInfos)) {
         if (layerInfos.name in this.independentLayers) {
           const layerDef = this.independentLayers[layerInfos.name];
@@ -129,23 +129,24 @@ class WmsManager {
         }
     }
     else {
-      throw new Error('Cannot remove this layer: it does not exist');
+      // TODO : this is called on layertree init, investigate why
+      console.error(`Cannot remove WMS-Layer ${layerInfos.name} from the map: it does not exist!`);
     }
   }
 
-  layerExists(layerInfos: Layer) {
+  layerExists(layerInfos: LayerWms) {
     if (layerInfos.name in this.independentLayers) {
       return true;
     }
     if (layerInfos.serverUniqueQueryId !== null && layerInfos.serverUniqueQueryId in this.layersByServer) {
       const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-      const layer = layerDef.layerList.find((item: { id: any; }) => item.id === layerInfos.id);
+      const layer = layerDef.layerList.find((item: { treeItemId: any; }) => item.treeItemId === layerInfos.treeItemId);
       return (layer !== undefined);
     }
     return false;
   }
 
-  getLayer(layerInfos: Layer) {
+  getLayer(layerInfos: LayerWms) {
     if (layerInfos.name in this.independentLayers) {
       return this.independentLayers[layerInfos.name];
     }
@@ -156,7 +157,7 @@ class WmsManager {
     return null;
   }
 
-  changeOpacity(layerInfos: Layer) {
+  changeOpacity(layerInfos: LayerWms) {
     if (this.layerExists(layerInfos)) {
         if (!layerInfos.isTransparent) {
           // Back to normal
@@ -194,7 +195,7 @@ class WmsManager {
     }
   }
 
-  makeLayerIndependent(layerInfos: Layer) {
+  makeLayerIndependent(layerInfos: LayerWms) {
     if (layerInfos.name in this.independentLayers) {
       // The layer is already independent.
       // => nothing to do here.
@@ -221,7 +222,7 @@ class WmsManager {
 
     for (let key in this.layersByServer) {
       const layer = this.layersByServer[key];
-      const queryLayers = layer.queryableList.map((l: Layer) => l.queryLayers!.split(',')).flat(1);
+      const queryLayers = layer.queryableList.map((l: LayerWms) => l.queryLayers!.split(',')).flat(1);
 
       selectionParams.push({
         wfsUrl: layer.urlWfs,

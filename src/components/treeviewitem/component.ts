@@ -1,8 +1,9 @@
 import ImageWMS from 'ol/source/ImageWMS';
 import tippy from "tippy.js";
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import Layer from '../../models/layer';
+import Layer from '../../models/layers/layer';
 import LayerManager from '../../tools/layermanager';
+import LayerWms from '../../models/layers/layerwms';
 
 class TreeViewItemComponent extends GirafeHTMLElement {
 
@@ -27,7 +28,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     // And we have to set the layer using the id passed to the layerid attribute
     const layerId = this.getAttribute('layerid');
     if (layerId) {
-      this.layer = this.layerManager.getLayer(parseInt(layerId));
+      this.layer = this.layerManager.getTreeItem(layerId) as Layer;
       // Get Legend Url
       this.setLegend();
     }
@@ -37,6 +38,11 @@ class TreeViewItemComponent extends GirafeHTMLElement {
   }
 
   setLegend() {
+    if (!(this.layer instanceof LayerWms)) {
+      this.layer.setError(`${this.layer.name} is not a WMS layer, and should not have a legend configured in the backend.`);
+      return;
+    }
+
     // Manage Icon URL
     if (this.layer.iconUrl) {
       // A custom legend icon has been defined and can be displayed
@@ -55,7 +61,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     // Manage Legend
     if (this.layer.legend) {
       if (this.layer.legendImage) {
-        // TODO REG : remove this ! when a reactoring of the Layer class has been done
+        // TODO REG : remove this ! when a refactoring of the Layer class has been done
         this.legendUrls[this.layer.layers!] = this.layer.legendImage;
       }
       else {
@@ -65,8 +71,8 @@ class TreeViewItemComponent extends GirafeHTMLElement {
   }
 
   getLegendImageUrlFromWms(iconOnly: boolean): Record<string, string> {
-    if (!this.layer.url) {
-      throw new Error('If legend URL ist null, this method should not be called.')
+    if (!(this.layer instanceof LayerWms)) {
+      throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called.`)
     }
 
     const legends: Record<string, string> = {};
@@ -148,6 +154,10 @@ class TreeViewItemComponent extends GirafeHTMLElement {
   }
 
   zoomToVisibleResolution() {
+    if (!(this.layer instanceof LayerWms)) {
+      throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called here.`)
+    }
+
     // Because of rounding errors (for example 1.59 becomes 1.589999999999998), 
     // we zoom a bit more than just the max resolution.
     // For the moment we try with 10% more
@@ -168,7 +178,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
       right: []
     };
     // If the object is already present in the other side, we remove it
-    newSwipedLayers[otherSide] = this.state.layers.swipedLayers[otherSide].filter((l:Layer) => { return l.id !== this.layer.id; });
+    newSwipedLayers[otherSide] = this.state.layers.swipedLayers[otherSide].filter((l:Layer) => { return l.treeItemId !== this.layer.treeItemId; });
     // Then, we add it to right side
     newSwipedLayers[side] = [...this.state.layers.swipedLayers[side]];
     newSwipedLayers[side].push(this.layer);

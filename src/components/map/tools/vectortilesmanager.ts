@@ -1,13 +1,13 @@
 import { Map } from 'ol';
-import VectorTileLayer from 'ol/layer/VectorTile.js';
+import olVectorTileLayer from 'ol/layer/VectorTile.js';
 import { applyStyle } from 'ol-mapbox-style';
-import Layer from '../../../models/layer';
+import LayerVectorTiles from '../../../models/layers/layervectortiles';
 
 class VectorTilesManager {
   map: Map;
   srid: string;
 
-  basemapLayers: VectorTileLayer[] = [];
+  basemapLayers: olVectorTileLayer[] = [];
 
   constructor(map: Map, srid: string) {
     this.map = map;
@@ -22,8 +22,8 @@ class VectorTilesManager {
     this.basemapLayers = [];
   }
 
-  addBasemapLayer(basemap:Layer) {
-    const olayer = new VectorTileLayer({ declutter: true });
+  addBasemapLayer(basemap:LayerVectorTiles) {
+    const olayer = new olVectorTileLayer({ declutter: true });
     applyStyle(olayer, basemap.style, basemap.source);
     this.basemapLayers.push(olayer);
     this.map.getLayers().insertAt(0, olayer);

@@ -1,5 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import Layer from '../../models/layer';
+import BaseLayer from '../../models/layers/baselayer';
+import GroupLayer from '../../models/layers/layergroup';
 import LayerManager from '../../tools/layermanager';
 
 class TreeViewGroupComponent extends GirafeHTMLElement {
@@ -9,9 +10,9 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
 
   layerManager: LayerManager;
 
-  group: Layer;
+  group: GroupLayer;
 
-  constructor(group: Layer) {
+  constructor(group: GroupLayer) {
     super('treeviewgroup');
 
     this.layerManager = LayerManager.getInstance();
@@ -23,19 +24,19 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
     // And we have to set the layer using the id passed to the layerid attribute
     const groupId = this.getAttribute('groupid');
     if (groupId) {
-      this.group = this.layerManager.getGroup(parseInt(groupId));
+      this.group = this.layerManager.getTreeItem(groupId) as GroupLayer;
     }
     super.render();
     this.activateTooltips(false, [800, 0], 'right');
   }
 
   registerEvents() {
-    this.stateManager.subscribe('layers\.layersList\..*\.isExpanded', (_oldValue:boolean, _newValue:boolean, group:Layer) =>  this.refreshRender(group));
-    this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldValue:boolean, _newValue:boolean, group:Layer) =>  this.refreshRender(group));
+    this.stateManager.subscribe('layers\.layersList\..*\.isExpanded', (_oldValue:boolean, _newValue:boolean, group:GroupLayer) =>  this.refreshRender(group));
+    this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldValue:boolean, _newValue:boolean, group:GroupLayer) =>  this.refreshRender(group));
   }
 
-  refreshRender(layer: Layer) {
-    if (layer === this.group) {
+  refreshRender(group: GroupLayer) {
+    if (group === this.group) {
       super.render()
     }
   }
@@ -53,15 +54,17 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
     });
   }
 
-  static deactivateGroup(layer: Layer) {
+  deactivateGroup(layer: BaseLayer) {
     layer.activeState = 'off';
-    for (const child of layer.children) {
-      this.deactivateGroup(child);
+    if (layer instanceof GroupLayer) {
+      for (const child of layer.children) {
+        this.deactivateGroup(child);
+      }
     }
   }
 
   deleteGroup() {
-    TreeViewGroupComponent.deactivateGroup(this.group);
+    this.deactivateGroup(this.group);
     const index = this.state.layers.layersList.findIndex((g) => g.id === this.group.id);
     if (index > 0) {
       this.state.layers.layersList.splice(index, 1);

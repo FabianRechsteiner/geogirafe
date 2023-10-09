@@ -46,8 +46,13 @@ i {
   cursor: pointer;
 }
 
-.text {
+.error {
   order: 3;
+  color: #b00;
+}
+
+.text {
+  order: 4;
   display: inline-block;
   margin: 0.2rem;
   flex-grow: 1;
@@ -58,7 +63,7 @@ i {
 }
 
 .delete {
-  order: 4;
+  order: 5;
   padding-top: 0.45rem;
 }
 

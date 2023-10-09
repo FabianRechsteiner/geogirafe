@@ -25,7 +25,11 @@
        onclick="${() => this.toggle('on')}">
     <i class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-regular fa-square-check selbox' : 'fa-xs fa-solid fa-circle-half-stroke selcircle'}"></i>
   </div>
-  
+
+  <!-- Error icon -->
+  <i class="${this.group.hasError ? 'fa-solid fa-circle-exclamation tool error' : 'error hidden'}"
+     tip="${this.group.errorMessage}"></i>
+
   <!-- Label -->
   <span i18n="${this.group.name}" 
         class="${this.group.activeState === 'on' || this.group.activeState === 'semi' ? 'text selected' : 'text selectable'}" 
@@ -36,8 +40,8 @@
   <!-- Sub layers -->
   <div class="${(this.group.isExpanded ? 'sublayers' : 'sublayers hidden')}">
       ${(this.group.children ?? []).map(layer => 
-      layer.isGroup ? uHtml`<girafe-tree-view-group groupid="${layer.id}"></girafe-tree-view-group>`
-                    : uHtml`<girafe-tree-view-item layerid="${layer.id}"></girafe-tree-view-item>`
+      (layer instanceof GroupLayer) ? uHtml`<girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>`
+                                    : uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>`
       )}
   </div>
 

@@ -1,9 +1,10 @@
 import Map from 'ol/Map';
-import Layer from '../../models/layer';
+import Layer from '../../models/layers/layer';
 import Feature from 'ol/Feature';
 import Basemap from '../../models/basemap';
 import { Coordinate } from 'ol/coordinate';
 import Theme from '../../models/theme';
+import BaseLayer from '../../models/layers/baselayer';
 
 type GraphicalInterface = {
   helpVisible: boolean,
@@ -22,7 +23,7 @@ type MapPosition = {
 }
 
 type LayersConfig = {
-  layersList: Layer[];
+  layersList: BaseLayer[];
   swipedLayers:  {
     left: Layer[];
     right: Layer[];

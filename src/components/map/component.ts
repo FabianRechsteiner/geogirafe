@@ -35,11 +35,15 @@ import { Geometry } from 'ol/geom';
 import { EventsKey } from 'ol/events';
 import RenderEvent from 'ol/render/Event';
 import { Coordinate } from 'ol/coordinate';
-import Layer from '../../models/layer';
+import Layer from '../../models/layers/layer';
 import { Type } from 'ol/geom/Geometry';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
 import { Extent } from 'ol/extent';
 import { Cesium3DTileset, CesiumTerrainProvider } from 'cesium';
+import LayerOsm from '../../models/layers/layerosm';
+import LayerVectorTiles from '../../models/layers/layervectortiles';
+import LayerWmts from '../../models/layers/layerwmts';
+import LayerWms from '../../models/layers/layerwms';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 // TODO REG: Problem : we import the cesium twice : one in the bundle, and another one with a scripts tag
@@ -422,10 +426,10 @@ class MapComponent extends GirafeHTMLElement {
   swipeLayersOnSide(layers: Layer[], side: 'left' | 'right') {
     for (let i=0; i<layers.length; ++i) {
       const layer = layers[i];
-      if (layer.isWms) {
+      if (layer instanceof LayerWms) {
         this.swipeManager.activateSwipeForWms(layer, side);
       }
-      else if (layer.isWmts) {
+      else if (layer instanceof LayerWmts) {
         this.swipeManager.activateSwipeForWmts(layer, side);
       }
     }
@@ -543,7 +547,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onLayerToggled(layer: Layer) {
-    if (layer.isLayer) {
+    if (layer instanceof Layer) {
       if (layer.active) {
         this.onAddLayers([layer]);
       }
@@ -555,10 +559,10 @@ class MapComponent extends GirafeHTMLElement {
 
   onAddLayers(layerInfos: Layer[]) {
     layerInfos.forEach((l) => {
-      if (l.isWms) {
+      if (l instanceof LayerWms) {
         this.wmsManager.addLayer(l);
       }
-      else if (l.isWmts) {
+      else if (l instanceof LayerWmts) {
         this.wmtsManager.addLayer(l);
       }
     });
@@ -566,10 +570,10 @@ class MapComponent extends GirafeHTMLElement {
 
   onRemoveLayers(layerInfos: Layer[]) {
     layerInfos.forEach((l) => {
-      if (l.isWms) {
+      if (l instanceof LayerWms) {
         this.wmsManager.removeLayer(l);
       }
-      else if (l.isWmts) {
+      else if (l instanceof LayerWmts) {
         if (this.wmtsManager.layerExists(l)) {
           this.wmtsManager.removeLayer(l);
         }
@@ -601,10 +605,10 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onChangeOpacity(layerInfos: Layer) {
-    if (layerInfos.isWms) {
+    if (layerInfos instanceof LayerWms) {
       this.wmsManager.changeOpacity(layerInfos);
     }
-    else if (layerInfos.isWmts) {
+    else if (layerInfos instanceof LayerWmts) {
       if (this.wmtsManager.layerExists(layerInfos)) {
         this.wmtsManager.changeOpacity(layerInfos, layerInfos.opacity);
       }
@@ -620,20 +624,20 @@ class MapComponent extends GirafeHTMLElement {
 
     // Then, add the selected basemaps
     basemap.layersList.forEach((layer) => {
-      if (layer.type === 'WMTS') {
-        this.wmtsManager.addBasemapLayer(layer);
-      }
-      else if (layer.type === 'WMS') {
-        this.wmsManager.addBasemapLayer(layer);
-      }
-      else if (layer.type === 'OSM') {
+      if (layer instanceof LayerOsm) {
         this.osmManager.addBasemapLayer();
       }
-      else if (layer.type === 'VectorTiles') {
+      else if (layer instanceof LayerVectorTiles) {
         this.vectorTilesManager.addBasemapLayer(layer);
       }
+      else if (layer instanceof LayerWmts) {
+        this.wmtsManager.addBasemapLayer(layer);
+      }
+      else if (layer instanceof LayerWms) {
+        this.wmsManager.addBasemapLayer(layer);
+      }
       else {
-        throw new Error('Unknown basemap type: ' + layer.type);
+        throw new Error('Unknown basemap type');
       }
     });
   }

@@ -2,12 +2,13 @@ import { Map } from 'ol';
 import {getRenderPixel} from 'ol/render';
 import WmtsManager from './wmtsmanager';
 import WmsManager from './wmsmanager';
-import Layer from '../../../models/layer';
 import { Layer as OLayer } from 'ol/layer';
 import { Listener } from 'ol/events';
 import RenderEvent from 'ol/render/Event';
 import { Size } from 'ol/size';
 import BaseEvent from 'ol/events/Event';
+import LayerWmts from '../../../models/layers/layerwmts';
+import LayerWms from '../../../models/layers/layerwms';
 
 class SwipeManager {
   map: Map;
@@ -36,7 +37,7 @@ class SwipeManager {
     this.wmsManager = wmsManager;
   }
 
-  activateSwipeForWmts(layer: Layer, side: 'left' | 'right') {
+  activateSwipeForWmts(layer: LayerWmts, side: 'left' | 'right') {
     if (this.wmtsManager.layerExists(layer)) {
       const olayer = this.wmtsManager.getLayer(layer)!;
       this.#activateSwipeForLayer(layer.layers!, olayer, side);
@@ -46,7 +47,7 @@ class SwipeManager {
     }
   }
 
-  activateSwipeForWms(layer: Layer, side: 'left' | 'right') {
+  activateSwipeForWms(layer: LayerWms, side: 'left' | 'right') {
     if (this.wmsManager.layerExists(layer)) {
       this.wmsManager.makeLayerIndependent(layer);
       const olayer = this.wmsManager.getLayer(layer);
