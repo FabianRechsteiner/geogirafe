@@ -120,7 +120,7 @@ class ThemesManager extends GirafeSingleton {
     const themes: { [key: number]: Theme} = {};
     const order = { value: 0 };
     themesJson.forEach((themeJson: GMFTheme, index: number) => {
-      if (!themeJson.icon.startsWith('http') && !this.configManager.Config.themes.imagesUrlPrefix) {
+      if (!themeJson.icon.startsWith('http') && this.configManager.Config.themes.imagesUrlPrefix) {
         themeJson.icon = this.configManager.Config.themes.imagesUrlPrefix + themeJson.icon;
       }
       const theme = new Theme(themeJson);
