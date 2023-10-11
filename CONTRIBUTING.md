@@ -75,9 +75,11 @@ You can contact us through the following channels:
 
 A big thank to all the contributors of GeoGirafe, in alphabetical order:
 
+- Arnaud Poncet-Montanges @ponceta (SIGIP)
 - Daniel Gnerre (Cartoriviera)
+- Dietmar Schneider @sdietmar (techplus)
 - Guillaume Remy @remyguillaume (Basel-Stadt)
 - Olivier Monod (Yverdon-les-bains)
-- Pauline Fanguin (Cartolacote)
+- Pauline Fanguin @pfanguin (Cartolacote)
 - Rémi Bovard @rbovard (Cartoriviera)
 - Stéphane Malta e Sousa @maltaesousa (SITN Neuchâtel)
