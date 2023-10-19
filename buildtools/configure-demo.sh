@@ -10,9 +10,6 @@ mkdir -p "$MOCKDIR"
 if [ "$1" = 'c2c' ];
 then
     echo "Preparing environment CAMPTOCAMP..."
-    echo $2
-    echo $APPDIR
-    echo $MOCKDIR
     cp demo/config.$1.json $APPDIR/config.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/de.json" --silent --output $MOCKDIR/de.json
@@ -32,9 +29,10 @@ elif [ "$1" = 'cartoriviera' ];
 then
     echo "Preparing environment CARTORIVIERA..."
     cp demo/config.$1.json $APPDIR/config.json
-    curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://map.cartoriviera.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://map.cartoriviera.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
+    echo "Cannot create Mock objects for cartoriviera, the following commands are blocked when executed from AWS or GitLab Pipeline"
+    #curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    #curl "https://map.cartoriviera.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    #curl "https://map.cartoriviera.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'cjl' ];
 then

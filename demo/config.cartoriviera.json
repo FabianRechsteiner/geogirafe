@@ -7,13 +7,13 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "fr": "Mock/fr.json",
+    "fr": "https://map.cartoriviera.ch/static/dummy/fr.json",
     "//comment2": "Default language",
     "defaultLanguage": "fr"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "Mock/themes.json",
+    "url": "https://map.cartoriviera.ch/themes?background=background&interface=desktop",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
     "defaultTheme" : "cadastre"
   },
