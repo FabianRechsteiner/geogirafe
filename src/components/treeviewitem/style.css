@@ -54,6 +54,7 @@ i {
   padding-top: 0.25rem;
   margin-left: 0.2rem;
   cursor: pointer;
+  object-fit: none;
 }
 
 .error {
