@@ -141,6 +141,7 @@ pages:
     - apt update && apt install -y brotli curl
     - mkdir -p public/Mock
     - mkdir release
+    - chmod a+x ./buildtools/configure-demo.sh
   script:
     # Prepare all demo environments
     - demo='c2c'
