@@ -8,8 +8,6 @@
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
     "de": "Mock/de.json",
-    "en": "Mock/en.json",
-    "fr": "Mock/fr.json",
     "//comment2": "Default language",
     "defaultLanguage": "de"
   },
@@ -17,13 +15,13 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : ""
+    "defaultTheme" : "Basisinfo"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
     "show" : true,
     "//comment2": "Name of the default basemap.",
-    "defaultBasemap": "Grundkarte farbig",
+    "defaultBasemap": "Karte grau",
     "//comment3" : "special basemaps that can be activated or not",
     "OSM": true,
     "SwissTopoVectorTiles": true
@@ -31,22 +29,18 @@
   "treeview": {
     "useCheckboxes": false,
     "useLegendIcons": true,
-    "hideLegendWhenLayerIsDeactivated": false,
-    "defaultIconSize": {
-      "width": "20",
-      "height": "20"
-    }
+    "hideLegendWhenLayerIsDeactivated": false
   },
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
-    "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://edit.geo.gr.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###"
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "https://map.geo.bs.ch/printproxy/",
+    "url": "https://edit.geo.gr.ch/printproxy/",
     "//comment2": "The print layout selected by default",
-    "defaultLayout": "print_A4_hochformat"
+    "defaultLayout": "1 A4 portrait"
   },
   "selection": {
     "defaultFillColor": "#ff66667f",
@@ -71,14 +65,14 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200, 100, 50],
-    "startPosition": "2611000,1267000",
-    "startZoom": "4",
-    "maxExtent": "2583000,1235000,2650000,1291000",
+    "startZoom": "0",
+    "startPosition": "2760000,1170000",
+    "maxExtent": "2500000,1100000,2800000,1300000",
+    "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200],
     "constraintScales": true
   },
   "map3d": {
-    "terrainUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/",
-    "tilesetUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/cesium/tiles/av-gebaeude-basel-stadt/tileset.json"
+    "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
+    "tilesetUrl": "https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"
   }
 }

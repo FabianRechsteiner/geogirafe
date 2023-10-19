@@ -7,7 +7,7 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "de": "https://map.geo.sz.ch/static-ngeo/build/de.json",
+    "de": "Mock/de.json",
     "//comment2": "Default language",
     "defaultLanguage": "de"
   },
