@@ -1,13 +1,26 @@
 APPDIR="src/static"
-if [ -z "$2" ]
+if [ -n "$2" ];
 then
-    APPDIR="$2";
+    APPDIR="$2"
 fi
 
 MOCKDIR="$APPDIR/Mock"
 mkdir -p "$MOCKDIR"
 
-if [ "$1" = 'cartolacote' ];
+if [ "$1" = 'c2c' ];
+then
+    echo "Preparing environment CAMPTOCAMP..."
+    echo $2
+    echo $APPDIR
+    echo $MOCKDIR
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://geomapfish-demo-2-8.camptocamp.com/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/de.json" --silent --output $MOCKDIR/de.json
+    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/en.json" --silent --output $MOCKDIR/en.json
+    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://geomapfish-demo-2-8.camptocamp.com/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
+
+elif [ "$1" = 'cartolacote' ];
 then
     echo "Preparing environment CARTOLACOTE..."
     cp demo/config.$1.json $APPDIR/config.json
