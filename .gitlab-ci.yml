@@ -121,7 +121,7 @@ docker-build:
 # Some tool functions to simplify demo configuration and publication
 .prepare_demo: &prepare_demo |
   cp -R public $demo && mv $demo release/
-  ./demo/configure-demo.sh "$demo" "release/$demo"
+  ./buildtools/configure-demo.sh "$demo" "release/$demo"
   gzip -k -f release/$demo/config.json release/$demo/Mock/*.json
   brotli -k -f release/$demo/config.json release/$demo/Mock/*.json
 
