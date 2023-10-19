@@ -16,39 +16,39 @@ variables:
 #unitests:
 #  stage: test
 #  image: node:18-slim
-#  
-#  script: 
+#
+#  script:
 #    # build
 #    - npm i
 #    - npm run test
 
 #################################
-# Audit NPM dependencies to find any known vulnerability 
+# Audit NPM dependencies to find any known vulnerability
 npm-audit:
   stage: test
   image: node:18-slim
   allow_failure: true
-  
-  script: 
+
+  script:
     # build
     - npm i
     - npm audit --omit=dev --audit-level high
     - npm audit signatures
 
 #################################
-# Audit NPM dependencies to find any known vulnerability 
+# Audit NPM dependencies to find any known vulnerability
 npm-outdated:
   stage: test
   image: node:18-slim
   allow_failure: true
-  
-  script: 
+
+  script:
     # build
     - npm i
     - npm outdated
 
 #################################
-# Quality, readability, reliability and security checks with Sonarcloud 
+# Quality, readability, reliability and security checks with Sonarcloud
 sonarcloud-check:
   stage: test
   image:
@@ -78,7 +78,7 @@ build:
 
   before_script:
     - apt update && apt -y install jq brotli
-  script: 
+  script:
     - npm i
     - npm run build
     # List all dependencies
@@ -111,7 +111,7 @@ docker-build:
     - docker info
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
 
-  script: 
+  script:
     # build
     - docker build -t geogirafe/viewer -f buildtools/Dockerfile .
     # push
@@ -145,25 +145,27 @@ pages:
     # Prepare all demo environments
     - demo='c2c'
     - *prepare_demo
-    - demo='mapbs'
+    - demo='cartolacote'
     - *prepare_demo
     - demo='cartoriviera'
     - *prepare_demo
-    - demo='cartolacote'
+    - demo='geogr'
     - *prepare_demo
-    - demo='mapnv'
-    - *prepare_demo
-    - demo='sitn'
-    - *prepare_demo
-    - demo='schwyz'
+    - demo='lausanne'
     - *prepare_demo
     - demo='lie'
     - *prepare_demo
+    - demo='mapbs'
+    - *prepare_demo
+    - demo='mapnv'
+    - *prepare_demo
+    - demo='schwyz'
+    - *prepare_demo
     - demo='sigip'
     - *prepare_demo
-    - demo='ticino'
+    - demo='sitn'
     - *prepare_demo
-    - demo='lausanne'
+    - demo='ticino'
     - *prepare_demo
     # Rename the release directory to public
     - rm -Rf public && mv release public
@@ -173,51 +175,57 @@ pages:
 
     # Wget themes.json to improve performance on demo instance
     # (this does not work for cartoriviera.ch, it seems to be blocked)
-    # MapBS
-    - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/mapbs/Mock/themes.json
-    - gzip -k -f public/mapbs/Mock/themes.json
-    - brotli -k -f public/mapbs/Mock/themes.json
     # Cartolacote
     - curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --output public/cartolacote/Mock/themes.json
     - gzip -k -f public/cartolacote/Mock/themes.json
     - brotli -k -f public/cartolacote/Mock/themes.json
-    # MapNV
-    - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
-    - gzip -k -f public/mapnv/Mock/themes.json
-    - brotli -k -f public/mapnv/Mock/themes.json
-    # SITN
-    - curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --output public/sitn/Mock/themes.json
-    - curl "https://sitn.ne.ch/printproxy/capabilities.json" --output public/sitn/Mock/capabilities.json
-    - gzip -k -f public/sitn/Mock/themes.json public/sitn/Mock/capabilities.json
-    - brotli -k -f public/sitn/Mock/themes.json public/sitn/Mock/capabilities.json
-    # Schwyz
-    - curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output public/schwyz/Mock/themes.json
-    - gzip -k -f public/schwyz/Mock/themes.json
-    - brotli -k -f public/schwyz/Mock/themes.json
-    # Liechtenstein
-    - curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --output public/lie/Mock/themes.json
-    - curl "https://map.geo.llv.li/static/X/de.json" --output public/lie/Mock/de.json
-    - curl "https://map.geo.llv.li/printproxy/capabilities.json" --output public/lie/Mock/capabilities.json
-    - gzip -k -f public/lie/Mock/themes.json public/lie/Mock/de.json public/lie/Mock/capabilities.json
-    - brotli -k -f public/lie/Mock/themes.json public/lie/Mock/de.json public/lie/Mock/capabilities.json
-    # SIGIP
-    - curl "https://www.sigip.ch/themes?background=background&interface=desktop" --output public/sigip/Mock/themes.json
-    - curl "https://www.sigip.ch/static/X/fr.json" --output public/sigip/Mock/fr.json
-    - curl "https://www.sigip.ch/printproxy/capabilities.json" --output public/sigip/Mock/capabilities.json
-    - gzip -k -f public/sigip/Mock/themes.json public/sigip/Mock/fr.json public/sigip/Mock/capabilities.json
-    - brotli -k -f public/sigip/Mock/themes.json public/sigip/Mock/fr.json public/sigip/Mock/capabilities.json
-    # Ticino
-    - curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --output public/ticino/Mock/themes.json
-    - curl "https://map.geo.ti.ch/static/dummy/en.json" --output public/ticino/Mock/en.json
-    - curl "https://map.geo.ti.ch/printproxy/capabilities.json" --output public/ticino/Mock/capabilities.json
-    - gzip -k -f public/ticino/Mock/themes.json public/ticino/Mock/en.json public/ticino/Mock/capabilities.json
-    - brotli -k -f public/ticino/Mock/themes.json public/ticino/Mock/en.json public/ticino/Mock/capabilities.json
+    # GeoGR
+    - curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --output public/geogr/Mock/themes.json
+    - curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --output public/geogr/Mock/de.json
+    - curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --output public/geogr/Mock/capabilities.json
+    - gzip -k -f public/geogr/Mock/themes.json public/geogr/Mock/de.json public/geogr/Mock/capabilities.json
+    - brotli -k -f public/geogr/Mock/themes.json public/geogr/Mock/de.json public/geogr/Mock/capabilities.json
     # Lausanne
     - curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --output public/lausanne/Mock/themes.json
     - curl "https://map.lausanne.ch/static/dummy/fr.json" --output public/lausanne/Mock/fr.json
     - curl "https://map.lausanne.ch/printproxy/capabilities.json" --output public/lausanne/Mock/capabilities.json
     - gzip -k -f public/lausanne/Mock/themes.json public/lausanne/Mock/fr.json public/lausanne/Mock/capabilities.json
     - brotli -k -f public/lausanne/Mock/themes.json public/lausanne/Mock/fr.json public/lausanne/Mock/capabilities.json
+    # Liechtenstein
+    - curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --output public/lie/Mock/themes.json
+    - curl "https://map.geo.llv.li/static/X/de.json" --output public/lie/Mock/de.json
+    - curl "https://map.geo.llv.li/printproxy/capabilities.json" --output public/lie/Mock/capabilities.json
+    - gzip -k -f public/lie/Mock/themes.json public/lie/Mock/de.json public/lie/Mock/capabilities.json
+    - brotli -k -f public/lie/Mock/themes.json public/lie/Mock/de.json public/lie/Mock/capabilities.json
+    # MapBS
+    - curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output public/mapbs/Mock/themes.json
+    - gzip -k -f public/mapbs/Mock/themes.json
+    - brotli -k -f public/mapbs/Mock/themes.json
+    # MapNV
+    - curl "https://mapnv.ch/themes?background=background&interface=desktop" --output public/mapnv/Mock/themes.json
+    - gzip -k -f public/mapnv/Mock/themes.json
+    - brotli -k -f public/mapnv/Mock/themes.json
+    # Schwyz
+    - curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output public/schwyz/Mock/themes.json
+    - gzip -k -f public/schwyz/Mock/themes.json
+    - brotli -k -f public/schwyz/Mock/themes.json
+    # SIGIP
+    - curl "https://www.sigip.ch/themes?background=background&interface=desktop" --output public/sigip/Mock/themes.json
+    - curl "https://www.sigip.ch/static/X/fr.json" --output public/sigip/Mock/fr.json
+    - curl "https://www.sigip.ch/printproxy/capabilities.json" --output public/sigip/Mock/capabilities.json
+    - gzip -k -f public/sigip/Mock/themes.json public/sigip/Mock/fr.json public/sigip/Mock/capabilities.json
+    - brotli -k -f public/sigip/Mock/themes.json public/sigip/Mock/fr.json public/sigip/Mock/capabilities.json
+    # SITN
+    - curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --output public/sitn/Mock/themes.json
+    - curl "https://sitn.ne.ch/printproxy/capabilities.json" --output public/sitn/Mock/capabilities.json
+    - gzip -k -f public/sitn/Mock/themes.json public/sitn/Mock/capabilities.json
+    - brotli -k -f public/sitn/Mock/themes.json public/sitn/Mock/capabilities.json
+    # Ticino
+    - curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --output public/ticino/Mock/themes.json
+    - curl "https://map.geo.ti.ch/static/dummy/en.json" --output public/ticino/Mock/en.json
+    - curl "https://map.geo.ti.ch/printproxy/capabilities.json" --output public/ticino/Mock/capabilities.json
+    - gzip -k -f public/ticino/Mock/themes.json public/ticino/Mock/en.json public/ticino/Mock/capabilities.json
+    - brotli -k -f public/ticino/Mock/themes.json public/ticino/Mock/en.json public/ticino/Mock/capabilities.json
 
   artifacts:
     paths:

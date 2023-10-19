@@ -7,7 +7,7 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "fr": "https://mapnv.ch/static/dummy/fr.json",
+    "fr": "Mock/fr.json",
     "//comment2": "Default language",
     "defaultLanguage": "fr"
   },

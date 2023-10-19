@@ -120,6 +120,28 @@
             <div class="u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-4">
               <div class="u-container-layout u-similar-container u-container-layout-4">
                 <div class="img-container">
+                <img src="./static/logo_schwyz.png" alt="" class="u-expanded-width u-image u-image-default u-image-4" data-image-width="700" data-image-height="700">
+              </div>
+                <h4 id="schwyz-version" class="u-text u-text-default u-text-palette-4-base u-text-11">V. 0.2</h4>
+                <h5 class="u-text u-text-default u-text-12">Schwyz</h5>
+                <p class="u-text u-text-default u-text-13">Demo based on data from Schwyz. This application is automatically updated with the latest development version.</p>
+                <a href="https://demo.geomapfish.dev/schwyz" class="u-border-none u-btn u-btn-round u-button-style u-palette-4-base u-radius-50 u-btn-4">Demo</a>
+              </div>
+            </div>
+            <div class="u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-4">
+              <div class="u-container-layout u-similar-container u-container-layout-4">
+                <div class="img-container">
+                <img src="./static/logo_geogr.png" alt="" class="u-expanded-width u-image u-image-default u-image-4" data-image-width="700" data-image-height="700">
+              </div>
+                <h4 id="geogr-version" class="u-text u-text-default u-text-palette-4-base u-text-11">V. 0.2</h4>
+                <h5 class="u-text u-text-default u-text-12">Grisons</h5>
+                <p class="u-text u-text-default u-text-13">Demo based on data from Grisons. This application is automatically updated with the latest development version.</p>
+                <a href="https://demo.geomapfish.dev/geogr" class="u-border-none u-btn u-btn-round u-button-style u-palette-4-base u-radius-50 u-btn-4">Demo</a>
+              </div>
+            </div>
+            <div class="u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-4">
+              <div class="u-container-layout u-similar-container u-container-layout-4">
+                <div class="img-container">
                 <img src="./static/logo_c2c.svg" alt="" class="u-expanded-width u-image u-image-default u-image-4" data-image-width="700" data-image-height="700">
               </div>
                 <h4 id="c2c-version" class="u-text u-text-default u-text-palette-4-base u-text-11">V. 0.2</h4>
@@ -132,7 +154,7 @@
         </div>
       </div>
     </section>
-    
+
     <section class="u-backlink u-clearfix u-grey-80">
       <a class="u-link" href="https://gitlab.com/geogirafe/gg-viewer" target="_blank">
         <span>GeoGirafe</span>
@@ -147,20 +169,22 @@
             document.getElementById(elementId).innerHTML = `v. ${data.version}<span>.${data.build}</span>`;
         });
       }
-        
+
       window.addEventListener("DOMContentLoaded", (event) => {
-        updateVersion('https://demo.geomapfish.dev/mapbs', 'mapbs-version');
-        updateVersion('https://demo.geomapfish.dev/sitn', 'sitn-version');
-        updateVersion('https://demo.geomapfish.dev/cartoriviera', 'cartoriviera-version');
-        updateVersion('https://demo.geomapfish.dev/cartolacote', 'cartolacote-version');
-        updateVersion('https://demo.geomapfish.dev/mapnv', 'mapnv-version');
-        updateVersion('https://demo.geomapfish.dev/sigip', 'sigip-version');
-        updateVersion('https://demo.geomapfish.dev/lie', 'lie-version');
-        updateVersion('https://demo.geomapfish.dev/ticino', 'ticino-version');
-        updateVersion('https://demo.geomapfish.dev/lausanne', 'lausanne-version');
         updateVersion('https://demo.geomapfish.dev/c2c', 'c2c-version');
+        updateVersion('https://demo.geomapfish.dev/cartolacote', 'cartolacote-version');
+        updateVersion('https://demo.geomapfish.dev/cartoriviera', 'cartoriviera-version');
+        updateVersion('https://demo.geomapfish.dev/geogr', 'geogr-version');
+        updateVersion('https://demo.geomapfish.dev/lausanne', 'lausanne-version');
+        updateVersion('https://demo.geomapfish.dev/lie', 'lie-version');
+        updateVersion('https://demo.geomapfish.dev/mapbs', 'mapbs-version');
+        updateVersion('https://demo.geomapfish.dev/mapnv', 'mapnv-version');
+        updateVersion('https://demo.geomapfish.dev/schwyz', 'schwyz-version');
+        updateVersion('https://demo.geomapfish.dev/sigip', 'sigip-version');
+        updateVersion('https://demo.geomapfish.dev/sitn', 'sitn-version');
+        updateVersion('https://demo.geomapfish.dev/ticino', 'ticino-version');
       });
     </script>
-  
+
   </body>
 </html>

@@ -15,7 +15,7 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : ""
+    "defaultTheme" : "Geokategorien"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
@@ -42,7 +42,7 @@
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "Mock/",
+    "url": "https://map.geo.llv.li/printproxy/",
     "//comment2": "The print layout selected by default",
     "defaultLayout": "1 A4 Hochformat"
   },

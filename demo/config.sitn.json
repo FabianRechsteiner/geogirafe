@@ -7,7 +7,7 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "fr": "https://sitn.ne.ch/static/dummy/fr.json",
+    "fr": "Mock/fr.json",
     "//comment2": "Default language",
     "defaultLanguage": "fr"
   },
@@ -42,7 +42,7 @@
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
-    "url": "Mock/",
+    "url": "https://sitn.ne.ch/printproxy/",
     "//comment2": "The print layout selected by default",
     "defaultLayout": "1 A4 paysage"
   },
