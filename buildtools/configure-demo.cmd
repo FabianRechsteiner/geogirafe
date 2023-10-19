@@ -21,6 +21,15 @@ if "%1"=="cartoriviera" (
     goto :end
 )
 
+if "%1"=="cjl" (
+    echo "Preparing environment CARTOJURALEMAN..."
+    copy demo\config.cjl.json src\static\config.json /Y
+    curl "https://map.cjl.ch/themes?background=background&interface=desktop" --silent --output %OUTPUTDIR%\themes.json
+    curl "https://map.cjl.ch/static/dummy/fr.json" --silent --output %OUTPUTDIR%\fr.json
+    curl "https://map.cjl.ch/printproxy/capabilities.json" --silent --output %OUTPUTDIR%\capabilities.json
+    goto :end
+)
+
 if "%1"=="geogr" (
     echo "Preparing environment GEOGR..."
     copy demo\config.geogr.json src\static\config.json /Y
@@ -105,7 +114,7 @@ if "%1"=="ticino" (
 )
 
 echo "Usage: ./configure-demo-win <environment>"
-echo "Possible environments: ['cartolacote', 'cartoriviera', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
+echo "Possible environments: ['cartolacote', 'cartoriviera', 'cjl', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
 echo "Usage example: ./configure-demo-win mapbs"
 echo "Usage example with npm: npm run configure-demo-win mapbs"
 

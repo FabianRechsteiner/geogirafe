@@ -1,99 +1,113 @@
-OUTPUTDIR="src/static/Mock"
-mkdir -p "$OUTPUTDIR"
+APPDIR="src/static"
+if [ -z "$2" ]
+then
+    APPDIR="$2";
+fi
+
+MOCKDIR="$APPDIR/Mock"
+mkdir -p "$MOCKDIR"
 
 if [ "$1" = 'cartolacote' ];
 then
     echo "Preparing environment CARTOLACOTE..."
-    cp demo/config.cartolacote.json src/static/config.json
-    curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://map.cartolacote.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
-    curl "https://map.cartolacote.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://map.cartolacote.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://map.cartolacote.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'cartoriviera' ];
 then
     echo "Preparing environment CARTORIVIERA..."
-    cp demo/config.cartoriviera.json src/static/config.json
-    curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://map.cartoriviera.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
-    curl "https://map.cartoriviera.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://map.cartoriviera.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://map.cartoriviera.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
+
+elif [ "$1" = 'cjl' ];
+then
+    echo "Preparing environment CARTOJURALEMAN..."
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://map.cjl.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://map.cjl.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://map.cjl.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'geogr' ];
 then
     echo "Preparing environment GEOGR..."
-    cp demo/config.geogr.json src/static/config.json
-    curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --silent --output $OUTPUTDIR/de.json
-    curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --silent --output $MOCKDIR/de.json
+    curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'lausanne' ];
 then
     echo "Preparing environment LAUSANNE..."
-    cp demo/config.lausanne.json src/static/config.json
-    curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://map.lausanne.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
-    curl "https://map.lausanne.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://map.lausanne.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://map.lausanne.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'lie' ];
 then
     echo "Preparing environment LIE..."
-    cp demo/config.lie.json src/static/config.json
-    curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://map.geo.llv.li/static/dummy/de.json" --silent --output $OUTPUTDIR/de.json
-    curl "https://map.geo.llv.li/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://map.geo.llv.li/static/dummy/de.json" --silent --output $MOCKDIR/de.json
+    curl "https://map.geo.llv.li/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'mapbs' ];
 then
     echo "Preparing environment MAPBS..."
-    cp demo/config.mapbs.json src/static/config.json
-    curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://map.geo.bs.ch/static/dummy/de.json" --silent --output $OUTPUTDIR/de.json
-    curl "https://map.geo.bs.ch/static/dummy/en.json" --silent --output $OUTPUTDIR/en.json
-    curl "https://map.geo.bs.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
-    curl "https://map.geo.bs.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://map.geo.bs.ch/static/dummy/de.json" --silent --output $MOCKDIR/de.json
+    curl "https://map.geo.bs.ch/static/dummy/en.json" --silent --output $MOCKDIR/en.json
+    curl "https://map.geo.bs.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://map.geo.bs.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'mapnv' ];
 then
     echo "Preparing environment MAPNV..."
-    cp demo/config.mapnv.json src/static/config.json
-    curl "https://mapnv.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://mapnv.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
-    curl "https://mapnv.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://mapnv.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://mapnv.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://mapnv.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'schwyz' ];
 then
     echo "Preparing environment SCHWYZ..."
-    cp demo/config.schwyz.json src/static/config.json
-    curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://map.geo.sz.ch/static-ngeo/build/de.json" --silent --output $OUTPUTDIR/de.json
-    curl "https://map.geo.sz.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://map.geo.sz.ch/static-ngeo/build/de.json" --silent --output $MOCKDIR/de.json
+    curl "https://map.geo.sz.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'sigip' ];
 then
     echo "Preparing environment SIGIP..."
-    cp demo/config.sigip.json src/static/config.json
-    curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://www.sigip.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
-    curl "https://www.sigip.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://www.sigip.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://www.sigip.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'sitn' ];
 then
     echo "Preparing environment SITN..."
-    cp demo/config.sitn.json src/static/config.json
-    curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://sitn.ne.ch/static/dummy/fr.json" --silent --output $OUTPUTDIR/fr.json
-    curl "https://sitn.ne.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://sitn.ne.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://sitn.ne.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'ticino' ];
 then
     echo "Preparing environment TICINO..."
-    cp demo/config.ticino.json src/static/config.json
-    curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --silent --output $OUTPUTDIR/themes.json
-    curl "https://map.geo.ti.ch/static/dummy/en.json" --silent --output $OUTPUTDIR/en.json
-    curl "https://map.geo.ti.ch/printproxy/capabilities.json" --silent --output $OUTPUTDIR/capabilities.json
+    cp demo/config.$1.json $APPDIR/config.json
+    curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    curl "https://map.geo.ti.ch/static/dummy/en.json" --silent --output $MOCKDIR/en.json
+    curl "https://map.geo.ti.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 else
     echo "Usage: ./configure-demo <environment>"
-    echo "Possible environments: ['cartolacote', 'cartoriviera', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
+    echo "Possible environments: ['cartolacote', 'cartoriviera', 'cjl', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
     echo "Usage example: ./configure-demo mapbs"
     echo "Usage example with npm: npm run configure-demo mapbs"
 
