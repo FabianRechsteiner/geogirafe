@@ -15,7 +15,7 @@ class ViewManager {
   configManager: ConfigManager;
 
   // Those 3 values are linked and can indicate the current zoomlevel/resolution/scale
-  zoom: number;
+  zoom: number | null = null;
   resolution: number | null = null;
   scale: number | null = null;
 
@@ -62,10 +62,11 @@ class ViewManager {
     return scale;
   }
 
+
   getView() {
     return new View({
       center: this.center,
-      zoom: this.zoom,
+      zoom: this.zoom ?? undefined,
       projection: this.srid,
       extent: this.extent,
       resolutions: this.allowedResolutions,
@@ -115,21 +116,24 @@ class ViewManager {
   }
 
   setZoom(zoom: number) {
-    // TODO REG : Calculate resolution and scale ?
     this.zoom = zoom;
+    this.map.getView().setZoom(this.zoom);
+    this.resolution = this.map.getView().getResolution() ?? null;
+    this.scale = this.getScale();
   }
 
   setResolution(resolution: number) {
-    // TODO REG : Calculate zoom and scale ?
     this.resolution = resolution;
     this.map.getView().setResolution(this.resolution);
+    this.zoom = this.map.getView().getZoom() ?? null;
+    this.scale = this.getScale();
   }
 
   setScale(scale: number) {
-    // TODO REG : Calculate zoom ?
     this.scale = scale;
     this.resolution = this.scaleToResolution(scale);
     this.map.getView().setResolution(this.resolution);
+    this.zoom = this.map.getView().getZoom() ?? null;
   }
 }
 

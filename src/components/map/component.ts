@@ -104,10 +104,11 @@ class MapComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('interface.darkMode', (_oldValue: boolean, _newValue: boolean) => this.onChangeDarkMode());
     this.stateManager.subscribe('position.scale', (_oldScale: number, newScale: number) => this.onChangeScale(newScale));
     this.stateManager.subscribe('position.resolution', (_oldResolution: number, newResolution: number) => this.zoomToResolution(newResolution));
+    this.stateManager.subscribe('position.zoom', (_oldZoom: number, newZoom: number) => this.zoomToZoom(newZoom));
     this.stateManager.subscribe('position.center', (_oldCenter: Coordinate, newCenter: Coordinate) => this.panToCoordinate(newCenter));
     this.stateManager.subscribe('selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) => this.onFeaturesSelected(newFeatures));
     this.stateManager.subscribe('focusedFeature', (_oldFeature: Feature, newFeature: Feature) => this.onFeatureFocused(newFeature));
-    this.stateManager.subscribe('layers.swipedLayers', (_oldLayers: {left: Layer[]; right: Layer[];}, newLayers: {left: Layer[]; right: Layer[];}) => this.onSwipedLayersChanged(newLayers));
+    this.stateManager.subscribe('layers.swipedLayers', (_oldLayers: { left: Layer[]; right: Layer[]; }, newLayers: { left: Layer[]; right: Layer[]; }) => this.onSwipedLayersChanged(newLayers));
 
     this.stateManager.subscribe('redlining.activeTool', (_oldTool: string | null, newTool: string | null) => this.onRedliningToolChanged(newTool));
     this.stateManager.subscribe('redlining.features', (oldFeatures: RedliningFeature[], newFeatures: RedliningFeature[]) => this.onFeaturesChanged(oldFeatures, newFeatures));
@@ -166,7 +167,7 @@ class MapComponent extends GirafeHTMLElement {
       features: this.selectedFeaturesCollection
     });
 
-    this.configManager.loadConfig().then(() => { 
+    this.configManager.loadConfig().then(() => {
       this.selectionLayer = new VectorLayer({
         source: selectionSource,
         // TODO REG: Change default selection color
@@ -413,7 +414,7 @@ class MapComponent extends GirafeHTMLElement {
 
   onSwipedLayersChanged(swipedLayers: { left: Layer[]; right: Layer[]; }) {
     if (swipedLayers.left.length === 0 && swipedLayers.right.length === 0) {
-      // TODO REG: Better manage WMS in order to combine swiped layers again in a unique olayer 
+      // TODO REG: Better manage WMS in order to combine swiped layers again in a unique olayer
       // (to minimize the amount of WMS queries that are sent to the server)
       this.swipeManager.deactivateSwipe();
     }
@@ -424,7 +425,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   swipeLayersOnSide(layers: Layer[], side: 'left' | 'right') {
-    for (let i=0; i<layers.length; ++i) {
+    for (let i = 0; i < layers.length; ++i) {
       const layer = layers[i];
       if (layer instanceof LayerWms) {
         this.swipeManager.activateSwipeForWms(layer, side);
@@ -442,10 +443,10 @@ class MapComponent extends GirafeHTMLElement {
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = 'lib/cesium/Cesium.js';
-  
+
         script.onload = resolve;
         script.onerror = reject;
-  
+
         document.body.appendChild(script);
       }).catch((error) => {
         console.error('Error while loading Cesium', error);
@@ -514,10 +515,13 @@ class MapComponent extends GirafeHTMLElement {
     this.viewManager.setScale(scale);
   }
 
-  zoomToResolution(resolution:number) {
+  zoomToResolution(resolution: number) {
     this.viewManager.setResolution(resolution);
   }
 
+  zoomToZoom(zoom: number) {
+    this.viewManager.setZoom(zoom);
+  }
   zoomToExtent(extent: Extent) {
     this.map.getView().fit(extent);
   }
@@ -585,23 +589,23 @@ class MapComponent extends GirafeHTMLElement {
     alert('Not Implemented yet');
     // TODO REG : Rewrite this while taking avery layer type in account.
     /*this.wmsManager.changeOrder(layers);
-    layers.forEach(layerInfos => {
-      if (layerInfos.serverUniqueQueryId in this.layersByServer) {
-        const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-        const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
-        layerDef.layer.setSource(source);
-      }
-      else if (layerInfos.name in this.independantLayers) {
-        // TODO REG: Here we have to change to order of the layers around the transparent layer.
-        // This case can be a bit complicated, because the transparent layer can be between non transparent layers
-        // Perhaps we will have to split the non-transparent layers in 2 different lists ?
-        // Do we really want this ? It sound a bit too much... and can be complicated to implement.
-      }
-      // TODO REG : Manager swiped layers here
-      else if (layerInfos.name in this.swipedLayers) {
-        throw new Error(''This case is not supported yet');
-      }
-    });*/
+layers.forEach(layerInfos => {
+  if (layerInfos.serverUniqueQueryId in this.layersByServer) {
+    const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
+    const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
+    layerDef.layer.setSource(source);
+  }
+  else if (layerInfos.name in this.independantLayers) {
+    // TODO REG: Here we have to change to order of the layers around the transparent layer.
+    // This case can be a bit complicated, because the transparent layer can be between non transparent layers
+    // Perhaps we will have to split the non-transparent layers in 2 different lists ?
+    // Do we really want this ? It sound a bit too much... and can be complicated to implement.
+  }
+  // TODO REG : Manager swiped layers here
+  else if (layerInfos.name in this.swipedLayers) {
+    throw new Error(''This case is not supported yet');
+  }
+});*/
   }
 
   onChangeOpacity(layerInfos: Layer) {
@@ -643,12 +647,12 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   /*activatePrintMask(format) {
-    this.map.addLayer(this.maskLayer);
-  }
+  this.map.addLayer(this.maskLayer);
+}
 
-  deactivatePrintMask() {
-    this.map.removeLayer(this.maskLayer);
-  }*/
+deactivatePrintMask() {
+  this.map.removeLayer(this.maskLayer);
+}*/
 
   onFeaturesChanged(oldFeatures: RedliningFeature[], newFeatures: RedliningFeature[]) {
     let deletedFeatures: RedliningFeature[] = [];
