@@ -14,7 +14,7 @@ type TranslationsDict = {
 };
 
 /**
- * A disctionary that holds all the languages with their translation strings.
+ * A dictionary that holds all the languages with their translation strings.
  * For example:
  * {
  *   'fr': {

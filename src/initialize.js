@@ -25,11 +25,13 @@ import SelectionWindowComponent from './components/selectionwindow/component';
 import SelectionGridComponent from './components/selectiongrid/component';
 import HelpComponent from './components/help/component';
 import AboutComponent from './components/about/component';
+import QueryBuilderComponent from './components/querybuilder/component';
 
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 import ThemesManager from './tools/themesmanager';
 import WfsManager from './tools/wfsmanager';
+import tippy from "tippy.js";
 
 // Register custom EPSG
 // https://epsg.io/21781
@@ -37,6 +39,9 @@ proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.4395833
 // https://epsg.io/2056
 proj4.defs("EPSG:2056" , '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs');
 register(proj4);
+
+// Override default tooltip maxWidth:
+tippy.setDefaultProps({ maxWidth: '' });
 
 // Initialize the themes manager, in order to load the themes
 ThemesManager.getInstance();

@@ -1,12 +1,12 @@
 import { WFS } from 'ol/format';
 import GML3 from 'ol/format/GML3';
 
-import { SelectFeaturesActionDetails, SelectionParams } from '../models/events';
 import GirafeSingleton from "../base/GirafeSingleton";
-//import ConfigManager from "./configmanager";
 import MessageManager from "./messagemanager";
 import StateManager from "./state/statemanager";
-import GeoEvents from '../models/events';
+import { SelectionParam } from './state/state';
+import LayerWms from '../models/layers/layerwms';
+import ServerWfs from '../models/serverwfs';
 
 class WfsManager extends GirafeSingleton {
 
@@ -19,117 +19,147 @@ class WfsManager extends GirafeSingleton {
   //TODO: make this configurable
   maxFeatures: number = 10000;
 
-  wfsUrlLoaded: string[] = [];
-  featureTypeToGeometryAttributeName: { [key: string]: string; } = {};
+  serversWfs: Record<string, ServerWfs> = {};
+  featureTypeToGeometryColumnName: { [key: string]: string; } = {};
 
   constructor(type: string) {
     super(type);
 
-   /* this.configManager = ConfigManager.getInstance();*/
     this.stateManager = StateManager.getInstance();
     this.messageManager = MessageManager.getInstance();
 
-/*    this.configManager.loadConfig()
-      .then(() => { this.loadThemes(); })
-      .then(() => { console.log('Themes were loaded'); });*/
-
-    //this.stateManager.subscribe('selectedTheme', (oldTheme, newTheme) => this.onChangeTheme(newTheme));
-    this.messageManager.register(this.onCustomGirafeEvent.bind(this));
+    this.stateManager.subscribe('selection.selectionParameters', (_oldParams: SelectionParam[], newParams: SelectionParam[]) => this.onSelectFeatures(newParams));
   }
 
-  onCustomGirafeEvent(details: SelectFeaturesActionDetails) {
-    if (details.action === GeoEvents.selectFeatures) {
-      this.onSelectFeatures(details.selectionParams);
-    }
-  }
-
-  onSelectFeatures(selectionParams: SelectionParams[]) {
+  onSelectFeatures(selectionParams: SelectionParam[]) {
 
     this.state.loading = true;
 
     // Reset current selection
-    this.state.selectedFeatures = [];
+    this.state.selection.selectedFeatures = [];
 
     // First, we have to load the DescribeFeatureType for this WFS server if this wasn't done yet
     const wfsToInitialize: string[] = [];
-    for (let i = 0; i < selectionParams.length; ++i) {
-      if (!this.wfsUrlLoaded.includes(selectionParams[i].wfsUrl)) {
-        wfsToInitialize.push(selectionParams[i].wfsUrl);
+    for (const param of selectionParams) {
+      for (const layerWms of param.layers) {
+        if (layerWms.queryable && layerWms.urlWfs && !(layerWms.urlWfs in this.serversWfs)) {
+          wfsToInitialize.push(layerWms.urlWfs);
+        }
       }
     }
 
     if (wfsToInitialize.length === 0) {
-      // We can directly do the WFS query
+      // All layers have already been initialized, we can directly do the WFS query
       this.wfsQuery(selectionParams);
     }
     else {
       // We first have to load the missing wfs configuration
-      let wfsLoadCount = 0;
-      for (let i = 0; i < wfsToInitialize.length; ++i) {
-        const url = this.getDescribeFeatureTypeUrl(wfsToInitialize[i]);
-        fetch(url)
-          .then(response => response.text())
-          .then(str => {
-            const xml = new DOMParser().parseFromString(str, "text/xml");
-            // First find all direct "element" childs
-            const elementTypeToName: {[key: string]: string} = {};
-            const elements = xml.querySelectorAll(':scope>element');
-            for (let j = 0; j < elements.length; ++j) {
-              const element = elements[j];
-              if (element.hasAttribute('name') && element.hasAttribute('type')) {
-                const name = element.getAttribute('name');
-                let type = element.getAttribute('type');
-                if (type && name) {
-                  if (type.includes(':')) {
-                    type = type.split(':')[1];
-                  }
-                  elementTypeToName[type] = name;
-                }
-              }
-              else {
-                console.log('What happend with this element?');
-              }
-            }
-            // Then, find all "complexType" elements
-            const tags = xml.getElementsByTagName("complexType");
-            for (let i=0; i<tags.length; i++) {
-              const tag = tags[i];
-              const typeName = tag.getAttribute('name');
-              if (!typeName) {
-                throw new Error('Could not find a name for the complex type');
-              }
-              const featureType = elementTypeToName[typeName];
-              const elements = tag.getElementsByTagName('sequence')[0].getElementsByTagName('element');
-              for (let j=0; j<=elements.length; ++j) {
-                const element = elements[j];
-                const type = element.getAttribute('type');
-                if (type && type.startsWith('gml:')) {
-                  // We are on the geometry attribute
-                  const geometryAttributeName = element.getAttribute('name');
-                  if (geometryAttributeName) {
-                    this.featureTypeToGeometryAttributeName[featureType] = geometryAttributeName;
-                  }
-                  break;
-                }
-              }
-              // If we didn't find any geometry attribute for this featureType, then we have a problem
-              // Because the wfs query won't be possible
-              if (!(featureType in this.featureTypeToGeometryAttributeName)) {
-                throw new Error('No Geometry column for the type ' + featureType);
-              }
-            }
+      this.#initializeWfs(wfsToInitialize).then(() => { 
+        this.wfsQuery(selectionParams);
+      });
+    }
+  }
 
-            // This WFS is now initialized
-            this.wfsUrlLoaded.push(wfsToInitialize[i]);
+  async getServerWfs(wfsUrl: string) {
+    if (!(wfsUrl in this.serversWfs)) {
+      await this.#initializeWfs([wfsUrl]);
+    }
 
-            wfsLoadCount++;
-            if (wfsLoadCount === wfsToInitialize.length) {
-              // Everything was loaded, we can start the WFS query
-              this.wfsQuery(selectionParams);
-            }
-          });
+    return this.serversWfs[wfsUrl];
+  }
+
+  async #initializeWfs(wfsToInitialize: string[]) {
+    for (const wfsUrl of wfsToInitialize) {
+      const serverWfs = new ServerWfs('', wfsUrl);
+      const url = this.getDescribeFeatureTypeUrl(wfsUrl);
+      const response = await fetch(url);
+      const content = await response.text();
+      const xml = new DOMParser().parseFromString(content, "text/xml");
+
+      // First find all direct "element" childs
+      const elementTypeToName = this.getElementToTypeName(xml);
+
+      // Then, find all "complexType" elements
+      const tags = xml.getElementsByTagName("complexType");
+      for (const tag of tags) {
+        const typeName = tag.getAttribute('name');
+        if (!typeName) {
+          throw new Error('Could not find a name for the complex type');
+        }
+
+        const featureType = elementTypeToName[typeName];
+        const elements = tag.getElementsByTagName('sequence')[0].getElementsByTagName('element');
+        let geometryAttributeFound: boolean = false;
+        for (const element of elements) {
+          if (this.manageLayerAttribute(serverWfs, element, featureType)) {
+            geometryAttributeFound = true;
+          }
+        }
+
+        // If we didn't find any geometry attribute for this featureType, then we have a problem
+        // Because the wfs query won't be possible
+        if (!geometryAttributeFound) {
+          throw new Error('No Geometry column for the type ' + featureType);
+        }
+      }
+
+      // This WFS is now initialized
+      serverWfs.initialized = true;
+      this.serversWfs[wfsUrl] = serverWfs;
+    }
+  }
+
+  manageLayerAttribute(serverWfs: ServerWfs, element: Element, featureType: string) {
+    let geometryAttributeFound: boolean = false;
+    const type = element.getAttribute('type');
+
+    if (type && type.startsWith('gml:')) {
+      // We are on the geometry attribute
+      const geometryAttributeName = element.getAttribute('name');
+      if (geometryAttributeName) {
+        this.featureTypeToGeometryColumnName[featureType] = geometryAttributeName;
+        geometryAttributeFound = true;
+      }
+      else {
+        throw new Error('Why is geometryAttributeName null here ?');
       }
     }
+    else {
+      // We are not on an geometry attribute, but on a normal attribute
+      // We update the WMS Layer with its attributes informations
+      const attrName = element.getAttribute('name');
+      const attrType = element.getAttribute('type');
+      if (!attrName || !attrType) {
+        console.warn(`Error while loading attribute for layer ${featureType}. Querying or filtering this layer won't work correctly.`);
+      }
+      else {
+        serverWfs.addLayerAttribute(featureType, attrName, attrType);
+      }
+    }
+
+    return geometryAttributeFound;
+  }
+
+  getElementToTypeName(xml: Document) {
+    const elementTypeToName: Record<string, string> = {};
+    const elements = xml.querySelectorAll(':scope>element');
+    for (const element of elements) {
+      if (element.hasAttribute('name') && element.hasAttribute('type')) {
+        const name = element.getAttribute('name');
+        let type = element.getAttribute('type');
+        if (type && name) {
+          if (type.includes(':')) {
+            type = type.split(':')[1];
+          }
+          elementTypeToName[type] = name;
+        }
+      }
+      else {
+        console.log('What happend with this element?');
+      }
+    }
+
+    return elementTypeToName;
   }
 
   getDescribeFeatureTypeUrl(wfsUrl: string) {
@@ -142,24 +172,28 @@ class WfsManager extends GirafeSingleton {
     return url.href;
   }
 
-  wfsQuery(selectionParams: SelectionParams[]) {
+  wfsQuery(selectionParams: SelectionParam[]) {
     const promises = [];
 
-    for (let i = 0; i < selectionParams.length; ++i) {
-      const selectionParam = selectionParams[i];
+    for (const selectionParam of selectionParams) {
 
-      // Test if all layers have the same geometry column name
-      const columnNameToFeatureType: {[key: string]: string[]} = {};
-      for (let j = 0; j < selectionParam.featureTypes.length; ++j) {
-        const featureType = selectionParam.featureTypes[j];
-        const geometryColumnName = this.featureTypeToGeometryAttributeName[featureType];
-        if (!(geometryColumnName in columnNameToFeatureType)) {
-          columnNameToFeatureType[geometryColumnName] = [];
-        }
-        columnNameToFeatureType[geometryColumnName].push(featureType);
+      // First, keep only queryable layers
+      // And verify that all layers have the same WFS URL
+      const queryableLayers = this.getQueryableLayers(selectionParam);
+      if (queryableLayers.length <= 0) {
+        continue;
+      }
+      if (!queryableLayers[0].urlWfs) {
+        throw new Error('The queryable Layers must have a WFS Url!')
       }
 
-      for (let [columnName, featureTypes] of Object.entries(columnNameToFeatureType)) {
+      
+      // Get the geometry column name of each layer
+      // TODO REG : (not sure) This could probably be simplify by initializing a property in the ServerWfs object
+      // containing the name of the geometry column during the WFS initialization.
+      const geometryColumnNameToFeatureType = this.getGeometryColumnNameToFeatureTypes(queryableLayers);
+
+      for (const [columnName, featureTypes] of Object.entries(geometryColumnNameToFeatureType)) {
         // WFS GetFeature
         const featureRequest = new WFS().writeGetFeature({
           srsName: selectionParam.srid,
@@ -170,7 +204,6 @@ class WfsManager extends GirafeSingleton {
           maxFeatures: this.maxFeatures,
           // TODO REG: Do we always want to use the format GML3 here ?
           outputFormat: 'GML3',
-          // TODO REG: get the right geometry column name
           geometryName: columnName,
           bbox: selectionParam.selectionBox,
           //resultType: 'hits'
@@ -180,7 +213,7 @@ class WfsManager extends GirafeSingleton {
           ),*/
         });
 
-        promises.push(fetch(selectionParam.wfsUrl, {
+        promises.push(fetch(queryableLayers[0].urlWfs, {
           method: 'POST',
           body: new XMLSerializer().serializeToString(featureRequest),
         }));
@@ -203,19 +236,41 @@ class WfsManager extends GirafeSingleton {
           this.state.interface.selectionGridVisible = false;
         }
         else {
-          this.state.selectedFeatures = selectedFeatures;
+          this.state.selection.selectedFeatures = selectedFeatures;
           this.state.interface.selectionGridVisible = true;
-
-          /*this.host.style.display = 'block';
-          this.header.innerHTML = '';
-          this.content.innerHTML = '';*/
-
-          // Default, selected the first feature
-          /*this.onFocusFeature(0);*/
         }
 
         this.state.loading = false;
       });
+  }
+
+  getQueryableLayers(selectionParam: SelectionParam) {
+    const queryableLayers = selectionParam.layers.filter(l => l.queryable);
+    if (queryableLayers.length > 0) {
+      if (!queryableLayers[0].urlWfs) {
+        throw new Error('The queryable Layers must have a WFS Url!')
+      }
+      const sameUrlForAll = queryableLayers.every((layer: LayerWms) => { return layer.urlWfs === queryableLayers[0].urlWfs; });
+      if (!sameUrlForAll) {
+        throw new Error('Not all layers of this list have the same WFS URL. We cannot do que WFS query.');
+      }
+    }
+
+    return queryableLayers;
+  }
+
+  getGeometryColumnNameToFeatureTypes(queryableLayers: LayerWms[]) {
+    const geometryColumnNameToFeatureType: Record<string, string[]> = {};
+    const featureTypes = queryableLayers.map(l => l.queryLayers!.split(',')).flat(1);
+    for (const featureType of featureTypes) {
+      const geometryColumnName = this.featureTypeToGeometryColumnName[featureType];
+      if (!(geometryColumnName in geometryColumnNameToFeatureType)) {
+        geometryColumnNameToFeatureType[geometryColumnName] = [];
+      }
+      geometryColumnNameToFeatureType[geometryColumnName].push(featureType);
+    }
+
+    return geometryColumnNameToFeatureType;
   }
 }
 

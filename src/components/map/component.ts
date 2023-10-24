@@ -106,8 +106,8 @@ class MapComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('position.resolution', (_oldResolution: number, newResolution: number) => this.zoomToResolution(newResolution));
     this.stateManager.subscribe('position.zoom', (_oldZoom: number, newZoom: number) => this.zoomToZoom(newZoom));
     this.stateManager.subscribe('position.center', (_oldCenter: Coordinate, newCenter: Coordinate) => this.panToCoordinate(newCenter));
-    this.stateManager.subscribe('selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) => this.onFeaturesSelected(newFeatures));
-    this.stateManager.subscribe('focusedFeature', (_oldFeature: Feature, newFeature: Feature) => this.onFeatureFocused(newFeature));
+    this.stateManager.subscribe('selection.selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) => this.onFeaturesSelected(newFeatures));
+    this.stateManager.subscribe('selection.focusedFeature', (_oldFeature: Feature, newFeature: Feature) => this.onFeatureFocused(newFeature));
     this.stateManager.subscribe('layers.swipedLayers', (_oldLayers: { left: Layer[]; right: Layer[]; }, newLayers: { left: Layer[]; right: Layer[]; }) => this.onSwipedLayersChanged(newLayers));
 
     this.stateManager.subscribe('redlining.activeTool', (_oldTool: string | null, newTool: string | null) => this.onRedliningToolChanged(newTool));
@@ -120,6 +120,7 @@ class MapComponent extends GirafeHTMLElement {
 
     this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldActive: boolean, _newActive: boolean, layer: Layer) => this.onLayerToggled(layer));
     this.stateManager.subscribe('layers\.layersList\..*\.opacity', (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer));
+    this.stateManager.subscribe('layers\.layersList\..*\.filter', (_oldFilter: string, _newFilter: string, layer: Layer) => this.onChangeFilter(layer));
     this.stateManager.subscribe('layers\.layersList\..*\.order', () => this.onChangeOrder([]));
   }
 
@@ -616,6 +617,12 @@ layers.forEach(layerInfos => {
       if (this.wmtsManager.layerExists(layerInfos)) {
         this.wmtsManager.changeOpacity(layerInfos, layerInfos.opacity);
       }
+    }
+  }
+
+  onChangeFilter(layerInfos: Layer) {
+    if (layerInfos instanceof LayerWms) {
+      this.wmsManager.changeFilter(layerInfos);
     }
   }
 

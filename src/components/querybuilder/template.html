@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+
+<div>
+  <div class="${this.loading ? 'loading' : 'loading hidden'}">
+    <i class="fa-xl fa-solid fa-circle-notch fa-spin"></i>
+    Loading server configuration...
+  </div>
+  <div class="${this.loading ? 'content hidden' : 'content'}">
+    <div class="custom-select">
+      <select id="attribute" name="attribute" onchange="${() => this.attributeChanged()}">
+        <option value="" disabled selected>Select attribute...</option>
+        ${this.layerAttributes.map(attr => uHtml.for(attr)`<option i18n="${attr.name}" value="${attr.name}">${attr.name}</option>`)}
+      </select>
+    </div>
+
+    <div class="custom-select">
+      <select id="operator" name="operator" onchange="${() => this.operatorChanged()}">
+        <option value="" disabled selected>Select operator...</option>
+        <option value="eq" class="${this.isNumber || this.isString ? '' : 'hidden'}">equals</option>
+        <option value="neq" class="${this.isNumber || this.isString ? '' : 'hidden'}">does not equal</option>
+        <option value="like" class="${!this.isString ? 'hidden' : ''}">contains</option>
+        <option value="nlike" class="${!this.isString ? 'hidden' : ''}">does not contain</option>
+        <option value="gt" class="${!this.isNumber ? 'hidden' : ''}">greater than</option>
+        <option value="gte" class="${!this.isNumber ? 'hidden' : ''}">greater than or equal to</option>
+        <option value="lt" class="${!this.isNumber ? 'hidden' : ''}">less than</option>
+        <option value="lte" class="${!this.isNumber ? 'hidden' : ''}">less than or equal to</option>
+        <option value="nul" class="${this.isNumber || this.isString ? '' : 'hidden'}">is blank</option>
+        <option value="nnul" class="${this.isNumber || this.isString ? '' : 'hidden'}">is not blank</option>
+      </select>
+    </div>
+
+    <input id="val" type="text" class="${this.showVal ? '' : 'hidden'}" placeholder="Enter value..." />
+
+    <button tip="Apply filter" onclick="${() => this.filter()}">
+      <i class="fa-sm fa-solid fa-filter"></i>
+    </button>
+
+    <button tip="Remove filter" onclick="${() => this.removeFilter()}">
+      <i class="fa-sm fa-solid fa-trash"></i>
+    </button>
+
+  </div>
+
+</div>

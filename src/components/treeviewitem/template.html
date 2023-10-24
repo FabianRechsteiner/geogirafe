@@ -31,7 +31,8 @@
   <!-- Label -->
   <span 
     i18n="${this.layer.name}" 
-    class="${this.layer.activeState === 'on' ? 'text selected' : 'text selectable'}"
+    class="${this.layer.activeState === 'on' ? (this.layer.hasFilter ? 'text selected filtered' : 'text selected') : 'text selectable'}"
+    tip="${this.layer.hasFilter ? 'This layer is filtered.' : ''}"
     onclick="${() => this.toggle()}">${this.layer.name}</span>
 
   <!-- zoom to resolution -->
@@ -52,6 +53,11 @@
   <i class="fa-solid fa-caret-up advanced tool moveup selectable" tip="Move this layer up"></i>
 
   <i id="opacity" class="fa-regular fa-sun tool selectable opacity advanced" tip="Control opacity"></i>
+
+  <!-- Filter -->
+  <i id="filter" 
+     class="${this.layer instanceof LayerWms && this.layer.queryable ? 'fa-solid fa-filter tool selectable filter advanced' : 'filter invisible'}"
+     tip="Filter layer"></i>
 
   <!-- Toggle legend icon -->
   <div class="${this.layer instanceof LayerWms && this.layer.legend ? 'legend selectable' : 'legend invisible'}">

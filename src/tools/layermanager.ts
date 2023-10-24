@@ -228,6 +228,17 @@ class LayerManager extends GirafeSingleton {
     }
     return false;
   }
+  
+  setError(layer: BaseLayer, error: string) {
+    layer.hasError = true;
+    layer.errorMessage = error;
+    console.warn(layer.errorMessage);
+  }
+
+  unsetError(layer: BaseLayer) {
+    layer.hasError = false;
+    layer.errorMessage = null;
+  }
 }
 
 export default LayerManager
