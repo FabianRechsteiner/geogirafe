@@ -1,6 +1,13 @@
 import Layer from './layer';
 
 class LayerWms extends Layer {
+  /**
+   * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
+   * This means that each modification made to its properties must come from outside, 
+   * because they have to be made through the proxy, so that the modification can be listen.
+   * Therefore, this class must not contain any method which is updating a value directly
+   * For example, any method doing <this.xxx = value> is forbidden here, because the modification be known from the proxy
+   */
 
   // Base WMS attributes
   public serverName: string;
@@ -22,6 +29,7 @@ class LayerWms extends Layer {
   // If the layer is queryable
   public queryable = false;
   public queryLayers: string | null = null;
+  public filter: string | null = null;
 
   constructor(elem: any, serverName: string, url: string, urlWfs: string | null, order: number) {
     super(elem, order);
@@ -50,6 +58,19 @@ class LayerWms extends Layer {
       else {
         this.queryable = elem.childLayers[0].queryable;
         this.queryLayers = (this.queryable) ? elem.childLayers.map((l: any) => l.name).join(',') : '';
+
+        if (this.queryable) {
+          if (!this.queryLayers || this.queryLayers.length == 0) {
+            this.hasError = true;
+            this.errorMessage = "This layer is defined as queryable but no layer to query has been defined.";
+            this.queryable = false;
+          }
+          if (!this.urlWfs || this.urlWfs.length == 0) {
+            this.hasError = true;
+            this.errorMessage = "This layer is defined as queryable but no Url for Wfs has been defined.";
+            this.queryable = false;
+          }
+        }
       }
     }
   }
@@ -59,11 +80,12 @@ class LayerWms extends Layer {
          || (this.maxResolution && this.maxResolution !== 999999999));
   }
 
+  get hasFilter() {
+    return this.filter !== null && this.filter !== undefined && this.filter !== '';
+  }
+
   get serverUniqueQueryId() {
-    if (this.serverName) {
-      return this.serverName + this.imageType;
-    }
-    return null
+    return this.serverName + this.imageType;
   }
 }
 

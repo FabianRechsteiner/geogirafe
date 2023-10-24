@@ -4,6 +4,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Layer from '../../models/layers/layer';
 import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
+import QueryBuilderComponent from '../querybuilder/component';
 
 class TreeViewItemComponent extends GirafeHTMLElement {
 
@@ -34,12 +35,13 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     }
     super.render();
     this.createOpacityTooltip();
-    this.activateTooltips(false, [800, 0], 'right');
+    this.createFilterTooltip();
+    this.createTooltips();
   }
 
   setLegend() {
     if (!(this.layer instanceof LayerWms)) {
-      this.layer.setError(`${this.layer.name} is not a WMS layer, and should not have a legend configured in the backend.`);
+      this.layerManager.setError(this.layer, `${this.layer.name} is not a WMS layer, and should not have a legend configured in the backend.`);
       return;
     }
 
@@ -131,9 +133,28 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     });
   }
 
+  createFilterTooltip() {
+    const el = this.shadow.getElementById('filter');
+    tippy(el, {
+      trigger: 'click',
+      arrow: true,
+      interactive: true,
+      theme: 'light',
+      placement: 'right',
+      appendTo: document.body,
+      content: (_reference: any) => {
+        const filterbox = new QueryBuilderComponent(this.layer as LayerWms);
+        return filterbox;
+      }
+    });
+  }
+
   registerEvents() {
     this.stateManager.subscribe('layers\.layersList\..*\.isLegendExpanded', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
     this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
+    this.stateManager.subscribe('layers\.layersList\..*\.hasError', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
+    this.stateManager.subscribe('layers\.layersList\..*\.errorMessage', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
+    this.stateManager.subscribe('layers\.layersList\..*\.filter', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
     this.stateManager.subscribe('treeview\.advanced', () =>  super.render());
     this.stateManager.subscribe('position\.resolution', () =>  this.refreshLegends());
   }
@@ -145,8 +166,13 @@ class TreeViewItemComponent extends GirafeHTMLElement {
 
   refreshRender(layer: Layer) {
     if (layer === this.layer) {
-      super.render()
+      super.render();
+      this.createTooltips();
     }
+  }
+
+  createTooltips() {
+    super.activateTooltips(false, [800, 0], 'right');
   }
 
   toggle(state: 'on' | 'off') {

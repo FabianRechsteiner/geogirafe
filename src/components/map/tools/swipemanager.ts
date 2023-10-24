@@ -50,7 +50,7 @@ class SwipeManager {
   activateSwipeForWms(layer: LayerWms, side: 'left' | 'right') {
     if (this.wmsManager.layerExists(layer)) {
       this.wmsManager.makeLayerIndependent(layer);
-      const olayer = this.wmsManager.getLayer(layer);
+      const olayer = this.wmsManager.getOLayer(layer) as OLayer;
       this.#activateSwipeForLayer(layer.name, olayer, side);
     }
     else {

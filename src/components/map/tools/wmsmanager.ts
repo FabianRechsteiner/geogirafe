@@ -1,31 +1,44 @@
-import { Image as ImageLayer, Layer as OLayer } from 'ol/layer';
+import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import MessageManager from '../../../tools/messagemanager';
-import GeoEvents from '../../../models/events';
 import { Map } from 'ol';
 import LayerWms from '../../../models/layers/layerwms';
+import StateManager from '../../../tools/state/statemanager';
+import type { SelectionParam } from '../../../tools/state/state';
+import LayerManager from '../../../tools/layermanager';
 
 class WmsManager {
+
   map: Map;
   srid: string;
 
   messageManager: MessageManager;
+  layerManager: LayerManager;
 
-  layersByServer: Record<string, { 
-    olayer: OLayer, 
-    url: string, 
-    urlWfs: string | null, 
-    layerList: LayerWms[], 
-    queryableList: LayerWms[]
+  // The Id of this dictionary if an unique ID that allow the differenciantion of server queries.
+  // For example, a combination of server URL and ImageType could be used.
+  // Each element of this dictionary will generate 1 WMS server query
+  layersByUniqueServerId: Record<string, { 
+    layersWms: LayerWms[],
+    olayer: ImageLayer<ImageWMS>
   }> = {};
-  independentLayers: Record<string, any> = {};
-  basemapLayers: ImageLayer<any>[] = [];
+
+  // Independent layers are layers that need to be queried alone 
+  // (not combine to other WMS layers in the same query)
+  // The treeItemId will be used as key for this dictionary
+  independentLayers: Record<string, {
+    layerWms: LayerWms,
+    olayer: ImageLayer<ImageWMS>
+   }> = {};
+
+  basemapLayers: ImageLayer<ImageWMS>[] = [];
 
   constructor(map: Map, srid: string) {
     this.map = map;
     // TODO REG: use global state for this info, or update when map component is updated.
     this.srid = srid;
     this.messageManager = MessageManager.getInstance();
+    this.layerManager = LayerManager.getInstance();
   }
 
   removeAllBasemapLayers() {
@@ -35,49 +48,52 @@ class WmsManager {
     this.basemapLayers = [];
   }
 
-  addLayer(layerInfos: LayerWms) {
-    if (layerInfos.isTransparent) {
-      const source = this.#createImageWMSSource(layerInfos.url!, [layerInfos], layerInfos.imageType!);
-      const layer = new ImageLayer({
-        source: source,
-        opacity: layerInfos.opacity
-      });
-      this.independentLayers[layerInfos.name] = layer;
-      this.map.addLayer(layer);
-    } 
-    else if (layerInfos.serverUniqueQueryId !== null && layerInfos.serverUniqueQueryId in this.layersByServer) {
+  addLayer(layerWms: LayerWms) {
+    if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
       // Get existing ol layer for this server
       // and add a new wms layer in the source
-      const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-      layerDef.layerList.push(layerInfos);
-      if (layerInfos.queryable) {
-        layerDef.queryableList.push(layerInfos);
-      }
-      const source = this.#createImageWMSSource(layerInfos.url!, layerDef.layerList, layerInfos.imageType!);
+      const layerDef = this.layersByUniqueServerId[layerWms.serverUniqueQueryId];
+      layerDef.layersWms.push(layerWms);
+      const source = this.#createImageWMSSource(layerDef.layersWms);
       layerDef.olayer.setSource(source);
     }
     else {
       // Create a new ol layer and add it to the right server
-      const olayer = new ImageLayer();
-      const layerDef = { olayer: olayer, url:layerInfos.url!, urlWfs: layerInfos.urlWfs, layerList: [layerInfos], queryableList: [] as LayerWms[] };
-      if (layerInfos.queryable) {
-        layerDef.queryableList.push(layerInfos);
-      }
-      this.layersByServer[layerInfos.serverUniqueQueryId!] = layerDef;
-      const source = this.#createImageWMSSource(layerInfos.url!, layerDef.layerList, layerInfos.imageType!);
+      const olayer = new ImageLayer<ImageWMS>();
+      const source = this.#createImageWMSSource([layerWms]);
       olayer.setSource(source);
       this.map.addLayer(olayer);
+
+      const layerDef = { olayer: olayer, layersWms: [layerWms] };
+      this.layersByUniqueServerId[layerWms.serverUniqueQueryId] = layerDef;
     }
 
-    // If the layer is transparent, we make it transparent
-    if (layerInfos.isTransparent) {
-      //this.onChangeOpacity(layerInfos);
-    }
+    this.#manageLayerOptions(layerWms);
   }
 
-  #createImageWMSSource(url: string, layerList: LayerWms[], imageType: string) {
+  #createImageWMSSource(layerList: LayerWms[]) {
+    const url = layerList[0].url;
+    // Verify that all objects have the same URL.
+    // If not, we have a problem, we should not be in this function.
+    const sameUrlForAll = layerList.every((layer: LayerWms) => {
+      return layer.url === url;
+    });
+    if (!sameUrlForAll) {
+      throw new Error('Not all layers of this list have the same server URL. We should not be in this function.');
+    }
+
+    const imageType = layerList[0].imageType;
+    // Same check for imageType
+    const sameImageTypeForAll = layerList.every((layer: LayerWms) => {
+      return layer.url === url;
+    });
+    if (!sameImageTypeForAll) {
+      throw new Error('Not all layers of this list have the same image type. We should not be in this function.');
+    }
+
     const orderedLayers = layerList.slice().sort((l1: LayerWms, l2: LayerWms) => { return l2.order - l1.order });
     const orderedLayerNames = orderedLayers.map((l: LayerWms) => l.layers);
+    
     const source = new ImageWMS({
       url: url,
       params: {
@@ -85,132 +101,153 @@ class WmsManager {
         'FORMAT': imageType
       }
     });
+
+    // We intercept the avent in order to set an error icon if the WMS query has an error
+    // Otherwise we do no see anything on the client.
+    source.on('imageloaderror', () => {
+      for (const layerWms of layerList) {
+        this.layerManager.setError(layerWms, 'Image cannot be loaded from WMS Server');
+      }
+    });
+    source.on('imageloadend', () => {
+      for (const layerWms of layerList) {
+        this.layerManager.unsetError(layerWms);
+      }
+    });
+    
     return source;
   }
 
-  addBasemapLayer(layerInfos: LayerWms) {
-    const source = this.#createImageWMSSource(layerInfos.url!, [layerInfos], layerInfos.imageType!);
+  addBasemapLayer(layerWms: LayerWms) {
+    const source = this.#createImageWMSSource([layerWms]);
     const olayer = new ImageLayer({
       source: source,
-      opacity: layerInfos.opacity
+      opacity: layerWms.opacity
     });
     this.basemapLayers.push(olayer);
     this.map.getLayers().insertAt(0, olayer);
   }
 
-  removeLayer(layerInfos: LayerWms) {
-    if (this.layerExists(layerInfos)) {
-        if (layerInfos.name in this.independentLayers) {
-          const layerDef = this.independentLayers[layerInfos.name];
-          delete this.independentLayers[layerInfos.name];
-          this.map.removeLayer(layerDef);
+  removeLayer(layerWms: LayerWms) {
+    if (this.layerExists(layerWms)) {
+        if (layerWms.treeItemId in this.independentLayers) {
+          const olayer = this.independentLayers[layerWms.treeItemId].olayer;
+          delete this.independentLayers[layerWms.treeItemId];
+          this.map.removeLayer(olayer);
         }
-        else if (layerInfos.serverUniqueQueryId !== null && layerInfos.serverUniqueQueryId in this.layersByServer) {
+        else if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
           // Get existing ol layer for this server
-          // and add a new wms layer in the source
-          const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-          layerDef.layerList = layerDef.layerList.filter((item: { id: any; }) => item.id !== layerInfos.id);
+          // and remove the wms layer from the source
+          const layerDef = this.layersByUniqueServerId[layerWms.serverUniqueQueryId];
+          layerDef.layersWms = layerDef.layersWms.filter((item: LayerWms) => item.treeItemId !== layerWms.treeItemId);
     
-          if (layerDef.layerList.length > 0) {
+          if (layerDef.layersWms.length > 0) {
             // There are still layers in the list.
             // => We update the layer source
-            const source = this.#createImageWMSSource(layerInfos.url!, layerDef.layerList, layerInfos.imageType!);
+            const source = this.#createImageWMSSource(layerDef.layersWms);
             layerDef.olayer.setSource(source);
           }
           else {
             // No more layer here.
             // => We simply remove the whole layer
-            delete this.layersByServer[layerInfos.serverUniqueQueryId];
+            delete this.layersByUniqueServerId[layerWms.serverUniqueQueryId];
             this.map.removeLayer(layerDef.olayer);
           }
         }
         else {
-          console.log('Nothing to remove !');
+          console.warn('Nothing to remove !');
         }
     }
     else {
-      // TODO : this is called on layertree init, investigate why
-      console.error(`Cannot remove WMS-Layer ${layerInfos.name} from the map: it does not exist!`);
+      console.error(`Cannot remove WMS-Layer ${layerWms.name} from the map: it does not exist!`);
     }
   }
 
-  layerExists(layerInfos: LayerWms) {
-    if (layerInfos.name in this.independentLayers) {
+  layerExists(layerWms: LayerWms) {
+    if (layerWms.treeItemId in this.independentLayers) {
       return true;
     }
-    if (layerInfos.serverUniqueQueryId !== null && layerInfos.serverUniqueQueryId in this.layersByServer) {
-      const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-      const layer = layerDef.layerList.find((item: { treeItemId: any; }) => item.treeItemId === layerInfos.treeItemId);
+    if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
+      const layerDef = this.layersByUniqueServerId[layerWms.serverUniqueQueryId];
+      const layer = layerDef.layersWms.find((l: LayerWms) => l.treeItemId === layerWms.treeItemId);
       return (layer !== undefined);
     }
     return false;
   }
 
-  getLayer(layerInfos: LayerWms) {
-    if (layerInfos.name in this.independentLayers) {
-      return this.independentLayers[layerInfos.name];
+  getOLayer(layerWms: LayerWms): ImageLayer<ImageWMS> | null {
+    if (layerWms.treeItemId in this.independentLayers) {
+      return this.independentLayers[layerWms.treeItemId].olayer;
     }
-    if (layerInfos.serverUniqueQueryId !== null && layerInfos.serverUniqueQueryId in this.layersByServer) {
-      const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
+    if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
+      const layerDef = this.layersByUniqueServerId[layerWms.serverUniqueQueryId];
       return layerDef.olayer;
     }
     return null;
   }
 
-  changeOpacity(layerInfos: LayerWms) {
-    if (this.layerExists(layerInfos)) {
-        if (!layerInfos.isTransparent) {
-          // Back to normal
-          // The opacity was set to 1 again.
-          if (layerInfos.name in this.independentLayers) {
-            const layerDef = this.independentLayers[layerInfos.name];
-            // We delete the layer from the transparent layers
-            delete this.independentLayers[layerInfos.name];
-            this.map.removeLayer(layerDef);
-            // And add it to the normal layer again
-            this.addLayer(layerInfos);
-          }
-          else {
-            // Nothing to do.
-            console.log('Nothing to do here');
-          }
-        }
-        else if (layerInfos.name in this.independentLayers) {
-          // The layer has already a configured opacity
-          // => We just change the opacity
-          const layerDef = this.independentLayers[layerInfos.name];
-          layerDef.setOpacity(layerInfos.opacity);
-        }
-        else if (layerInfos.serverUniqueQueryId !== null && layerInfos.serverUniqueQueryId in this.layersByServer) {
-          this.makeLayerIndependent(layerInfos);
-        }
-        else {
-          // Nothing to do
-          console.log('Nothing to do!');
-        }
-      
+  // TODO SMS: Refactor this so it's actually a helper for the private function
+  changeOpacity(layerWms: LayerWms) {
+    this.#manageLayerOptions(layerWms);
+  }
+
+  // TODO SMS: Refactor this so it's actually a helper for the private function
+  changeFilter(layerWms: LayerWms) {
+    this.#manageLayerOptions(layerWms);
+  }
+
+  #manageLayerOptions(layerWms: LayerWms) {
+    if (!this.layerExists(layerWms)) {
+      throw new Error('Cannot change filter for this layer: it does not exist');
     }
-    else {
-      throw new Error('Cannot change opacity for this layer: it does not exist');
+
+    if (!layerWms.hasFilter && !layerWms.isTransparent) {
+      // There is no more filter or opacity
+      // => Back to normal
+      if (layerWms.treeItemId in this.independentLayers) {
+        const olayer = this.independentLayers[layerWms.treeItemId].olayer;
+        // We delete the layer from the transparent layers
+        delete this.independentLayers[layerWms.treeItemId];
+        this.map.removeLayer(olayer);
+        // And add it to the normal layer again
+        this.addLayer(layerWms);
+      }
+    }
+    else if (layerWms.treeItemId in this.independentLayers) {
+      // The layer has already a configured filter or opacity
+      // => We just change the and/or the filter
+      const olayer = this.independentLayers[layerWms.treeItemId].olayer;
+      if (layerWms.isTransparent) {
+        olayer.setOpacity(layerWms.opacity);
+      }
+      if (layerWms.hasFilter) {
+        (olayer.getSource() as ImageWMS).updateParams({'FILTER': layerWms.filter})
+      }
+    }
+    else if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
+      this.makeLayerIndependent(layerWms);
     }
   }
 
-  makeLayerIndependent(layerInfos: LayerWms) {
-    if (layerInfos.name in this.independentLayers) {
+  makeLayerIndependent(layerWms: LayerWms) {
+    if (layerWms.name in this.independentLayers) {
       // The layer is already independent.
       // => nothing to do here.
     }
-    else if (layerInfos.serverUniqueQueryId !== null && layerInfos.serverUniqueQueryId in this.layersByServer) {
+    else if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
       // First, we remove the layer from the default layer
-      this.removeLayer(layerInfos);
+      this.removeLayer(layerWms);
       // Then, we create a new layer
-      const source = this.#createImageWMSSource(layerInfos.url!, [layerInfos], layerInfos.imageType!);
-      const layer = new ImageLayer({
+      const source = this.#createImageWMSSource([layerWms]);
+      const olayer = new ImageLayer({
         source: source,
-        opacity: layerInfos.opacity
+        opacity: layerWms.opacity
       });
-      this.independentLayers[layerInfos.name] = layer;
-      this.map.addLayer(layer);
+      if (layerWms.hasFilter) {
+        source.updateParams({'FILTER': layerWms.filter})
+      }
+      this.independentLayers[layerWms.treeItemId] = { layerWms: layerWms, olayer: olayer };
+      this.map.addLayer(olayer);
     }
     else {
       throw new Error('A layer can be made independent only if it has already been added to the map.');
@@ -218,21 +255,27 @@ class WmsManager {
   }
 
   selectFeatures(extent: number[]) {
-    const selectionParams = [];
+    const selectionParams: SelectionParam[] = [];
 
-    for (let key in this.layersByServer) {
-      const layer = this.layersByServer[key];
-      const queryLayers = layer.queryableList.map((l: LayerWms) => l.queryLayers!.split(',')).flat(1);
-
+    for (const key in this.layersByUniqueServerId) {
+      const layerDef = this.layersByUniqueServerId[key];
       selectionParams.push({
-        wfsUrl: layer.urlWfs,
+        layers: layerDef.layersWms,
         selectionBox: extent,
-        srid: this.srid,
-        featureTypes: queryLayers
+        srid: this.srid
       });
     }
 
-    this.messageManager.sendMessage({ action: GeoEvents.selectFeatures, selectionParams: selectionParams });
+    for (const key in this.independentLayers) {
+      const layerDef = this.independentLayers[key];
+      selectionParams.push({
+        layers: [layerDef.layerWms],
+        selectionBox: extent,
+        srid: this.srid
+      });
+    }
+
+    StateManager.getInstance().state.selection.selectionParameters = selectionParams;
   }
 }
 

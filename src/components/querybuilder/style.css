@@ -1,0 +1,67 @@
+.content {
+  display: flex;
+}
+
+.hidden {
+  display: none;
+}
+
+.loading i {
+  margin: 0.8rem;
+}
+
+button {
+  border: none;
+  border-right: solid 1px #fff;
+  width: 2.3rem;
+  height: 2.3rem;
+  line-height: 2.3rem;
+  background-color: #444;
+  color: #fff;
+  padding: 0;
+  cursor: pointer;
+  margin:0;
+  display: inline-block;
+}
+
+button:hover {
+  background-color: #000;
+}
+
+/* Custom style for select */
+.custom-select {
+  min-width: 15rem;
+  position: relative;
+}
+
+input, select {
+  border: solid 1px #ccc;
+  border-radius: 0.25rem;
+  background-color: #fff;
+  padding-left: 1rem;
+  color: #000;
+  font-size: 0.9rem;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.custom-select::before,
+.custom-select::after {
+  content: "";
+  position: absolute;
+  right: 1rem;
+  pointer-events: none;
+}
+
+.custom-select::after {
+  border-left: 0.4rem solid transparent;
+  border-right: 0.4rem solid transparent;
+  border-top: 0.4rem solid black;
+  top: 45%;
+}

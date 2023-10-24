@@ -73,6 +73,11 @@ i {
   width: 0;
 }
 
+.text.filtered {
+  background-color: #666;
+  color: #fff;
+}
+
 .resolution {
   order: 5;
 }
@@ -97,8 +102,12 @@ i {
   order: 10;
 }
 
-.legend {
+.filter {
   order: 11;
+}
+
+.legend {
+  order: 12;
 }
 
 .item i.advanced {

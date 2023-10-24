@@ -42,7 +42,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('selectedFeatures', (oldFeatures, newFeatures) => this.onFeaturesSelected(newFeatures));
+    this.stateManager.subscribe('selection.selectedFeatures', (oldFeatures, newFeatures) => this.onFeaturesSelected(newFeatures));
     this.stateManager.subscribe('interface.selectionGridVisible', (oldValue, newValue) => this.togglePanel(newValue));
   }
 
@@ -223,7 +223,7 @@ class SelectionGridComponent extends GirafeResizableElement {
 
   closePanel() {
     this.state.interface.selectionGridVisible = false;
-    this.state.selectedFeatures = null;
+    this.state.selection.selectedFeatures = null;
   }
 
   togglePanel(visible) {

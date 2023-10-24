@@ -14,6 +14,8 @@ class GirafeHTMLElement extends HTMLElement {
   component: string;
   shadow: ShadowRoot;
 
+  activeTooltips: any[] = [];
+
   messageManager: MessageManager;
   configManager: ConfigManager;
   stateManager: StateManager;
@@ -92,17 +94,27 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   activateTooltips(arrow: boolean, delay: [number, number], defaultPlacement: string) {
+    // First, deactivate all existing tooltips
+    for (const tooltip of this.activeTooltips) {
+      tooltip.destroy();
+    }
+    this.activeTooltips = [];
+
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach(el => {
-      let placement = el.getAttribute('tip-placement') ?? defaultPlacement ;
-      tippy(el, {
-        arrow: arrow,
-        delay: delay,
-        placement: placement,
-        //animateFill: false,
-        //animation: 'scale-with-inertia',
-        content: el.getAttribute('tip')
-      })
+      const tooltipText = el.getAttribute('tip');
+      if (tooltipText !== '') {
+        let placement = el.getAttribute('tip-placement') ?? defaultPlacement ;
+        const tooltip = tippy(el, {
+          arrow: arrow,
+          delay: delay,
+          placement: placement,
+          //animateFill: false,
+          //animation: 'scale-with-inertia',
+          content: el.getAttribute('tip')
+        });
+        this.activeTooltips.push(tooltip);
+      }
     });
   }
 

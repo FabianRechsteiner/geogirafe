@@ -5,6 +5,7 @@ import Basemap from '../../models/basemap';
 import { Coordinate } from 'ol/coordinate';
 import Theme from '../../models/theme';
 import BaseLayer from '../../models/layers/baselayer';
+import LayerWms from '../../models/layers/layerwms';
 
 type GraphicalInterface = {
   helpVisible: boolean,
@@ -13,6 +14,18 @@ type GraphicalInterface = {
   selectionGridVisible: boolean,
   aboutVisible: boolean,
   darkMode: boolean
+}
+
+export type SelectionParam = {
+  layers: LayerWms[],
+  selectionBox: number[],
+  srid: string
+}
+
+type Selection = {
+  selectionParameters: SelectionParam[];
+  selectedFeatures: Feature[];
+  focusedFeature: Feature | null;  
 }
 
 type MapPosition = {
@@ -52,6 +65,13 @@ type GlobeConfig = {
 }
 
 class State {
+  /**
+   * This class is a used as the state of the application, which will be accessed behind a javascript proxy.
+   * This means that each modification made to its properties must come from outside, 
+   * because they have to be made through the proxy, so that the modification can be listen.
+   * Therefore, this class must not contain any method which is updating a value directly
+   * For example, any method doing <this.xxx = value> is forbidden here, because the modification be known from the proxy
+   */
 
   // All themes from themes.json
   // Dictionary where the key is the id of the theme
@@ -101,7 +121,6 @@ class State {
   loading = false;
 
   // Current position configuration of the map
-  // TODO REG : When zoom, resolution or scale is changed, calculate the other values
   position: MapPosition = {
     center: [],
     zoom: null,
@@ -151,8 +170,11 @@ class State {
   olMap: Map | null = null;
 
   // To manage selected and focused features
-  selectedFeatures: Feature[] = [];
-  focusedFeature: Feature | null = null;
+  selection: Selection = {
+    selectionParameters: [],
+    selectedFeatures: [],
+    focusedFeature: null
+  };
 
   theme: Object | null = null;
 

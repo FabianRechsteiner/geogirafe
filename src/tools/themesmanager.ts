@@ -11,11 +11,13 @@ import LayerOsm from "../models/layers/layerosm";
 import LayerVectorTiles from "../models/layers/layervectortiles";
 import LayerWmts from "../models/layers/layerwmts";
 import LayerWms from "../models/layers/layerwms";
+import LayerManager from "./layermanager";
 
 class ThemesManager extends GirafeSingleton {
 
   configManager: ConfigManager;
   stateManager: StateManager;
+  layerManager: LayerManager;
 
   get state() {
     return this.stateManager.state;
@@ -26,6 +28,7 @@ class ThemesManager extends GirafeSingleton {
 
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
+    this.layerManager = LayerManager.getInstance();
 
     this.configManager.loadConfig()
       .then(() => { this.loadThemes(); })
@@ -169,7 +172,7 @@ class ThemesManager extends GirafeSingleton {
         }
         else {
           layer = new Layer(elem, order.value);
-          layer.setError(`No OGC-Server was found for layer ${elem.name}, please Verify the backend configuration.`);
+          this.layerManager.setError(layer, `No OGC-Server was found for layer ${elem.name}, please verify the backend configuration.`);
         }
         break;
 

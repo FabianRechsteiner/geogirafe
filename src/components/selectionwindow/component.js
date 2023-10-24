@@ -32,15 +32,15 @@ class SelectionWindowComponent extends GirafeDraggableElement {
 
   onFocusFeature(index) {
     this.focusedIndex = index;
-    this.state.focusedFeature = this.state.selectedFeatures[index];
+    this.state.selection.focusedFeature = this.state.selection.selectedFeatures[index];
 
     // Title (draggable header)
-    const id = this.state.focusedFeature.getId();
+    const id = this.state.selection.focusedFeature.getId();
     const featureType = (id === undefined) ? 'UNKNOWN' : id.split('.')[0];
     this.header.setAttribute('i18n', featureType);
 
     // Content
-    const properties = this.state.focusedFeature.getProperties();
+    const properties = this.state.selection.focusedFeature.getProperties();
     const table = document.createElement('table');
     for (const key in properties) {
 
@@ -79,7 +79,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     if (this.focusedIndex === 0) {
       previousDisplay = 'none';
     }
-    if (this.focusedIndex === this.state.selectedFeatures.length - 1) {
+    if (this.focusedIndex === this.state.selection.selectedFeatures.length - 1) {
       nextDisplay = 'none';
     }
 
@@ -87,11 +87,11 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     this.nextButton.style.display = nextDisplay;
 
     // Set counter text
-    if (this.state.selectedFeatures.length === 1) {
+    if (this.state.selection.selectedFeatures.length === 1) {
       this.counterText.innerHTML = '';
     }
     else {
-      this.counterText.innerHTML = (this.focusedIndex+1) + '/' + this.state.selectedFeatures.length;
+      this.counterText.innerHTML = (this.focusedIndex+1) + '/' + this.state.selection.selectedFeatures.length;
     }
   }
 

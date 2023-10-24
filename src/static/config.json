@@ -7,15 +7,15 @@
   },
   "languages": {
     "//comment1": "List of languages with their corresponding translation-file.",
-    "de": "https://geomapfish-demo-2-8.camptocamp.com/static/X/de.json",
-    "en": "https://geomapfish-demo-2-8.camptocamp.com/static/X/en.json",
-    "fr": "https://geomapfish-demo-2-8.camptocamp.com/static/X/fr.json",
+    "de": "Mock/de.json",
+    "en": "Mock/en.json",
+    "fr": "Mock/fr.json",
     "//comment2": "Default language",
     "defaultLanguage": "en"
   },
   "themes": {
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
-    "url": "https://geomapfish-demo-2-8.camptocamp.com/themes?background=background&interface=desktop",
+    "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
     "defaultTheme" : "Demo"
   },

@@ -66,7 +66,7 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
   deleteGroup() {
     this.deactivateGroup(this.group);
     const index = this.state.layers.layersList.findIndex((g) => g.id === this.group.id);
-    if (index > 0) {
+    if (index >= 0) {
       this.state.layers.layersList.splice(index, 1);
     }
     else {
