@@ -17,14 +17,14 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : ""
+    "defaultTheme": ""
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
-    "show" : true,
+    "show": true,
     "//comment2": "Name of the default basemap.",
     "defaultBasemap": "Grundkarte farbig",
-    "//comment3" : "special basemaps that can be activated or not",
+    "//comment3": "special basemaps that can be activated or not",
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
@@ -33,8 +33,8 @@
     "useLegendIcons": true,
     "hideLegendWhenLayerIsDeactivated": false,
     "defaultIconSize": {
-      "width": "20",
-      "height": "20"
+      "width": "21",
+      "height": "16"
     }
   },
   "search": {
@@ -71,7 +71,22 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200, 100, 50],
+    "scales": [
+      200000,
+      75000,
+      40000,
+      20000,
+      10000,
+      7500,
+      5000,
+      3500,
+      2000,
+      1000,
+      500,
+      200,
+      100,
+      50
+    ],
     "startPosition": "2611000,1267000",
     "startZoom": "4",
     "maxExtent": "2583000,1235000,2650000,1291000",
