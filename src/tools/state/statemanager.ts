@@ -13,7 +13,7 @@ class StateManager extends GirafeSingleton {
 
   // TODO: If Map() needs to be used, it needs some change in the code.
   // with set and get.
-  #callbacks: {[key: string]: Function[]} = {};
+  #callbacks: { [key: string]: Function[] } = {};
 
   configManager: ConfigManager | null = null;
 
@@ -24,11 +24,13 @@ class StateManager extends GirafeSingleton {
 
     this.#girafeState = new State();
     this.#stateProxy = onChange(this.#girafeState, (path, value, oldValue, _applyData) => {
-      if (path !== 'mouseCoordinates') {
-        // TODO REG: This test is not very beautiful, but mouseCoordinates generate far too many logs.
-        console.log(`${path} has changed.`);
+      if (!this.areEqual(oldValue, value)) {
+        if (path !== 'mouseCoordinates') {
+          // TODO REG: This test is not very beautiful, but mouseCoordinates generate far too many logs.
+          console.log(`${path} has changed.`);
+        }
+        this.onChange(path, oldValue, value);
       }
-      this.onChange(path, oldValue, value);
     });
 
     // Prevent extensions of the State Object.
@@ -58,10 +60,10 @@ class StateManager extends GirafeSingleton {
         if (!parentObject.found) {
           console.warn('Parent object could not be found in the state');
         }
-        
+
         const callbacks = this.#callbacks[key];
-        for (let i=0; i < callbacks.length; ++i) {
-          callbacks[i](oldValue, value, parentObject.object);
+        for (const callback of callbacks) {
+          callback(oldValue, value, parentObject.object);
         }
       }
     }
@@ -80,9 +82,9 @@ class StateManager extends GirafeSingleton {
     const obj = this.getPropertyByPath(this.state, path);
     if (obj.found) {
       if (obj.object === null ||
-          obj.object === undefined ||
-          (Array.isArray(obj.object) && obj.object.length === 0) ||
-          (obj.object instanceof Object && Object.keys(obj.object).length === 0)) {
+        obj.object === undefined ||
+        (Array.isArray(obj.object) && obj.object.length === 0) ||
+        (obj.object instanceof Object && Object.keys(obj.object).length === 0)) {
         // Empty object => nothing to do
       }
       else {
@@ -110,9 +112,9 @@ class StateManager extends GirafeSingleton {
     if (path.trim() !== '') {
       const keys = path.split(".");
 
-      for (let i = 0; i < keys.length; i++) {
-        if (keys[i] in currentObj) {
-          currentObj = currentObj[keys[i]];
+      for (const key of keys) {
+        if (key in currentObj) {
+          currentObj = currentObj[key];
         } else {
           return { found: false, object: null };
         }
@@ -120,6 +122,40 @@ class StateManager extends GirafeSingleton {
     }
 
     return { found: true, object: currentObj };
+  }
+
+  areEqual(obj1: any, obj2: any) {
+
+    if (typeof (obj1) === 'number' && typeof (obj2) === 'number') {
+      // Special case for numbers : check NaN
+      if (Number.isNaN(obj1) && Number.isNaN(obj2)) {
+        return true;
+      }
+      return obj1 === obj2;
+    }
+
+    if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null || obj1 === undefined || obj2 === undefined) {
+      // Compare simple values
+      return obj1 === obj2;
+    }
+
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) {
+      // Not the same number of properties
+      return false;
+    }
+
+    for (const key of keys1) {
+      // Comparer les valeurs des propriétés (utilisation récursive)
+      if (!this.areEqual(obj1[key], obj2[key])) {
+        return false;
+      }
+    }
+
+    // Everything is equal
+    return true;
   }
 }
 

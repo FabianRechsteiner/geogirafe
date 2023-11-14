@@ -116,7 +116,8 @@ girafe-selection-grid {
   display: block;
 }
 
-girafe-redlining, girafe-print {
+girafe-redlining,
+girafe-print {
   position: absolute;
   right: 0;
   top: 0;
@@ -137,12 +138,16 @@ girafe-selection-window {
   display: none;
 }
 
+girafe-nav-history {
+  z-index: 10;
+}
+
 girafe-about {
   position: absolute;
   z-index: 100;
   background: #fff;
   display: none;
-  top: 50%; 
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }

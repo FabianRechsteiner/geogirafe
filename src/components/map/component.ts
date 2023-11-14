@@ -44,6 +44,7 @@ import LayerOsm from '../../models/layers/layerosm';
 import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
+import MapPosition from '../../tools/state/mapposition';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 // TODO REG: Problem : we import the cesium twice : one in the bundle, and another one with a scripts tag
@@ -102,6 +103,7 @@ class MapComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) => this.onChangeBasemap(newBasemap));
     this.stateManager.subscribe('projection', (_oldProjection: string, newProjection: string) => this.onChangeProjection(newProjection));
     this.stateManager.subscribe('interface.darkMode', (_oldValue: boolean, _newValue: boolean) => this.onChangeDarkMode());
+    this.stateManager.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) => this.onPositionChanged(newPosition));
     this.stateManager.subscribe('position.scale', (_oldScale: number, newScale: number) => this.onChangeScale(newScale));
     this.stateManager.subscribe('position.resolution', (_oldResolution: number, newResolution: number) => this.zoomToResolution(newResolution));
     this.stateManager.subscribe('position.zoom', (_oldZoom: number, newZoom: number) => this.zoomToZoom(newZoom));
@@ -285,11 +287,16 @@ class MapComponent extends GirafeHTMLElement {
 
   onMoveEnd(_e: MapEvent) {
     const view = this.map.getView();
-    const center = view.getCenter()!;
-    this.state.position.center = center;
-    this.state.position.resolution = view.getResolution()!;
-    this.state.position.scale = this.viewManager.getScale();
-    this.state.position.zoom = view.getZoom()!;
+
+    const newPosition = new MapPosition();
+    newPosition.center = view.getCenter()!;
+    newPosition.zoom = view.getZoom()!;
+    newPosition.resolution = view.getResolution()!;
+    newPosition.scale = this.viewManager.getScale();
+
+    if (newPosition.isValid) {
+      this.state.position = newPosition;
+    }
   }
 
   onClick(e: MapBrowserEvent<UIEvent>) {
@@ -404,7 +411,7 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onCustomGirafeEvent(details: {action: string, layer: Layer, extent: Extent}) {
+  onCustomGirafeEvent(details: { action: string, layer: Layer, extent: Extent }) {
     if (details.action === GeoEvents.zoomToExtent) {
       this.zoomToExtent(details.extent);
     }
@@ -426,8 +433,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   swipeLayersOnSide(layers: Layer[], side: 'left' | 'right') {
-    for (let i = 0; i < layers.length; ++i) {
-      const layer = layers[i];
+    for (const layer of layers) {
       if (layer instanceof LayerWms) {
         this.swipeManager.activateSwipeForWms(layer, side);
       }
@@ -501,8 +507,8 @@ class MapComponent extends GirafeHTMLElement {
   onFeaturesSelected(features: Feature[]) {
     this.selectedFeaturesCollection.clear();
     if (features) {
-      for (let i = 0; i < features.length; ++i) {
-        this.selectedFeaturesCollection.push(features[i]);
+      for (const feature of features) {
+        this.selectedFeaturesCollection.push(feature);
       }
     }
   }
@@ -510,6 +516,13 @@ class MapComponent extends GirafeHTMLElement {
   onFeatureFocused(feature: Feature) {
     this.focusedFeaturesCollection.clear();
     this.focusedFeaturesCollection.push(feature);
+  }
+
+  onPositionChanged(position: MapPosition) {
+    this.zoomToResolution(position.resolution);
+    if (position.isValid) {
+      this.panToCoordinate(position.center);
+    }
   }
 
   onChangeScale(scale: number) {

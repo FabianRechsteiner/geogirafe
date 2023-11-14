@@ -10,7 +10,7 @@ class ScaleComponent extends GirafeHTMLElement {
   locale = null;
   container = null;
   scales = null;
-  
+
   constructor() {
     super('scale');
   }
@@ -34,7 +34,7 @@ class ScaleComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('position\.scale', () => this.onScaleChanged());
+    this.stateManager.subscribe('position', () => this.onScaleChanged());
   }
 
   onScaleChanged() {

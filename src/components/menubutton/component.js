@@ -11,7 +11,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   textSpan = null;
   menuContent = null;
   container = null;
-  
+
   constructor() {
     super('menubutton');
   }
@@ -51,13 +51,17 @@ class MenuButtonComponent extends GirafeHTMLElement {
   }
 
   setOpenDirection(direction) {
-    switch(direction) {
+    switch (direction) {
       case 'left':
         this.menuContent.classList.add('open-left');
         break;
       case 'up':
         this.menuContent.classList.add('open-up');
         break;
+      case 'bottom-left':
+        this.menuContent.classList.add('open-bottom-left');
+        break;
+      case 'bottom':
       default:
         this.menuContent.classList.add('open-bottom');
         break;
@@ -95,7 +99,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
         // This function can be called before the component if full initialized
         // Therefore, we have to delay the execution, because this.button can still be null
         super.delayed(
-          () => { return this.button !== null }, 
+          () => { return this.button !== null },
           () => this.button.appendChild(this.textSpan)
         );
       }
@@ -160,9 +164,9 @@ class MenuButtonComponent extends GirafeHTMLElement {
 
     // Otherwise, we check the elements in slots
     const slot = parent.querySelector('slot[name="menu-content"]');
-    const elements = slot.assignedElements({flatten: true});
-    for (let i=0; i<elements.length; ++i) {
-      if (elements[i].contains(child)) {
+    const elements = slot.assignedElements({ flatten: true });
+    for (const element of elements) {
+      if (element.contains(child)) {
         return true;
       }
     }

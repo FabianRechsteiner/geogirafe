@@ -5,9 +5,9 @@ import I18nManager from './tools/i18nmanager';
 import I18MessageManager from './tools/messagemanager';
 
 // TODO: Migrate all these components to TypeScript
-import TreeViewComponent from  './components/treeview/component';
-import TreeViewGroupComponent from  './components/treeviewgroup/component';
-import TreeViewItemComponent from  './components/treeviewitem/component';
+import TreeViewComponent from './components/treeview/component';
+import TreeViewGroupComponent from './components/treeviewgroup/component';
+import TreeViewItemComponent from './components/treeviewitem/component';
 import MapComponent from './components/map/component';
 import SearchComponent from './components/search/component';
 import ProjectionComponent from './components/projection/component';
@@ -26,6 +26,7 @@ import SelectionGridComponent from './components/selectiongrid/component';
 import HelpComponent from './components/help/component';
 import AboutComponent from './components/about/component';
 import QueryBuilderComponent from './components/querybuilder/component';
+import NavHelperComponent from './components/navigation/navhelper/component';
 
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
@@ -33,11 +34,15 @@ import ThemesManager from './tools/themesmanager';
 import WfsManager from './tools/wfsmanager';
 import tippy from "tippy.js";
 
+// Default configuration for Cesium
+// See https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/
+window.CESIUM_BASE_URL = '/lib/cesium/';
+
 // Register custom EPSG
 // https://epsg.io/21781
 proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
 // https://epsg.io/2056
-proj4.defs("EPSG:2056" , '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs');
+proj4.defs("EPSG:2056", '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs');
 register(proj4);
 
 // Override default tooltip maxWidth:

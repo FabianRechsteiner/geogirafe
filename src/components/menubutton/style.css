@@ -12,8 +12,16 @@
   top: 100%;
   left: 0;
   border-top: solid 1px #fff;
-  width: 4rem;
   height: max-content;
+  width: fit-content;
+}
+
+#menu-content.open-bottom-left {
+  top: 100%;
+  right: 0;
+  border-top: solid 1px #fff;
+  height: max-content;
+  width: fit-content;
 }
 
 #menu-content.open-up {
@@ -21,13 +29,14 @@
   right: 0;
   border-bottom: solid 1px #fff;
   height: max-content;
+  width: fit-content;
 }
 
 #menu-content.open-left {
   right: 100%;
   bottom: 0;
-  height: 4.6rem;
   width: max-content;
+  height: fit-content;
 }
 
 #button {
@@ -39,7 +48,7 @@
   color: #fff;
   padding: 0;
   cursor: pointer;
-  margin:0;
+  margin: 0;
   display: inline-block;
   line-height: 4rem;
 }
