@@ -2,10 +2,10 @@ import Map from 'ol/Map';
 import Layer from '../../models/layers/layer';
 import Feature from 'ol/Feature';
 import Basemap from '../../models/basemap';
-import { Coordinate } from 'ol/coordinate';
 import Theme from '../../models/theme';
 import BaseLayer from '../../models/layers/baselayer';
 import LayerWms from '../../models/layers/layerwms';
+import MapPosition from './mapposition';
 
 type GraphicalInterface = {
   helpVisible: boolean,
@@ -25,19 +25,12 @@ export type SelectionParam = {
 type Selection = {
   selectionParameters: SelectionParam[];
   selectedFeatures: Feature[];
-  focusedFeature: Feature | null;  
-}
-
-type MapPosition = {
-  center: Coordinate;
-  zoom: number | null;
-  resolution: number;
-  scale: number | null;
+  focusedFeature: Feature | null;
 }
 
 type LayersConfig = {
   layersList: BaseLayer[];
-  swipedLayers:  {
+  swipedLayers: {
     left: Layer[];
     right: Layer[];
   }
@@ -121,12 +114,7 @@ class State {
   loading = false;
 
   // Current position configuration of the map
-  position: MapPosition = {
-    center: [],
-    zoom: null,
-    resolution: 100, /* dummy default value because it should never be null. It will be recalculated when the map will be created */
-    scale: null
-  }
+  position: MapPosition = new MapPosition();
 
   // Lastly selected theme
   selectedTheme: Theme | null = null;
