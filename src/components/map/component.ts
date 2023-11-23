@@ -222,6 +222,7 @@ class MapComponent extends GirafeHTMLElement {
     }, 1000);
   }
 
+
   getDefaultStyle(feature: Feature) {
 
     const strokeColor = (feature.get('strokeColor')) ? feature.get('strokeColor') : this.configManager.Config.redlining.defaultStrokeColor;
@@ -387,8 +388,9 @@ class MapComponent extends GirafeHTMLElement {
     this.loadConfig().then(() => {
       this.render();
       super.girafeTranslate();
-      this.registerEvents();
+      // this.changeCanvasColor(); 
       this.listenOpenLayersEvents();
+      this.registerEvents();
     });
   }
 

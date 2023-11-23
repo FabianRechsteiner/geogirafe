@@ -28,7 +28,7 @@
   border: none;
   width: 5px;
   height: 100%;
-  background: #fff;
+  background: var(--bkg-color);
   position: absolute;
   top: 0;
   right: 0;
@@ -38,7 +38,7 @@
 .hide {
   border: solid 1px #999;
   border-left: none;
-  color: #999;
+  color: var(--text-color-grad2);
   padding: 0.7rem 0.5rem 0.7rem 0;
   border-radius: 0 10px 10px 0;
   width: 0.8rem;
@@ -47,7 +47,7 @@
   position: fixed;
   top: 5.8rem;
   left: 25rem;
-  background-color: #fff;
+  background-color: var(--bkg-color);
   cursor: pointer;
 }
 
@@ -65,12 +65,12 @@
 
 .hide:hover {
   border-color: #000;
-  color: #000;
+  color: var(--text-color);
 }
 
 .menu {
   border-top: solid 1px #bbb;
-  background-color: #fff;
+  background-color: var(--bkg-color);
   height: 2.3rem;
   position: absolute;
   bottom: 0;
@@ -86,7 +86,7 @@
   left: 0;
   right: 5px;
   bottom: 2.3rem;
-  background : #fff;
+  background: var(--bkg-color);
   padding-left : 1rem;
   padding-top : 1rem;
   padding-bottom : 1.5rem;
@@ -100,13 +100,13 @@
 
 .menu i {
   margin-top: 1rem;
-  color: #777;
+  color: var(--text-color-grad1);
   margin-right: 0.2rem;
   width: 3rem;
 }
 
-.menu i.selected {
-  color: #000;
+#menu i.selected {
+  color: var(--text-color);
 }
 
 .selectable {

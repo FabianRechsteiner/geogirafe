@@ -19,12 +19,12 @@
 }
 
 .selectable:hover {
-  color: #000;
+  color: var(--text-color);
 }
 
 .selected {
   cursor: pointer;
-  color: #000;
+  color: var(--text-color);
 }
 
 i {
@@ -74,8 +74,8 @@ i {
 }
 
 .text.filtered {
-  background-color: #666;
-  color: #fff;
+  background-color: var(--bkg-color-grad2);
+  color: var(--text-color-grad2);
 }
 
 .resolution {

@@ -13,7 +13,8 @@ type GraphicalInterface = {
   printPanelVisible: boolean,
   selectionGridVisible: boolean,
   aboutVisible: boolean,
-  darkMode: boolean
+  darkMode: boolean,
+  darkFrontendMode: boolean
 }
 
 export type SelectionParam = {
@@ -104,7 +105,8 @@ class State {
     printPanelVisible: false,
     selectionGridVisible: false,
     aboutVisible: false,
-    darkMode: false
+    darkMode: false,
+    darkFrontendMode: false
   }
 
   // Current language

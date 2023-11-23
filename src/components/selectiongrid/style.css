@@ -1,6 +1,7 @@
 :host, #panel {
   min-height: 10rem;
   height: 16rem;
+  background: var(--bkg-color);;
 }
 
 #panel {
@@ -16,7 +17,7 @@
   border: none;
   height: 6px;
   width: 100%;
-  background: #fff;
+  background: var(--bkg-color);;
   position: absolute;
   top: 0;
   left: 0;
@@ -34,7 +35,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  background-color: #fff;
+  background-color: var(--bkg-color);;
   cursor: pointer;
 }
 
@@ -53,7 +54,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background : #fff;
+  background: var(--bkg-color);;
   padding : 0;
   margin: 0.5rem;
   overflow: hidden;
@@ -74,11 +75,12 @@
   margin-right: 0.2rem;
   margin-bottom: 0.2rem;
   cursor: pointer;
+  background-color: var(--bkg-color-grad2);
 }
 
 .tab.active {
-  color: #fff;
-  background-color: #444;
+  color: var(--text-color);
+  background-color: var(--bkg-color);
 }
 
 #grid {
@@ -113,4 +115,22 @@ girafe-button {
 
 ::-webkit-scrollbar-thumb {
   background: #999;
+}
+
+.gridjs-table {
+  background-color: var(--bkg-color) !important;
+  color: var(--text-color);
+}
+
+td.gridjs-td {
+  background-color: var(--bkg-color) !important;
+}
+
+th.gridjs-th {
+  color: var(--text-color-grad2);
+  background-color: var(--bkg-color-grad2) !important;
+}
+
+.gridjs-th-content {
+  color: var(--text-color) !important;
 }
