@@ -44,8 +44,8 @@
   border-right: solid 1px #fff;
   width: 4rem;
   height: 4.6rem;
-  background-color: #444;
-  color: #fff;
+  background-color: var(--bkg-color-grad1);
+  color: var(--text-color);
   padding: 0;
   cursor: pointer;
   margin: 0;
@@ -55,12 +55,12 @@
 
 #container.transparent #button {
   background-color: transparent;
-  color: #444;
+  color: var(--text-color);
 }
 
 #container.transparent #button:hover {
   background-color: transparent;
-  color: #000;
+  color: var(--text-color-grad1);
 }
 
 #button.small {
@@ -93,5 +93,5 @@ span {
 }
 
 #button:hover {
-  background-color: #000;
+  background-color: var(--bkg-color);
 }

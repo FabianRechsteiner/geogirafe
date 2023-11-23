@@ -25,6 +25,7 @@ import SelectionWindowComponent from './components/selectionwindow/component';
 import SelectionGridComponent from './components/selectiongrid/component';
 import HelpComponent from './components/help/component';
 import AboutComponent from './components/about/component';
+import ColorSwitcher from "./components/colorswitcher/component";
 import QueryBuilderComponent from './components/querybuilder/component';
 import NavHelperComponent from './components/navigation/navhelper/component';
 

@@ -10,3 +10,4 @@ src/static/lib/gridjs
 src/static/Mock
 src/static/config_*.json
 .vscode
+.idea

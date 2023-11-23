@@ -15,7 +15,7 @@
   border: none;
   width: 6px;
   height: 100%;
-  background: #fff;
+  background: var(--bkg-color);
   position: absolute;
   top: 0;
   left: 0;
@@ -23,9 +23,9 @@
 }
 
 #close {
-  border: solid 1px #999;
+  border: solid 1px var(--text-color-grad1);
   border-right: none;
-  color: #999;
+  color: var(--text-color-grad1);
   padding: 0.7rem 0 0.7rem 0.5rem;
   border-radius: 10px 0  0 10px;
   width: 0.8rem;
@@ -34,7 +34,7 @@
   position: fixed;
   top: 5.8rem;
   right: 20rem;
-  background-color: #fff;
+  background-color: var(--bkg-color);
   cursor: pointer;
 }
 
@@ -43,8 +43,8 @@
 }
 
 #close:hover {
-  border-color: #000;
-  color: #000;
+  border-color: var(--text-color);
+  color: var(--text-color);
 }
 
 #content {
@@ -53,37 +53,37 @@
   left: 6px;
   right: 0;
   bottom: 0;
-  background : #fff;
+  background : var(--bkg-color);
   padding : 1.5rem;
   margin: 0;
   overflow: visible;
 }
 
 #content button {
-  border: solid 1px #fff;
-  color: #777;
+  border: solid 1px var(--bkg-color);
+  color: var(--text-color-grad2);
   height: 2.4rem;
   width: 2.4rem;
   text-align: left;
   padding: 0;
   padding-left: 0.5rem;
-  background-color: #fff;
+  background-color: var(--bkg-color);
   cursor: pointer;
 }
 
 #content button:hover {
-    border: solid 1px #444;
+    border: solid 1px var(--text-color-grad2);
 }
 
 #content button.selected {
-  border: solid 1px #444;
-  background-color: #444;
-  color: #fff;
+  border: solid 1px var(--text-color-grad2);
+  background-color: var(--text-color-grad2);
+  color: var(--bkg-color);
 }
 
 #drawingList {
   min-height: 5rem;
-  background-color: #fff;
+  background-color: var(--bkg-color);
   padding-top: 2rem;
   margin-right: 1rem;
 }
@@ -94,16 +94,16 @@
   padding: 0.5rem;
   margin-top: 0.1rem;
   margin-right: 0.1rem;
-  border: solid 1px #999;
+  border: solid 1px var(--text-color);
   text-align: left;
   width: 100%;
   max-width: 16rem;
   min-width: 13rem;
-  color: #666;
+  color: var(--text-color-grad2);
 }
 
 #drawingList div.girafe:hover {
-  color: #000;
+  color: var(--text-color);
 }
 
 #drawingList input.name {

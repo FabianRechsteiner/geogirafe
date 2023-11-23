@@ -19,12 +19,12 @@
 }
 
 .selectable:hover {
-  color: #000;
+  color: var(--text-color);
 }
 
 .selected {
   cursor: pointer;
-  color: #000;
+  color: var(--text-color);
 }
 
 i {
