@@ -4,33 +4,52 @@
 
 <div id="panel" class="panel">
   <div class="menu">
-    <girafe-button icon-style="${this.state.treeview.advanced ? 'fa-sm fa-solid fa-gear selectable' : 'fa-sm fa-solid fa-gears selectable'}" 
-                   size="small" tip="Advanced options" tip-placement="top" class="options transparent"
-                   onclick="${() => this.state.treeview.advanced = !this.state.treeview.advanced}"></girafe-button>
+    <girafe-button
+      icon-style="${this.state.treeview.advanced ? 'fa-sm fa-solid fa-gear selectable' : 'fa-sm fa-solid fa-gears selectable'}"
+      size="small"
+      tip="Advanced options"
+      tip-placement="top"
+      class="options transparent"
+      onclick="${() => this.state.treeview.advanced = !this.state.treeview.advanced}"></girafe-button>
 
-    <girafe-button icon-style="${this.areAllLegendExpanded ? 'fa-sm fa-solid fa-bars selectable fa-rotate-270' : 'fa-sm fa-solid fa-bars selectable'}" 
-                   size="small" tip="Toggle all legends" tip-placement="top" class="togglelegends transparent"
-                   onclick="${() => this.toggleAllLegends()}"></girafe-button>
-    
-    <girafe-button icon-style="${this.isAllExpanded ? 'fa-sm fa-solid fa-caret-right selectable' : 'fa-sm fa-solid fa-caret-down selectable'}" 
-                   size="small" tip="Expand / Collapse all" tip-placement="top" class="expandall transparent"
-                   onclick="${() => this.expandAll()}"></girafe-button>
-    
-    <girafe-button icon-style="fa-sm fa-solid fa-trash selectable" 
-                   size="small" tip="Remove all layers" tip-placement="top" class="delete transparent"
-                   onclick="${() => this.removeAll()}"></girafe-button>
+    <girafe-button
+      icon-style="${this.areAllLegendExpanded ? 'fa-sm fa-solid fa-bars selectable fa-rotate-270' : 'fa-sm fa-solid fa-bars selectable'}"
+      size="small"
+      tip="Toggle all legends"
+      tip-placement="top"
+      class="togglelegends transparent"
+      onclick="${() => this.toggleAllLegends()}"></girafe-button>
 
-    <girafe-button icon-style="fa-sm fa-solid fa-left-right selectable" size="small" tip="Hide Swiper" tip-placement="top"
-                   class="${this.isSwiperVisible ? 'swipe transparent' : 'swipe hidden'}"
-                   onclick="${() => this.hideSwipe()}"></girafe-button>
+    <girafe-button
+      icon-style="${this.isAllExpanded ? 'fa-sm fa-solid fa-caret-right selectable' : 'fa-sm fa-solid fa-caret-down selectable'}"
+      size="small"
+      tip="Expand / Collapse all"
+      tip-placement="top"
+      class="expandall transparent"
+      onclick="${() => this.expandAll()}"></girafe-button>
+
+    <girafe-button
+      icon-style="fa-sm fa-solid fa-trash selectable"
+      size="small"
+      tip="Remove all layers"
+      tip-placement="top"
+      class="delete transparent"
+      onclick="${() => this.removeAll()}"></girafe-button>
+
+    <girafe-button
+      icon-style="fa-sm fa-solid fa-left-right selectable"
+      size="small"
+      tip="Hide Swiper"
+      tip-placement="top"
+      class="${this.isSwiperVisible ? 'swipe transparent' : 'swipe hidden'}"
+      onclick="${() => this.hideSwipe()}"></girafe-button>
 
     <girafe-basemap tip="Select basemap"></girafe-basemap>
   </div>
   <div class="treeview-list">
-    ${this.state.layers.layersList.map(layer => 
-        (layer instanceof GroupLayer) ? uHtml.for(layer)`<girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>`
-                                      : uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>`
-      )}
+    ${this.state.layers.layersList.map(layer => (layer instanceof GroupLayer) ? uHtml.for(layer)`<girafe-tree-view-group
+      groupid="${layer.treeItemId}"></girafe-tree-view-group
+    >` : uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>` )}
   </div>
   <div id="gutter" class="gutter"></div>
   <div id="hide" class="hide">

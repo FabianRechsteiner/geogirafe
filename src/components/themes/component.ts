@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Theme from '../../models/theme';
 
 class ThemeComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -29,7 +28,10 @@ class ThemeComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.stateManager.subscribe('loading', () => super.render());
-    this.stateManager.subscribe('themes', () => { super.render(); super.girafeTranslate(); });
+    this.stateManager.subscribe('themes', () => {
+      super.render();
+      super.girafeTranslate();
+    });
   }
 
   onBlur() {
@@ -41,15 +43,11 @@ class ThemeComponent extends GirafeHTMLElement {
   toggleThemesList(forceDisplay: null | boolean = null) {
     if (forceDisplay === true) {
       this.themesList.style.display = 'block';
-    }
-    else if (forceDisplay === false) {
+    } else if (forceDisplay === false) {
       this.themesList.style.display = 'none';
-    }
-
-    else if (this.themesList.style.display === 'none') {
+    } else if (this.themesList.style.display === 'none') {
       this.themesList.style.display = 'block';
-    }
-    else {
+    } else {
       this.themesList.style.display = 'none';
     }
   }
@@ -65,14 +63,11 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig()
-      .then(() => {
-        this.render();
-        this.registerEvents();
-      });
+    this.loadConfig().then(() => {
+      this.render();
+      this.registerEvents();
+    });
   }
 }
-
-customElements.define('girafe-theme-select', ThemeComponent);
 
 export default ThemeComponent;

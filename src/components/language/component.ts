@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MenuButtonComponent from '../menubutton/component';
 
 class LanguageComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -43,7 +42,9 @@ class LanguageComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('language', (_oldLanguage: string, newLanguage: string) => this.onTranslate(newLanguage));
+    this.stateManager.subscribe('language', (_oldLanguage: string, newLanguage: string) =>
+      this.onTranslate(newLanguage)
+    );
   }
 
   onTranslate(language: string) {
@@ -59,7 +60,5 @@ class LanguageComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-language-select', LanguageComponent);
 
 export default LanguageComponent;

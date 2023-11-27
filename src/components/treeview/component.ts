@@ -1,11 +1,10 @@
-import GirafeResizableElement from '../../base/GirafeResizableElement'
+import GirafeResizableElement from '../../base/GirafeResizableElement';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/layergroup';
 import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
 
 class TreeViewComponent extends GirafeResizableElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -15,7 +14,7 @@ class TreeViewComponent extends GirafeResizableElement {
   areAllLegendExpanded: boolean = true;
 
   get isSwiperVisible() {
-    return (this.state.layers.swipedLayers.left.length > 0 || this.state.layers.swipedLayers.right.length > 0);
+    return this.state.layers.swipedLayers.left.length > 0 || this.state.layers.swipedLayers.right.length > 0;
   }
 
   constructor() {
@@ -26,17 +25,16 @@ class TreeViewComponent extends GirafeResizableElement {
 
   registerEvents() {
     this.stateManager.subscribe('selectedTheme', () => this.onThemeChanged());
-    this.stateManager.subscribe('layers\.layersList', () => super.render());
-    this.stateManager.subscribe('layers\.swipedLayers', () => super.render());
-    this.stateManager.subscribe('treeview\.advanced', () =>  super.render());
+    this.stateManager.subscribe('layers.layersList', () => super.render());
+    this.stateManager.subscribe('layers.swipedLayers', () => super.render());
+    this.stateManager.subscribe('treeview.advanced', () => super.render());
   }
 
   onThemeChanged() {
     if (this.state.selectedTheme != null) {
       this.state.layers.layersList = [...this.state.selectedTheme.layersTree];
       this.activateDefaultLayers(this.state.layers.layersList);
-    }
-    else {
+    } else {
       this.state.layers.layersList = [];
     }
   }
@@ -54,12 +52,11 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   connectedCallback() {
-    this.loadConfig()
-      .then(() => {
-        this.render();
-        super.girafeTranslate();
-        this.registerEvents();
-      });
+    this.loadConfig().then(() => {
+      this.render();
+      super.girafeTranslate();
+      this.registerEvents();
+    });
   }
 
   render() {
@@ -92,8 +89,7 @@ class TreeViewComponent extends GirafeResizableElement {
     for (const layer of layers) {
       if (layer instanceof LayerWms && layer.legend) {
         layer.isLegendExpanded = this.areAllLegendExpanded;
-      }
-      else if (layer instanceof GroupLayer) {
+      } else if (layer instanceof GroupLayer) {
         this.#toggleAllLegendsRecursive(layer.children);
       }
     }
@@ -109,11 +105,9 @@ class TreeViewComponent extends GirafeResizableElement {
   }
 
   hideSwipe() {
-    this.state.layers.swipedLayers = { left:[], right:[] };
+    this.state.layers.swipedLayers = { left: [], right: [] };
     super.render();
   }
 }
-
-customElements.define('girafe-tree-view', TreeViewComponent);
 
 export default TreeViewComponent;

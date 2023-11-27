@@ -1,7 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class MenuButtonComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -22,7 +21,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
     this.button = this.shadow.querySelector('#button');
     this.menuContent = this.shadow.querySelector('#menu-content');
 
-    let direction = (this.hasAttribute('open')) ? this.getAttribute('open') : 'bottom';
+    let direction = this.hasAttribute('open') ? this.getAttribute('open') : 'bottom';
     this.setOpenDirection(direction);
 
     if (this.hasAttribute('icon-style')) {
@@ -76,7 +75,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   setButtonStyle() {
     if (this.icon !== null && this.textSpan !== null) {
       // If both icon and text were set, we need to adapt the style in order to make both visible
-      this.button.className = "hybrid";
+      this.button.className = 'hybrid';
     }
   }
 
@@ -86,25 +85,24 @@ class MenuButtonComponent extends GirafeHTMLElement {
       this.text = null;
       this.textSpan.remove();
       this.textSpan = null;
-    }
-    else if (this.textSpan === null && !this.isNullOrUndefinedOrBlank(text)) {
+    } else if (this.textSpan === null && !this.isNullOrUndefinedOrBlank(text)) {
       // text does not exists yet and has to be created
       this.text = text;
       this.textSpan = document.createElement('span');
       this.textSpan.innerHTML = this.text;
       if (this.button !== null) {
-        this.button.appendChild(this.textSpan)
-      }
-      else {
+        this.button.appendChild(this.textSpan);
+      } else {
         // This function can be called before the component if full initialized
         // Therefore, we have to delay the execution, because this.button can still be null
         super.delayed(
-          () => { return this.button !== null },
+          () => {
+            return this.button !== null;
+          },
           () => this.button.appendChild(this.textSpan)
         );
       }
-    }
-    else {
+    } else {
       // Text already exists and has to be changed
       this.text = text;
       this.textSpan.innerHTML = this.text;
@@ -115,8 +113,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   openMenu() {
     if (this.menuContent.style.display === 'block') {
       this.closeMenu();
-    }
-    else {
+    } else {
       this.menuContent.style.display = 'block';
       this.focusContent();
     }
@@ -183,7 +180,5 @@ class MenuButtonComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-menu-button', MenuButtonComponent);
 
 export default MenuButtonComponent;

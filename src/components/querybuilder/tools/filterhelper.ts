@@ -1,11 +1,9 @@
-/** Works at the moment only for MapServer 
-  * See Documentation, here: https://www.mapserver.org/ogc/filter_encoding.html
-*/
+/** Works at the moment only for MapServer
+ * See Documentation, here: https://www.mapserver.org/ogc/filter_encoding.html
+ */
 class FilterHelper {
-
   static isNumeric(str: string) {
-    return str.trim().length > 0 &&
-      !isNaN(Number(str)) // ensure strings of whitespace fail or mixed chars and numbers like '2n'
+    return str.trim().length > 0 && !isNaN(Number(str)); // ensure strings of whitespace fail or mixed chars and numbers like '2n'
   }
 
   public static getFilter(
@@ -14,7 +12,6 @@ class FilterHelper {
     propertyType: 'string' | 'integer' | 'double' | 'long' | 'date' | null,
     value: string
   ): string {
-
     if (!propertyType) {
       throw new Error('The type of the property should never be null !');
     }
@@ -24,16 +21,14 @@ class FilterHelper {
         if (propertyType === 'string' && FilterHelper.isNumeric(value)) {
           // See https://mapserver-users.osgeo.narkive.com/P0EVA6Qr/wfs-filter-creates-a-query-using-a-number-instead-of-text
           return FilterHelper.likeFilter(propertyName, value);
-        }
-        else {
+        } else {
           return FilterHelper.eqFilter(propertyName, value);
         }
       case 'neq':
         if (propertyType === 'string' && FilterHelper.isNumeric(value)) {
           // See https://mapserver-users.osgeo.narkive.com/P0EVA6Qr/wfs-filter-creates-a-query-using-a-number-instead-of-text
           return FilterHelper.nlikeFilter(propertyName, value);
-        }
-        else {
+        } else {
           return FilterHelper.neqFilter(propertyName, value);
         }
       case 'gt':
@@ -80,7 +75,7 @@ class FilterHelper {
   private static gteFilter(name: string, value: string) {
     return `<Filter><PropertyIsGreaterThanOrEqualTo><PropertyName>${name}</PropertyName><Literal>${value}</Literal></PropertyIsGreaterThanOrEqualTo></Filter>`;
   }
-  
+
   private static likeFilter(name: string, value: string) {
     return `<Filter><PropertyIsLike wildcard='*' singleChar='.' escape='!'><PropertyName>${name}</PropertyName><Literal>${value}</Literal></PropertyIsLike></Filter>`;
   }

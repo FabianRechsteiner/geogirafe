@@ -1,7 +1,6 @@
 import { Coordinate } from 'ol/coordinate';
 
 class MapPosition {
-
   center: Coordinate = [];
   zoom: number | null = null;
   resolution: number = 100; /* dummy default value because it should never be null. It will be recalculated when the map will be created */

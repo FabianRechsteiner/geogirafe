@@ -22,14 +22,24 @@ Please ensure you agree with the license of the project before contributing.
 
 ## Effectively contributing
 
-### 1. Create a Branch and a Merge-Request
+### 1. Activate the pre-commit hooks
+
+To enforce a consistent style of the code in the whole application, we have decided to use [prettier](https://prettier.io/).  
+If you commit regularly, prettier should be integrated in the git pre-commit hooks.  
+This can be done with the following command:
+
+```
+git config core.hookspath buildtools/git-hooks
+```
+
+### 2. Create a Branch and a Merge-Request
 
 The first of all thing is to create a branch for your contribution. 
 Give it a intelligible name, and create an associated Merge-Request.
 
 Add a description to the Merge-Request to explain with is it for, and mark it as *Draft*.
 
-### 2. Code, commit early, push often.
+### 3. Code, commit early, push often.
 
 For your contribution, please be attentive to the following points:
 
@@ -44,18 +54,19 @@ For your contribution, please be attentive to the following points:
 - Please avoid the usage of foEach() loops. Prefer "for" and "for-of" loops instead: they preserve context, and can be breaked.
 - There is little reason to NOT commit/push frequently. It doesn’t hurt, and you'll get feedback from the pipelines early.
 
-### 3. Validate your Merge-Request
+### 4. Validate your Merge-Request
 
 When you're done with the code, it's time to make a great Merge-Request !
 Please:
 - Verify there is not conflict that would prevent an merge of your code.
+- Check the linting with `npm run lint`
 - Verify that the pipelines passed successfully on your branch: https://gitlab.com/geogirafe/gg-viewer/-/pipelines
 - Check the Sonarcloud reports directly on the Merge-Request, and fix the reported errors.
 - Verify the accessibility of your contribution by using the Wave tools: https://wave.webaim.org/
 
 When everything seems ok for you, you can remove the *Draft* flag, and request a review from the GeoGirafe Team.
 
-### 4. Review and merge
+### 5. Review and merge
 
 Every contribution will be reviewed. Therefore, the contribution quality should be appropriate (see points 2 and 3).
 
@@ -76,10 +87,11 @@ You can contact us through the following channels:
 A big thank to all the contributors of GeoGirafe, in alphabetical order:
 
 - Arnaud Poncet-Montanges @ponceta (SIGIP)
-- Daniel Gnerre (Cartoriviera)
+- Ben Koch @beeekey (OpenGIS)
+- Daniel Gnerre @gnerred (Cartoriviera)
 - Dietmar Schneider @sdietmar (techplus)
 - Guillaume Remy @remyguillaume (Basel-Stadt)
-- Olivier Monod (Yverdon-les-bains)
+- Olivier Monod @monodo (Yverdon-les-bains)
 - Pauline Fanguin @pfanguin (Cartolacote)
 - Rémi Bovard @rbovard (Cartoriviera)
 - Stéphane Malta e Sousa @maltaesousa (SITN Neuchâtel)

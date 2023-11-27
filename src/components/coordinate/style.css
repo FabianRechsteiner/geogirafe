@@ -1,6 +1,6 @@
 #content {
-	background: var(--t-bkg);
-	color: var(--text-color);
+  background: var(--t-bkg);
+  color: var(--text-color);
   width: -moz-fit-content;
   width: fit-content;
   white-space: nowrap;

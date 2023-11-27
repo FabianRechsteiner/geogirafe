@@ -62,18 +62,9 @@ git clone https://gitlab.com/geogirafe/gg-viewer.git
 
 Now you can build the application, and start the development server:
 
-### On Linux
-
 ```bash
 npm install
 npm run serve
-```
-
-### On Windows
-
-```bash
-npm install
-npm run serve-win
 ```
 
 ## Configuration
@@ -106,18 +97,9 @@ This will automatically copy the `config.yaml` file in the right place, and down
 
 ## Build for Production
 
-### On Linux
-
 ```bash
 npm install
 npm run build
-```
-
-### On Windows
-
-```bash
-npm install
-npm run build-win
 ```
 
 ### Using Docker
@@ -153,7 +135,8 @@ docker run -p 8080:80 -p 8443:443 <your_name>/gg-viewer
 
 Merge-Requests are welcome.
 For major changes, please open an issue first to discuss what you would like to change.  
-Contribution guidelines are available here: [CONTRIBUTING.md](CONTRIBUTING.md)
+Contribution guidelines are available here: [CONTRIBUTING.md](CONTRIBUTING.md).  
+**Please read them before contributing.**
 
 # License
 

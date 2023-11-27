@@ -10,7 +10,7 @@ import GirafeSingleton from '../base/GirafeSingleton';
  * }
  */
 type TranslationsDict = {
-  [lang: string]: string
+  [lang: string]: string;
 };
 
 /**
@@ -23,11 +23,10 @@ type TranslationsDict = {
  * }
  */
 type AvailableLanguages = {
-  [lang: string]: TranslationsDict
+  [lang: string]: TranslationsDict;
 };
 
 class I18nManager extends GirafeSingleton {
-
   translations: AvailableLanguages = {};
   loadingLanguagePromise: Promise<TranslationsDict> | null = null;
 
@@ -81,24 +80,23 @@ class I18nManager extends GirafeSingleton {
     return key;
   }
 
-  translate(dom: DocumentFragment ) {
+  translate(dom: DocumentFragment) {
     if (this.stateManager.state && this.stateManager.state.language) {
-      this.#loadTranslations(this.stateManager.state.language)
-        .then(() => {
-          const toTranslate = dom.querySelectorAll('[i18n]');
-          toTranslate.forEach(item => {
-            const key = item.getAttribute('i18n');
-            if (key) {
-              const translation = this.getTranslation(key);
-              if (item.hasAttribute('placeholder')) {
-                item.setAttribute('placeholder', translation);
-              } else {
-                // Default : simply set innerHTML.
-                item.innerHTML = translation;
-              }
+      this.#loadTranslations(this.stateManager.state.language).then(() => {
+        const toTranslate = dom.querySelectorAll('[i18n]');
+        toTranslate.forEach((item) => {
+          const key = item.getAttribute('i18n');
+          if (key) {
+            const translation = this.getTranslation(key);
+            if (item.hasAttribute('placeholder')) {
+              item.setAttribute('placeholder', translation);
+            } else {
+              // Default : simply set innerHTML.
+              item.innerHTML = translation;
             }
-          });
+          }
         });
+      });
     }
   }
 }

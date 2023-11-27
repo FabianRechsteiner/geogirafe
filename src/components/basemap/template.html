@@ -2,8 +2,12 @@
   <div slot="menu-content">
     <div id="container">
       ${Object.values(this.state.basemaps).map(basemap => uHtml.for(basemap)`
-        <girafe-button text="${basemap.name}" size="large" class="border-top" onclick="${() => this.changeBasemap(basemap)}"></girafe-button>`
-      )}
+      <girafe-button
+        text="${basemap.name}"
+        size="large"
+        class="border-top"
+        onclick="${() => this.changeBasemap(basemap)}"></girafe-button
+      >` )}
     </div>
   </div>
 </girafe-menu-button>

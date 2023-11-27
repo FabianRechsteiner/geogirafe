@@ -9,7 +9,7 @@ class WmtsManager {
   map: Map;
   srid: string;
 
-  wmtsCapabilitiesByServer: Record<string, {}> = {};
+  wmtsCapabilitiesByServer: Record<string, string> = {};
   wmtsLayers: Record<string, OLayer> = {};
   basemapLayers: OLayer[] = [];
 
@@ -48,47 +48,49 @@ class WmtsManager {
       }
 
       // Set the right dimensions
-      for (let key in layer.dimensions) {
+      for (const key in layer.dimensions) {
         if (key in options.dimensions) {
           // Update value
           options.dimensions[key] = layer.dimensions[key];
-        }
-        else {
-          console.warn('A dimension ' + key + ' was defined for the WMTS layer ' + layer.layers + ' but the server does not seem to accept it.')
+        } else {
+          console.warn(
+            'A dimension ' +
+              key +
+              ' was defined for the WMTS layer ' +
+              layer.layers +
+              ' but the server does not seem to accept it.'
+          );
         }
       }
 
-
       const olayer = new TileLayer({
         opacity: layer.opacity,
-        source: new WMTS(options),
+        source: new WMTS(options)
       });
 
       // Add to map
       if (isBasemap) {
         this.basemapLayers.push(olayer);
         this.map.getLayers().insertAt(0, olayer);
-      }
-      else {
+      } else {
         this.wmtsLayers[layer.layerUniqueId] = olayer;
         this.map.addLayer(olayer);
       }
     });
   }
-  
+
   removeLayer(layer: LayerWmts) {
     if (this.layerExists(layer)) {
       const olayer = this.wmtsLayers[layer.layerUniqueId];
       delete this.wmtsLayers[layer.layerUniqueId];
       this.map.removeLayer(olayer);
-    }
-    else {
+    } else {
       throw new Error('Cannot remove this layer: it does not exist');
     }
   }
-  
+
   layerExists(layer: LayerWmts) {
-    return (layer.layerUniqueId in this.wmtsLayers);
+    return layer.layerUniqueId in this.wmtsLayers;
   }
 
   getLayer(layer: LayerWmts) {
@@ -102,23 +104,21 @@ class WmtsManager {
     if (this.layerExists(layer)) {
       const olayer = this.wmtsLayers[layer.layerUniqueId];
       olayer.setOpacity(opacity);
-    }
-    else {
+    } else {
       throw new Error('Cannot change opacity for this layer: it does not exist');
     }
   }
 
-  #getWmtsCapabilities(url: string, callback: Function) {
+  #getWmtsCapabilities(url: string, callback: (capabilities: string) => void) {
     if (url in this.wmtsCapabilitiesByServer) {
       // Capabilities were already loaded
       const capabilities = this.wmtsCapabilitiesByServer[url];
       callback(capabilities);
-    }
-    else {
+    } else {
       // Capabilities were not loaded yet.
       fetch(url)
-        .then(response => response.text())
-        .then(capabilities => {
+        .then((response) => response.text())
+        .then((capabilities) => {
           // Create new WMTS Layer from Capabilities
           const parser = new WMTSCapabilities();
           const result = parser.read(capabilities);

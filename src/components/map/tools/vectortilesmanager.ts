@@ -22,7 +22,7 @@ class VectorTilesManager {
     this.basemapLayers = [];
   }
 
-  addBasemapLayer(basemap:LayerVectorTiles) {
+  addBasemapLayer(basemap: LayerVectorTiles) {
     const olayer = new olVectorTileLayer({ declutter: true });
     applyStyle(olayer, basemap.style, basemap.source);
     this.basemapLayers.push(olayer);

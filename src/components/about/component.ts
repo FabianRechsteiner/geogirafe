@@ -1,7 +1,6 @@
 import GirafeDraggableElement from '../../base/GirafeDraggableElement';
 
 class AboutComponent extends GirafeDraggableElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -32,19 +31,17 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   registerEvents() {
-    (this.stateManager).subscribe(
-      'interface.aboutVisible', (_oldValue: boolean, newValue: boolean) => this.toggleAbout(newValue)
+    this.stateManager.subscribe('interface.aboutVisible', (_oldValue: boolean, newValue: boolean) =>
+      this.toggleAbout(newValue)
     );
   }
 
   toggleAbout(visible: boolean) {
     if (visible) {
-      this.loadVersionInfos()
-        .then(() => {
-          ((this.shadow.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'block';
-        });
-    }
-    else {
+      this.loadVersionInfos().then(() => {
+        ((this.shadow.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'block';
+      });
+    } else {
       ((this.shadow.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'none';
     }
   }
@@ -62,7 +59,5 @@ class AboutComponent extends GirafeDraggableElement {
     });
   }
 }
-
-customElements.define('girafe-about', AboutComponent as any);
 
 export default AboutComponent;

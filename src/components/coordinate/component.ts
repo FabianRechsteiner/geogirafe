@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { niceCoordinates } from '../../tools/geometrytools';
 
 class CoordinateComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -27,7 +26,9 @@ class CoordinateComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('mouseCoordinates', (_oldCoordinates: number[], newCoordinates: number[]) => this.onChangeCoordinates(newCoordinates));
+    this.stateManager.subscribe('mouseCoordinates', (_oldCoordinates: number[], newCoordinates: number[]) =>
+      this.onChangeCoordinates(newCoordinates)
+    );
   }
 
   onChangeCoordinates(coord: number[]) {
@@ -43,7 +44,5 @@ class CoordinateComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-coordinate', CoordinateComponent);
 
 export default CoordinateComponent;

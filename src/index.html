@@ -1,104 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="GeoGirafe is an flexible application to build online geoportals." />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="GeoGirafe is an flexible application to build online geoportals.">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="manifest" href="site.webmanifest" />
 
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" media="screen" href="index.css" />
+    <link rel="stylesheet" media="screen" href="index.mobile.css" />
 
-  <link rel="stylesheet" media="screen" href="index.css" />
-  <link rel="stylesheet" media="screen" href="index.mobile.css" />
+    <link
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      href="lib/fontawesome/css/all.min.css" />
+    <noscript>
+      <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+    </noscript>
+    <link
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      href="lib/font-gis/css/font-gis.css" />
+    <noscript>
+      <link rel="stylesheet" href="lib/font-gis/css/font-gis.css" />
+    </noscript>
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/tippy.min.css" />
+    <noscript>
+      <link rel="stylesheet" href="lib/tippy.js/tippy.min.css" />
+    </noscript>
 
-  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
-    href="lib/fontawesome/css/all.min.css" />
-  <noscript>
-    <link rel="stylesheet" href="lib/fontawesome/css/all.min.css">
-  </noscript>
-  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/font-gis/css/font-gis.css" />
-  <noscript>
-    <link rel="stylesheet" href="lib/font-gis/css/font-gis.css">
-  </noscript>
-  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/tippy.min.css" />
-  <noscript>
-    <link rel="stylesheet" href="lib/tippy.js/tippy.min.css">
-  </noscript>
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="lib/fontawesome/webfonts/fa-solid-900.woff2"
+      crossorigin="anonymous" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="lib/fontawesome/webfonts/fa-regular-400.woff2"
+      crossorigin="anonymous" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="lib/font-gis/fonts/font-gis.woff2?t=1634903189298"
+      crossorigin="anonymous" />
 
-  <link rel="preload" as="font" type="font/woff2" href="lib/fontawesome/webfonts/fa-solid-900.woff2"
-    crossorigin="anonymous">
-  <link rel="preload" as="font" type="font/woff2" href="lib/fontawesome/webfonts/fa-regular-400.woff2"
-    crossorigin="anonymous">
-  <link rel="preload" as="font" type="font/woff2" href="lib/font-gis/fonts/font-gis.woff2?t=1634903189298"
-    crossorigin="anonymous">
+    <script type="module" src="initialize.ts"></script>
+    <title>GeoGirafe</title>
+  </head>
 
-  <script type="module" src="initialize.js"></script>
-  <title>GeoGirafe</title>
-</head>
+  <body>
+    <header>
+      <girafe-theme-select></girafe-theme-select>
+      <img id="logo" alt="geogirafe-logo" src="images/logo_small.webp" />
+      <girafe-search id="search"></girafe-search>
+      <div id="buttonbar">
+        <girafe-nav-history></girafe-nav-history>
+        <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
+        <girafe-colorswitcher></girafe-colorswitcher>
+        <girafe-button
+          icon-style="fa-2xl fa-solid fa-circle-question"
+          onclick="document.state.interface.helpVisible = true">
+        </girafe-button>
+        <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
+          <div slot="menu-content">
+            <girafe-button
+              icon-style="fa-xl fa-regular fa-pen-to-square"
+              text="Draw"
+              onclick="document.state.interface.redliningPanelVisible = !document.state.interface.redliningPanelVisible">
+            </girafe-button>
+            <girafe-button
+              icon-style="fa-xl fa-solid fa-print"
+              text="Print"
+              onclick="document.state.interface.printPanelVisible = !document.state.interface.printPanelVisible">
+            </girafe-button>
+            <girafe-proj-select></girafe-proj-select>
+            <girafe-language-select></girafe-language-select>
+            <girafe-button
+              icon-style="fa-xl fa-solid fa-moon"
+              text="Dark"
+              onclick="document.state.interface.darkMode = !document.state.interface.darkMode">
+            </girafe-button>
+            <girafe-globe-select></girafe-globe-select>
+            <girafe-button
+              icon-style="fa-xl fa-solid fa-circle-info"
+              class="border-top"
+              text="about"
+              onclick="document.state.interface.aboutVisible = true">
+            </girafe-button>
+          </div>
+        </girafe-menu-button>
+      </div>
+    </header>
 
-<body>
-  <header>
-    <girafe-theme-select></girafe-theme-select>
-    <img id="logo" alt="geogirafe-logo" src="images/logo_small.webp" />
-    <girafe-search id="search"></girafe-search>
-    <div id="buttonbar">
-      <girafe-nav-history></girafe-nav-history>
-      <girafe-button icon-style="fa-2xl fa-solid fa-user"></girafe-button>
-      <girafe-colorswitcher></girafe-colorswitcher>
-      <girafe-button icon-style="fa-2xl fa-solid fa-circle-question"
-        onclick="document.state.interface.helpVisible = true">
-      </girafe-button>
-      <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
-        <div slot="menu-content">
-          <girafe-button icon-style="fa-xl fa-regular fa-pen-to-square" text="Draw"
-            onclick="document.state.interface.redliningPanelVisible = !document.state.interface.redliningPanelVisible">
-          </girafe-button>
-          <girafe-button icon-style="fa-xl fa-solid fa-print" text="Print"
-            onclick="document.state.interface.printPanelVisible = !document.state.interface.printPanelVisible">
-          </girafe-button>
-          <girafe-proj-select></girafe-proj-select>
-          <girafe-language-select></girafe-language-select>
-          <girafe-button icon-style="fa-xl fa-solid fa-moon" text="Dark"
-            onclick="document.state.interface.darkMode = !document.state.interface.darkMode">
-          </girafe-button>
-          <girafe-globe-select></girafe-globe-select>
-          <girafe-button icon-style="fa-xl fa-solid fa-circle-info" class="border-top" text="about"
-            onclick="document.state.interface.aboutVisible = true">
-          </girafe-button>
-        </div>
-      </girafe-menu-button>
+    <div id="content">
+      <div id="content-map">
+        <section>
+          <girafe-tree-view dock="left"></girafe-tree-view>
+          <girafe-map></girafe-map>
+          <footer>
+            <girafe-scale></girafe-scale>
+            <girafe-coordinate></girafe-coordinate>
+          </footer>
+        </section>
+        <girafe-redlining dock="right"></girafe-redlining>
+        <girafe-print dock="right"></girafe-print>
+        <girafe-about></girafe-about>
+        <!-- <girafe-selection-window></girafe-selection-window> -->
+        <girafe-help></girafe-help>
+      </div>
+
+      <div id="content-bottom">
+        <girafe-selection-grid dock="bottom"></girafe-selection-grid>
+      </div>
     </div>
-  </header>
-
-  <div id="content">
-
-    <div id="content-map">
-      <section>
-        <girafe-tree-view dock="left"></girafe-tree-view>
-        <girafe-map></girafe-map>
-        <footer>
-          <girafe-scale></girafe-scale>
-          <girafe-coordinate></girafe-coordinate>
-        </footer>
-      </section>
-      <girafe-redlining dock="right"></girafe-redlining>
-      <girafe-print dock="right"></girafe-print>
-      <girafe-about></girafe-about>
-      <!-- <girafe-selection-window></girafe-selection-window> -->
-      <girafe-help></girafe-help>
-    </div>
-
-    <div id="content-bottom">
-      <girafe-selection-grid dock="bottom"></girafe-selection-grid>
-    </div>
-
-  </div>
-
-
-
-</body>
-
+  </body>
 </html>

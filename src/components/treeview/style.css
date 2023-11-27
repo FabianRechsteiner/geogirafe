@@ -17,7 +17,7 @@
 .panel {
   min-width: 18rem;
   position: absolute;
-  top : 0;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
@@ -52,7 +52,7 @@
 }
 
 .hide i:before {
-  content: "\f104";
+  content: '\f104';
 }
 
 .hide.closed {
@@ -60,7 +60,7 @@
 }
 
 .hide.closed i:before {
-  content: "\f105";
+  content: '\f105';
 }
 
 .hide:hover {
@@ -82,15 +82,15 @@
 
 .treeview-list {
   position: absolute;
-  top : 0;
+  top: 0;
   left: 0;
   right: 5px;
   bottom: 2.3rem;
   background: var(--bkg-color);
-  padding-left : 1rem;
-  padding-top : 1rem;
-  padding-bottom : 1.5rem;
-  padding-right : 0.7rem;
+  padding-left: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1.5rem;
+  padding-right: 0.7rem;
   margin: 0;
   margin-top: 0.5rem;
   overflow-y: auto;

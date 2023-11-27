@@ -1,9 +1,10 @@
-import BaseLayer from "./baselayer";
+import { GMFTreeItem } from '../gmf';
+import BaseLayer from './baselayer';
 
 class GroupLayer extends BaseLayer {
   /**
    * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
-   * This means that each modification made to its properties must come from outside, 
+   * This means that each modification made to its properties must come from outside,
    * because they have to be made through the proxy, so that the modification can be listen.
    * Therefore, this class must not contain any method which is updating a value directly
    * For example, any method doing <this.xxx = value> is forbidden here, because the modification be known from the proxy
@@ -15,10 +16,10 @@ class GroupLayer extends BaseLayer {
 
   children: BaseLayer[] = [];
 
-  constructor(elem: any, order: number) {
+  constructor(elem: GMFTreeItem, order: number) {
     const isDefaultChecked = elem.metadata?.isChecked ?? false;
     super(elem.id, elem.name, order, isDefaultChecked);
-    
+
     const isDefaultExpanded = elem.metadata?.isExpanded ?? false;
     this.isExpanded = isDefaultExpanded;
     this.isExclusiveGroup = elem.metadata?.exclusiveGroup ?? false;

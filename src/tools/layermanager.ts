@@ -1,13 +1,12 @@
-import GirafeSingleton from "../base/GirafeSingleton";
-import BaseLayer from "../models/layers/baselayer";
-import GroupLayer from "../models/layers/layergroup";
-import Layer from "../models/layers/layer";
-import ConfigManager from "./configmanager";
-import StateManager from "./state/statemanager";
-import LayerWms from "../models/layers/layerwms";
+import GirafeSingleton from '../base/GirafeSingleton';
+import BaseLayer from '../models/layers/baselayer';
+import GroupLayer from '../models/layers/layergroup';
+import Layer from '../models/layers/layer';
+import ConfigManager from './configmanager';
+import StateManager from './state/statemanager';
+import LayerWms from '../models/layers/layerwms';
 
 class LayerManager extends GirafeSingleton {
-
   configManager: ConfigManager;
   stateManager: StateManager;
 
@@ -23,11 +22,15 @@ class LayerManager extends GirafeSingleton {
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
 
-    this.configManager.loadConfig().then(() => { 
-      this.hideLegendWhenLayerIsDeactivated = this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated ?? false;
+    this.configManager.loadConfig().then(() => {
+      this.hideLegendWhenLayerIsDeactivated =
+        this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated ?? false;
     });
 
-    this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldActive: boolean, _newActive: boolean, layer: BaseLayer) => this.onLayerToggled(layer));
+    this.stateManager.subscribe(
+      'layers.layersList..*.activeState',
+      (_oldActive: boolean, _newActive: boolean, layer: BaseLayer) => this.onLayerToggled(layer)
+    );
   }
 
   getTreeItem(treeItemId: string): BaseLayer {
@@ -35,7 +38,7 @@ class LayerManager extends GirafeSingleton {
     if (treeItem) {
       return treeItem;
     }
-    throw new Error(`BaseLayer ${treeItemId} not found !`)
+    throw new Error(`BaseLayer ${treeItemId} not found !`);
   }
 
   #getLayerRecursive(layers: BaseLayer[], treeItemId: string): BaseLayer | null {
@@ -65,12 +68,11 @@ class LayerManager extends GirafeSingleton {
       layer.isLegendExpanded = false;
     }
   }
-  
+
   toggle(layer: BaseLayer, state: 'on' | 'off') {
     if (layer instanceof GroupLayer) {
       this.toggleGroup(layer, state);
-    }
-    else if (layer instanceof Layer) {
+    } else if (layer instanceof Layer) {
       this.toggleLayer(layer, state);
     }
   }
@@ -84,14 +86,12 @@ class LayerManager extends GirafeSingleton {
       if (layer.activeState !== 'semi') {
         this.#toggleChilds(layer, layer.activeState);
       }
-    }
-    else if (layer instanceof Layer) {
+    } else if (layer instanceof Layer) {
       // Hide the legend when the layer is deactivated (if configured so)
       if (layer instanceof LayerWms && this.hideLegendWhenLayerIsDeactivated) {
         if (layer.active) {
           layer.isLegendExpanded = layer.wasLegendExpanded;
-        }
-        else { 
+        } else {
           layer.wasLegendExpanded = layer.isLegendExpanded;
           layer.isLegendExpanded = false;
         }
@@ -110,11 +110,9 @@ class LayerManager extends GirafeSingleton {
     let newState: 'on' | 'off';
     if (state) {
       newState = state;
-    }
-    else if (layer.activeState === 'off') {
+    } else if (layer.activeState === 'off') {
       newState = 'on';
-    }
-    else {
+    } else {
       newState = 'off';
     }
 
@@ -128,11 +126,9 @@ class LayerManager extends GirafeSingleton {
     let newState: 'on' | 'off' | 'semi';
     if (state) {
       newState = state;
-    }
-    else if (group.activeState === 'off') {
+    } else if (group.activeState === 'off') {
       newState = 'on';
-    }
-    else {
+    } else {
       newState = 'off';
     }
 
@@ -147,18 +143,14 @@ class LayerManager extends GirafeSingleton {
       if (layer.parent.isExclusiveGroup) {
         if (this.#isAnyChildActive(layer.parent)) {
           this.toggleGroup(layer.parent, 'on');
-        }
-        else {
+        } else {
           this.toggleGroup(layer.parent, 'off');
         }
-      }
-      else if (this.#areAllChildrenActive(layer.parent)) {
+      } else if (this.#areAllChildrenActive(layer.parent)) {
         this.toggleGroup(layer.parent, 'on');
-      }
-      else if (this.#areAllChildrenInactive(layer.parent)) {
+      } else if (this.#areAllChildrenInactive(layer.parent)) {
         this.toggleGroup(layer.parent, 'off');
-      }
-      else {
+      } else {
         this.toggleGroup(layer.parent, 'semi');
       }
     }
@@ -171,8 +163,7 @@ class LayerManager extends GirafeSingleton {
       if (!this.#isAnyChildActive(group)) {
         this.toggle(group.children[0], state);
       }
-    }
-    else {
+    } else {
       // In all other cases, we activate/deactivate all children
       for (const child of group.children) {
         this.toggle(child, state);
@@ -185,11 +176,18 @@ class LayerManager extends GirafeSingleton {
     // If we have activate a layer, and if the parent group is defined as "exclusive"
     // It means only 1 child can be activated at the same time.
     // Therefore, we have to deactivate all other childs for the parent group.
-    if ((layer.active || (layer instanceof GroupLayer && layer.semiActive)) && layer.parent != null && layer.parent.isExclusiveGroup) {
+    if (
+      (layer.active || (layer instanceof GroupLayer && layer.semiActive)) &&
+      layer.parent != null &&
+      layer.parent.isExclusiveGroup
+    ) {
       // Deactivate all other layers
       for (const child of layer.parent.children) {
         const otherLayer = this.getTreeItem(child.treeItemId);
-        if (otherLayer.treeItemId !== layer.treeItemId && (otherLayer.active || (otherLayer instanceof GroupLayer && otherLayer.semiActive))) {
+        if (
+          otherLayer.treeItemId !== layer.treeItemId &&
+          (otherLayer.active || (otherLayer instanceof GroupLayer && otherLayer.semiActive))
+        ) {
           this.toggle(otherLayer, 'off');
         }
       }
@@ -228,7 +226,7 @@ class LayerManager extends GirafeSingleton {
     }
     return false;
   }
-  
+
   setError(layer: BaseLayer, error: string) {
     layer.hasError = true;
     layer.errorMessage = error;
@@ -241,4 +239,4 @@ class LayerManager extends GirafeSingleton {
   }
 }
 
-export default LayerManager
+export default LayerManager;

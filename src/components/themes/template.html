@@ -1,8 +1,6 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
-<button title="Theme Selection" 
-        onclick="${() => this.toggleThemesList()}" 
-        onblur="${() => this.onBlur()}">
+<button title="Theme Selection" onclick="${() => this.toggleThemesList()}" onblur="${() => this.onBlur()}">
   <div class="${(this.state.loading ? 'hidden' : '')}">
     <i class="fa-2x fa-solid fa-layer-group"></i>
   </div>
@@ -12,8 +10,7 @@
 </button>
 <ul id="themes">
   ${Object.values(this.state.themes ?? {}).map(theme => uHtml.for(theme)`
-  <div onmousedown="${() => this.ignoreBlur()}" 
-       onclick="${() => this.onThemeChanged(theme)}">
+  <div onmousedown="${() => this.ignoreBlur()}" onclick="${() => this.onThemeChanged(theme)}">
     <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
     <span i18n="${theme.name}">${theme.name}</span>
   </div>

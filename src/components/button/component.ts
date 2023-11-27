@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MenuButtonComponent from '../menubutton/component';
 
 class ButtonComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -12,12 +11,12 @@ class ButtonComponent extends GirafeHTMLElement {
   textSpan: HTMLElement | null = null;
   text: string | null = null;
 
-  option: any = null;
+  option: Record<string, unknown> | null = null;
   href: string | null = null;
 
   actionState: string | null = null;
   actionValue: string | boolean | (string | number)[] | null = null;
-  
+
   constructor() {
     super('button');
   }
@@ -48,7 +47,7 @@ class ButtonComponent extends GirafeHTMLElement {
     }
     // Apply all style from host to container
     this.container.classList.add(...this.classList);
-    
+
     this.setButtonStyle();
   }
 
@@ -65,25 +64,24 @@ class ButtonComponent extends GirafeHTMLElement {
       this.text = null;
       this.textSpan.remove();
       this.textSpan = null;
-    }
-    else if (this.textSpan === null && !this.isNullOrUndefinedOrBlank(text)) {
+    } else if (this.textSpan === null && !this.isNullOrUndefinedOrBlank(text)) {
       // text does not exist yet and has to be created
       this.text = text;
       this.textSpan = document.createElement('span');
       this.textSpan.innerHTML = this.text;
       if (!this.isNullOrUndefined(this.button)) {
         this.button.appendChild(this.textSpan);
-      }
-      else {
+      } else {
         // This function can be called before the component is fully initialized
         // Therefore, we have to delay the execution, because this.button can still be null
         super.delayed(
-          () => { return this.button !== null }, 
+          () => {
+            return this.button !== null;
+          },
           () => this.button.appendChild(this.textSpan!)
         );
       }
-    }
-    else {
+    } else {
       // Text already exists and has to be changed
       this.text = text;
       this.textSpan!.innerHTML = this.text;
@@ -94,17 +92,15 @@ class ButtonComponent extends GirafeHTMLElement {
   registerEvents() {
     if (this.hasAttribute('href')) {
       this.href = this.getAttribute('href') as string;
-    }
-    else if (this.hasAttribute('message')) {
+    } else if (this.hasAttribute('message')) {
       this.option = {};
-      this.option.message = this.getAttribute('message');
+      this.option.message = this.getAttribute('message')!;
 
       // Get message attributes from dataset if there is any
       for (const key in this.dataset) {
-        this.option[key] = this.dataset[key];
+        this.option[key] = this.dataset[key]!;
       }
-    }
-    else if (this.hasAttribute('state-action')) {
+    } else if (this.hasAttribute('state-action')) {
       this.actionState = this.getAttribute('state-action');
       this.actionValue = this.getActionValue();
     }
@@ -121,7 +117,7 @@ class ButtonComponent extends GirafeHTMLElement {
       // Only one parameter is authorized here, because the state method is invoked dynamically
       // And we cannot control the order of the parameters for the state update in the onClick() method.
       // So for now, we send an error if more than 1 parameter is set.
-      throw new Error ('Maximum 1 parameter is allowed here.');
+      throw new Error('Maximum 1 parameter is allowed here.');
     }
 
     if (Object.keys(this.dataset).length === 0) {
@@ -142,7 +138,7 @@ class ButtonComponent extends GirafeHTMLElement {
     // Manage arrays
     if (value.startsWith('[') && value.endsWith(']')) {
       const content = value.substring(1, value.length - 1);
-      const array = content.split(',').map(item => parseFloat(item) ? parseFloat(item) : item);
+      const array = content.split(',').map((item) => (parseFloat(item) ? parseFloat(item) : item));
       return array;
     }
     // String
@@ -150,7 +146,7 @@ class ButtonComponent extends GirafeHTMLElement {
   }
 
   parentAttributeChanged(mutationList: MutationRecord[]) {
-    mutationList.forEach(mutation => {
+    mutationList.forEach((mutation) => {
       if (mutation.attributeName === 'class') {
         // Apply all style from host to container
         this.container.classList.add(...this.classList);
@@ -167,35 +163,38 @@ class ButtonComponent extends GirafeHTMLElement {
     if (!this.isNullOrUndefined(this.href)) {
       // Open link in a new tab
       window.open(this.href!, '_blank');
-    }
-    else if (!this.isNullOrUndefined(this.option)) {
+    } else if (this.option) {
       // send message
       this.messageManager.sendMessage(this.option);
-    }
-    else if (!this.isNullOrUndefined(this.actionState)) {
+    } else if (this.actionState) {
       // update state
-      const keys = this.actionState!.split('.');
-      let state:{[index:string]: {}} = this.state as {};
-      for (let i=0; i<keys.length-1; ++i) {
+      const keys = this.actionState.split('.');
+      // TODO REG: This code should be deleted, because we do no want to use custom attributes any more.
+      // The eslint exception will then be deleted as well.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let state: Record<string, any> = this.state as any;
+      for (let i = 0; i < keys.length - 1; ++i) {
         state = state[keys[i]];
       }
 
       if (this.actionValue === null) {
-        if (typeof state[keys[keys.length-1]] !== 'boolean') {
+        if (typeof state[keys[keys.length - 1]] !== 'boolean') {
           // The value is not a boolean, and no action-value was defined
           // In this case, we should "invert" the boolean.
           // => we cannot do this, because it isn't a boolean
           throw new Error("Cannot invert boolean value: it isn't a boolean");
         }
-        state[keys[keys.length-1]] = !state[keys[keys.length-1]];
-      }
-      else {
-        state[keys[keys.length-1]] = this.actionValue;
+        state[keys[keys.length - 1]] = !state[keys[keys.length - 1]];
+      } else {
+        state[keys[keys.length - 1]] = this.actionValue;
       }
     }
 
     // Close parent menu-button if any
-    const parentMenuButton = super.getParentOfType('GIRAFE-MENU-BUTTON', this.shadow.host.parentNode) as MenuButtonComponent;
+    const parentMenuButton = super.getParentOfType(
+      'GIRAFE-MENU-BUTTON',
+      this.shadow.host.parentNode
+    ) as MenuButtonComponent;
     if (parentMenuButton !== null) {
       parentMenuButton.closeMenu();
     }
@@ -209,7 +208,5 @@ class ButtonComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-button', ButtonComponent);
 
 export default ButtonComponent;

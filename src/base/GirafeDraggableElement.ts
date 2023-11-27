@@ -26,7 +26,6 @@ That's it, it should work.
 */
 
 class GirafeDraggableElement extends GirafeHTMLElement {
-
   button?: HTMLElement;
   div?: HTMLElement;
   header?: HTMLElement;
@@ -74,37 +73,33 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     e.preventDefault();
 
     const hostRect = _this.host.getBoundingClientRect();
-    
+
     // Position left
     const pos1 = _this.pos3 - e.clientX;
     const newLeft = _this.host.offsetLeft - pos1;
     const newRight = newLeft + hostRect.width;
     if (newLeft < 0) {
-      _this.host.style.left = "0px";
-    }
-    else if (newRight > this.getBodyWidth()) {
-      _this.host.style.left = (this.getBodyWidth() - hostRect.width) + "px";
-    }
-    else {
+      _this.host.style.left = '0px';
+    } else if (newRight > this.getBodyWidth()) {
+      _this.host.style.left = this.getBodyWidth() - hostRect.width + 'px';
+    } else {
       _this.pos1 = pos1;
       _this.pos3 = e.clientX;
-      _this.host.style.left = newLeft + "px";
+      _this.host.style.left = newLeft + 'px';
     }
-    
+
     // Position top
     const pos2 = _this.pos4 - e.clientY;
     const newTop = _this.host.offsetTop - pos2;
     const newBottom = newTop + hostRect.height;
     if (newTop < 0) {
-      _this.host.style.top = "0px";
-    }
-    else if (newBottom > this.getBodyHeight()) {
-      _this.host.style.top = (this.getBodyHeight() - hostRect.height) + "px";
-    }
-    else {
+      _this.host.style.top = '0px';
+    } else if (newBottom > this.getBodyHeight()) {
+      _this.host.style.top = this.getBodyHeight() - hostRect.height + 'px';
+    } else {
       _this.pos2 = pos2;
       _this.pos4 = e.clientY;
-      _this.host.style.top = newTop + "px";
+      _this.host.style.top = newTop + 'px';
     }
   }
 
@@ -117,7 +112,7 @@ class GirafeDraggableElement extends GirafeHTMLElement {
       document.documentElement.clientWidth
     );
   }
-  
+
   getBodyHeight() {
     return Math.max(
       document.body.scrollHeight,

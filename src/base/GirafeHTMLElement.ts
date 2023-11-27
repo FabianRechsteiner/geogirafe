@@ -6,15 +6,16 @@ import MessageManager from '../tools/messagemanager';
 import ConfigManager from '../tools/configmanager';
 import StateManager from '../tools/state/statemanager';
 
-class GirafeHTMLElement extends HTMLElement {
+type TippyType = typeof tippy;
 
+class GirafeHTMLElement extends HTMLElement {
   templateUrl: string | null = null;
   styleUrl: string | null = null;
   template?: Renderable | (() => Renderable);
   component: string;
   shadow: ShadowRoot;
 
-  activeTooltips: any[] = [];
+  activeTooltips: TippyType[] = [];
 
   messageManager: MessageManager;
   configManager: ConfigManager;
@@ -32,7 +33,7 @@ class GirafeHTMLElement extends HTMLElement {
     this.messageManager = MessageManager.getInstance();
     this.stateManager = StateManager.getInstance();
 
-    this.shadow = this.attachShadow({mode: 'open'});
+    this.shadow = this.attachShadow({ mode: 'open' });
 
     this.stateManager.subscribe('language', (_oldLanguage: string, _newLanguage: string) => this.girafeTranslate());
   }
@@ -56,15 +57,15 @@ class GirafeHTMLElement extends HTMLElement {
    * @param val
    * @returns
    */
-  isNullOrUndefined(val: any): boolean {
-    return (val === undefined || val === null);
+  isNullOrUndefined(val: unknown): boolean {
+    return val === undefined || val === null;
   }
 
-  isNullOrUndefinedOrBlank(val: any): boolean {
-    return (val === undefined || val === null || val === '');
+  isNullOrUndefinedOrBlank(val: unknown): boolean {
+    return val === undefined || val === null || val === '';
   }
 
-  delayed(functionToWatch: Function, functionToExecute: Function) {
+  delayed(functionToWatch: () => boolean, functionToExecute: () => void) {
     const observer = new MutationObserver((_mutations, obs) => {
       if (functionToWatch()) {
         functionToExecute();
@@ -85,8 +86,7 @@ class GirafeHTMLElement extends HTMLElement {
     let parent: ParentNode | null = null;
     if (elem instanceof ShadowRoot) {
       parent = elem.host;
-    }
-    else {
+    } else {
       parent = elem.parentNode;
     }
 
@@ -101,10 +101,10 @@ class GirafeHTMLElement extends HTMLElement {
     this.activeTooltips = [];
 
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
-    elementsWithTooltip.forEach(el => {
+    elementsWithTooltip.forEach((el) => {
       const tooltipText = el.getAttribute('tip');
       if (tooltipText !== '') {
-        let placement = el.getAttribute('tip-placement') ?? defaultPlacement ;
+        const placement = el.getAttribute('tip-placement') ?? defaultPlacement;
         const tooltip = tippy(el, {
           arrow: arrow,
           delay: delay,
