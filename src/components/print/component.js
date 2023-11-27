@@ -1,11 +1,10 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 
 class PrintComponent extends GirafeResizableElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  panel = null
+  panel = null;
   exportButton = null;
   scaleSelect = null;
   layoutSelect = null;
@@ -35,7 +34,7 @@ class PrintComponent extends GirafeResizableElement {
   getReportUrl(format) {
     return this.printUrl + 'report.' + format;
   }
-  
+
   getDownloadUrl(result) {
     return this.printUrl + result.downloadURL.substring(result.downloadURL.indexOf('/report') + 1);
   }
@@ -43,7 +42,7 @@ class PrintComponent extends GirafeResizableElement {
   getStatusUrl(result) {
     return this.printUrl + result.statusURL.substring(result.statusURL.indexOf('/status') + 1);
   }
-  
+
   constructor() {
     super('print');
   }
@@ -55,11 +54,11 @@ class PrintComponent extends GirafeResizableElement {
       this.printUrl += '/';
     }
 
-    const response = await fetch(this.capabilitiesUrl, {referrer:''});
+    const response = await fetch(this.capabilitiesUrl, { referrer: '' });
     const content = await response.json();
-    this.printApp = content["app"];
-    this.printLayouts = content["layouts"];
-    this.printFormats = content["formats"];
+    this.printApp = content['app'];
+    this.printLayouts = content['layouts'];
+    this.printFormats = content['formats'];
   }
 
   render() {
@@ -79,7 +78,7 @@ class PrintComponent extends GirafeResizableElement {
     this.printList = this.shadow.querySelector('#printList');
 
     // Initialize layout, scales and formats
-    this.printLayouts.forEach(elem => {
+    this.printLayouts.forEach((elem) => {
       this.layoutsByName[elem.name] = elem;
       this.addLayoutOption(this.layoutSelect, elem);
     });
@@ -87,10 +86,10 @@ class PrintComponent extends GirafeResizableElement {
       this.layoutSelect.value = this.defaultLayout;
     }
     const layout = this.layoutsByName[this.layoutSelect.value];
-    const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
+    const clientInfo = layout.attributes.filter((elem) => elem.type === 'MapAttributeValues')[0].clientInfo;
     this.updateScales(clientInfo);
 
-    this.printFormats.forEach(elem => {
+    this.printFormats.forEach((elem) => {
       this.addFormatOption(this.formatSelect, elem);
     });
 
@@ -137,34 +136,33 @@ class PrintComponent extends GirafeResizableElement {
 
   onLayoutChanged(e) {
     const layout = this.layoutsByName[e.target.value];
-    const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
+    const clientInfo = layout.attributes.filter((elem) => elem.type === 'MapAttributeValues')[0].clientInfo;
     this.updateScales(clientInfo);
     this.state.print.format = [clientInfo.width, clientInfo.height];
   }
 
   onScaleChanged(e) {
-    this.state.print.scale = e.target.value
+    this.state.print.scale = e.target.value;
   }
 
   updateScales(clientInfo) {
     // Update scales
     const currentSelectedValue = this.scaleSelect.value;
     this.scaleSelect.innerHTML = '';
-    clientInfo.scales.forEach(scale => {
+    clientInfo.scales.forEach((scale) => {
       this.addScaleOption(this.scaleSelect, scale);
     });
     // Restore previously selected value
     if (!this.isNullOrUndefinedOrBlank(currentSelectedValue)) {
       this.scaleSelect.value = currentSelectedValue;
       this.scaleSelect.value = currentSelectedValue;
-    }
-    else {
+    } else {
       this.scaleSelect.value = clientInfo.scales[0];
     }
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => 
+    this.loadConfig().then(() =>
       this.initializePrint().then(() => {
         this.render();
         this.registerEvents();
@@ -178,11 +176,10 @@ class PrintComponent extends GirafeResizableElement {
       this.panel.getRootNode().host.style.display = 'block';
       // Set default print state
       const layout = this.layoutsByName[this.layoutSelect.value];
-      const clientInfo = layout.attributes.filter(elem => elem.type === 'MapAttributeValues')[0].clientInfo;
+      const clientInfo = layout.attributes.filter((elem) => elem.type === 'MapAttributeValues')[0].clientInfo;
       this.state.print.scale = this.scaleSelect.value;
       this.state.print.format = [clientInfo.width, clientInfo.height];
-    }
-    else {
+    } else {
       this.panel.style.display = 'none';
       this.panel.getRootNode().host.style.display = 'none';
     }
@@ -194,54 +191,50 @@ class PrintComponent extends GirafeResizableElement {
     const scale = this.scaleSelect.value;
 
     const body = {
-      "attributes": {
-          "map": {
-              "dpi": 254,
-              "rotation": 0,
-              "center": [this.state.position.center[0], this.state.position.center[1]],
-              "projection": this.state.projection,
-              "scale": scale,
-              "useNearestScale": false,
-              "layers": [
-                  {
-                      "baseURL": "https://map.geo.bs.ch/mapserv_proxy",
-                      "imageFormat": "image/png",
-                      "layers": [
-                          "Stadt- und Parzellenplan farbig"
-                      ],
-                      "customParams": {
-                          "TRANSPARENT": "true",
-                          "ogcserver": "WMS BS (1)"
-                      },
-                      "serverType": "mapserver",
-                      "type": "wms",
-                      "opacity": 1,
-                      "useNativeAngle": true,
-                      "styles": [
-                          ""
-                      ]
-                  },
-              ]
-          },
-          "title": this.titleInput.value,
-          "comment": this.commentInput.value,
-          "maxTitleLength": "130",
-          "maxCommentLength": "190"
+      attributes: {
+        map: {
+          dpi: 254,
+          rotation: 0,
+          center: [this.state.position.center[0], this.state.position.center[1]],
+          projection: this.state.projection,
+          scale: scale,
+          useNearestScale: false,
+          layers: [
+            {
+              baseURL: 'https://map.geo.bs.ch/mapserv_proxy',
+              imageFormat: 'image/png',
+              layers: ['Stadt- und Parzellenplan farbig'],
+              customParams: {
+                TRANSPARENT: 'true',
+                ogcserver: 'WMS BS (1)'
+              },
+              serverType: 'mapserver',
+              type: 'wms',
+              opacity: 1,
+              useNativeAngle: true,
+              styles: ['']
+            }
+          ]
+        },
+        title: this.titleInput.value,
+        comment: this.commentInput.value,
+        maxTitleLength: '130',
+        maxCommentLength: '190'
       },
-      "format": format,
-      "lang": "en",
-      "layout": layout
-    }
-    
+      format: format,
+      lang: 'en',
+      layout: layout
+    };
+
     fetch(this.getReportUrl(format), {
       method: 'POST',
       headers: new Headers({
         'Content-Type': 'application/json;charset=UTF-8'
       }),
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     })
-    .then(r => r.json())
-    .then(result => this.managePrintStatus(result));
+      .then((r) => r.json())
+      .then((result) => this.managePrintStatus(result));
   }
 
   managePrintStatus(result) {
@@ -251,13 +244,15 @@ class PrintComponent extends GirafeResizableElement {
     const elementId = 'p-' + result.ref.substring(0, result.ref.indexOf('-'));
     this.addPrintToList(elementId);
 
-    setTimeout(function(elementId, statusUrl, downloadUrl) {
-      this.checkStatus(elementId, statusUrl, downloadUrl)
-    }.bind(this, elementId, statusUrl, downloadUrl), 2000);
+    setTimeout(
+      function (elementId, statusUrl, downloadUrl) {
+        this.checkStatus(elementId, statusUrl, downloadUrl);
+      }.bind(this, elementId, statusUrl, downloadUrl),
+      2000
+    );
   }
 
   addPrintToList(elementId) {
-
     const container = document.createElement('div');
     container.className = 'girafe';
     container.id = elementId;
@@ -281,7 +276,7 @@ class PrintComponent extends GirafeResizableElement {
     const date = new Date(Date.now());
     const time = document.createElement('span');
     time.innerHTML = date.getHours() + ':' + date.getMinutes();
-    time.className = "time";
+    time.className = 'time';
     container.appendChild(time);
 
     this.printList.prepend(container);
@@ -289,38 +284,39 @@ class PrintComponent extends GirafeResizableElement {
 
   checkStatus(elementId, statusUrl, downloadUrl) {
     fetch(statusUrl)
-    .then(r => r.json())
-    .then(status => {
-      if (!status.done) {
-        // We wait maximum 30 seconds
-        if (status.elapsedTime > 30000) {
-          alert('timeout');
+      .then((r) => r.json())
+      .then((status) => {
+        if (!status.done) {
+          // We wait maximum 30 seconds
+          if (status.elapsedTime > 30000) {
+            alert('timeout');
+          } else {
+            // Continue to wait
+            setTimeout(
+              function (elementId, statusUrl, downloadUrl) {
+                this.checkStatus(elementId, statusUrl, downloadUrl);
+              }.bind(this, elementId, statusUrl, downloadUrl),
+              2000
+            );
+          }
+        } else {
+          // Print is done.
+          switch (status.status) {
+            case 'error':
+              this.printError(elementId, status.error);
+              break;
+            case 'finished':
+              this.printFinished(elementId, downloadUrl);
+          }
         }
-        else {
-          // Continue to wait
-          setTimeout(function(elementId, statusUrl, downloadUrl) {
-            this.checkStatus(elementId, statusUrl, downloadUrl)
-          }.bind(this, elementId, statusUrl, downloadUrl), 2000);
-        }
-      }
-      else {
-        // Print is done.
-        switch (status.status) {
-          case "error":
-            this.printError(elementId, status.error);
-            break;
-          case "finished":
-            this.printFinished(elementId, downloadUrl);
-        }
-      }
-    })
+      });
   }
 
   printFinished(elementId, downloadUrl) {
     const div = this.shadow.querySelector('#' + elementId);
     const status = div.querySelectorAll('i')[0];
     status.className = 'fa-solid fa-file-arrow-down fa-3x';
-    status.onclick = () => window.open(downloadUrl,'_blank');
+    status.onclick = () => window.open(downloadUrl, '_blank');
   }
 
   printError(elementId, error) {
@@ -330,7 +326,5 @@ class PrintComponent extends GirafeResizableElement {
     status.title = error;
   }
 }
-
-customElements.define('girafe-print', PrintComponent);
 
 export default PrintComponent;

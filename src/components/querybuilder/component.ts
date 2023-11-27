@@ -5,7 +5,6 @@ import { LayerAttribute } from '../../models/serverwfs';
 import FilterHelper from './tools/filterhelper';
 
 class QueryBuilderComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -28,13 +27,15 @@ class QueryBuilderComponent extends GirafeHTMLElement {
 
     super.render();
 
-    WfsManager.getInstance().getServerWfs(this.layer.urlWfs).then((serverWfs) => {
-      this.layerAttributes = serverWfs.layers[this.layer.name];
-      this.loading = false;
-      super.render();
-      super.girafeTranslate();
-      this.activateTooltips(false, [800, 0], 'top-end');
-    });
+    WfsManager.getInstance()
+      .getServerWfs(this.layer.urlWfs)
+      .then((serverWfs) => {
+        this.layerAttributes = serverWfs.layers[this.layer.name];
+        this.loading = false;
+        super.render();
+        super.girafeTranslate();
+        this.activateTooltips(false, [800, 0], 'top-end');
+      });
   }
 
   get isString() {
@@ -43,12 +44,16 @@ class QueryBuilderComponent extends GirafeHTMLElement {
   }
 
   get isNumber() {
-    return this.currentAttributeType === 'integer' || this.currentAttributeType === 'double' || this.currentAttributeType === 'long';
+    return (
+      this.currentAttributeType === 'integer' ||
+      this.currentAttributeType === 'double' ||
+      this.currentAttributeType === 'long'
+    );
   }
 
   attributeChanged() {
     const attributeSelect = this.shadow.getElementById('attribute') as HTMLSelectElement;
-    const layerAttribute = this.layerAttributes.find(attr => attr.name = attributeSelect.value);
+    const layerAttribute = this.layerAttributes.find((attr) => (attr.name = attributeSelect.value));
     if (!layerAttribute) {
       throw new Error('Why is this object null ? This should never happen...');
     }
@@ -59,7 +64,7 @@ class QueryBuilderComponent extends GirafeHTMLElement {
 
   operatorChanged() {
     const operatorSelect = this.shadow.getElementById('operator') as HTMLSelectElement;
-    this.showVal = (operatorSelect.value !== 'nul' && operatorSelect.value !== 'nnul');
+    this.showVal = operatorSelect.value !== 'nul' && operatorSelect.value !== 'nnul';
     super.render();
   }
 
@@ -68,7 +73,12 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     const operatorSelect = this.shadow.getElementById('operator') as HTMLSelectElement;
     const val = this.shadow.getElementById('val') as HTMLInputElement;
 
-    this.layer.filter = FilterHelper.getFilter(operatorSelect.value, attributeSelect.value, this.currentAttributeType, val.value);
+    this.layer.filter = FilterHelper.getFilter(
+      operatorSelect.value,
+      attributeSelect.value,
+      this.currentAttributeType,
+      val.value
+    );
     console.log(this.layer.filter);
   }
 
@@ -92,7 +102,5 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-query-builder', QueryBuilderComponent);
 
 export default QueryBuilderComponent;

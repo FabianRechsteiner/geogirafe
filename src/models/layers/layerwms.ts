@@ -1,9 +1,10 @@
+import { GMFChildLayer, GMFTreeItem } from '../gmf';
 import Layer from './layer';
 
 class LayerWms extends Layer {
   /**
    * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
-   * This means that each modification made to its properties must come from outside, 
+   * This means that each modification made to its properties must come from outside,
    * because they have to be made through the proxy, so that the modification can be listen.
    * Therefore, this class must not contain any method which is updating a value directly
    * For example, any method doing <this.xxx = value> is forbidden here, because the modification be known from the proxy
@@ -13,16 +14,16 @@ class LayerWms extends Layer {
   public serverName: string;
   public url: string;
   public urlWfs: string | null;
-  public imageType: string | null;
-  public minResolution: number | null;
-  public maxResolution: number | null;
-  public layers: string | null = null;
+  public imageType?: string;
+  public minResolution?: number;
+  public maxResolution?: number;
+  public layers?: string;
 
   // Legend attributes
-  public legend: string | null;
-  public iconUrl: string | null;
-  public legendRule: string | null;
-  public legendImage: string | null;
+  public legend?: string;
+  public iconUrl?: string;
+  public legendRule?: string;
+  public legendImage?: string;
   public isLegendExpanded: boolean;
   public wasLegendExpanded: boolean;
 
@@ -31,7 +32,7 @@ class LayerWms extends Layer {
   public queryLayers: string | null = null;
   public filter: string | null = null;
 
-  constructor(elem: any, serverName: string, url: string, urlWfs: string | null, order: number) {
+  constructor(elem: GMFTreeItem, serverName: string, url: string, urlWfs: string | null, order: number) {
     super(elem, order);
     this.serverName = serverName;
     this.url = url;
@@ -41,7 +42,7 @@ class LayerWms extends Layer {
     this.maxResolution = elem.maxResolutionHint;
 
     this.legend = elem.metadata.legend;
-    this.iconUrl = elem.metadata.iconUrl
+    this.iconUrl = elem.metadata.iconUrl;
     this.legendRule = elem.metadata.legendRule;
     this.legendImage = elem.metadata.legendImage;
     this.isLegendExpanded = elem.metadata.isLegendExpanded ?? false;
@@ -54,20 +55,19 @@ class LayerWms extends Layer {
         // We are on a WMS Layer, but it doesn't have any childlayer.
         // This is probably a configuration error in the backend
         console.warn(`WMS Layer ${elem.name} has no defined child-layer`);
-      }
-      else {
+      } else {
         this.queryable = elem.childLayers[0].queryable;
-        this.queryLayers = (this.queryable) ? elem.childLayers.map((l: any) => l.name).join(',') : '';
+        this.queryLayers = this.queryable ? elem.childLayers.map((l: GMFChildLayer) => l.name).join(',') : '';
 
         if (this.queryable) {
           if (!this.queryLayers || this.queryLayers.length == 0) {
             this.hasError = true;
-            this.errorMessage = "This layer is defined as queryable but no layer to query has been defined.";
+            this.errorMessage = 'This layer is defined as queryable but no layer to query has been defined.';
             this.queryable = false;
           }
           if (!this.urlWfs || this.urlWfs.length == 0) {
             this.hasError = true;
-            this.errorMessage = "This layer is defined as queryable but no Url for Wfs has been defined.";
+            this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
             this.queryable = false;
           }
         }
@@ -76,8 +76,7 @@ class LayerWms extends Layer {
   }
 
   hasRestrictedResolution() {
-    return ((this.minResolution && this.minResolution !== 0) 
-         || (this.maxResolution && this.maxResolution !== 999999999));
+    return (this.minResolution && this.minResolution !== 0) || (this.maxResolution && this.maxResolution !== 999999999);
   }
 
   get hasFilter() {

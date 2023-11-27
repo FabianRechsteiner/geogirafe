@@ -9,7 +9,9 @@
     <div class="custom-select">
       <select id="attribute" name="attribute" onchange="${() => this.attributeChanged()}">
         <option value="" disabled selected>Select attribute...</option>
-        ${this.layerAttributes.map(attr => uHtml.for(attr)`<option i18n="${attr.name}" value="${attr.name}">${attr.name}</option>`)}
+        ${this.layerAttributes.map(attr => uHtml.for(attr)`
+        <option i18n="${attr.name}" value="${attr.name}">${attr.name}</option>
+        `)}
       </select>
     </div>
 
@@ -38,7 +40,5 @@
     <button tip="Remove filter" onclick="${() => this.removeFilter()}">
       <i class="fa-sm fa-solid fa-trash"></i>
     </button>
-
   </div>
-
 </div>

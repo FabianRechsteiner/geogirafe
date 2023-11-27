@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MenuButtonComponent from '../menubutton/component';
 
 class GlobeComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -31,7 +30,5 @@ class GlobeComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-globe-select', GlobeComponent);
 
 export default GlobeComponent;

@@ -1,19 +1,19 @@
+/* eslint @typescript-eslint/no-explicit-any: 1 */
+// TODO REG : Deactivate this exception in eslint when this type-error will be solved
+
 import GirafeSingleton from '../../base/GirafeSingleton';
 import State from './state.js';
 import ConfigManager from '../configmanager';
 import onChange from 'on-change';
 
 class StateManager extends GirafeSingleton {
-
   #girafeState: State | null = null;
   #stateProxy: State;
   get state() {
     return this.#stateProxy;
   }
 
-  // TODO: If Map() needs to be used, it needs some change in the code.
-  // with set and get.
-  #callbacks: { [key: string]: Function[] } = {};
+  #callbacks: Record<string, ((oldValue: any, value: any, parent: any) => void | Promise<void>)[]> = {};
 
   configManager: ConfigManager | null = null;
 
@@ -25,10 +25,7 @@ class StateManager extends GirafeSingleton {
     this.#girafeState = new State();
     this.#stateProxy = onChange(this.#girafeState, (path, value, oldValue, _applyData) => {
       if (!this.areEqual(oldValue, value)) {
-        if (path !== 'mouseCoordinates') {
-          // TODO REG: This test is not very beautiful, but mouseCoordinates generate far too many logs.
-          console.log(`${path} has changed.`);
-        }
+        console.debug(`${path} has changed.`);
         this.onChange(path, oldValue, value);
       }
     });
@@ -49,7 +46,7 @@ class StateManager extends GirafeSingleton {
     });
   }
 
-  onChange(property: string, oldValue: any, value: any) {
+  onChange(property: string, oldValue: unknown, value: unknown) {
     const path = property.trim();
     for (const key in this.#callbacks) {
       const regex = new RegExp('^' + key + '$');
@@ -69,25 +66,26 @@ class StateManager extends GirafeSingleton {
     }
   }
 
-  subscribe(path: string, callback: Function) {
+  subscribe(path: string, callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>) {
     if (!(path in this.#callbacks)) {
       this.#callbacks[path] = [];
     }
     this.#callbacks[path].push(callback);
-    console.log(`Subscribing to ${path}. ${this.#callbacks[path].length} are currently subscribing ${path}.`);
+    console.debug(`Subscribing to ${path}. ${this.#callbacks[path].length} are currently subscribing ${path}.`);
 
     // At the application start, perhaps the value in state was initialized before the subscribe method was called
     // Therefore, if the subscribed value os not null, undefined or an empty object or array
     // We immediately call the callback.
     const obj = this.getPropertyByPath(this.state, path);
     if (obj.found) {
-      if (obj.object === null ||
+      if (
+        obj.object === null ||
         obj.object === undefined ||
         (Array.isArray(obj.object) && obj.object.length === 0) ||
-        (obj.object instanceof Object && Object.keys(obj.object).length === 0)) {
+        (obj.object instanceof Object && Object.keys(obj.object).length === 0)
+      ) {
         // Empty object => nothing to do
-      }
-      else {
+      } else {
         // Object is not null during the subscribe. => we call the callback
         const parentPath = path.substring(0, path.lastIndexOf('.'));
         const parentObject = this.getPropertyByPath(this.state, parentPath);
@@ -96,21 +94,21 @@ class StateManager extends GirafeSingleton {
     }
   }
 
-  unsubscribe(callback: Function) {
+  unsubscribe(callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>) {
     for (const path in this.#callbacks) {
       const callbacks = this.#callbacks[path];
       const index = callbacks.indexOf(callback);
       if (index !== -1) {
         callbacks.splice(index, 1);
-        console.log(`Unsubscribing to ${path}. ${this.#callbacks[path].length} subscribtions remaining.`);
+        console.debug(`Unsubscribing to ${path}. ${this.#callbacks[path].length} subscribtions remaining.`);
       }
     }
   }
 
-  getPropertyByPath(obj: any, path: any) {
+  getPropertyByPath(obj: any, path: string) {
     let currentObj = obj;
     if (path.trim() !== '') {
-      const keys = path.split(".");
+      const keys = path.split('.');
 
       for (const key of keys) {
         if (key in currentObj) {
@@ -125,8 +123,7 @@ class StateManager extends GirafeSingleton {
   }
 
   areEqual(obj1: any, obj2: any) {
-
-    if (typeof (obj1) === 'number' && typeof (obj2) === 'number') {
+    if (typeof obj1 === 'number' && typeof obj2 === 'number') {
       // Special case for numbers : check NaN
       if (Number.isNaN(obj1) && Number.isNaN(obj2)) {
         return true;
@@ -134,7 +131,14 @@ class StateManager extends GirafeSingleton {
       return obj1 === obj2;
     }
 
-    if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null || obj1 === undefined || obj2 === undefined) {
+    if (
+      typeof obj1 !== 'object' ||
+      typeof obj2 !== 'object' ||
+      obj1 === null ||
+      obj2 === null ||
+      obj1 === undefined ||
+      obj2 === undefined
+    ) {
       // Compare simple values
       return obj1 === obj2;
     }

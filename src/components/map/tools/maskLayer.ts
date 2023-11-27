@@ -5,7 +5,6 @@ import GeoConsts from '../../../tools/geoconsts';
 import { FrameState } from 'ol/Map';
 
 class MaskLayer extends Layer {
-
   private size: [number, number] | null = null;
   private scale: number | null = null;
   private context: CanvasRenderingContext2D;
@@ -31,12 +30,12 @@ class MaskLayer extends Layer {
     return 0;
   }
 
-  render(frameState:FrameState) {
+  render(frameState: FrameState) {
     if (this.size === null) {
-      throw Error('Cannot render Mask : size has not been set.')
+      throw Error('Cannot render Mask : size has not been set.');
     }
     if (this.scale === null) {
-      throw Error('Cannot render Mask : scale has not been set.')
+      throw Error('Cannot render Mask : scale has not been set.');
     }
 
     const cwidth = frameState.size[0];
@@ -58,8 +57,10 @@ class MaskLayer extends Layer {
     const width = this.size[0];
     const resolution = frameState.viewState.resolution;
 
-    const extentHalfWidth = ((width / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * this.scale) / resolution / 2;
-    const extentHalfHeight = ((height / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * this.scale) / resolution / 2;
+    const extentHalfWidth =
+      ((width / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * this.scale) / resolution / 2;
+    const extentHalfHeight =
+      ((height / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * this.scale) / resolution / 2;
 
     const rotation = this.getRotation !== undefined ? toRadians(this.getRotation()) : 0;
 

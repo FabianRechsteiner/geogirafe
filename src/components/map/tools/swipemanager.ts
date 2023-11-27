@@ -1,5 +1,5 @@
 import { Map } from 'ol';
-import {getRenderPixel} from 'ol/render';
+import { getRenderPixel } from 'ol/render';
 import WmtsManager from './wmtsmanager';
 import WmsManager from './wmsmanager';
 import { Layer as OLayer } from 'ol/layer';
@@ -13,11 +13,14 @@ import LayerWms from '../../../models/layers/layerwms';
 class SwipeManager {
   map: Map;
   swiper: HTMLInputElement;
-  swiperEventListeners: Record<string, {
-    olayer: OLayer,
-    prerender: Listener,
-    postrender: Listener
-  }> = {};
+  swiperEventListeners: Record<
+    string,
+    {
+      olayer: OLayer;
+      prerender: Listener;
+      postrender: Listener;
+    }
+  > = {};
 
   swiperMaxVal: number;
 
@@ -27,7 +30,7 @@ class SwipeManager {
   constructor(map: Map, swiper: HTMLInputElement, wmtsManager: WmtsManager, wmsManager: WmsManager) {
     this.map = map;
     this.swiper = swiper;
-    
+
     const maxVal = swiper.getAttribute('max');
     if (!maxVal) {
       throw new Error('The Attribute <max> on the swiper is not defined !');
@@ -41,8 +44,7 @@ class SwipeManager {
     if (this.wmtsManager.layerExists(layer)) {
       const olayer = this.wmtsManager.getLayer(layer)!;
       this.#activateSwipeForLayer(layer.layers!, olayer, side);
-    }
-    else {
+    } else {
       throw new Error('Cannot swipe this layer: it does not exist.');
     }
   }
@@ -52,13 +54,12 @@ class SwipeManager {
       this.wmsManager.makeLayerIndependent(layer);
       const olayer = this.wmsManager.getOLayer(layer) as OLayer;
       this.#activateSwipeForLayer(layer.name, olayer, side);
-    }
-    else {
+    } else {
       // Nothing to do
       throw new Error('Layer does not exists. Cannot activate swiper.');
     }
   }
-  
+
   #setSwiperVisible() {
     this.swiper.style.display = 'block';
   }
@@ -66,7 +67,7 @@ class SwipeManager {
   #hideSwiper() {
     this.swiper.style.display = 'none';
   }
-  
+
   /*deactivateSwipeForWms(layerInfos) {
     if (layerInfos.name in this.swipedLayers) {
       // Back to normal
@@ -84,14 +85,14 @@ class SwipeManager {
     // First, remove the old event listener
     if (layername in this.swiperEventListeners) {
       const eventListeners = this.swiperEventListeners[layername];
-      olayer.removeEventListener('prerender', eventListeners.prerender)
-      olayer.removeEventListener('postrender', eventListeners.postrender)
+      olayer.removeEventListener('prerender', eventListeners.prerender);
+      olayer.removeEventListener('postrender', eventListeners.postrender);
       delete this.swiperEventListeners[layername];
     }
 
     // Then add the new listener
-    const prerenderHandler = (e: BaseEvent|Event) => this.#prerenderSwipe(e as RenderEvent, side);
-    const postrenderHandler = (e: BaseEvent|Event) => this.#postrenderSwipe(e as RenderEvent);
+    const prerenderHandler = (e: BaseEvent | Event) => this.#prerenderSwipe(e as RenderEvent, side);
+    const postrenderHandler = (e: BaseEvent | Event) => this.#postrenderSwipe(e as RenderEvent);
     this.swiperEventListeners[layername] = {
       olayer: olayer,
       prerender: prerenderHandler,
@@ -135,18 +136,16 @@ class SwipeManager {
       tr = getRenderPixel(event, [mapSize[0], 0]);
       bl = getRenderPixel(event, [width, mapSize[1]]);
       br = getRenderPixel(event, mapSize);
-    }
-    else if (side === 'left') {
+    } else if (side === 'left') {
       // Coordinates for rendering to the left
       tl = getRenderPixel(event, [0, 0]);
       tr = getRenderPixel(event, [width, 0]);
       bl = getRenderPixel(event, [0, mapSize[1]]);
       br = getRenderPixel(event, [width, mapSize[1]]);
-    }
-    else {
+    } else {
       throw new Error('Invalid value for parameter side');
     }
-  
+
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(tl[0], tl[1]);

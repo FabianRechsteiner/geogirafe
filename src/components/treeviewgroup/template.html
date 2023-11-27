@@ -3,46 +3,58 @@
 <link rel="stylesheet" href="lib/tippy.js/tippy.min.css" />
 
 <div class="group">
-  
   <!-- Caret -->
   <div class="${(this.group.isExpanded ? 'expand hidden' : 'expand')}" onclick="${() => this.group.isExpanded = true}">
     <i class="fa fa-caret-right selectable expand"></i>
   </div>
-  <div class="${(this.group.isExpanded ? 'collapse' : 'collapse hidden')}" onclick="${() => this.group.isExpanded = false}">
+  <div
+    class="${(this.group.isExpanded ? 'collapse' : 'collapse hidden')}"
+    onclick="${() => this.group.isExpanded = false}">
     <i class="fa fa-caret-down selectable expand"></i>
   </div>
 
   <!-- Bullet or Checkbox -->
-  <div class="${this.group.activeState === 'off' ? 'circle-off selectable' : 'circle-off hidden'}"
-       onclick="${() => this.toggle()}">
-    <i class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-regular fa-square selbox' : 'fa-xs fa-regular fa-circle selcircle'}"></i>
+  <div
+    class="${this.group.activeState === 'off' ? 'circle-off selectable' : 'circle-off hidden'}"
+    onclick="${() => this.toggle()}">
+    <i
+      class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-regular fa-square selbox' : 'fa-xs fa-regular fa-circle selcircle'}"></i>
   </div>
-  <div class="${this.group.activeState === 'on' ? 'circle-on selected' : 'circle-on hidden'}" 
-       onclick="${() => this.toggle()}">
-    <i class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-solid fa-square-check selbox' : 'fa-xs fa-solid fa-circle selcircle'}"></i>
+  <div
+    class="${this.group.activeState === 'on' ? 'circle-on selected' : 'circle-on hidden'}"
+    onclick="${() => this.toggle()}">
+    <i
+      class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-solid fa-square-check selbox' : 'fa-xs fa-solid fa-circle selcircle'}"></i>
   </div>
-  <div class="${this.group.activeState === 'semi' ? 'circle-semi selected' : 'circle-semi hidden'}" 
-       onclick="${() => this.toggle('on')}">
-    <i class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-regular fa-square-check selbox' : 'fa-xs fa-solid fa-circle-half-stroke selcircle'}"></i>
+  <div
+    class="${this.group.activeState === 'semi' ? 'circle-semi selected' : 'circle-semi hidden'}"
+    onclick="${() => this.toggle('on')}">
+    <i
+      class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-regular fa-square-check selbox' : 'fa-xs fa-solid fa-circle-half-stroke selcircle'}"></i>
   </div>
 
   <!-- Error icon -->
-  <i class="${this.group.hasError ? 'fa-solid fa-circle-exclamation tool error' : 'error hidden'}"
-     tip="${this.group.errorMessage}"></i>
+  <i
+    class="${this.group.hasError ? 'fa-solid fa-circle-exclamation tool error' : 'error hidden'}"
+    tip="${this.group.errorMessage}"></i>
 
   <!-- Label -->
-  <span i18n="${this.group.name}" 
-        class="${this.group.activeState === 'on' || this.group.activeState === 'semi' ? 'text selected' : 'text selectable'}" 
-        onclick="${() => this.toggle()}">${this.group.name}</span>
+  <span
+    i18n="${this.group.name}"
+    class="${this.group.activeState === 'on' || this.group.activeState === 'semi' ? 'text selected' : 'text selectable'}"
+    onclick="${() => this.toggle()}"
+    >${this.group.name}</span
+  >
 
-  <i class="fa fa-solid fa-xmark tool delete selectable"  tip="Remove this group" onclick="${() => this.deleteGroup()}"></i>
+  <i
+    class="fa fa-solid fa-xmark tool delete selectable"
+    tip="Remove this group"
+    onclick="${() => this.deleteGroup()}"></i>
 
   <!-- Sub layers -->
   <div class="${(this.group.isExpanded ? 'sublayers' : 'sublayers hidden')}">
-      ${(this.group.children ?? []).map(layer => 
-      (layer instanceof GroupLayer) ? uHtml`<girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>`
-                                    : uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>`
-      )}
+    ${(this.group.children ?? []).map(layer => (layer instanceof GroupLayer) ? uHtml`<girafe-tree-view-group
+      groupid="${layer.treeItemId}"></girafe-tree-view-group
+    >` : uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>` )}
   </div>
-
 </div>

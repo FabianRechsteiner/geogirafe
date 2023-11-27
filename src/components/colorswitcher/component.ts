@@ -1,20 +1,19 @@
-import GirafeHTMLElement from "../../base/GirafeHTMLElement.ts";
-import Statemanager from "../../tools/state/statemanager.ts";
+import GirafeHTMLElement from '../../base/GirafeHTMLElement.ts';
+import Statemanager from '../../tools/state/statemanager.ts';
 
 // https://css-tricks.com/a-complete-guide-to-dark-mode-on-the-web/
 
 enum Toggle {
   toggle = 'toggle',
-  replace = 'replace',
+  replace = 'replace'
 }
 
 enum Mode {
   light = 'light',
-  dark = 'dark',
+  dark = 'dark'
 }
 
-class ColorSwitcher extends GirafeHTMLElement {
-
+class ColorSwitcherComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -23,8 +22,7 @@ class ColorSwitcher extends GirafeHTMLElement {
   header!: HTMLElement;
 
   // Select the theme preference from localStorage
-  currentTheme: String | null = localStorage.getItem("theme");
-
+  currentTheme: string | null = localStorage.getItem('theme');
 
   constructor() {
     super('colorswitcher');
@@ -34,7 +32,6 @@ class ColorSwitcher extends GirafeHTMLElement {
     super.render();
     this.colorswitcherContainer = this.shadow.querySelector('#colorswitcherContainer') as HTMLElement;
     this.colorswitchSwitcher = this.shadow.querySelector('#colorswitchSwitcher') as HTMLElement;
-
   }
 
   getHeader() {
@@ -58,30 +55,27 @@ class ColorSwitcher extends GirafeHTMLElement {
     clrSchema = !clrSchema;
     Statemanager.getInstance().state.interface.darkFrontendMode = clrSchema;
 
+    let theme = 'light';
 
-    let theme = "light";
-
-    if (!clrSchema) {
-    } else {
-      theme = "dark";
+    if (clrSchema) {
+      theme = 'dark';
     }
     this.toggleClassList(clrSchema);
-    localStorage.setItem("theme", theme);
+    localStorage.setItem('theme', theme);
   }
 
   initValue() {
-
     // In case the user has changed it already it's saved to local storage, let's reflect that in the UI
-    if (this.currentTheme != undefined && this.currentTheme === "dark") {
+    if (this.currentTheme != undefined && this.currentTheme === 'dark') {
       this.activateThemeMode(Mode.dark, Toggle.toggle);
       return;
-    } else if (this.currentTheme != undefined && this.currentTheme === "light") {
+    } else if (this.currentTheme != undefined && this.currentTheme === 'light') {
       this.activateThemeMode(Mode.light, Toggle.toggle);
-      return
+      return;
     }
 
     // If they haven't been explicit, let's check the media query
-    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
     if (prefersDarkScheme.matches) {
       this.activateThemeMode(Mode.dark, Toggle.toggle);
     } else {
@@ -93,7 +87,6 @@ class ColorSwitcher extends GirafeHTMLElement {
     // ...apply the .dark-theme class to override the default light styles
 
     if (toggle === Toggle.toggle) {
-
       document.body.classList.toggle(`${mode}-theme`);
     } else {
       const otherMode = mode === Mode.dark ? Mode.light : Mode.dark;
@@ -102,12 +95,11 @@ class ColorSwitcher extends GirafeHTMLElement {
     Statemanager.getInstance().state.interface.darkFrontendMode = mode === Mode.dark ? true : false;
 
     if (mode === Mode.dark) {
-      (<HTMLImageElement>document.body.querySelector("#logo"))!.src = 'images/logo_black_small.webp';
+      (<HTMLImageElement>document.body.querySelector('#logo'))!.src = 'images/logo_black_small.webp';
     } else {
-      (<HTMLImageElement>document.body.querySelector("#logo"))!.src = 'images/logo_small.webp';
+      (<HTMLImageElement>document.body.querySelector('#logo'))!.src = 'images/logo_small.webp';
     }
-  } 
-
+  }
 
   connectedCallback() {
     this.loadConfig().then(() => {
@@ -121,7 +113,4 @@ class ColorSwitcher extends GirafeHTMLElement {
   }
 }
 
-customElements.define('girafe-colorswitcher', ColorSwitcher as any);
-
-
-export default ColorSwitcher;
+export default ColorSwitcherComponent;

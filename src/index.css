@@ -2,28 +2,28 @@
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 body {
-  --bx-shdw: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, .16);
+  --bx-shdw: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.16);
   --t-bkg: #ffffffbb;
   --text-color: #222;
   --text-color-grad1: #444;
   --text-color-grad2: #666;
-  --bkg-color: rgb(255,255,255);
+  --bkg-color: rgb(255, 255, 255);
   --bkg-color-grad1: #ddd;
   --bkg-color-grad2: #bbb;
-  --lnk: #0000FF;
+  --lnk: #0000ff;
   --lnk-visited: #800080;
   --lnk-hover: #0099ff;
-  --lnk-active: #FF0000;
-  --tst: #FF0000;
+  --lnk-active: #ff0000;
+  --tst: #ff0000;
 }
 
 /* Dark theme colors */
 body.dark-theme {
-  --bx-shdw: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 2px 4px 0 rgba(255, 255, 255, .16);
+  --bx-shdw: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 2px 4px 0 rgba(255, 255, 255, 0.16);
   --t-bkg: #000000bb;
   --text-color: #eee;
   --text-color-grad1: #ccc;
@@ -39,10 +39,9 @@ body.dark-theme {
 
 /* Styles for users who prefer dark mode at the OS level */
 @media (prefers-color-scheme: dark) {
-
   /* defaults to dark theme */
   body {
-    --bx-shdw: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 2px 4px 0 rgba(255, 255, 255, .16);
+    --bx-shdw: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 2px 4px 0 rgba(255, 255, 255, 0.16);
     --t-bkg: #000000bb;
     --text-color: #eee;
     --text-color-grad1: #ccc;
@@ -58,21 +57,20 @@ body.dark-theme {
 
   /* Override dark mode with light mode styles if the user decides to swap */
   body.light-theme {
-    --bx-shdw: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, .16);
+    --bx-shdw: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.16);
     --t-bkg: #ffffffbb;
     --text-color: #222;
     --text-color-grad1: #444;
     --text-color-grad2: #666;
-    --bkg-color: rgb(255,255,255);
+    --bkg-color: rgb(255, 255, 255);
     --bkg-color-grad1: #ddd;
     --bkg-color-grad2: #bbb;
-    --lnk: #0000FF;
+    --lnk: #0000ff;
     --lnk-visited: #800080;
     --lnk-hover: #0099ff;
-    --lnk-active: #FF0000;
+    --lnk-active: #ff0000;
   }
 }
-
 
 body a:link {
   color: var(--lnk);
@@ -103,7 +101,9 @@ header {
   height: 4.5rem;
   z-index: 100;
   justify-content: space-between;
-  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.3),
+    0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
 girafe-theme-select {
@@ -178,7 +178,7 @@ girafe-map {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0
+  bottom: 0;
 }
 
 girafe-tree-view {
@@ -187,7 +187,9 @@ girafe-tree-view {
   z-index: 90;
   background: var(--bkg-color);
   overflow: auto;
-  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.3),
+    0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
 footer {
@@ -216,7 +218,9 @@ girafe-print {
   background: var(--bkg-color);
   overflow: visible;
   display: none;
-  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.3),
+    0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
 girafe-selection-window {

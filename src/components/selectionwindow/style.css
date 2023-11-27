@@ -1,68 +1,70 @@
 #draggable {
-    border: solid 1px #666;
-    border-radius: 3px;
-    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
-    background: var(--bkg-color);
+  border: solid 1px #666;
+  border-radius: 3px;
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.3),
+    0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  background: var(--bkg-color);
 }
 
 #header {
-    padding: 0.5rem;
-    cursor: move;
-    z-index: 10;
-    background-color: #666;
-    color: var(--text-color);
-    text-align: center;
+  padding: 0.5rem;
+  cursor: move;
+  z-index: 10;
+  background-color: #666;
+  color: var(--text-color);
+  text-align: center;
 }
 
 #content {
-    padding: 1rem 2rem;
-    width: 26rem;
-    height: 12rem;
-    overflow-y : auto;
-    scrollbar-width: thin;
+  padding: 1rem 2rem;
+  width: 26rem;
+  height: 12rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 table {
-    border-collapse: collapse;
-    width: 100%;
+  border-collapse: collapse;
+  width: 100%;
 }
 
 td.label {
-    text-align: right;
-    padding-right: 1rem;
-    color: #666;
-    width: 8rem;
-    vertical-align: top
+  text-align: right;
+  padding-right: 1rem;
+  color: #666;
+  width: 8rem;
+  vertical-align: top;
 }
 
 td.label:after {
-    content: ' :';
+  content: ' :';
 }
 
 #footer {
-    color: #aaa;
-    height: 2rem;
-    border-top: solid 1px #999;
+  color: #aaa;
+  height: 2rem;
+  border-top: solid 1px #999;
 }
 
 #previous {
-    padding: 0.5rem;
-    cursor: pointer;
-    position: absolute;
-    left: 0;
-    bottom: 0;
+  padding: 0.5rem;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  bottom: 0;
 }
 
-#next  {
-    padding: 0.5rem;
-    cursor: pointer;
-    position: absolute;
-    right: 0;
-    bottom: 0;
+#next {
+  padding: 0.5rem;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
 #counter {
-    line-height: 2rem;
-    text-align: center;
-    margin-top : 0;
+  line-height: 2rem;
+  text-align: center;
+  margin-top: 0;
 }

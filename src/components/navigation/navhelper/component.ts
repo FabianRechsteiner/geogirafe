@@ -1,15 +1,16 @@
-import tippy from "tippy.js";
+import tippy from 'tippy.js';
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import MapPosition from '../../../tools/state/mapposition';
-import NavBookmarksComponent from "../navbookmarks/component";
-import { Bookmark } from "../Bookmark";
+import NavBookmarksComponent from '../navbookmarks/component';
+import { Bookmark } from '../Bookmark';
+
+type TippyType = typeof tippy;
 
 class NavHelperComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  #tooltip: any;
+  #tooltip: TippyType;
   #positionHistory: MapPosition[] = [];
   #currentPositionIndex: number = -1;
 
@@ -39,7 +40,7 @@ class NavHelperComponent extends GirafeHTMLElement {
       theme: 'light',
       placement: 'bottom',
       appendTo: document.body,
-      content: (_reference: any) => {
+      content: (_reference: object) => {
         const bookmarkbox = new NavBookmarksComponent(this);
         return bookmarkbox;
       }
@@ -63,7 +64,9 @@ class NavHelperComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) => this.onPositionChanged(newPosition));
+    this.stateManager.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
+      this.onPositionChanged(newPosition)
+    );
   }
 
   onPositionChanged(position: MapPosition) {
@@ -73,7 +76,6 @@ class NavHelperComponent extends GirafeHTMLElement {
         return;
       }
 
-      console.log(position);
       if (this.#currentPositionIndex !== this.#positionHistory.length - 1) {
         // Remove history from this index to create a new one
         this.#positionHistory.splice(this.#currentPositionIndex + 1);
@@ -121,7 +123,5 @@ class NavHelperComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-nav-history', NavHelperComponent);
 
 export default NavHelperComponent;

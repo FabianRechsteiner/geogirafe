@@ -30,7 +30,6 @@ npm-audit:
   allow_failure: true
 
   script:
-    # build
     - npm i
     - npm audit --omit=dev --audit-level high
     - npm audit signatures
@@ -43,9 +42,19 @@ npm-outdated:
   allow_failure: true
 
   script:
-    # build
     - npm i
     - npm outdated
+
+#################################
+# ESLint
+eslint:
+  stage: test
+  image: node:18-slim
+  allow_failure: true
+
+  script:
+    - npm i
+    - npm run lint
 
 #################################
 # Quality, readability, reliability and security checks with Sonarcloud

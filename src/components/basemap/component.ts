@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Basemap from '../../models/basemap';
 
 class BasemapComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -23,7 +22,7 @@ class BasemapComponent extends GirafeHTMLElement {
     super.render();
   }
 
-  onBasemapsLoaded(basemaps: {[key: number]: Basemap}) {
+  onBasemapsLoaded(basemaps: { [key: number]: Basemap }) {
     super.render();
 
     // Configure default basemap
@@ -44,24 +43,20 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('basemaps', (_oldBasemaps: {[key: number]: Basemap}, newBasemaps: {[key: number]: Basemap}) => this.onBasemapsLoaded(newBasemaps));
-    this.stateManager.subscribe('olMap', (_oldMap: Basemap, newMap: Basemap) => this.testBasemap(newMap));
-  }
-
-  testBasemap(map: Basemap) {
-    console.log('test basemap', map);
+    this.stateManager.subscribe(
+      'basemaps',
+      (_oldBasemaps: { [key: number]: Basemap }, newBasemaps: { [key: number]: Basemap }) =>
+        this.onBasemapsLoaded(newBasemaps)
+    );
   }
 
   connectedCallback() {
-    this.loadConfig()
-      .then(() => {
-        this.render();
-        super.girafeTranslate();
-        this.registerEvents();
+    this.loadConfig().then(() => {
+      this.render();
+      super.girafeTranslate();
+      this.registerEvents();
     });
   }
 }
-
-customElements.define('girafe-basemap', BasemapComponent);
 
 export default BasemapComponent;

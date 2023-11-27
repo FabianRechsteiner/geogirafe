@@ -1,9 +1,8 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
-import { Bookmark } from "../Bookmark";
-import NavHelperComponent from "../navhelper/component";
+import { Bookmark } from '../Bookmark';
+import NavHelperComponent from '../navhelper/component';
 
 class NavBookmarksComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -41,7 +40,5 @@ class NavBookmarksComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-nav-bookmarks', NavBookmarksComponent);
 
 export default NavBookmarksComponent;

@@ -3,47 +3,68 @@
  */
 
 export interface GMFOGCServer {
-    url: string;
-    wfsUrl?: string;
-    wfsSupport?: boolean;
-    imageType: "image/png" | "image/jpeg";
-    isSingleTile?: boolean;
-    serverType: "mapserver" | "geoserver" | "qgisserver";
+  url: string;
+  wfsUrl?: string;
+  wfsSupport?: boolean;
+  imageType: 'image/png' | 'image/jpeg';
+  isSingleTile?: boolean;
+  serverType: 'mapserver' | 'geoserver' | 'qgisserver';
+}
+
+export interface GMFMetadata {
+  legend?: string;
+  iconUrl?: string;
+  legendRule?: string;
+  legendImage?: string;
+  isLegendExpanded: boolean;
+  wasLegendExpanded: boolean;
+  exclusiveGroup: boolean;
+  isExpanded: boolean;
+  isChecked: boolean;
+}
+
+export interface GMFChildLayer {
+  name: string;
+  queryable: boolean;
 }
 
 export interface GMFTreeItem {
-    id: number;
-    name: string;
-    ogcServer?: string;
-    children?: GMFTreeItem[];
-    type?: string;
-    url?: string;
+  id: number;
+  name: string;
+  ogcServer?: string;
+  children?: GMFTreeItem[];
+  type?: string;
+  url?: string;
+  style?: string;
+  source?: string;
+  projection?: string;
+  imageType?: string;
+  minResolutionHint?: number;
+  maxResolutionHint?: number;
+  metadata: GMFMetadata;
+  layers?: string;
+  childLayers?: GMFChildLayer[];
+  layer?: string;
+  dimensions?: Record<string, object>;
 }
 
 export interface GMFTheme {
-    id: number;
-    name: string;
-    icon: string;
-    // TODO: make a type for this if necessary
-    functionalities: {
-        [key: string]: string
-    };
-    // TODO: make a type for this if necessary
-    metadata: {
-        [key: string]: string
-    };
-    children: GMFTreeItem[];
+  id: number;
+  name: string;
+  icon: string;
+  // TODO: make a type for this if necessary
+  functionalities: {
+    [key: string]: string;
+  };
+  metadata: GMFMetadata;
+  children: GMFTreeItem[];
 }
 
 export interface GMFGroup extends GMFTreeItem {
-    children: GMFTreeItem[];
+  children: GMFTreeItem[];
 }
 
 export interface GMFBackgroundLayer extends GMFTreeItem {
-    // TODO: make a type for this if necessary
-    metadata: {
-        [key: string]: string
-    };
-    children?: Array<GMFTreeItem>;
-    mixed?: boolean;
+  children?: Array<GMFTreeItem>;
+  mixed?: boolean;
 }

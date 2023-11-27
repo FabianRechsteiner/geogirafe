@@ -5,7 +5,7 @@ import StateManager from './state/statemanager';
 import GirafeSingleton from '../base/GirafeSingleton';
 
 class UrlManager extends GirafeSingleton {
-/*
+  /*
   static #instance = null;
   static #initializingSingleton = false;
 

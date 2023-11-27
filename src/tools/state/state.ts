@@ -8,60 +8,65 @@ import LayerWms from '../../models/layers/layerwms';
 import MapPosition from './mapposition';
 
 type GraphicalInterface = {
-  helpVisible: boolean,
-  redliningPanelVisible: boolean,
-  printPanelVisible: boolean,
-  selectionGridVisible: boolean,
-  aboutVisible: boolean,
-  darkMode: boolean,
-  darkFrontendMode: boolean
-}
+  helpVisible: boolean;
+  redliningPanelVisible: boolean;
+  printPanelVisible: boolean;
+  selectionGridVisible: boolean;
+  aboutVisible: boolean;
+  darkMode: boolean;
+  darkFrontendMode: boolean;
+};
 
 export type SelectionParam = {
-  layers: LayerWms[],
-  selectionBox: number[],
-  srid: string
-}
+  layers: LayerWms[];
+  selectionBox: number[];
+  srid: string;
+};
 
 type Selection = {
   selectionParameters: SelectionParam[];
   selectedFeatures: Feature[];
   focusedFeature: Feature | null;
-}
+};
 
 type LayersConfig = {
   layersList: BaseLayer[];
   swipedLayers: {
     left: Layer[];
     right: Layer[];
-  }
-}
+  };
+};
 
 type RedliningConfig = {
   activeTool: boolean | null;
-  features: Object[];
-}
+  features: object[];
+};
 
 type TreeviewConfig = {
   advanced: boolean;
-}
+};
 
 // Current Print state
 type PrintConfig = {
   format: [number, number] | null;
   scale: number | null;
-}
+};
 
+type ServerOgc = {
+  url: string;
+  wfsSupport: boolean;
+  urlWfs: string;
+};
 
 // Current 3D-Globe state
 type GlobeConfig = {
   display: 'none' | 'full' | 'side';
-}
+};
 
 class State {
   /**
    * This class is a used as the state of the application, which will be accessed behind a javascript proxy.
-   * This means that each modification made to its properties must come from outside, 
+   * This means that each modification made to its properties must come from outside,
    * because they have to be made through the proxy, so that the modification can be listen.
    * Therefore, this class must not contain any method which is updating a value directly
    * For example, any method doing <this.xxx = value> is forbidden here, because the modification be known from the proxy
@@ -69,25 +74,15 @@ class State {
 
   // All themes from themes.json
   // Dictionary where the key is the id of the theme
-  themes: {
-    [key: number]: Theme
-  } = {};
+  themes: Record<number, Theme> = {};
 
   // All basemaps from themes.json
   // Dictionary where the key is the id of the basemap
-  basemaps: {
-    [key: number]: Basemap
-  } = {};
+  basemaps: Record<number, Basemap> = {};
 
   // All OCG Servers from themes.json
   // Dictionary where the key is the name of the server
-  ogcServers: {
-    [key: string]: {
-      url: string;
-      wfsSupport: boolean;
-      urlWfs: string;
-    }
-  } = {};
+  ogcServers: Record<string, ServerOgc> = {};
 
   // Current active basemap
   activeBasemap: Basemap | null = null;
@@ -107,7 +102,7 @@ class State {
     aboutVisible: false,
     darkMode: false,
     darkFrontendMode: false
-  }
+  };
 
   // Current language
   language: string | null = null;
@@ -128,30 +123,30 @@ class State {
       left: [],
       right: []
     }
-  }
+  };
 
   // Current redlining state
   redlining: RedliningConfig = {
     activeTool: null,
     features: []
-  }
+  };
 
   // Current Treeview state
   treeview: TreeviewConfig = {
     advanced: false
-  }
+  };
 
   // Current Print state
   print: PrintConfig = {
     format: null,
     scale: null
-  }
+  };
 
   // Current 3D-Globe state
   globe: GlobeConfig = {
     // Possible values : ['full, 'side', 'none']
-    display: 'none',
-  }
+    display: 'none'
+  };
 
   // The openlayer map
   // Keep in mind that you shoudn't use it directly to add layers or drawings,
@@ -166,7 +161,7 @@ class State {
     focusedFeature: null
   };
 
-  theme: Object | null = null;
+  theme: Theme | null = null;
 
   // The State object is defined as <not extensible> by the StateManager.
   // This property can be used by third-parts components or extensions
@@ -175,4 +170,3 @@ class State {
 }
 
 export default State;
-

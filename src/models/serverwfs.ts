@@ -1,10 +1,9 @@
 export type LayerAttribute = {
   name: string;
   type: 'string' | 'integer' | 'double' | 'long' | 'date';
-}
+};
 
 class ServerWfs {
-  
   name: string;
   url: string;
   layers: Record<string, LayerAttribute[]>;
@@ -18,7 +17,6 @@ class ServerWfs {
   }
 
   addLayerAttribute(layer: string, name: string, type: string) {
-
     if (!['string', 'integer', 'double', 'long', 'date'].includes(type)) {
       console.warn(`Unmanaged attribute type: ${type}.`);
       return;
@@ -32,7 +30,7 @@ class ServerWfs {
     this.layers[layer].push({
       name: name,
       type: type as 'string' | 'integer' | 'double' | 'long' | 'date'
-    })
+    });
   }
 }
 

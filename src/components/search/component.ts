@@ -1,11 +1,10 @@
-import {buffer, getWidth, getHeight, Extent} from 'ol/extent';
+import { buffer, getWidth, getHeight, Extent } from 'ol/extent';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events';
 import SearchResult from '../../models/searchresult';
 
 class SearchComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -13,7 +12,7 @@ class SearchComponent extends GirafeHTMLElement {
   #resultsBox?: HTMLElement;
   ignoreBlur = false;
 
-  resultList: any[] = [];
+  resultList: SearchResult[] = [];
 
   searchTermPlaceholder = '###SEARCHTERM###';
   initialSearchBoxHeight = this.convertRemToPixels(2.5);
@@ -88,21 +87,20 @@ class SearchComponent extends GirafeHTMLElement {
 
       const url = this.configManager.Config.search.url.replace(this.searchTermPlaceholder, term);
       fetch(url)
-        .then(response => response.json())
-        .then(data => this.displayResults(data));
+        .then((response) => response.json())
+        .then((data) => this.displayResults(data));
     }
   }
 
-  displayResults(results: { type: string, features: SearchResult[] }) {
+  displayResults(results: { type: string; features: SearchResult[] }) {
     // First, group the results
-    const groupedResults: Record<string, any[]> = {}
-    results.features.forEach(result => {
-      const type = result.properties.layer_name;
+    const groupedResults: Record<string, SearchResult[]> = {};
+    results.features.forEach((result) => {
+      const type = result.properties ? result.properties.layer_name : 'ERROR: Missing type in the search result';
 
       if (type in groupedResults) {
         this.resultList = groupedResults[type];
-      }
-      else {
+      } else {
         this.resultList = [];
         groupedResults[type] = this.resultList;
       }
@@ -113,7 +111,6 @@ class SearchComponent extends GirafeHTMLElement {
     // Then, display the results by group
     this.clearSearch();
     for (const type in groupedResults) {
-
       // Create a title
       const title = document.createElement('div');
       title.className = 'title';
@@ -129,17 +126,22 @@ class SearchComponent extends GirafeHTMLElement {
       this.resultsBox.appendChild(title);
 
       // Create results
-      groupedResults[type].forEach(r => {
+      groupedResults[type].forEach((r: SearchResult) => {
         const result = document.createElement('div');
         result.className = 'result';
-        this.resultList.push(r.bbox);
+        this.resultList.push(r);
         result.dataset.resultId = String(this.resultList.length - 1);
 
-        result.onmousedown = () => { this.ignoreBlur = true };
-        result.onclick = (e) => { this.ignoreBlur = false; this.onSelect(e); };
+        result.onmousedown = () => {
+          this.ignoreBlur = true;
+        };
+        result.onclick = (e) => {
+          this.ignoreBlur = false;
+          this.onSelect(e);
+        };
 
         const text = document.createElement('span');
-        text.innerHTML = r.properties.label;
+        text.innerHTML = r.properties ? r.properties.label : 'ERROR: No property for thie searchresult !';
         result.appendChild(text);
 
         this.resultsBox.appendChild(result);
@@ -151,7 +153,7 @@ class SearchComponent extends GirafeHTMLElement {
 
   getIconClassName(type: string) {
     // TODO: Do not hardcode values here
-    switch(type) {
+    switch (type) {
       case 'Adresse':
         return 'fa-solid fa-location-dot';
       case 'Basel Info (BI)':
@@ -181,17 +183,21 @@ class SearchComponent extends GirafeHTMLElement {
       const div = super.getParentOfType('DIV', target) as HTMLDivElement;
       const resultGeometry = this.resultList[parseInt(div.dataset.resultId!)];
 
-      this.zoomTo(resultGeometry);
+      if (resultGeometry.bbox) {
+        this.zoomTo(resultGeometry.bbox);
+      } else {
+        console.warn('No BBOX found for this search result');
+      }
       this.onFocusOut();
     }
   }
 
   zoomTo(extent: Extent) {
     // We create a buffer around the extent from 50% of the width/height
-    const bufferValue = Math.max(getWidth(extent)*50/100, getHeight(extent)*50/100);
+    const bufferValue = Math.max((getWidth(extent) * 50) / 100, (getHeight(extent) * 50) / 100);
     const bufferedExtent = buffer(extent, bufferValue);
 
-    this.messageManager.sendMessage({action: GeoEvents.zoomToExtent, extent: bufferedExtent});
+    this.messageManager.sendMessage({ action: GeoEvents.zoomToExtent, extent: bufferedExtent });
   }
 
   attributeChangedCallback(_name: string, _oldValue: string, _newValue: string, _namespace: string) {
@@ -202,7 +208,5 @@ class SearchComponent extends GirafeHTMLElement {
     return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
   }
 }
-
-customElements.define('girafe-search', SearchComponent);
 
 export default SearchComponent;

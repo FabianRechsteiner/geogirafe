@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MenuButtonComponent from '../menubutton/component';
 
 class ProjectionComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -25,7 +24,7 @@ class ProjectionComponent extends GirafeHTMLElement {
     this.projections = this.configManager.Config.projections;
     for (const key in this.projections) {
       if (key.startsWith('//')) {
-          delete this.projections[key];
+        delete this.projections[key];
       }
     }
 
@@ -44,7 +43,9 @@ class ProjectionComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('projection', (_oldProjection: string, newProjection: string) => this.onChangeProjection(newProjection));
+    this.stateManager.subscribe('projection', (_oldProjection: string, newProjection: string) =>
+      this.onChangeProjection(newProjection)
+    );
   }
 
   onChangeProjection(projection: string) {
@@ -62,7 +63,5 @@ class ProjectionComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-proj-select', ProjectionComponent);
 
 export default ProjectionComponent;

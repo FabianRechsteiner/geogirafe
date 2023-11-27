@@ -1,6 +1,6 @@
 import View from 'ol/View';
 import { getPointResolution, get as getProjection, transform } from 'ol/proj';
-import ConfigManager from "../../../tools/configmanager";
+import ConfigManager from '../../../tools/configmanager';
 import GeoConsts from '../../../tools/geoconsts';
 import { Map } from 'ol';
 import { Coordinate } from 'ol/coordinate';
@@ -51,17 +51,24 @@ class ViewManager {
 
   scaleToResolution(scale: number) {
     const unit = this.projection.getUnits();
-    const resolution = scale / (GeoConsts.METERS_PER_UNIT as Record<string, number>)[unit] / GeoConsts.INCHES_PER_METER / GeoConsts.SCREEN_DOTS_PER_INCH;
+    const resolution =
+      scale /
+      (GeoConsts.METERS_PER_UNIT as Record<string, number>)[unit] /
+      GeoConsts.INCHES_PER_METER /
+      GeoConsts.SCREEN_DOTS_PER_INCH;
     return resolution;
   }
 
   getScale() {
     const unit = this.projection.getUnits();
     const resolution = this.map.getView().getResolution()!;
-    const scale = resolution * (GeoConsts.METERS_PER_UNIT as Record<string, number>)[unit] * GeoConsts.INCHES_PER_METER * GeoConsts.SCREEN_DOTS_PER_INCH;
+    const scale =
+      resolution *
+      (GeoConsts.METERS_PER_UNIT as Record<string, number>)[unit] *
+      GeoConsts.INCHES_PER_METER *
+      GeoConsts.SCREEN_DOTS_PER_INCH;
     return scale;
   }
-
 
   getView() {
     return new View({
@@ -90,7 +97,8 @@ class ViewManager {
     const newCenter = transform(currentCenter, currentProjection, this.projection);
     const currentMPU = currentProjection.getMetersPerUnit()!;
     const newMPU = this.projection.getMetersPerUnit()!;
-    const currentPointResolution = getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') * currentMPU;
+    const currentPointResolution =
+      getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') * currentMPU;
     const newPointResolution = getPointResolution(this.projection, 1 / newMPU, newCenter, 'm') * newMPU;
     const newResolution = (currentResolution * currentPointResolution) / newPointResolution;
     const newExtentPoint1 = transform([currentExtent[0], currentExtent[1]], currentProjection, this.projection);

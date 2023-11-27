@@ -1,4 +1,4 @@
-import GirafeSingleton from "../base/GirafeSingleton";
+import GirafeSingleton from '../base/GirafeSingleton';
 
 class GirafeConfig {
   general: {
@@ -23,9 +23,9 @@ class GirafeConfig {
     useLegendIcons: boolean;
     hideLegendWhenLayerIsDeactivated: boolean;
     defaultIconSize: {
-      width: number,
-      height: number
-    }
+      width: number;
+      height: number;
+    };
   };
   search: {
     url: string;
@@ -85,7 +85,7 @@ class GirafeConfig {
     this.languages = config.languages;
 
     if (!config.themes || !config.themes.url) {
-      throw new Error(`themes.url is required`)
+      throw new Error(`themes.url is required`);
     }
     this.themes = {
       url: config.themes.url,
@@ -94,14 +94,14 @@ class GirafeConfig {
     };
 
     if (!config.basemaps || !config.basemaps.defaultBasemap) {
-      throw new Error(`basemaps.defaultBasemap is required`)
+      throw new Error(`basemaps.defaultBasemap is required`);
     }
     this.basemaps = {
       show: config.basemaps.show ?? true,
       defaultBasemap: config.basemaps.defaultBasemap,
       OSM: config.basemaps.OSM ?? false,
       SwissTopoVectorTiles: config.basemaps.SwissTopoVectorTiles ?? false
-    }
+    };
 
     this.treeview = {
       useCheckboxes: config.treeview.useCheckboxes ?? false,
@@ -114,7 +114,7 @@ class GirafeConfig {
     };
 
     if (!config.search) {
-      throw new Error(`search is required`)
+      throw new Error(`search is required`);
     }
     this.search = config.search;
 
@@ -126,17 +126,17 @@ class GirafeConfig {
         console.warn('Your print.defaultLayout is not configured, print will not work');
       }
     } catch (e) {
-      console.warn(`print.url and print.defaultLayout are required`)
+      console.warn(`print.url and print.defaultLayout are required`);
     }
     this.print = config.print;
 
     if (!config.selection) {
       config.selection = {
-        defaultFillColor: "#ff66667f",
-        defaultStrokeColor: "#ff3333",
+        defaultFillColor: '#ff66667f',
+        defaultStrokeColor: '#ff3333',
         defaultStrokeWidth: 4,
-        defaultFocusFillColor: "#ff33337f",
-        defaultFocusStrokeColor: "#ff0000",
+        defaultFocusFillColor: '#ff33337f',
+        defaultFocusStrokeColor: '#ff0000',
         defaultFocusStrokeWidth: 4
       };
     }
@@ -144,12 +144,12 @@ class GirafeConfig {
 
     if (!config.redlining) {
       config.redlining = {
-        defaultFillColor: "#6666ff7f",
-        defaultStrokeColor: "#0000ff",
+        defaultFillColor: '#6666ff7f',
+        defaultStrokeColor: '#0000ff',
         defaultStrokeWidth: 2,
         defaultTextSize: 12,
-        defaultFont: "Arial"
-      }
+        defaultFont: 'Arial'
+      };
     }
     this.redlining = config.redlining;
 
@@ -165,7 +165,7 @@ class GirafeConfig {
       throw new Error(`map.scales is required`);
     }
     if (!config.map.startZoom) {
-      config.map.startZoom = "4";
+      config.map.startZoom = '4';
     }
     if (!config.map.maxExtent) {
       throw new Error(`map.maxExtent is required`);
@@ -177,11 +177,9 @@ class GirafeConfig {
 
     this.map3d = config.map3d;
   }
-};
-
+}
 
 class ConfigManager extends GirafeSingleton {
-
   static #config: GirafeConfig;
   static #locked = false;
 
@@ -196,7 +194,7 @@ class ConfigManager extends GirafeSingleton {
       try {
         if (!ConfigManager.#config) {
           // Load configuration
-          console.log('Loading Application Configuration...')
+          console.log('Loading Application Configuration...');
           const response = await fetch('config.json');
           const jsonConfig = await response.json();
           const configInstance = new GirafeConfig(jsonConfig);
@@ -208,12 +206,11 @@ class ConfigManager extends GirafeSingleton {
       } finally {
         ConfigManager.#locked = false;
       }
-    }
-    else {
+    } else {
       await new Promise<void>((resolve) => setTimeout(resolve, 100));
       await this.loadConfig();
     }
   }
 }
 
-export default ConfigManager
+export default ConfigManager;

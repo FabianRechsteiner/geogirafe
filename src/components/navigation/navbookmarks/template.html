@@ -1,7 +1,10 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
 <div class="content">
-  <input id="name" type="text" placeholder="Enter name..."
+  <input
+    id="name"
+    type="text"
+    placeholder="Enter name..."
     onkeypress="${(e) => { if (e.keyCode === 13) this.saveBookmark(); else console.log(e.keyCode);}}" />
 
   <button tip="Add bookmark" onclick="${() => this.saveBookmark()}">

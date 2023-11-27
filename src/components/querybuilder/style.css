@@ -20,7 +20,7 @@ button {
   color: #fff;
   padding: 0;
   cursor: pointer;
-  margin:0;
+  margin: 0;
   display: inline-block;
 }
 
@@ -34,7 +34,8 @@ button:hover {
   position: relative;
 }
 
-input, select {
+input,
+select {
   border: solid 1px #ccc;
   border-radius: 0.25rem;
   background-color: #fff;
@@ -53,7 +54,7 @@ select {
 
 .custom-select::before,
 .custom-select::after {
-  content: "";
+  content: '';
   position: absolute;
   right: 1rem;
   pointer-events: none;

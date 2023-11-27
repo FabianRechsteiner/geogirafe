@@ -1,15 +1,14 @@
 import { WFS } from 'ol/format';
 import GML3 from 'ol/format/GML3';
 
-import GirafeSingleton from "../base/GirafeSingleton";
-import MessageManager from "./messagemanager";
-import StateManager from "./state/statemanager";
+import GirafeSingleton from '../base/GirafeSingleton';
+import MessageManager from './messagemanager';
+import StateManager from './state/statemanager';
 import { SelectionParam } from './state/state';
 import LayerWms from '../models/layers/layerwms';
 import ServerWfs from '../models/serverwfs';
 
 class WfsManager extends GirafeSingleton {
-
   messageManager: MessageManager;
   stateManager: StateManager;
   get state() {
@@ -20,7 +19,7 @@ class WfsManager extends GirafeSingleton {
   maxFeatures: number = 10000;
 
   serversWfs: Record<string, ServerWfs> = {};
-  featureTypeToGeometryColumnName: { [key: string]: string; } = {};
+  featureTypeToGeometryColumnName: { [key: string]: string } = {};
 
   constructor(type: string) {
     super(type);
@@ -28,11 +27,13 @@ class WfsManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
     this.messageManager = MessageManager.getInstance();
 
-    this.stateManager.subscribe('selection.selectionParameters', (_oldParams: SelectionParam[], newParams: SelectionParam[]) => this.onSelectFeatures(newParams));
+    this.stateManager.subscribe(
+      'selection.selectionParameters',
+      (_oldParams: SelectionParam[], newParams: SelectionParam[]) => this.onSelectFeatures(newParams)
+    );
   }
 
   onSelectFeatures(selectionParams: SelectionParam[]) {
-
     this.state.loading = true;
 
     // Reset current selection
@@ -51,10 +52,9 @@ class WfsManager extends GirafeSingleton {
     if (wfsToInitialize.length === 0) {
       // All layers have already been initialized, we can directly do the WFS query
       this.wfsQuery(selectionParams);
-    }
-    else {
+    } else {
       // We first have to load the missing wfs configuration
-      this.#initializeWfs(wfsToInitialize).then(() => { 
+      this.#initializeWfs(wfsToInitialize).then(() => {
         this.wfsQuery(selectionParams);
       });
     }
@@ -74,13 +74,13 @@ class WfsManager extends GirafeSingleton {
       const url = this.getDescribeFeatureTypeUrl(wfsUrl);
       const response = await fetch(url);
       const content = await response.text();
-      const xml = new DOMParser().parseFromString(content, "text/xml");
+      const xml = new DOMParser().parseFromString(content, 'text/xml');
 
       // First find all direct "element" childs
       const elementTypeToName = this.getElementToTypeName(xml);
 
       // Then, find all "complexType" elements
-      const tags = xml.getElementsByTagName("complexType");
+      const tags = xml.getElementsByTagName('complexType');
       for (const tag of tags) {
         const typeName = tag.getAttribute('name');
         if (!typeName) {
@@ -119,20 +119,19 @@ class WfsManager extends GirafeSingleton {
       if (geometryAttributeName) {
         this.featureTypeToGeometryColumnName[featureType] = geometryAttributeName;
         geometryAttributeFound = true;
-      }
-      else {
+      } else {
         throw new Error('Why is geometryAttributeName null here ?');
       }
-    }
-    else {
+    } else {
       // We are not on an geometry attribute, but on a normal attribute
       // We update the WMS Layer with its attributes informations
       const attrName = element.getAttribute('name');
       const attrType = element.getAttribute('type');
       if (!attrName || !attrType) {
-        console.warn(`Error while loading attribute for layer ${featureType}. Querying or filtering this layer won't work correctly.`);
-      }
-      else {
+        console.warn(
+          `Error while loading attribute for layer ${featureType}. Querying or filtering this layer won't work correctly.`
+        );
+      } else {
         serverWfs.addLayerAttribute(featureType, attrName, attrType);
       }
     }
@@ -153,8 +152,7 @@ class WfsManager extends GirafeSingleton {
           }
           elementTypeToName[type] = name;
         }
-      }
-      else {
+      } else {
         console.log('What happend with this element?');
       }
     }
@@ -176,7 +174,6 @@ class WfsManager extends GirafeSingleton {
     const promises = [];
 
     for (const selectionParam of selectionParams) {
-
       // First, keep only queryable layers
       // And verify that all layers have the same WFS URL
       const queryableLayers = this.getQueryableLayers(selectionParam);
@@ -184,10 +181,9 @@ class WfsManager extends GirafeSingleton {
         continue;
       }
       if (!queryableLayers[0].urlWfs) {
-        throw new Error('The queryable Layers must have a WFS Url!')
+        throw new Error('The queryable Layers must have a WFS Url!');
       }
 
-      
       // Get the geometry column name of each layer
       // TODO REG : (not sure) This could probably be simplify by initializing a property in the ServerWfs object
       // containing the name of the geometry column during the WFS initialization.
@@ -205,7 +201,7 @@ class WfsManager extends GirafeSingleton {
           // TODO REG: Do we always want to use the format GML3 here ?
           outputFormat: 'GML3',
           geometryName: columnName,
-          bbox: selectionParam.selectionBox,
+          bbox: selectionParam.selectionBox
           //resultType: 'hits'
           /*filter: andFilter(
             likeFilter('name', 'Mississippi*'),
@@ -213,44 +209,46 @@ class WfsManager extends GirafeSingleton {
           ),*/
         });
 
-        promises.push(fetch(queryableLayers[0].urlWfs, {
-          method: 'POST',
-          body: new XMLSerializer().serializeToString(featureRequest),
-        }));
+        promises.push(
+          fetch(queryableLayers[0].urlWfs, {
+            method: 'POST',
+            body: new XMLSerializer().serializeToString(featureRequest)
+          })
+        );
       }
     }
 
     // Wait the result of all promises to display responses
-    Promise.all(promises)
-      .then(async (responses) => { 
-        const selectedFeatures = [];
-        for (let i=0; i<responses.length; ++i) {
-          const gml = await responses[i].text();
-          // TODO REG: Do we always want to use the format GML3 here ?
-          const features = new GML3().readFeatures(gml);
-          selectedFeatures.push(...features);
-        }
+    Promise.all(promises).then(async (responses) => {
+      const selectedFeatures = [];
+      for (let i = 0; i < responses.length; ++i) {
+        const gml = await responses[i].text();
+        // TODO REG: Do we always want to use the format GML3 here ?
+        const features = new GML3().readFeatures(gml);
+        selectedFeatures.push(...features);
+      }
 
-        if (selectedFeatures.length === 0) {
-          // No feature selected
-          this.state.interface.selectionGridVisible = false;
-        }
-        else {
-          this.state.selection.selectedFeatures = selectedFeatures;
-          this.state.interface.selectionGridVisible = true;
-        }
+      if (selectedFeatures.length === 0) {
+        // No feature selected
+        this.state.interface.selectionGridVisible = false;
+      } else {
+        this.state.selection.selectedFeatures = selectedFeatures;
+        this.state.interface.selectionGridVisible = true;
+      }
 
-        this.state.loading = false;
-      });
+      this.state.loading = false;
+    });
   }
 
   getQueryableLayers(selectionParam: SelectionParam) {
-    const queryableLayers = selectionParam.layers.filter(l => l.queryable);
+    const queryableLayers = selectionParam.layers.filter((l) => l.queryable);
     if (queryableLayers.length > 0) {
       if (!queryableLayers[0].urlWfs) {
-        throw new Error('The queryable Layers must have a WFS Url!')
+        throw new Error('The queryable Layers must have a WFS Url!');
       }
-      const sameUrlForAll = queryableLayers.every((layer: LayerWms) => { return layer.urlWfs === queryableLayers[0].urlWfs; });
+      const sameUrlForAll = queryableLayers.every((layer: LayerWms) => {
+        return layer.urlWfs === queryableLayers[0].urlWfs;
+      });
       if (!sameUrlForAll) {
         throw new Error('Not all layers of this list have the same WFS URL. We cannot do que WFS query.');
       }
@@ -261,7 +259,7 @@ class WfsManager extends GirafeSingleton {
 
   getGeometryColumnNameToFeatureTypes(queryableLayers: LayerWms[]) {
     const geometryColumnNameToFeatureType: Record<string, string[]> = {};
-    const featureTypes = queryableLayers.map(l => l.queryLayers!.split(',')).flat(1);
+    const featureTypes = queryableLayers.map((l) => l.queryLayers!.split(',')).flat(1);
     for (const featureType of featureTypes) {
       const geometryColumnName = this.featureTypeToGeometryColumnName[featureType];
       if (!(geometryColumnName in geometryColumnNameToFeatureType)) {
@@ -274,4 +272,4 @@ class WfsManager extends GirafeSingleton {
   }
 }
 
-export default WfsManager
+export default WfsManager;

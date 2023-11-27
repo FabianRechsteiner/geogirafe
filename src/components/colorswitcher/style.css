@@ -34,31 +34,31 @@
   height: 1.5rem;
   vertical-align: middle;
   background-color: var(--bkg-color);
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 1.3rem;
   width: 1.3rem;
   left: 4px;
   bottom: 0.1rem;
   background-color: var(--text-color-grad1);
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
-input:checked+.slider {
+input:checked + .slider {
   background-color: #222;
 }
 
-input:focus+.slider {
+input:focus + .slider {
   box-shadow: 0 0 1px #222;
 }
 
-input:checked+.slider:before {
+input:checked + .slider:before {
   -webkit-transform: translateX(18px);
   -ms-transform: translateX(18px);
   transform: translateX(18px);

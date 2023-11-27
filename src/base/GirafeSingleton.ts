@@ -1,17 +1,16 @@
 // List of singletons already created
 type GirafeSingletonInstances = {
   [type: string]: GirafeSingleton;
-}
+};
 
 // List of singletons currently being created
 type GirafeSingletonInitializing = {
   [type: string]: boolean;
-}
+};
 
-type Constructor<T> = new (type: string) => T
+type Constructor<T> = new (type: string) => T;
 
 class GirafeSingleton {
-
   private static instances: GirafeSingletonInstances = {};
   private static initializingSingletons: GirafeSingletonInitializing = {};
 
@@ -32,8 +31,7 @@ class GirafeSingleton {
         console.log(`Creating Singleton ${type}`);
         const singleton = new this(type);
         GirafeSingleton.instances[type] = singleton as GirafeSingleton;
-      }
-      finally {
+      } finally {
         GirafeSingleton.initializingSingletons[type] = false;
       }
     }
@@ -41,12 +39,12 @@ class GirafeSingleton {
     return GirafeSingleton.instances[type] as T;
   }
 
-  isNullOrUndefined(val: any) {
-    return (val === undefined || val === null);
+  isNullOrUndefined(val: unknown) {
+    return val === undefined || val === null;
   }
 
-  isNullOrUndefinedOrBlank(val: any) {
-    return (val === undefined || val === null || val === '');
+  isNullOrUndefinedOrBlank(val: unknown) {
+    return val === undefined || val === null || val === '';
   }
 }
 

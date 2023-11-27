@@ -4,7 +4,6 @@ import GroupLayer from '../../models/layers/layergroup';
 import LayerManager from '../../tools/layermanager';
 
 class TreeViewGroupComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -31,16 +30,21 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('layers\.layersList\..*\.isExpanded', (_oldValue:boolean, _newValue:boolean, group:GroupLayer) =>  this.refreshRender(group));
-    this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldValue:boolean, _newValue:boolean, group:GroupLayer) =>  this.refreshRender(group));
+    this.stateManager.subscribe(
+      'layers.layersList..*.isExpanded',
+      (_oldValue: boolean, _newValue: boolean, group: GroupLayer) => this.refreshRender(group)
+    );
+    this.stateManager.subscribe(
+      'layers.layersList..*.activeState',
+      (_oldValue: boolean, _newValue: boolean, group: GroupLayer) => this.refreshRender(group)
+    );
   }
 
   refreshRender(group: GroupLayer) {
     if (group === this.group) {
-      super.render()
+      super.render();
     }
   }
-
 
   toggle(state: 'on' | 'off' | 'semi') {
     this.layerManager.toggleGroup(this.group, state);
@@ -68,14 +72,11 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
     const index = this.state.layers.layersList.findIndex((g) => g.id === this.group.id);
     if (index >= 0) {
       this.state.layers.layersList.splice(index, 1);
-    }
-    else {
+    } else {
       // TODO REG : manage subgroup deletion
-      console.log('cannot delete this group. Probably a subgroup, this is not managed yet.')
+      console.log('cannot delete this group. Probably a subgroup, this is not managed yet.');
     }
   }
 }
-
-customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
 
 export default TreeViewGroupComponent;

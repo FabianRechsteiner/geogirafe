@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ButtonComponent from '../button/component';
 
 class ScaleComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -23,7 +22,7 @@ class ScaleComponent extends GirafeHTMLElement {
     this.scales = this.configManager.Config.map.scales;
 
     // Add options from themes
-    this.scales.forEach(scale => {
+    this.scales.forEach((scale) => {
       const button = new ButtonComponent();
       button.setAttribute('text', this.formatScale(scale));
       button.setAttribute('size', 'large');
@@ -39,9 +38,8 @@ class ScaleComponent extends GirafeHTMLElement {
 
   onScaleChanged() {
     if (this.state.position.scale !== null) {
-      this.scaleSpan.innerHTML = this.formatScale(this.state.position.scale)
-    }
-    else {
+      this.scaleSpan.innerHTML = this.formatScale(this.state.position.scale);
+    } else {
       this.scaleSpan.innerHTML = '';
     }
   }
@@ -58,7 +56,5 @@ class ScaleComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-scale', ScaleComponent);
 
 export default ScaleComponent;

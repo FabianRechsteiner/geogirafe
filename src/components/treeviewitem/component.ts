@@ -1,5 +1,5 @@
 import ImageWMS from 'ol/source/ImageWMS';
-import tippy from "tippy.js";
+import tippy from 'tippy.js';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Layer from '../../models/layers/layer';
 import LayerManager from '../../tools/layermanager';
@@ -7,7 +7,6 @@ import LayerWms from '../../models/layers/layerwms';
 import QueryBuilderComponent from '../querybuilder/component';
 
 class TreeViewItemComponent extends GirafeHTMLElement {
-
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -41,7 +40,10 @@ class TreeViewItemComponent extends GirafeHTMLElement {
 
   setLegend() {
     if (!(this.layer instanceof LayerWms)) {
-      this.layerManager.setError(this.layer, `${this.layer.name} is not a WMS layer, and should not have a legend configured in the backend.`);
+      this.layerManager.setError(
+        this.layer,
+        `${this.layer.name} is not a WMS layer, and should not have a legend configured in the backend.`
+      );
       return;
     }
 
@@ -49,12 +51,10 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     if (this.layer.iconUrl) {
       // A custom legend icon has been defined and can be displayed
       this.iconUrl = this.layer.iconUrl;
-    }
-    else if (this.layer.legendRule) {
+    } else if (this.layer.legendRule) {
       // We need to get the legend icon URL from WMS
       this.iconUrl = Object.values(this.getLegendImageUrlFromWms(true))[0];
-    }
-    else {
+    } else {
       // All other cases, we do not have any icon for the layer
       // => A simple selection icon will be rendered
       this.iconUrl = null;
@@ -65,8 +65,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
       if (this.layer.legendImage) {
         // TODO REG : remove this ! when a refactoring of the Layer class has been done
         this.legendUrls[this.layer.layers!] = this.layer.legendImage;
-      }
-      else {
+      } else {
         this.legendUrls = this.getLegendImageUrlFromWms(false);
       }
     }
@@ -74,7 +73,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
 
   getLegendImageUrlFromWms(iconOnly: boolean): Record<string, string> {
     if (!(this.layer instanceof LayerWms)) {
-      throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called.`)
+      throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called.`);
     }
 
     const legends: Record<string, string> = {};
@@ -82,7 +81,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     for (const l of this.layer.layers!.split(',')) {
       const wmsSource = new ImageWMS({
         url: this.layer.url,
-        params: { 'LAYERS': l },
+        params: { LAYERS: l },
         ratio: 1
       });
 
@@ -95,7 +94,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
 
       if (!graphicUrl.toLowerCase().includes('sld_version')) {
         // Add SLD_Version (it is mandatory, but openlayers do not seems to set it in the URL)
-        graphicUrl += '&SLD_Version=1.1.0'
+        graphicUrl += '&SLD_Version=1.1.0';
       }
 
       if (iconOnly) {
@@ -120,14 +119,14 @@ class TreeViewItemComponent extends GirafeHTMLElement {
       interactive: true,
       theme: 'light',
       placement: 'bottom-end',
-      content: (_reference: any) => {
+      content: (_reference: object) => {
         const slider = document.createElement('input');
         slider.type = 'range';
         slider.className = 'slider';
         slider.min = '0';
         slider.max = '20';
-        slider.value = (this.layer.opacity*20).toString();
-        slider.oninput = (_e) => this.layer.opacity = parseInt(slider.value)/20;
+        slider.value = (this.layer.opacity * 20).toString();
+        slider.oninput = (_e) => (this.layer.opacity = parseInt(slider.value) / 20);
         return slider;
       }
     });
@@ -142,7 +141,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
       theme: 'light',
       placement: 'right',
       appendTo: document.body,
-      content: (_reference: any) => {
+      content: (_reference: object) => {
         const filterbox = new QueryBuilderComponent(this.layer as LayerWms);
         return filterbox;
       }
@@ -150,13 +149,27 @@ class TreeViewItemComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('layers\.layersList\..*\.isLegendExpanded', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
-    this.stateManager.subscribe('layers\.layersList\..*\.activeState', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
-    this.stateManager.subscribe('layers\.layersList\..*\.hasError', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
-    this.stateManager.subscribe('layers\.layersList\..*\.errorMessage', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
-    this.stateManager.subscribe('layers\.layersList\..*\.filter', (_oldValue:boolean, _newValue:boolean, layer:Layer) =>  this.refreshRender(layer));
-    this.stateManager.subscribe('treeview\.advanced', () =>  super.render());
-    this.stateManager.subscribe('position\.resolution', () =>  this.refreshLegends());
+    this.stateManager.subscribe(
+      'layers.layersList..*.isLegendExpanded',
+      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    );
+    this.stateManager.subscribe(
+      'layers.layersList..*.activeState',
+      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    );
+    this.stateManager.subscribe(
+      'layers.layersList..*.hasError',
+      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    );
+    this.stateManager.subscribe(
+      'layers.layersList..*.errorMessage',
+      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    );
+    this.stateManager.subscribe('layers.layersList..*.filter', (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
+      this.refreshRender(layer)
+    );
+    this.stateManager.subscribe('treeview.advanced', () => super.render());
+    this.stateManager.subscribe('position.resolution', () => this.refreshLegends());
   }
 
   refreshLegends() {
@@ -181,14 +194,14 @@ class TreeViewItemComponent extends GirafeHTMLElement {
 
   zoomToVisibleResolution() {
     if (!(this.layer instanceof LayerWms)) {
-      throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called here.`)
+      throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called here.`);
     }
 
-    // Because of rounding errors (for example 1.59 becomes 1.589999999999998), 
+    // Because of rounding errors (for example 1.59 becomes 1.589999999999998),
     // we zoom a bit more than just the max resolution.
     // For the moment we try with 10% more
-    if (this.layer.maxResolution !== null) {
-      const resolution = this.layer.maxResolution - 10/100*this.layer.maxResolution;
+    if (this.layer.maxResolution) {
+      const resolution = this.layer.maxResolution - (10 / 100) * this.layer.maxResolution;
       this.state.position.resolution = resolution;
     }
   }
@@ -198,13 +211,15 @@ class TreeViewItemComponent extends GirafeHTMLElement {
       this.toggle('on');
     }
 
-    const otherSide = (side === 'left') ? 'right' : 'left';
+    const otherSide = side === 'left' ? 'right' : 'left';
     const newSwipedLayers: Record<'left' | 'right', Array<Layer>> = {
       left: [],
       right: []
     };
     // If the object is already present in the other side, we remove it
-    newSwipedLayers[otherSide] = this.state.layers.swipedLayers[otherSide].filter((l:Layer) => { return l.treeItemId !== this.layer.treeItemId; });
+    newSwipedLayers[otherSide] = this.state.layers.swipedLayers[otherSide].filter((l: Layer) => {
+      return l.treeItemId !== this.layer.treeItemId;
+    });
     // Then, we add it to right side
     newSwipedLayers[side] = [...this.state.layers.swipedLayers[side]];
     newSwipedLayers[side].push(this.layer);
@@ -220,7 +235,5 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     });
   }
 }
-
-customElements.define('girafe-tree-view-item', TreeViewItemComponent);
 
 export default TreeViewItemComponent;

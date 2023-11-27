@@ -7,44 +7,44 @@
   width: 100%;
   display: flex;
   flex-direction: row;
-  box-shadow: var(--bx-shdw)
+  box-shadow: var(--bx-shdw);
 }
 
 #search {
-    font-size: 1rem;
-    outline: none;
-    margin: 0 0 0 0.5rem;
-    padding-left: 0.8rem;
-    border: 0;
-    height: 2.2rem;
-    width: auto;
-    flex: 1 1 auto;
-    -ms-flex: 1 1 auto;
-    -webkit-flex: 1 1 auto;
-    -webkit-appearance: none;
-    background : transparent;
-    color: var(--text-color);
+  font-size: 1rem;
+  outline: none;
+  margin: 0 0 0 0.5rem;
+  padding-left: 0.8rem;
+  border: 0;
+  height: 2.2rem;
+  width: auto;
+  flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  -webkit-appearance: none;
+  background: transparent;
+  color: var(--text-color);
 }
 
 #searchIcon {
-    display: inline-block;
-    width: 20px;
-    height: 25px;
-    color: var(--text-color);
-    background-position: -121px 1px;
-    padding: 9px 10px;
-    background-repeat: no-repeat;
-    background-clip: content-box;
-    background-origin: content-box;
-    -moz-background-clip: content-box;
-    -moz-background-origin: content-box;
-    -webkit-background-clip: content-box;
-    -webkit-background-origin: content-box;
+  display: inline-block;
+  width: 20px;
+  height: 25px;
+  color: var(--text-color);
+  background-position: -121px 1px;
+  padding: 9px 10px;
+  background-repeat: no-repeat;
+  background-clip: content-box;
+  background-origin: content-box;
+  -moz-background-clip: content-box;
+  -moz-background-origin: content-box;
+  -webkit-background-clip: content-box;
+  -webkit-background-origin: content-box;
 }
 
 #results {
   z-index: 1000;
-  margin-top : 0.1rem;
+  margin-top: 0.1rem;
   margin-bottom: 0.5rem;
   position: absolute;
   top: 3.5rem;
@@ -55,7 +55,8 @@
   scrollbar-width: thin;
 }
 
-.result, .title {
+.result,
+.title {
   display: inline-block;
   padding: 0.3rem 1rem;
   width: Calc(36rem - 2rem);
