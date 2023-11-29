@@ -122,6 +122,35 @@ class StateManager extends GirafeSingleton {
     return { found: true, object: currentObj };
   }
 
+  /**
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value
+   * @returns a replacer for a cyclic value
+   */
+  getCircularReplacer() {
+    const visitedObjects = new WeakSet();
+
+    return function (_key: string, value: any) {
+
+      if (typeof value !== "object" || value === null) {
+        // The value is not an object
+        // => We just return it
+        return value;
+      }
+
+      if (visitedObjects.has(value)) {
+        // We have found a circular reference. 
+        // => We replace it with a dummy string.
+        return "[Circular]";
+      }
+
+      // Add the object to the list of visited objects
+      visitedObjects.add(value);
+
+      // Return the value
+      return value;
+    };
+  }
+
   areEqual(obj1: any, obj2: any) {
     if (typeof obj1 === 'number' && typeof obj2 === 'number') {
       // Special case for numbers : check NaN
@@ -151,11 +180,8 @@ class StateManager extends GirafeSingleton {
       return false;
     }
 
-    for (const key of keys1) {
-      // Comparer les valeurs des propriétés (utilisation récursive)
-      if (!this.areEqual(obj1[key], obj2[key])) {
-        return false;
-      }
+    if (JSON.stringify(obj1, this.getCircularReplacer()) !== JSON.stringify(obj2, this.getCircularReplacer())) {
+      return false;
     }
 
     // Everything is equal
