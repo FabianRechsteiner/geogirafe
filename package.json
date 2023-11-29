@@ -73,7 +73,7 @@
   },
   "scripts": {
     "serve": "node buildtools/prebuild.cjs && tsc && vite serve --port 8080",
-    "build": "node buildtools/prebuild.cjs && tsc && vite build",
+    "build": "export NODE_OPTIONS=--max-old-space-size=8192 && node buildtools/prebuild.cjs && tsc && vite build",
     "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile .",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "configure-demo": "bash -C './buildtools/configure-demo.sh'",
