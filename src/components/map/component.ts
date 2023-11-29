@@ -16,7 +16,6 @@ import adjectives from 'adjectives';
 import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
 import { unByKey } from 'ol/Observable';
-import OLCesium from 'olcs/OLCesium';
 import { v4 as uuidv4 } from 'uuid';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
@@ -45,8 +44,6 @@ import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
 import MapPosition from '../../tools/state/mapposition';
 
-type OLCesiumType = typeof OLCesium;
-
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 // TODO REG: Problem : we import the cesium twice : one in the bundle, and another one with a scripts tag
 // How to solve this ?
@@ -57,7 +54,10 @@ class MapComponent extends GirafeHTMLElement {
 
   map!: Map;
   mapTarget!: HTMLDivElement;
-  map3d!: OLCesiumType;
+  // TODO REG : Howto use the right type here without importing the whole library (it needs to be imported only on demand) ?
+  // This works but needs the library: type OLCesiumType = typeof OLCesium;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  map3d!: any;
   map3dTarget!: HTMLDivElement;
   swiper!: HTMLInputElement;
   swipeManager!: SwipeManager;
@@ -503,21 +503,12 @@ class MapComponent extends GirafeHTMLElement {
 
   async create3dMap() {
     if (!this.map3d) {
-      // First : Lazy loading of cesium
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = 'lib/cesium/Cesium.js';
+      // First : Lazy loading of cesium and olcs
+      const Cesium = await import('cesium');
+      window.Cesium = Cesium;
 
-        script.onload = resolve;
-        script.onerror = reject;
-
-        document.body.appendChild(script);
-      }).catch((error) => {
-        console.error('Error while loading Cesium', error);
-      });
-
-      const Cesium = window.Cesium;
+      const olcs = await import('olcs/OLCesium');
+      const OLCesium = olcs.default;
 
       // Initialize the 3D Map
       this.map3d = new OLCesium({ map: this.map, target: this.map3dTarget });

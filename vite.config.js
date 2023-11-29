@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 
 import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
 import RestartPlugin from './buildtools/vite-restart-plugin';
-import { viteExternalsPlugin } from 'vite-plugin-externals';
 
 // https://v2.vitejs.dev/config/
 export default defineConfig({
@@ -19,13 +18,11 @@ export default defineConfig({
           lazy: ['gridjs', 'vanilla-picker', 'adjectives', 'tippy.js']
         }
       }
+      //external: ['cesium']
     }
   },
-  plugins: [
-    viteExternalsPlugin({
-      cesium: 'Cesium'
-    }),
-    InlineTemplatesPlugin(),
-    RestartPlugin()
-  ]
+  optimizeDeps: {
+    include: ['cesium', 'olcs/OLCesium']
+  },
+  plugins: [InlineTemplatesPlugin(), RestartPlugin()]
 });

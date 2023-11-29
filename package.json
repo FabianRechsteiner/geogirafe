@@ -69,8 +69,7 @@
     "prettier": "3.1.0",
     "proj4": "2.9.2",
     "typescript": "5.3.2",
-    "vite": "4.5.0",
-    "vite-plugin-externals": "0.6.2"
+    "vite": "4.5.0"
   },
   "scripts": {
     "serve": "node buildtools/prebuild.cjs && tsc && vite serve --port 8080",
