@@ -1,28 +1,31 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
 import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
 import RestartPlugin from './buildtools/vite-restart-plugin';
+import { viteExternalsPlugin } from 'vite-plugin-externals';
 
 // https://v2.vitejs.dev/config/
 export default defineConfig({
-    root: './src',
-    base: './',
-    publicDir: './static',
-    build: {
-        outDir: '../public',
-        sourcemap: true,
-        emptyOutDir: true,
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    lazy: ['gridjs', 'vanilla-picker', 'adjectives', 'tippy.js'],
-                    cesium: ['cesium']
-                }
-            }
+  root: './src',
+  base: './',
+  publicDir: './static',
+  build: {
+    outDir: '../public',
+    sourcemap: true,
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          lazy: ['gridjs', 'vanilla-picker', 'adjectives', 'tippy.js']
         }
-    },
-    plugins: [
-      InlineTemplatesPlugin(),
-      RestartPlugin()
-    ]
+      }
+    }
+  },
+  plugins: [
+    viteExternalsPlugin({
+      cesium: 'Cesium'
+    }),
+    InlineTemplatesPlugin(),
+    RestartPlugin()
+  ]
 });

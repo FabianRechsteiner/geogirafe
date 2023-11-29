@@ -71,22 +71,7 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "scales": [
-      200000,
-      75000,
-      40000,
-      20000,
-      10000,
-      7500,
-      5000,
-      3500,
-      2000,
-      1000,
-      500,
-      200,
-      100,
-      50
-    ],
+    "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200, 100, 50],
     "startPosition": "2611000,1267000",
     "startZoom": "4",
     "maxExtent": "2583000,1235000,2650000,1291000",
@@ -94,6 +79,6 @@
   },
   "map3d": {
     "terrainUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/",
-    "tilesetUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/cesium/tiles/av-gebaeude-basel-stadt/tileset.json"
+    "tilesetUrl": "https://3d.geo.bs.ch/static/tiles/a57b8783-1d7b-4ca9-b652-d4ead5436ead_2/tileset.json"
   }
 }

@@ -39,7 +39,6 @@ import Layer from '../../models/layers/layer';
 import { Type } from 'ol/geom/Geometry';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
 import { Extent } from 'ol/extent';
-import { Cesium3DTileset, CesiumTerrainProvider } from 'cesium';
 import LayerOsm from '../../models/layers/layerosm';
 import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
@@ -518,16 +517,18 @@ class MapComponent extends GirafeHTMLElement {
         console.error('Error while loading Cesium', error);
       });
 
+      const Cesium = window.Cesium;
+
       // Initialize the 3D Map
       this.map3d = new OLCesium({ map: this.map, target: this.map3dTarget });
       const scene = this.map3d.getCesiumScene();
 
       // Add terrain
-      const terrainProvider = await CesiumTerrainProvider.fromUrl(this.configManager.Config.map3d!.terrainUrl);
+      const terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(this.configManager.Config.map3d!.terrainUrl);
       scene.terrainProvider = terrainProvider;
 
       // Add 3D-Tiles layer
-      const tileset = await Cesium3DTileset.fromUrl(this.configManager.Config.map3d!.tilesetUrl);
+      const tileset = await Cesium.Cesium3DTileset.fromUrl(this.configManager.Config.map3d!.tilesetUrl);
       scene.primitives.add(tileset);
     }
   }
