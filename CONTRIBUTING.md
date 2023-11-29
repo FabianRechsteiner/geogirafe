@@ -2,7 +2,7 @@
 
 If you're reading this, you're probably thinking of contributing to GeoGirafe, and we're delighted!
 
-In this document, you will find some essential information to help and guide you in your contributions. 
+In this document, you will find some essential information to help and guide you in your contributions.
 You'll also find a few rules to follow so that you can contribute effectively to the project.
 
 ## Before contributing
@@ -10,7 +10,7 @@ You'll also find a few rules to follow so that you can contribute effectively to
 Generally speaking, the GeoGirafe project is open to contributions of any kind.
 There is no need for discussion if you contribute just a simple and quite obvious bugfix. So... just do it!
 
-But for complexer changes or if you want to extent the functionalities, please **first open an issue to discuss your contribution before starting the work**. Let us know that you plan to contribute **before** you do any coding. Use mailing list or developer chat. Just avoid future disappointments and **let us know** early. 
+But for complexer changes or if you want to extent the functionalities, please **first open an issue to discuss your contribution before starting the work**. Let us know that you plan to contribute **before** you do any coding. Use mailing list or developer chat. Just avoid future disappointments and **let us know** early.
 
 This will also avoid conflicts with others also working on the same subject.
 
@@ -34,10 +34,10 @@ git config core.hookspath buildtools/git-hooks
 
 ### 2. Create a Branch and a Merge-Request
 
-The first of all thing is to create a branch for your contribution. 
+The first of all thing is to create a branch for your contribution.
 Give it a intelligible name, and create an associated Merge-Request.
 
-Add a description to the Merge-Request to explain with is it for, and mark it as *Draft*.
+Add a description to the Merge-Request to explain with is it for, and mark it as _Draft_.
 
 ### 3. Code, commit early, push often.
 
@@ -58,13 +58,14 @@ For your contribution, please be attentive to the following points:
 
 When you're done with the code, it's time to make a great Merge-Request !
 Please:
+
 - Verify there is not conflict that would prevent an merge of your code.
 - Check the linting with `npm run lint`
 - Verify that the pipelines passed successfully on your branch: https://gitlab.com/geogirafe/gg-viewer/-/pipelines
 - Check the Sonarcloud reports directly on the Merge-Request, and fix the reported errors.
 - Verify the accessibility of your contribution by using the Wave tools: https://wave.webaim.org/
 
-When everything seems ok for you, you can remove the *Draft* flag, and request a review from the GeoGirafe Team.
+When everything seems ok for you, you can remove the _Draft_ flag, and request a review from the GeoGirafe Team.
 
 ### 5. Review and merge
 

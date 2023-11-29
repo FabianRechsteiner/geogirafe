@@ -15,15 +15,15 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : "Test_theme",
+    "defaultTheme": "Test_theme",
     "imagesUrlPrefix": "https://map.geo.ti.ch"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
-    "show" : true,
+    "show": true,
     "//comment2": "Name of the default basemap.",
     "defaultBasemap": "Carta Nazionale (bianco e nero)",
-    "//comment3" : "special basemaps that can be activated or not",
+    "//comment3": "special basemaps that can be activated or not",
     "OSM": true,
     "SwissTopoVectorTiles": true
   },

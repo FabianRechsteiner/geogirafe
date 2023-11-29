@@ -1,4 +1,4 @@
-const HtmlRebuildPlugin = function() {
+const HtmlRebuildPlugin = function () {
   return {
     name: 'girafe-html-rebuild',
     handleHotUpdate({ file, server }) {
@@ -7,6 +7,6 @@ const HtmlRebuildPlugin = function() {
       }
     }
   };
-}
+};
 
 export default HtmlRebuildPlugin;

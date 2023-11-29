@@ -2,20 +2,17 @@ import MagicString from 'magic-string';
 import fs from 'node:fs';
 import path from 'path';
 
-const InlineTemplatesPlugin = function() {
+const InlineTemplatesPlugin = function () {
   return {
     name: 'girafe-inline-templates',
     transform(code, id) {
       //const originalCode = fs.readFileSync(id, 'utf8');
-      
 
       let newCode = code;
       const magicString = new MagicString(code);
       if (id.includes('src/components/') && (id.endsWith('.js') || id.endsWith('.ts'))) {
-
         const htmlRegex = new RegExp(`templateUrl *= *['"](.*)['"] *;?`);
         if (htmlRegex.test(code)) {
-
           // First, verify is there is a style file
           let styleCode = '';
           const styleRegex = new RegExp(`styleUrl *= *['"](.*)['"] *;?`);
@@ -65,6 +62,6 @@ const InlineTemplatesPlugin = function() {
       };
     }
   };
-}
+};
 
 export default InlineTemplatesPlugin;

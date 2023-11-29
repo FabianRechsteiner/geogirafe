@@ -74,7 +74,7 @@ This configuration will be loaded dynamically when the application starts.
 Therefore it is not necessary to rebuild the project when you modify this file.
 
 The file `static/config.json` does not exists by default.
-The simplest way to create one is to pick up an existing one in the *demo* directory, and to adapt the content to your needs.
+The simplest way to create one is to pick up an existing one in the _demo_ directory, and to adapt the content to your needs.
 
 You can also preconfigure GeoGirafe for an existing demo configuration by using:
 
@@ -141,4 +141,3 @@ Contribution guidelines are available here: [CONTRIBUTING.md](CONTRIBUTING.md).
 # License
 
 Apache License, Version 2.0
-

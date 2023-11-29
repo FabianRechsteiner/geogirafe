@@ -130,17 +130,16 @@ class StateManager extends GirafeSingleton {
     const visitedObjects = new WeakSet();
 
     return function (_key: string, value: any) {
-
-      if (typeof value !== "object" || value === null) {
+      if (typeof value !== 'object' || value === null) {
         // The value is not an object
         // => We just return it
         return value;
       }
 
       if (visitedObjects.has(value)) {
-        // We have found a circular reference. 
+        // We have found a circular reference.
         // => We replace it with a dummy string.
-        return "[Circular]";
+        return '[Circular]';
       }
 
       // Add the object to the list of visited objects

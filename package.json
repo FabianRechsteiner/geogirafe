@@ -80,7 +80,7 @@
     "configure-demo": "bash -C './buildtools/configure-demo.sh'",
     "configure-demo-win": "buildtools\\configure-demo.cmd",
     "lint": "eslint src/**/*.ts",
-    "pretty": "prettier --write src",
+    "pretty": "prettier --write .",
     "tsc": "tsc"
   }
 }

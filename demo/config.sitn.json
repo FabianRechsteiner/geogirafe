@@ -15,14 +15,14 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : "main"
+    "defaultTheme": "main"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
-    "show" : false,
+    "show": false,
     "//comment2": "Name of the default basemap.",
     "defaultBasemap": "OpenStreetMap",
-    "//comment3" : "special basemaps that can be activated or not",
+    "//comment3": "special basemaps that can be activated or not",
     "OSM": false,
     "SwissTopoVectorTiles": false
   },

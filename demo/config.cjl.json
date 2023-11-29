@@ -15,14 +15,14 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : "cadastre_thm"
+    "defaultTheme": "cadastre_thm"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
-    "show" : true,
+    "show": true,
     "//comment2": "Name of the default basemap.",
     "defaultBasemap": "Plan ville",
-    "//comment3" : "special basemaps that can be activated or not",
+    "//comment3": "special basemaps that can be activated or not",
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
@@ -70,7 +70,7 @@
   "map": {
     "srid": "EPSG:2056",
     "startZoom": "1",
-    "startPosition": "2512825,1160553", 
+    "startPosition": "2512825,1160553",
     "maxExtent": "2442047,1115504,2598860,1198698",
     "scales": [150000, 60000, 30000, 15000, 7500, 5000, 2500, 1000, 500, 250, 100, 50],
     "constraintScales": false

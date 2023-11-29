@@ -15,14 +15,14 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : "Geokategorien"
+    "defaultTheme": "Geokategorien"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
-    "show" : true,
+    "show": true,
     "//comment2": "Name of the default basemap.",
     "defaultBasemap": "ch.swisstopo.pixelkarte-grau",
-    "//comment3" : "special basemaps that can be activated or not",
+    "//comment3": "special basemaps that can be activated or not",
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
@@ -69,7 +69,9 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "scales": [200000, 150000, 100000, 50000, 35000, 25000, 20000, 15000, 10000, 5000, 3500, 2000, 1500, 1000, 500, 350, 250, 150],
+    "scales": [
+      200000, 150000, 100000, 50000, 35000, 25000, 20000, 15000, 10000, 5000, 3500, 2000, 1500, 1000, 500, 350, 250, 150
+    ],
     "startPosition": "2760000,1225000",
     "startZoom": "1",
     "maxExtent": "2500000,1150000,3020000,1300000",

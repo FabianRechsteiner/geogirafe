@@ -2,3 +2,9 @@ src/static/components
 src/static/lib
 src/static/Mock
 src/typings
+public
+node_modules
+coverage
+demo/static
+.vscode
+.idea

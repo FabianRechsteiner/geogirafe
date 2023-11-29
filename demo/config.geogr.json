@@ -15,14 +15,14 @@
     "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
     "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
-    "defaultTheme" : "Basisinfo"
+    "defaultTheme": "Basisinfo"
   },
   "basemaps": {
     "//comment1": "Display the Basemap control or not",
-    "show" : true,
+    "show": true,
     "//comment2": "Name of the default basemap.",
     "defaultBasemap": "Karte grau",
-    "//comment3" : "special basemaps that can be activated or not",
+    "//comment3": "special basemaps that can be activated or not",
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
@@ -72,7 +72,10 @@
     "startZoom": "1",
     "startPosition": "2736020,1172666",
     "maxExtent": "2465960,993706,2977184,1346546",
-    "scales": [800000, 500000, 200000, 100000, 50000, 25000, 20000, 10000, 7500, 5000, 2500, 2000, 1000, 750, 500, 250, 200, 100, 50],
+    "scales": [
+      800000, 500000, 200000, 100000, 50000, 25000, 20000, 10000, 7500, 5000, 2500, 2000, 1000, 750, 500, 250, 200, 100,
+      50
+    ],
     "constraintScales": true
   },
   "map3d": {
