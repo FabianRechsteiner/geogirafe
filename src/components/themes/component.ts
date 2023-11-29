@@ -60,6 +60,14 @@ class ThemeComponent extends GirafeHTMLElement {
     this.state.selectedTheme = theme;
     this.toggleThemesList(false);
     this.#ignoreBlur = false;
+
+    if (theme.location != null || theme.zoom != null) {
+      this.state.olMap?.getView().animate({
+        center: theme.location ?? this.state.olMap?.getView().getCenter(),
+        zoom: theme.zoom ?? this.state.olMap?.getView().getZoom(),
+        duration: 1000
+      });
+    }
   }
 
   connectedCallback() {

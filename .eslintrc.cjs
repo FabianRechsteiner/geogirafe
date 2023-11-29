@@ -4,8 +4,8 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   root: true,
   env: {
-    "browser": true,
-    "node": true
+    browser: true,
+    node: true
   },
   rules: {
     'no-useless-escape': 'off',
@@ -13,8 +13,8 @@ module.exports = {
       'error',
       {
         varsIgnorePattern: '^_',
-        argsIgnorePattern: '^_',
+        argsIgnorePattern: '^_'
       }
     ]
-  },
+  }
 };

@@ -4,46 +4,46 @@ const path = require('path');
 let nbFilesCopied = 0;
 
 function copyFile(sourceDir, destinationDir, filename) {
-    fs.ensureDirSync(destinationDir);
-    //console.log(`Copying file ${filename} to ${destinationDir}`);
-    fs.copyFileSync(path.join(sourceDir, filename), path.join(destinationDir, filename));
-    nbFilesCopied++;
+  fs.ensureDirSync(destinationDir);
+  //console.log(`Copying file ${filename} to ${destinationDir}`);
+  fs.copyFileSync(path.join(sourceDir, filename), path.join(destinationDir, filename));
+  nbFilesCopied++;
 }
 
 function copyFilesRecursive(sourceDir, destinationDir, allowedExtensions = null) {
-    const childs = fs.readdirSync(sourceDir);
-    childs.forEach((filename) => {
-        const src = path.join(sourceDir, filename);
-        const dest = path.join(destinationDir, filename);
+  const childs = fs.readdirSync(sourceDir);
+  childs.forEach((filename) => {
+    const src = path.join(sourceDir, filename);
+    const dest = path.join(destinationDir, filename);
 
-        if (fs.statSync(src).isDirectory()) {
-            copyFilesRecursive(src, dest, allowedExtensions);
-        } else {
-            const extension = path.extname(filename).toLowerCase();
-            if (allowedExtensions === null || allowedExtensions.includes(extension)) {
-                copyFile(sourceDir, destinationDir, filename);
-            }
-        } 
-    });
-};
+    if (fs.statSync(src).isDirectory()) {
+      copyFilesRecursive(src, dest, allowedExtensions);
+    } else {
+      const extension = path.extname(filename).toLowerCase();
+      if (allowedExtensions === null || allowedExtensions.includes(extension)) {
+        copyFile(sourceDir, destinationDir, filename);
+      }
+    }
+  });
+}
 
 function findFilesRecursive(sourceDir, allowedExtensions, fileList = []) {
-    const childs = fs.readdirSync(sourceDir);
+  const childs = fs.readdirSync(sourceDir);
 
-    childs.forEach((filename) => {
-        const src = path.join(sourceDir, filename);
+  childs.forEach((filename) => {
+    const src = path.join(sourceDir, filename);
 
-        if (fs.statSync(src).isDirectory()) {
-            findFilesRecursive(src, allowedExtensions, fileList);
-        } else {
-            const extension = path.extname(filename).toLowerCase();
-            if (allowedExtensions.includes(extension)) {
-                fileList.push(src);
-            }
-        }
-    });
+    if (fs.statSync(src).isDirectory()) {
+      findFilesRecursive(src, allowedExtensions, fileList);
+    } else {
+      const extension = path.extname(filename).toLowerCase();
+      if (allowedExtensions.includes(extension)) {
+        fileList.push(src);
+      }
+    }
+  });
 
-    return fileList;
+  return fileList;
 }
 
 const sourceDir = path.join(__dirname, '..', 'src');
@@ -72,7 +72,7 @@ fs.removeSync(dst);
 copyFile(src, dst, 'vanilla-picker.csp.css');
 
 // Gridjs
-src = path.join(nodeModulesDir, 'gridjs','dist','theme');
+src = path.join(nodeModulesDir, 'gridjs', 'dist', 'theme');
 dst = path.join(libDir, 'gridjs');
 fs.removeSync(dst);
 copyFile(src, dst, 'mermaid.min.css');
@@ -85,14 +85,14 @@ fs.removeSync(dst);
 fs.ensureDirSync(dst);
 const fileList = findFilesRecursive(src, ['.css']);
 for (let file of fileList) {
-    //console.log(file);
-    const content = fs.readFileSync(file, 'utf-8');
-    fs.appendFileSync(dstFile, content);
-    nbFilesCopied++;
+  //console.log(file);
+  const content = fs.readFileSync(file, 'utf-8');
+  fs.appendFileSync(dstFile, content);
+  nbFilesCopied++;
 }
 
 // Cesium
-src = path.join(nodeModulesDir, 'cesium','Build','Cesium');
+src = path.join(nodeModulesDir, 'cesium', 'Build', 'Cesium');
 dst = path.join(libDir, 'cesium');
 fs.removeSync(dst);
 copyFilesRecursive(src, dst);
