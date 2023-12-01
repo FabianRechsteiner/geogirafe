@@ -24,7 +24,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
   }
 
   render() {
-    // If we come from an  html element, the layer was not defined in the constructor
+    // If we come from a html element, the layer was not defined in the constructor
     // And we have to set the layer using the id passed to the layerid attribute
     const layerId = this.getAttribute('layerid');
     if (layerId) {
@@ -40,10 +40,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
 
   setLegend() {
     if (!(this.layer instanceof LayerWms)) {
-      this.layerManager.setError(
-        this.layer,
-        `${this.layer.name} is not a WMS layer, and should not have a legend configured in the backend.`
-      );
+      // nothing to do if it's not a WMS
       return;
     }
 
