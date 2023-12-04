@@ -75,7 +75,8 @@
     "startPosition": "2611000,1267000",
     "startZoom": "4",
     "maxExtent": "2583000,1235000,2650000,1291000",
-    "constraintScales": true
+    "constraintScales": true,
+    "showScaleLine": true
   },
   "map3d": {
     "terrainUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/",

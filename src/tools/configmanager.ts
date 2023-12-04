@@ -59,6 +59,7 @@ class GirafeConfig {
     maxExtent: string;
     scales: number[];
     constraintScales: boolean;
+    showScaleLine: boolean;
   };
   map3d?: {
     terrainUrl: string;
@@ -172,6 +173,9 @@ class GirafeConfig {
     }
     if (!config.map.constraintScales) {
       config.map.constraintScales = false;
+    }
+    if (!config.map.showScaleLine) {
+      config.map.showScaleLine = false;
     }
     this.map = config.map;
 

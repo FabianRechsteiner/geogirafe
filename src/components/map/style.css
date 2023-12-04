@@ -53,6 +53,12 @@
   top: 4rem !important;
 }
 
+.ol-scale-line {
+  right: 1rem !important;
+  bottom: 0.5rem !important;
+  left: unset !important;
+}
+
 #swiper {
   display: none;
   width: 99%;
