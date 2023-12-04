@@ -62,7 +62,7 @@ class GirafeConfig {
   };
   map3d?: {
     terrainUrl: string;
-    tilesetUrl: string;
+    tilesetsUrls: string[];
   };
 
   /**
