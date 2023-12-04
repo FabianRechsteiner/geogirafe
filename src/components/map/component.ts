@@ -59,6 +59,7 @@ class MapComponent extends GirafeHTMLElement {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map3d!: any;
   map3dTarget!: HTMLDivElement;
+  loading: boolean = false;
   swiper!: HTMLInputElement;
   swipeManager!: SwipeManager;
   wmtsManager!: WmtsManager;
@@ -503,6 +504,8 @@ class MapComponent extends GirafeHTMLElement {
 
   async create3dMap() {
     if (!this.map3d) {
+      this.loading = true;
+      super.render();
       // First : Lazy loading of cesium and olcs
       const Cesium = await import('cesium');
       window.Cesium = Cesium;
@@ -521,26 +524,28 @@ class MapComponent extends GirafeHTMLElement {
       // Add 3D-Tiles layer
       const tileset = await Cesium.Cesium3DTileset.fromUrl(this.configManager.Config.map3d!.tilesetUrl);
       scene.primitives.add(tileset);
+      this.loading = false;
+      super.render();
     }
   }
 
   async onGlobeToggled(): Promise<void> {
     if (this.state.globe.display === 'full') {
       // Full screen globe has been enabled
-      await this.create3dMap();
       this.mapTarget.style.display = 'none';
       this.map3dTarget.style.display = 'block';
       this.map3dTarget.style.left = '0';
       this.map3dTarget.style.width = '100%';
+      await this.create3dMap();
       this.map3d.setEnabled(true);
     } else if (this.state.globe.display === 'side') {
       // Side by side has been enabled
-      await this.create3dMap();
       this.mapTarget.style.display = 'block';
       this.mapTarget.style.width = '55%';
       this.map3dTarget.style.display = 'block';
       this.map3dTarget.style.left = '55%';
       this.map3dTarget.style.width = '45%';
+      await this.create3dMap();
       this.map3d.setEnabled(true);
     } else {
       // 3d map is not visible

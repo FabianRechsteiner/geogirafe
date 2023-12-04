@@ -1,7 +1,14 @@
+<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 <link rel="stylesheet" href="lib/openlayers/ol.css" />
 
 <div id="container">
   <div id="ol-map"></div>
-  <div id="cs-map"></div>
+  <div id="cs-map">
+    <div class="${this.loading ? 'loading center' : 'loading hidden'}">
+      <i class="fa-3x fa-solid fa-circle-notch fa-spin"></i>
+      <span>Loading cesium...</span>
+      <span class="quote">Please be patient, like a giraffe reaching for the tastiest leaves.</span>
+    </div>
+  </div>
   <input id="swiper" type="range" min="0" max="1000" step="1" />
 </div>
