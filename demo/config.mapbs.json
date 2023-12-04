@@ -79,6 +79,6 @@
   },
   "map3d": {
     "terrainUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/",
-    "tilesetUrl": "https://3d.geo.bs.ch/static/tiles/a57b8783-1d7b-4ca9-b652-d4ead5436ead_2/tileset.json"
+    "tilesetsUrls": ["https://3d.geo.bs.ch/static/tiles/a57b8783-1d7b-4ca9-b652-d4ead5436ead_2/tileset.json"]
   }
 }

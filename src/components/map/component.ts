@@ -503,7 +503,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   async create3dMap() {
-    if (!this.map3d) {
+    if (!this.map3d && this.configManager.Config.map3d) {
       this.loading = true;
       super.render();
       // First : Lazy loading of cesium and olcs
@@ -518,12 +518,14 @@ class MapComponent extends GirafeHTMLElement {
       const scene = this.map3d.getCesiumScene();
 
       // Add terrain
-      const terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(this.configManager.Config.map3d!.terrainUrl);
+      const terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(this.configManager.Config.map3d.terrainUrl);
       scene.terrainProvider = terrainProvider;
 
-      // Add 3D-Tiles layer
-      const tileset = await Cesium.Cesium3DTileset.fromUrl(this.configManager.Config.map3d!.tilesetUrl);
-      scene.primitives.add(tileset);
+      // Add 3D-Tiles layers
+      this.configManager.Config.map3d.tilesetsUrls.forEach((tilesetUrl) => {
+        Cesium.Cesium3DTileset.fromUrl(tilesetUrl).then((tileset) => scene.primitives.add(tileset));
+      });
+
       this.loading = false;
       super.render();
     }
