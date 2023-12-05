@@ -74,7 +74,8 @@
     "startPosition": "2688050,1117550",
     "maxExtent": "2420000,1030000,2900000,1350000",
     "scales": [1000000, 350000, 200000, 75000, 40000, 20000, 7500, 3500, 2000, 1000, 500, 200],
-    "constraintScales": true
+    "constraintScales": true,
+    "showScaleLine": true
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",

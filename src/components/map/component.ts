@@ -17,6 +17,7 @@ import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
 import { unByKey } from 'ol/Observable';
 import { v4 as uuidv4 } from 'uuid';
+import { ScaleLine } from 'ol/control';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events';
@@ -260,6 +261,13 @@ class MapComponent extends GirafeHTMLElement {
       });
       this.map.addLayer(this.focusLayer);
       this.focusLayer.setZIndex(1003);
+
+      if (this.configManager.Config.map.showScaleLine) {
+        const scaleLine = new ScaleLine({
+          units: 'metric'
+        });
+        this.map.addControl(scaleLine);
+      }
     });
 
     // Add dragbox selection interaction

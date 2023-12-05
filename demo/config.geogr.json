@@ -76,7 +76,8 @@
       800000, 500000, 200000, 100000, 50000, 25000, 20000, 10000, 7500, 5000, 2500, 2000, 1000, 750, 500, 250, 200, 100,
       50
     ],
-    "constraintScales": true
+    "constraintScales": true,
+    "showScaleLine": true
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
