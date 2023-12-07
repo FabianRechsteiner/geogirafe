@@ -78,6 +78,6 @@
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
-    "tilesetsUrls": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"]
+    "tilesetsUrls": ["https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_Cesium_2023-2/Scene/Vevey_Cesium_2023.json"]
   }
 }
