@@ -13,7 +13,7 @@ type GraphicalInterface = {
   printPanelVisible: boolean;
   selectionGridVisible: boolean;
   aboutVisible: boolean;
-  darkMode: boolean;
+  darkMapMode: boolean;
   darkFrontendMode: boolean;
 };
 
@@ -100,7 +100,7 @@ class State {
     printPanelVisible: false,
     selectionGridVisible: false,
     aboutVisible: false,
-    darkMode: false,
+    darkMapMode: false,
     darkFrontendMode: false
   };
 

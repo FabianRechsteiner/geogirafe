@@ -1,5 +1,4 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement.ts';
-import Statemanager from '../../tools/state/statemanager.ts';
 
 // https://css-tricks.com/a-complete-guide-to-dark-mode-on-the-web/
 
@@ -17,9 +16,8 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  colorswitcherContainer!: HTMLElement;
-  colorswitchSwitcher!: HTMLElement;
-  header!: HTMLElement;
+  frontendColorSwitcher!: HTMLInputElement;
+  mapColorSwitcher!: HTMLInputElement;
 
   // Select the theme preference from localStorage
   currentTheme: string | null = localStorage.getItem('theme');
@@ -30,16 +28,14 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    this.colorswitcherContainer = this.shadow.querySelector('#colorswitcherContainer') as HTMLElement;
-    this.colorswitchSwitcher = this.shadow.querySelector('#colorswitchSwitcher') as HTMLElement;
-  }
-
-  getHeader() {
-    this.header = this.shadow.querySelector('body') as HTMLElement;
+    this.frontendColorSwitcher = this.shadow.querySelector('#frontendColorSwitcher') as HTMLInputElement;
+    this.mapColorSwitcher = this.shadow.querySelector('#mapColorSwitcher') as HTMLInputElement;
+    this.activateTooltips(false, [800, 0], 'top-end');
   }
 
   registerEvents() {
-    this.colorswitchSwitcher.addEventListener('click', () => this.toggleDarkFrontendMode());
+    this.stateManager.subscribe('interface.darkFrontendMode', () => this.onChangeDarkFrontendMode());
+    this.stateManager.subscribe('interface.darkMapMode', () => this.onChangeDarkFrontendMode());
   }
 
   toggleClassList(val: boolean) {
@@ -50,36 +46,31 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
     }
   }
 
-  toggleDarkFrontendMode() {
-    let clrSchema = Statemanager.getInstance().state.interface.darkFrontendMode;
-    clrSchema = !clrSchema;
-    Statemanager.getInstance().state.interface.darkFrontendMode = clrSchema;
-
-    let theme = 'light';
-
-    if (clrSchema) {
-      theme = 'dark';
-    }
-    this.toggleClassList(clrSchema);
+  onChangeDarkFrontendMode() {
+    // Interface
+    const theme = this.state.interface.darkFrontendMode ? 'dark' : 'light';
+    this.toggleClassList(this.state.interface.darkFrontendMode);
+    this.frontendColorSwitcher.checked = this.state.interface.darkFrontendMode;
     localStorage.setItem('theme', theme);
+
+    // Map
+    this.mapColorSwitcher.checked = this.state.interface.darkMapMode;
   }
 
   initValue() {
     // In case the user has changed it already it's saved to local storage, let's reflect that in the UI
-    if (this.currentTheme != undefined && this.currentTheme === 'dark') {
+    if (this.currentTheme === 'dark') {
       this.activateThemeMode(Mode.dark, Toggle.toggle);
-      return;
-    } else if (this.currentTheme != undefined && this.currentTheme === 'light') {
+    } else if (this.currentTheme === 'light') {
       this.activateThemeMode(Mode.light, Toggle.toggle);
-      return;
-    }
-
-    // If they haven't been explicit, let's check the media query
-    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-    if (prefersDarkScheme.matches) {
-      this.activateThemeMode(Mode.dark, Toggle.toggle);
     } else {
-      this.activateThemeMode(Mode.light, Toggle.toggle);
+      // If they haven't been explicit, let's check the media query
+      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+      if (prefersDarkScheme.matches) {
+        this.activateThemeMode(Mode.dark, Toggle.toggle);
+      } else {
+        this.activateThemeMode(Mode.light, Toggle.toggle);
+      }
     }
   }
 
@@ -92,13 +83,7 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
       const otherMode = mode === Mode.dark ? Mode.light : Mode.dark;
       document.body.classList.replace(`${otherMode}-theme`, `${mode}-theme`);
     }
-    Statemanager.getInstance().state.interface.darkFrontendMode = mode === Mode.dark ? true : false;
-
-    if (mode === Mode.dark) {
-      (<HTMLImageElement>document.body.querySelector('#logo'))!.src = 'images/logo_black_small.webp';
-    } else {
-      (<HTMLImageElement>document.body.querySelector('#logo'))!.src = 'images/logo_small.webp';
-    }
+    this.state.interface.darkFrontendMode = mode === Mode.dark;
   }
 
   connectedCallback() {
@@ -106,8 +91,6 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
       this.render();
       this.girafeTranslate();
       this.registerEvents();
-
-      this.getHeader();
       this.initValue();
     });
   }
