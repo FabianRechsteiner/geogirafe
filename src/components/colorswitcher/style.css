@@ -1,16 +1,18 @@
-.lbl {
-  position: inherit;
-  top: -0.75rem;
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 4.6rem;
 }
 
 /* The switch - the box around the slider */
 .switch {
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   vertical-align: middle;
-  border-right: solid 1px #fff;
+  border-right: solid 1px var(--bkg-color);
   width: 4rem;
-  height: 4.6rem;
+  height: 50%;
   text-align: center;
   background-color: var(--bkg-color-grad1);
 }
@@ -24,18 +26,15 @@
 
 /* The slider */
 .slider {
-  position: absolute;
+  position: relative;
   cursor: pointer;
-  top: 2.2rem;
-  left: 0.5rem;
-  right: 0.5rem;
-  bottom: 1.4rem;
   width: 3rem;
   height: 1.5rem;
   vertical-align: middle;
   background-color: var(--bkg-color);
   -webkit-transition: 0.4s;
   transition: 0.4s;
+  margin: 0 auto;
 }
 
 .slider:before {

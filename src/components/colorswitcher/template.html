@@ -1,9 +1,18 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
-<div id="container">
+<div class="container">
   <label class="switch">
-    <h6 class="lbl">Color mode</h6>
-    <input id="colorswitchSwitcher" type="checkbox" />
-    <span id="colorswitcher" class="slider round"></span>
+    <input
+      id="frontendColorSwitcher"
+      type="checkbox"
+      onclick="${() => this.state.interface.darkFrontendMode = !this.state.interface.darkFrontendMode}" />
+    <span tip="Dark mode on interface" class="slider round"></span>
+  </label>
+  <label class="switch">
+    <input
+      id="mapColorSwitcher"
+      type="checkbox"
+      onclick="${() => this.state.interface.darkMapMode = !this.state.interface.darkMapMode}" />
+    <span tip="Dark mode on map" class="slider round"></span>
   </label>
 </div>

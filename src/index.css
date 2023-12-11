@@ -115,13 +115,21 @@ girafe-theme-select {
   z-index: 100;
 }
 
-#logo {
+.logo {
   position: absolute;
   left: 4.5rem;
   bottom: 0;
   margin-bottom: 0.5rem;
   height: 45px;
   margin-left: 1rem;
+}
+
+body.dark-theme .logo-light {
+  display: none;
+}
+
+body.light-theme .logo-dark {
+  display: none;
 }
 
 girafe-search {

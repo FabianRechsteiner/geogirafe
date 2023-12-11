@@ -60,7 +60,8 @@
   <body>
     <header>
       <girafe-theme-select></girafe-theme-select>
-      <img id="logo" alt="geogirafe-logo" src="images/logo_small.webp" />
+      <img class="logo logo-light" alt="geogirafe-logo" src="images/logo_small.webp" />
+      <img class="logo logo-dark" alt="geogirafe-logo" src="images/logo_black_small.webp" />
       <girafe-search id="search"></girafe-search>
       <div id="buttonbar">
         <girafe-nav-history></girafe-nav-history>
@@ -84,11 +85,6 @@
             </girafe-button>
             <girafe-proj-select></girafe-proj-select>
             <girafe-language-select></girafe-language-select>
-            <girafe-button
-              icon-style="fa-xl fa-solid fa-moon"
-              text="Dark"
-              onclick="document.state.interface.darkMode = !document.state.interface.darkMode">
-            </girafe-button>
             <girafe-globe-select></girafe-globe-select>
             <girafe-button
               icon-style="fa-xl fa-solid fa-circle-info"

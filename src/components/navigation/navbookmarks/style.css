@@ -13,7 +13,7 @@ input {
 
 button {
   border: none;
-  border-right: solid 1px #fff;
+  border-right: solid 1px var(--bkg-color);
   width: 2.3rem;
   height: 2.3rem;
   line-height: 2.3rem;

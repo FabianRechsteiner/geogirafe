@@ -45,10 +45,6 @@ import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
 import MapPosition from '../../tools/state/mapposition';
 
-// read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
-// TODO REG: Problem : we import the cesium twice : one in the bundle, and another one with a scripts tag
-// How to solve this ?
-
 class MapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
@@ -108,7 +104,7 @@ class MapComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('projection', (_oldProjection: string, newProjection: string) =>
       this.onChangeProjection(newProjection)
     );
-    this.stateManager.subscribe('interface.darkMode', (_oldValue: boolean, _newValue: boolean) =>
+    this.stateManager.subscribe('interface.darkMapMode', (_oldValue: boolean, _newValue: boolean) =>
       this.onChangeDarkMode()
     );
     this.stateManager.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
@@ -624,7 +620,7 @@ class MapComponent extends GirafeHTMLElement {
   onChangeDarkMode() {
     const canvas = this.shadow.querySelector('canvas');
     if (canvas) {
-      canvas.style.filter = this.state.interface.darkMode ? 'invert(100%) hue-rotate(180deg)' : '';
+      canvas.style.filter = this.state.interface.darkMapMode ? 'invert(100%) hue-rotate(180deg)' : '';
     }
   }
 
