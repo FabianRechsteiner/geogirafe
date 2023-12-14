@@ -2,7 +2,7 @@
 // TODO REG : Deactivate this exception in eslint when this type-error will be solved
 
 import GirafeSingleton from '../../base/GirafeSingleton';
-import State from './state.js';
+import State from './state';
 import ConfigManager from '../configmanager';
 import onChange from 'on-change';
 
@@ -23,12 +23,22 @@ class StateManager extends GirafeSingleton {
     this.configManager = ConfigManager.getInstance();
 
     this.#girafeState = new State();
-    this.#stateProxy = onChange(this.#girafeState, (path, value, oldValue, _applyData) => {
-      if (!this.areEqual(oldValue, value)) {
-        console.debug(`${path} has changed.`);
-        this.onChange(path, oldValue, value);
+    this.#stateProxy = onChange(
+      this.#girafeState,
+      (path, value, oldValue, _applyData) => {
+        if (!this.areEqual(oldValue, value)) {
+          console.debug(`${path} has changed.`);
+          this.onChange(path, oldValue, value);
+        }
+      },
+      {
+        // NOTE REG: The mechanisms implemented by the on-change librairy and based on javascript proxies are having a few problems with certain openlayers objects.
+        // For the time being, there's nothing to worry about, as it only concerns private one properties of openlayers.
+        // This is why they are excluded from on-change monitoring, thanks to the configuration below.
+        // However, we have to pay attention to this point in the future.
+        ignoreKeys: ['styleFunction_']
       }
-    });
+    );
 
     // Prevent extensions of the State Object.
     Object.preventExtensions(this.#girafeState);
@@ -52,10 +62,17 @@ class StateManager extends GirafeSingleton {
       const regex = new RegExp('^' + key + '$');
       if (path.match(regex)) {
         // We find the parent object and send it in the callback
-        const parentPath = path.substring(0, path.lastIndexOf('.'));
+        const indexOfLastPoint = path.lastIndexOf('.');
+        const parentPath = path.substring(0, indexOfLastPoint);
+        const childPathFromParent = path.substring(indexOfLastPoint + 1);
         const parentObject = this.getPropertyByPath(this.state, parentPath);
         if (!parentObject.found) {
           console.warn('Parent object could not be found in the state');
+        } else {
+          // At this point, the "value" is not the proxy, but the initial object.
+          // But we want to get the proxy and to return it, because it can be used in the calling methods
+          // Otherwise, the modifications made to the object won't go through the proxy, and the events won't be fired
+          value = parentObject.object[childPathFromParent];
         }
 
         const callbacks = this.#callbacks[key];
@@ -89,19 +106,24 @@ class StateManager extends GirafeSingleton {
         // Object is not null during the subscribe. => we call the callback
         const parentPath = path.substring(0, path.lastIndexOf('.'));
         const parentObject = this.getPropertyByPath(this.state, parentPath);
-        callback(null, obj.object, parentObject);
+        callback(null, obj.object, parentObject.object);
       }
     }
   }
 
   unsubscribe(callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>) {
+    let found = false;
     for (const path in this.#callbacks) {
       const callbacks = this.#callbacks[path];
       const index = callbacks.indexOf(callback);
       if (index !== -1) {
+        found = true;
         callbacks.splice(index, 1);
         console.debug(`Unsubscribing to ${path}. ${this.#callbacks[path].length} subscribtions remaining.`);
       }
+    }
+    if (!found) {
+      throw Error(`Cannot unsubscribe this callback : it does not exist`);
     }
   }
 

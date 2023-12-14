@@ -38,11 +38,35 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
       'layers.layersList..*.activeState',
       (_oldValue: boolean, _newValue: boolean, group: GroupLayer) => this.refreshRender(group)
     );
+    this.stateManager.subscribe(
+      'layers.layersList..*.children',
+      (oldChildren: BaseLayer[], newChildren: BaseLayer[], group: GroupLayer) =>
+        this.onChildrenListChanged(oldChildren, newChildren, group)
+    );
   }
 
   refreshRender(group: GroupLayer) {
     if (group === this.group) {
       super.render();
+    }
+  }
+
+  onChildrenListChanged(oldChildren: BaseLayer[], newChildren: BaseLayer[], group: GroupLayer) {
+    this.refreshRender(group);
+    // If we added a new group to the list of layers
+    // Then we activate the layers that should be activated by default
+    const addedLayers = newChildren.filter(
+      (newChild) => !oldChildren.find((oldChild) => oldChild.treeItemId === newChild.treeItemId)
+    );
+    this.activateDefaultLayers(addedLayers);
+  }
+
+  activateDefaultLayers(layers: BaseLayer[]) {
+    for (const layer of layers) {
+      this.layerManager.activateIfDefaultChecked(layer);
+      if (layer instanceof GroupLayer) {
+        this.activateDefaultLayers(layer.children);
+      }
     }
   }
 

@@ -9,6 +9,8 @@ import { Size } from 'ol/size';
 import BaseEvent from 'ol/events/Event';
 import LayerWmts from '../../../models/layers/layerwmts';
 import LayerWms from '../../../models/layers/layerwms';
+import LayerLocalFile from '../../../models/layers/layerlocalfile';
+import LocalFileManager from './localfilemanager';
 
 class SwipeManager {
   map: Map;
@@ -26,8 +28,15 @@ class SwipeManager {
 
   wmtsManager: WmtsManager;
   wmsManager: WmsManager;
+  localFileManager: LocalFileManager;
 
-  constructor(map: Map, swiper: HTMLInputElement, wmtsManager: WmtsManager, wmsManager: WmsManager) {
+  constructor(
+    map: Map,
+    swiper: HTMLInputElement,
+    wmtsManager: WmtsManager,
+    wmsManager: WmsManager,
+    localFileManager: LocalFileManager
+  ) {
     this.map = map;
     this.swiper = swiper;
 
@@ -38,12 +47,22 @@ class SwipeManager {
     this.swiperMaxVal = parseInt(maxVal);
     this.wmtsManager = wmtsManager;
     this.wmsManager = wmsManager;
+    this.localFileManager = localFileManager;
   }
 
   activateSwipeForWmts(layer: LayerWmts, side: 'left' | 'right') {
     if (this.wmtsManager.layerExists(layer)) {
       const olayer = this.wmtsManager.getLayer(layer)!;
       this.#activateSwipeForLayer(layer.layers!, olayer, side);
+    } else {
+      throw new Error('Cannot swipe this layer: it does not exist.');
+    }
+  }
+
+  activateSwipeForLocalFile(layer: LayerLocalFile, side: 'left' | 'right') {
+    if (this.localFileManager.layerExists(layer)) {
+      const olayer = this.localFileManager.getLayer(layer)!;
+      this.#activateSwipeForLayer(layer.name, olayer, side);
     } else {
       throw new Error('Cannot swipe this layer: it does not exist.');
     }

@@ -25,7 +25,9 @@ class TreeViewComponent extends GirafeResizableElement {
 
   registerEvents() {
     this.stateManager.subscribe('selectedTheme', () => this.onThemeChanged());
-    this.stateManager.subscribe('layers.layersList', () => super.render());
+    this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) =>
+      this.onLayersListChanged(oldLayers, newLayers)
+    );
     this.stateManager.subscribe('layers.swipedLayers', () => super.render());
     this.stateManager.subscribe('treeview.advanced', () => super.render());
   }
@@ -37,6 +39,16 @@ class TreeViewComponent extends GirafeResizableElement {
     } else {
       this.state.layers.layersList = [];
     }
+  }
+
+  onLayersListChanged(oldLayers: BaseLayer[], newLayers: BaseLayer[]) {
+    super.render();
+    // If we added a new group to the list of layers
+    // Then we activate the layers that should be activated by default
+    const addedLayers = newLayers.filter(
+      (newLayer) => !oldLayers.find((oldLayer) => oldLayer.treeItemId === newLayer.treeItemId)
+    );
+    this.activateDefaultLayers(addedLayers);
   }
 
   activateDefaultLayers(layers: BaseLayer[]) {

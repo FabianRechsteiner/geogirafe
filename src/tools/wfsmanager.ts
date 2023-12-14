@@ -36,9 +36,6 @@ class WfsManager extends GirafeSingleton {
   onSelectFeatures(selectionParams: SelectionParam[]) {
     this.state.loading = true;
 
-    // Reset current selection
-    this.state.selection.selectedFeatures = [];
-
     // First, we have to load the DescribeFeatureType for this WFS server if this wasn't done yet
     const wfsToInitialize: string[] = [];
     for (const param of selectionParams) {
@@ -221,8 +218,8 @@ class WfsManager extends GirafeSingleton {
     // Wait the result of all promises to display responses
     Promise.all(promises).then(async (responses) => {
       const selectedFeatures = [];
-      for (let i = 0; i < responses.length; ++i) {
-        const gml = await responses[i].text();
+      for (const element of responses) {
+        const gml = await element.text();
         // TODO REG: Do we always want to use the format GML3 here ?
         const features = new GML3().readFeatures(gml);
         selectedFeatures.push(...features);
@@ -232,7 +229,7 @@ class WfsManager extends GirafeSingleton {
         // No feature selected
         this.state.interface.selectionGridVisible = false;
       } else {
-        this.state.selection.selectedFeatures = selectedFeatures;
+        this.state.selection.selectedFeatures.push(...selectedFeatures);
         this.state.interface.selectionGridVisible = true;
       }
 

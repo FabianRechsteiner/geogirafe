@@ -118,3 +118,12 @@ i {
 .item.advanced i.advanced {
   display: block;
 }
+
+.legend-file,
+.legend-image {
+  margin-left: 1rem;
+}
+
+.legend-file {
+  font-style: italic;
+}
