@@ -12,17 +12,6 @@ variables:
   GIT_DEPTH: '0' # Tells git to fetch all the branches of the project, required by the analysis task
 
 #################################
-# run unittests
-#unitests:
-#  stage: test
-#  image: node:18-slim
-#
-#  script:
-#    # build
-#    - npm i
-#    - npm run test
-
-#################################
 # Audit NPM dependencies to find any known vulnerability
 npm-audit:
   stage: test
@@ -50,11 +39,20 @@ npm-outdated:
 eslint:
   stage: test
   image: node:18-slim
-  allow_failure: true
 
   script:
     - npm i
     - npm run lint
+
+#################################
+# Unit-Tests
+unittest:
+  stage: test
+  image: node:18-slim
+
+  script:
+    - npm i
+    - npm run test
 
 #################################
 # Quality, readability, reliability and security checks with Sonarcloud

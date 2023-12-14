@@ -50,7 +50,11 @@ class SelectionGridComponent extends GirafeResizableElement {
   onFeaturesSelected(features) {
     this.header.innerHTML = '';
     if (this.isNullOrUndefined(features) || features.length <= 0) {
+      this.state.interface.selectionGridVisible = false;
+      this.grid.innerHTML = '';
       return;
+    } else {
+      this.state.interface.selectionGridVisible = false;
     }
 
     this.typeToFeatures = {};
@@ -166,6 +170,7 @@ class SelectionGridComponent extends GirafeResizableElement {
         (lowerCell.includes('<a') && lowerCell.includes('href')) ||
         (lowerCell.includes('<img') && lowerCell.includes('src')) ||
         lowerCell.includes('<girafe-button') ||
+        lowerCell.includes('<table') ||
         (lowerCell.includes('<i') && lowerCell.includes('class'))
       ) {
         // For links and images, interpret html

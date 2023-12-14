@@ -46,6 +46,13 @@
     onclick="${() => this.zoomToVisibleResolution()}">
   </i>
 
+  <!-- zoom to full extent -->
+  <i
+    class="${this.layer instanceof LayerLocalFile ? 'fa-solid fa-magnifying-glass tool selectable resolution' : 'resolution hidden'}"
+    tip="Zoom to full extent"
+    onclick="${() => this.zoomToFullExtent()}">
+  </i>
+
   <!-- swipe icons -->
   <i
     class="fa-solid fa-arrow-left tool selectable swipe-left advanced"
@@ -69,7 +76,8 @@
     tip="Filter layer"></i>
 
   <!-- Toggle legend icon -->
-  <div class="${this.layer instanceof LayerWms && this.layer.legend ? 'legend selectable' : 'legend invisible'}">
+  <div
+    class="${this.layer instanceof LayerLocalFile || (this.layer instanceof LayerWms && this.layer.legend) ? 'legend selectable' : 'legend invisible'}">
     <i
       tip="Toggle legend"
       class="${this.layer.isLegendExpanded ? 'fa-solid fa-bars fa-rotate-270 tool selectable' : 'fa-solid fa-bars tool selectable'}"
@@ -81,3 +89,9 @@ ${this.layer.layers?.split(',').map(l => uHtml`<img
   class="${this.layer instanceof LayerWms && this.layer.legend && this.layer.isLegendExpanded ? 'legend-image' : 'legend-image hidden'}"
   alt="${'Legend for ' + l}"
   src="${this.legendUrls[l]}" />` )}
+
+<div
+  class="${this.layer instanceof LayerLocalFile && this.layer.isLegendExpanded ? 'legend-file' : 'legend-file hidden'}">
+  <span>File from </span><span>${this.layer.lastModifiedDate}</span><span> [</span
+  ><span>${this.layer._features?.length} </span><span>features.]</span>
+</div>

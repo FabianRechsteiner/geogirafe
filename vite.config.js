@@ -24,5 +24,6 @@ export default defineConfig({
   optimizeDeps: {
     include: ['cesium', 'olcs/OLCesium']
   },
-  plugins: [InlineTemplatesPlugin(), RestartPlugin()]
+  plugins: [InlineTemplatesPlugin(), RestartPlugin()],
+  test: {}
 });

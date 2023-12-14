@@ -44,6 +44,8 @@ import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
 import MapPosition from '../../tools/state/mapposition';
+import LocalFileManager from './tools/localfilemanager';
+import LayerLocalFile from '../../models/layers/layerlocalfile';
 
 class MapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -64,6 +66,7 @@ class MapComponent extends GirafeHTMLElement {
   osmManager!: OsmManager;
   viewManager!: ViewManager;
   vectorTilesManager!: VectorTilesManager;
+  localFileManager!: LocalFileManager;
 
   srid!: ProjectionLike;
   get projection() {
@@ -182,9 +185,16 @@ class MapComponent extends GirafeHTMLElement {
     this.osmManager = new OsmManager(this.map, this.srid);
     this.viewManager = new ViewManager(this.map, this.srid);
     this.vectorTilesManager = new VectorTilesManager(this.map, this.srid);
+    this.localFileManager = new LocalFileManager(this.map);
     this.wmtsManager = new WmtsManager(this.map, this.srid);
     this.swiper = this.shadow.getElementById('swiper') as HTMLInputElement;
-    this.swipeManager = new SwipeManager(this.map, this.swiper, this.wmtsManager, this.wmsManager);
+    this.swipeManager = new SwipeManager(
+      this.map,
+      this.swiper,
+      this.wmtsManager,
+      this.wmsManager,
+      this.localFileManager
+    );
 
     // View
     const view = this.viewManager.getView();
@@ -374,15 +384,20 @@ class MapComponent extends GirafeHTMLElement {
     const bottomRightCoord = this.map.getCoordinateFromPixel(bottomRightPixel);
     const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
 
-    // Today, only the selection on WMS Layer is managed
-    this.wmsManager.selectFeatures(extent);
+    this.select(extent);
   }
 
   onDragSelection(_e: DragBoxEvent) {
     const extent = this.dragbox.getGeometry().getExtent();
+    this.select(extent);
+  }
 
-    // Today, only the selection on WMS Layer is managed
+  select(extent: number[]) {
+    // Reset current selection
+    this.state.selection.selectedFeatures = [];
+    // Layers selectable today are WMS and Local files
     this.wmsManager.selectFeatures(extent);
+    this.localFileManager.selectFeatures(extent);
   }
 
   flash(feature: Feature) {
@@ -502,6 +517,8 @@ class MapComponent extends GirafeHTMLElement {
         this.swipeManager.activateSwipeForWms(layer, side);
       } else if (layer instanceof LayerWmts) {
         this.swipeManager.activateSwipeForWmts(layer, side);
+      } else if (layer instanceof LayerLocalFile) {
+        this.swipeManager.activateSwipeForLocalFile(layer, side);
       }
     }
   }
@@ -640,6 +657,8 @@ class MapComponent extends GirafeHTMLElement {
         this.wmsManager.addLayer(l);
       } else if (l instanceof LayerWmts) {
         this.wmtsManager.addLayer(l);
+      } else if (l instanceof LayerLocalFile) {
+        this.localFileManager.addLayer(l);
       }
     });
   }
@@ -652,6 +671,8 @@ class MapComponent extends GirafeHTMLElement {
         if (this.wmtsManager.layerExists(l)) {
           this.wmtsManager.removeLayer(l);
         }
+      } else if (l instanceof LayerLocalFile) {
+        this.localFileManager.removeLayer(l);
       }
     });
   }

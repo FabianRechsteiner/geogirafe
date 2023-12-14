@@ -4,7 +4,9 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Layer from '../../models/layers/layer';
 import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
+import LayerLocalFile from '../../models/layers/layerlocalfile';
 import QueryBuilderComponent from '../querybuilder/component';
+import GeoEvents from '../../models/events';
 
 class TreeViewItemComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -29,8 +31,10 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     const layerId = this.getAttribute('layerid');
     if (layerId) {
       this.layer = this.layerManager.getTreeItem(layerId) as Layer;
-      // Get Legend Url
-      this.setLegend();
+      if (this.layer instanceof LayerWms) {
+        // Get Legend Url
+        this.setWmsLegend();
+      }
     }
     super.render();
     this.createOpacityTooltip();
@@ -38,7 +42,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     this.createTooltips();
   }
 
-  setLegend() {
+  setWmsLegend() {
     if (!(this.layer instanceof LayerWms)) {
       // nothing to do if it's not a WMS
       return;
@@ -170,7 +174,9 @@ class TreeViewItemComponent extends GirafeHTMLElement {
   }
 
   refreshLegends() {
-    this.setLegend();
+    if (this.layer instanceof LayerWms) {
+      this.setWmsLegend();
+    }
     super.render();
   }
 
@@ -201,6 +207,14 @@ class TreeViewItemComponent extends GirafeHTMLElement {
       const resolution = this.layer.maxResolution - (10 / 100) * this.layer.maxResolution;
       this.state.position.resolution = resolution;
     }
+  }
+
+  zoomToFullExtent() {
+    if (!(this.layer instanceof LayerLocalFile)) {
+      throw new Error(`${this.layer.name} is not a LocalFile layer, this method should not be called here.`);
+    }
+
+    this.messageManager.sendMessage({ action: GeoEvents.zoomToExtent, extent: this.layer.extent });
   }
 
   swipeLayer(side: 'left' | 'right') {

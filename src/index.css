@@ -255,3 +255,7 @@ girafe-about {
 .border-top {
   border-top: solid 1px #fff;
 }
+
+.tippy-content {
+  white-space: pre-line;
+}
