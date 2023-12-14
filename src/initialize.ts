@@ -36,6 +36,7 @@ import ThemeComponent from './components/themes/component';
 import TreeViewComponent from './components/treeview/component';
 import TreeViewItemComponent from './components/treeviewitem/component';
 import TreeViewGroupComponent from './components/treeviewgroup/component';
+import VideoRecordComponent from './components/videorecord/component';
 
 // Extend default Document and Window interfaces
 declare global {
@@ -105,3 +106,4 @@ customElements.define('girafe-theme-select', ThemeComponent);
 customElements.define('girafe-tree-view', TreeViewComponent);
 customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
 customElements.define('girafe-tree-view-item', TreeViewItemComponent);
+customElements.define('girafe-video-record', VideoRecordComponent);
