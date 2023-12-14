@@ -1,0 +1,11 @@
+<div id="content">
+  <div class="${this.status === 'downloaded' ? '' : 'hidden'}">
+    <girafe-button icon-style="fa-2xl fa-solid fa-video" onclick="${() => this.startRecording()}"></girafe-button>
+  </div>
+  <div class="${this.status === 'recording' ? '' : 'hidden'}">
+    <girafe-button icon-style="fa-2xl fa-solid fa-circle-stop" onclick="${() => this.stopRecording()}"></girafe-button>
+  </div>
+  <div class="${this.status === 'recorded' ? '' : 'hidden'}">
+    <girafe-button icon-style="fa-2xl fa-solid fa-circle-down" onclick="${() => this.downloadRecord()}"></girafe-button>
+  </div>
+</div>
