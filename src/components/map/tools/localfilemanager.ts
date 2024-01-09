@@ -5,7 +5,7 @@ import { Vector as VectorLayer } from 'ol/layer.js';
 import { Vector as VectorSource } from 'ol/source.js';
 import { Geometry } from 'ol/geom';
 import LayerLocalFile from '../../../models/layers/layerlocalfile';
-import GroupLayer from '../../../models/layers/layergroup';
+import GroupLayer from '../../../models/layers/grouplayer';
 import StateManager from '../../../tools/state/statemanager';
 import { extend, intersects } from 'ol/extent';
 

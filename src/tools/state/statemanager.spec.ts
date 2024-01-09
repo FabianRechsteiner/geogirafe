@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import StateManager from './statemanager';
 import State from './state';
 import onChange from 'on-change';
+import Theme from '../../models/theme';
+import LayerOsm from '../../models/layers/layerosm';
 
 describe('StateManager.getCircularReplacer', () => {
   const manager = StateManager.getInstance();
@@ -307,6 +309,26 @@ describe('StateManager.subscribe', () => {
       expect(controlValue).toEqual(1);
       // @ts-ignore
       manager.state.extendedState.arr[0].visible = true;
+      expect(controlValue).toEqual(2);
+    } finally {
+      manager.unsubscribe(callback);
+    }
+  });
+
+  it('subscribe should not listen to properties whose name begins with underscode', () => {
+    let controlValue;
+    const callback = () => {
+      controlValue = 2;
+    };
+    try {
+      const theme = new Theme({ id: 1, name: 'test', icon: 'iconpath' });
+      theme._layersTree.push(new LayerOsm(0));
+      manager.state.themes[theme.id] = theme;
+      manager.subscribe('.*', callback);
+      controlValue = 1;
+      manager.state.themes[theme.id]._layersTree[0].name = 'new name';
+      expect(controlValue).toEqual(1);
+      manager.state.themes[theme.id].name = 'new name';
       expect(controlValue).toEqual(2);
     } finally {
       manager.unsubscribe(callback);

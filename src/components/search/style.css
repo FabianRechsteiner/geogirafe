@@ -1,3 +1,7 @@
+.hidden {
+  display: none;
+}
+
 #searchbox {
   background-color: var(--bkg-color);
   border-right: none;
@@ -26,7 +30,7 @@
   color: var(--text-color);
 }
 
-#searchIcon {
+.search-icon {
   display: inline-block;
   width: 20px;
   height: 25px;

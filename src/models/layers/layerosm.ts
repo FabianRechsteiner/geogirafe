@@ -10,8 +10,20 @@ class LayerOsm extends Layer {
    * For example, any method doing <this.xxx = value> is forbidden here, because the modification be known from the proxy
    */
 
-  constructor(elem: GMFTreeItem, order: number) {
-    super(elem, order);
+  constructor(order: number) {
+    const data: GMFTreeItem = {
+      id: -1,
+      name: 'OpenStreetMap',
+      type: 'OSM',
+      metadata: {
+        isLegendExpanded: false,
+        wasLegendExpanded: false,
+        exclusiveGroup: false,
+        isExpanded: false,
+        isChecked: false
+      }
+    };
+    super(data, order);
   }
 }
 

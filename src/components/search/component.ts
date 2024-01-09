@@ -3,152 +3,90 @@ import { buffer, getWidth, getHeight, Extent } from 'ol/extent';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events';
 import SearchResult from '../../models/searchresult';
+import ThemesManager from '../../tools/themesmanager';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  #searchBox?: HTMLElement;
-  #resultsBox?: HTMLElement;
-  ignoreBlur = false;
+  themeManager: ThemesManager;
 
-  resultList: SearchResult[] = [];
+  #ignoreBlur = false;
+  groupedResults: Record<string, SearchResult[]> = {};
+  forceHide: boolean = false;
 
   searchTermPlaceholder = '###SEARCHTERM###';
-  initialSearchBoxHeight = this.convertRemToPixels(2.5);
+  searchLangPlaceholder = '###SEARCHLANG###';
 
   constructor() {
     super('search');
+    this.themeManager = ThemesManager.getInstance();
   }
 
-  get searchBox() {
-    if (!this.#searchBox) {
-      throw new Error('You called searchBox before render');
-    }
-    return this.#searchBox;
-  }
-
-  get resultsBox() {
-    if (!this.#resultsBox) {
-      throw new Error('You called resultsBox before render');
-    }
-    return this.#resultsBox;
-  }
-
-  render() {
-    super.render();
-
-    // Get default height of searchBox
-    this.#searchBox = this.shadow.querySelector('#searchbox')!;
-    this.#resultsBox = this.shadow.querySelector('#results')!;
-  }
-
-  registerEvents() {
-    this.searchBox.addEventListener('input', (e) => this.doSearch(e));
-    this.searchBox.addEventListener('focusin', (_e) => this.onFocusIn());
-    this.searchBox.addEventListener('focusout', (_e) => this.onFocusOut());
+  ignoreBlur() {
+    this.#ignoreBlur = true;
   }
 
   onFocusIn() {
-    this.ignoreBlur = false;
-    this.resultsBox.style.display = 'block';
-    this.setSearchBoxHeight(this.initialSearchBoxHeight + this.resultsBox.offsetHeight + 20);
+    this.forceHide = false;
+    super.render();
   }
 
   onFocusOut() {
-    if (!this.ignoreBlur) {
-      this.resultsBox.style.display = 'none';
-      this.setSearchBoxHeight(this.initialSearchBoxHeight);
+    if (!this.#ignoreBlur) {
+      this.forceHide = true;
+      super.render();
     }
+    this.#ignoreBlur = false;
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
-      this.render();
+      super.render();
       super.girafeTranslate();
-      this.registerEvents();
     });
   }
 
   clearSearch() {
-    this.resultList = [];
-    this.resultsBox.innerHTML = '';
-    this.setSearchBoxHeight(this.initialSearchBoxHeight);
+    this.groupedResults = {};
+    this.forceHide = false;
+    super.render();
   }
 
-  doSearch(e: Event) {
+  async doSearch(e: Event) {
     const target = e.target as HTMLInputElement;
     if (target) {
       const term: string = target.value;
-      if (term.length <= 0) {
-        this.clearSearch();
-        return;
+      this.clearSearch();
+      if (term.length > 0) {
+        const url = this.configManager.Config.search.url
+          .replace(this.searchTermPlaceholder, term)
+          .replace(this.searchLangPlaceholder, this.state.language!);
+        const response = await fetch(url);
+        const data = await response.json();
+        this.displayResults(data);
       }
-
-      const url = this.configManager.Config.search.url.replace(this.searchTermPlaceholder, term);
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) => this.displayResults(data));
     }
   }
 
   displayResults(results: { type: string; features: SearchResult[] }) {
     // First, group the results
-    const groupedResults: Record<string, SearchResult[]> = {};
     results.features.forEach((result) => {
       const type = result.properties ? result.properties.layer_name : 'ERROR: Missing type in the search result';
 
-      if (type in groupedResults) {
-        this.resultList = groupedResults[type];
+      let resultList: SearchResult[];
+      if (type in this.groupedResults) {
+        resultList = this.groupedResults[type];
       } else {
-        this.resultList = [];
-        groupedResults[type] = this.resultList;
+        resultList = [];
+        this.groupedResults[type] = resultList;
       }
 
-      this.resultList.push(result);
+      resultList.push(result);
     });
 
-    // Then, display the results by group
-    this.clearSearch();
-    for (const type in groupedResults) {
-      // Create a title
-      const title = document.createElement('div');
-      title.className = 'title';
-
-      const icon = document.createElement('i');
-      icon.className = this.getIconClassName(type);
-      title.appendChild(icon);
-
-      const titleText = document.createElement('span');
-      titleText.innerHTML = type; // TODO: Translate `type`
-      title.appendChild(titleText);
-
-      this.resultsBox.appendChild(title);
-
-      // Create results
-      groupedResults[type].forEach((r: SearchResult) => {
-        const result = document.createElement('div');
-        result.className = 'result';
-        this.resultList.push(r);
-        result.dataset.resultId = String(this.resultList.length - 1);
-
-        result.onmousedown = () => {
-          this.ignoreBlur = true;
-        };
-        result.onclick = (e) => {
-          this.ignoreBlur = false;
-          this.onSelect(e);
-        };
-
-        const text = document.createElement('span');
-        text.innerHTML = r.properties ? r.properties.label : 'ERROR: No property for thie searchresult !';
-        result.appendChild(text);
-
-        this.resultsBox.appendChild(result);
-      });
-    }
-
-    this.setSearchBoxHeight(this.initialSearchBoxHeight + this.resultsBox.offsetHeight + 20);
+    // And then rerender the results
+    super.render();
   }
 
   getIconClassName(type: string) {
@@ -173,23 +111,30 @@ class SearchComponent extends GirafeHTMLElement {
     }
   }
 
-  setSearchBoxHeight(height: number) {
-    this.searchBox.style.height = height + 'px';
-  }
+  onSelect(result: SearchResult) {
+    this.#ignoreBlur = false;
+    this.forceHide = true;
+    super.render();
 
-  onSelect(e: MouseEvent) {
-    const target = e.target as HTMLSpanElement;
-    if (target) {
-      const div = super.getParentOfType('DIV', target) as HTMLDivElement;
-      const resultGeometry = this.resultList[parseInt(div.dataset.resultId!)];
+    console.log(result);
 
-      if (resultGeometry.bbox) {
-        this.zoomTo(resultGeometry.bbox);
-      } else {
-        console.warn('No BBOX found for this search result');
+    if (result.bbox) {
+      // Result with geometry
+      this.zoomTo(result.bbox);
+    } else if (result.properties?.actions[0].action === 'add_group') {
+      const group = this.themeManager.findGroupByName(result.properties?.actions[0].data);
+      if (!this.state.layers.layersList.includes(group)) {
+        this.state.layers.layersList.push(group);
       }
-      this.onFocusOut();
+    } else if (result.properties?.actions[0].action === 'add_layer') {
+      const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
+      if (!this.state.layers.layersList.includes(layer)) {
+        this.state.layers.layersList.push(layer);
+      }
+    } else {
+      console.warn('Unsupported result type');
     }
+    this.onFocusOut();
   }
 
   zoomTo(extent: Extent) {
@@ -198,14 +143,6 @@ class SearchComponent extends GirafeHTMLElement {
     const bufferedExtent = buffer(extent, bufferValue);
 
     this.messageManager.sendMessage({ action: GeoEvents.zoomToExtent, extent: bufferedExtent });
-  }
-
-  attributeChangedCallback(_name: string, _oldValue: string, _newValue: string, _namespace: string) {
-    console.log('attributeChangedCallback');
-  }
-
-  convertRemToPixels(rem: number) {
-    return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
   }
 }
 
