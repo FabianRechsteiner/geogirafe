@@ -1,4 +1,4 @@
-import GroupLayer from './layergroup';
+import GroupLayer from './grouplayer';
 import { v4 as uuidv4 } from 'uuid';
 
 abstract class BaseLayer {

@@ -40,7 +40,7 @@
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
-    "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###&lang=###SEARCHLANG###"
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",

@@ -36,7 +36,9 @@ class StateManager extends GirafeSingleton {
         // For the time being, there's nothing to worry about, as it only concerns private one properties of openlayers.
         // This is why they are excluded from on-change monitoring, thanks to the configuration below.
         // However, we have to pay attention to this point in the future.
-        ignoreKeys: ['styleFunction_']
+        ignoreKeys: ['styleFunction_'],
+        ignoreUnderscores: true,
+        ignoreSymbols: true
       }
     );
 

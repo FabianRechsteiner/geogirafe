@@ -1,6 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import BaseLayer from '../../models/layers/baselayer';
-import GroupLayer from '../../models/layers/layergroup';
+import GroupLayer from '../../models/layers/grouplayer';
 import LayerManager from '../../tools/layermanager';
 
 class TreeViewGroupComponent extends GirafeHTMLElement {

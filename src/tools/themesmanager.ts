@@ -5,7 +5,7 @@ import Theme from '../models/theme';
 import { GMFBackgroundLayer, GMFTheme, GMFTreeItem } from '../models/gmf';
 import ConfigManager from './configmanager';
 import StateManager from './state/statemanager';
-import GroupLayer from '../models/layers/layergroup';
+import GroupLayer from '../models/layers/grouplayer';
 import BaseLayer from '../models/layers/baselayer';
 import LayerOsm from '../models/layers/layerosm';
 import LayerVectorTiles from '../models/layers/layervectortiles';
@@ -79,19 +79,7 @@ class ThemesManager extends GirafeSingleton {
       // Add default OSM Option
       const osmBasemap = new Basemap({ id: -1, name: 'OpenStreetMap' });
       basemaps[osmBasemap.id] = osmBasemap;
-      const data: GMFTreeItem = {
-        id: -1,
-        name: 'OpenStreetMap',
-        type: 'OSM',
-        metadata: {
-          isLegendExpanded: false,
-          wasLegendExpanded: false,
-          exclusiveGroup: false,
-          isExpanded: false,
-          isChecked: false
-        }
-      };
-      osmBasemap.layersList.push(new LayerOsm(data, 0));
+      osmBasemap.layersList.push(new LayerOsm(0));
     }
 
     if (this.configManager.Config.basemaps.SwissTopoVectorTiles) {
@@ -147,7 +135,7 @@ class ThemesManager extends GirafeSingleton {
       const theme = new Theme(themeJson);
       themeJson.children.forEach((layerJson: GMFTreeItem) => {
         const layer = this.prepareThemeLayer(layerJson, null, order);
-        theme.layersTree.push(layer);
+        theme._layersTree.push(layer);
       });
       themes[index] = theme;
     });
@@ -171,7 +159,7 @@ class ThemesManager extends GirafeSingleton {
     let layer: BaseLayer;
     switch (elem.type) {
       case 'OSM': {
-        layer = new LayerOsm(elem, order.value);
+        layer = new LayerOsm(order.value);
         break;
       }
 
@@ -229,7 +217,7 @@ class ThemesManager extends GirafeSingleton {
     // Add the current theme
     const layersList: Layer[] = [];
     if (theme) {
-      theme.layersTree.forEach((layer) => {
+      theme._layersTree.forEach((layer) => {
         this.addLayerToLoadedList(layersList, layer);
       });
     }
@@ -245,6 +233,50 @@ class ThemesManager extends GirafeSingleton {
         this.addLayerToLoadedList(layersList, child);
       });
     }
+  }
+
+  findGroupByName(groupname: string): GroupLayer {
+    const group = this.#findBaseLayerByName(groupname);
+    if (group instanceof GroupLayer) {
+      return group;
+    }
+
+    throw new Error(`Layer ${group.name} was found, but is not a group`);
+  }
+
+  findLayerByName(layername: string): Layer {
+    const layer = this.#findBaseLayerByName(layername);
+    if (layer instanceof Layer) {
+      return layer;
+    }
+
+    throw new Error(`Layer ${layer.name} was found, but is not a layer`);
+  }
+
+  #findBaseLayerByName(layername: string): BaseLayer {
+    for (const theme of Object.values(this.state.themes)) {
+      const layer = this.#findLayerRecursive(theme._layersTree, layername);
+      if (layer) {
+        return layer;
+      }
+    }
+    throw new Error(`Layer ${layername} not found !`);
+  }
+
+  #findLayerRecursive(layers: BaseLayer[], layername: string): BaseLayer | null {
+    for (const layer of layers) {
+      if (layer.name === layername) {
+        return layer;
+      }
+      if (layer instanceof GroupLayer) {
+        const child = this.#findLayerRecursive(layer.children, layername);
+        if (child) {
+          return child;
+        }
+      }
+    }
+
+    return null;
   }
 }
 

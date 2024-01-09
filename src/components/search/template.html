@@ -8,7 +8,22 @@
     autocomplete="off"
     autocorrect="off"
     i18n="Search"
-    placeholder="Search..." />
-  <a id="searchIcon" href="#" title="Geogirafe search"><i class="fa-solid fa-magnifying-glass"></i></a>
-  <div id="results"></div>
+    placeholder="Search..."
+    oninput="${(e) => this.doSearch(e)}"
+    onfocusin="${() => this.onFocusIn()}"
+    onfocusout="${() => this.onFocusOut()}" />
+
+  <a class="search-icon" href="#" title="Geogirafe search">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </a>
+
+  <div id="results" class="${Object.keys(this.groupedResults).length === 0 || this.forceHide ? 'hidden' : ''}">
+    ${Object.keys(this.groupedResults).map(group => uHtml`
+    <div class="title"><i class="${this.getIconClassName(group)}"></i><span>${group}</span></div>
+    ${this.groupedResults[group].map(result => uHtml`
+    <div class="result" onmousedown="${() => this.ignoreBlur()}" onclick="${() => this.onSelect(result)}">
+      <span>${result.properties.label}</span>
+    </div>
+    `)} `)}
+  </div>
 </div>

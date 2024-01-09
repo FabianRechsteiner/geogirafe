@@ -1,6 +1,6 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import BaseLayer from '../../models/layers/baselayer';
-import GroupLayer from '../../models/layers/layergroup';
+import GroupLayer from '../../models/layers/grouplayer';
 import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
 
@@ -34,7 +34,7 @@ class TreeViewComponent extends GirafeResizableElement {
 
   onThemeChanged() {
     if (this.state.selectedTheme != null) {
-      this.state.layers.layersList = [...this.state.selectedTheme.layersTree];
+      this.state.layers.layersList = [...this.state.selectedTheme._layersTree];
       this.activateDefaultLayers(this.state.layers.layersList);
     } else {
       this.state.layers.layersList = [];
