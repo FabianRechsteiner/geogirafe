@@ -79,7 +79,7 @@
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
     "tilesetsUrls": [
-      "https://sitn.ne.ch/3dtiles/le_locle_est/LeLocle_objmCesium3DTiles.json",
+      "https://sitn.ne.ch/3dtiles/chaux81123/Production_1_pro_tie_3d_cesium.json",
       "https://sitn.ne.ch/3dtiles/le_locle_ouest/LeLocle_objmCesium3DTiles.json",
       "https://sitn.ne.ch/3dtiles/vdt/P1_cesium/patch1_cesium.json",
       "https://sitn.ne.ch/3dtiles/vdt/P2_cesium/patch2_cesium.json",
