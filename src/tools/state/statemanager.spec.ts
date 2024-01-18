@@ -279,6 +279,9 @@ describe('StateManager.subscribe', () => {
     expect(() => {
       manager.subscribe('nonExistentProperty.subproperty', () => {});
     }).not.toThrowError();
+    expect(() => {
+      manager.subscribe(/nonExistentProperty\.subproperty/, () => {});
+    }).not.toThrowError();
   });
 
   it('subscribe should support regular expressions for attributes', () => {
@@ -287,7 +290,7 @@ describe('StateManager.subscribe', () => {
       controlValue = 2;
     };
     try {
-      manager.subscribe('.*.helpVisible', callback);
+      manager.subscribe(/.*\.helpVisible/, callback);
       expect(controlValue).toEqual(1);
       manager.state.interface.helpVisible = true;
       expect(controlValue).toEqual(2);
@@ -305,7 +308,7 @@ describe('StateManager.subscribe', () => {
       manager.state.extendedState = {
         arr: [{ visible: false }, { visible: false }, { visible: false }]
       };
-      manager.subscribe('extendedState.arr.[0-9]+.visible', callback);
+      manager.subscribe(/extendedState\.arr\.[0-9]+\.visible/, callback);
       expect(controlValue).toEqual(1);
       // @ts-ignore
       manager.state.extendedState.arr[0].visible = true;
@@ -324,7 +327,7 @@ describe('StateManager.subscribe', () => {
       const theme = new Theme({ id: 1, name: 'test', icon: 'iconpath' });
       theme._layersTree.push(new LayerOsm(0));
       manager.state.themes[theme.id] = theme;
-      manager.subscribe('.*', callback);
+      manager.subscribe(/.*/, callback);
       controlValue = 1;
       manager.state.themes[theme.id]._layersTree[0].name = 'new name';
       expect(controlValue).toEqual(1);

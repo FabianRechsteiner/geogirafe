@@ -31,15 +31,15 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.stateManager.subscribe(
-      'layers.layersList..*.isExpanded',
+      /layers\.layersList\..*\.isExpanded/,
       (_oldValue: boolean, _newValue: boolean, group: GroupLayer) => this.refreshRender(group)
     );
     this.stateManager.subscribe(
-      'layers.layersList..*.activeState',
+      /layers\.layersList\..*\.activeState/,
       (_oldValue: boolean, _newValue: boolean, group: GroupLayer) => this.refreshRender(group)
     );
     this.stateManager.subscribe(
-      'layers.layersList..*.children',
+      /layers\.layersList\..*\.children/,
       (oldChildren: BaseLayer[], newChildren: BaseLayer[], group: GroupLayer) =>
         this.onChildrenListChanged(oldChildren, newChildren, group)
     );

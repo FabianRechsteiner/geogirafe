@@ -147,22 +147,23 @@ class MapComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('interface.printPanelVisible', (_oldValue: boolean, newValue: boolean) =>
       this.onPrintPanelToggled(newValue)
     );
-    this.stateManager.subscribe('print.*', () => this.onPrintStateChanged());
+    this.stateManager.subscribe(/print\..*/, () => this.onPrintStateChanged());
 
     this.stateManager.subscribe('globe.display', () => this.onGlobeToggled());
 
     this.stateManager.subscribe(
-      'layers.layersList..*.activeState',
+      /layers\.layersList\..*\.activeState/,
       (_oldActive: boolean, _newActive: boolean, layer: Layer) => this.onLayerToggled(layer)
     );
     this.stateManager.subscribe(
-      'layers.layersList..*.opacity',
+      /layers\.layersList\..*\.opacity/,
       (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer)
     );
-    this.stateManager.subscribe('layers.layersList..*.filter', (_oldFilter: string, _newFilter: string, layer: Layer) =>
-      this.onChangeFilter(layer)
+    this.stateManager.subscribe(
+      /layers\.layersList\..*\.filter/,
+      (_oldFilter: string, _newFilter: string, layer: Layer) => this.onChangeFilter(layer)
     );
-    this.stateManager.subscribe('layers.layersList..*.order', () => this.onChangeOrder([]));
+    this.stateManager.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder([]));
   }
 
   render() {

@@ -28,7 +28,7 @@ class LayerManager extends GirafeSingleton {
     });
 
     this.stateManager.subscribe(
-      'layers.layersList..*.activeState',
+      /layers\.layersList\..*\.activeState/,
       (_oldActive: boolean, _newActive: boolean, layer: BaseLayer) => this.onLayerToggled(layer)
     );
   }
