@@ -67,6 +67,11 @@ npm install
 npm run serve
 ```
 
+## Debugging using VSCode
+
+If you are using VSCode, there is a preconfigured debugging configuration in the `.vscode` directory.  
+After you've started the application in development mode, just press `F5`, and VSCode will attach to the running process. You will then be able to debug your code.
+
 ## Configuration
 
 The complete configuration of the application is done in the file `static/config.json`.
