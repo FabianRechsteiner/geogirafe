@@ -40,7 +40,7 @@ GeoGirafe is developed according to the following principles:
 
 ## Architecture
 
-Architectural choices made for the GeoGirafe project, including strategic objectives and technological choices, is explained in details here: https://geogirafe.gitlab.io/gg-doc/docs/architecture.
+Architectural choices made for the GeoGirafe project, including strategic objectives and technological choices, is explained in details here: https://doc.geomapfish.dev/docs/architecture.
 
 # Getting Started
 
