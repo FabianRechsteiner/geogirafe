@@ -537,13 +537,32 @@ class MapComponent extends GirafeHTMLElement {
       // Initialize the 3D Map
       this.map3d = new OLCesium({ map: this.map, target: this.map3dTarget });
       const scene = this.map3d.getCesiumScene();
+      const config = this.configManager.Config.map3d;
 
       // Add terrain
-      const terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(this.configManager.Config.map3d.terrainUrl);
-      scene.terrainProvider = terrainProvider;
+      if (config.terrainUrl) {
+        scene.terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(config.terrainUrl);
+      }
+
+      // Add terrain imagery
+      let coverage = Cesium.Rectangle.MAX_VALUE;
+      if (config.terrainImagery) {
+        if (config.terrainImagery.coverageArea) {
+          coverage = Cesium.Rectangle.fromDegrees(...config.terrainImagery.coverageArea);
+        }
+        scene.imageryLayers.addImageryProvider(
+          new Cesium.UrlTemplateImageryProvider({
+            url: config.terrainImagery.url,
+            minimumLevel: config.terrainImagery.minLoD ?? 0,
+            maximumLevel: config.terrainImagery.maxLoD,
+            tilingScheme: new Cesium.GeographicTilingScheme(),
+            rectangle: coverage
+          })
+        );
+      }
 
       // Add 3D-Tiles layers
-      this.configManager.Config.map3d.tilesetsUrls.forEach((tilesetUrl) => {
+      config.tilesetsUrls.forEach((tilesetUrl) => {
         Cesium.Cesium3DTileset.fromUrl(tilesetUrl).then((tileset) => scene.primitives.add(tileset));
       });
 

@@ -62,6 +62,12 @@ class GirafeConfig {
     showScaleLine: boolean;
   };
   map3d?: {
+    terrainImagery: {
+      url: string;
+      minLoD: number | undefined;
+      maxLoD: number | undefined;
+      coverageArea: number[] | undefined;
+    };
     terrainUrl: string;
     tilesetsUrls: string[];
   };

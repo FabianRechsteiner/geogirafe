@@ -78,6 +78,12 @@
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
+    "terrainImagery": {
+      "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
+      "minLoD": 8,
+      "maxLoD": 17,
+      "coverageArea": [5.013926957923385, 45.35600133779394, 11.477436312994008, 48.27502358353741]
+    },
     "tilesetsUrls": [
       "https://sitn.ne.ch/3dtiles/chaux81123/Production_1_pro_tie_3d_cesium.json",
       "https://sitn.ne.ch/3dtiles/le_locle_ouest/LeLocle_objmCesium3DTiles.json",
