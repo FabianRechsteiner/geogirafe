@@ -563,8 +563,16 @@ class MapComponent extends GirafeHTMLElement {
       }
 
       // Add 3D-Tiles layers
+      const tilesetOptions = {
+        // If the error of the model is higher than this, we increase the resolution
+        maximumScreenSpaceError: 0.5,
+        // Enable different level of details based on the distance from the camera
+        dynamicScreenSpaceError: true,
+        // Model error at the max distance from the camera (higher = distant models are of lower quality)
+        dynamicScreenSpaceErrorFactor: config.tilesetsMaxError ?? 7
+      };
       config.tilesetsUrls.forEach((tilesetUrl) => {
-        Cesium.Cesium3DTileset.fromUrl(tilesetUrl).then((tileset) => scene.primitives.add(tileset));
+        Cesium.Cesium3DTileset.fromUrl(tilesetUrl, tilesetOptions).then((tileset) => scene.primitives.add(tileset));
       });
 
       this.loading = false;

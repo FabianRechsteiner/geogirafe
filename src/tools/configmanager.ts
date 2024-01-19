@@ -68,6 +68,7 @@ class GirafeConfig {
       maxLoD: number | undefined;
       coverageArea: number[] | undefined;
     };
+    tilesetsMaxError: number | undefined;
     terrainUrl: string;
     tilesetsUrls: string[];
   };

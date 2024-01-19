@@ -13,7 +13,7 @@ const InlineTemplatesPlugin = function () {
       if (id.includes('src/components/') && (id.endsWith('.js') || id.endsWith('.ts'))) {
         const htmlRegex = new RegExp(`templateUrl *= *['"](.*)['"] *;?`);
         if (htmlRegex.test(code)) {
-          // First, verify is there is a style file
+          // First, verify if there is a style file
           let styleCode = '';
           const styleRegex = new RegExp(`styleUrl *= *['"](.*)['"] *;?`);
           if (styleRegex.test(code)) {
@@ -21,7 +21,7 @@ const InlineTemplatesPlugin = function () {
             const styleFilePath = path.join(path.dirname(id), styleFound[1]);
             try {
               const styleFileContent = fs.readFileSync(styleFilePath, 'utf8');
-              // Concert css notation (for ex \002a) to javascript notation (\u002a)
+              // Convert css notation (for ex \002a) to javascript notation (\u002a)
               styleCode = styleFileContent.replace(/\\([0-9a-fA-F]{4})/g, '\\u$1');
               styleCode = `<style>\n${styleCode}\n</style>`;
               magicString.overwrite(styleFound.index, styleFound.index + styleFound[0].length, '');
