@@ -41,7 +41,10 @@ import VideoRecordComponent from './components/videorecord/component';
 // Extend default Document and Window interfaces
 declare global {
   interface Document {
-    state: State;
+    geogirafe: {
+      state: State;
+      stateManager: StateManager;
+    };
   }
   interface Window {
     CESIUM_BASE_URL: string;
@@ -73,13 +76,15 @@ tippy.setDefaultProps({ maxWidth: '' });
 ConfigManager.getInstance();
 I18nManager.getInstance();
 MessageManager.getInstance();
-StateManager.getInstance();
 ThemesManager.getInstance();
 UrlManager.getInstance();
 WfsManager.getInstance();
 
 // Add the state to document, so that it will be accessible everywhere
-document.state = StateManager.getInstance().state;
+document.geogirafe = {
+  state: StateManager.getInstance().state,
+  stateManager: StateManager.getInstance()
+};
 
 // Define components names
 customElements.define('girafe-about', AboutComponent);

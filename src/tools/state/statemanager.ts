@@ -85,17 +85,22 @@ class StateManager extends GirafeSingleton {
     }
   }
 
-  subscribe(path: string, callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>) {
-    if (!(path in this.#callbacks)) {
-      this.#callbacks[path] = [];
+  subscribe(path: string, callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>): void;
+  subscribe(path: RegExp, callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>): void;
+  subscribe(path: string | RegExp, callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>): void {
+    const pathAsString = typeof path === 'string' ? path : path.source;
+    if (!(pathAsString in this.#callbacks)) {
+      this.#callbacks[pathAsString] = [];
     }
-    this.#callbacks[path].push(callback);
-    console.debug(`Subscribing to ${path}. ${this.#callbacks[path].length} are currently subscribing ${path}.`);
+    this.#callbacks[pathAsString].push(callback);
+    console.debug(
+      `Subscribing to ${path}. ${this.#callbacks[pathAsString].length} are currently subscribing ${pathAsString}.`
+    );
 
     // At the application start, perhaps the value in state was initialized before the subscribe method was called
     // Therefore, if the subscribed value os not null, undefined or an empty object or array
     // We immediately call the callback.
-    const obj = this.getPropertyByPath(this.state, path);
+    const obj = this.getPropertyByPath(this.state, pathAsString);
     if (obj.found) {
       if (
         obj.object === null ||
@@ -106,7 +111,7 @@ class StateManager extends GirafeSingleton {
         // Empty object => nothing to do
       } else {
         // Object is not null during the subscribe. => we call the callback
-        const parentPath = path.substring(0, path.lastIndexOf('.'));
+        const parentPath = pathAsString.substring(0, pathAsString.lastIndexOf('.'));
         const parentObject = this.getPropertyByPath(this.state, parentPath);
         callback(null, obj.object, parentObject.object);
       }

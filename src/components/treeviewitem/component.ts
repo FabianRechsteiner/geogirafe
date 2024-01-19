@@ -151,23 +151,24 @@ class TreeViewItemComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.stateManager.subscribe(
-      'layers.layersList..*.isLegendExpanded',
+      /layers\.layersList\..*\.isLegendExpanded/,
       (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
     );
     this.stateManager.subscribe(
-      'layers.layersList..*.activeState',
+      /layers\.layersList\..*\.activeState/,
       (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
     );
     this.stateManager.subscribe(
-      'layers.layersList..*.hasError',
+      /layers\.layersList\..*\.hasError/,
       (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
     );
     this.stateManager.subscribe(
-      'layers.layersList..*.errorMessage',
+      /layers\.layersList\..*\.errorMessage/,
       (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
     );
-    this.stateManager.subscribe('layers.layersList..*.filter', (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
-      this.refreshRender(layer)
+    this.stateManager.subscribe(
+      /layers\.layersList\..*\.filter/,
+      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
     );
     this.stateManager.subscribe('treeview.advanced', () => super.render());
     this.stateManager.subscribe('position.resolution', () => this.refreshLegends());

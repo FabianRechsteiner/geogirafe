@@ -70,19 +70,19 @@
         <girafe-colorswitcher></girafe-colorswitcher>
         <girafe-button
           icon-style="fa-2xl fa-solid fa-circle-question"
-          onclick="document.state.interface.helpVisible = true">
+          onclick="document.geogirafe.state.interface.helpVisible = true">
         </girafe-button>
         <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
           <div slot="menu-content">
             <girafe-button
               icon-style="fa-xl fa-regular fa-pen-to-square"
               text="Draw"
-              onclick="document.state.interface.redliningPanelVisible = !document.state.interface.redliningPanelVisible">
+              onclick="document.geogirafe.state.interface.redliningPanelVisible = !document.geogirafe.state.interface.redliningPanelVisible">
             </girafe-button>
             <girafe-button
               icon-style="fa-xl fa-solid fa-print"
               text="Print"
-              onclick="document.state.interface.printPanelVisible = !document.state.interface.printPanelVisible">
+              onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
             </girafe-button>
             <girafe-proj-select></girafe-proj-select>
             <girafe-language-select></girafe-language-select>
@@ -91,7 +91,7 @@
               icon-style="fa-xl fa-solid fa-circle-info"
               class="border-top"
               text="about"
-              onclick="document.state.interface.aboutVisible = true">
+              onclick="document.geogirafe.state.interface.aboutVisible = true">
             </girafe-button>
           </div>
         </girafe-menu-button>
