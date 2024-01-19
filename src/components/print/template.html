@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
-<div id="panel">
+<div id="panel" class="${this.visible ? '' : 'hidden'}">
   <div id="gutter"></div>
   <div id="close">
     <i class="fa-solid"></i>
@@ -8,22 +8,36 @@
   <div id="content">
     <div class="option">
       <label for="layout">Layout</label>
-      <div class="select">
-        <select id="layout"></select>
+      <div class="select" onchange="${(evt) => this.onLayoutChanged(evt)}">
+        <select id="layout">
+          ${Object.keys(this.layoutsByName).map((layoutName) => uHtml`
+          <option i18n="${layoutName}" ?selected="${this.selectedLayoutName === layoutName}" value="${layoutName}">
+            ${layoutName}
+          </option>
+          `)}
+        </select>
       </div>
     </div>
 
     <div class="option">
       <label for="scale">Scale</label>
-      <div class="select">
-        <select id="scale"></select>
+      <div class="select" onchange="${(evt) => this.onScaleChanged(evt)}">
+        <select id="scale">
+          ${this.scales.map((scale) => uHtml`
+          <option ?selected="${this.selectedScale === scale}" value="${scale}">1:${scale}</option>
+          `)}
+        </select>
       </div>
     </div>
 
     <div class="option">
       <label for="format">Format</label>
-      <div class="select">
-        <select id="format"></select>
+      <div class="select" onchange="${(evt) => this.onFormatChanged(evt)}">
+        <select id="format">
+          ${this.printFormats.map((format) => uHtml`
+          <option ?selected="${this.selectedFormat === format}" value="${format}">${format}</option>
+          `)}
+        </select>
       </div>
     </div>
 
@@ -37,8 +51,21 @@
       <textarea id="comment"></textarea>
     </div>
 
-    <button id="export-pdf">Print</button>
+    <button id="export-pdf" onclick="${() => this.print()}">Print</button>
 
-    <div id="printList"></div>
+    <div id="printList">
+      ${this.printList.map((printItem) => uHtml`
+      <div
+        id="${printItem.id}"
+        class="girafe"
+        title="${printItem.elementTitle}"
+        onclick="${() => this.onPrintElementClicked(printItem.id)}">
+        <i class="${this.getStatusClasses(printItem.status)}"></i>
+        <span>${printItem.selectedLayoutName} (${printItem.selectedFormat})</span>
+        <span>${printItem.title}</span>
+        <span class="time">${printItem.time}</span>
+      </div>
+      `)}
+    </div>
   </div>
 </div>

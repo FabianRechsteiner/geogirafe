@@ -40,7 +40,7 @@
   "search": {
     "//comment1": "Link to the GeoMapFish-Compliant Search Service",
     "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
-    "url": "https://geomapfish-demo-2-8.camptocamp.com/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://geomapfish-demo-2-8.camptocamp.com/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=###SEARCHLANG###"
   },
   "print": {
     "//comment1": "Link to the GeoMapFish-Compliant Print Service",
@@ -75,10 +75,11 @@
     "startPosition": "2628597,1186378",
     "startZoom": "3",
     "maxExtent": "2200000,1040000,3000000,1310000",
-    "constraintScales": true
+    "constraintScales": true,
+    "showScaleLine": true
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
-    "tilesetUrl": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"]
+    "tilesetsUrls": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"]
   }
 }

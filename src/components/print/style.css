@@ -98,6 +98,7 @@
   max-width: 16rem;
   min-width: 13rem;
   color: #666;
+  cursor: pointer;
 }
 
 div.girafe i {

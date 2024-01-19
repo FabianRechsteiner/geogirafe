@@ -43,6 +43,7 @@
   },
   "peerDependencies": {
     "cesium": "^1.111.0",
+    "@geoblocks/mapfishprint": "^0.1.1",
     "ol": "^8.1.0",
     "ol-mapbox-style": "^12.1.0",
     "olcs": "^2.16.0",
@@ -50,6 +51,7 @@
   },
   "devDependencies": {
     "@types/babel__generator": "7.6.8",
+    "@types/geojson": "7946.0.10",
     "@types/istanbul-lib-coverage": "2.0.6",
     "@types/proj4": "2.5.5",
     "@types/uuid": "9.0.7",
