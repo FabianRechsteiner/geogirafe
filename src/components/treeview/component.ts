@@ -45,9 +45,12 @@ class TreeViewComponent extends GirafeResizableElement {
     super.render();
     // If we added a new group to the list of layers
     // Then we activate the layers that should be activated by default
-    const addedLayers = newLayers.filter(
-      (newLayer) => !oldLayers.find((oldLayer) => oldLayer.treeItemId === newLayer.treeItemId)
-    );
+    let addedLayers = newLayers;
+    if (oldLayers) {
+      addedLayers = newLayers.filter(
+        (newLayer) => !oldLayers.find((oldLayer) => oldLayer.treeItemId === newLayer.treeItemId)
+      );
+    }
     this.activateDefaultLayers(addedLayers);
   }
 
