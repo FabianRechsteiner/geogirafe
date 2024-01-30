@@ -1,13 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import StateManager from './statemanager';
 import State from './state';
 import onChange from 'on-change';
 import Theme from '../../models/theme';
 import LayerOsm from '../../models/layers/layerosm';
+import MockHelper from '../tests/mockhelper';
+
+let manager: StateManager;
+
+beforeAll(() => {
+  MockHelper.startMocking();
+  manager = StateManager.getInstance();
+});
+
+afterAll(() => {
+  MockHelper.stopMocking();
+});
 
 describe('StateManager.getCircularReplacer', () => {
-  const manager = StateManager.getInstance();
-
   it('should replace circular references with [Circular]', () => {
     const circularObject: any = {};
     circularObject.circularReference = circularObject;
@@ -51,8 +61,6 @@ describe('StateManager.getCircularReplacer', () => {
 });
 
 describe('StateManager.areEqual', () => {
-  const manager = StateManager.getInstance();
-
   it('areEqual should compare equal numbers', () => {
     expect(manager.areEqual(42, 42)).toBe(true);
   });
@@ -141,7 +149,6 @@ describe('StateManager.areEqual', () => {
 });
 
 describe('StateManager.getPropertyPath', () => {
-  const manager = StateManager.getInstance();
   it('getPropertyByPath should get property by path', () => {
     const obj = {
       nested: {
@@ -210,8 +217,6 @@ describe('StateManager.getPropertyPath', () => {
 });
 
 describe('StateManager.subscribe', () => {
-  const manager = StateManager.getInstance();
-
   it('subscribe should call callback immediately if value is not null, undefined, empty object, or empty array', () => {
     let controlOldValue = undefined;
     let controlValue = undefined;
@@ -340,8 +345,6 @@ describe('StateManager.subscribe', () => {
 });
 
 describe('StateManager.unsubscribe', () => {
-  const manager = StateManager.getInstance();
-
   it('unsubscribe should remove the specified callback', () => {
     let callback1Called = false;
     const callback1 = () => {

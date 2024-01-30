@@ -3,7 +3,7 @@ import { Renderable } from '../typings/uhtml';
 import tippy from 'tippy.js';
 import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
-import ConfigManager from '../tools/configmanager';
+import ConfigManager from '../tools/configuration/configmanager';
 import StateManager from '../tools/state/statemanager';
 
 type TippyType = typeof tippy;

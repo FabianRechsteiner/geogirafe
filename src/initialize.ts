@@ -3,7 +3,7 @@ import { register } from 'ol/proj/proj4';
 import tippy from 'tippy.js';
 import State from './tools/state/state.js';
 
-import ConfigManager from './tools/configmanager';
+import ConfigManager from './tools/configuration/configmanager';
 import I18nManager from './tools/i18nmanager';
 import MessageManager from './tools/messagemanager';
 import StateManager from './tools/state/statemanager';

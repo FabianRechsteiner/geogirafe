@@ -1,7 +1,7 @@
 import Feature from 'ol/Feature';
 import Layer from './layer';
 import Geometry from 'ol/geom/Geometry';
-import ConfigManager from '../../tools/configmanager';
+import ConfigManager from '../../tools/configuration/configmanager';
 import { Extent } from 'ol/extent';
 
 class LayerLocalFile extends Layer {

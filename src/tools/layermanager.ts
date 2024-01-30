@@ -2,7 +2,7 @@ import GirafeSingleton from '../base/GirafeSingleton';
 import BaseLayer from '../models/layers/baselayer';
 import GroupLayer from '../models/layers/grouplayer';
 import Layer from '../models/layers/layer';
-import ConfigManager from './configmanager';
+import ConfigManager from './configuration/configmanager';
 import StateManager from './state/statemanager';
 import LayerWms from '../models/layers/layerwms';
 

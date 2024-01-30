@@ -125,10 +125,16 @@ docker-build:
     - docker push geogirafe/viewer
 
 #################################
-# Some tool functions to simplify demo configuration and publication
+# Configure and optimize the demo
+# A part of the themes.json is not used in the frontend today, and can just be deleted
+#  => With 'jq', and we delete the "attributes" part of the "ocgServers",
+#     because it sometimes represents 70% of the content of themes.json.
+# Then, we also compress everything with gzip and brotli
 .prepare_demo: &prepare_demo |
   cp -R public $demo && mv $demo release/
   ./buildtools/configure-demo.sh "$demo" "release/$demo"
+  if [ -f "release/$demo/Mock/themes.json" ]; then jq --ascii-output "del(.ogcServers[] | .attributes)" "release/$demo/Mock/themes.json" > "release/$demo/Mock/themes_simplified.json"; rm "release/$demo/Mock/themes.json"; mv "release/$demo/Mock/themes_simplified.json" "release/$demo/Mock/themes.json"; fi
+  if [ -f "release/$demo/Mock/themes.json" ]; then gzip -k -f "release/$demo/Mock/themes.json"; brotli -k -f "release/$demo/Mock/themes.json"; fi
   if [ -f "release/$demo/config.json" ]; then gzip -k -f "release/$demo/config.json"; brotli -k -f "release/$demo/config.json"; fi
   if [ -f "release/$demo/Mock/fr.json" ]; then gzip -k -f "release/$demo/Mock/fr.json"; brotli -k -f "release/$demo/Mock/fr.json"; fi
   if [ -f "release/$demo/Mock/de.json" ]; then gzip -k -f "release/$demo/Mock/de.json"; brotli -k -f "release/$demo/Mock/de.json"; fi
@@ -147,7 +153,7 @@ pages:
     - when: never
 
   before_script:
-    - apt update && apt install -y brotli curl
+    - apt update && apt install -y brotli curl jq
     - mkdir -p public/Mock
     - mkdir release
     - chmod a+x ./buildtools/configure-demo.sh

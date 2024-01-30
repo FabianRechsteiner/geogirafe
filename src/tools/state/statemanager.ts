@@ -3,7 +3,7 @@
 
 import GirafeSingleton from '../../base/GirafeSingleton';
 import State from './state';
-import ConfigManager from '../configmanager';
+import ConfigManager from '../configuration/configmanager';
 import onChange from 'on-change';
 
 class StateManager extends GirafeSingleton {

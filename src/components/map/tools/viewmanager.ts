@@ -1,6 +1,6 @@
 import View from 'ol/View';
 import { getPointResolution, get as getProjection, transform } from 'ol/proj';
-import ConfigManager from '../../../tools/configmanager';
+import ConfigManager from '../../../tools/configuration/configmanager';
 import GeoConsts from '../../../tools/geoconsts';
 import { Map } from 'ol';
 import { Coordinate } from 'ol/coordinate';
@@ -23,7 +23,7 @@ class ViewManager {
   extent: number[];
   scales: number[];
   allowedResolutions: number[];
-  constraintScales: boolean;
+  constrainScales: boolean;
 
   constructor(map: Map, srid: string) {
     this.map = map;
@@ -33,7 +33,7 @@ class ViewManager {
     this.configManager = ConfigManager.getInstance();
     this.center = this.configManager.Config.map.startPosition.split(',').map(Number);
     this.zoom = Number(this.configManager.Config.map.startZoom);
-    this.constraintScales = this.configManager.Config.map.constraintScales;
+    this.constrainScales = this.configManager.Config.map.constrainScales;
     this.extent = this.configManager.Config.map.maxExtent.split(',').map(Number);
 
     this.scales = this.configManager.Config.map.scales;
@@ -77,7 +77,7 @@ class ViewManager {
       projection: this.srid,
       extent: this.extent,
       resolutions: this.allowedResolutions,
-      constrainResolution: this.constraintScales
+      constrainResolution: this.constrainScales
     });
   }
 
@@ -112,7 +112,7 @@ class ViewManager {
       rotation: currentRotation,
       projection: this.projection,
       resolutions: this.allowedResolutions,
-      constrainResolution: this.constraintScales,
+      constrainResolution: this.constrainScales,
       extent: newExtent
     });
     return newView;
