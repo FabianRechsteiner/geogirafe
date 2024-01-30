@@ -3,7 +3,7 @@ import Basemap from '../models/basemap';
 import Layer from '../models/layers/layer';
 import Theme from '../models/theme';
 import { GMFBackgroundLayer, GMFTheme, GMFTreeItem } from '../models/gmf';
-import ConfigManager from './configmanager';
+import ConfigManager from './configuration/configmanager';
 import StateManager from './state/statemanager';
 import GroupLayer from '../models/layers/grouplayer';
 import BaseLayer from '../models/layers/baselayer';

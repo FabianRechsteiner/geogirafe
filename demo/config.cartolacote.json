@@ -1,68 +1,31 @@
 {
-  "//comment1": "This is the whole configuration of the GeoGirafe Viewer.",
-  "//comment2": "Here, you can set the entries according to your environment.",
   "general": {
-    "//comment1": "Will be used when formating numbers or dates",
     "locale": "fr-CH"
   },
   "languages": {
-    "//comment1": "List of languages with their corresponding translation-file.",
     "fr": "Mock/fr.json",
-    "//comment2": "Default language",
     "defaultLanguage": "fr"
   },
   "themes": {
-    "//comment1": "Link to the GeoMapFish-Compliant Themes.json",
     "url": "Mock/themes.json",
-    "//comment2": "Name of the default theme. It will be automatically loaded when the application starts",
     "defaultTheme": "plan_ville"
   },
   "basemaps": {
-    "//comment1": "Display the Basemap control or not",
-    "show": true,
-    "//comment2": "Name of the default basemap.",
     "defaultBasemap": "plan_ville",
-    "//comment3": "special basemaps that can be activated or not",
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
   "treeview": {
-    "useCheckboxes": false,
-    "useLegendIcons": true,
-    "hideLegendWhenLayerIsDeactivated": true,
-    "defaultIconSize": {
-      "width": "20",
-      "height": "20"
-    }
+    "useLegendIcons": true
   },
   "search": {
-    "//comment1": "Link to the GeoMapFish-Compliant Search Service",
-    "//comment2": "The muster <###SEARCHTERM###> will be replaced by the search-term",
     "url": "https://map.cartolacote.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
   },
   "print": {
-    "//comment1": "Link to the GeoMapFish-Compliant Print Service",
     "url": "https://map.cartolacote.ch/printproxy/",
-    "//comment2": "The print layout selected by default",
     "defaultLayout": "01 A4 portrait"
   },
-  "selection": {
-    "defaultFillColor": "#ff66667f",
-    "defaultStrokeColor": "#ff3333",
-    "defaultStrokeWidth": 4,
-    "defaultFocusFillColor": "#ff33337f",
-    "defaultFocusStrokeColor": "#ff0000",
-    "defaultFocusStrokeWidth": 4
-  },
-  "redlining": {
-    "defaultFillColor": "#6666ff7f",
-    "defaultStrokeColor": "#0000ff",
-    "defaultStrokeWidth": 2,
-    "defaultTextSize": 12,
-    "defaultFont": "Arial"
-  },
   "projections": {
-    "//comment1": "List of projections with their corresponding abbreviation",
     "EPSG:3857": "W-M",
     "EPSG:4326": "WGS84",
     "EPSG:2056": "MN95"
@@ -72,9 +35,7 @@
     "startZoom": "0",
     "startPosition": "2492000,1140000",
     "maxExtent": "2450900,1095300,2602800,1197700",
-    "scales": [200000, 80000, 40000, 20000, 10000, 8000, 4000, 2000, 1000, 500, 200, 100],
-    "constraintScales": true,
-    "showScaleLine": true
+    "scales": [200000, 80000, 40000, 20000, 10000, 8000, 4000, 2000, 1000, 500, 200, 100]
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",

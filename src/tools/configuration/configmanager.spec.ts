@@ -1,0 +1,66 @@
+import { describe, it, expect } from 'vitest';
+import ConfigManager from './configmanager';
+import GirafeConfig from './girafeconfig';
+import MockHelper from '../tests/mockhelper';
+import TestHelper from '../tests/testhelper';
+
+describe('ConfigManager.loadConfig', () => {
+  const manager = ConfigManager.getInstance();
+
+  it('should return config if config is already loaded', async () => {
+    // @ts-ignore
+    manager.config = new GirafeConfig(MockHelper.mockConfig);
+    manager.loadConfig().then((config) => {
+      // No promise should have been created here, because the config is already given.
+      // @ts-ignore
+      expect(manager.loadingPromise).toBeNull();
+      expect(config).not.toBeNull();
+    });
+  });
+
+  it('the given configuration entries should be present in the final configuration', async () => {
+    // @ts-ignore (use of private member for testing purpose only)
+    manager.config = new GirafeConfig(MockHelper.mockConfig);
+    manager.loadConfig().then((config) => {
+      expect(TestHelper.obj2ContainsObj1PropertiesValues(MockHelper.mockConfig, config)).toBeTruthy();
+    });
+  });
+
+  it('the default configuration values should be present in the final configuration', async () => {
+    // @ts-ignore
+    manager.config = new GirafeConfig(MockHelper.mockConfig);
+    manager.loadConfig().then((config) => {
+      expect(config.treeview.useCheckboxes).toEqual(false);
+      expect(config.themes.imagesUrlPrefix).toEqual('');
+      expect(config.general.locale).toEqual('en-US');
+      expect(config.selection.defaultFocusStrokeColor).toEqual('#ff0000');
+      expect(config.redlining.defaultTextSize).toEqual(12);
+      expect(config.basemaps.OSM).toEqual(false);
+      expect(config.map.showScaleLine).toEqual(true);
+    });
+  });
+
+  it('the overriden configuration entries should be present in the final configuration', async () => {
+    const myConfig = { ...MockHelper.mockConfig };
+    myConfig.themes.url = 'https://www.my-custom-themes-url.reg';
+    myConfig.map.srid = 'EPSG:2222';
+    // @ts-ignore (use of private member for testing purpose only)
+    manager.config = new GirafeConfig(myConfig);
+    manager.loadConfig().then((config) => {
+      expect(TestHelper.obj2ContainsObj1PropertiesValues(myConfig, config)).toBeTruthy();
+    });
+  });
+
+  it('the new configuration entries should be present in the final configuration', async () => {
+    const myConfig = { ...MockHelper.mockConfig };
+    // @ts-ignore
+    myConfig.languages.de = 'https://www.my-custom-language-url.reg';
+    // @ts-ignore
+    myConfig.redlining = { defaultFillColor: '#333333', defaultFont: 'Verdana' };
+    // @ts-ignore
+    manager.config = new GirafeConfig(myConfig);
+    manager.loadConfig().then((config) => {
+      expect(TestHelper.obj2ContainsObj1PropertiesValues(myConfig, config)).toBeTruthy();
+    });
+  });
+});

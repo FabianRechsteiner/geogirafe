@@ -1,4 +1,4 @@
-import ConfigManager from './configmanager';
+import ConfigManager from './configuration/configmanager';
 import StateManager from './state/statemanager';
 import GirafeSingleton from '../base/GirafeSingleton';
 
