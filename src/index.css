@@ -19,6 +19,7 @@ body {
   --lnk-hover: #0099ff;
   --lnk-active: #ff0000;
   --tst: #ff0000;
+  --error-color: #bb0000;
 }
 
 /* Dark theme colors */
@@ -35,6 +36,7 @@ body.dark-theme {
   --lnk-visited: #6d4b8d;
   --lnk-hover: #ffffff;
   --lnk-active: #ff4040;
+  --error-color: #ff6347;
 }
 
 /* Styles for users who prefer dark mode at the OS level */
@@ -256,6 +258,7 @@ girafe-about {
   border-top: solid 1px #fff;
 }
 
-.tippy-content {
+.tippy-box[data-theme~='error'] {
+  background-color: var(--error-color);
   white-space: pre-line;
 }

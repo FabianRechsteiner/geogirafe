@@ -105,10 +105,12 @@ class GirafeHTMLElement extends HTMLElement {
       const tooltipText = el.getAttribute('tip');
       if (tooltipText !== '') {
         const placement = el.getAttribute('tip-placement') ?? defaultPlacement;
+        const theme = el.getAttribute('tip-theme') ?? '';
         const tooltip = tippy(el, {
           arrow: arrow,
           delay: delay,
           placement: placement,
+          theme: theme,
           //animateFill: false,
           //animation: 'scale-with-inertia',
           content: el.getAttribute('tip')
