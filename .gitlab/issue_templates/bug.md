@@ -1,13 +1,14 @@
 ## Bug Description
 
-*(What is the problem)*
+(Explain what is the problem)
 
 ## Steps to reproduce
 
-*(Describe how to reproduce the error)*
+(Describe how to reproduce the error)
 
 ## Screenshots & Logs
 
-*(If necessary, add some screenshots of log messages)*
+(If necessary, add some screenshots of log messages)
 
 /label ~bug
+/label ~new

@@ -6,16 +6,6 @@ stages:
   - scan
 
 #################################
-# Do not run pipelines if only markdown files have been modified
-rules:
-  - exists:
-      - '*.md'
-    changes:
-      - '*.*'
-  - changes:
-      - '*.*'
-
-#################################
 # Define pipeline variables
 variables:
   SONAR_USER_HOME: '${CI_PROJECT_DIR}/.sonar' # Defines the location of the analysis task cache
