@@ -536,7 +536,11 @@ class MapComponent extends GirafeHTMLElement {
       const OLCesium = olcs.default;
 
       // Initialize the 3D Map
-      this.map3d = new OLCesium({ map: this.map, target: this.map3dTarget });
+      this.map3d = new OLCesium({
+        map: this.map,
+        target: this.map3dTarget,
+        time: () => Cesium.JulianDate.fromDate(new Date(timeDatePicker.value))
+      });
       const scene = this.map3d.getCesiumScene();
       const config = this.configManager.Config.map3d;
 
@@ -574,6 +578,19 @@ class MapComponent extends GirafeHTMLElement {
       config.tilesetsUrls.forEach((tilesetUrl) => {
         Cesium.Cesium3DTileset.fromUrl(tilesetUrl, tilesetOptions).then((tileset) => scene.primitives.add(tileset));
       });
+
+      // Shadows and lighting
+      scene.shadowMap.enabled = true;
+      scene.globe.enableLighting = true;
+      const timeDatePicker = document.createElement('input');
+      timeDatePicker.type = 'datetime-local';
+      const date = new Date();
+      timeDatePicker.valueAsNumber = Math.round((date.valueOf() - date.getTimezoneOffset() * 60000) / 60000) * 60000;
+
+      const timeContainer = document.createElement('div');
+      timeContainer.style.position = 'absolute';
+      timeContainer.appendChild(timeDatePicker);
+      this.map3dTarget.appendChild(timeContainer);
 
       this.loading = false;
       super.render();
