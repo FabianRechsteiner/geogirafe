@@ -7,7 +7,7 @@ import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
 import VectorLayer from 'ol/layer/Vector';
-import Collection, { CollectionEvent } from 'ol/Collection';
+import Collection from 'ol/Collection';
 import { platformModifierKeyOnly } from 'ol/events/condition';
 import { Modify, Snap, DragBox } from 'ol/interaction';
 import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
