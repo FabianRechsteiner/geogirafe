@@ -592,6 +592,14 @@ class MapComponent extends GirafeHTMLElement {
       timeContainer.appendChild(timeDatePicker);
       this.map3dTarget.appendChild(timeContainer);
 
+      const ambientOcclusion = scene.postProcessStages.ambientOcclusion;
+      ambientOcclusion.enabled = true;
+      ambientOcclusion.uniforms.intensity = 3;
+      ambientOcclusion.uniforms.bias = 0.5;
+      ambientOcclusion.uniforms.lengthCap = 0.33;
+      ambientOcclusion.uniforms.stepSize = 1;
+      ambientOcclusion.uniforms.blurStepSize = 1;
+
       this.loading = false;
       super.render();
     }
