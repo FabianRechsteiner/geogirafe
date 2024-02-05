@@ -594,9 +594,7 @@ class MapComponent extends GirafeHTMLElement {
 
       const ambientOcclusion = scene.postProcessStages.ambientOcclusion;
       ambientOcclusion.enabled = true;
-      ambientOcclusion.uniforms.intensity = 3;
       ambientOcclusion.uniforms.bias = 0.5;
-      ambientOcclusion.uniforms.lengthCap = 0.33;
       ambientOcclusion.uniforms.stepSize = 1;
       ambientOcclusion.uniforms.blurStepSize = 1;
 
