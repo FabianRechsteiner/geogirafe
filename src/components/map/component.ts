@@ -1,13 +1,13 @@
 import Map from 'ol/Map';
 
-import VectorSource from 'ol/source/Vector';
+import VectorSource, { VectorSourceEvent } from 'ol/source/Vector';
 import Style, { StyleLike } from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
 import VectorLayer from 'ol/layer/Vector';
-import Collection, { CollectionEvent } from 'ol/Collection';
+import Collection from 'ol/Collection';
 import { platformModifierKeyOnly } from 'ol/events/condition';
 import { Modify, Snap, DragBox } from 'ol/interaction';
 import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
@@ -76,6 +76,7 @@ class MapComponent extends GirafeHTMLElement {
   // For Redlining
   redliningFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   redliningSource!: VectorSource;
+  redliningSourceAddCallback = (e: VectorSourceEvent) => this.onFeatureAdded(e);
   redliningLayer: VectorLayer<VectorSource> | null = null;
   draw: Draw | null = null;
   snap!: Snap;
@@ -211,6 +212,7 @@ class MapComponent extends GirafeHTMLElement {
     });
     this.map.addLayer(this.redliningLayer);
     this.redliningLayer.setZIndex(1001);
+    this.redliningLayer.set('altitudeMode', 'clampToGround');
 
     // Create layer for selection
     const selectionSource = new VectorSource({
@@ -304,11 +306,6 @@ class MapComponent extends GirafeHTMLElement {
       ? feature.get('textSize')
       : this.configManager.Config.redlining.defaultTextSize;
 
-    feature.set('strokeColor', strokeColor);
-    feature.set('strokeWidth', strokeWidth);
-    feature.set('fillColor', fillColor);
-    feature.set('textSize', textSize);
-
     return new Style({
       stroke: new Stroke({ color: strokeColor, width: strokeWidth }),
       fill: new Fill({ color: fillColor }),
@@ -348,7 +345,7 @@ class MapComponent extends GirafeHTMLElement {
     //? change:view
 
     // Drawing events
-    this.redliningFeaturesCollection.on('add', (e) => this.onFeatureAdded(e));
+    this.redliningSource.on('addfeature', this.redliningSourceAddCallback);
   }
 
   onLoadStart(_e: MapEvent) {
@@ -452,17 +449,19 @@ class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onFeatureAdded(e: CollectionEvent<Feature<Geometry>>) {
-    const olFeature: Feature<Geometry> = e.element;
-    olFeature.setId(uuidv4());
-    // Set the default feature name
-    const name = adjectives[this.getRandomInt(0, adjectives.length)] + ' ' + e.element!.getGeometry()!.getType();
-    olFeature.set('name', name);
-    // Add default style as a function, because we want the attributes (for example the name) to be evaluated on display time
-    olFeature.setStyle(((feature: Feature) => this.getDefaultStyle(feature)) as StyleLike);
+  onFeatureAdded(e: VectorSourceEvent) {
+    if (e.feature != undefined) {
+      const olFeature: Feature<Geometry> = e.feature;
+      olFeature.setId(uuidv4());
+      // Set the default feature name
+      const name = adjectives[this.getRandomInt(0, adjectives.length)] + ' ' + olFeature.getGeometry()!.getType();
+      olFeature.set('name', name);
+      // Add default style as a function, because we want the attributes (for example the name) to be evaluated on display time
+      olFeature.setStyle(((feature: Feature) => this.getDefaultStyle(feature)) as StyleLike);
 
-    const feature = new RedliningFeature(olFeature);
-    this.state.redlining.features.push(feature);
+      const feature = new RedliningFeature(olFeature);
+      this.state.redlining.features.push(feature);
+    }
   }
 
   connectedCallback() {
@@ -535,10 +534,15 @@ class MapComponent extends GirafeHTMLElement {
       const olcs = await import('olcs/OLCesium');
       const OLCesium = olcs.default;
 
+      // Remove the event, because OLCesium adds another event during addfeature that must be called before
+      this.redliningSource.un('addfeature', this.redliningSourceAddCallback);
+
       // Initialize the 3D Map
       this.map3d = new OLCesium({ map: this.map, target: this.map3dTarget });
       const scene = this.map3d.getCesiumScene();
       const config = this.configManager.Config.map3d;
+
+      this.redliningSource.on('addfeature', this.redliningSourceAddCallback);
 
       // Add terrain
       if (config.terrainUrl) {
@@ -851,10 +855,11 @@ deactivatePrintMask() {
       freehand: freehand,
       geometryFunction: geometryFunction
     });
+    this.map.addInteraction(this.draw);
+
     const modify = new Modify({ source: this.redliningSource });
     this.map.addInteraction(modify);
 
-    this.map.addInteraction(this.draw);
     this.snap = new Snap({ source: this.redliningSource });
     this.map.addInteraction(this.snap);
   }
