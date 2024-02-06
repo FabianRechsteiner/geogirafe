@@ -48,6 +48,7 @@ type TreeviewConfig = {
 
 // Current Print state
 type PrintConfig = {
+  maskVisible: boolean;
   format: [number, number] | null;
   scale: number | null;
 };
@@ -138,6 +139,7 @@ class State {
 
   // Current Print state
   print: PrintConfig = {
+    maskVisible: false,
     format: null,
     scale: null
   };

@@ -1,4 +1,4 @@
-import { render as uRender } from 'uhtml';
+import { render as uRender, html } from 'uhtml';
 import { Renderable } from '../typings/uhtml';
 import tippy from 'tippy.js';
 import I18nManager from '../tools/i18nmanager';
@@ -120,10 +120,24 @@ class GirafeHTMLElement extends HTMLElement {
     });
   }
 
+  /**
+   * Render the component's template.
+   */
   render() {
     uRender(this.shadow, this.template);
   }
 
+  /**
+   * Renders a hidden span with the name of the component.
+   * Useful to render a placeholder for not visible component.
+   */
+  renderEmpty() {
+    uRender(this.shadow, html`<span style="display: none">${this.component}</span>`);
+  }
+
+  /**
+   * Hide the component (display: none).
+   */
   hide() {
     this.style.display = 'none';
   }

@@ -1,6 +1,13 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
-import { MapFishPrintReportResponse } from '@geoblocks/mapfishprint/src/mapfishprintTypes.ts';
+import type { MapFishPrintReportResponse } from '@geoblocks/mapfishprint/src/mapfishprintTypes.ts';
+import { EventsKey } from 'ol/events';
+import { unByKeyAll } from '../../tools/olUtils.ts';
+import { clamp, toDegrees, toRadians } from 'ol/math';
 
+/**
+ * Print panel component.
+ * Have actions on the print mask and on the map (rotation).
+ */
 interface MapFishPrintCapabilitiesLayoutAttribute {
   name: string;
   default?: string | boolean | number;
@@ -67,52 +74,116 @@ class PrintComponent extends GirafeResizableElement {
 
   private printList: PrintElement[] = [];
   private printUrl?: string;
+  private capabilities?: MapFishPrintCapabilities;
+  private readonly eventKeys: EventsKey[] = [];
+  private configWantedAttributeNames: string[] = [];
+  wantedAttributeNames: string[] = [];
   printFormats: string[] = [];
   selectedFormat?: string;
   layoutsByName: { [name: string]: MapFishPrintCapabilitiesLayout } = {};
   selectedLayoutName?: string;
   scales: number[] = [];
   selectedScale?: number;
+  rotation = 0;
+  visible = false;
 
   constructor() {
     super('print');
   }
 
   connectedCallback() {
-    this.loadConfig().then(() =>
-      this.initializePrint().then(() => {
-        this.render();
-        this.registerEvents();
-      })
-    );
+    this.render();
+    this.registerVisibilityEvents();
   }
 
+  /**
+   * Render the component regarding its visibility.
+   * Update the state of the print maskVisibility accordingly.
+   */
   render() {
-    super.render();
-    this.activateTooltips(false, [800, 0], 'top-end');
-    super.girafeTranslate();
+    if (this.visible) {
+      super.render();
+      super.girafeTranslate();
+      if (this.capabilities) {
+        this.state.print.maskVisible = true;
+        this.activateTooltips(false, [800, 0], 'top-end');
+        this.registerEvents();
+      }
+    } else {
+      unByKeyAll(this.eventKeys);
+      this.state.print.maskVisible = false;
+      this.renderEmpty();
+    }
   }
 
+  /**
+   * Close the panel via the state.
+   */
   closePanel() {
     this.state.interface.printPanelVisible = false;
   }
 
+  /**
+   * Update the values relative to the layout (attributes, scales, etc.)
+   * Set scale and print format in the state.
+   * Renders the panel with new info.
+   */
   onLayoutChanged(event: Event) {
     const eventValue = (event.target as HTMLInputElement)?.value;
+    this.selectedLayoutName = eventValue;
     const clientInfo = this.getClientInfo(eventValue);
     this.updateScales(clientInfo);
+    this.updateAvailableAttributes();
     this.state.print.format = [clientInfo.width, clientInfo.height];
     this.render();
   }
 
+  /**
+   * Set selected scale in the state.
+   */
   onScaleChanged(event: Event) {
     this.state.print.scale = parseInt((event.target as HTMLInputElement)?.value);
   }
 
+  /**
+   * Set selected print format.
+   */
   onFormatChanged(event: Event) {
     this.selectedFormat = (event.target as HTMLInputElement)?.value;
   }
 
+  /**
+   * Sync both rotation inputs and update the map rotation value.
+   */
+  onRotationChanged(event: Event) {
+    const element = event.target as HTMLInputElement;
+    this.setRotation(element);
+  }
+
+  /**
+   * @returns The matching attribute in the selected "capabilities" layout.
+   */
+  getCapabilitiesAttribute(attributeName: string): MapFishPrintCapabilitiesLayoutAttribute | undefined {
+    const attributes = this.layoutsByName[this.selectedLayoutName ?? ''].attributes ?? [];
+    return attributes.find((attr) => attr.name === attributeName);
+  }
+
+  /**
+   * Used to know the matching HTML element.
+   * @returns An arbitrary type based on the matching capabilities" attribute.
+   */
+  getAttributeInputType(attributeName: string) {
+    const attribute = this.getCapabilitiesAttribute(attributeName);
+    if (attribute?.name === 'comments') return 'textarea';
+    if (attribute?.type === 'Number') return 'number';
+    if (attribute?.type === 'LegendAttributeValue') return 'checkbox';
+    if (attribute?.type === 'Boolean') return 'checkbox';
+    return 'text';
+  }
+
+  /**
+   * @returns html classes regarding the print status.
+   */
   getStatusClasses(status: PrintStatus): string {
     const baseClasses = 'fa-solid fa-3x ';
     if (status === PrintStatus.Errored) {
@@ -124,23 +195,33 @@ class PrintComponent extends GirafeResizableElement {
     return baseClasses + 'fa-circle-notch fa-spin';
   }
 
+  /**
+   * Print the map - currently hardcoded
+   */
   print() {
-    const layout = this.selectedLayoutName;
+    const layout = this.selectedLayoutName ?? '';
     const format = this.selectedFormat ?? '';
     const scale = this.selectedScale;
 
-    const body = {
+    if (this.getCapabilitiesAttributeValue('legend') === 'true') {
+      console.log('Legend not implemented yet');
+    }
+
+    const mapFishPrintSpec = {
+      layout,
+      format,
+      lang: 'en',
       attributes: {
         map: {
           dpi: 254,
-          rotation: 0,
+          rotation: this.rotation,
           center: [this.state.position.center[0], this.state.position.center[1]],
-          projection: this.state.projection,
-          scale: scale,
+          projection: this.state.projection ?? '',
+          scale: scale ?? 0,
           useNearestScale: false,
           layers: [
             {
-              baseURL: 'https://map.geo.bs.ch/mapserv_proxy',
+              baseURL: this.configManager.Config.print.url,
               imageFormat: 'image/png',
               layers: ['Stadt- und Parzellenplan farbig'],
               customParams: {
@@ -155,15 +236,23 @@ class PrintComponent extends GirafeResizableElement {
             }
           ]
         },
-        datasource: [],
-        title: this.getTitleValue(),
-        comments: this.getCommentValue()
+        datasource: []
         // maxTitleLength: '130',
         // maxCommentLength: '190'
-      },
-      format: format,
-      lang: 'en',
-      layout: layout
+      }
+    };
+
+    mapFishPrintSpec.attributes = {
+      ...mapFishPrintSpec.attributes,
+      ...this.wantedAttributeNames
+        .filter((attrName) => attrName !== 'legend')
+        .reduce(
+          (attributeObj, attrName) => {
+            attributeObj[attrName] = this.getCapabilitiesAttributeValue(attrName);
+            return attributeObj;
+          },
+          {} as Record<string, string>
+        )
     };
 
     fetch(this.getReportUrl(format), {
@@ -171,12 +260,18 @@ class PrintComponent extends GirafeResizableElement {
       headers: new Headers({
         'Content-Type': 'application/json;charset=UTF-8'
       }),
-      body: JSON.stringify(body)
+      body: JSON.stringify(mapFishPrintSpec)
     })
       .then((r) => r.json())
-      .then((result: MapFishPrintReportResponse) => this.managePrintStatus(result));
+      .then((result: MapFishPrintReportResponse) => this.trackPrintStatus(result));
   }
 
+  /**
+   * On print element clicked:
+   *  - Download it on success
+   *  - Remove it on error.
+   *  - Do nothing on pending element.
+   */
   onPrintElementClicked(itemId: string) {
     const printItem = this.getPrintElement(itemId);
     if (printItem?.status === PrintStatus.Success) {
@@ -192,8 +287,44 @@ class PrintComponent extends GirafeResizableElement {
     }
   }
 
-  private registerEvents() {
+  /**
+   * Event about visibility that must be always listened by this component, even hidden.
+   * @private
+   */
+  private registerVisibilityEvents() {
     this.stateManager.subscribe('interface.printPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
+  }
+
+  /**
+   * Event about visibility that must be always listened by this component, even hidden.
+   * @private
+   */
+  private registerEvents() {
+    const map = this.state.olMap;
+    if (!map) {
+      return;
+    }
+    const view = map.getView();
+    const rotationInput = this.shadow.querySelector('#rotationSlider') as HTMLInputElement;
+    this.eventKeys.push(
+      view.on('change:rotation', () => {
+        this.setRotation(rotationInput, Math.round(toDegrees(view.getRotation())));
+      })
+    );
+  }
+
+  /**
+   * Sync both rotation inputs and update the map rotation value.
+   * @private
+   */
+  private setRotation(rotationInputElement: HTMLInputElement, value: number | null = null) {
+    const slider = rotationInputElement.parentElement?.querySelector('#rotationSlider') as HTMLInputElement;
+    const number = rotationInputElement.parentElement?.querySelector('#rotationNumber') as HTMLInputElement;
+    const rotation = value ?? parseInt(rotationInputElement.value);
+    this.rotation = clamp(rotation, -180, 180);
+    slider.value = `${this.rotation}`;
+    number.value = `${this.rotation}`;
+    this.state.olMap?.getView().setRotation(toRadians(this.rotation));
   }
 
   private getCapabilitiesUrl(): string {
@@ -212,32 +343,87 @@ class PrintComponent extends GirafeResizableElement {
     return this.printUrl + result.statusURL.substring(result.statusURL.indexOf('/status') + 1);
   }
 
+  /**
+   * @returns a pending or finished PrintElement by id.
+   * @private
+   */
   private getPrintElement(itemId: string): PrintElement | undefined {
     return this.printList.find((element) => element.id === itemId);
   }
 
-  private async initializePrint() {
+  /**
+   * Load the application config and then fetch the capabilities and initialize the print.
+   * @returns the fetched print capabilities or undefined in case of error.
+   * @private
+   */
+  private async initComponentConfig(): Promise<MapFishPrintCapabilities | undefined> {
+    await this.loadConfig();
+    await this.fetchCapabilities();
+    this.initFromCapabilities();
+    return this.capabilities;
+  }
+
+  /**
+   * @returns the fetched print capabilities or undefined in case of error.
+   * @private
+   */
+  private async fetchCapabilities(): Promise<MapFishPrintCapabilities | undefined> {
     this.printUrl = this.configManager.Config.print.url;
-    this.selectedLayoutName = this.configManager.Config.print.defaultLayout;
     if (!this.printUrl.endsWith('/')) {
       this.printUrl += '/';
     }
+    let capabilities: MapFishPrintCapabilities | undefined = undefined;
+    try {
+      const response = await fetch(this.getCapabilitiesUrl(), { referrer: '' });
+      capabilities = await response.json();
+    } catch (error) {
+      console.error(error);
+    }
+    this.capabilities = capabilities;
+    return capabilities;
+  }
 
-    const response = await fetch(this.getCapabilitiesUrl(), { referrer: '' });
-    const content: MapFishPrintCapabilities = await response.json();
+  /**
+   * Init the print component default values with the print capabilities.
+   * @private
+   */
+  private initFromCapabilities() {
+    if (!this.capabilities) {
+      return;
+    }
 
-    this.printFormats = content.formats;
-    this.selectedFormat = this.printFormats[0];
-
-    const printLayouts: MapFishPrintCapabilitiesLayout[] = content.layouts;
+    const printLayouts: MapFishPrintCapabilitiesLayout[] = this.capabilities?.layouts ?? [];
     printLayouts.forEach((elem) => {
       this.layoutsByName[elem.name] = elem;
     });
 
+    if (!printLayouts.length) {
+      console.error("Can't print without any configured print layouts.");
+      this.capabilities = undefined;
+      return;
+    }
+
+    const config = this.configManager.Config.print;
+    this.selectedLayoutName = config.defaultLayout ?? printLayouts[0];
+    this.printFormats = this.capabilities?.formats ?? [];
+    const isValidDefaultFormat = this.printFormats.includes(config.defaultFormat ?? '');
+    this.selectedFormat = isValidDefaultFormat ? config.defaultFormat : this.printFormats[0];
+
     const clientInfo = this.getClientInfo(this.selectedLayoutName);
     this.updateScales(clientInfo);
+    const isValidDefaultScale = this.scales.includes(config.defaultScale ?? -1);
+    this.selectedScale = isValidDefaultScale ? config.defaultScale : this.selectedScale;
+
+    if (config.wantedAttributeNames) {
+      this.configWantedAttributeNames = config.wantedAttributeNames ?? [];
+    }
+    this.updateAvailableAttributes();
   }
 
+  /**
+   * Set the state's print scale.
+   * @private
+   */
   private updateScales(clientInfo: MapFishPrintCapabilitiesLayoutAttributeClientInfo) {
     this.scales = clientInfo.scales;
     if (!this.selectedScale || !this.scales.includes(this.selectedScale)) {
@@ -246,38 +432,76 @@ class PrintComponent extends GirafeResizableElement {
     }
   }
 
+  private updateAvailableAttributes() {
+    const layoutAttributes = this.layoutsByName[this.selectedLayoutName ?? '']?.attributes ?? [];
+    this.wantedAttributeNames = this.configWantedAttributeNames.filter((wantedAttrName) =>
+      layoutAttributes.some((layoutAttr) => layoutAttr.name === wantedAttrName)
+    );
+  }
+
+  /**
+   * @returns The ClientInfo config object from the selected layout.
+   * @private
+   */
   private getClientInfo(layoutName: string): MapFishPrintCapabilitiesLayoutAttributeClientInfo {
     const layout = this.layoutsByName[layoutName];
     const attributes = layout.attributes.filter((elem) => elem.type === 'MapAttributeValues');
     return attributes[0].clientInfo!;
   }
 
-  private togglePanel(visible: boolean) {
-    const parent = (this.panel!.getRootNode() as ShadowRoot).host as HTMLElement;
-    if (!visible) {
-      this.panel!.style.display = 'none';
+  /**
+   * Set the visibility of the panel
+   * Load the component config if it's not initialized.
+   * @private
+   */
+  private async togglePanel(visible: boolean): Promise<void> {
+    this.visible = visible;
+    const parent = this.host;
+    if (!this.visible) {
       parent.style.display = 'none';
+      this.render();
       return;
     }
-    this.panel!.style.display = 'block';
+
     parent.style.display = 'block';
-    // Set default print state
+
+    if (!this.capabilities) {
+      if (!(await this.initComponentConfig())) {
+        this.render();
+        return;
+      }
+    }
+
+    // Set default print state to display mask.
     const clientInfo = this.getClientInfo(this.selectedLayoutName!);
     this.state.print.scale = this.selectedScale ?? 0;
     this.state.print.format = [clientInfo.width, clientInfo.height];
+
+    this.render();
   }
 
-  private getTitleValue(): string {
-    const titleInput = this.shadow.querySelector('#title') as HTMLInputElement;
-    return titleInput?.value || '';
+  /**
+   * @returns the current title element value.
+   * @private
+   */
+  private getCapabilitiesAttributeValue(attrName: string): string {
+    const attribute = this.getCapabilitiesAttribute(attrName);
+    if (!attribute) {
+      return '';
+    }
+    const type = this.getAttributeInputType(attrName);
+    const input = this.shadow.querySelector(`#${attrName}`) as HTMLInputElement;
+    if (type === 'checkbox') {
+      return `${input.checked}`;
+    }
+    return input?.value || '';
   }
 
-  private getCommentValue(): string {
-    const commentInput = this.shadow.querySelector('#comment') as HTMLInputElement;
-    return commentInput?.value || '';
-  }
-
-  private managePrintStatus(result: MapFishPrintReportResponse) {
+  /**
+   * Set an initial print status element and track the state of the linked print task.
+   * @private
+   */
+  private trackPrintStatus(result: MapFishPrintReportResponse) {
     const downloadUrl = this.getDownloadUrl(result);
     const statusUrl = this.getStatusUrl(result);
 
@@ -289,7 +513,7 @@ class PrintComponent extends GirafeResizableElement {
       time,
       selectedFormat: this.selectedFormat ?? '',
       selectedLayoutName: this.selectedLayoutName ?? '',
-      title: this.getTitleValue(),
+      title: this.getCapabilitiesAttributeValue('title') || id,
       status: PrintStatus.Started
     });
     this.render();
@@ -299,6 +523,10 @@ class PrintComponent extends GirafeResizableElement {
     }, 2000);
   }
 
+  /**
+   * Loop recursively to check the element status.
+   * @private
+   */
   private checkStatus(elementId: string, statusUrl: string, downloadUrl: string) {
     fetch(statusUrl)
       .then((r) => r.json())
@@ -326,6 +554,10 @@ class PrintComponent extends GirafeResizableElement {
       });
   }
 
+  /**
+   * On print finished update the print element with the status and the download url.
+   * @private
+   */
   private printFinished(itemId: string, downloadUrl: string) {
     const printItem = this.getPrintElement(itemId);
     if (!printItem) {
@@ -336,6 +568,10 @@ class PrintComponent extends GirafeResizableElement {
     this.render();
   }
 
+  /**
+   * On print errored update the print element with the status and the error info.
+   * @private
+   */
   private printError(itemId: string, error: string) {
     const printItem = this.getPrintElement(itemId);
     if (!printItem) {

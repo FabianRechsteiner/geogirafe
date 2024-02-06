@@ -1,16 +1,19 @@
 import Layer from 'ol/layer/Layer';
 import { createCanvasContext2D } from 'ol/dom';
 import { toRadians } from 'ol/math';
-import GeoConsts from '../../../tools/geoconsts';
+import GeoConsts from '../../../tools/geoconsts.ts';
 import { FrameState } from 'ol/Map';
 
-class MaskLayer extends Layer {
+/**
+ * A layer to display a mask for a zone to print.
+ */
+class PrintMaskLayer extends Layer {
   private size: [number, number] | null = null;
   private scale: number | null = null;
   private context: CanvasRenderingContext2D;
 
   constructor(options = {}) {
-    super(options);
+    super({ className: 'printMask', ...options });
 
     this.context = createCanvasContext2D();
     this.context.canvas.style.opacity = '0.5';
@@ -26,10 +29,13 @@ class MaskLayer extends Layer {
   }
 
   getRotation() {
-    // TODO REG : Get current rotation from map
+    console.warn('Not implemented yet');
     return 0;
   }
 
+  /**
+   * Draw the print canvas mask.
+   */
   render(frameState: FrameState) {
     if (this.size === null) {
       throw Error('Cannot render Mask : size has not been set.');
@@ -95,4 +101,4 @@ class MaskLayer extends Layer {
   }
 }
 
-export default MaskLayer;
+export default PrintMaskLayer;

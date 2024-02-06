@@ -1,71 +1,110 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
-<div id="panel" class="${this.visible ? '' : 'hidden'}">
+<div id="panel">
   <div id="gutter"></div>
   <div id="close">
     <i class="fa-solid"></i>
   </div>
   <div id="content">
-    <div class="option">
-      <label for="layout">Layout</label>
-      <div class="select" onchange="${(evt) => this.onLayoutChanged(evt)}">
-        <select id="layout">
-          ${Object.keys(this.layoutsByName).map((layoutName) => uHtml`
-          <option i18n="${layoutName}" ?selected="${this.selectedLayoutName === layoutName}" value="${layoutName}">
-            ${layoutName}
-          </option>
-          `)}
-        </select>
+    <div class="${!this.capabilities ? '' : 'hidden'}">
+      Error, can not fetch the capabilities. Please try again later.
+    </div>
+
+    <div class="${this.capabilities ? '' : 'hidden'}">
+      <div class="option">
+        <label for="layout" i18n="Layout">Layout</label>
+        <div class="select" onchange="${(evt) => this.onLayoutChanged(evt)}">
+          <select id="layout">
+            ${Object.keys(this.layoutsByName).map((layoutName) => uHtml`
+            <option i18n="${layoutName}" ?selected="${this.selectedLayoutName === layoutName}" value="${layoutName}">
+              ${layoutName}
+            </option>
+            `)}
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="option">
-      <label for="scale">Scale</label>
-      <div class="select" onchange="${(evt) => this.onScaleChanged(evt)}">
-        <select id="scale">
-          ${this.scales.map((scale) => uHtml`
-          <option ?selected="${this.selectedScale === scale}" value="${scale}">1:${scale}</option>
-          `)}
-        </select>
+      <div class="option">
+        <label for="scale" i18n="Scale">Scale</label>
+        <div class="select" onchange="${(evt) => this.onScaleChanged(evt)}">
+          <select id="scale">
+            ${this.scales.map((scale) => uHtml`
+            <option ?selected="${this.selectedScale === scale}" value="${scale}">1:${scale}</option>
+            `)}
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="option">
-      <label for="format">Format</label>
-      <div class="select" onchange="${(evt) => this.onFormatChanged(evt)}">
-        <select id="format">
-          ${this.printFormats.map((format) => uHtml`
-          <option ?selected="${this.selectedFormat === format}" value="${format}">${format}</option>
-          `)}
-        </select>
+      <div class="option">
+        <label for="format" i18n="Format">Format</label>
+        <div class="select" onchange="${(evt) => this.onFormatChanged(evt)}">
+          <select id="format">
+            ${this.printFormats.map((format) => uHtml`
+            <option ?selected="${this.selectedFormat === format}" value="${format}">${format}</option>
+            `)}
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div class="option">
-      <label for="title">Title</label>
-      <input id="title" />
-    </div>
-
-    <div class="option">
-      <label for="comment">Comment</label>
-      <textarea id="comment"></textarea>
-    </div>
-
-    <button id="export-pdf" onclick="${() => this.print()}">Print</button>
-
-    <div id="printList">
-      ${this.printList.map((printItem) => uHtml`
-      <div
-        id="${printItem.id}"
-        class="girafe"
-        title="${printItem.elementTitle}"
-        onclick="${() => this.onPrintElementClicked(printItem.id)}">
-        <i class="${this.getStatusClasses(printItem.status)}"></i>
-        <span>${printItem.selectedLayoutName} (${printItem.selectedFormat})</span>
-        <span>${printItem.title}</span>
-        <span class="time">${printItem.time}</span>
+      ${this.wantedAttributeNames.map( (attrName) => { if (this.getAttributeInputType(attrName) === 'number') { return
+      uHtml`
+      <div class="option">
+        <label for="${attrName}" i18n="${attrName}">${attrName}</label>
+        <input id="${attrName}" type="number" value="${this.getCapabilitiesAttribute(attrName)?.default}" />
       </div>
-      `)}
+      `} if (this.getAttributeInputType(attrName) === 'checkbox') { return uHtml`
+      <div class="option">
+        <label for="${attrName}" i18n="${attrName}">${attrName}</label>
+        <input id="${attrName}" type="checkbox" />
+      </div>
+      `} if (this.getAttributeInputType(attrName) === 'textarea') { return uHtml`
+      <div class="option">
+        <label for="${attrName}" i18n="${attrName}">${attrName}</label>
+        <textarea id="${attrName}">${this.getCapabilitiesAttribute(attrName)?.default}</textarea>
+      </div>
+      `} return uHtml`
+      <div class="option">
+        <label for="${attrName}" i18n="${attrName}">${attrName}</label>
+        <input id="${attrName}" type="text" value="${this.getCapabilitiesAttribute(attrName)?.default}" />
+      </div>
+      `})}
+
+      <div class="option">
+        <label for="rotationSlider" i18n="Rotation">Rotation</label>
+        <input
+          id="rotationSlider"
+          type="range"
+          min="-180"
+          max="180"
+          step="1"
+          value="${this.rotation}"
+          oninput="${(evt) => this.onRotationChanged(evt)}" />
+        <input
+          id="rotationNumber"
+          type="number"
+          min="-180"
+          max="180"
+          step="1"
+          value="${this.rotation}"
+          oninput="${(evt) => this.onRotationChanged(evt)}" />
+      </div>
+
+      <button id="export-pdf" onclick="${() => this.print()}" i18n="Print">Print</button>
+
+      <div id="printList">
+        ${this.printList.map((printItem) => uHtml`
+        <div
+          id="${printItem.id}"
+          class="girafe"
+          title="${printItem.elementTitle}"
+          onclick="${() => this.onPrintElementClicked(printItem.id)}">
+          <i class="${this.getStatusClasses(printItem.status)}"></i>
+          <span>${printItem.selectedLayoutName} (${printItem.selectedFormat})</span>
+          <span>${printItem.title}</span>
+          <span class="time">${printItem.time}</span>
+        </div>
+        `)}
+      </div>
     </div>
   </div>
 </div>
