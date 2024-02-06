@@ -1,7 +1,9 @@
 import { GMFChildLayer, GMFTreeItem } from '../gmf';
+import ILayerWithFilter from './ilayerwithfilter';
+import ILayerWithLegend from './ilayerwithlegend';
 import Layer from './layer';
 
-class LayerWms extends Layer {
+class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   /**
    * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
    * This means that each modification made to its properties must come from outside,

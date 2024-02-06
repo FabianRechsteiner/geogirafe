@@ -1,7 +1,7 @@
 import Layer from 'ol/layer/Layer';
 import { createCanvasContext2D } from 'ol/dom';
 import { toRadians } from 'ol/math';
-import GeoConsts from '../../../tools/geoconsts.ts';
+import GeoConsts from '../../../tools/geoconsts';
 import { FrameState } from 'ol/Map';
 
 /**

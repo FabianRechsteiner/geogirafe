@@ -1,10 +1,10 @@
 ## Description
 
-*(What is this Merge-Request for)*
+_(What is this Merge-Request for)_
 
 ## Job done
 
-*(Explain shortly was was done, and wath are the important things to know ab out those changes)*
+_(Explain shortly was was done, and wath are the important things to know ab out those changes)_
 
 ## Definition of Done
 

@@ -5,6 +5,8 @@ import Layer from '../models/layers/layer';
 import ConfigManager from './configuration/configmanager';
 import StateManager from './state/statemanager';
 import LayerWms from '../models/layers/layerwms';
+import ILayerWithLegend from '../models/layers/ilayerwithlegend';
+import ILayerWithFilter from '../models/layers/ilayerwithfilter';
 
 class LayerManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -102,7 +104,7 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  toggleLayer(layer: Layer, state: 'on' | 'off') {
+  toggleLayer(layer: Layer, state?: 'on' | 'off') {
     if (!(layer instanceof Layer)) {
       throw new Error('This method should only be called on leafs layers, not on groups');
     }
@@ -122,7 +124,7 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  toggleGroup(group: GroupLayer, state: 'on' | 'off' | 'semi') {
+  toggleGroup(group: GroupLayer, state?: 'on' | 'off' | 'semi') {
     let newState: 'on' | 'off' | 'semi';
     if (state) {
       newState = state;
@@ -236,6 +238,14 @@ class LayerManager extends GirafeSingleton {
   unsetError(layer: BaseLayer) {
     layer.hasError = false;
     layer.errorMessage = null;
+  }
+
+  isLayerWithLegend(layer: ILayerWithLegend | Layer): layer is ILayerWithLegend {
+    return (<ILayerWithLegend>layer).isLegendExpanded !== undefined;
+  }
+
+  isLayerWithFilter(layer: ILayerWithFilter | Layer): layer is ILayerWithFilter {
+    return (<ILayerWithFilter>layer).filter !== undefined;
   }
 }
 

@@ -1,5 +1,5 @@
 class SearchResult {
-  // TODO REG : What should we do with this type ? Make it compatible the the structure of search results ?
+  // TODO REG : What should we do with this type ? Make it compatible to the structure of search results ?
   /*type: string;*/
   bbox?: [number, number, number, number];
   //id: number;

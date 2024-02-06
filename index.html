@@ -10,8 +10,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
     <link rel="manifest" href="site.webmanifest" />
 
-    <link rel="stylesheet" media="screen" href="index.css" />
-    <link rel="stylesheet" media="screen" href="index.mobile.css" />
+    <link rel="stylesheet" media="screen" href="src/index.css" />
+    <link rel="stylesheet" media="screen" href="src/index.mobile.css" />
 
     <link
       rel="preload"
@@ -21,17 +21,19 @@
     <noscript>
       <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
     </noscript>
-    <link
-      rel="preload"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-      href="lib/font-gis/css/font-gis.css" />
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/font-gis/font-gis.css" />
     <noscript>
-      <link rel="stylesheet" href="lib/font-gis/css/font-gis.css" />
+      <link rel="stylesheet" href="lib/font-gis/font-gis.css" />
     </noscript>
-    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/tippy.min.css" />
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/tippy.css" />
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/backdrop.css" />
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/border.css" />
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/svg-arrow.css" />
     <noscript>
-      <link rel="stylesheet" href="lib/tippy.js/tippy.min.css" />
+      <link rel="stylesheet" href="lib/tippy.js/tippy.css" />
+      <link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
+      <link rel="stylesheet" href="lib/tippy.js/border.css" />
+      <link rel="stylesheet" href="lib/tippy.js/svg-arrow.css" />
     </noscript>
 
     <link
@@ -50,10 +52,10 @@
       rel="preload"
       as="font"
       type="font/woff2"
-      href="lib/font-gis/fonts/font-gis.woff2?t=1634903189298"
+      href="lib/font-gis/font-gis.woff2?t=1634903189298"
       crossorigin="anonymous" />
 
-    <script type="module" src="initialize.ts"></script>
+    <script type="module" src="src/main.ts"></script>
     <title>GeoGirafe</title>
   </head>
 

@@ -1,5 +1,5 @@
-import PrintMaskLayer from './printMaskLayer.ts';
-import StateManager from '../../../tools/state/statemanager.ts';
+import PrintMaskLayer from './printMaskLayer';
+import StateManager from '../../../tools/state/statemanager';
 import Map from 'ol/Map';
 
 /**

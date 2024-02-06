@@ -1,11 +1,11 @@
 {
-  "name": "@geogirafe/core",
-  "description": "GeoGirafe is a VanillaJS-based library for creating online 2D and 3D geoportals.",
+  "name": "@geogirafe/lib-geoportal",
+  "description": "GeoGirafe is a flexible application to build online geoportals.",
   "author": {
     "name": "GeoGirafe PSC",
     "url": "https://doc.geomapfish.dev"
   },
-  "version": "0.3",
+  "version": "0.4.0",
   "type": "module",
   "engines": {
     "node": ">=18.0.0"
@@ -33,17 +33,15 @@
   "license": "Apache-2.0",
   "homepage": "https://doc.geomapfish.dev",
   "dependencies": {
-    "adjectives": "1.0.2",
     "gridjs": "6.1.1",
     "on-change": "5.0.1",
     "tippy.js": "6.3.7",
     "uhtml": "3.2.2",
-    "uuid": "9.0.1",
     "vanilla-picker": "2.12.2"
   },
   "peerDependencies": {
-    "cesium": "^1.111.0",
     "@geoblocks/mapfishprint": "^0.1.1",
+    "cesium": "^1.113.0",
     "ol": "^8.1.0",
     "ol-mapbox-style": "^12.1.0",
     "olcs": "^2.16.0",
@@ -51,32 +49,68 @@
   },
   "devDependencies": {
     "@types/babel__generator": "7.6.8",
-    "@types/geojson": "7946.0.13",
+    "@types/geojson": "7946.0.14",
     "@types/istanbul-lib-coverage": "2.0.6",
     "@types/proj4": "2.5.5",
-    "@types/uuid": "9.0.7",
-    "@typescript-eslint/eslint-plugin": "6.19.1",
-    "@typescript-eslint/parser": "6.19.1",
+    "@types/uuid": "9.0.8",
+    "@typescript-eslint/eslint-plugin": "6.20.0",
+    "@typescript-eslint/parser": "6.20.0",
+    "adjectives": "1.0.2",
     "cesium": "1.113.0",
     "cross-env": "7.0.3",
     "eslint": "8.56.0",
+    "font-gis": "1.0.5",
     "fs-extra": "11.2.0",
-    "lint-staged": "15.2.0",
-    "magic-string": "0.30.5",
+    "lint-staged": "15.2.1",
+    "magic-string": "0.30.6",
     "ol": "8.2.0",
-    "ol-mapbox-style": "12.1.1",
-    "olcs": "2.17.0",
+    "ol-mapbox-style": "12.2.0",
+    "olcs": "2.18.0",
     "prettier": "3.2.4",
     "proj4": "2.10.0",
     "typescript": "5.3.3",
+    "uuid": "9.0.1",
     "vite": "5.0.12",
-    "vitest": "1.2.1"
+    "vitest": "1.2.2",
+    "vite-plugin-static-copy": "1.0.0"
   },
+  "types": "./main.lib.d.ts",
+  "exports": {
+    ".": {
+      "import": "./main.lib.js"
+    },
+    "./base": {
+      "import": "./base/main.js"
+    },
+    "./components": {
+      "import": "./components/main.js"
+    },
+    "./models": {
+      "import": "./models/main.js"
+    },
+    "./tools": {
+      "import": "./tools/main.js"
+    },
+    "./vite-inline-templates-plugin": {
+      "import": "./buildtools/vite-inline-templates-plugin.js"
+    },
+    "./vite-restart-plugin": {
+      "import": "./buildtools/vite-restart-plugin.js"
+    }
+  },
+  "bin": {
+    "lib-inline": "./buildtools/lib-inline.js"
+  },
+  "files": [
+    "**/*"
+  ],
   "scripts": {
-    "serve": "node buildtools/prebuild.cjs && tsc && vite serve --port 8080",
-    "serve-rebundle-deps": "node buildtools/prebuild.cjs && tsc && vite serve --force --port 8080",
-    "build": "node buildtools/prebuild.cjs && tsc && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
-    "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile .",
+    "start": "tsc && vite serve --port 8080",
+    "start-rebundle-deps": "tsc && vite serve --force --port 8080",
+    "build": "node buildtools/app-clean.js && tsc && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
+    "build-lib": "node buildtools/lib-clean.js && node buildtools/lib-inline.js && node buildtools/lib-collect.js && tsc --project tsconfig.lib.json && node buildtools/lib-finalize.js",
+    "publish-lib": "cd dist/lib && npm publish",
+    "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile dist",
     "test": "vitest",
     "configure-demo": "bash -C './buildtools/configure-demo.sh'",
     "configure-demo-win": "buildtools\\configure-demo.cmd",

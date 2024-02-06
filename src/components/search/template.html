@@ -9,7 +9,7 @@
     autocorrect="off"
     i18n="Search"
     placeholder="Search..."
-    oninput="${(e) => this.doSearch(e)}"
+    oninput="${(e:Event) => this.doSearch(e)}"
     onfocusin="${() => this.onFocusIn()}"
     onfocusout="${() => this.onFocusOut()}" />
 
@@ -22,7 +22,7 @@
     <div class="title"><i class="${this.getIconClassName(group)}"></i><span>${group}</span></div>
     ${this.groupedResults[group].map(result => uHtml`
     <div class="result" onmousedown="${() => this.ignoreBlur()}" onclick="${() => this.onSelect(result)}">
-      <span>${result.properties.label}</span>
+      <span>${result.properties?.label}</span>
     </div>
     `)} `)}
   </div>

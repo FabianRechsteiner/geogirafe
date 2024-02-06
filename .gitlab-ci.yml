@@ -1,7 +1,8 @@
 stages:
   - test
+  - versioning
   - build
-  - docker-build
+  - publish
   - pages
   - scan
 
@@ -10,6 +11,9 @@ stages:
 variables:
   SONAR_USER_HOME: '${CI_PROJECT_DIR}/.sonar' # Defines the location of the analysis task cache
   GIT_DEPTH: '0' # Tells git to fetch all the branches of the project, required by the analysis task
+  MAIN_PROJECT: 'geogirafe/gg-viewer'
+  MAIN_BRANCH: 'main'
+  DOCKER_IMAGE: 'geogirafe/viewer'
 
 #################################
 # Audit NPM dependencies to find any known vulnerability
@@ -19,7 +23,7 @@ npm-audit:
   allow_failure: true
 
   script:
-    - npm i
+    - npm ci
     - npm audit --omit=dev --audit-level high
     - npm audit signatures
 
@@ -31,7 +35,7 @@ npm-outdated:
   allow_failure: true
 
   script:
-    - npm i
+    - npm ci
     - npm outdated
 
 #################################
@@ -41,17 +45,17 @@ eslint:
   image: node:18-slim
 
   script:
-    - npm i
+    - npm ci
     - npm run lint
 
 #################################
 # Unit-Tests
-unittest:
+unittests:
   stage: test
   image: node:18-slim
 
   script:
-    - npm i
+    - npm ci
     - npm run test
 
 #################################
@@ -78,39 +82,85 @@ include:
   - template: Security/SAST.gitlab-ci.yml
 
 #################################
+# Increment version number
+versioning:
+  stage: versioning
+  image: node:18-slim
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "${MAIN_BRANCH}" && $CI_PROJECT_PATH == "${MAIN_PROJECT}"'
+  #     when: always
+  #   - when: never
+  before_script:
+    - apt update && apt -y install git
+    - git config user.email "geogirafe@geomapfish.dev"
+    - git config user.name "GeoGirafe CI"
+  script:
+    - npm version patch
+    # TODO REG : How to push the changes to GIT ? Do we want that ? Will it recreate a commit, and therfore autoamticall rerun a pipeline (infinite loop) ?
+    # - git remote add versioning https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    # - git push --follow-tags versioning
+  artifacts:
+    paths:
+      - package.json
+
+#################################
 # Build the application for production
-build:
+build-app:
   stage: build
   image: node:18-slim
+  dependencies:
+    - versioning
 
   before_script:
     - apt update && apt -y install jq brotli
   script:
-    - npm i
+    - npm ci
     - npm run build
     # List all dependencies
     - npm list --all --omit=dev
     # Generate Version Number
     - version=$(jq -r '.version' package.json)
-    - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > public/about.json
+    - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > dist/app/about.json
     # Compress all files
-    - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
-    - find public -type f -regex '.*\.\(html\|css\|js\|json\)' -exec gzip -k -f {} \;
+    - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
+    - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec gzip -k -f {} \;
   artifacts:
     paths:
-      - public
+      - dist/app
+
+#################################
+# Build the library for production
+build-lib:
+  stage: build
+  image: node:18-slim
+  dependencies:
+    - versioning
+
+  before_script:
+    - apt update && apt -y install jq
+  script:
+    - npm ci
+    - npm run build-lib
+    # List all dependencies
+    - npm list --all --omit=dev
+    # Generate Version Number
+    - version=$(jq -r '.version' package.json)
+    - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > dist/lib/public/about.json
+  artifacts:
+    paths:
+      - dist/lib
 
 #################################
 # Create a docker image with the production build
-docker-build:
-  stage: docker-build
-  image: docker:20.10.16
+publish-docker:
+  stage: publish
+  image: docker:25
   services:
-    - docker:20.10.16-dind
+    - docker:25-dind
   dependencies:
-    - build
+    - build-app
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "${MAIN_BRANCH}" && $CI_PROJECT_PATH == "${MAIN_PROJECT}"'
       when: always
     - when: never
 
@@ -120,9 +170,26 @@ docker-build:
 
   script:
     # build
-    - docker build -t geogirafe/viewer -f buildtools/Dockerfile .
+    - docker build -t ${DOCKER_IMAGE} -f buildtools/Dockerfile dist
     # push
-    - docker push geogirafe/viewer
+    - docker push ${DOCKER_IMAGE}
+
+#################################
+# Publish the library to npm
+publish-lib:
+  stage: publish
+  image: node:18-slim
+  dependencies:
+    - build-lib
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "${MAIN_BRANCH}" && $CI_PROJECT_PATH == "${MAIN_PROJECT}"'
+      when: always
+    - when: never
+
+  before_script:
+    - apt update
+  script:
+    - npm run publish-lib
 
 #################################
 # Configure and optimize the demo
@@ -131,7 +198,7 @@ docker-build:
 #     because it sometimes represents 70% of the content of themes.json.
 # Then, we also compress everything with gzip and brotli
 .prepare_demo: &prepare_demo |
-  cp -R public $demo && mv $demo release/
+  cp -R dist/app $demo && mv $demo release/
   ./buildtools/configure-demo.sh "$demo" "release/$demo"
   if [ -f "release/$demo/Mock/themes.json" ]; then jq --ascii-output "del(.ogcServers[] | .attributes)" "release/$demo/Mock/themes.json" > "release/$demo/Mock/themes_simplified.json"; rm "release/$demo/Mock/themes.json"; mv "release/$demo/Mock/themes_simplified.json" "release/$demo/Mock/themes.json"; fi
   if [ -f "release/$demo/Mock/themes.json" ]; then gzip -k -f "release/$demo/Mock/themes.json"; brotli -k -f "release/$demo/Mock/themes.json"; fi
@@ -146,15 +213,15 @@ pages:
   stage: pages
   image: debian:stable-slim
   dependencies:
-    - build
+    - build-app
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "${MAIN_BRANCH}" && $CI_PROJECT_PATH == "${MAIN_PROJECT}"'
       when: always
     - when: never
 
   before_script:
     - apt update && apt install -y brotli curl jq
-    - mkdir -p public/Mock
+    - mkdir -p dist/app/Mock
     - mkdir release
     - chmod a+x ./buildtools/configure-demo.sh
   script:
@@ -197,6 +264,29 @@ pages:
       - public
 
 #################################
+# Create a docker image with the production build
+docker-scout:
+  stage: scan
+  image: docker:25
+  services:
+    - docker:25-dind
+  dependencies:
+    - publish-docker
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "${MAIN_BRANCH}" && $CI_PROJECT_PATH == "${MAIN_PROJECT}"'
+      when: always
+    - when: never
+
+  before_script:
+    - apk update && apk add curl
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+    - curl -sSfL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh -s --
+  script:
+    - docker scout quickview ${DOCKER_IMAGE}
+    - docker scout cves ${DOCKER_IMAGE}
+    - docker scout recommendations ${DOCKER_IMAGE}
+
+#################################
 # Perform a baseline security scan of the application using ZAP-Proxy
 zap-baseline-scan:
   stage: scan
@@ -204,7 +294,7 @@ zap-baseline-scan:
   dependencies:
     - pages
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "${MAIN_BRANCH}" && $CI_PROJECT_PATH == "${MAIN_PROJECT}"'
       when: always
     - when: never
 

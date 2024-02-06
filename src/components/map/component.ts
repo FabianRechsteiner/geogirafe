@@ -45,7 +45,14 @@ import LayerWms from '../../models/layers/layerwms';
 import MapPosition from '../../tools/state/mapposition';
 import LocalFileManager from './tools/localfilemanager';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
-import PrintMaskManager from '../print/tools/printMaskManager.ts';
+import PrintMaskManager from '../print/tools/printMaskManager';
+
+// read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
+declare global {
+  interface Window {
+    Cesium: unknown;
+  }
+}
 
 class MapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';

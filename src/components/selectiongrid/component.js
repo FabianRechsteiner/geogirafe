@@ -5,7 +5,6 @@ import { niceCoordinates } from '../../tools/geometrytools';
 import Geometry from 'ol/geom/Geometry.js';
 import { getCenter } from 'ol/extent';
 import { LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
-
 class SelectionGridComponent extends GirafeResizableElement {
   templateUrl = './template.html';
   styleUrl = './style.css';

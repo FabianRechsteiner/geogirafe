@@ -192,7 +192,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     super.activateTooltips(false, [800, 0], 'right');
   }
 
-  toggle(state: 'on' | 'off') {
+  toggle(state?: 'on' | 'off') {
     this.layerManager.toggleLayer(this.layer, state);
   }
 

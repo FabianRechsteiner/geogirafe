@@ -16,6 +16,7 @@ class NavBookmarksComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
+
     this.nameInput = this.shadow.getElementById('name') as HTMLInputElement;
     this.nameInput.focus();
   }
