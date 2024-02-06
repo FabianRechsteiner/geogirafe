@@ -166,7 +166,7 @@ publish-docker:
   dependencies:
     - build-app
   rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: always
     - when: never
 
