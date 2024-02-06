@@ -94,6 +94,12 @@ versioning:
     - apt update && apt -y install git
     - git config user.email "geogirafe@geomapfish.dev"
     - git config user.name "GeoGirafe CI"
+    - echo ${MAIN_PROJECT}
+    - echo ${MAIN_BRANCH}
+    - echo $CI_COMMIT_BRANCH
+    - echo $CI_PROJECT_PATH
+    - echo ${CI_COMMIT_BRANCH}
+    - echo ${CI_PROJECT_PATH}
   script:
     - npm version patch
     # TODO REG : How to push the changes to GIT ? Do we want that ? Will it recreate a commit, and therfore autoamticall rerun a pipeline (infinite loop) ?
