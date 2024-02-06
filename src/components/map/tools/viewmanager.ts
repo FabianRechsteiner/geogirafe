@@ -24,6 +24,7 @@ class ViewManager {
   scales: number[];
   allowedResolutions: number[];
   constrainScales: boolean;
+  constrainRotation: boolean | number;
 
   constructor(map: Map, srid: string) {
     this.map = map;
@@ -34,6 +35,7 @@ class ViewManager {
     this.center = this.configManager.Config.map.startPosition.split(',').map(Number);
     this.zoom = Number(this.configManager.Config.map.startZoom);
     this.constrainScales = this.configManager.Config.map.constrainScales;
+    this.constrainRotation = this.configManager.Config.map.constrainRotation;
     this.extent = this.configManager.Config.map.maxExtent.split(',').map(Number);
 
     this.scales = this.configManager.Config.map.scales;
@@ -77,7 +79,8 @@ class ViewManager {
       projection: this.srid,
       extent: this.extent,
       resolutions: this.allowedResolutions,
-      constrainResolution: this.constrainScales
+      constrainResolution: this.constrainScales,
+      constrainRotation: this.constrainRotation
     });
   }
 
@@ -113,6 +116,7 @@ class ViewManager {
       projection: this.projection,
       resolutions: this.allowedResolutions,
       constrainResolution: this.constrainScales,
+      constrainRotation: this.constrainRotation,
       extent: newExtent
     });
     return newView;

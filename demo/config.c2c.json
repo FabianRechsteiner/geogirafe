@@ -23,7 +23,9 @@
   },
   "print": {
     "url": "https://geomapfish-demo-2-8.camptocamp.com/printproxy/",
-    "defaultLayout": "1 A4 portrait"
+    "defaultLayout": "1 A4 portrait",
+    "defaultFormat": "pdf",
+    "wantedAttributeNames": ["legend", "title", "comments", "timezone"]
   },
   "projections": {
     "EPSG:3857": "W-M",

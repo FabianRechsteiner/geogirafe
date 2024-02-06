@@ -31,6 +31,9 @@ class GirafeConfig {
   print: {
     url: string;
     defaultLayout: string;
+    defaultFormat?: string;
+    defaultScale?: number;
+    wantedAttributeNames?: string[];
   };
   selection: {
     defaultFillColor: string;
@@ -57,6 +60,7 @@ class GirafeConfig {
     maxExtent: string;
     scales: number[];
     constrainScales: boolean;
+    constrainRotation: boolean;
     showScaleLine: boolean;
   };
   map3d?: {
@@ -153,6 +157,7 @@ class GirafeConfig {
       maxExtent: config.map.maxExtent,
       scales: config.map.scales,
       constrainScales: config.map?.constrainScales ?? true,
+      constrainRotation: config.map?.constrainRotation ?? false,
       showScaleLine: config.map?.showScaleLine ?? true
     };
   }
@@ -186,6 +191,9 @@ class GirafeConfig {
       throw new Error(
         `Configuration for print.defaultLayout is required. See https://doc.geomapfish.dev/docs/configuration`
       );
+    }
+    if (!config.print?.wantedAttributeNames) {
+      config.print.wantedAttributeNames = ['title', 'comments', 'legend'];
     }
     return config.print;
   }

@@ -89,6 +89,7 @@ A big thank to all the contributors of GeoGirafe, in alphabetical order:
 
 - Arnaud Poncet-Montanges @ponceta (SIGIP)
 - Ben Koch @beeekey (OpenGIS)
+- Benjamin Gerber @ger-benjamin (Camptocamp SA)
 - Daniel Gnerre @gnerred (Cartoriviera)
 - Dietmar Schneider @sdietmar (techplus)
 - Guillaume Remy @remyguillaume (Basel-Stadt)

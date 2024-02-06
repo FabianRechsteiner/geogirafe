@@ -21,7 +21,6 @@ import { ScaleLine } from 'ol/control';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import GeoEvents from '../../models/events';
-import MaskLayer from './tools/maskLayer';
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
 import OsmManager from './tools/osmmanager';
@@ -46,6 +45,7 @@ import LayerWms from '../../models/layers/layerwms';
 import MapPosition from '../../tools/state/mapposition';
 import LocalFileManager from './tools/localfilemanager';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
+import PrintMaskManager from '../print/tools/printMaskManager.ts';
 
 class MapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -61,6 +61,7 @@ class MapComponent extends GirafeHTMLElement {
   loading: boolean = false;
   swiper!: HTMLInputElement;
   swipeManager!: SwipeManager;
+  printMaskManager!: PrintMaskManager;
   wmtsManager!: WmtsManager;
   wmsManager!: WmsManager;
   osmManager!: OsmManager;
@@ -88,9 +89,6 @@ class MapComponent extends GirafeHTMLElement {
   focusAnimation: EventsKey | null = null;
   pixelTolerance = 10;
   dragbox!: DragBox;
-
-  // For print
-  maskLayer = new MaskLayer({ name: 'PrintMask' });
 
   constructor() {
     super('map');
@@ -144,11 +142,6 @@ class MapComponent extends GirafeHTMLElement {
         this.onFeaturesChanged(oldFeatures, newFeatures)
     );
 
-    this.stateManager.subscribe('interface.printPanelVisible', (_oldValue: boolean, newValue: boolean) =>
-      this.onPrintPanelToggled(newValue)
-    );
-    this.stateManager.subscribe(/print\..*/, () => this.onPrintStateChanged());
-
     this.stateManager.subscribe('globe.display', () => this.onGlobeToggled());
 
     this.stateManager.subscribe(
@@ -182,6 +175,7 @@ class MapComponent extends GirafeHTMLElement {
     this.state.olMap = this.map;
 
     // Initialize managers
+    this.printMaskManager = new PrintMaskManager(this.map);
     this.wmsManager = new WmsManager(this.map, this.srid);
     this.osmManager = new OsmManager(this.map, this.srid);
     this.viewManager = new ViewManager(this.map, this.srid);
@@ -475,24 +469,6 @@ class MapComponent extends GirafeHTMLElement {
     });
   }
 
-  onPrintStateChanged() {
-    if (this.state.print.format) {
-      this.maskLayer.updateSize(this.state.print.format!);
-    }
-    if (this.state.print.scale) {
-      this.maskLayer.updateScale(this.state.print.scale!);
-    }
-    this.map.updateSize();
-  }
-
-  onPrintPanelToggled(visible: boolean) {
-    if (visible) {
-      this.maskLayer.setMap(this.map);
-    } else {
-      this.maskLayer.setMap(null);
-    }
-  }
-
   onCustomGirafeEvent(details: { action: string; layer: Layer; extent: Extent }) {
     if (details.action === GeoEvents.zoomToExtent) {
       this.zoomToExtent(details.extent);
@@ -766,14 +742,6 @@ layers.forEach(layerInfos => {
       }
     });
   }
-
-  /*activatePrintMask(format) {
-  this.map.addLayer(this.maskLayer);
-}
-
-deactivatePrintMask() {
-  this.map.removeLayer(this.maskLayer);
-}*/
 
   onFeaturesChanged(oldFeatures: RedliningFeature[], newFeatures: RedliningFeature[]) {
     let deletedFeatures: RedliningFeature[] = [];
