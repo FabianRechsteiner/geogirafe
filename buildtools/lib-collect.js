@@ -1,0 +1,13 @@
+import path from 'path';
+import { copy } from './tools.js';
+
+const sourceDir = 'src';
+const targetDir = path.join('dist', 'lib-src-inline');
+
+copy('base', sourceDir, targetDir);
+copy('models', sourceDir, targetDir);
+copy('tools', sourceDir, targetDir);
+copy('typings', sourceDir, targetDir);
+copy('decs.d.ts', sourceDir, targetDir);
+copy('main.lib.ts', sourceDir, targetDir);
+copy('main.lib.d.ts', sourceDir, targetDir);

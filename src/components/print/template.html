@@ -13,7 +13,7 @@
     <div class="${this.capabilities ? '' : 'hidden'}">
       <div class="option">
         <label for="layout" i18n="Layout">Layout</label>
-        <div class="select" onchange="${(evt) => this.onLayoutChanged(evt)}">
+        <div class="select" onchange="${(evt:Event) => this.onLayoutChanged(evt)}">
           <select id="layout">
             ${Object.keys(this.layoutsByName).map((layoutName) => uHtml`
             <option i18n="${layoutName}" ?selected="${this.selectedLayoutName === layoutName}" value="${layoutName}">
@@ -26,7 +26,7 @@
 
       <div class="option">
         <label for="scale" i18n="Scale">Scale</label>
-        <div class="select" onchange="${(evt) => this.onScaleChanged(evt)}">
+        <div class="select" onchange="${(evt:Event) => this.onScaleChanged(evt)}">
           <select id="scale">
             ${this.scales.map((scale) => uHtml`
             <option ?selected="${this.selectedScale === scale}" value="${scale}">1:${scale}</option>
@@ -37,7 +37,7 @@
 
       <div class="option">
         <label for="format" i18n="Format">Format</label>
-        <div class="select" onchange="${(evt) => this.onFormatChanged(evt)}">
+        <div class="select" onchange="${(evt:Event) => this.onFormatChanged(evt)}">
           <select id="format">
             ${this.printFormats.map((format) => uHtml`
             <option ?selected="${this.selectedFormat === format}" value="${format}">${format}</option>
@@ -46,8 +46,9 @@
         </div>
       </div>
 
-      ${this.wantedAttributeNames.map( (attrName) => { if (this.getAttributeInputType(attrName) === 'number') { return
-      uHtml`
+      <!-- prettier is breaking this line because it breaks just after the return -->
+      <!-- prettier-ignore -->
+      ${this.wantedAttributeNames.map( (attrName) => { if (this.getAttributeInputType(attrName) === 'number') { return uHtml`
       <div class="option">
         <label for="${attrName}" i18n="${attrName}">${attrName}</label>
         <input id="${attrName}" type="number" value="${this.getCapabilitiesAttribute(attrName)?.default}" />
@@ -78,7 +79,7 @@
           max="180"
           step="1"
           value="${this.rotation}"
-          oninput="${(evt) => this.onRotationChanged(evt)}" />
+          oninput="${(evt:Event) => this.onRotationChanged(evt)}" />
         <input
           id="rotationNumber"
           type="number"
@@ -86,7 +87,7 @@
           max="180"
           step="1"
           value="${this.rotation}"
-          oninput="${(evt) => this.onRotationChanged(evt)}" />
+          oninput="${(evt:Event) => this.onRotationChanged(evt)}" />
       </div>
 
       <button id="export-pdf" onclick="${() => this.print()}" i18n="Print">Print</button>

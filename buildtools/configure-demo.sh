@@ -1,4 +1,4 @@
-APPDIR="src/static"
+APPDIR="public"
 if [ -n "$2" ];
 then
     APPDIR="$2"

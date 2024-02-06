@@ -3,8 +3,9 @@ import Layer from './layer';
 import Geometry from 'ol/geom/Geometry';
 import ConfigManager from '../../tools/configuration/configmanager';
 import { Extent } from 'ol/extent';
+import ILayerWithLegend from './ilayerwithlegend';
 
-class LayerLocalFile extends Layer {
+class LayerLocalFile extends Layer implements ILayerWithLegend {
   /**
    * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
    * This means that each modification made to its properties must come from outside,

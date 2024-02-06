@@ -1,6 +1,9 @@
-<link rel="stylesheet" href="lib/font-gis/css/font-gis.css" />
+<link rel="stylesheet" href="lib/font-gis/font-gis.css" />
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
-<link rel="stylesheet" href="lib/tippy.js/tippy.min.css" />
+<link rel="stylesheet" href="lib/tippy.js/tippy.css" />
+<link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
+<link rel="stylesheet" href="lib/tippy.js/border.css" />
+<link rel="stylesheet" href="lib/tippy.js/svg-arrow.css" />
 
 <div class="${this.state.treeview.advanced ? 'item advanced' : 'item'}">
   <!-- spacer for alignment -->
@@ -13,13 +16,13 @@
     onclick="${() => this.toggle()}"
     src="${this.iconUrl}" />
   <div
-    class="${(!this.layer instanceof LayerWms || !this.configManager.Config.treeview.useLegendIcons || !this.iconUrl || this.configManager.Config.treeview.useCheckboxes) && this.layer.activeState === 'off' ? 'circle-off selectable' : 'circle-off hidden'}"
+    class="${(!(this.layer instanceof LayerWms) || !this.configManager.Config.treeview.useLegendIcons || !this.iconUrl || this.configManager.Config.treeview.useCheckboxes) && this.layer.activeState === 'off' ? 'circle-off selectable' : 'circle-off hidden'}"
     onclick="${() => this.toggle()}">
     <i
       class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-regular fa-square selbox' : 'fa-xs fa-regular fa-circle selcircle'}"></i>
   </div>
   <div
-    class="${(!this.layer instanceof LayerWms || !this.configManager.Config.treeview.useLegendIcons || !this.iconUrl || this.configManager.Config.treeview.useCheckboxes) && this.layer.activeState === 'on' ? 'circle-on selected' : 'circle-on hidden'}"
+    class="${(!(this.layer instanceof LayerWms) || !this.configManager.Config.treeview.useLegendIcons || !this.iconUrl || this.configManager.Config.treeview.useCheckboxes) && this.layer.activeState === 'on' ? 'circle-on selected' : 'circle-on hidden'}"
     onclick="${() => this.toggle()}">
     <i
       class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-solid fa-square-check selbox' : 'fa-xs fa-solid fa-circle selcircle'}"></i>
@@ -34,8 +37,8 @@
   <!-- Label -->
   <span
     i18n="${this.layer.name}"
-    class="${this.layer.activeState === 'on' ? (this.layer.hasFilter ? 'text selected filtered' : 'text selected') : 'text selectable'}"
-    tip="${this.layer.hasFilter ? 'This layer is filtered.' : ''}"
+    class="${this.layer.activeState === 'on' ? ((this.layerManager.isLayerWithFilter(this.layer) && this.layer.hasFilter) ? 'text selected filtered' : 'text selected') : 'text selectable'}"
+    tip="${(this.layerManager.isLayerWithFilter(this.layer) && this.layer.hasFilter) ? 'This layer is filtered.' : ''}"
     onclick="${() => this.toggle()}"
     >${this.layer.name}</span
   >
@@ -81,18 +84,18 @@
     class="${this.layer instanceof LayerLocalFile || (this.layer instanceof LayerWms && this.layer.legend) ? 'legend selectable' : 'legend invisible'}">
     <i
       tip="Toggle legend"
-      class="${this.layer.isLegendExpanded ? 'fa-solid fa-bars fa-rotate-270 tool selectable' : 'fa-solid fa-bars tool selectable'}"
-      onclick="${() => this.layer.isLegendExpanded = !this.layer.isLegendExpanded}"></i>
+      class="${this.layerManager.isLayerWithLegend(this.layer) && this.layer.isLegendExpanded ? 'fa-solid fa-bars fa-rotate-270 tool selectable' : 'fa-solid fa-bars tool selectable'}"
+      onclick="${() => {if (this.layerManager.isLayerWithLegend(this.layer)) {this.layer.isLegendExpanded = !this.layer.isLegendExpanded}}}"></i>
   </div>
 </div>
 
-${this.layer.layers?.split(',').map(l => uHtml`<img
+${(this.layer as LayerWms)?.layers?.split(',').map((l:string) => uHtml`<img
   class="${this.layer instanceof LayerWms && this.layer.legend && this.layer.isLegendExpanded ? 'legend-image' : 'legend-image hidden'}"
   alt="${'Legend for ' + l}"
   src="${this.legendUrls[l]}" />` )}
 
 <div
   class="${this.layer instanceof LayerLocalFile && this.layer.isLegendExpanded ? 'legend-file' : 'legend-file hidden'}">
-  <span>File from </span><span>${this.layer.lastModifiedDate}</span><span> [</span
-  ><span>${this.layer._features?.length} </span><span>features.]</span>
+  <span>File from </span><span>${(this.layer as LayerLocalFile).lastModifiedDate}</span><span> [</span
+  ><span>${(this.layer as LayerLocalFile)._features?.length} </span><span>features.]</span>
 </div>

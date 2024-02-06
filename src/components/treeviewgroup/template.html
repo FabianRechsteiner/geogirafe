@@ -1,6 +1,9 @@
-<link rel="stylesheet" href="lib/font-gis/css/font-gis.css" />
+<link rel="stylesheet" href="lib/font-gis/font-gis.css" />
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
-<link rel="stylesheet" href="lib/tippy.js/tippy.min.css" />
+<link rel="stylesheet" href="lib/tippy.js/tippy.css" />
+<link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
+<link rel="stylesheet" href="lib/tippy.js/border.css" />
+<link rel="stylesheet" href="lib/tippy.js/svg-arrow.css" />
 
 <div class="group">
   <!-- Caret -->
@@ -16,13 +19,13 @@
   <!-- Bullet or Checkbox -->
   <div
     class="${this.group.activeState === 'off' ? 'circle-off selectable' : 'circle-off hidden'}"
-    onclick="${() => this.toggle()}">
+    onclick="${() => this.toggle('on')}">
     <i
       class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-regular fa-square selbox' : 'fa-xs fa-regular fa-circle selcircle'}"></i>
   </div>
   <div
     class="${this.group.activeState === 'on' ? 'circle-on selected' : 'circle-on hidden'}"
-    onclick="${() => this.toggle()}">
+    onclick="${() => this.toggle('off')}">
     <i
       class="${this.configManager.Config.treeview.useCheckboxes ? 'fa-lg fa-solid fa-square-check selbox' : 'fa-xs fa-solid fa-circle selcircle'}"></i>
   </div>

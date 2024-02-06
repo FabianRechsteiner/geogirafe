@@ -48,8 +48,7 @@ declare global {
   }
   interface Window {
     CESIUM_BASE_URL: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Cesium: any;
+    Cesium: unknown;
   }
 }
 

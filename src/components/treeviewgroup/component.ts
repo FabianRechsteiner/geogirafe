@@ -70,7 +70,7 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
     }
   }
 
-  toggle(state: 'on' | 'off' | 'semi') {
+  toggle(state?: 'on' | 'off' | 'semi') {
     this.layerManager.toggleGroup(this.group, state);
   }
 

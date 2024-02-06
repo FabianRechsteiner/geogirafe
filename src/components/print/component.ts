@@ -1,7 +1,7 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
-import type { MapFishPrintReportResponse } from '@geoblocks/mapfishprint/src/mapfishprintTypes.ts';
+import type { MapFishPrintReportResponse } from '@geoblocks/mapfishprint/src/mapfishprintTypes';
 import { EventsKey } from 'ol/events';
-import { unByKeyAll } from '../../tools/olUtils.ts';
+import { unByKeyAll } from '../../tools/olUtils';
 import { clamp, toDegrees, toRadians } from 'ol/math';
 
 /**

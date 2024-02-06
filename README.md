@@ -64,7 +64,7 @@ Now you can build the application, and start the development server:
 
 ```bash
 npm install
-npm run serve
+npm start
 ```
 
 ## Debugging using VSCode
@@ -74,11 +74,11 @@ After you've started the application in development mode, just press `F5`, and V
 
 ## Configuration
 
-The complete configuration of the application is done in the file `static/config.json`.
+The complete configuration of the application is done in the file `config.json`.
 This configuration will be loaded dynamically when the application starts.
 Therefore it is not necessary to rebuild the project when you modify this file.
 
-The file `static/config.json` does not exists by default.
+The file `config.json` does not exists by default.
 The simplest way to create one is to pick up an existing one in the _demo_ directory, and to adapt the content to your needs.
 
 You can also preconfigure GeoGirafe for an existing demo configuration by using:
@@ -107,6 +107,38 @@ npm install
 npm run build
 ```
 
+This will output a complete built GeoGirafe app which can be served by a Webserver
+easily in the [dist/app](dist/app) folder.
+
+You can try the built asset with (you need docker for this example!):
+
+```bash
+docker run --rm -p 8088:80 -v $(pwd)/dist/app:/usr/share/nginx/html nginx:latest
+```
+
+This will spin up an NGINX and you can access it on [localhost:8088](http://localhost:8088).
+
+Press `CTRL+C` to stop the container.
+
+## Build the NPM Package
+
+Make sure to have run the command `npm login` before at least once
+
+### Build the library
+
+```bash
+npm install
+npm run build-lib
+```
+
+This will output (beside others) a transpiled version of GeoGirafe's library part into [dist/lib](dist/lib).
+
+### Publish Lib Package to [npmjs.com](https.//npmjs.com)
+
+```bash
+npm run publish-lib --access public
+```
+
 ### Using Docker
 
 ```bash
@@ -127,13 +159,13 @@ Copy the `public` directory content to any webserver, for example in the `htdocs
 When the project has been built, you can build a docker image that will contains the application:
 
 ```
-docker build -t <your_name>/gg-viewer -f buildtools/Dockerfile .
+docker build -t <your_name>/viewer -f buildtools/Dockerfile dist
 ```
 
 Then, you can start it:
 
 ```
-docker run -p 8080:80 -p 8443:443 <your_name>/gg-viewer
+docker run -p 8080:80 -p 8443:443 <your_name>/viewer
 ```
 
 # Contributing
