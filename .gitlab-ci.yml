@@ -85,20 +85,17 @@ include:
 # Increment version number
 versioning:
   stage: versioning
-  image: node:18-slim
+  image: debian:stable-slim
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: always
     - when: never
   before_script:
-    - apt update && apt -y install git
-    - git config user.email "geogirafe@geomapfish.dev"
-    - git config user.name "GeoGirafe CI"
+    - apt update && apt -y install jq
   script:
-    - npm version patch
-    # TODO REG : How to push the changes to GIT ? Do we want that ? Will it recreate a commit, and therfore autoamticall rerun a pipeline (infinite loop) ?
-    # - git remote add versioning https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
-    # - git push --follow-tags versioning
+    - jq '.version |= . + "-$CI_PIPELINE_ID"' package.json > package-temp.json
+    - rm package.json && mv package-temp.json package.json
+
   artifacts:
     paths:
       - package.json
@@ -188,6 +185,7 @@ publish-lib:
 
   before_script:
     - apt update
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > /dist/lib/.npmrc
   script:
     - npm run publish-lib
 

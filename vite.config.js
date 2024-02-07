@@ -13,6 +13,7 @@ const cesiumBaseUrl = 'lib/cesium/';
 
 // https://v2.vitejs.dev/config/
 export default defineConfig({
+  base: './',
   build: {
     outDir: 'dist/app',
     sourcemap: true,
