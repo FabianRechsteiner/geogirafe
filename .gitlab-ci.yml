@@ -86,6 +86,12 @@ include:
 versioning:
   stage: versioning
   image: debian:stable-slim
+  needs:
+    - job: eslint
+      artifacts: false
+    - job: unittests
+      artifacts: false
+
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: always
@@ -93,7 +99,7 @@ versioning:
   before_script:
     - apt update && apt -y install jq
   script:
-    - jq '.version |= . + "-$CI_PIPELINE_ID"' package.json > package-temp.json
+    - jq ".version |= . + \"-$CI_PIPELINE_ID\"" package.json > package-temp.json
     - rm package.json && mv package-temp.json package.json
 
   artifacts:
@@ -105,8 +111,9 @@ versioning:
 build-app:
   stage: build
   image: node:18-slim
-  dependencies:
-    - versioning
+  needs:
+    - job: versioning
+      artifacts: true
 
   before_script:
     - apt update && apt -y install jq brotli
@@ -130,8 +137,9 @@ build-app:
 build-lib:
   stage: build
   image: node:18-slim
-  dependencies:
-    - versioning
+  needs:
+    - job: versioning
+      artifacts: true
 
   before_script:
     - apt update && apt -y install jq
@@ -154,8 +162,10 @@ publish-docker:
   image: docker:25
   services:
     - docker:25-dind
-  dependencies:
-    - build-app
+  needs:
+    - job: build-app
+      artifacts: true
+
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: always
@@ -176,8 +186,10 @@ publish-docker:
 publish-lib:
   stage: publish
   image: node:18-slim
-  dependencies:
-    - build-lib
+  needs:
+    - job: build-lib
+      artifacts: true
+
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: always
@@ -210,8 +222,10 @@ publish-lib:
 pages:
   stage: pages
   image: debian:stable-slim
-  dependencies:
-    - build-app
+  needs:
+    - job: build-app
+      artifacts: true
+
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: always
@@ -268,8 +282,10 @@ docker-scout:
   image: docker:25
   services:
     - docker:25-dind
-  dependencies:
-    - publish-docker
+  needs:
+    - job: publish-docker
+      artifacts: false
+
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: always
@@ -289,8 +305,10 @@ docker-scout:
 zap-baseline-scan:
   stage: scan
   image: owasp/zap2docker-stable
-  dependencies:
-    - pages
+  needs:
+    - job: pages
+      artifacts: false
+
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: always
