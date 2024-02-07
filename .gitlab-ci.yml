@@ -199,7 +199,7 @@ publish-lib:
 
   before_script:
     - apt update
-    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > /dist/lib/.npmrc
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > dist/lib/.npmrc
   script:
     - npm run publish-lib
 
