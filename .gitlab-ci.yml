@@ -88,9 +88,9 @@ versioning:
   image: debian:stable-slim
   needs:
     - job: eslint
-      artifacts: false
+      artifacts: true
     - job: unittests
-      artifacts: false
+      artifacts: true
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
@@ -284,7 +284,7 @@ docker-scout:
     - docker:25-dind
   needs:
     - job: publish-docker
-      artifacts: false
+      artifacts: true
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
@@ -307,7 +307,7 @@ zap-baseline-scan:
   image: owasp/zap2docker-stable
   needs:
     - job: pages
-      artifacts: false
+      artifacts: true
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
