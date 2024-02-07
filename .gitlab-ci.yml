@@ -88,13 +88,13 @@ versioning:
   image: debian:stable-slim
   needs:
     - job: eslint
-      artifacts: true
+      artifacts: false
     - job: unittests
-      artifacts: true
+      artifacts: false
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
-      when: always
+      when: on_success
     - when: never
   before_script:
     - apt update && apt -y install jq
@@ -114,6 +114,7 @@ build-app:
   needs:
     - job: versioning
       artifacts: true
+  when: on_success
 
   before_script:
     - apt update && apt -y install jq brotli
@@ -140,6 +141,7 @@ build-lib:
   needs:
     - job: versioning
       artifacts: true
+  when: on_success
 
   before_script:
     - apt update && apt -y install jq
@@ -168,7 +170,7 @@ publish-docker:
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
-      when: always
+      when: on_success
     - when: never
 
   before_script:
@@ -192,7 +194,7 @@ publish-lib:
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
-      when: always
+      when: on_success
     - when: never
 
   before_script:
@@ -228,7 +230,7 @@ pages:
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
-      when: always
+      when: on_success
     - when: never
 
   before_script:
@@ -284,11 +286,11 @@ docker-scout:
     - docker:25-dind
   needs:
     - job: publish-docker
-      artifacts: true
+      artifacts: false
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
-      when: always
+      when: on_success
     - when: never
 
   before_script:
@@ -307,11 +309,11 @@ zap-baseline-scan:
   image: owasp/zap2docker-stable
   needs:
     - job: pages
-      artifacts: true
+      artifacts: false
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
-      when: always
+      when: on_success
     - when: never
 
   script:
