@@ -201,7 +201,7 @@ publish-lib:
     - apt update
     - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > dist/lib/.npmrc
   script:
-    - npm run publish-lib
+    - cd dist/lib && npm login && npm publish --access public
 
 #################################
 # Configure and optimize the demo
