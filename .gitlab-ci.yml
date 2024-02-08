@@ -92,10 +92,6 @@ versioning:
     - job: unittests
       artifacts: false
 
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
-      when: on_success
-    - when: never
   before_script:
     - apt update && apt -y install jq
   script:
@@ -199,10 +195,9 @@ publish-lib:
 
   before_script:
     - apt update
-    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > dist/lib/.npmrc
+    - npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
   script:
-    - cd dist/lib && npm login && npm publish --access public
-
+    - cd dist/lib && npm publish --access public
 #################################
 # Configure and optimize the demo
 # A part of the themes.json is not used in the frontend today, and can just be deleted
