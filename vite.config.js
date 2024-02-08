@@ -23,8 +23,7 @@ export default defineConfig({
         manualChunks: {
           lazy: ['gridjs', 'vanilla-picker', 'adjectives', 'tippy.js']
         }
-      },
-      external: ['cesium']
+      }
     }
   },
   optimizeDeps: {
