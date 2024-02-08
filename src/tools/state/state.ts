@@ -64,6 +64,12 @@ type GlobeConfig = {
   display: 'none' | 'full' | 'side';
 };
 
+export type InfoBoxContent = {
+  id: string;
+  text: string;
+  type: 'info' | 'warning' | 'error';
+};
+
 class State {
   /**
    * This class is a used as the state of the application, which will be accessed behind a javascript proxy.
@@ -164,6 +170,10 @@ class State {
   };
 
   theme: Theme | null = null;
+
+  infobox = {
+    elements: [] as InfoBoxContent[]
+  };
 
   // The State object is defined as <not extensible> by the StateManager.
   // This property can be used by third-parts components or extensions

@@ -15,6 +15,7 @@ abstract class BaseLayer {
   public name: string;
   public order: number;
   public isDefaultChecked: boolean;
+  public disclaimer: string | null = null;
 
   public hasError: boolean = false;
   public errorMessage: string | null = null;
@@ -25,12 +26,13 @@ abstract class BaseLayer {
 
   public parent: GroupLayer | null = null;
 
-  constructor(id: number, name: string, order: number, isDefaultChecked: boolean) {
+  constructor(id: number, name: string, order: number, isDefaultChecked: boolean, disclaimer: string | null) {
     this.id = id;
     this.treeItemId = uuidv4();
     this.name = name;
     this.order = order;
     this.isDefaultChecked = isDefaultChecked;
+    this.disclaimer = disclaimer;
   }
 }
 

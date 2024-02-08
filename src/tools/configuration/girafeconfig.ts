@@ -9,6 +9,7 @@ class GirafeConfig {
     url: string;
     defaultTheme: string;
     imagesUrlPrefix: string;
+    showErrorsOnStart: boolean;
   };
   basemaps: {
     show: boolean;
@@ -236,7 +237,8 @@ class GirafeConfig {
     return {
       url: config.themes.url,
       defaultTheme: config.themes.defaultTheme ?? '',
-      imagesUrlPrefix: config.themes.imagesUrlPrefix ?? ''
+      imagesUrlPrefix: config.themes.imagesUrlPrefix ?? '',
+      showErrorsOnStart: config.themes.showErrorsOnStart ?? false
     };
   }
 

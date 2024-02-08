@@ -202,9 +202,15 @@ girafe-tree-view {
     0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
-footer {
-  flex: 0;
+.info-area {
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
   align-self: flex-end;
+  flex-direction: column;
+}
+
+footer {
   border: none;
   z-index: 10;
   display: flex;

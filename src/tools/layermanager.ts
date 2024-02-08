@@ -102,6 +102,25 @@ class LayerManager extends GirafeSingleton {
       this.#manageExclusiveGroups(layer);
       this.#toggleParent(layer);
     }
+
+    this.#manageDisclaimer(layer);
+  }
+
+  #manageDisclaimer(layer: BaseLayer) {
+    if (layer.active && layer.disclaimer) {
+      this.state.infobox.elements.push({
+        id: layer.treeItemId,
+        text: layer.disclaimer,
+        type: 'info'
+      });
+    }
+
+    if (layer.inactive && layer.disclaimer) {
+      const index = this.state.infobox.elements.findIndex((el) => el.id === layer.treeItemId);
+      if (index >= 0) {
+        this.state.infobox.elements.splice(index, 1);
+      }
+    }
   }
 
   toggleLayer(layer: Layer, state?: 'on' | 'off') {

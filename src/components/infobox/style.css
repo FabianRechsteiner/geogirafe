@@ -1,0 +1,56 @@
+.content {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+}
+
+.content div {
+  position: relative;
+  border: solid 1px black;
+  width: 24rem;
+  line-height: 1.5rem;
+  flex: 1;
+  margin: 5px;
+  padding: 10px;
+  color: var(--text-color);
+}
+
+.content div.info {
+  background-color: var(--bkg-color);
+}
+
+.content div.warning {
+  background-color: orange;
+  color: #fff;
+}
+
+.content div.error {
+  background-color: var(--error-color);
+  color: #fff;
+}
+
+i {
+  border: none;
+  color: var(--text-color-grad2);
+  padding: 0;
+  margin: 0.5rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--bkg-color);
+  cursor: pointer;
+}
+
+span {
+  word-wrap: break-word;
+}
+
+.content div.error i {
+  background-color: var(--error-color);
+  color: #fff;
+}
+
+.content div.warning i {
+  background-color: orange;
+  color: #fff;
+}

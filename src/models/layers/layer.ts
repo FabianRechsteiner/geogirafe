@@ -19,7 +19,8 @@ class Layer extends BaseLayer {
 
   constructor(elem: GMFTreeItem, order: number) {
     const isDefaultChecked = elem.metadata?.isChecked ?? false;
-    super(elem.id, elem.name, order, isDefaultChecked);
+    const disclaimer = elem.metadata?.disclaimer ?? null;
+    super(elem.id, elem.name, order, isDefaultChecked, disclaimer);
   }
 
   get isTransparent() {
