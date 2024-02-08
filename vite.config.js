@@ -39,7 +39,7 @@ export default defineConfig({
         { src: 'node_modules/ol/ol.css', dest: 'lib/ol/' },
         { src: 'node_modules/gridjs/dist/theme/mermaid.min.css', dest: 'lib/gridjs/' },
         { src: 'node_modules/font-gis/css/*.css', dest: 'lib/font-gis/' },
-        { src: 'node_modules/font-gis/fonts/*', dest: 'lib/font-gis/' },
+        { src: 'node_modules/font-gis/fonts/*', dest: 'lib/fonts/' },
         { src: 'node_modules/tippy.js/dist/*.css', dest: 'lib/tippy.js/' },
         { src: 'node_modules/vanilla-picker/dist/*.css', dest: 'lib/vanilla-picker/' }
       ]
