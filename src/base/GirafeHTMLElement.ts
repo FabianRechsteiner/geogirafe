@@ -128,6 +128,15 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   /**
+   * Convert the string in parameter with uHtml and return it.
+   * This allows to convert a string with html in right an html object.
+   * For example, htmlUnsafe('<div></div>') will return an html div object.
+   */
+  htmlUnsafe(str: string) {
+    return uHtml([str]);
+  }
+
+  /**
    * Renders a hidden span with the name of the component.
    * Useful to render a placeholder for not visible component.
    */

@@ -21,6 +21,7 @@ export interface GMFMetadata {
   exclusiveGroup: boolean;
   isExpanded: boolean;
   isChecked: boolean;
+  disclaimer?: string;
 }
 
 export interface GMFChildLayer {

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import GirafeSingleton from '../base/GirafeSingleton';
 import Basemap from '../models/basemap';
 import Layer from '../models/layers/layer';
@@ -54,6 +55,18 @@ class ThemesManager extends GirafeSingleton {
       this.state.basemaps = this.prepareBasemaps(content['background_layers']);
     }
     this.state.themes = this.prepareThemes(content['themes']);
+
+    if (this.configManager.Config.themes.showErrorsOnStart) {
+      // Display themes errors only if configured so.
+      // Parse errors if any
+      for (const error of content['errors']) {
+        this.state.infobox.elements.push({
+          id: uuidv4(),
+          text: error,
+          type: 'error'
+        });
+      }
+    }
 
     this.setDefaultTheme();
   }
