@@ -1,4 +1,3 @@
-import Map from 'ol/Map';
 import Layer from '../../models/layers/layer';
 import Feature from 'ol/Feature';
 import Basemap from '../../models/basemap';
@@ -155,12 +154,6 @@ class State {
     // Possible values : ['full, 'side', 'none']
     display: 'none'
   };
-
-  // The openlayer map
-  // Keep in mind that you shoudn't use it directly to add layers or drawings,
-  // because the components are not listening to olMap changes, and the application will be desynchronized.
-  // => Consider using the other properties of the state, which components are listening to
-  olMap: Map | null = null;
 
   // To manage selected and focused features
   selection: Selection = {

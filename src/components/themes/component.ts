@@ -1,5 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Theme from '../../models/theme';
+import MapManager from '../../tools/state/mapManager.ts';
 
 class ThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -7,9 +8,11 @@ class ThemeComponent extends GirafeHTMLElement {
 
   #themesList?: HTMLUListElement;
   #ignoreBlur = false;
+  private readonly mapManager: MapManager;
 
   constructor() {
     super('themes');
+    this.mapManager = MapManager.getInstance();
   }
 
   get themesList() {
@@ -62,9 +65,10 @@ class ThemeComponent extends GirafeHTMLElement {
     this.#ignoreBlur = false;
 
     if (theme.location != null || theme.zoom != null) {
-      this.state.olMap?.getView().animate({
-        center: theme.location ?? this.state.olMap?.getView().getCenter(),
-        zoom: theme.zoom ?? this.state.olMap?.getView().getZoom(),
+      const view = this.mapManager.getMap().getView();
+      view.animate({
+        center: theme.location ?? view.getCenter(),
+        zoom: theme.zoom ?? view.getZoom(),
         duration: 1000
       });
     }

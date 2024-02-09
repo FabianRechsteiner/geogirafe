@@ -6,6 +6,8 @@ import State from './state';
 import ConfigManager from '../configuration/configmanager';
 import onChange from 'on-change';
 
+export type Callback = (oldValue: any, value: any, parent?: any) => void | Promise<void>;
+
 class StateManager extends GirafeSingleton {
   #girafeState: State | null = null;
   #stateProxy: State;
@@ -13,7 +15,7 @@ class StateManager extends GirafeSingleton {
     return this.#stateProxy;
   }
 
-  #callbacks: Record<string, ((oldValue: any, value: any, parent: any) => void | Promise<void>)[]> = {};
+  #callbacks: Record<string, Callback[]> = {};
 
   configManager: ConfigManager | null = null;
 
@@ -32,11 +34,8 @@ class StateManager extends GirafeSingleton {
         }
       },
       {
-        // NOTE REG: The mechanisms implemented by the on-change librairy and based on javascript proxies are having a few problems with certain openlayers objects.
-        // For the time being, there's nothing to worry about, as it only concerns private one properties of openlayers.
-        // This is why they are excluded from on-change monitoring, thanks to the configuration below.
-        // However, we have to pay attention to this point in the future.
-        ignoreKeys: ['styleFunction_'],
+        // Adding object in the state with a name starting by a symbol will avoid to Proxy this object
+        // (The Proxy API changes the class!) and prevent to listen changes on this object.
         ignoreUnderscores: true,
         ignoreSymbols: true
       }
@@ -85,9 +84,9 @@ class StateManager extends GirafeSingleton {
     }
   }
 
-  subscribe(path: string, callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>): void;
-  subscribe(path: RegExp, callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>): void;
-  subscribe(path: string | RegExp, callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>): void {
+  subscribe(path: string, callback: Callback): Callback;
+  subscribe(path: RegExp, callback: Callback): Callback;
+  subscribe(path: string | RegExp, callback: Callback): Callback {
     const pathAsString = typeof path === 'string' ? path : path.source;
     if (!(pathAsString in this.#callbacks)) {
       this.#callbacks[pathAsString] = [];
@@ -116,22 +115,26 @@ class StateManager extends GirafeSingleton {
         callback(null, obj.object, parentObject.object);
       }
     }
+    return callback;
   }
 
-  unsubscribe(callback: (oldValue: any, value: any, parent?: any) => void | Promise<void>) {
-    let found = false;
-    for (const path in this.#callbacks) {
-      const callbacks = this.#callbacks[path];
-      const index = callbacks.indexOf(callback);
-      if (index !== -1) {
-        found = true;
-        callbacks.splice(index, 1);
-        console.debug(`Unsubscribing to ${path}. ${this.#callbacks[path].length} subscribtions remaining.`);
+  /** Unsubscribe one or multiple trackers by their callbacks.  */
+  unsubscribe(callbacks: Callback | Callback[]) {
+    (Array.isArray(callbacks) ? callbacks : [callbacks]).forEach((callback) => {
+      let found = false;
+      for (const path in this.#callbacks) {
+        const callbacks = this.#callbacks[path];
+        const index = callbacks.indexOf(callback);
+        if (index !== -1) {
+          found = true;
+          callbacks.splice(index, 1);
+          console.debug(`Unsubscribing to ${path}. ${this.#callbacks[path].length} subscribtions remaining.`);
+        }
       }
-    }
-    if (!found) {
-      throw Error(`Cannot unsubscribe this callback : it does not exist`);
-    }
+      if (!found) {
+        throw Error(`Cannot unsubscribe this callback : it does not exist`);
+      }
+    });
   }
 
   getPropertyByPath(obj: any, path: string) {

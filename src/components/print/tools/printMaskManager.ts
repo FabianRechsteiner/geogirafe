@@ -1,5 +1,5 @@
 import PrintMaskLayer from './printMaskLayer';
-import StateManager from '../../../tools/state/statemanager';
+import StateManager, { Callback } from '../../../tools/state/statemanager';
 import Map from 'ol/Map';
 
 /**
@@ -10,6 +10,7 @@ class PrintMaskManager {
   private readonly stateManager: StateManager;
   private readonly printMaskLayer = new PrintMaskLayer({ name: 'PrintMask' });
   private readonly map: Map;
+  private readonly eventsCallbacks: Callback[] = [];
 
   constructor(map: Map) {
     this.map = map;
@@ -22,9 +23,20 @@ class PrintMaskManager {
   }
 
   private registerEvents() {
-    this.stateManager.subscribe('print.format', () => this.onPrintFormatChanged());
-    this.stateManager.subscribe('print.scale', () => this.onPrintScaleChanged());
-    this.stateManager.subscribe('print.maskVisible', () => this.onPrintMaskVisibleChanged());
+    this.eventsCallbacks.push(
+      ...[
+        this.stateManager.subscribe('print.format', () => this.onPrintFormatChanged()),
+        this.stateManager.subscribe('print.scale', () => this.onPrintScaleChanged()),
+        this.stateManager.subscribe('print.maskVisible', () => this.onPrintMaskVisibleChanged())
+      ]
+    );
+  }
+
+  destroy() {
+    this.stateManager.unsubscribe(this.eventsCallbacks);
+    this.eventsCallbacks.length = 0;
+    this.state.print.maskVisible = false;
+    this.onPrintMaskVisibleChanged();
   }
 
   /**
