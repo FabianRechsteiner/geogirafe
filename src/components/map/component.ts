@@ -45,7 +45,7 @@ import LayerWms from '../../models/layers/layerwms';
 import MapPosition from '../../tools/state/mapposition';
 import LocalFileManager from './tools/localfilemanager';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
-import MapManager from '../../tools/state/mapManager.ts';
+import MapManager from '../../tools/state/mapManager';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {

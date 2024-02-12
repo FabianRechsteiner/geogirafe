@@ -3,8 +3,8 @@ import type { MapFishPrintReportResponse } from '@geoblocks/mapfishprint/src/map
 import { EventsKey } from 'ol/events';
 import { unByKeyAll } from '../../tools/olUtils';
 import { clamp, toDegrees, toRadians } from 'ol/math';
-import MapManager from '../../tools/state/mapManager.ts';
-import PrintMaskManager from './tools/printMaskManager.ts';
+import MapManager from '../../tools/state/mapManager';
+import PrintMaskManager from './tools/printMaskManager';
 
 /**
  * Print panel component.

@@ -119,7 +119,9 @@ class StateManager extends GirafeSingleton {
   }
 
   /** Unsubscribe one or multiple trackers by their callbacks.  */
-  unsubscribe(callbacks: Callback | Callback[]) {
+  unsubscribe(callback: Callback): void;
+  unsubscribe(callbacks: Callback[]): void;
+  unsubscribe(callbacks: Callback | Callback[]): void {
     (Array.isArray(callbacks) ? callbacks : [callbacks]).forEach((callback) => {
       let found = false;
       for (const path in this.#callbacks) {

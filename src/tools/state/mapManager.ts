@@ -1,4 +1,4 @@
-import GirafeSingleton from '../../base/GirafeSingleton.ts';
+import GirafeSingleton from '../../base/GirafeSingleton';
 import Map from 'ol/Map';
 
 /** The singleton containing the main OpenLayers map accessible from everywhere */

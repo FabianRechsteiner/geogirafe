@@ -1,6 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Theme from '../../models/theme';
-import MapManager from '../../tools/state/mapManager.ts';
+import MapManager from '../../tools/state/mapManager';
 
 class ThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
