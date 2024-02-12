@@ -345,7 +345,7 @@ describe('StateManager.subscribe', () => {
 });
 
 describe('StateManager.unsubscribe', () => {
-  it('unsubscribe should remove the specified callback', () => {
+  it('unsubscribe (one) should remove the specified callback', () => {
     let callback1Called = false;
     const callback1 = () => {
       callback1Called = true;
@@ -374,6 +374,42 @@ describe('StateManager.unsubscribe', () => {
     } finally {
       manager.unsubscribe(callback1);
     }
+  });
+
+  it('unsubscribe multiple should remove specific objects', () => {
+    manager.state.language = null;
+    let callback1Called = false;
+    let callback2Called = false;
+    let callback3Called = false;
+    const callbacks = [
+      manager.subscribe('language', () => {
+        callback1Called = true;
+      }),
+      manager.subscribe('language', () => {
+        callback2Called = true;
+      })
+    ];
+    const callback3 = manager.subscribe('language', () => {
+      callback3Called = true;
+    });
+
+    try {
+      // UnsubscribeAll (1, 2)
+      manager.unsubscribe(callbacks);
+
+      // Trigger a change event
+      manager.state.language = 'fr';
+
+      // Ensure only the third callback is called
+      expect(callback1Called).toBe(false);
+      expect(callback2Called).toBe(false);
+      expect(callback3Called).toBe(true);
+    } finally {
+      manager.unsubscribe(callback3);
+    }
+    expect(() => {
+      manager.unsubscribe(() => {});
+    }).toThrowError();
   });
 
   it('unsubscribe should throw an error if callback is not found', () => {

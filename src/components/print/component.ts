@@ -3,6 +3,8 @@ import type { MapFishPrintReportResponse } from '@geoblocks/mapfishprint/src/map
 import { EventsKey } from 'ol/events';
 import { unByKeyAll } from '../../tools/olUtils';
 import { clamp, toDegrees, toRadians } from 'ol/math';
+import MapManager from '../../tools/state/mapManager.ts';
+import PrintMaskManager from './tools/printMaskManager.ts';
 
 /**
  * Print panel component.
@@ -75,8 +77,10 @@ class PrintComponent extends GirafeResizableElement {
   private printList: PrintElement[] = [];
   private printUrl?: string;
   private capabilities?: MapFishPrintCapabilities;
+  private readonly mapManager: MapManager;
   private readonly eventKeys: EventsKey[] = [];
   private configWantedAttributeNames: string[] = [];
+  private printMaskManager?: PrintMaskManager;
   wantedAttributeNames: string[] = [];
   printFormats: string[] = [];
   selectedFormat?: string;
@@ -89,6 +93,7 @@ class PrintComponent extends GirafeResizableElement {
 
   constructor() {
     super('print');
+    this.mapManager = MapManager.getInstance();
   }
 
   connectedCallback() {
@@ -106,12 +111,13 @@ class PrintComponent extends GirafeResizableElement {
       super.girafeTranslate();
       if (this.capabilities) {
         this.state.print.maskVisible = true;
+        this.printMaskManager = new PrintMaskManager(this.mapManager.getMap());
         this.activateTooltips(false, [800, 0], 'top-end');
         this.registerEvents();
       }
     } else {
+      this.printMaskManager?.destroy();
       unByKeyAll(this.eventKeys);
-      this.state.print.maskVisible = false;
       this.renderEmpty();
     }
   }
@@ -300,11 +306,7 @@ class PrintComponent extends GirafeResizableElement {
    * @private
    */
   private registerEvents() {
-    const map = this.state.olMap;
-    if (!map) {
-      return;
-    }
-    const view = map.getView();
+    const view = this.mapManager.getMap().getView();
     const rotationInput = this.shadow.querySelector('#rotationSlider') as HTMLInputElement;
     this.eventKeys.push(
       view.on('change:rotation', () => {
@@ -324,7 +326,7 @@ class PrintComponent extends GirafeResizableElement {
     this.rotation = clamp(rotation, -180, 180);
     slider.value = `${this.rotation}`;
     number.value = `${this.rotation}`;
-    this.state.olMap?.getView().setRotation(toRadians(this.rotation));
+    this.mapManager.getMap().getView().setRotation(toRadians(this.rotation));
   }
 
   private getCapabilitiesUrl(): string {

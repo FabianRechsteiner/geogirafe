@@ -45,7 +45,7 @@ import LayerWms from '../../models/layers/layerwms';
 import MapPosition from '../../tools/state/mapposition';
 import LocalFileManager from './tools/localfilemanager';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
-import PrintMaskManager from '../print/tools/printMaskManager';
+import MapManager from '../../tools/state/mapManager.ts';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -58,7 +58,7 @@ class MapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  map!: Map;
+  map: Map;
   mapTarget!: HTMLDivElement;
   // TODO REG : Howto use the right type here without importing the whole library (it needs to be imported only on demand) ?
   // This works but needs the library: type OLCesiumType = typeof OLCesium;
@@ -68,7 +68,6 @@ class MapComponent extends GirafeHTMLElement {
   loading: boolean = false;
   swiper!: HTMLInputElement;
   swipeManager!: SwipeManager;
-  printMaskManager!: PrintMaskManager;
   wmtsManager!: WmtsManager;
   wmsManager!: WmsManager;
   osmManager!: OsmManager;
@@ -100,6 +99,7 @@ class MapComponent extends GirafeHTMLElement {
 
   constructor() {
     super('map');
+    this.map = MapManager.getInstance().getMap();
   }
 
   registerEvents() {
@@ -172,18 +172,12 @@ class MapComponent extends GirafeHTMLElement {
 
     this.srid = this.configManager.Config.map.srid;
 
-    // Create map element
+    // Initialize the map element
     this.mapTarget = this.shadow.getElementById('ol-map') as HTMLDivElement;
     this.map3dTarget = this.shadow.getElementById('cs-map') as HTMLDivElement;
-    this.map = new Map({
-      target: this.mapTarget,
-      layers: []
-    });
-    // Share the map among the state
-    this.state.olMap = this.map;
+    this.map.setTarget(this.mapTarget);
 
     // Initialize managers
-    this.printMaskManager = new PrintMaskManager(this.map);
     this.wmsManager = new WmsManager(this.map, this.srid);
     this.osmManager = new OsmManager(this.map, this.srid);
     this.viewManager = new ViewManager(this.map, this.srid);
