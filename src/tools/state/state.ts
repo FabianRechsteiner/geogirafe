@@ -94,7 +94,7 @@ class State {
   activeBasemap: Basemap | null = null;
 
   // Current projection
-  projection: string | null = null;
+  projection!: string;
 
   // Current mouse coordinates
   mouseCoordinates: number[] = [];

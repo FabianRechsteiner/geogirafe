@@ -31,8 +31,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   gutter?: HTMLElement;
   hideButton?: HTMLElement;
   closeButton?: HTMLElement;
-  // TODO: why not use an enum?
-  dock: string;
+  dock: 'left' | 'right' | 'bottom';
   prevX = 0;
   prevY = 0;
   toggleWidth?: number;
@@ -45,7 +44,14 @@ class GirafeResizableElement extends GirafeHTMLElement {
 
   constructor(component: string) {
     super(component);
-    this.dock = this.getAttribute('dock') ?? 'right';
+    const dock = this.getAttribute('dock');
+    if (!dock) {
+      this.dock = 'right';
+    } else if (dock === 'left' || dock === 'right' || dock === 'bottom') {
+      this.dock = dock;
+    } else {
+      throw new Error(`Invalid value for the attribute dock: ${dock}. Should be one of [left, right, bottom]`);
+    }
   }
 
   render() {

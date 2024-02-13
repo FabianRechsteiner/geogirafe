@@ -222,7 +222,7 @@ class PrintComponent extends GirafeResizableElement {
           dpi: 254,
           rotation: this.rotation,
           center: [this.state.position.center[0], this.state.position.center[1]],
-          projection: this.state.projection ?? '',
+          projection: this.state.projection,
           scale: scale ?? 0,
           useNearestScale: false,
           layers: [

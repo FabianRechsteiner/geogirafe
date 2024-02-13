@@ -51,8 +51,8 @@ class StateManager extends GirafeSingleton {
     // Set default values
     this.configManager?.loadConfig().then(() => {
       if (this.state && this.configManager?.Config) {
-        this.state.projection = this.configManager.Config.map!.srid!;
-        this.state.language = this.configManager.Config.languages!.defaultLanguage;
+        this.state.projection = this.configManager.Config.map.srid;
+        this.state.language = this.configManager.Config.languages.defaultLanguage;
       }
     });
   }

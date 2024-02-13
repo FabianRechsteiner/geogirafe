@@ -1,6 +1,5 @@
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
-import MessageManager from '../../../tools/messagemanager';
 import { Map } from 'ol';
 import LayerWms from '../../../models/layers/layerwms';
 import StateManager from '../../../tools/state/statemanager';
@@ -9,10 +8,11 @@ import LayerManager from '../../../tools/layermanager';
 
 class WmsManager {
   map: Map;
-  srid: string;
-
-  messageManager: MessageManager;
   layerManager: LayerManager;
+
+  get state() {
+    return StateManager.getInstance().state;
+  }
 
   // The Id of this dictionary if an unique ID that allow the differenciantion of server queries.
   // For example, a combination of server URL and ImageType could be used.
@@ -38,11 +38,8 @@ class WmsManager {
 
   basemapLayers: ImageLayer<ImageWMS>[] = [];
 
-  constructor(map: Map, srid: string) {
+  constructor(map: Map) {
     this.map = map;
-    // TODO REG: use global state for this info, or update when map component is updated.
-    this.srid = srid;
-    this.messageManager = MessageManager.getInstance();
     this.layerManager = LayerManager.getInstance();
   }
 
@@ -260,7 +257,7 @@ class WmsManager {
       selectionParams.push({
         layers: layerDef.layersWms,
         selectionBox: extent,
-        srid: this.srid
+        srid: this.state.projection
       });
     }
 
@@ -269,7 +266,7 @@ class WmsManager {
       selectionParams.push({
         layers: [layerDef.layerWms],
         selectionBox: extent,
-        srid: this.srid
+        srid: this.state.projection
       });
     }
 

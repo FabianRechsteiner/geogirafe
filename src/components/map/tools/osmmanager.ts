@@ -4,14 +4,10 @@ import OSM from 'ol/source/OSM';
 
 class OsmManager {
   map: Map;
-  srid: string;
-
   basemapLayers: TileLayer<OSM>[] = [];
 
-  constructor(map: Map, srid: string) {
+  constructor(map: Map) {
     this.map = map;
-    // TODO REG: use global state for this info, or update when map component is updated.
-    this.srid = srid;
   }
 
   removeAllBasemapLayers() {

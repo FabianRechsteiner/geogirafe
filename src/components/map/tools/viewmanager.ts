@@ -4,12 +4,17 @@ import ConfigManager from '../../../tools/configuration/configmanager';
 import GeoConsts from '../../../tools/geoconsts';
 import { Map } from 'ol';
 import { Coordinate } from 'ol/coordinate';
+import { StateManager } from '../../../tools/main';
 
 class ViewManager {
   map: Map;
-  srid: string;
+
+  get state() {
+    return StateManager.getInstance().state;
+  }
+
   get projection() {
-    return getProjection(this.srid)!;
+    return getProjection(this.state.projection)!;
   }
 
   configManager: ConfigManager;
@@ -26,10 +31,8 @@ class ViewManager {
   constrainScales: boolean;
   constrainRotation: boolean | number;
 
-  constructor(map: Map, srid: string) {
+  constructor(map: Map) {
     this.map = map;
-    // TODO REG: use global state for this info, or update when map component is updated.
-    this.srid = srid;
 
     this.configManager = ConfigManager.getInstance();
     this.center = this.configManager.Config.map.startPosition.split(',').map(Number);
@@ -76,7 +79,7 @@ class ViewManager {
     return new View({
       center: this.center,
       zoom: this.zoom ?? undefined,
-      projection: this.srid,
+      projection: this.state.projection,
       extent: this.extent,
       resolutions: this.allowedResolutions,
       constrainResolution: this.constrainScales,
@@ -84,11 +87,13 @@ class ViewManager {
     });
   }
 
-  getViewFromSrid(srid: string) {
-    this.srid = srid;
-
+  getViewConvertedToSrid(newSrid: string) {
     const currentView = this.map.getView();
     const currentProjection = currentView.getProjection();
+    if (currentProjection.getCode() === newSrid) {
+      // Nothing to do
+      return currentView;
+    }
 
     // Convert old values...
     const currentResolution = currentView.getResolution()!;
