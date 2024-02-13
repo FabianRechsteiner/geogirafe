@@ -4,19 +4,21 @@ import TileLayer from 'ol/layer/Tile';
 import { Map } from 'ol';
 import { Layer as OLayer } from 'ol/layer';
 import LayerWmts from '../../../models/layers/layerwmts';
+import { StateManager } from '../../../tools/main';
 
 class WmtsManager {
   map: Map;
-  srid: string;
 
   wmtsCapabilitiesByServer: Record<string, string> = {};
   wmtsLayers: Record<string, OLayer> = {};
   basemapLayers: OLayer[] = [];
 
-  constructor(map: Map, srid: string) {
+  get state() {
+    return StateManager.getInstance().state;
+  }
+
+  constructor(map: Map) {
     this.map = map;
-    // TODO REG: use global state for this info, or update when map component is updated.
-    this.srid = srid;
   }
 
   removeAllBasemapLayers() {
@@ -36,10 +38,9 @@ class WmtsManager {
 
   #addLayerInternal(layer: LayerWmts, isBasemap: boolean) {
     this.#getWmtsCapabilities(layer.url!, (capabilities: string) => {
-      // TODO REG : Manage dimensions, because the "layers" can be the same with different dimensions
       const options = optionsFromCapabilities(capabilities, {
         layer: layer.layers,
-        projection: this.srid
+        projection: this.state.projection
       });
 
       if (options === null) {

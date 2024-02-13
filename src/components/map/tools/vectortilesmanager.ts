@@ -5,14 +5,11 @@ import LayerVectorTiles from '../../../models/layers/layervectortiles';
 
 class VectorTilesManager {
   map: Map;
-  srid: string;
 
   basemapLayers: olVectorTileLayer[] = [];
 
-  constructor(map: Map, srid: string) {
+  constructor(map: Map) {
     this.map = map;
-    // TODO REG: use global state for this info, or update when map component is updated.
-    this.srid = srid;
   }
 
   removeAllBasemapLayers() {

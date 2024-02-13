@@ -53,7 +53,7 @@ class LocalFileManager {
     });
     dragAndDropInteraction.on('addfeatures', (e) => {
       // Check if all features can be displayed in the current map maximum extent
-      // This will also approximately validate it the SRID is correct
+      // This will also approximately validate if the SRID is correct
       const featureType = e.file.name.replace('.', '_');
       const acceptableFeatures = this.validateAndCompleteFeatures(featureType, e.features as Feature<Geometry>[]);
       // Create Layer

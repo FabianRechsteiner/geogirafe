@@ -110,8 +110,8 @@ class MapComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) =>
       this.onChangeBasemap(newBasemap)
     );
-    this.stateManager.subscribe('projection', (_oldProjection: string, newProjection: string) =>
-      this.onChangeProjection(newProjection)
+    this.stateManager.subscribe('projection', (oldProjection: string, newProjection: string) =>
+      this.onChangeProjection(oldProjection, newProjection)
     );
     this.stateManager.subscribe('interface.darkMapMode', (_oldValue: boolean, _newValue: boolean) =>
       this.onChangeDarkMode()
@@ -178,12 +178,12 @@ class MapComponent extends GirafeHTMLElement {
     this.map.setTarget(this.mapTarget);
 
     // Initialize managers
-    this.wmsManager = new WmsManager(this.map, this.srid);
-    this.osmManager = new OsmManager(this.map, this.srid);
-    this.viewManager = new ViewManager(this.map, this.srid);
-    this.vectorTilesManager = new VectorTilesManager(this.map, this.srid);
+    this.wmsManager = new WmsManager(this.map);
+    this.osmManager = new OsmManager(this.map);
+    this.viewManager = new ViewManager(this.map);
+    this.vectorTilesManager = new VectorTilesManager(this.map);
     this.localFileManager = new LocalFileManager(this.map);
-    this.wmtsManager = new WmtsManager(this.map, this.srid);
+    this.wmtsManager = new WmtsManager(this.map);
     this.swiper = this.shadow.getElementById('swiper') as HTMLInputElement;
     this.swipeManager = new SwipeManager(
       this.map,
@@ -630,16 +630,9 @@ class MapComponent extends GirafeHTMLElement {
     this.viewManager.setCenter(coordinate);
   }
 
-  onChangeProjection(srid: string) {
-    if (this.srid === srid) {
-      // Everything is already ok.
-      // => Nothing to do
-      return;
-    }
-
-    this.srid = srid;
-    // TODO REG : update srid in all manager?
-    const newView = this.viewManager.getViewFromSrid(srid);
+  onChangeProjection(_oldSrid: string, newSrid: string) {
+    this.srid = newSrid;
+    const newView = this.viewManager.getViewConvertedToSrid(newSrid);
     this.map.setView(newView);
   }
 
