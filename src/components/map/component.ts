@@ -515,7 +515,18 @@ class MapComponent extends GirafeHTMLElement {
       this.redliningSource.un('addfeature', this.redliningSourceAddCallback);
 
       // Initialize the 3D Map
-      this.map3d = new OLCesium({ map: this.map, target: this.map3dTarget });
+      this.map3d = new OLCesium({
+        map: this.map,
+        target: this.map3dTarget,
+        time: () => {
+          const date = new Date(timeDatePicker.value);
+          if (isNaN(date.getTime())) {
+            return Cesium.JulianDate.now();
+          } else {
+            return Cesium.JulianDate.fromDate(date);
+          }
+        }
+      });
       const scene = this.map3d.getCesiumScene();
       const config = this.configManager.Config.map3d;
 
@@ -555,6 +566,41 @@ class MapComponent extends GirafeHTMLElement {
       config.tilesetsUrls.forEach((tilesetUrl) => {
         Cesium.Cesium3DTileset.fromUrl(tilesetUrl, tilesetOptions).then((tileset) => scene.primitives.add(tileset));
       });
+
+      // Shadows and lighting
+      const date = new Date();
+      const timeDatePicker = document.createElement('input');
+      timeDatePicker.type = 'datetime-local';
+      timeDatePicker.classList.add('ui-input');
+      timeDatePicker.style.display = 'none';
+      timeDatePicker.valueAsNumber = Math.round((date.valueOf() - date.getTimezoneOffset() * 60000) / 60000) * 60000;
+      const timeDatePickerContainer = document.createElement('div');
+      timeDatePickerContainer.appendChild(timeDatePicker);
+
+      const shadowCheckbox = document.createElement('input');
+      shadowCheckbox.type = 'checkbox';
+      shadowCheckbox.onchange = () => {
+        scene.shadowMap.enabled = scene.globe.enableLighting = shadowCheckbox.checked;
+        timeDatePicker.style.display = shadowCheckbox.checked ? 'block' : 'none';
+      };
+      const shadowLabel = document.createElement('label');
+      shadowLabel.innerText = 'Enable shadows';
+      const shadowEnabledContainer = document.createElement('div');
+      shadowEnabledContainer.classList.add('ui-input');
+      shadowEnabledContainer.appendChild(shadowCheckbox);
+      shadowEnabledContainer.appendChild(shadowLabel);
+
+      const timeContainer = document.createElement('div');
+      timeContainer.style.position = 'absolute';
+      timeContainer.appendChild(shadowEnabledContainer);
+      timeContainer.appendChild(timeDatePickerContainer);
+      this.map3dTarget.appendChild(timeContainer);
+
+      const ambientOcclusion = scene.postProcessStages.ambientOcclusion;
+      ambientOcclusion.enabled = true;
+      ambientOcclusion.uniforms.bias = 0.5;
+      ambientOcclusion.uniforms.stepSize = 1;
+      ambientOcclusion.uniforms.blurStepSize = 1;
 
       this.loading = false;
       super.render();
