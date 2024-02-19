@@ -57,4 +57,73 @@ describe('Components architecture', () => {
       throw new Error(errors.join('\n'));
     }
   });
+
+  it('There should not be any cross-dependencies between the files', async () => {
+    const tsFiles = getAllTypescriptFiles(__dirname);
+
+    // Actually a cross-dependency can be legitim
+    // but in this case we want to manually exclude them from the test.
+    // This will ensure that the cross-dependency not created unintentionally
+    const legitimCrossDependencies = [
+      {
+        oa: path.join(__dirname, path.normalize('components/navigation/navbookmarks/component.ts')),
+        ob: path.join(__dirname, path.normalize('components/navigation/navhelper/component.ts'))
+      },
+      {
+        oa: path.join(__dirname, path.normalize('models/layers/baselayer.ts')),
+        ob: path.join(__dirname, path.normalize('models/layers/grouplayer.ts'))
+      }
+    ];
+
+    // Build a list of all dependencies
+    const allDependencies: Record<string, string[]> = {};
+    for (const tsFile of tsFiles) {
+      if (!tsFile.includes('.spec.ts')) {
+        // We are not on a unitest file
+        const dependencies: string[] = [];
+        const code = fs.readFileSync(tsFile, 'utf8');
+        const regex = / *import *\{? *([\w, ]+)\}? *from *'(.*)';?/gm;
+        const matches = code.matchAll(regex);
+        for (const match of matches) {
+          const importPath = match[2];
+          if (importPath.includes('./')) {
+            // We are on a local dependency, not on a library dependency
+            let fullImportPath = path.join(path.dirname(tsFile), importPath);
+            if (!fullImportPath.endsWith('.ts')) {
+              fullImportPath += '.ts';
+            }
+            dependencies.push(fullImportPath);
+          }
+        }
+        allDependencies[tsFile] = dependencies;
+      }
+    }
+
+    // Check if there are cross dependencies
+    const errors: string[] = [];
+    for (const objA in allDependencies) {
+      for (const objB of allDependencies[objA]) {
+        // Cgheck if objB has a dependency to objA
+        if (allDependencies[objB] && allDependencies[objB].includes(objA)) {
+          // Cross dependency found!
+          // Is it legitim?
+          let isLegitim = false;
+          for (const legitim of legitimCrossDependencies) {
+            if ((legitim.oa === objA && legitim.ob === objB) || (legitim.oa === objB && legitim.ob === objA)) {
+              isLegitim = true;
+              break;
+            }
+          }
+          if (!isLegitim) {
+            errors.push(`Illegal cross dependency: ${objA} is referencing ${objB} and vice-versa.`);
+          }
+        }
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
 });
