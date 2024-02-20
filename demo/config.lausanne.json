@@ -22,6 +22,10 @@
     "url": "https://map.lausanne.ch/printproxy/",
     "defaultLayout": "1) A4 portrait"
   },
+  "share": {
+    "service": "lstu",
+    "createUrl": "https://lstu.fr/a"
+  },
   "projections": {
     "EPSG:3857": "W-M",
     "EPSG:4326": "WGS84",

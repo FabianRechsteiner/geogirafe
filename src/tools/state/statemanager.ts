@@ -17,7 +17,7 @@ class StateManager extends GirafeSingleton {
 
   #callbacks: Record<string, Callback[]> = {};
 
-  configManager: ConfigManager | null = null;
+  configManager: ConfigManager;
 
   constructor(type: string) {
     super(type);

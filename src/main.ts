@@ -6,6 +6,7 @@ import State from './tools/state/state.js';
 import ConfigManager from './tools/configuration/configmanager';
 import I18nManager from './tools/i18nmanager';
 import MessageManager from './tools/messagemanager';
+import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
 import ThemesManager from './tools/themesmanager';
 import UrlManager from './tools/urlmanager';
@@ -33,6 +34,7 @@ import ScaleComponent from './components/scale/component.js';
 import SearchComponent from './components/search/component';
 import SelectionGridComponent from './components/selectiongrid/component';
 import SelectionWindowComponent from './components/selectionwindow/component';
+import ShareComponent from './components/share/component';
 import ThemeComponent from './components/themes/component';
 import TreeViewComponent from './components/treeview/component';
 import TreeViewItemComponent from './components/treeviewitem/component';
@@ -45,6 +47,7 @@ declare global {
     geogirafe: {
       state: State;
       stateManager: StateManager;
+      shareManager: ShareManager;
     };
   }
   interface Window {
@@ -83,7 +86,8 @@ WfsManager.getInstance();
 // Add the state to document, so that it will be accessible everywhere
 document.geogirafe = {
   state: StateManager.getInstance().state,
-  stateManager: StateManager.getInstance()
+  stateManager: StateManager.getInstance(),
+  shareManager: ShareManager.getInstance()
 };
 
 // Define components names
@@ -108,6 +112,7 @@ customElements.define('girafe-scale', ScaleComponent);
 customElements.define('girafe-search', SearchComponent);
 customElements.define('girafe-selection-grid', SelectionGridComponent);
 customElements.define('girafe-selection-window', SelectionWindowComponent);
+customElements.define('girafe-share', ShareComponent);
 customElements.define('girafe-theme-select', ThemeComponent);
 customElements.define('girafe-tree-view', TreeViewComponent);
 customElements.define('girafe-tree-view-group', TreeViewGroupComponent);

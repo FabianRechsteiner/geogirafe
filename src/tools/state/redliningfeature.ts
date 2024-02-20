@@ -2,51 +2,51 @@ import { getUid } from 'ol/util';
 import Feature from 'ol/Feature';
 
 class RedliningFeature {
-  olFeature: Feature;
+  _olFeature: Feature;
 
   constructor(olFeature: Feature) {
-    this.olFeature = olFeature;
+    this._olFeature = olFeature;
   }
 
   get name() {
-    return this.olFeature.get('name');
+    return this._olFeature.get('name');
   }
 
   set name(value) {
-    this.olFeature.set('name', value);
+    this._olFeature.set('name', value);
   }
 
   get strokeColor() {
-    return this.olFeature.get('strokeColor');
+    return this._olFeature.get('strokeColor');
   }
 
   set strokeColor(value) {
-    this.olFeature.set('strokeColor', value);
+    this._olFeature.set('strokeColor', value);
   }
 
   get strokeWidth() {
-    return this.olFeature.get('strokeWidth');
+    return this._olFeature.get('strokeWidth');
   }
   set strokeWidth(value) {
-    this.olFeature.set('strokeWidth', value);
+    this._olFeature.set('strokeWidth', value);
   }
 
   get fillColor() {
-    return this.olFeature.get('fillColor');
+    return this._olFeature.get('fillColor');
   }
   set fillColor(value) {
-    this.olFeature.set('fillColor', value);
+    this._olFeature.set('fillColor', value);
   }
 
   get textSize() {
-    return this.olFeature.get('textSize');
+    return this._olFeature.get('textSize');
   }
   set textSize(value) {
-    this.olFeature.set('textSize', value);
+    this._olFeature.set('textSize', value);
   }
 
   get id() {
-    return getUid(this.olFeature);
+    return getUid(this._olFeature);
   }
 
   get geometry() {

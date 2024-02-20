@@ -22,6 +22,10 @@
     "url": "https://map.geo.llv.li/printproxy/",
     "defaultLayout": "1 A4 Hochformat"
   },
+  "share": {
+    "service": "lstu",
+    "createUrl": "https://lstu.fr/a"
+  },
   "projections": {
     "EPSG:3857": "W-M",
     "EPSG:4326": "WGS84",

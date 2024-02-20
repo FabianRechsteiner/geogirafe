@@ -32,6 +32,10 @@
     "url": "https://map.geo.bs.ch/printproxy/",
     "defaultLayout": "print_A4_hochformat"
   },
+  "share": {
+    "service": "lstu",
+    "createUrl": "https://lstu.fr/a"
+  },
   "projections": {
     "EPSG:3857": "W-M",
     "EPSG:4326": "WGS84",

@@ -13,11 +13,13 @@ import LayerVectorTiles from '../models/layers/layervectortiles';
 import LayerWmts from '../models/layers/layerwmts';
 import LayerWms from '../models/layers/layerwms';
 import LayerManager from './layermanager';
+import ShareManager from './share/sharemanager';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
   layerManager: LayerManager;
+  shareManager: ShareManager;
 
   get state() {
     return this.stateManager.state;
@@ -29,19 +31,27 @@ class ThemesManager extends GirafeSingleton {
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
     this.layerManager = LayerManager.getInstance();
-
-    this.configManager
-      .loadConfig()
-      .then(() => {
-        this.loadThemes();
-      })
-      .then(() => {
-        console.log('Themes were loaded');
-      });
+    this.shareManager = ShareManager.getInstance();
 
     this.stateManager.subscribe('selectedTheme', (_oldTheme: Theme | null, newTheme: Theme | null) =>
       this.onChangeTheme(newTheme)
     );
+
+    this.initialize();
+  }
+
+  private async initialize() {
+    await this.configManager.loadConfig();
+    await this.loadThemes();
+
+    console.log('Themes were loaded');
+
+    // We shouldn't set the default theme is there is any configured hash
+    if (this.shareManager.hasSharedState()) {
+      this.shareManager.setStateFromUrl();
+    } else {
+      this.setDefaultTheme();
+    }
   }
 
   /**
@@ -67,8 +77,6 @@ class ThemesManager extends GirafeSingleton {
         });
       }
     }
-
-    this.setDefaultTheme();
   }
 
   setDefaultTheme() {

@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+
+<div id="draggable">
+  <div id="header">
+    Share this map with a link
+    <div id="close">
+      <i class="fa-solid fa-xmark"></i>
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="${(this.loading ? '' : 'hidden')}">
+      <i class="fa-4x fa-solid fa-circle-notch fa-spin loading"></i>
+    </div>
+
+    <div class="${(this.loading ? 'hidden' : '')}">
+      <div class="link">
+        <input id="link" type="text" value="${this.shareLink}" />
+        <button tip="Add bookmark" onclick="${() => this.copyToClipboard()}">
+          <i class="fa-sm fa-regular fa-copy"></i>
+        </button>
+      </div>
+
+      <img alt="share-qrcode" class="${(this.qrCode ? 'qrcode' : 'hidden')}" src="${this.qrCode}" />
+      <div class="${(this.qrCode ? 'hidden' : 'qrcode error')}">
+        <i class="fa-solid fa-circle-exclamation tool error"></i>
+        Error, can not fetch the shortener service. Please try again later.
+      </div>
+
+      <div class="social">
+        <img alt="share-facebook" src="${this.facebookLogo}" onclick="${() => this.shareFacebook()}" />
+        <img alt="share-twitter" src="${this.twitterLogo}" onclick="${() => this.shareTwitter()}" />
+        <img alt="share-linkedin" src="${this.linkedInLogo}" onclick="${() => this.shareLinkedIn()}" />
+        <img alt="share-mail" src="${this.mailLogo}" onclick="${() => this.shareMail()}" />
+      </div>
+    </div>
+  </div>
+</div>

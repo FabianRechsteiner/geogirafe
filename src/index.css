@@ -250,11 +250,11 @@ girafe-nav-history {
   z-index: 10;
 }
 
-girafe-about {
+girafe-about,
+girafe-share {
   position: absolute;
   z-index: 100;
   background: var(--bkg-color);
-  display: none;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);

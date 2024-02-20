@@ -44,7 +44,7 @@ describe('Components architecture', () => {
       for (const match of matches) {
         const importPath = match[2];
         for (const component of components) {
-          if (importPath.includes(`/${component}/`)) {
+          if (!importPath.includes('../../tools/') && importPath.includes(`/${component}/`)) {
             // This import is using an import of another component
             errors.push(`Illegal dependency: the component ${tsFile} is referencing another component ${importPath}`);
           }

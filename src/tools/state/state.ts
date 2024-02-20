@@ -5,6 +5,7 @@ import Theme from '../../models/theme';
 import BaseLayer from '../../models/layers/baselayer';
 import LayerWms from '../../models/layers/layerwms';
 import MapPosition from './mapposition';
+import RedliningFeature from './redliningfeature';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -12,6 +13,7 @@ type GraphicalInterface = {
   printPanelVisible: boolean;
   selectionGridVisible: boolean;
   aboutVisible: boolean;
+  shareVisible: boolean;
   darkMapMode: boolean;
   darkFrontendMode: boolean;
 };
@@ -38,7 +40,7 @@ type LayersConfig = {
 
 type RedliningConfig = {
   activeTool: boolean | null;
-  features: object[];
+  features: RedliningFeature[];
 };
 
 type TreeviewConfig = {
@@ -91,6 +93,7 @@ class State {
   ogcServers: Record<string, ServerOgc> = {};
 
   // Current active basemap
+  // TODO REG : This should not be nullable, but we should have a default "empty basemap" value
   activeBasemap: Basemap | null = null;
 
   // Current projection
@@ -106,6 +109,7 @@ class State {
     printPanelVisible: false,
     selectionGridVisible: false,
     aboutVisible: false,
+    shareVisible: false,
     darkMapMode: false,
     darkFrontendMode: false
   };

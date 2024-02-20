@@ -12,7 +12,6 @@ class Layer extends BaseLayer {
 
   public activeState: 'on' | 'off' = 'off';
   public opacity: number = 1;
-  public order: number = 0;
 
   // Is this layer used as basemap ?
   basemap = false;
