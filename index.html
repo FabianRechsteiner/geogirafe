@@ -74,6 +74,10 @@
           icon-style="fa-2xl fa-solid fa-circle-question"
           onclick="document.geogirafe.state.interface.helpVisible = true">
         </girafe-button>
+        <girafe-button
+          icon-style="fa-2xl fa-solid fa-share-nodes"
+          onclick="document.geogirafe.state.interface.shareVisible = true">
+        </girafe-button>
         <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
           <div slot="menu-content">
             <girafe-button
@@ -116,6 +120,7 @@
         <girafe-redlining dock="right"></girafe-redlining>
         <girafe-print dock="right"></girafe-print>
         <girafe-about></girafe-about>
+        <girafe-share></girafe-share>
         <!-- <girafe-selection-window></girafe-selection-window> -->
         <girafe-help></girafe-help>
       </div>

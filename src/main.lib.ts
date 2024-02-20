@@ -1,4 +1,5 @@
-import State from './tools/state/state.js';
+import ShareManager from './tools/share/sharemanager';
+import State from './tools/state/state';
 import StateManager from './tools/state/statemanager';
 
 // Extend default Document and Window interfaces
@@ -7,6 +8,7 @@ declare global {
     geogirafe: {
       state: State;
       stateManager: StateManager;
+      shareManager: ShareManager;
     };
   }
   interface Window {

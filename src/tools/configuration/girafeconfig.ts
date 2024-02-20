@@ -51,6 +51,10 @@ class GirafeConfig {
     defaultTextSize: number;
     defaultFont: string;
   };
+  share: {
+    service: 'lstu' | 'gmf' | null;
+    createUrl: string;
+  };
   projections: {
     [key: string]: string;
   };
@@ -103,6 +107,15 @@ class GirafeConfig {
       // We just display a warning in the console
       console.warn(e);
       this.search = { url: '' };
+    }
+
+    try {
+      this.share = this.initConfigShare(config);
+    } catch (e) {
+      // The application can be started even if the search is not correctly configured
+      // We just display a warning in the console
+      console.warn(e);
+      this.share = { service: null, createUrl: '' };
     }
 
     try {
@@ -170,6 +183,18 @@ class GirafeConfig {
       defaultStrokeWidth: config.redlining?.defaultStrokeWidth ?? 2,
       defaultTextSize: config.redlining?.defaultTextSize ?? 12,
       defaultFont: config.redlining?.defaultFont ?? 'Arial'
+    };
+  }
+
+  private initConfigShare(config: GirafeConfig) {
+    if (!config.share?.createUrl) {
+      throw new Error(
+        `Configuration for share.createUrl is required. See https://doc.geomapfish.dev/docs/configuration`
+      );
+    }
+    return {
+      service: config.share?.service ?? 'gmf',
+      createUrl: config.share?.createUrl
     };
   }
 

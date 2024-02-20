@@ -49,7 +49,7 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   closeWindow() {
-    this.state!.interface.aboutVisible = false;
+    this.state.interface.aboutVisible = false;
   }
 
   connectedCallback() {

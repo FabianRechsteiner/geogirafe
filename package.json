@@ -34,6 +34,7 @@
   "homepage": "https://doc.geomapfish.dev",
   "dependencies": {
     "gridjs": "6.1.1",
+    "lz-string": "1.5.0",
     "on-change": "5.0.1",
     "tippy.js": "6.3.7",
     "uhtml": "3.2.2",
@@ -71,8 +72,8 @@
     "typescript": "5.3.3",
     "uuid": "9.0.1",
     "vite": "5.0.12",
-    "vitest": "1.2.2",
-    "vite-plugin-static-copy": "1.0.1"
+    "vite-plugin-static-copy": "1.0.1",
+    "vitest": "1.2.2"
   },
   "types": "./main.lib.d.ts",
   "exports": {
@@ -111,11 +112,13 @@
     "build-lib": "node buildtools/lib-clean.js && node buildtools/lib-inline.js && node buildtools/lib-collect.js && tsc --project tsconfig.lib.json && node buildtools/lib-finalize.js",
     "publish-lib": "cd dist/lib && npm publish",
     "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile dist",
-    "test": "vitest",
+    "test": "vitest --run",
+    "test-watch": "vitest",
     "configure-demo": "bash -C './buildtools/configure-demo.sh'",
     "configure-demo-win": "buildtools\\configure-demo.cmd",
     "lint": "eslint src/**/*.ts",
     "pretty": "prettier --write .",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "check-all": "npm run tsc && npm run lint && npm run test && npm run build && npm run build-lib"
   }
 }

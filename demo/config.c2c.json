@@ -27,6 +27,10 @@
     "defaultFormat": "pdf",
     "wantedAttributeNames": ["legend", "title", "comments", "timezone"]
   },
+  "share": {
+    "service": "lstu",
+    "createUrl": "https://lstu.fr/a"
+  },
   "projections": {
     "EPSG:3857": "W-M",
     "EPSG:4326": "WGS84",

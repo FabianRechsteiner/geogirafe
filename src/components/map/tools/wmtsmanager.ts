@@ -10,7 +10,14 @@ class WmtsManager {
   map: Map;
 
   wmtsCapabilitiesByServer: Record<string, string> = {};
-  wmtsLayers: Record<string, OLayer> = {};
+  wmtsLayers: Record<
+    string,
+    {
+      olayer: OLayer;
+      layerWmts: LayerWmts;
+    }
+  > = {};
+
   basemapLayers: OLayer[] = [];
 
   get state() {
@@ -69,12 +76,18 @@ class WmtsManager {
         source: new WMTS(options)
       });
 
+      // Set zindex for this new layer
+      // (The bigger the order is, the deeper in the map it should be displayed.)
+      // (order is the inverse of z-index)
+      // TODO REG: find a better way as an hardcoded 5000 here
+      olayer.setZIndex(5000 - layer.order);
+
       // Add to map
       if (isBasemap) {
         this.basemapLayers.push(olayer);
         this.map.getLayers().insertAt(0, olayer);
       } else {
-        this.wmtsLayers[layer.layerUniqueId] = olayer;
+        this.wmtsLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
         this.map.addLayer(olayer);
       }
     });
@@ -82,7 +95,7 @@ class WmtsManager {
 
   removeLayer(layer: LayerWmts) {
     if (this.layerExists(layer)) {
-      const olayer = this.wmtsLayers[layer.layerUniqueId];
+      const olayer = this.wmtsLayers[layer.layerUniqueId].olayer;
       delete this.wmtsLayers[layer.layerUniqueId];
       this.map.removeLayer(olayer);
     } else {
@@ -96,14 +109,14 @@ class WmtsManager {
 
   getLayer(layer: LayerWmts) {
     if (this.layerExists(layer)) {
-      return this.wmtsLayers[layer.layerUniqueId];
+      return this.wmtsLayers[layer.layerUniqueId].olayer;
     }
     return null;
   }
 
   changeOpacity(layer: LayerWmts, opacity: number) {
     if (this.layerExists(layer)) {
-      const olayer = this.wmtsLayers[layer.layerUniqueId];
+      const olayer = this.wmtsLayers[layer.layerUniqueId].olayer;
       olayer.setOpacity(opacity);
     } else {
       throw new Error('Cannot change opacity for this layer: it does not exist');

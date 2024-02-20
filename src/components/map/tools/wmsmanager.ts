@@ -63,6 +63,13 @@ class WmsManager {
       const olayer = new ImageLayer<ImageWMS>();
       const source = this.#createImageWMSSource([layerWms]);
       olayer.setSource(source);
+
+      // Set zindex for this new layer
+      // (The bigger the order is, the deeper in the map it should be displayed.)
+      // (order is the inverse of z-index)
+      // TODO REG: find a better way as an hardcoded 5000 here
+      olayer.setZIndex(5000 - layerWms.order);
+
       this.map.addLayer(olayer);
 
       const layerDef = { olayer: olayer, layersWms: [layerWms] };

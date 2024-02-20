@@ -445,17 +445,24 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onFeatureAdded(e: VectorSourceEvent) {
-    if (e.feature != undefined) {
+    if (e.feature) {
       const olFeature: Feature<Geometry> = e.feature;
-      olFeature.setId(uuidv4());
-      // Set the default feature name
-      const name = adjectives[this.getRandomInt(0, adjectives.length)] + ' ' + olFeature.getGeometry()!.getType();
-      olFeature.set('name', name);
-      // Add default style as a function, because we want the attributes (for example the name) to be evaluated on display time
-      olFeature.setStyle(((feature: Feature) => this.getDefaultStyle(feature)) as StyleLike);
+      if (!olFeature.getId()) {
+        // This feature does not have any Id yet.
+        // It means it was just drawn on the map.
+        // Otherwise, it would already have an id
+        olFeature.setId(uuidv4());
+        // Set the default feature name
+        const name = adjectives[this.getRandomInt(0, adjectives.length)] + ' ' + olFeature.getGeometry()!.getType();
+        olFeature.set('name', name);
 
-      const feature = new RedliningFeature(olFeature);
-      this.state.redlining.features.push(feature);
+        // Add it the the state.
+        const feature = new RedliningFeature(olFeature);
+        this.state.redlining.features.push(feature);
+      }
+
+      // In all cases, we have to set the style function
+      olFeature.setStyle(((feature: Feature) => this.getDefaultStyle(feature)) as StyleLike);
     }
   }
 
@@ -793,10 +800,12 @@ layers.forEach(layerInfos => {
     if (Array.isArray(newFeatures) && Array.isArray(oldFeatures)) {
       // We received a list of features
       deletedFeatures = oldFeatures.filter(
-        (oldFeature) => !newFeatures.find((newFeature) => newFeature.olFeature.getId() === oldFeature.olFeature.getId())
+        (oldFeature) =>
+          !newFeatures.find((newFeature) => newFeature._olFeature.getId() === oldFeature._olFeature.getId())
       );
       addedFeatures = newFeatures.filter(
-        (newFeature) => !oldFeatures.find((oldFeature) => oldFeature.olFeature.getId() === newFeature.olFeature.getId())
+        (newFeature) =>
+          !oldFeatures.find((oldFeature) => oldFeature._olFeature.getId() === newFeature._olFeature.getId())
       );
     } else {
       if (!this.isNullOrUndefined(oldFeatures)) {
@@ -808,11 +817,11 @@ layers.forEach(layerInfos => {
     }
 
     deletedFeatures.forEach((feature) => {
-      this.deleteFeature(feature.olFeature);
+      this.deleteFeature(feature._olFeature);
     });
 
     addedFeatures.forEach((feature) => {
-      this.addFeature(feature.olFeature);
+      this.addFeature(feature._olFeature);
     });
   }
 
@@ -823,10 +832,14 @@ layers.forEach(layerInfos => {
     }
   }
 
-  addFeature(_feature: Feature) {
-    // TODO REG : This has to be corretly implemented if we want to add object from state
-    // But at the moment only drawing in OpenLayer is supported
-    //this.redliningFeaturesCollection.push(feature);
+  addFeature(feature: Feature) {
+    const existingFeature = this.redliningFeaturesCollection.getArray().find((f) => f.getId() === feature.getId());
+    // If the feature already exists in the local list of drawn features, there is nothing to do.
+    // Otherwise, it means that the feature was added to the list od redlining object from somewhere else
+    // For example from the encoded URL. In this case, we add the feature to the local list of objects
+    if (!existingFeature) {
+      this.redliningFeaturesCollection.push(feature);
+    }
   }
 
   onRedliningToolChanged(tool: string | null) {
