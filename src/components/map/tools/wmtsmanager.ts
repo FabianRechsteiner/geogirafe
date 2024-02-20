@@ -76,20 +76,23 @@ class WmtsManager {
         source: new WMTS(options)
       });
 
+      let zindex;
+      if (isBasemap) {
+        this.basemapLayers.push(olayer);
+        zindex = -5000 - layer.order;
+      } else {
+        this.wmtsLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
+        zindex = -layer.order;
+      }
+
       // Set zindex for this new layer
       // (The bigger the order is, the deeper in the map it should be displayed.)
       // (order is the inverse of z-index)
-      // TODO REG: find a better way as an hardcoded 5000 here
-      olayer.setZIndex(5000 - layer.order);
+      // For basemap, set a minimal number (arbitrary defined to less than -5000)
+      olayer.setZIndex(zindex);
 
       // Add to map
-      if (isBasemap) {
-        this.basemapLayers.push(olayer);
-        this.map.getLayers().insertAt(0, olayer);
-      } else {
-        this.wmtsLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
-        this.map.addLayer(olayer);
-      }
+      this.map.addLayer(olayer);
     });
   }
 

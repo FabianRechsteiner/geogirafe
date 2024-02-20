@@ -7,7 +7,6 @@ import ShareManager from '../../tools/share/sharemanager';
 import { IUrlShortener } from './tools/iurlshortener';
 import LstuManager from './tools/lstumanager';
 import GmfManager from './tools/gmfmanager';
-import { v4 as uuidv4 } from 'uuid';
 
 class ShareComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
@@ -62,20 +61,11 @@ class ShareComponent extends GirafeDraggableElement {
       const hash = this.shareManager.getStateToShare();
       const longurl = `${base}#${hash}`;
 
-      try {
-        const response = await this.urlShortener.shortenUrl(longurl);
-        this.shareLink = response.shorturl;
-        this.qrCode = response.qrcode;
-        this.loading = false;
-        this.render();
-      } catch (error) {
-        this.state.infobox.elements.push({
-          type: 'error',
-          id: uuidv4(),
-          text: `Error while generating shortURL: ${error}`
-        });
-        this.closeWindow();
-      }
+      const response = await this.urlShortener.shortenUrl(longurl);
+      this.shareLink = response.shorturl;
+      this.qrCode = response.qrcode;
+      this.loading = false;
+      this.render();
     } else {
       this.renderEmpty();
     }

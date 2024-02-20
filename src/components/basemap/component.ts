@@ -1,5 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Basemap from '../../models/basemap';
+import ShareManager from '../../tools/share/sharemanager';
 
 class BasemapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -8,8 +9,12 @@ class BasemapComponent extends GirafeHTMLElement {
   servers = {};
   basemapJson = {};
 
+  shareManager: ShareManager;
+
   constructor() {
     super('basemap');
+
+    this.shareManager = ShareManager.getInstance();
 
     this.configManager.loadConfig().then(() => {
       if (!this.configManager.Config.basemaps.show) {
@@ -25,11 +30,13 @@ class BasemapComponent extends GirafeHTMLElement {
   onBasemapsLoaded(basemaps: { [key: number]: Basemap }) {
     super.render();
 
-    // Configure default basemap
-    for (const basemap of Object.values(basemaps)) {
-      if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
-        this.state.activeBasemap = basemap;
-        break;
+    // Configure default basemap (only if there is no sharedstate)
+    if (!this.shareManager.hasSharedState()) {
+      for (const basemap of Object.values(basemaps)) {
+        if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
+          this.state.activeBasemap = basemap;
+          break;
+        }
       }
     }
   }

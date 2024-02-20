@@ -23,6 +23,10 @@ class VectorTilesManager {
     const olayer = new olVectorTileLayer({ declutter: true });
     applyStyle(olayer, basemap.style, basemap.source);
     this.basemapLayers.push(olayer);
+
+    // For basemap, set a minimal number (arbitrary defined to less than -5000)
+    olayer.setZIndex(-5000 - basemap.order);
+
     this.map.getLayers().insertAt(0, olayer);
   }
 }

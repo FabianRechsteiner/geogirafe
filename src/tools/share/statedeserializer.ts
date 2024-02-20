@@ -22,6 +22,8 @@ class StateDeserializer {
     const stringState = LZString.decompressFromBase64(compressedState);
     const sharedState: SharedState = JSON.parse(stringState);
 
+    // TODO REG : Today only default SRID is managed. The coordiantes here can have invalid format.
+
     this.state.position.center = sharedState.p.c;
     this.state.position.resolution = sharedState.p.r;
     this.state.treeview.advanced = Boolean(sharedState.t.a);
@@ -31,6 +33,9 @@ class StateDeserializer {
     if (sharedState.b) {
       const basemap = Object.values(this.state.basemaps).find((b) => b.id === sharedState.b!.i);
       if (basemap) {
+        if (basemap.projection) {
+          this.state.projection = basemap.projection;
+        }
         this.state.activeBasemap = basemap;
       } else {
         // TODO REG : Add infobox ?

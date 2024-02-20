@@ -781,7 +781,7 @@ layers.forEach(layerInfos => {
     // Then, add the selected basemaps
     basemap.layersList.forEach((layer) => {
       if (layer instanceof LayerOsm) {
-        this.osmManager.addBasemapLayer();
+        this.osmManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerVectorTiles) {
         this.vectorTilesManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerWmts) {

@@ -1,6 +1,7 @@
 import { Map } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
+import { LayerOsm } from '../../../models/main';
 
 class OsmManager {
   map: Map;
@@ -17,12 +18,16 @@ class OsmManager {
     this.basemapLayers = [];
   }
 
-  addBasemapLayer() {
+  addBasemapLayer(layer: LayerOsm) {
     const olayer = new TileLayer({
       source: new OSM()
     });
     this.basemapLayers.push(olayer);
-    this.map.getLayers().insertAt(0, olayer);
+
+    // For basemap, set a minimal number (arbitrary defined to less than -5000)
+    olayer.setZIndex(-5000 - layer.order);
+
+    this.map.addLayer(olayer);
   }
 }
 

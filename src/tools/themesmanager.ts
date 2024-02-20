@@ -14,6 +14,7 @@ import LayerWmts from '../models/layers/layerwmts';
 import LayerWms from '../models/layers/layerwms';
 import LayerManager from './layermanager';
 import ShareManager from './share/sharemanager';
+import LayerConsts from '../models/layers/layerconsts';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -108,7 +109,7 @@ class ThemesManager extends GirafeSingleton {
       const vectorBasemap = new Basemap({ id: -2, name: 'Vector-Tiles' });
       basemaps[vectorBasemap.id] = vectorBasemap;
       const data: GMFTreeItem = {
-        id: -2,
+        id: LayerConsts.LayerSwisstopoVectorTilesId,
         name: 'Vector-Tiles',
         type: 'VectorTiles',
         style: 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',

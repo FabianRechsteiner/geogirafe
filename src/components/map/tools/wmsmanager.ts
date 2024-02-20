@@ -67,8 +67,7 @@ class WmsManager {
       // Set zindex for this new layer
       // (The bigger the order is, the deeper in the map it should be displayed.)
       // (order is the inverse of z-index)
-      // TODO REG: find a better way as an hardcoded 5000 here
-      olayer.setZIndex(5000 - layerWms.order);
+      olayer.setZIndex(-layerWms.order);
 
       this.map.addLayer(olayer);
 
@@ -134,8 +133,12 @@ class WmsManager {
       source: source,
       opacity: layerWms.opacity
     });
+
+    // For basemap, set a minimal number (arbitrary defined to less than -5000)
+    olayer.setZIndex(-5000 - layerWms.order);
+
     this.basemapLayers.push(olayer);
-    this.map.getLayers().insertAt(0, olayer);
+    this.map.addLayer(olayer);
   }
 
   removeLayer(layerWms: LayerWms) {

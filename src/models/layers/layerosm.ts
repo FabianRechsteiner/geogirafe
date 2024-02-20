@@ -1,5 +1,6 @@
 import { GMFTreeItem } from '../gmf';
 import Layer from './layer';
+import LayerConsts from './layerconsts';
 
 class LayerOsm extends Layer {
   /**
@@ -12,7 +13,7 @@ class LayerOsm extends Layer {
 
   constructor(order: number) {
     const data: GMFTreeItem = {
-      id: -1,
+      id: LayerConsts.LayerOsmId,
       name: 'OpenStreetMap',
       type: 'OSM',
       metadata: {
