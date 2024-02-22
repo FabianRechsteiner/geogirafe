@@ -88,3 +88,24 @@
   background-color: #aaa;
   color: var(--text-color);
 }
+
+.active {
+  background-color: #aaa !important;
+  color: var(--text-color);
+}
+
+@media screen and (max-width: 1000px) {
+  #searchbox {
+    border-radius: 0;
+    border: solid 1px #666;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    box-shadow: none;
+  }
+
+  #results {
+    top: 7rem;
+    left: 2rem;
+  }
+}

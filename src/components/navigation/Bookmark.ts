@@ -1,7 +1,7 @@
 import MapPosition from '../../tools/state/mapposition';
 
 export class Bookmark {
-  static BOOKMARKNAMEPATTERN = /^[A-Za-z0-9_ -]+$/;
+  static BOOKMARKNAMEPATTERN = /^[A-Za-zÀ-ž0-9_ -]+$/;
   name: string;
   position: MapPosition;
 

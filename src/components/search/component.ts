@@ -13,14 +13,27 @@ class SearchComponent extends GirafeHTMLElement {
 
   #ignoreBlur = false;
   groupedResults: Record<string, SearchResult[]> = {};
-  forceHide: boolean = false;
+  forceHide: boolean = true;
 
   searchTermPlaceholder = '###SEARCHTERM###';
   searchLangPlaceholder = '###SEARCHLANG###';
 
+  selectedResult: HTMLElement | null = null;
+  selectedCntr: number = 0;
+
+  bgClr = 'rgba(255, 255, 255, 0.1)';
+
   constructor() {
     super('search');
     this.themeManager = ThemesManager.getInstance();
+  }
+
+  registerEvents() {
+    this.stateManager.subscribe('interface.darkFrontendMode', () => this.onChangeDarkFrontendMode());
+  }
+
+  onChangeDarkFrontendMode() {
+    this.bgClr = this.state.interface.darkFrontendMode ? 'rgba(34, 34, 34, 1)' : 'rgba(255, 255, 255, 1)';
   }
 
   ignoreBlur() {
@@ -42,14 +55,23 @@ class SearchComponent extends GirafeHTMLElement {
 
   connectedCallback() {
     this.loadConfig().then(() => {
+      this.registerEvents();
       super.render();
       super.girafeTranslate();
     });
   }
 
-  clearSearch() {
-    this.groupedResults = {};
+  clearSearch(purge: boolean = false) {
+    if (purge) {
+      const target = this.shadowRoot?.getElementById('search') as HTMLInputElement;
+      if (target) {
+        target.value = '';
+      }
+    }
     this.forceHide = false;
+    this.groupedResults = {};
+    this.selectedCntr = 0;
+    this.selectedResult = null;
     super.render();
   }
 
@@ -66,6 +88,8 @@ class SearchComponent extends GirafeHTMLElement {
         const data = await response.json();
         this.displayResults(data);
       }
+      this.selectedResult = null;
+      this.selectedCntr = 0;
     }
   }
 
@@ -116,8 +140,6 @@ class SearchComponent extends GirafeHTMLElement {
     this.forceHide = true;
     super.render();
 
-    console.log(result);
-
     if (result.bbox) {
       // Result with geometry
       this.zoomTo(result.bbox);
@@ -135,6 +157,89 @@ class SearchComponent extends GirafeHTMLElement {
       console.warn('Unsupported result type');
     }
     this.onFocusOut();
+  }
+
+  selectResult() {
+    // selecting the next search result with the keyboard
+    const results = this.shadowRoot?.querySelectorAll('.result');
+
+    const next = results![this.selectedCntr] as HTMLElement;
+    if (next) {
+      if (this.selectedResult) {
+        this.selectedResult.classList.remove('active');
+      }
+      this.selectedResult = next;
+      this.selectedResult.classList.add('active');
+      this.selectedResult.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  onMouseMove() {
+    // if the mouse moves, we activate the hover effect
+    const results = this.shadowRoot?.querySelectorAll('.result');
+    for (const result of results!) {
+      result.classList.remove('active');
+      const htmlResult = result as HTMLElement;
+      htmlResult.style.removeProperty('background-color');
+    }
+  }
+
+  removeHover() {
+    // if the keyboard is used, we deactivate the hover effect
+    const results = this.shadowRoot?.querySelectorAll('.result');
+    for (const result of results!) {
+      const htmlResult = result as HTMLElement;
+      htmlResult.style.backgroundColor = this.bgClr;
+    }
+  }
+
+  navigateToResult(e: KeyboardEvent) {
+    // deactivate mouse hover effect
+    this.removeHover();
+
+    if (e.key === 'ArrowDown') {
+      if (this.selectedResult) {
+        this.selectedCntr += 1;
+      }
+      this.selectResult();
+    }
+    if (e.key === 'ArrowUp') {
+      if (this.selectedResult) {
+        this.selectedCntr -= 1;
+      }
+      this.selectResult();
+    }
+    // select search result
+    if (e.key === 'Enter' && this.selectedResult !== null) {
+      const results = [];
+
+      for (const k in this.groupedResults) {
+        results.push(...this.groupedResults[k]);
+      }
+
+      this.onSelect(results[this.selectedCntr]);
+    }
+  }
+
+  onKeyDown(e: KeyboardEvent) {
+    console.log(e.key);
+
+    // clear search on escape
+    if (e.key === 'Escape') {
+      this.clearSearch(true);
+    }
+
+    // automatic re-open search results on enter
+    else if (this.forceHide) {
+      if (e.key === 'Enter') {
+        this.onFocusIn();
+      }
+    }
+
+    // navigate through search results
+    else if (!this.forceHide) {
+      this.navigateToResult(e);
+    }
   }
 
   zoomTo(extent: Extent) {
