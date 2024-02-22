@@ -15,7 +15,6 @@
 }
 
 .panel {
-  min-width: 18rem;
   position: absolute;
   top: 0;
   left: 0;
@@ -121,4 +120,15 @@ girafe-basemap {
   position: absolute;
   right: 0;
   top: 0;
+}
+
+@media screen and (max-width: 1000px) {
+  .panel {
+    width: 18rem;
+  }
+
+  .hide {
+    left: 18rem;
+    top: 8.3rem;
+  }
 }

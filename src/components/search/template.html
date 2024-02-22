@@ -11,13 +11,17 @@
     placeholder="Search..."
     oninput="${(e:Event) => this.doSearch(e)}"
     onfocusin="${() => this.onFocusIn()}"
-    onfocusout="${() => this.onFocusOut()}" />
+    onfocusout="${() => this.onFocusOut()}"
+    onkeydown="${(e:KeyboardEvent) => this.onKeyDown(e)}" />
 
   <a class="search-icon" href="#" title="Geogirafe search">
     <i class="fa-solid fa-magnifying-glass"></i>
   </a>
 
-  <div id="results" class="${Object.keys(this.groupedResults).length === 0 || this.forceHide ? 'hidden' : ''}">
+  <div
+    id="results"
+    class="${Object.keys(this.groupedResults).length === 0 || this.forceHide ? 'hidden' : ''}"
+    onmousemove="${() => this.onMouseMove()}">
     ${Object.keys(this.groupedResults).map(group => uHtml`
     <div class="title"><i class="${this.getIconClassName(group)}"></i><span>${group}</span></div>
     ${this.groupedResults[group].map(result => uHtml`

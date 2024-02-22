@@ -119,6 +119,7 @@
     "lint": "eslint src/**/*.ts",
     "pretty": "prettier --write .",
     "tsc": "tsc",
+    "prepare_commit": "npm run lint && npm run pretty && npm run tsc",
     "check-all": "npm run tsc && npm run lint && npm run test && npm run build && npm run build-lib"
   }
 }
