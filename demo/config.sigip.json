@@ -41,5 +41,10 @@
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
     "tilesetsUrls": ["https://uzuflycesium.s3.amazonaws.com/Pully/3Dtiles/Pully_3Dtiles/Scene/Pully_3Dtiles.json"]
+  },
+  "bookmarks": {
+    "service": "localStorage",
+    "get": "",
+    "post": ""
   }
 }

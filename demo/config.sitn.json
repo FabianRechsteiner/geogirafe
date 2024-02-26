@@ -62,5 +62,10 @@
       "https://sitn.ne.ch/3dtiles/vdt/P6_Est_cesium/est_cesium.json",
       "https://sitn.ne.ch/3dtiles/vdt/P6_Ouest_cesium/ouest_cesium.json"
     ]
+  },
+  "bookmarks": {
+    "service": "localStorage",
+    "get": "",
+    "post": ""
   }
 }

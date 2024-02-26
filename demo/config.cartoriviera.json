@@ -47,5 +47,10 @@
     "tilesetsUrls": [
       "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_Cesium_2023-2/Scene/Vevey_Cesium_2023.json"
     ]
+  },
+  "bookmarks": {
+    "service": "localStorage",
+    "get": "",
+    "post": ""
   }
 }
