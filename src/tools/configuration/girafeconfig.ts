@@ -79,6 +79,11 @@ class GirafeConfig {
     terrainUrl: string;
     tilesetsUrls: string[];
   };
+  bookmarks?: {
+    service: 'localStorage' | 'server';
+    get: string | undefined;
+    post: string | undefined;
+  };
 
   /**
    * Creates the configuration of the app validating the json passed or giving default values.
@@ -99,6 +104,7 @@ class GirafeConfig {
     this.redlining = this.initConfigRedlining(config);
     this.projections = this.initConfigProjections(config);
     this.map = this.initConfigMap(config);
+    this.bookmarks = this.initConfigBookmarks(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -253,6 +259,24 @@ class GirafeConfig {
       OSM: config.basemaps?.OSM ?? false,
       SwissTopoVectorTiles: config.basemaps?.SwissTopoVectorTiles ?? false
     };
+  }
+
+  private initConfigBookmarks(config: GirafeConfig) {
+    if (config.bookmarks?.service) {
+      if (config.bookmarks.service === 'server') {
+        if (!config.bookmarks.get) {
+          throw new Error(
+            `Configuration for bookmarks.get is required. See https://doc.geomapfish.dev/docs/configuration`
+          );
+        }
+        if (!config.bookmarks.post) {
+          throw new Error(
+            `Configuration for bookmarks.post is required. See https://doc.geomapfish.dev/docs/configuration`
+          );
+        }
+      }
+      return config.bookmarks;
+    }
   }
 
   private initConfigThemes(config: GirafeConfig) {
