@@ -330,7 +330,8 @@
         fetch(baseUrl + '/about.json')
           .then((response) => response.json())
           .then((data) => {
-            document.getElementById(elementId).innerHTML = `v. ${data.version}<span>.${data.build}</span>`;
+            const version = data.version.split('-')[0];
+            document.getElementById(elementId).innerHTML = `v. ${version}<span>.${data.build}</span>`;
           });
       }
 
