@@ -21,7 +21,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          lazy: ['gridjs', 'vanilla-picker', 'adjectives', 'tippy.js']
+          lazy: ['gridjs', 'vanilla-picker', 'tippy.js']
         }
       }
     }
