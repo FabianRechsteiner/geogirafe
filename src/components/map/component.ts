@@ -12,7 +12,6 @@ import { platformModifierKeyOnly } from 'ol/events/condition';
 import { Modify, Snap, DragBox } from 'ol/interaction';
 import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
 import { ProjectionLike, get as getProjection } from 'ol/proj';
-import adjectives from 'adjectives';
 import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
 import { unByKey } from 'ol/Observable';
@@ -46,6 +45,7 @@ import MapPosition from '../../tools/state/mapposition';
 import LocalFileManager from './tools/localfilemanager';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
 import MapManager from '../../tools/state/mapManager';
+import FeatureManager from './tools/featuremanager';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -453,10 +453,10 @@ class MapComponent extends GirafeHTMLElement {
         // Otherwise, it would already have an id
         olFeature.setId(uuidv4());
         // Set the default feature name
-        const name = adjectives[this.getRandomInt(0, adjectives.length)] + ' ' + olFeature.getGeometry()!.getType();
+        const name = new FeatureManager().getRandomName(olFeature);
         olFeature.set('name', name);
 
-        // Add it the the state.
+        // Add it to the state.
         const feature = new RedliningFeature(olFeature);
         this.state.redlining.features.push(feature);
       }
@@ -892,13 +892,6 @@ layers.forEach(layerInfos => {
     if (this.snap) {
       this.map.removeInteraction(this.snap);
     }
-  }
-
-  getRandomInt(min: number, max: number) {
-    // The maximum is exclusive and the minimum is inclusive
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min);
   }
 }
 
