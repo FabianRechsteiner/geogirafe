@@ -1,16 +1,18 @@
+import type { FrameState } from 'ol/Map';
 import Layer from 'ol/layer/Layer';
 import { createCanvasContext2D } from 'ol/dom';
 import { toRadians } from 'ol/math';
 import GeoConsts from '../../../tools/geoconsts';
-import { FrameState } from 'ol/Map';
+
+export type ScaleFn = (frameState: FrameState) => number;
 
 /**
  * A layer to display a mask for a zone to print.
  */
 class PrintMaskLayer extends Layer {
+  private readonly context: CanvasRenderingContext2D;
   private size: [number, number] | null = null;
-  private scale: number | null = null;
-  private context: CanvasRenderingContext2D;
+  private scaleFn?: ScaleFn;
 
   constructor(options = {}) {
     super({ className: 'printMask', ...options });
@@ -20,16 +22,22 @@ class PrintMaskLayer extends Layer {
     this.context.canvas.style.position = 'absolute';
   }
 
+  /**
+   * Updates the size (width, height), in pixel, of the mask.
+   */
   updateSize(size: [number, number]) {
     this.size = size;
   }
 
-  updateScale(scale: number) {
-    this.scale = scale;
+  /**
+   * Sets the provided scale function to retrieve the current scale.
+   */
+  setGetScaleFn(scaleFn: ScaleFn) {
+    this.scaleFn = scaleFn;
   }
 
   getRotation() {
-    console.warn('Not implemented yet');
+    // Not implemented yet
     return 0;
   }
 
@@ -40,8 +48,8 @@ class PrintMaskLayer extends Layer {
     if (this.size === null) {
       throw Error('Cannot render Mask : size has not been set.');
     }
-    if (this.scale === null) {
-      throw Error('Cannot render Mask : scale has not been set.');
+    if (!this.scaleFn) {
+      throw Error('Cannot render Mask : scaleDn has not been set.');
     }
 
     const cwidth = frameState.size[0];
@@ -63,10 +71,11 @@ class PrintMaskLayer extends Layer {
     const width = this.size[0];
     const resolution = frameState.viewState.resolution;
 
+    const scale = this.scaleFn(frameState);
     const extentHalfWidth =
-      ((width / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * this.scale) / resolution / 2;
+      ((width / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * scale) / resolution / 2;
     const extentHalfHeight =
-      ((height / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * this.scale) / resolution / 2;
+      ((height / GeoConsts.PRINT_DOTS_PER_INCH / GeoConsts.INCHES_PER_METER) * scale) / resolution / 2;
 
     const rotation = this.getRotation !== undefined ? toRadians(this.getRotation()) : 0;
 

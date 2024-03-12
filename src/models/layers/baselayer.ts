@@ -34,6 +34,14 @@ abstract class BaseLayer {
     this.isDefaultChecked = isDefaultChecked;
     this.disclaimer = disclaimer;
   }
+
+  /**
+   * @returns the name of the class to facilitate the identification
+   * of subclasses, even in Proxy objects.
+   */
+  public get className() {
+    return this.constructor.name;
+  }
 }
 
 export default BaseLayer;

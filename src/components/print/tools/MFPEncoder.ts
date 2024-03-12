@@ -1,0 +1,269 @@
+import type { BaseCustomizer, MFPLayer, MFPImageLayer, MFPMap, MFPWmtsLayer } from '@geoblocks/mapfishprint';
+import type { GroupLayer, BaseLayer } from '../../../models/main.ts';
+import type { MapManager, State } from '../../../tools/main.ts';
+
+import { getAbsoluteUrl, getWmtsMatrices, getWmtsUrl, MFPVectorEncoder } from '@geoblocks/mapfishprint';
+import { toDegrees } from 'ol/math';
+import { LayerWms, LayerWmts } from '../../../models/main.ts';
+import VectorLayer from 'ol/layer/Vector';
+import { isLayerVisible } from './printUtils.ts';
+
+/** Options for encoding a map. */
+export interface EncodeMapOptions {
+  state: State;
+  mapManager: MapManager;
+  scale: number;
+  printResolution: number;
+  dpi: number;
+  customizer: BaseCustomizer;
+}
+
+/**
+ * Class representing a Mapfish Print Encoder.
+ */
+export default class MFPEncoder {
+  private printResolution = 100;
+  private options?: EncodeMapOptions;
+
+  /**
+   * Encodes the map options, notably the map state and the ol map into a top-level MFPMap object.
+   * @returns A Promise that resolves with the encoded map object.
+   */
+  async encodeMap(options: EncodeMapOptions): Promise<MFPMap> {
+    this.options = options;
+    const mapManager = options.mapManager;
+    const view = mapManager.getMap().getView();
+    const center = view.getCenter() ?? [0, 0];
+    const projection = view.getProjection().getCode();
+    const rotation = toDegrees(view.getRotation());
+    this.printResolution = view.getResolution() || 100;
+    const allLayers = this.getAllLayers(options.state);
+    const mfpLayers = await this.encodeLayers(allLayers);
+    mfpLayers.unshift(...this.encodeSpecialLayers(mapManager, options.customizer));
+
+    return {
+      center,
+      dpi: options.dpi,
+      projection,
+      rotation,
+      scale: options.scale,
+      layers: mfpLayers
+    };
+  }
+
+  /**
+   * @returns An array of all active layers from the state object.
+   */
+  getAllLayers(state: State) {
+    const treeLayers = this.getFlatLayers(state.layers.layersList).filter((layer) => layer.active);
+    const baseMap = state.activeBasemap?.layersList ?? [];
+    return [...treeLayers, ...baseMap];
+  }
+
+  /**
+   * @returns The flattened array of base layers.
+   */
+  getFlatLayers(baseLayers: BaseLayer[]): BaseLayer[] {
+    return baseLayers.reduce((layers, layer) => {
+      if ((layer as GroupLayer).children) {
+        const resultLayers = this.getFlatLayers((layer as GroupLayer).children);
+        layers.push(...resultLayers);
+      } else {
+        layers.push(layer);
+      }
+      return layers;
+    }, [] as BaseLayer[]);
+  }
+
+  /**
+   * Encode special layers, meaning not-in-the-layer-tree layers.
+   * These layers are from the mapManager.getLayersToPrint method.
+   * @returns An array of encodedlayers.
+   */
+  encodeSpecialLayers(mapManager: MapManager, customizer: BaseCustomizer): MFPLayer[] {
+    const encoded = [...mapManager.getLayersToPrint()]
+      .sort((olayerA, olayerB) => {
+        const indexA = olayerA.getZIndex() ?? 0;
+        const indexB = olayerB.getZIndex() ?? 0;
+        return indexB - indexA;
+      })
+      .map((olayer) => {
+        if (olayer instanceof VectorLayer) {
+          return new MFPVectorEncoder(olayer.getLayerState(), customizer).encodeVectorLayer(this.printResolution);
+        }
+        return null;
+      });
+    return encoded.filter((spec) => spec !== null) as MFPLayer[];
+  }
+
+  /**
+   * Encode layers recursively.
+   * @returns a list of Mapfish print layer specs for the given layers.
+   */
+  async encodeLayers(baseLayers: BaseLayer[]): Promise<MFPLayer[]> {
+    const mfpLayers = [];
+    for (const layer of baseLayers) {
+      const spec = await this.encodeLayer(layer);
+      if (spec) {
+        if (Array.isArray(spec)) {
+          mfpLayers.push(...spec);
+        } else {
+          mfpLayers.push(spec);
+        }
+      }
+    }
+    return mfpLayers;
+  }
+
+  /**
+   * Encodes a layer object according to it's className and options.
+   * @returns A promise that resolves to an array of MFP layers, a single MFP layer, or null.
+   */
+  async encodeLayer(layer: BaseLayer): Promise<MFPLayer[] | MFPLayer | null> {
+    if (layer.className === LayerWms.name) {
+      return this.encodeImageLayer(layer as LayerWms);
+    }
+    if (layer.className === LayerWmts.name) {
+      return this.encodeTileWmtsLayer(layer as LayerWmts);
+    }
+    return null;
+  }
+
+  /**
+   * Encodes an image layer from a WMS layer object.
+   * @returns The encoded image layer or null if the layer is not visible.
+   */
+  encodeImageLayer(layerWms: LayerWms): MFPImageLayer | null {
+    if (!isLayerVisible(layerWms, this.options?.printResolution)) {
+      return null;
+    }
+    let url = layerWms.url;
+    if (layerWms.url.startsWith('//')) {
+      url = window.location.protocol + url;
+    }
+    const url_url = new URL(url);
+    const customParams: Record<string, string> = { TRANSPARENT: 'true' };
+    if (url_url.searchParams) {
+      url_url.searchParams.forEach((value, key) => {
+        customParams[key] = value;
+      });
+    }
+
+    const ogcServer = this.options?.state.ogcServers[layerWms.serverName];
+    let serverType = ogcServer?.type;
+    if (serverType === 'arcgis') {
+      serverType = undefined;
+    }
+
+    const layers = layerWms.layers?.split(',') ?? [''];
+
+    // Add empty styles if needed
+    let styles = layerWms.style?.split(',');
+    if (!styles) {
+      styles = [''];
+    }
+    // Get the same amount of styles than layers to print
+    while (layers.length > styles.length) {
+      styles.push('');
+    }
+
+    const object = {
+      baseURL: getAbsoluteUrl(url_url.origin + url_url.pathname),
+      imageFormat: layerWms.imageType ?? 'image/png',
+      layers: layers,
+      customParams: customParams,
+      serverType: serverType,
+      type: 'wms',
+      opacity: layerWms.opacity,
+      useNativeAngle: layerWms.printNativeAngle,
+      styles: styles
+    };
+    return object as unknown as MFPImageLayer;
+  }
+
+  /**
+   * Encodes a WMTS layer into a MFPWmtsLayer or MFPImageLayer object.
+   * @returns The encoded layer object, or null if the layer is not visible.
+   */
+  encodeTileWmtsLayer(layerWmts: LayerWmts): MFPWmtsLayer | MFPImageLayer | null {
+    if (!isLayerVisible(layerWmts, this.options?.printResolution)) {
+      return null;
+    }
+
+    if (layerWmts.printLayers || layerWmts.wmsLayers) {
+      // Print configured wms layer instead.
+      const spec = this.encodeWmsFromWmtsLayer(layerWmts);
+      if (spec) {
+        return spec;
+      }
+    }
+
+    const oLayer = layerWmts._olayer;
+    const source = oLayer?.getSource();
+
+    if (!oLayer || !source) {
+      console.warn('Can not encode tile layer: ', layerWmts);
+      return null;
+    }
+
+    const dimensionParams = source.getDimensions();
+    const dimensions = Object.keys(dimensionParams);
+
+    return {
+      baseURL: getWmtsUrl(source),
+      dimensions,
+      dimensionParams,
+      imageFormat: source.getFormat(),
+      layer: source.getLayer(),
+      matrices: getWmtsMatrices(source),
+      matrixSet: source.getMatrixSet(),
+      name: layerWmts.name,
+      opacity: layerWmts.opacity,
+      requestEncoding: source.getRequestEncoding(),
+      style: source.getStyle(),
+      type: 'wmts',
+      version: source.getVersion()
+    };
+  }
+
+  /**
+   * Encodes a WMS layer from a WMTS layer.
+   * @returns The encoded WMS layer or null if the ogcServer is missing.
+   */
+  encodeWmsFromWmtsLayer(layerWmts: LayerWmts): MFPImageLayer | null {
+    if (!layerWmts.ogcServer) {
+      console.error('Missing ogcServer');
+      return null;
+    }
+    const ogcServer = this.options?.state.ogcServers[layerWmts.ogcServer];
+    const layers = layerWmts.printLayers ?? layerWmts.wmsLayers ?? '';
+    const layerWms = new LayerWms(
+      {
+        id: 0,
+        name: layers,
+        url: ogcServer?.url,
+        imageType: ogcServer?.imageType ?? 'image/png',
+        childLayers: [
+          {
+            name: layers,
+            queryable: false
+          }
+        ],
+        metadata: {
+          isLegendExpanded: false,
+          wasLegendExpanded: false,
+          exclusiveGroup: false,
+          isExpanded: false,
+          isChecked: false
+        },
+        layers: layers
+      },
+      layerWmts.ogcServer,
+      ogcServer?.url ?? '',
+      '',
+      0
+    );
+    layerWms.opacity = layerWmts.opacity;
+    return this.encodeImageLayer(layerWms);
+  }
+}

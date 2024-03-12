@@ -50,14 +50,18 @@ type TreeviewConfig = {
 // Current Print state
 type PrintConfig = {
   maskVisible: boolean;
-  format: [number, number] | null;
+  pageSize: [number, number] | null;
+  format: string | null;
   scale: number | null;
+  dpi: number | null;
 };
 
 type ServerOgc = {
   url: string;
   wfsSupport: boolean;
   urlWfs: string;
+  type: string;
+  imageType: string;
 };
 
 // Current 3D-Globe state
@@ -149,8 +153,10 @@ class State {
   // Current Print state
   print: PrintConfig = {
     maskVisible: false,
+    pageSize: null,
     format: null,
-    scale: null
+    scale: null,
+    dpi: null
   };
 
   // Current 3D-Globe state

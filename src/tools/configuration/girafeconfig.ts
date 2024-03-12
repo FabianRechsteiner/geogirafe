@@ -31,10 +31,19 @@ class GirafeConfig {
   };
   print: {
     url: string;
-    defaultLayout: string;
+    formats?: string[];
     defaultFormat?: string;
+    layouts?: string[];
+    defaultLayout?: string;
+    scales?: number[];
     defaultScale?: number;
-    wantedAttributeNames?: string[];
+    attributeNames?: string[];
+    printLegend?: {
+      useBbox?: boolean;
+      label?: Record<string, boolean | undefined>;
+      params?: Record<string, Record<string, unknown>>;
+      showGroupsTitle?: boolean;
+    };
   };
   selection: {
     defaultFillColor: string;
@@ -130,7 +139,7 @@ class GirafeConfig {
       // The application can be started even if the print is not correctly configured
       // We just display a warning in the console
       console.warn(e);
-      this.print = { url: '', defaultLayout: '' };
+      this.print = { url: '' };
     }
 
     try {
@@ -219,13 +228,11 @@ class GirafeConfig {
     if (!config.print?.url) {
       throw new Error(`Configuration for print.url is required. See https://doc.geomapfish.dev/docs/configuration`);
     }
-    if (!config.print?.defaultLayout) {
-      throw new Error(
-        `Configuration for print.defaultLayout is required. See https://doc.geomapfish.dev/docs/configuration`
-      );
+    if (!config.print?.attributeNames) {
+      config.print.attributeNames = ['title', 'comments', 'legend'];
     }
-    if (!config.print?.wantedAttributeNames) {
-      config.print.wantedAttributeNames = ['title', 'comments', 'legend'];
+    if (!config.print?.formats) {
+      config.print.formats = ['pdf', 'png'];
     }
     return config.print;
   }

@@ -5,6 +5,7 @@ import LayerWms from '../../../models/layers/layerwms';
 import StateManager from '../../../tools/state/statemanager';
 import type { SelectionParam } from '../../../tools/state/state';
 import LayerManager from '../../../tools/layermanager';
+import { appendParams } from 'ol/uri';
 
 class WmsManager {
   map: Map;
@@ -282,6 +283,91 @@ class WmsManager {
 
     StateManager.getInstance().state.selection.selectionParameters = selectionParams;
   }
+
+  /**
+   * Get the WMS legend URL.
+   * @param url The base url of the wms service.
+   * @param layerName The name of a wms layer.
+   * @param options to create the legend url.
+   * @returns The legend URL or undefined.
+   */
+  static getWMSLegendURL = (
+    url: string | undefined,
+    layerName: string,
+    options?: WMSLegendURLOptions
+  ): string | undefined => {
+    if (!url) {
+      return undefined;
+    }
+    const queryString: Record<string, unknown> = {
+      FORMAT: 'image/png',
+      TRANSPARENT: true,
+      SERVICE: 'WMS',
+      VERSION: '1.1.1',
+      REQUEST: 'GetLegendGraphic',
+      LAYER: layerName
+    };
+    const scale = options?.scale;
+    const legendRule = options?.legendRule;
+    const legendWidth = options?.legendWidth;
+    const legendHeight = options?.legendHeight;
+    const serverType = options?.serverType;
+    const dpi = options?.dpi;
+    const bbox = options?.bbox;
+    const srs = options?.srs;
+    const additionalQueryString = options?.additionalQueryString;
+    if (scale !== undefined) {
+      queryString.SCALE = scale;
+    }
+    if (legendRule !== undefined) {
+      queryString.RULE = legendRule;
+      if (legendWidth !== undefined) {
+        queryString.WIDTH = legendWidth;
+      }
+      if (legendHeight !== undefined) {
+        queryString.HEIGHT = legendHeight;
+      }
+    }
+    if (serverType == 'qgis') {
+      if (dpi != undefined) {
+        queryString.DPI = dpi;
+      }
+      if (bbox != undefined && srs != undefined && scale != undefined && dpi != undefined && legendRule == undefined) {
+        queryString.BBOX = bbox.join(',');
+        queryString.SRS = srs;
+        queryString.SRCWIDTH = Math.round(((bbox[2] - bbox[0]) / scale) * 39.37 * dpi);
+        queryString.SRCHEIGHT = Math.round(((bbox[3] - bbox[1]) / scale) * 39.37 * dpi);
+        delete queryString.SCALE; // QGIS calculate it from the BBOX the SRCWIDTH and the SRCHEIGHT.
+      }
+    }
+    if (additionalQueryString) {
+      Object.assign(queryString, additionalQueryString);
+    }
+    return appendParams(url, queryString);
+  };
+}
+
+/**
+ * Options to get WMS legend URL.
+ * @property legendRule parameters to add to the returned URL.
+ * @property legendWidth the legend width.
+ * @property legendHeight the legend height.
+ * @property serverType the OpenLayers server type.
+ * @property dpi the DPI.
+ * @property bbox the bbox.
+ * @property srs The projection code.
+ * @property additionalQueryString Additional query string parameters.
+ */
+export interface WMSLegendURLOptions {
+  scale?: number;
+  legendRule?: string;
+  legendWidth?: number;
+  legendHeight?: number;
+  serverType?: string;
+  dpi?: number;
+  bbox?: number[];
+  srs?: string;
+  additionalQueryString?: Record<string, unknown>;
 }
 
 export default WmsManager;
