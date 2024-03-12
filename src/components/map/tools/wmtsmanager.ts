@@ -9,7 +9,7 @@ import { StateManager } from '../../../tools/main';
 class WmtsManager {
   map: Map;
 
-  wmtsCapabilitiesByServer: Record<string, string> = {};
+  wmtsCapabilitiesByServer: Record<string, Record<string, unknown>> = {};
   wmtsLayers: Record<
     string,
     {
@@ -44,7 +44,7 @@ class WmtsManager {
   }
 
   #addLayerInternal(layer: LayerWmts, isBasemap: boolean) {
-    this.#getWmtsCapabilities(layer.url!, (capabilities: string) => {
+    this.#getWmtsCapabilities(layer.url!, (capabilities) => {
       const options = optionsFromCapabilities(capabilities, {
         layer: layer.layers,
         projection: this.state.projection
@@ -76,6 +76,8 @@ class WmtsManager {
         source: new WMTS(options)
       });
 
+      this.enrichWmtsLayerFromCapabilities(layer, olayer, capabilities);
+
       let zindex;
       if (isBasemap) {
         this.basemapLayers.push(olayer);
@@ -93,7 +95,20 @@ class WmtsManager {
 
       // Add to map
       this.map.addLayer(olayer);
+
+      // Add to state
+      layer._olayer = olayer;
     });
+  }
+
+  enrichWmtsLayerFromCapabilities(layer: LayerWmts, olayer: TileLayer<WMTS>, capabilities: Record<string, unknown>) {
+    const layers = (capabilities?.Contents as Record<string, Record<string, string>[]>).Layer ?? [];
+    const matchLayer = layers.find((elt) => elt.Identifier == layer.layers);
+    if (matchLayer) {
+      olayer.set('capabilitiesStyles', matchLayer.Style);
+    } else {
+      console.warn('No matching layer name in wmts capabilities.');
+    }
   }
 
   removeLayer(layer: LayerWmts) {
@@ -126,7 +141,7 @@ class WmtsManager {
     }
   }
 
-  #getWmtsCapabilities(url: string, callback: (capabilities: string) => void) {
+  #getWmtsCapabilities(url: string, callback: (capabilities: Record<string, unknown>) => void) {
     if (url in this.wmtsCapabilitiesByServer) {
       // Capabilities were already loaded
       const capabilities = this.wmtsCapabilitiesByServer[url];
@@ -140,11 +155,28 @@ class WmtsManager {
           const parser = new WMTSCapabilities();
           const result = parser.read(capabilities);
           this.wmtsCapabilitiesByServer[url] = result;
-
           callback(result);
         });
     }
   }
+
+  /**
+   * Retrieves the legend URL for a given WMTS tile layer.
+   * @param {TileLayer<WMTS>} olayer - The OpenLayers tile layer object.
+   * @returns The legend URL or undefined if not found.
+   */
+  static getWMTSLegendURL = (olayer: TileLayer<WMTS>): string | undefined => {
+    // BGE case of multiple styles ?  case of multiple legendUrl ?
+    const styles = olayer.get('capabilitiesStyles');
+    if (!Array.isArray(styles) || styles.length <= 0) {
+      return;
+    }
+    const legendURL = styles[0].LegendURL;
+    if (!Array.isArray(legendURL) || legendURL.length <= 0) {
+      return;
+    }
+    return legendURL[0].href;
+  };
 }
 
 export default WmtsManager;

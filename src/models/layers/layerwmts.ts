@@ -1,5 +1,7 @@
 import { GMFTreeItem } from '../gmf';
 import Layer from './layer';
+import TileLayer from 'ol/layer/Tile';
+import WMTS from 'ol/source/WMTS';
 
 class LayerWmts extends Layer {
   /**
@@ -13,6 +15,17 @@ class LayerWmts extends Layer {
   public url: string;
   public layers: string;
   public dimensions: Record<string, object> | null;
+  public imageType?: string;
+  public style?: string;
+  public ogcServer?: string;
+  // From metadata
+  public wmsLayers?: string;
+  public printLayers?: string;
+  public minResolution?: number;
+  public maxResolution?: number;
+
+  /** Linked ol layer, starting with an underscore to not be part of the proxy. **/
+  public _olayer?: TileLayer<WMTS>;
 
   constructor(elem: GMFTreeItem, order: number) {
     if (!elem.url || !elem.layer) {
@@ -23,6 +36,13 @@ class LayerWmts extends Layer {
     this.url = elem.url;
     this.layers = elem.layer;
     this.dimensions = elem.dimensions ?? null;
+    this.imageType = elem.imageType;
+    this.style = elem.style;
+    this.ogcServer = elem.metadata.ogcServer;
+    this.wmsLayers = elem.metadata.wmsLayers;
+    this.printLayers = elem.metadata.printLayers;
+    this.minResolution = elem.minResolutionHint;
+    this.maxResolution = elem.maxResolutionHint;
   }
 
   get layerUniqueId() {

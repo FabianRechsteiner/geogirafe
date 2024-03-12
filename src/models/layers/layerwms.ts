@@ -20,6 +20,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   public minResolution?: number;
   public maxResolution?: number;
   public layers?: string;
+  public style?: string;
 
   // Legend attributes
   public legend?: string;
@@ -28,6 +29,8 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   public legendImage?: string;
   public isLegendExpanded: boolean;
   public wasLegendExpanded: boolean;
+  public hiDPILegendImages?: Record<string, string>;
+  public printNativeAngle?: boolean;
 
   // If the layer is queryable
   public queryable = false;
@@ -42,6 +45,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     this.imageType = elem.imageType;
     this.minResolution = elem.minResolutionHint;
     this.maxResolution = elem.maxResolutionHint;
+    this.style = elem.style;
 
     this.legend = elem.metadata.legend;
     this.iconUrl = elem.metadata.iconUrl;
@@ -49,30 +53,32 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     this.legendImage = elem.metadata.legendImage;
     this.isLegendExpanded = elem.metadata.isLegendExpanded ?? false;
     this.wasLegendExpanded = this.isLegendExpanded;
+    this.hiDPILegendImages = elem.metadata.hiDPILegendImages;
+    // TODO BGE Is it correct to have it at this level (should be for groups) ?
+    this.printNativeAngle = elem.metadata.printNativeAngle;
+    this.layers = elem.layers;
 
-    if (elem.childLayers) {
-      this.layers = elem.layers;
-      // TODO REG: Is it possible that 1 childlayer is queryable, and another one not ?
-      if (elem.childLayers.length === 0) {
-        // We are on a WMS Layer, but it doesn't have any childlayer.
-        // This is probably a configuration error in the backend
-        console.warn(`WMS Layer ${elem.name} has no defined child-layer`);
-      } else {
-        this.queryable = elem.childLayers[0].queryable;
-        this.queryLayers = this.queryable ? elem.childLayers.map((l: GMFChildLayer) => l.name).join(',') : '';
+    if (!elem.childLayers || elem.childLayers.length === 0) {
+      // We are on a WMS Layer, but it doesn't have any childlayer.
+      // This is probably a configuration error in the backend
+      console.warn(`WMS Layer ${elem.name} has no defined child-layer`);
+      return;
+    }
+    const childLayers = elem.childLayers;
+    // TODO REG: Is it possible that 1 childlayer is queryable, and another one not ?
+    this.queryable = childLayers[0].queryable;
+    this.queryLayers = this.queryable ? childLayers.map((l: GMFChildLayer) => l.name).join(',') : '';
 
-        if (this.queryable) {
-          if (!this.queryLayers || this.queryLayers.length == 0) {
-            this.hasError = true;
-            this.errorMessage = 'This layer is defined as queryable but no layer to query has been defined.';
-            this.queryable = false;
-          }
-          if (!this.urlWfs || this.urlWfs.length == 0) {
-            this.hasError = true;
-            this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
-            this.queryable = false;
-          }
-        }
+    if (this.queryable) {
+      if (!this.queryLayers || this.queryLayers.length == 0) {
+        this.hasError = true;
+        this.errorMessage = 'This layer is defined as queryable but no layer to query has been defined.';
+        this.queryable = false;
+      }
+      if (!this.urlWfs || this.urlWfs.length == 0) {
+        this.hasError = true;
+        this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
+        this.queryable = false;
       }
     }
   }

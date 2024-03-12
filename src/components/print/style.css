@@ -28,9 +28,9 @@
 }
 
 #close {
-  border: solid 1px #999;
+  border: solid 1px var(--text-color-grad1);
   border-right: none;
-  color: #999;
+  color: var(--text-color-grad1);
   padding: 0.7rem 0 0.7rem 0.5rem;
   border-radius: 10px 0 0 10px;
   width: 0.8rem;
@@ -48,8 +48,8 @@
 }
 
 #close:hover {
-  border-color: #000;
-  color: #000;
+  border-color: var(--text-color);
+  color: var(--text-color);
 }
 
 #content {
@@ -79,44 +79,69 @@
   color: var(--text-color);
   border-radius: 3px;
   outline: 0;
-  border: solid 1px #444;
+  border: solid 1px var(--text-color);
   cursor: pointer;
 }
 
 #content button:hover {
-  background-color: #000;
+  background-color: var(--bkg-color-grad2);
 }
 
 #content #printList {
-  margin-top: 8rem;
+  margin-top: 5rem;
 }
 
-#printList div.girafe {
-  display: inline-block;
+#printList .print-item {
   position: relative;
   padding: 0.5rem;
-  margin-top: 0.1rem;
-  margin-right: 0.1rem;
-  border: solid 1px #999;
-  text-align: left;
-  width: 100%;
-  max-width: 16rem;
-  min-width: 13rem;
-  color: #666;
+  margin-top: 0.5rem;
+  border: solid 1px var(--text-color);
+  color: var(--text-color);
+}
+
+#printList .print-item .container {
+  display: inline;
+}
+
+.print-item .cancel {
+  cursor: pointer;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: var(--text-color-grad1);
+}
+
+.print-item .cancel i:before {
+  content: '\f00d';
+}
+
+.print-item .cancel:hover {
+  border-color: var(--text-color);
+  color: var(--text-color);
+}
+
+.print-item i.status {
+  margin-right: 1rem;
+  float: left;
+  width: 3rem;
+  text-align: center;
+}
+
+.print-item:has(.success):hover {
+  background-color: var(--bkg-color-grad2);
   cursor: pointer;
 }
 
-div.girafe i {
-  margin-right: 1rem;
-  float: left;
+.print-item i.status::before {
+  line-height: 3rem;
+  display: block;
 }
 
-div.girafe span {
-  display: block;
+.print-item p {
   line-height: 1.3rem;
 }
 
-div.girafe span.time {
+.print-item p.time {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -128,6 +153,7 @@ label {
   width: 8rem;
   line-height: 2.5rem;
   margin-right: 0.5rem;
+  flex-grow: 1;
 }
 
 label ~ * {
@@ -143,23 +169,44 @@ label:after {
 select,
 textarea,
 input {
+  font-family: Arial, sans-serif;
   appearance: none;
   outline: 0;
   box-shadow: none;
-  padding: 0 0.5rem;
+  padding: 0.5rem;
   color: var(--text-color);
   background-color: var(--bkg-color);
-  border: solid 1px #444;
+  border: solid 1px var(--text-color);
   background-image: none;
   cursor: pointer;
 }
 
 textarea {
   height: 6rem;
-  padding: 0.5rem 1rem;
 }
 
-input[type='range'],
+.w-full {
+  width: 100%;
+}
+
+.rotation {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rotation input {
+  appearance: auto;
+  flex-grow: 1;
+  overflow: hidden;
+  max-width: 50%;
+}
+
+.rotation input[type='range'] {
+  padding-left: 0;
+  padding-right: 0;
+  flex-grow: 2;
+}
+
 input[type='checkbox'] {
   appearance: auto;
   flex-grow: 0;
@@ -179,7 +226,7 @@ input[type='checkbox'] {
 }
 
 .select select {
-  flex: 1;
+  flex-grow: 1;
 }
 
 .select::after {
@@ -188,11 +235,8 @@ input[type='checkbox'] {
   top: 0;
   right: 0;
   padding: 0.7rem;
-  background-color: #444;
+  border: solid 1px var(--text-color);
+  border-left-width: 0;
   color: var(--text-color);
   pointer-events: none;
-}
-
-.select:hover::after {
-  background-color: #000;
 }

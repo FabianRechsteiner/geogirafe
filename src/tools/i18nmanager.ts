@@ -40,6 +40,10 @@ class I18nManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
   }
 
+  formatNumber(number: string | number): string {
+    return parseFloat(`${number}`).toLocaleString(this.stateManager.state.language ?? 'en');
+  }
+
   async #loadTranslations(language: string): Promise<TranslationsDict> {
     if (this.loadingLanguagePromise) {
       // There's already a promise for loading translations
@@ -86,18 +90,32 @@ class I18nManager extends GirafeSingleton {
         const toTranslate = dom.querySelectorAll('[i18n]');
         toTranslate.forEach((item) => {
           const key = item.getAttribute('i18n');
-          if (key) {
-            const translation = this.getTranslation(key);
-            if (item.hasAttribute('placeholder')) {
-              item.setAttribute('placeholder', translation);
-            } else {
-              // Default : simply set innerHTML.
-              item.innerHTML = translation;
-            }
+          if (!key) {
+            return;
+          }
+          let translation: string;
+          if (item.hasAttribute('i18nFn')) {
+            translation = this.getFnTranslated(item, key);
+          } else {
+            translation = this.getTranslation(key);
+          }
+          if (item.hasAttribute('placeholder')) {
+            item.setAttribute('placeholder', translation);
+          } else {
+            // Default : simply set innerHTML.
+            item.innerHTML = translation;
           }
         });
       });
     }
+  }
+
+  private getFnTranslated(item: Element, key: string): string {
+    const fnName = item.getAttribute('i18nFn');
+    if (fnName === 'formatNumber') {
+      return this.formatNumber(key);
+    }
+    return key;
   }
 }
 

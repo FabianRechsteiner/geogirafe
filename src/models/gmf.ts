@@ -2,16 +2,8 @@
  * These are the models for a GeoMapFish backend
  */
 
-export interface GMFOGCServer {
-  url: string;
-  wfsUrl?: string;
-  wfsSupport?: boolean;
-  imageType: 'image/png' | 'image/jpeg';
-  isSingleTile?: boolean;
-  serverType: 'mapserver' | 'geoserver' | 'qgisserver';
-}
-
 export interface GMFMetadata {
+  ogcServer?: string;
   legend?: string;
   iconUrl?: string;
   legendRule?: string;
@@ -22,6 +14,10 @@ export interface GMFMetadata {
   isExpanded: boolean;
   isChecked: boolean;
   disclaimer?: string;
+  hiDPILegendImages?: Record<string, string>;
+  printLayers?: string;
+  wmsLayers?: string;
+  printNativeAngle?: boolean;
 }
 
 export interface GMFChildLayer {

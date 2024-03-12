@@ -202,6 +202,9 @@ class MapComponent extends GirafeHTMLElement {
       features: this.redliningFeaturesCollection
     });
     this.redliningLayer = new VectorLayer({
+      properties: {
+        addToPrintedLayers: true
+      },
       source: this.redliningSource
       //style: (feature) => this.getDefaultStyle(feature)
     });
@@ -216,6 +219,9 @@ class MapComponent extends GirafeHTMLElement {
 
     this.configManager.loadConfig().then(() => {
       this.selectionLayer = new VectorLayer({
+        properties: {
+          addToPrintedLayers: true
+        },
         source: selectionSource,
         // TODO REG: Change default selection color
         style: new Style({
@@ -245,6 +251,9 @@ class MapComponent extends GirafeHTMLElement {
         this.flash(e.feature!);
       });
       this.focusLayer = new VectorLayer({
+        properties: {
+          addToPrintedLayers: true
+        },
         source: selectionSource,
         // TODO REG: Change default focus color
         style: new Style({
@@ -439,6 +448,8 @@ class MapComponent extends GirafeHTMLElement {
 
       vectorContext.setStyle(style);
       vectorContext.drawGeometry(flashGeom);
+      // TODO BGE: Animation are bad for performances and should be optimized. First by re-rendering only the
+      //  concerned layer and not the whole map. the style must be cached too, etc.
       // tell OpenLayers to continue postrender animation
       _this.map.render();
     }

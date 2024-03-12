@@ -42,7 +42,8 @@
     "uuid": "9.0.1"
   },
   "peerDependencies": {
-    "@geoblocks/mapfishprint": "^0.1.1",
+    "@geoblocks/mapfishprint": "^0.2.5",
+    "@types/geojson": "7946.0.14",
     "cesium": "^1.113.0",
     "ol": "^8.1.0",
     "ol-mapbox-style": "^12.1.0",
@@ -51,7 +52,6 @@
   },
   "devDependencies": {
     "@types/babel__generator": "7.6.8",
-    "@types/geojson": "7946.0.14",
     "@types/istanbul-lib-coverage": "2.0.6",
     "@types/proj4": "2.5.5",
     "@types/uuid": "9.0.8",

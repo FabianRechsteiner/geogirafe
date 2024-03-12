@@ -23,9 +23,15 @@
   },
   "print": {
     "url": "https://geomapfish-demo-2-8.camptocamp.com/printproxy/",
-    "defaultLayout": "1 A4 portrait",
+    "formats": ["png", "pdf", "jpg", "jpeg", "notvalid"],
     "defaultFormat": "pdf",
-    "wantedAttributeNames": ["legend", "title", "comments", "timezone"]
+    "layouts": ["1 A4 portrait", "4 A3 landscape"],
+    "defaultLayout": "1 A4 portrait",
+    "scales": [500000, 25000, 10000, 99999, 5000, 2500],
+    "attributeNames": ["legend", "title", "comments"],
+    "printLegend": {
+      "showGroupsTitle": true
+    }
   },
   "share": {
     "service": "lstu",
