@@ -2,11 +2,15 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import Map from 'ol/Map';
 import BaseLayer from 'ol/layer/Base';
 
-/** The singleton containing the main OpenLayers map accessible from everywhere */
-export default class MapManager extends GirafeSingleton {
-  private readonly map = new Map({
+export const createNewMap = (): Map => {
+  return new Map({
     layers: []
   });
+};
+
+/** The singleton containing the main OpenLayers map accessible from everywhere */
+export default class MapManager extends GirafeSingleton {
+  private readonly map = createNewMap();
 
   getMap() {
     return this.map;

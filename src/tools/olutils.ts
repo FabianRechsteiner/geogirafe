@@ -1,8 +1,9 @@
-import { EventsKey } from 'ol/events';
+import type { EventsKey } from 'ol/events';
+import type { Map } from 'ol';
+import type BaseLayer from 'ol/layer/Base';
+import type Feature from 'ol/Feature';
+
 import { unByKey } from 'ol/Observable';
-import { Map } from 'ol';
-import BaseLayer from 'ol/layer/Base';
-import Feature from 'ol/Feature';
 
 /**
  * Unsubscribe to all OpenLayer listeners.
@@ -14,7 +15,7 @@ export const unByKeyAll = (eventKeys: EventsKey[]) => {
 /**
  * @returns a layer in the map that match the given name (property name).
  */
-export const getLayerByName = (map: Map, layerName: string): BaseLayer | undefined => {
+export const getOlayerByName = (map: Map, layerName: string): BaseLayer | undefined => {
   return map.getAllLayers().find((layer) => layer.get('name') === layerName);
 };
 

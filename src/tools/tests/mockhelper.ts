@@ -1,5 +1,8 @@
 import ConfigManager from '../configuration/configmanager';
 import GirafeConfig from '../configuration/girafeconfig';
+import { MapManager } from '../main';
+import { createNewMap } from '../state/mapManager';
+import { ServerOgc } from '../state/state';
 
 class MockHelper {
   public static mockConfig = {
@@ -19,17 +22,38 @@ class MockHelper {
       startPosition: '2628597,1186378',
       startZoom: '3',
       maxExtent: '2200000,1040000,3000000,1310000'
+    },
+    search: {
+      url: 'https://search.url?query=###SEARCHTERM###'
+    },
+    share: {
+      createUrl: 'https://share.url'
+    },
+    print: {
+      url: 'https://print.url'
     }
   };
 
   public static startMocking() {
     // @ts-ignore
     ConfigManager.getInstance().config = new GirafeConfig(MockHelper.mockConfig);
+    // @ts-ignore
+    MapManager.getInstance().map = createNewMap();
   }
 
   public static stopMocking() {
     // @ts-ignore
     ConfigManager.getInstance().config = null;
+  }
+
+  public static getServerOgc(): ServerOgc {
+    return {
+      url: 'https://test.com',
+      urlWfs: 'https://test.com/wfs',
+      wfsSupport: true,
+      imageType: 'image/jpg',
+      type: 'mapserver'
+    };
   }
 }
 

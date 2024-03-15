@@ -26,11 +26,18 @@ export default class MFPEncoder {
   private options?: EncodeMapOptions;
 
   /**
+   * Sets the options for encoding the map.
+   */
+  setOptions(options: EncodeMapOptions) {
+    this.options = options;
+  }
+
+  /**
    * Encodes the map options, notably the map state and the ol map into a top-level MFPMap object.
    * @returns A Promise that resolves with the encoded map object.
    */
-  async encodeMap(options: EncodeMapOptions): Promise<MFPMap> {
-    this.options = options;
+  encodeMap(options: EncodeMapOptions): MFPMap {
+    this.setOptions(options);
     const mapManager = options.mapManager;
     const view = mapManager.getMap().getView();
     const center = view.getCenter() ?? [0, 0];
@@ -38,7 +45,7 @@ export default class MFPEncoder {
     const rotation = toDegrees(view.getRotation());
     this.printResolution = view.getResolution() || 100;
     const allLayers = this.getAllLayers(options.state);
-    const mfpLayers = await this.encodeLayers(allLayers);
+    const mfpLayers = this.encodeLayers(allLayers);
     mfpLayers.unshift(...this.encodeSpecialLayers(mapManager, options.customizer));
 
     return {
@@ -100,10 +107,10 @@ export default class MFPEncoder {
    * Encode layers recursively.
    * @returns a list of Mapfish print layer specs for the given layers.
    */
-  async encodeLayers(baseLayers: BaseLayer[]): Promise<MFPLayer[]> {
+  encodeLayers(baseLayers: BaseLayer[]): MFPLayer[] {
     const mfpLayers = [];
     for (const layer of baseLayers) {
-      const spec = await this.encodeLayer(layer);
+      const spec = this.encodeLayer(layer);
       if (spec) {
         if (Array.isArray(spec)) {
           mfpLayers.push(...spec);
@@ -119,7 +126,7 @@ export default class MFPEncoder {
    * Encodes a layer object according to it's className and options.
    * @returns A promise that resolves to an array of MFP layers, a single MFP layer, or null.
    */
-  async encodeLayer(layer: BaseLayer): Promise<MFPLayer[] | MFPLayer | null> {
+  encodeLayer(layer: BaseLayer): MFPLayer[] | MFPLayer | null {
     if (layer.className === LayerWms.name) {
       return this.encodeImageLayer(layer as LayerWms);
     }
@@ -235,7 +242,8 @@ export default class MFPEncoder {
       console.error('Missing ogcServer');
       return null;
     }
-    const ogcServer = this.options?.state.ogcServers[layerWmts.ogcServer];
+    const ogcServers = this.options?.state.ogcServers;
+    const ogcServer = ogcServers ? ogcServers[layerWmts.ogcServer] : undefined;
     const layers = layerWmts.printLayers ?? layerWmts.wmsLayers ?? '';
     const layerWms = new LayerWms(
       {

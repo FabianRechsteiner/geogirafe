@@ -3,16 +3,16 @@
  */
 
 export interface GMFMetadata {
-  ogcServer?: string;
-  legend?: string;
-  iconUrl?: string;
-  legendRule?: string;
-  legendImage?: string;
   isLegendExpanded: boolean;
   wasLegendExpanded: boolean;
   exclusiveGroup: boolean;
   isExpanded: boolean;
   isChecked: boolean;
+  ogcServer?: string;
+  legend?: string;
+  iconUrl?: string;
+  legendRule?: string;
+  legendImage?: string;
   disclaimer?: string;
   hiDPILegendImages?: Record<string, string>;
   printLayers?: string;
@@ -28,6 +28,7 @@ export interface GMFChildLayer {
 export interface GMFTreeItem {
   id: number;
   name: string;
+  metadata: GMFMetadata;
   ogcServer?: string;
   children?: GMFTreeItem[];
   type?: string;
@@ -38,7 +39,6 @@ export interface GMFTreeItem {
   imageType?: string;
   minResolutionHint?: number;
   maxResolutionHint?: number;
-  metadata: GMFMetadata;
   layers?: string;
   childLayers?: GMFChildLayer[];
   layer?: string;

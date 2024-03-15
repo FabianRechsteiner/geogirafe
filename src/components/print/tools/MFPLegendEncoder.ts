@@ -51,11 +51,18 @@ export class MFPLegendEncoder {
   };
 
   /**
+   * Sets the options for encoding legend.
+   */
+  setOptions(options: EncodeLegendOptions) {
+    this.options = { ...this.defaultOptions, ...options };
+  }
+
+  /**
    * Encodes the legend based on the provided options.
    * @returns The encoded legend or null if no legend classes were found.
    */
   encodeLegend(options: EncodeLegendOptions): MFPLegendClass | null {
-    this.options = { ...this.defaultOptions, ...options };
+    this.setOptions(options);
     const layerLegend = this.encodeLayersLegend(options.state.layers.layersList);
     const legend: MFPLegendClass = { classes: layerLegend };
     return legend.classes!.length > 0 ? legend : null;
@@ -148,7 +155,8 @@ export class MFPLegendEncoder {
       return null;
     }
 
-    const ogcServer = this.options?.state.ogcServers[layerWms.serverName];
+    const ogcServers = this.options?.state.ogcServers;
+    const ogcServer = ogcServers ? ogcServers[layerWms.serverName] : undefined;
     const serverType = ogcServer?.type ?? '';
     const dpi = this.options?.dpi ?? GeoConsts.SCREEN_DOTS_PER_INCH;
 
@@ -211,8 +219,8 @@ export class MFPLegendEncoder {
   }
 
   /**
-   * Retrieves the metadata legend image for the given layer.
-   * @returns {LegendURLDPI | null} - The metadata legend image URL and DPI, or null if not found.
+   * Retrieves the metadata legend image or hiDPILegendImages for the given layer.
+   * @returns The metadata legend image URL and DPI, or null if not found.
    */
   getMetadataLegendImage(layer: LayerWms | LayerWmts): LegendURLDPI | null {
     let dpi = this.options?.dpi ?? -1;
@@ -221,8 +229,8 @@ export class MFPLegendEncoder {
     }
 
     let found_dpi = dpi;
-    let legendImage = (layer as LayerWms).legendImage;
-    const hiDPILegendImages = (layer as LayerWms).hiDPILegendImages;
+    let legendImage = layer.legendImage;
+    const hiDPILegendImages = layer.hiDPILegendImages;
     let dist = Number.MAX_VALUE;
     if (legendImage) {
       dist = Math.abs(Math.log(GeoConsts.SCREEN_DOTS_PER_INCH / dpi));

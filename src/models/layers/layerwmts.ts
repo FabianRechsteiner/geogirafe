@@ -23,6 +23,8 @@ class LayerWmts extends Layer {
   public printLayers?: string;
   public minResolution?: number;
   public maxResolution?: number;
+  public legendImage?: string;
+  public hiDPILegendImages?: Record<string, string>;
 
   /** Linked ol layer, starting with an underscore to not be part of the proxy. **/
   public _olayer?: TileLayer<WMTS>;
@@ -43,6 +45,8 @@ class LayerWmts extends Layer {
     this.printLayers = elem.metadata.printLayers;
     this.minResolution = elem.minResolutionHint;
     this.maxResolution = elem.maxResolutionHint;
+    this.legendImage = elem.metadata.legendImage;
+    this.hiDPILegendImages = elem.metadata.hiDPILegendImages;
   }
 
   get layerUniqueId() {
