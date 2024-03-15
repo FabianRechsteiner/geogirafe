@@ -1,7 +1,7 @@
 import type { MFPSpec, MFPReportResponse, MFPCancelResponse } from '@geoblocks/mapfishprint';
-import type { MFPAttributes } from '@geoblocks/mapfishprint/src/types.ts';
-import type { EncodeLegendOptions, MFPLegendClass } from './MFPLegendEncoder.ts';
-import type { State, I18nManager, MapManager } from '../../../tools/main.ts';
+import type { MFPAttributes } from '@geoblocks/mapfishprint/src/types';
+import type { EncodeLegendOptions, MFPLegendClass } from './MFPLegendEncoder';
+import type { State, I18nManager, MapManager } from '../../../tools/main';
 
 import {
   BaseCustomizer,
@@ -10,8 +10,8 @@ import {
   cancelPrint as cancelPrintMFP,
   getPrintExtent as getPrintExtentMFP
 } from '@geoblocks/mapfishprint';
-import { MFPLegendEncoder } from './MFPLegendEncoder.ts';
-import MFPEncoder from './MFPEncoder.ts';
+import { MFPLegendEncoder } from './MFPLegendEncoder';
+import MFPEncoder from './MFPEncoder';
 
 /**
  * Represents encoding options to print the map.

@@ -1,4 +1,4 @@
-import type { LayerWms, LayerWmts } from '../../../models/main.ts';
+import type { LayerWms, LayerWmts } from '../../../models/main';
 
 /**
  * Determines if a layer is visible based on its opacity and print resolution.

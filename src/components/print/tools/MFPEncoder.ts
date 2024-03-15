@@ -1,12 +1,12 @@
 import type { BaseCustomizer, MFPLayer, MFPImageLayer, MFPMap, MFPWmtsLayer } from '@geoblocks/mapfishprint';
-import type { GroupLayer, BaseLayer } from '../../../models/main.ts';
-import type { MapManager, State } from '../../../tools/main.ts';
+import type { GroupLayer, BaseLayer } from '../../../models/main';
+import type { MapManager, State } from '../../../tools/main';
 
 import { getAbsoluteUrl, getWmtsMatrices, getWmtsUrl, MFPVectorEncoder } from '@geoblocks/mapfishprint';
 import { toDegrees } from 'ol/math';
-import { LayerWms, LayerWmts } from '../../../models/main.ts';
+import { LayerWms, LayerWmts } from '../../../models/main';
 import VectorLayer from 'ol/layer/Vector';
-import { isLayerVisible } from './printUtils.ts';
+import { isLayerVisible } from './printUtils';
 
 /** Options for encoding a map. */
 export interface EncodeMapOptions {

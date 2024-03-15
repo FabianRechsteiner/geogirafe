@@ -1,12 +1,11 @@
-import type { GroupLayer, BaseLayer } from '../../../models/main.ts';
-import type MapManager from '../../../tools/state/mapManager.ts';
-import type { I18nManager, State } from '../../../tools/main.ts';
+import type { GroupLayer, BaseLayer } from '../../../models/main';
+import type MapManager from '../../../tools/state/mapManager';
+import type { I18nManager, State } from '../../../tools/main';
 
-import { LayerWms, LayerWmts } from '../../../models/main.ts';
-import GeoConsts from '../../../tools/geoconsts.ts';
-import WmtsManager from '../../map/tools/wmtsmanager.ts';
-import WmsManager from '../../map/tools/wmsmanager.ts';
-import { isLayerVisible } from './printUtils.ts';
+import { LayerWms, LayerWmts } from '../../../models/main';
+import GeoConsts from '../../../tools/geoconsts';
+import { isLayerVisible } from './printUtils';
+import LegendHelper from '../../../tools/legendhelper';
 
 /** Represents the options for encoding a legend. */
 export interface EncodeLegendOptions {
@@ -123,7 +122,7 @@ export class MFPLegendEncoder {
     }
     let icon_dpi = this.getMetadataLegendImage(layerWmts);
     if (!icon_dpi && layerWmts._olayer) {
-      const url = WmtsManager.getWMTSLegendURL(layerWmts._olayer);
+      const url = LegendHelper.getWMTSLegendURL(layerWmts._olayer);
       if (url) {
         icon_dpi = {
           url: url,
@@ -169,7 +168,7 @@ export class MFPLegendEncoder {
     }
     const layerNames = layerWms.layers?.split(',') ?? [];
     layerNames.forEach((name) => {
-      const url = WmsManager.getWMSLegendURL(layerWms.url, name, {
+      const url = LegendHelper.getWMSLegendURL(layerWms.url, name, {
         dpi,
         serverType,
         scale: this.options?.scale,

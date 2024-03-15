@@ -6,16 +6,16 @@ import type {
   MFPCapabilitiesLayoutAttribute,
   MFPCapabilitiesLayoutAttributeClientInfo,
   MFPPrintDatasource
-} from './tools/MFPTypes.ts';
-import type { EncodeLegendOptions, MFPLegendClass } from './tools/MFPLegendEncoder.ts';
-import type { Callback } from '../../tools/state/statemanager.ts';
+} from './tools/MFPTypes';
+import type { EncodeLegendOptions, MFPLegendClass } from './tools/MFPLegendEncoder';
+import type { Callback } from '../../tools/state/statemanager';
 
-import PrintManager from './tools/PrintManager.ts';
-import PrintMaskManager from './tools/printMaskManager.ts';
+import PrintManager from './tools/PrintManager';
+import PrintMaskManager from './tools/printMaskManager';
 import { toDegrees, toRadians } from 'ol/math';
-import { MapManager, I18nManager } from '../../tools/main.ts';
+import { MapManager, I18nManager } from '../../tools/main';
 import GirafeResizableElement from '../../base/GirafeResizableElement';
-import { deleteFeatureOlParams, unByKeyAll } from '../../tools/olutils.ts';
+import { deleteFeatureOlParams, unByKeyAll } from '../../tools/olutils';
 import { intersects } from 'ol/extent';
 import { padNumber } from 'ol/string';
 
