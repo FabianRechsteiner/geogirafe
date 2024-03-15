@@ -76,7 +76,8 @@ class I18nManager extends GirafeSingleton {
 
   getTranslation(key: string) {
     const currentLanguage = this.stateManager?.state?.language ?? 'en';
-    const translation = this.translations[currentLanguage][key];
+    const translationDict = this.translations[currentLanguage];
+    const translation = translationDict ? translationDict[key] : null;
     if (translation !== undefined && translation !== null) {
       return translation;
     }

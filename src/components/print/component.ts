@@ -15,8 +15,7 @@ import PrintMaskManager from './tools/printMaskManager';
 import { toDegrees, toRadians } from 'ol/math';
 import { MapManager, I18nManager } from '../../tools/main';
 import GirafeResizableElement from '../../base/GirafeResizableElement';
-import { deleteFeatureOlParams, unByKeyAll } from '../../tools/olutils';
-import { intersects } from 'ol/extent';
+import { unByKeyAll } from '../../tools/olutils';
 import { padNumber } from 'ol/string';
 
 /** Represents the status of a printing process. */
@@ -220,10 +219,9 @@ class PrintComponent extends GirafeResizableElement {
    * Can add datasource (based on selection) and a legend.
    * The status will be tracked until finished.
    */
-  async print() {
+  print() {
     const customAttributes = this.getCustomAttributes();
-
-    const spec = await this.printManager?.encode({
+    const spec = this.printManager?.encode({
       mapManager: this.mapManager,
       i18nManager: this.i18nManager,
       state: this.state,
@@ -484,59 +482,22 @@ class PrintComponent extends GirafeResizableElement {
    * @private
    */
   private initFormats() {
-    this.initPrintFormats();
-    this.initDefaultFormat();
-  }
-
-  /**
-   * Initializes the print formats based on the configuration.
-   * Removes formats not proposed by MFP.
-   * @private
-   */
-  private initPrintFormats() {
-    const configFormats = this.configManager.Config.print.formats ?? [];
-    this.printFormats = configFormats.filter((format) => {
-      if (this.capabilities?.formats.includes(format)) {
-        return true;
-      }
-      console.warn(`Format ${format} is not supported.`);
-      return false;
-    });
-  }
-
-  /**
-   * Initializes the default selected print format based on the configuration.
-   * @private
-   */
-  private initDefaultFormat() {
     const config = this.configManager.Config.print;
-    if (config.defaultFormat) {
-      if (this.printFormats.includes(config.defaultFormat)) {
-        this.state.print.format = config.defaultFormat;
-        return;
-      }
-      console.warn('Configured format does not exist: ', config.defaultFormat);
-    }
-    this.state.print.format = this.printFormats.length ? this.printFormats[0] : this.default_format;
+    const printFormats = config.formats;
+    this.printFormats = PrintComponent.filterValidPrintFormats(printFormats, this.capabilities?.formats);
+    const defaultFormat = config.defaultFormat;
+    const validFormat = PrintComponent.getValidDefaultFormat(this.printFormats, defaultFormat);
+    this.state.print.format = validFormat ?? this.default_format;
   }
 
   /**
    * Whitelist the available layouts with the config.print.layouts, or allows every of them.
+   * @private
    */
   private initLayouts() {
-    let layouts = this.capabilities?.layouts;
+    const availableLayouts = this.capabilities?.layouts;
     const configLayouts = this.configManager.Config.print.layouts;
-    if (configLayouts && configLayouts.length > 0) {
-      // Alerts user if a configured layout doesn't exist.
-      configLayouts.forEach((layoutName) => {
-        if (!layouts?.find((layout) => layout.name === layoutName)) {
-          console.warn('Configured layout does not exist: ', layoutName);
-        }
-      });
-      // Filter layouts with the config.
-      layouts = layouts?.filter((layout) => configLayouts.includes(layout.name));
-    }
-    this.layouts = layouts ?? [];
+    this.layouts = PrintComponent.filterValidLayouts(availableLayouts, configLayouts);
   }
 
   /**
@@ -552,18 +513,7 @@ class PrintComponent extends GirafeResizableElement {
    * @private
    */
   private updateScales(clientInfo: MFPCapabilitiesLayoutAttributeClientInfo) {
-    let scales = [...clientInfo.scales];
-    const configScales = this.configManager.Config.print.scales;
-    if (configScales && configScales.length > 0) {
-      configScales.forEach((configScale) => {
-        if (!scales?.find((scale) => scale === configScale)) {
-          console.warn('Configured scale does not exist: ', configScale);
-        }
-      });
-      // Filter scales with the config.
-      scales = scales?.filter((scale) => configScales.includes(scale));
-    }
-    this.scales = scales;
+    this.scales = PrintComponent.filterValidScales(clientInfo.scales, this.configManager.Config.print.scales);
     this.printMaskManager?.setPossibleScales(this.scales);
   }
 
@@ -736,32 +686,76 @@ class PrintComponent extends GirafeResizableElement {
     const scale = this.getSelectedScale() ?? -1;
     const pageSize = this.state.print.pageSize ?? [];
     const extent = this.printManager?.getExtent(pageSize, scale, center) || [0, 0, Infinity, Infinity];
-    return (
-      this.state.selection.selectedFeatures?.reduce((datasources, feature) => {
-        const featureExtent = feature.getGeometry()?.getExtent() ?? [];
-        if (!intersects(featureExtent, extent)) {
-          return datasources;
-        }
-        const id = feature.getId();
-        const rawTitle = id === undefined ? 'UNKNOWN' : `${id}`.split('.')[0];
-        const title = this.i18nManager.getTranslation(rawTitle);
-        const properties = deleteFeatureOlParams(feature);
-        const datasource = datasources.find((datasource) => datasource.title === title);
-        const values = Object.values(properties);
-        if (datasource) {
-          datasource.table.data.push(values);
-          return datasources;
-        }
-        datasources.push({
-          title,
-          table: {
-            data: [values],
-            columns: Object.keys(properties).map((column) => this.i18nManager.getTranslation(column))
-          }
-        });
-        return datasources;
-      }, [] as MFPPrintDatasource[]) || []
-    );
+    const selectedFeatures = this.state.selection.selectedFeatures ?? [];
+    return PrintManager.getPrintDatasourceFromSelectedFeatures(selectedFeatures, extent, this.i18nManager);
+  }
+
+  /**
+   * Get the print formats based on the configuration.
+   * Removes formats not proposed in the available formats.
+   * @static
+   */
+  static filterValidPrintFormats(
+    configFormats: string[] | undefined,
+    availableFormats: string[] | undefined
+  ): string[] {
+    configFormats = configFormats ?? [];
+    return configFormats.filter((format) => {
+      if (availableFormats?.includes(format)) {
+        return true;
+      }
+      console.warn(`Format ${format} is not supported.`);
+      return false;
+    });
+  }
+
+  /**
+   * @returns a valid default format from an array of print formats.
+   * @static
+   */
+  static getValidDefaultFormat(printFormats: string[], defaultFormat?: string): string | undefined {
+    if (defaultFormat) {
+      if (printFormats.includes(defaultFormat)) {
+        return defaultFormat;
+      }
+      console.warn('Configured format does not exist: ', defaultFormat);
+    }
+    return printFormats.length ? printFormats[0] : undefined;
+  }
+
+  /**
+   * Whitelist the availableLayouts with the given layouts, or allows every of them.
+   * @static
+   */
+  static filterValidLayouts(availableLayouts?: MFPCapabilitiesLayout[], layouts?: string[]): MFPCapabilitiesLayout[] {
+    if (!layouts || layouts.length <= 0) {
+      return availableLayouts ?? [];
+    }
+    // Alerts user if a configured layout doesn't exist.
+    layouts.forEach((layoutName) => {
+      if (!availableLayouts?.find((layout) => layout.name === layoutName)) {
+        console.warn('Configured layout does not exist: ', layoutName);
+      }
+    });
+    // Filter availableLayouts with the given layouts.
+    return availableLayouts?.filter((layout) => layouts.includes(layout.name)) ?? [];
+  }
+
+  /**
+   * Whitelist the availableScales with the given scales, or allows every of them.
+   * @static
+   */
+  static filterValidScales(availableScales: number[], scales?: number[]): number[] {
+    if (!scales || scales.length <= 0) {
+      return availableScales;
+    }
+    scales.forEach((scale) => {
+      if (availableScales.find((availableScale) => availableScale === scale)) {
+        console.warn('Configured scale does not exist: ', scale);
+      }
+    });
+    // Filter availableScales with the given scales.
+    return availableScales?.filter((scale) => scales.includes(scale));
   }
 }
 

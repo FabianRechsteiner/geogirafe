@@ -1,7 +1,10 @@
 import type { MFPSpec, MFPReportResponse, MFPCancelResponse } from '@geoblocks/mapfishprint';
 import type { MFPAttributes } from '@geoblocks/mapfishprint/src/types';
+import type Feature from 'ol/Feature';
+import type Geometry from 'ol/geom/Geometry';
 import type { EncodeLegendOptions, MFPLegendClass } from './MFPLegendEncoder';
 import type { State, I18nManager, MapManager } from '../../../tools/main';
+import type { MFPPrintDatasource } from './MFPTypes';
 
 import {
   BaseCustomizer,
@@ -12,6 +15,8 @@ import {
 } from '@geoblocks/mapfishprint';
 import { MFPLegendEncoder } from './MFPLegendEncoder';
 import MFPEncoder from './MFPEncoder';
+import { deleteFeatureOlParams } from '../../../tools/olutils';
+import { intersects } from 'ol/extent';
 
 /**
  * Represents encoding options to print the map.
@@ -76,10 +81,10 @@ export default class PrintManager {
    * Introspect the map and convert each of its layers to MFP v3 format.
    * @returns a top level MFP spec
    */
-  async encode(options: EncodeOptions): Promise<MFPSpec | null> {
+  encode(options: EncodeOptions): MFPSpec | null {
     const center = options.mapManager.getMap().getView().getCenter() || [0, 0];
     this.customizer.setPrintExtent(this.getExtent(options.pageSize, options.scale, center) || [0, 0, 0, 0]);
-    const mapSpec = await this.encoder.encodeMap({
+    const mapSpec = this.encoder.encodeMap({
       state: options.state,
       mapManager: options.mapManager,
       scale: options.scale,
@@ -117,5 +122,42 @@ export default class PrintManager {
    */
   getExtent(pageSize: number[], scale: number, center: number[]) {
     return getPrintExtentMFP(pageSize, center, scale);
+  }
+
+  /**
+   * Formats the data source for printing, based on selected features filtered by the given extent.
+   * @static
+   * */
+  static getPrintDatasourceFromSelectedFeatures(
+    selectedFeatures: Feature<Geometry>[],
+    extent: number[],
+    i18nManager: I18nManager
+  ): MFPPrintDatasource[] {
+    return (
+      selectedFeatures.reduce((datasources, feature) => {
+        const featureExtent = feature.getGeometry()?.getExtent() ?? [];
+        if (!intersects(featureExtent, extent)) {
+          return datasources;
+        }
+        const id = feature.getId();
+        const rawTitle = id === undefined ? 'UNKNOWN' : `${id}`.split('.')[0];
+        const title = i18nManager.getTranslation(rawTitle);
+        const properties = deleteFeatureOlParams(feature);
+        const datasource = datasources.find((datasource) => datasource.title === title);
+        const values = Object.values(properties);
+        if (datasource) {
+          datasource.table.data.push(values);
+          return datasources;
+        }
+        datasources.push({
+          title,
+          table: {
+            data: [values],
+            columns: Object.keys(properties).map((column) => i18nManager.getTranslation(column))
+          }
+        });
+        return datasources;
+      }, [] as MFPPrintDatasource[]) || []
+    );
   }
 }

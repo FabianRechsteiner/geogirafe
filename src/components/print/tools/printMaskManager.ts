@@ -3,7 +3,7 @@ import type { Callback } from '../../../tools/state/statemanager';
 import Map, { FrameState } from 'ol/Map';
 import PrintMaskLayer from './printMaskLayer';
 import { GeoConsts, StateManager } from '../../../tools/main';
-import { getLayerByName } from '../../../tools/olutils';
+import { getOlayerByName } from '../../../tools/olutils';
 import { Size } from 'ol/size';
 
 const PRINT_MASK_LAYER_NAME = 'PrintMask';
@@ -91,7 +91,7 @@ class PrintMaskManager {
    * @private
    */
   private onPrintMaskVisibleChanged() {
-    const isLayerInMap = getLayerByName(this.map, PRINT_MASK_LAYER_NAME);
+    const isLayerInMap = getOlayerByName(this.map, PRINT_MASK_LAYER_NAME);
     if (this.state.print.maskVisible && !isLayerInMap) {
       this.map.addLayer(this.printMaskLayer);
       return;

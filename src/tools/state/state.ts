@@ -56,7 +56,7 @@ type PrintConfig = {
   dpi: number | null;
 };
 
-type ServerOgc = {
+export type ServerOgc = {
   url: string;
   wfsSupport: boolean;
   urlWfs: string;
