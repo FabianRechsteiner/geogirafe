@@ -2,8 +2,8 @@ import type { Callback } from '../../../tools/state/statemanager';
 
 import Map, { FrameState } from 'ol/Map';
 import PrintMaskLayer from './printMaskLayer';
-import { GeoConsts, StateManager } from '../../../tools/main.ts';
-import { getLayerByName } from '../../../tools/olutils.ts';
+import { GeoConsts, StateManager } from '../../../tools/main';
+import { getLayerByName } from '../../../tools/olutils';
 import { Size } from 'ol/size';
 
 const PRINT_MASK_LAYER_NAME = 'PrintMask';

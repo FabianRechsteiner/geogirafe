@@ -4,7 +4,7 @@ import TileLayer from 'ol/layer/Tile';
 import { Map } from 'ol';
 import { Layer as OLayer } from 'ol/layer';
 import LayerWmts from '../../../models/layers/layerwmts';
-import { StateManager } from '../../../tools/main';
+import StateManager from '../../../tools/state/statemanager';
 
 class WmtsManager {
   map: Map;
@@ -44,7 +44,7 @@ class WmtsManager {
   }
 
   #addLayerInternal(layer: LayerWmts, isBasemap: boolean) {
-    this.#getWmtsCapabilities(layer.url!, (capabilities) => {
+    this.#getWmtsCapabilities(layer.url, (capabilities) => {
       const options = optionsFromCapabilities(capabilities, {
         layer: layer.layers,
         projection: this.state.projection
@@ -159,24 +159,6 @@ class WmtsManager {
         });
     }
   }
-
-  /**
-   * Retrieves the legend URL for a given WMTS tile layer.
-   * @param {TileLayer<WMTS>} olayer - The OpenLayers tile layer object.
-   * @returns The legend URL or undefined if not found.
-   */
-  static getWMTSLegendURL = (olayer: TileLayer<WMTS>): string | undefined => {
-    // BGE case of multiple styles ?  case of multiple legendUrl ?
-    const styles = olayer.get('capabilitiesStyles');
-    if (!Array.isArray(styles) || styles.length <= 0) {
-      return;
-    }
-    const legendURL = styles[0].LegendURL;
-    if (!Array.isArray(legendURL) || legendURL.length <= 0) {
-      return;
-    }
-    return legendURL[0].href;
-  };
 }
 
 export default WmtsManager;

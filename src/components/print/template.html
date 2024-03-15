@@ -18,7 +18,7 @@
             ${this.layouts.map((layout) => uHtml`
             <option
               i18n="${layout.name}"
-              ?selected="${this.selectedLayout.name === layout.name}"
+              ?selected="${this.selectedLayout?.name === layout.name}"
               value="${layout.name}">
               ${layout.name}
             </option>

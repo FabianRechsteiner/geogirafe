@@ -9,6 +9,6 @@ export { default as WfsManager } from './wfsmanager';
 export { default as GeoConsts } from './geoconsts';
 export { niceCoordinates } from './geometrytools';
 export { default as LayerManager } from './layermanager';
-export { default as MapManager } from './state/mapManager.ts';
+export { default as MapManager } from './state/mapManager';
 export { default as State } from './state/state';
 export { default as MapPosition } from './state/mapposition.js';
