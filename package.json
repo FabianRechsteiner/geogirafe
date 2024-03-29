@@ -42,7 +42,7 @@
     "uuid": "9.0.1"
   },
   "peerDependencies": {
-    "@geoblocks/mapfishprint": "^0.2.6",
+    "@geoblocks/mapfishprint": "^0.2.10",
     "@types/geojson": "7946.0.14",
     "cesium": "^1.113.0",
     "ol": "^8.1.0",
