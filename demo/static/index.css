@@ -640,12 +640,8 @@
   }
 }
 
-h4 {
+h3 span {
   font-size: 1.2rem;
-  font-stretch: condensed;
-}
-
-h4 span {
-  font-size: 1rem;
   font-weight: 300;
 }
+
