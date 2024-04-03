@@ -28,6 +28,7 @@ import NavBookmarksComponent from './components/navigation/navbookmarks/componen
 import NavHelperComponent from './components/navigation/navhelper/component';
 import PrintComponent from './components/print/component';
 import ProjectionComponent from './components/projection/component';
+import PrototypeBannerComponent from './components/prototypebanner/component.js';
 import QueryBuilderComponent from './components/querybuilder/component';
 import RedliningComponent from './components/redlining/component.js';
 import ScaleComponent from './components/scale/component.js';
@@ -105,6 +106,7 @@ customElements.define('girafe-menu-button', MenuButtonComponent);
 customElements.define('girafe-nav-bookmarks', NavBookmarksComponent);
 customElements.define('girafe-nav-history', NavHelperComponent);
 customElements.define('girafe-print', PrintComponent);
+customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
 customElements.define('girafe-proj-select', ProjectionComponent);
 customElements.define('girafe-query-builder', QueryBuilderComponent);
 customElements.define('girafe-redlining', RedliningComponent);
