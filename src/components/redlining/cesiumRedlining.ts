@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import { Cartesian3, Entity } from 'cesium';
-import RedliningFeature, { RedliningShape } from './redliningFeature';
+import RedliningFeature from './redliningFeature';
+import RedliningShape from './redliningshape';
 
 import { MapComponent } from '../main';
 import ComponentManager from '../../tools/state/componentManager';

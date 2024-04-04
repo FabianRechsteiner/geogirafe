@@ -1,5 +1,6 @@
 import ConfigManager from '../../tools/configuration/configmanager';
 import StateManager from '../../tools/state/statemanager';
+import RedliningShape from './redliningshape';
 import ShapeNamer from './shapeNamer';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,17 +19,6 @@ type SerializedFeature = {
   g: object;
   t: RedliningShape;
 };
-
-export enum RedliningShape {
-  Point,
-  Polyline,
-  Polygon,
-  Square,
-  Rectangle,
-  Disk,
-  FreehandPolyline,
-  FreehandPolygon
-}
 
 export default class RedliningFeature {
   private _uid: string = uuidv4();

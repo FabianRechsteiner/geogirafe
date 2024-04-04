@@ -2,7 +2,8 @@ import GirafeResizableElement from '../../base/GirafeResizableElement';
 
 import GeoEvents from '../../models/events';
 import Picker from 'vanilla-picker/csp';
-import RedliningFeature, { RedliningShape } from './redliningFeature';
+import RedliningFeature from './redliningFeature';
+import RedliningShape from './redliningshape';
 import OlRedlining from './olRedlining';
 import CesiumRedlining from './cesiumRedlining';
 

@@ -13,7 +13,8 @@ import VectorLayer from 'ol/layer/Vector';
 import { getArea, getLength } from 'ol/sphere.js';
 import GeoJSON from 'ol/format/GeoJSON';
 
-import RedliningFeature, { RedliningShape } from './redliningFeature';
+import RedliningFeature from './redliningFeature';
+import RedliningShape from './redliningshape';
 
 // Global required because the ol Draw tool creates a new ol Feature without the possibility of giving it the GeoGirafe shape
 let currentShape: RedliningShape | null = null;

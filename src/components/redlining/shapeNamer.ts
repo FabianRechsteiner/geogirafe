@@ -1,4 +1,4 @@
-import { RedliningShape } from './redliningFeature';
+import RedliningShape from './redliningshape';
 
 export default class ShapeNamer {
   static getRandomName(type: RedliningShape) {

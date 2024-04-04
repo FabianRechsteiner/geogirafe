@@ -33,8 +33,7 @@ class StateSerializer {
       g: {
         d: state.globe.display
       },
-      l: sharedLayers,
-      f: {}
+      l: sharedLayers
     };
 
     // Drawn features

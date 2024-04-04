@@ -72,6 +72,10 @@ describe('Components architecture', () => {
       {
         oa: path.join(__dirname, path.normalize('models/layers/baselayer.ts')),
         ob: path.join(__dirname, path.normalize('models/layers/grouplayer.ts'))
+      },
+      {
+        oa: path.join(__dirname, path.normalize('base/GirafeHTMLElement.ts')),
+        ob: path.join(__dirname, path.normalize('tools/state/componentManager.ts'))
       }
     ];
 

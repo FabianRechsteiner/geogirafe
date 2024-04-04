@@ -32,5 +32,5 @@ export type SharedState = {
     i: number; // id
   };
   l: SharedLayer[]; // layers;
-  f: unknown;
+  f?: unknown; // Drawn features
 };

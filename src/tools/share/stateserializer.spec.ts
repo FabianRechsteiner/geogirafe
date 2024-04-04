@@ -169,8 +169,7 @@ describe('StateSerializer.getSerializedState', () => {
       g: {
         d: 'none'
       },
-      l: [],
-      f: []
+      l: []
     });
   });
 });
