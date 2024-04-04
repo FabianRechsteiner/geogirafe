@@ -1,8 +1,8 @@
 import { BaseLayer, GroupLayer, Layer } from '../../models/main';
-import { SharedFeature, SharedLayer, SharedState } from './sharedstate';
+import { SharedLayer, SharedState } from './sharedstate';
 import LZString from 'lz-string';
-import { LayerManager, RedliningFeature, State } from '../main';
-import FeatureSerializer from './featureserializer';
+import { LayerManager, State } from '../main';
+import ComponentManager from '../state/componentManager';
 
 class StateSerializer {
   layerManager: LayerManager;
@@ -21,9 +21,6 @@ class StateSerializer {
     // Treeview configuration and layers
     const sharedLayers = this.getSerializedLayerTree(state.layers.layersList);
 
-    // Drawn features
-    const sharedFeatures = this.getSerializedDrawnFeatures(state.redlining.features);
-
     // Position, Advanced mode, Globe, Basemap
     const sharedState: SharedState = {
       p: {
@@ -37,8 +34,14 @@ class StateSerializer {
         d: state.globe.display
       },
       l: sharedLayers,
-      f: sharedFeatures
+      f: {}
     };
+
+    // Drawn features
+    const redliningComponents = ComponentManager.getInstance().getComponentsByName('redlining');
+    if (redliningComponents != undefined) {
+      sharedState.f = redliningComponents[0].serialize();
+    }
 
     // Is there a basemap ?
     if (state.activeBasemap) {
@@ -83,12 +86,6 @@ class StateSerializer {
       e: Number(isExpanded),
       z: sharedChildren
     };
-  }
-
-  private getSerializedDrawnFeatures(features: RedliningFeature[]): SharedFeature[] {
-    const olFeatures = features.map((f: RedliningFeature) => f._olFeature);
-    // TODO REG: Configure the geometry precision in the configuration depending on the SRID.
-    return new FeatureSerializer(3).getSerializedFeatures(olFeatures);
   }
 }
 

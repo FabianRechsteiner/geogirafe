@@ -1,4 +1,3 @@
-export { default as RedliningFeature } from './state/redliningfeature';
 export { default as ConfigManager } from './configuration/configmanager';
 export { default as I18nManager } from './i18nmanager';
 export { default as MessageManager } from './messagemanager';

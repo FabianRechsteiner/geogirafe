@@ -1,51 +1,44 @@
-import Map from 'ol/Map';
-
-import VectorSource, { VectorSourceEvent } from 'ol/source/Vector';
-import Style, { StyleLike } from 'ol/style/Style';
-import Stroke from 'ol/style/Stroke';
-import Text from 'ol/style/Text';
-import Fill from 'ol/style/Fill';
-import Circle from 'ol/style/Circle';
-import VectorLayer from 'ol/layer/Vector';
-import Collection from 'ol/Collection';
-import { platformModifierKeyOnly } from 'ol/events/condition';
-import { Modify, Snap, DragBox } from 'ol/interaction';
-import Draw, { createBox, createRegularPolygon } from 'ol/interaction/Draw';
+import { Map, Feature, MapBrowserEvent, MapEvent, Collection } from 'ol';
+import { Style, Stroke, Fill, Circle } from 'ol/style';
 import { ProjectionLike, get as getProjection } from 'ol/proj';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import { platformModifierKeyOnly } from 'ol/events/condition';
+import { DragBox } from 'ol/interaction';
 import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
 import { unByKey } from 'ol/Observable';
-import { v4 as uuidv4 } from 'uuid';
 import { ScaleLine } from 'ol/control';
+import { DragBoxEvent } from 'ol/interaction/DragBox';
+import { Extent } from 'ol/extent';
+import { Geometry } from 'ol/geom';
+import { EventsKey } from 'ol/events';
+import RenderEvent from 'ol/render/Event';
+import { Coordinate } from 'ol/coordinate';
 
-import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import GeoEvents from '../../models/events';
+import { Cesium3DTileset } from 'cesium';
+
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
 import OsmManager from './tools/osmmanager';
 import VectorTilesManager from './tools/vectortilesmanager';
 import WmtsManager from './tools/wmtsmanager';
 import ViewManager from './tools/viewmanager';
-import RedliningFeature from '../../tools/state/redliningfeature';
+import LocalFileManager from './tools/localfilemanager';
+
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+
 import Basemap from '../../models/basemap';
-import { Feature, MapBrowserEvent, MapEvent } from 'ol';
-import { Geometry } from 'ol/geom';
-import { EventsKey } from 'ol/events';
-import RenderEvent from 'ol/render/Event';
-import { Coordinate } from 'ol/coordinate';
 import Layer from '../../models/layers/layer';
-import { Type } from 'ol/geom/Geometry';
-import { DragBoxEvent } from 'ol/interaction/DragBox';
-import { Extent } from 'ol/extent';
 import LayerOsm from '../../models/layers/layerosm';
 import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
-import MapPosition from '../../tools/state/mapposition';
-import LocalFileManager from './tools/localfilemanager';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
+import GeoEvents from '../../models/events';
+
 import MapManager from '../../tools/state/mapManager';
-import FeatureManager from './tools/featuremanager';
+import MapPosition from '../../tools/state/mapposition';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -54,11 +47,11 @@ declare global {
   }
 }
 
-class MapComponent extends GirafeHTMLElement {
+export default class MapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  map: Map;
+  olMap: Map;
   mapTarget!: HTMLDivElement;
   // TODO REG : Howto use the right type here without importing the whole library (it needs to be imported only on demand) ?
   // This works but needs the library: type OLCesiumType = typeof OLCesium;
@@ -80,14 +73,6 @@ class MapComponent extends GirafeHTMLElement {
     return getProjection(this.srid);
   }
 
-  // For Redlining
-  redliningFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
-  redliningSource!: VectorSource;
-  redliningSourceAddCallback = (e: VectorSourceEvent) => this.onFeatureAdded(e);
-  redliningLayer: VectorLayer<VectorSource> | null = null;
-  draw: Draw | null = null;
-  snap!: Snap;
-
   // For object selection
   selectedFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   focusedFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
@@ -99,13 +84,13 @@ class MapComponent extends GirafeHTMLElement {
 
   constructor() {
     super('map');
-    this.map = MapManager.getInstance().getMap();
+    this.olMap = MapManager.getInstance().getMap();
   }
 
   registerEvents() {
     this.messageManager.register(this.onCustomGirafeEvent.bind(this));
 
-    this.swiper.addEventListener('input', () => this.map.render());
+    this.swiper.addEventListener('input', () => this.olMap.render());
 
     this.stateManager.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) =>
       this.onChangeBasemap(newBasemap)
@@ -141,15 +126,6 @@ class MapComponent extends GirafeHTMLElement {
         this.onSwipedLayersChanged(newLayers)
     );
 
-    this.stateManager.subscribe('redlining.activeTool', (_oldTool: string | null, newTool: string | null) =>
-      this.onRedliningToolChanged(newTool)
-    );
-    this.stateManager.subscribe(
-      'redlining.features',
-      (oldFeatures: RedliningFeature[], newFeatures: RedliningFeature[]) =>
-        this.onFeaturesChanged(oldFeatures, newFeatures)
-    );
-
     this.stateManager.subscribe('globe.display', () => this.onGlobeToggled());
 
     this.stateManager.subscribe(
@@ -175,18 +151,18 @@ class MapComponent extends GirafeHTMLElement {
     // Initialize the map element
     this.mapTarget = this.shadow.getElementById('ol-map') as HTMLDivElement;
     this.map3dTarget = this.shadow.getElementById('cs-map') as HTMLDivElement;
-    this.map.setTarget(this.mapTarget);
+    this.olMap.setTarget(this.mapTarget);
 
     // Initialize managers
-    this.wmsManager = new WmsManager(this.map);
-    this.osmManager = new OsmManager(this.map);
-    this.viewManager = new ViewManager(this.map);
-    this.vectorTilesManager = new VectorTilesManager(this.map);
-    this.localFileManager = new LocalFileManager(this.map);
-    this.wmtsManager = new WmtsManager(this.map);
+    this.wmsManager = new WmsManager(this.olMap);
+    this.osmManager = new OsmManager(this.olMap);
+    this.viewManager = new ViewManager(this.olMap);
+    this.vectorTilesManager = new VectorTilesManager(this.olMap);
+    this.localFileManager = new LocalFileManager(this.olMap);
+    this.wmtsManager = new WmtsManager(this.olMap);
     this.swiper = this.shadow.getElementById('swiper') as HTMLInputElement;
     this.swipeManager = new SwipeManager(
-      this.map,
+      this.olMap,
       this.swiper,
       this.wmtsManager,
       this.wmsManager,
@@ -195,22 +171,7 @@ class MapComponent extends GirafeHTMLElement {
 
     // View
     const view = this.viewManager.getView();
-    this.map.setView(view);
-
-    // Create vector source for drawing
-    this.redliningSource = new VectorSource({
-      features: this.redliningFeaturesCollection
-    });
-    this.redliningLayer = new VectorLayer({
-      properties: {
-        addToPrintedLayers: true
-      },
-      source: this.redliningSource
-      //style: (feature) => this.getDefaultStyle(feature)
-    });
-    this.map.addLayer(this.redliningLayer);
-    this.redliningLayer.setZIndex(1001);
-    this.redliningLayer.set('altitudeMode', 'clampToGround');
+    this.olMap.setView(view);
 
     // Create layer for selection
     const selectionSource = new VectorSource({
@@ -240,7 +201,7 @@ class MapComponent extends GirafeHTMLElement {
           })
         })
       });
-      this.map.addLayer(this.selectionLayer);
+      this.olMap.addLayer(this.selectionLayer);
       this.selectionLayer.setZIndex(1002);
 
       // Create layer for focus
@@ -272,14 +233,14 @@ class MapComponent extends GirafeHTMLElement {
           })
         })
       });
-      this.map.addLayer(this.focusLayer);
+      this.olMap.addLayer(this.focusLayer);
       this.focusLayer.setZIndex(1003);
 
       if (this.configManager.Config.map.showScaleLine) {
         const scaleLine = new ScaleLine({
           units: 'metric'
         });
-        this.map.addControl(scaleLine);
+        this.olMap.addControl(scaleLine);
       }
     });
 
@@ -287,69 +248,37 @@ class MapComponent extends GirafeHTMLElement {
     this.dragbox = new DragBox({
       condition: platformModifierKeyOnly
     });
-    this.map.addInteraction(this.dragbox);
+    this.olMap.addInteraction(this.dragbox);
     this.dragbox.on('boxend', (e) => this.onDragSelection(e));
 
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {
-      this.map.updateSize();
+      this.olMap.updateSize();
     }, 1000);
-  }
-
-  getDefaultStyle(feature: Feature) {
-    const strokeColor = feature.get('strokeColor')
-      ? feature.get('strokeColor')
-      : this.configManager.Config.redlining.defaultStrokeColor;
-    const strokeWidth = feature.get('strokeWidth')
-      ? feature.get('strokeWidth')
-      : this.configManager.Config.redlining.defaultStrokeWidth;
-    const fillColor = feature.get('fillColor')
-      ? feature.get('fillColor')
-      : this.configManager.Config.redlining.defaultFillColor;
-    const textSize = feature.get('textSize')
-      ? feature.get('textSize')
-      : this.configManager.Config.redlining.defaultTextSize;
-
-    return new Style({
-      stroke: new Stroke({ color: strokeColor, width: strokeWidth }),
-      fill: new Fill({ color: fillColor }),
-      image: new Circle({
-        radius: 7,
-        fill: new Fill({ color: fillColor }),
-        stroke: new Stroke({ color: strokeColor, width: strokeWidth })
-      }),
-      text: new Text({
-        text: feature.get('name'),
-        font: 'Bold ' + textSize + 'px/1 ' + this.configManager.Config.redlining.defaultFont
-      })
-    });
   }
 
   listenOpenLayersEvents() {
     // https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html
-    //this.map.on('change', (e) => console.log(e));
-    this.map.on('singleclick', (e) => this.onClick(e));
-    //this.map.on('click', (e) => console.log(e));
-    //this.map.on('dblclick', (e) => console.log(e));
-    //this.map.on('error', (e) => console.log(e));
-    this.map.on('loadstart', (e) => this.onLoadStart(e));
-    this.map.on('loadend', (e) => this.onLoadEnd(e));
-    this.map.on('moveend', (e) => this.onMoveEnd(e));
-    //this.map.on('movestart', (e) => console.log(e));
-    //this.map.on('pointerdrag', (e) => console.log(e));
-    this.map.on('pointermove', (e) => this.onPointerMove(e));
-    //this.map.on('postcompose', (e) => console.log(e));
-    //this.map.on('postrender', (e) => console.log(e));
-    //this.map.on('precompose', (e) => console.log(e));
-    //this.map.on('propertychange', (e) => console.log(e));
-    //this.map.on('rendercomplete', (e) => this.onRenderComplete(e));
+    //this.olMap.on('change', (e) => console.log(e));
+    this.olMap.on('singleclick', (e) => this.onClick(e));
+    //this.olMap.on('click', (e) => console.log(e));
+    //this.olMap.on('dblclick', (e) => console.log(e));
+    //this.olMap.on('error', (e) => console.log(e));
+    this.olMap.on('loadstart', (e) => this.onLoadStart(e));
+    this.olMap.on('loadend', (e) => this.onLoadEnd(e));
+    this.olMap.on('moveend', (e) => this.onMoveEnd(e));
+    //this.olMap.on('movestart', (e) => console.log(e));
+    //this.olMap.on('pointerdrag', (e) => console.log(e));
+    this.olMap.on('pointermove', (e) => this.onPointerMove(e));
+    //this.olMap.on('postcompose', (e) => console.log(e));
+    //this.olMap.on('postrender', (e) => console.log(e));
+    //this.olMap.on('precompose', (e) => console.log(e));
+    //this.olMap.on('propertychange', (e) => console.log(e));
+    //this.olMap.on('rendercomplete', (e) => this.onRenderComplete(e));
     //? change:layerGroup
     //? change:size
     //? change:target
     //? change:view
-
-    // Drawing events
-    this.redliningSource.on('addfeature', this.redliningSourceAddCallback);
   }
 
   onLoadStart(_e: MapEvent) {
@@ -365,7 +294,7 @@ class MapComponent extends GirafeHTMLElement {
   }
 
   onMoveEnd(_e: MapEvent) {
-    const view = this.map.getView();
+    const view = this.olMap.getView();
 
     const newPosition = new MapPosition();
     newPosition.center = view.getCenter()!;
@@ -381,9 +310,9 @@ class MapComponent extends GirafeHTMLElement {
   onClick(e: MapBrowserEvent<UIEvent>) {
     // Build selectionbox using the default tolerance
     const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
-    const topLeftCoord = this.map.getCoordinateFromPixel(topLeftPixel);
+    const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);
     const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
-    const bottomRightCoord = this.map.getCoordinateFromPixel(bottomRightPixel);
+    const bottomRightCoord = this.olMap.getCoordinateFromPixel(bottomRightPixel);
     const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
 
     this.select(extent);
@@ -451,29 +380,7 @@ class MapComponent extends GirafeHTMLElement {
       // TODO BGE: Animation are bad for performances and should be optimized. First by re-rendering only the
       //  concerned layer and not the whole map. the style must be cached too, etc.
       // tell OpenLayers to continue postrender animation
-      _this.map.render();
-    }
-  }
-
-  onFeatureAdded(e: VectorSourceEvent) {
-    if (e.feature) {
-      const olFeature: Feature<Geometry> = e.feature;
-      if (!olFeature.getId()) {
-        // This feature does not have any Id yet.
-        // It means it was just drawn on the map.
-        // Otherwise, it would already have an id
-        olFeature.setId(uuidv4());
-        // Set the default feature name
-        const name = new FeatureManager().getRandomName(olFeature);
-        olFeature.set('name', name);
-
-        // Add it to the state.
-        const feature = new RedliningFeature(olFeature);
-        this.state.redlining.features.push(feature);
-      }
-
-      // In all cases, we have to set the style function
-      olFeature.setStyle(((feature: Feature) => this.getDefaultStyle(feature)) as StyleLike);
+      _this.olMap.render();
     }
   }
 
@@ -491,7 +398,7 @@ class MapComponent extends GirafeHTMLElement {
     if (details.action === GeoEvents.zoomToExtent) {
       this.zoomToExtent(details.extent);
     } else if (details.action === GeoEvents.undoDraw) {
-      this.draw!.removeLastPoint();
+      //this.redliningManager.removeLastPoint();
     }
   }
 
@@ -522,19 +429,16 @@ class MapComponent extends GirafeHTMLElement {
     if (!this.map3d && this.configManager.Config.map3d) {
       this.loading = true;
       super.render();
-      // First : Lazy loading of cesium and olcs
+      // First : Lazy loading of Cesium and olcs
       const Cesium = await import('cesium');
       window.Cesium = Cesium;
 
-      const olcs = await import('olcs/OLCesium');
+      const olcs = await import('olcs');
       const OLCesium = olcs.default;
-
-      // Remove the event, because OLCesium adds another event during addfeature that must be called before
-      this.redliningSource.un('addfeature', this.redliningSourceAddCallback);
 
       // Initialize the 3D Map
       this.map3d = new OLCesium({
-        map: this.map,
+        map: this.olMap,
         target: this.map3dTarget,
         time: () => {
           const date = new Date(timeDatePicker.value);
@@ -547,8 +451,6 @@ class MapComponent extends GirafeHTMLElement {
       });
       const scene = this.map3d.getCesiumScene();
       const config = this.configManager.Config.map3d;
-
-      this.redliningSource.on('addfeature', this.redliningSourceAddCallback);
 
       // Add terrain
       if (config.terrainUrl) {
@@ -582,7 +484,7 @@ class MapComponent extends GirafeHTMLElement {
         dynamicScreenSpaceErrorFactor: config.tilesetsMaxError ?? 7
       };
       config.tilesetsUrls.forEach((tilesetUrl) => {
-        Cesium.Cesium3DTileset.fromUrl(tilesetUrl, tilesetOptions).then((tileset) => scene.primitives.add(tileset));
+        Cesium3DTileset.fromUrl(tilesetUrl, tilesetOptions).then((t: Cesium3DTileset) => scene.primitives.add(t));
       });
 
       // Shadows and lighting
@@ -621,6 +523,7 @@ class MapComponent extends GirafeHTMLElement {
       ambientOcclusion.uniforms.blurStepSize = 1;
 
       this.loading = false;
+      this.state.globe.loaded = true;
       super.render();
     }
   }
@@ -687,7 +590,7 @@ class MapComponent extends GirafeHTMLElement {
     this.viewManager.setZoom(zoom);
   }
   zoomToExtent(extent: Extent) {
-    this.map.getView().fit(extent);
+    this.olMap.getView().fit(extent);
   }
 
   panToCoordinate(coordinate: Coordinate) {
@@ -697,7 +600,7 @@ class MapComponent extends GirafeHTMLElement {
   onChangeProjection(_oldSrid: string, newSrid: string) {
     this.srid = newSrid;
     const newView = this.viewManager.getViewConvertedToSrid(newSrid);
-    this.map.setView(newView);
+    this.olMap.setView(newView);
   }
 
   onChangeDarkMode() {
@@ -804,106 +707,4 @@ layers.forEach(layerInfos => {
       }
     });
   }
-
-  onFeaturesChanged(oldFeatures: RedliningFeature[], newFeatures: RedliningFeature[]) {
-    let deletedFeatures: RedliningFeature[] = [];
-    let addedFeatures: RedliningFeature[] = [];
-    if (Array.isArray(newFeatures) && Array.isArray(oldFeatures)) {
-      // We received a list of features
-      deletedFeatures = oldFeatures.filter(
-        (oldFeature) =>
-          !newFeatures.find((newFeature) => newFeature._olFeature.getId() === oldFeature._olFeature.getId())
-      );
-      addedFeatures = newFeatures.filter(
-        (newFeature) =>
-          !oldFeatures.find((oldFeature) => oldFeature._olFeature.getId() === newFeature._olFeature.getId())
-      );
-    } else {
-      if (!this.isNullOrUndefined(oldFeatures)) {
-        deletedFeatures.push(...oldFeatures);
-      }
-      if (!this.isNullOrUndefined(newFeatures)) {
-        addedFeatures.push(...newFeatures);
-      }
-    }
-
-    deletedFeatures.forEach((feature) => {
-      this.deleteFeature(feature._olFeature);
-    });
-
-    addedFeatures.forEach((feature) => {
-      this.addFeature(feature._olFeature);
-    });
-  }
-
-  deleteFeature(feature: Feature) {
-    const toRemove = this.redliningFeaturesCollection.getArray().find((f) => f.getId() === feature.getId());
-    if (!this.isNullOrUndefined(toRemove)) {
-      this.redliningFeaturesCollection.remove(toRemove!);
-    }
-  }
-
-  addFeature(feature: Feature) {
-    const existingFeature = this.redliningFeaturesCollection.getArray().find((f) => f.getId() === feature.getId());
-    // If the feature already exists in the local list of drawn features, there is nothing to do.
-    // Otherwise, it means that the feature was added to the list od redlining object from somewhere else
-    // For example from the encoded URL. In this case, we add the feature to the local list of objects
-    if (!existingFeature) {
-      this.redliningFeaturesCollection.push(feature);
-    }
-  }
-
-  onRedliningToolChanged(tool: string | null) {
-    if (tool === null) {
-      this.deactivateRedliningTool();
-    } else {
-      this.activateRedliningTool(tool);
-    }
-  }
-
-  activateRedliningTool(tool: string) {
-    // First remove existing interaction.
-    this.deactivateRedliningTool();
-
-    let geometryFunction = undefined;
-    let freehand = false;
-    if (tool === 'Square') {
-      tool = 'Circle';
-      geometryFunction = createRegularPolygon(4);
-    } else if (tool === 'Rectangle') {
-      tool = 'Circle';
-      geometryFunction = createBox();
-    } else if (tool === 'Freeline') {
-      tool = 'LineString';
-      freehand = true;
-    } else if (tool === 'Freepolygon') {
-      tool = 'Polygon';
-      freehand = true;
-    }
-
-    this.draw = new Draw({
-      source: this.redliningSource,
-      type: tool as Type,
-      freehand: freehand,
-      geometryFunction: geometryFunction
-    });
-    this.map.addInteraction(this.draw);
-
-    const modify = new Modify({ source: this.redliningSource });
-    this.map.addInteraction(modify);
-
-    this.snap = new Snap({ source: this.redliningSource });
-    this.map.addInteraction(this.snap);
-  }
-
-  deactivateRedliningTool() {
-    if (this.draw) {
-      this.map.removeInteraction(this.draw);
-    }
-    if (this.snap) {
-      this.map.removeInteraction(this.snap);
-    }
-  }
 }
-
-export default MapComponent;

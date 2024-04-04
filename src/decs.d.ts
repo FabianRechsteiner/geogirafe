@@ -1,3 +1,3 @@
 declare module 'uhtml';
 declare module 'tippy.js';
-declare module 'olcs/OLCesium';
+declare module 'olcs';

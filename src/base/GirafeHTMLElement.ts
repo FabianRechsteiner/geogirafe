@@ -5,6 +5,7 @@ import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
 import ConfigManager from '../tools/configuration/configmanager';
 import StateManager from '../tools/state/statemanager';
+import ComponentManager from '../tools/state/componentManager';
 
 type TippyType = typeof tippy;
 
@@ -12,7 +13,7 @@ class GirafeHTMLElement extends HTMLElement {
   templateUrl: string | null = null;
   styleUrl: string | null = null;
   template?: Renderable | (() => Renderable);
-  component: string;
+  name: string;
   shadow: ShadowRoot;
 
   activeTooltips: TippyType[] = [];
@@ -25,13 +26,14 @@ class GirafeHTMLElement extends HTMLElement {
     return this.stateManager.state;
   }
 
-  constructor(component: string) {
+  constructor(name: string) {
     super();
-    this.component = component;
+    this.name = name;
 
     this.configManager = ConfigManager.getInstance();
     this.messageManager = MessageManager.getInstance();
     this.stateManager = StateManager.getInstance();
+    ComponentManager.getInstance().registerComponent(this);
 
     this.shadow = this.attachShadow({ mode: 'open' });
 
@@ -141,7 +143,7 @@ class GirafeHTMLElement extends HTMLElement {
    * Useful to render a placeholder for not visible component.
    */
   renderEmpty() {
-    uRender(this.shadow, uHtml`<span style="display: none">${this.component}</span>`);
+    uRender(this.shadow, uHtml`<span style="display: none">${this.name}</span>`);
   }
 
   /**
@@ -150,6 +152,21 @@ class GirafeHTMLElement extends HTMLElement {
   hide() {
     this.style.display = 'none';
   }
+
+  /**
+   * Returns the serialization of the current element. This method should be
+   * overwritten by child classes
+   * @returns An object describing the current element serialized
+   */
+  serialize() {
+    return {};
+  }
+
+  /**
+   * Deserialize an element and set the current element state to the deserialized one
+   * @param _serializedElement The element serialization as returned by the serialize method
+   */
+  deserialize(_serializedElement: unknown) {}
 }
 
 export default GirafeHTMLElement;
