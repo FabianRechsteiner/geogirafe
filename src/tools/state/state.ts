@@ -5,7 +5,6 @@ import Theme from '../../models/theme';
 import BaseLayer from '../../models/layers/baselayer';
 import LayerWms from '../../models/layers/layerwms';
 import MapPosition from './mapposition';
-import RedliningFeature from './redliningfeature';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -38,11 +37,6 @@ type LayersConfig = {
   };
 };
 
-type RedliningConfig = {
-  activeTool: boolean | null;
-  features: RedliningFeature[];
-};
-
 type TreeviewConfig = {
   advanced: boolean;
 };
@@ -67,6 +61,7 @@ export type ServerOgc = {
 // Current 3D-Globe state
 type GlobeConfig = {
   display: 'none' | 'full' | 'side';
+  loaded: boolean;
 };
 
 export type InfoBoxContent = {
@@ -75,7 +70,7 @@ export type InfoBoxContent = {
   type: 'info' | 'warning' | 'error';
 };
 
-class State {
+export default class State {
   /**
    * This class is a used as the state of the application, which will be accessed behind a javascript proxy.
    * This means that each modification made to its properties must come from outside,
@@ -139,12 +134,6 @@ class State {
     }
   };
 
-  // Current redlining state
-  redlining: RedliningConfig = {
-    activeTool: null,
-    features: []
-  };
-
   // Current Treeview state
   treeview: TreeviewConfig = {
     advanced: false
@@ -162,7 +151,8 @@ class State {
   // Current 3D-Globe state
   globe: GlobeConfig = {
     // Possible values : ['full, 'side', 'none']
-    display: 'none'
+    display: 'none',
+    loaded: false
   };
 
   // To manage selected and focused features
@@ -181,7 +171,5 @@ class State {
   // The State object is defined as <not extensible> by the StateManager.
   // This property can be used by third-parts components or extensions
   // to add custom attributes to the state.
-  extendedState = {};
+  extendedState: Record<string, object> = {};
 }
-
-export default State;

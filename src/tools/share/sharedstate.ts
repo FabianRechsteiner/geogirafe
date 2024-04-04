@@ -10,27 +10,6 @@ export type SharedLayer = {
   z: SharedLayer[]; // children
 };
 
-export type SharedFeatureAttributes = {
-  n?: string; // Name
-  o?: string; // StrokeColor;
-  w?: number; // StrokeWidth;
-  f?: string; // FillColor;
-  t?: number; // TextSize;
-};
-
-export enum SharedGeometryType {
-  Point = 0,
-  LineString = 1,
-  Polygon = 2,
-  Circle = 3
-}
-
-export type SharedFeature = {
-  t: SharedGeometryType;
-  g: Coordinate | Coordinate[] | Coordinate[][] | [Coordinate, number]; // Geometry/Coordinates if supported by GEOJSon (not a circle), Center + Radius otherwise
-  p?: SharedFeatureAttributes;
-};
-
 export type SharedState = {
   // This state will be encoded in Base64.
   // Therefore, the names of the attributes have been reduced to the minimum possible length
@@ -52,6 +31,6 @@ export type SharedState = {
     // basemap
     i: number; // id
   };
-  l: SharedLayer[]; // layers
-  f: SharedFeature[]; // Drawn features
+  l: SharedLayer[]; // layers;
+  f: unknown;
 };

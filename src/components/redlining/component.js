@@ -1,8 +1,12 @@
-import GeoEvents from '../../models/events';
 import GirafeResizableElement from '../../base/GirafeResizableElement';
-import Picker from 'vanilla-picker/csp';
 
-class RedliningComponent extends GirafeResizableElement {
+import GeoEvents from '../../models/events';
+import Picker from 'vanilla-picker/csp';
+import RedliningFeature, { RedliningShape } from './redliningFeature';
+import OlRedlining from './olRedlining';
+import CesiumRedlining from './cesiumRedlining';
+
+export default class RedliningComponent extends GirafeResizableElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -17,13 +21,20 @@ class RedliningComponent extends GirafeResizableElement {
   freelineButton = null;
   freepolygonButton = null;
   undoButton = null;
-
   toolSelected = null;
-
   drawingList = null;
+
+  olRedlining = undefined;
+  cesiumRedlining = undefined;
 
   constructor() {
     super('redlining');
+    this.state.extendedState.redlining = {
+      activeTool: null,
+      features: []
+    };
+    this.olRedlining = new OlRedlining();
+    this.cesiumRedlining = new CesiumRedlining();
   }
 
   render() {
@@ -51,21 +62,39 @@ class RedliningComponent extends GirafeResizableElement {
     this.activateTooltips(false, [800, 0], 'top-end');
   }
 
+  serialize() {
+    return this.state.extendedState.redlining.features.map((feature) => feature.serialize());
+  }
+
+  deserialize(serializedFeatures) {
+    serializedFeatures.forEach((serializedFeature) => {
+      const feature = RedliningFeature.deserialize(serializedFeature);
+      this.addFeature(feature);
+    });
+  }
+
+  addFeature(feature) {
+    // Currently, as we are using olCesium, feature are automatically replicated to Cesium
+    if (this.olRedlining != undefined) {
+      this.olRedlining.addFeature(feature);
+    }
+  }
+
   registerEvents() {
     this.stateManager.subscribe('interface.redliningPanelVisible', (oldValue, newValue) => this.togglePanel(newValue));
-    this.stateManager.subscribe('redlining.features', (oldFeatures, newFeatures) =>
+    this.stateManager.subscribe('extendedState.redlining.features', (oldFeatures, newFeatures) =>
       this.onFeaturesChanged(oldFeatures, newFeatures)
     );
 
     this.disableButton.addEventListener('click', (e) => this.deactivateDraw(e));
-    this.pointButton.addEventListener('click', (e) => this.activateDraw(e, 'Point'));
-    this.lineButton.addEventListener('click', (e) => this.activateDraw(e, 'LineString'));
-    this.squareButton.addEventListener('click', (e) => this.activateDraw(e, 'Square'));
-    this.rectangleButton.addEventListener('click', (e) => this.activateDraw(e, 'Rectangle'));
-    this.polygonButton.addEventListener('click', (e) => this.activateDraw(e, 'Polygon'));
-    this.circleButton.addEventListener('click', (e) => this.activateDraw(e, 'Circle'));
-    this.freelineButton.addEventListener('click', (e) => this.activateDraw(e, 'Freeline'));
-    this.freepolygonButton.addEventListener('click', (e) => this.activateDraw(e, 'Freepolygon'));
+    this.pointButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Point));
+    this.lineButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Polyline));
+    this.squareButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Square));
+    this.rectangleButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Rectangle));
+    this.polygonButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Polygon));
+    this.circleButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Disk));
+    this.freelineButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.FreehandPolyline));
+    this.freepolygonButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.FreehandPolygon));
     this.undoButton.addEventListener('click', () => this.messageManager.sendMessage({ action: GeoEvents.undoDraw }));
   }
 
@@ -76,7 +105,7 @@ class RedliningComponent extends GirafeResizableElement {
     this.toolSelected = e.target.parentElement;
     this.toolSelected.className = 'selected';
 
-    this.state.redlining.activeTool = tool;
+    this.state.extendedState.redlining.activeTool = tool;
   }
 
   deactivateDraw(e) {
@@ -86,7 +115,7 @@ class RedliningComponent extends GirafeResizableElement {
     this.toolSelected = e.target.parentElement;
     this.toolSelected.className = 'selected';
 
-    this.state.redlining.activeTool = null;
+    this.state.extendedState.redlining.activeTool = null;
   }
 
   connectedCallback() {
@@ -140,7 +169,7 @@ class RedliningComponent extends GirafeResizableElement {
     nameinput.value = feature.name;
     nameinput.className = 'name';
     nameinput.oninput = (e) => {
-      const changedFeature = this.state.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
       changedFeature.name = e.target.value;
     };
     container.appendChild(nameinput);
@@ -152,7 +181,7 @@ class RedliningComponent extends GirafeResizableElement {
     const textminus = document.createElement('i');
     textminus.className = 'fa-solid fa-minus';
     textminus.onclick = () => {
-      const changedFeature = this.state.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
       changedFeature.textSize = changedFeature.textSize - 1;
     };
     textdiv.appendChild(textminus);
@@ -160,7 +189,7 @@ class RedliningComponent extends GirafeResizableElement {
     const textplus = document.createElement('i');
     textplus.className = 'fa-solid fa-plus';
     textplus.onclick = () => {
-      const changedFeature = this.state.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
       changedFeature.textSize = changedFeature.textSize + 1;
     };
     textdiv.appendChild(textplus);
@@ -177,11 +206,11 @@ class RedliningComponent extends GirafeResizableElement {
     const fillPicker = new Picker({ parent: fill, color: fillColor, popup: 'left' });
     // Message when color changed
     fillPicker.onChange = (color) => {
-      const changedFeature = this.state.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
       changedFeature.fillColor = color.hex;
     };
     fillPicker.onDone = (color) => {
-      const changedFeature = this.state.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
       changedFeature.fillColor = color.hex;
     };
 
@@ -195,11 +224,11 @@ class RedliningComponent extends GirafeResizableElement {
     const strokePicker = new Picker({ parent: stroke, color: strokeColor, popup: 'left' });
     // Message when color changed
     strokePicker.onChange = (color) => {
-      const changedFeature = this.state.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
       changedFeature.strokeColor = color.hex;
     };
     strokePicker.onDone = (color) => {
-      const changedFeature = this.state.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
       changedFeature.strokeColor = color.hex;
     };
 
@@ -213,7 +242,7 @@ class RedliningComponent extends GirafeResizableElement {
       ? this.configManager.Config.redlining.defaultStrokeWidth
       : feature.strokeWidth;
     slider.oninput = (e) => {
-      const changedFeature = this.state.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
       changedFeature.strokeWidth = e.target.value;
     };
     container.appendChild(slider);
@@ -221,7 +250,7 @@ class RedliningComponent extends GirafeResizableElement {
     // Trash
     const trash = document.createElement('i');
     trash.className = 'fa-solid fa-trash';
-    trash.onclick = (e) => this.deleteFeature(feature);
+    trash.onclick = (_) => this.deleteFeature(feature);
     container.appendChild(trash);
 
     this.drawingList.appendChild(container);
@@ -235,11 +264,9 @@ class RedliningComponent extends GirafeResizableElement {
 
   deleteFeature(feature) {
     if (confirm('Do you want to delete this feature?')) {
-      this.state.redlining.features = this.state.redlining.features.filter((f) => {
+      this.state.extendedState.redlining.features = this.state.extendedState.redlining.features.filter((f) => {
         return f.id != feature.id;
       });
     }
   }
 }
-
-export default RedliningComponent;

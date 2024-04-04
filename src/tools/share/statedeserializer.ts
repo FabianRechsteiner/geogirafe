@@ -1,17 +1,18 @@
 import { BaseLayer, GroupLayer, Layer } from '../../models/main';
-import RedliningFeature from '../state/redliningfeature';
 import { SharedLayer, SharedState } from './sharedstate';
 import LZString from 'lz-string';
 import { LayerManager, StateManager } from '../main';
-import FeatureDeserializer from './featuredeserializer';
+import ComponentManager from '../state/componentManager';
 
 class StateDeserializer {
   stateManager: StateManager;
   layerManager: LayerManager;
+  componentManager: ComponentManager;
 
   constructor() {
     this.stateManager = StateManager.getInstance();
     this.layerManager = LayerManager.getInstance();
+    this.componentManager = ComponentManager.getInstance();
   }
 
   get state() {
@@ -22,7 +23,7 @@ class StateDeserializer {
     const stringState = LZString.decompressFromBase64(compressedState);
     const sharedState: SharedState = JSON.parse(stringState);
 
-    // TODO REG : Today only default SRID is managed. The coordiantes here can have invalid format.
+    // TODO REG : Today only default SRID is managed. The coordinates here can have invalid format.
 
     this.state.position.center = sharedState.p.c;
     this.state.position.resolution = sharedState.p.r;
@@ -55,10 +56,9 @@ class StateDeserializer {
     }
 
     // Set drawn objects
-    const olFeatures = new FeatureDeserializer().getDeserializedFeatures(sharedState.f);
-    for (const olFeature of olFeatures) {
-      const redliningFeature = new RedliningFeature(olFeature);
-      this.state.redlining.features.push(redliningFeature);
+    const redliningComponents = ComponentManager.getInstance().getComponentsByName('redlining');
+    if (redliningComponents != undefined && sharedState.f != undefined) {
+      redliningComponents[0].deserialize(sharedState.f);
     }
   }
 
