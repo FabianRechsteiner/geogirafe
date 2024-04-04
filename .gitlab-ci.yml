@@ -7,6 +7,18 @@ stages:
   - scan
 
 #################################
+# https://docs.gitlab.com/ee/ci/yaml/workflow.html#switch-between-branch-pipelines-and-merge-request-pipelines
+# The workflow is the following one:
+# Branch pipelines will be run when NO merge request is for the branch.
+# Otherwise, Merge-Request pipelines will run when a merge request IS open for the branch.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+#################################
 # Define pipeline variables
 variables:
   SONAR_USER_HOME: '${CI_PROJECT_DIR}/.sonar' # Defines the location of the analysis task cache
@@ -74,7 +86,6 @@ sonarcloud-check:
   only:
     - merge_requests
     - main
-    - sonarcloud
 
 #################################
 # Static Application Security Testing with GitLab
