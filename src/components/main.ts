@@ -6,6 +6,7 @@ export { default as CoordinateComponent } from './coordinate/component';
 export { default as GlobeComponent } from './globe/component';
 export { default as HelpComponent } from './help/component';
 export { default as LanguageComponent } from './language/component';
+export { default as LRPanelComponent } from './lr-panel/component';
 export { default as MapComponent } from './map/component';
 export { default as MenuButtonComponent } from './menubutton/component.js';
 export { default as NavBookmarksComponent } from './navigation/navbookmarks/component';

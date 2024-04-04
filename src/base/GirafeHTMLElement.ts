@@ -154,6 +154,13 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   /**
+   * Show the component (display: block).
+   */
+  show() {
+    this.style.display = 'block';
+  }
+
+  /**
    * Returns the serialization of the current element. This method should be
    * overwritten by child classes
    * @returns An object describing the current element serialized
@@ -167,6 +174,7 @@ class GirafeHTMLElement extends HTMLElement {
    * @param _serializedElement The element serialization as returned by the serialize method
    */
   deserialize(_serializedElement: unknown) {}
+
 }
 
 export default GirafeHTMLElement;

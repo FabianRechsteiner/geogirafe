@@ -156,7 +156,7 @@ describe('StateManager.getPropertyPath', () => {
       }
     };
     const result = manager.getPropertyByPath(obj, 'nested.property');
-    expect(result).toEqual({ found: true, object: 'value' });
+    expect(result).toEqual({ found: true, object: 'value', parentObject: obj.nested, lastKey: 'property' });
   });
 
   it('getPropertyByPath should get property by path if value is null', () => {
@@ -166,7 +166,7 @@ describe('StateManager.getPropertyPath', () => {
       }
     };
     const result = manager.getPropertyByPath(obj, 'nested.property');
-    expect(result).toEqual({ found: true, object: null });
+    expect(result).toEqual({ found: true, object: null, parentObject: obj.nested, lastKey: 'property' });
   });
 
   it('getPropertyByPath should get property by path if value is undefined', () => {
@@ -176,25 +176,25 @@ describe('StateManager.getPropertyPath', () => {
       }
     };
     const result = manager.getPropertyByPath(obj, 'nested.property');
-    expect(result).toEqual({ found: true, object: undefined });
+    expect(result).toEqual({ found: true, object: undefined, parentObject: obj.nested, lastKey: 'property' });
   });
 
   it('getPropertyByPath should handle empty path', () => {
     const obj = { key: 'value' };
     const result = manager.getPropertyByPath(obj, '');
-    expect(result).toEqual({ found: true, object: obj });
+    expect(result).toEqual({ found: true, object: obj, parentObject: null, lastKey: null });
   });
 
   it('getPropertyByPath should handle non-existent path', () => {
     const obj = { key: 'value' };
     const result = manager.getPropertyByPath(obj, 'nonexistent.property');
-    expect(result).toEqual({ found: false, object: null });
+    expect(result).toEqual({ found: false, object: null, parentObject: null, lastKey: null });
   });
 
   it('getPropertyByPath should handle non-existent nested path', () => {
     const obj = { key: 'value' };
     const result = manager.getPropertyByPath(obj, 'nested.property');
-    expect(result).toEqual({ found: false, object: null });
+    expect(result).toEqual({ found: false, object: null, parentObject: null, lastKey: null });
   });
 
   it('getPropertyByPath should handle array indices', () => {
@@ -202,7 +202,7 @@ describe('StateManager.getPropertyPath', () => {
       array: [{ value: 1 }, { value: 2 }, { value: 3 }]
     };
     const result = manager.getPropertyByPath(obj, 'array.1.value');
-    expect(result).toEqual({ found: true, object: 2 });
+    expect(result).toEqual({ found: true, object: 2, parentObject: obj.array[1], lastKey: 'value' });
   });
 
   it('getPropertyByPath should handle mixed path', () => {
@@ -212,7 +212,31 @@ describe('StateManager.getPropertyPath', () => {
       }
     };
     const result = manager.getPropertyByPath(obj, 'nested.array.2.value');
-    expect(result).toEqual({ found: true, object: 'c' });
+    expect(result).toEqual({ found: true, object: 'c', parentObject: obj.nested.array[2], lastKey: 'value' });
+  });
+});
+
+describe('StateManager.setPropertyPath', () => {
+  it('setPropertyByPath should set property by path', () => {
+    const obj = {
+      nested: {
+        property: 'value'
+      }
+    };
+    const result = manager.setPropertyByPath(obj, 'nested.property', 'valueSet');
+    expect(result).toBeTruthy();
+    expect(obj.nested.property).toBe('valueSet');
+  });
+
+  it('setPropertyByPath should not set property on emptyPath', () => {
+    const obj = {
+      nested: {
+        property: 'value'
+      }
+    };
+    const result = manager.setPropertyByPath(obj, '', 'valueSet');
+    expect(result).toBeFalsy();
+    expect(obj.nested.property).toBe('value');
   });
 });
 

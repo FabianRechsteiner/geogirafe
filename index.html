@@ -105,9 +105,11 @@
     </header>
 
     <div id="content">
-      <div id="content-map">
-        <section>
-          <girafe-tree-view dock="left"></girafe-tree-view>
+      <div id="main">
+        <girafe-lr-panel class="panel-left" dock="left">
+          <girafe-tree-view slot="main"></girafe-tree-view>
+        </girafe-lr-panel>
+        <div id="content-map">
           <girafe-map></girafe-map>
           <div class="info-area">
             <girafe-infobox></girafe-infobox>
@@ -116,16 +118,19 @@
               <girafe-coordinate></girafe-coordinate>
             </footer>
           </div>
-        </section>
-        <girafe-redlining dock="right"></girafe-redlining>
-        <girafe-print dock="right"></girafe-print>
+        </div>
+        <girafe-lr-panel class="panel-right" dock="right">
+          <div slot="main">
+            <girafe-redlining data-toggle-path="interface.printPanelVisible"></girafe-redlining>
+            <girafe-print data-toggle-path="interface.redliningPanelVisible"></girafe-print>
+          </div>
+        </girafe-lr-panel>
         <girafe-about></girafe-about>
         <girafe-share></girafe-share>
         <!-- <girafe-selection-window></girafe-selection-window> -->
         <girafe-help></girafe-help>
         <girafe-prototype-banner></girafe-prototype-banner>
       </div>
-
       <div id="content-bottom">
         <girafe-selection-grid dock="bottom"></girafe-selection-grid>
       </div>

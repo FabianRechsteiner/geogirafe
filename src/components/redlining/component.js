@@ -1,5 +1,3 @@
-import GirafeResizableElement from '../../base/GirafeResizableElement';
-
 import GeoEvents from '../../models/events';
 import Picker from 'vanilla-picker/csp';
 import RedliningFeature from './redliningFeature';
@@ -7,11 +5,15 @@ import RedliningShape from './redliningshape';
 import OlRedlining from './olRedlining';
 import CesiumRedlining from './cesiumRedlining';
 
-export default class RedliningComponent extends GirafeResizableElement {
+import { GirafeHTMLElement } from '../../base/main';
+
+class RedliningComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  panel = null;
+  visible = false;
+  eventsCallbacks = [];
+
   disableButton = null;
   pointButton = null;
   lineButton = null;
@@ -39,11 +41,13 @@ export default class RedliningComponent extends GirafeResizableElement {
   }
 
   render() {
-    super.render();
+    this.visible ? this.renderComponent() : this.renderEmptyComponent();
+  }
 
-    // Bar is hidden per default
-    this.panel = this.shadow.querySelector('#panel');
-    this.panel.style.display = 'none';
+  renderComponent() {
+    super.render();
+    super.girafeTranslate();
+    this.activateTooltips(false, [800, 0], 'top-end');
 
     this.disableButton = this.shadow.querySelector('#disable');
     this.pointButton = this.shadow.querySelector('#point');
@@ -57,10 +61,18 @@ export default class RedliningComponent extends GirafeResizableElement {
     this.undoButton = this.shadow.querySelector('#undo');
 
     this.drawingList = this.shadow.querySelector('#drawingList');
-
     this.toolSelected = this.disableButton;
 
-    this.activateTooltips(false, [800, 0], 'top-end');
+    this.registerEvents();
+  }
+
+  renderEmptyComponent() {
+    this.unregisterEvents();
+    this.renderEmpty();
+  }
+
+  registerVisibilityEvents() {
+    this.stateManager.subscribe('interface.redliningPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
   serialize() {
@@ -82,11 +94,11 @@ export default class RedliningComponent extends GirafeResizableElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('interface.redliningPanelVisible', (oldValue, newValue) => this.togglePanel(newValue));
-    this.stateManager.subscribe('extendedState.redlining.features', (oldFeatures, newFeatures) =>
-      this.onFeaturesChanged(oldFeatures, newFeatures)
+    this.eventsCallbacks.push(
+      this.stateManager.subscribe('extendedState.redlining.features', (oldFeatures, newFeatures) =>
+        this.onFeaturesChanged(oldFeatures, newFeatures)
+      )
     );
-
     this.disableButton.addEventListener('click', (e) => this.deactivateDraw(e));
     this.pointButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Point));
     this.lineButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Polyline));
@@ -97,6 +109,23 @@ export default class RedliningComponent extends GirafeResizableElement {
     this.freelineButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.FreehandPolyline));
     this.freepolygonButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.FreehandPolygon));
     this.undoButton.addEventListener('click', () => this.messageManager.sendMessage({ action: GeoEvents.undoDraw }));
+  }
+
+  unregisterEvents() {
+    this.stateManager.unsubscribe(this.eventsCallbacks);
+    this.eventsCallbacks.length = 0;
+    this.disableButton?.removeEventListener('click', (e) => this.deactivateDraw(e));
+    this.pointButton?.removeEventListener('click', (e) => this.activateDraw(e, 'Point'));
+    this.lineButton?.removeEventListener('click', (e) => this.activateDraw(e, 'LineString'));
+    this.squareButton?.removeEventListener('click', (e) => this.activateDraw(e, 'Square'));
+    this.rectangleButton?.removeEventListener('click', (e) => this.activateDraw(e, 'Rectangle'));
+    this.polygonButton?.removeEventListener('click', (e) => this.activateDraw(e, 'Polygon'));
+    this.circleButton?.removeEventListener('click', (e) => this.activateDraw(e, 'Circle'));
+    this.freelineButton?.removeEventListener('click', (e) => this.activateDraw(e, 'Freeline'));
+    this.freepolygonButton?.removeEventListener('click', (e) => this.activateDraw(e, 'Freepolygon'));
+    this.undoButton?.removeEventListener('click', () =>
+      this.messageManager.sendMessage({ action: GeoEvents.undoDraw })
+    );
   }
 
   activateDraw(e, tool) {
@@ -122,26 +151,17 @@ export default class RedliningComponent extends GirafeResizableElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.girafeTranslate();
-      this.registerEvents();
+      this.registerVisibilityEvents();
     });
   }
 
-  closePanel() {
-    this.state.interface.redliningPanelVisible = false;
-  }
-
   togglePanel(visible) {
-    if (visible) {
-      this.panel.style.display = 'block';
-      this.panel.getRootNode().host.style.display = 'block';
-    } else {
-      this.panel.style.display = 'none';
-      this.panel.getRootNode().host.style.display = 'none';
-    }
+    this.visible = visible;
+    this.render();
   }
 
   onFeaturesChanged(oldFeatures, newFeatures) {
+    oldFeatures = oldFeatures ?? [];
     const deletedFeatures = oldFeatures.filter(
       (oldFeature) => !newFeatures.find((newFeature) => newFeature.id === oldFeature.id)
     );
@@ -271,3 +291,5 @@ export default class RedliningComponent extends GirafeResizableElement {
     }
   }
 }
+
+export default RedliningComponent;

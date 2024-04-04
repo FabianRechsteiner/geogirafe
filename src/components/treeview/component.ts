@@ -1,10 +1,10 @@
-import GirafeResizableElement from '../../base/GirafeResizableElement';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
 
-class TreeViewComponent extends GirafeResizableElement {
+class TreeViewComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 

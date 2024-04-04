@@ -1,0 +1,94 @@
+#panel,
+#gutter,
+slot {
+  height: 100%;
+}
+
+#panel {
+  position: relative;
+}
+
+#gutter {
+  z-index: 10;
+  width: 6px;
+  height: 100%;
+  background: var(--bkg-color);
+  position: absolute;
+  top: 0;
+  cursor: col-resize;
+}
+
+#panel.left #gutter {
+  border-right: solid 1px #999;
+  right: 0;
+}
+
+#panel.right #gutter {
+  border-left: solid 1px #999;
+  left: 0;
+}
+
+#hide,
+#close {
+  z-index: 100;
+  border: solid 1px #999;
+  color: var(--text-color-grad2);
+  padding: 0.7rem 0.5rem;
+  width: 0.8rem;
+  height: 2rem;
+  line-height: 2rem;
+  position: absolute;
+  top: 1rem;
+  background-color: var(--bkg-color);
+  cursor: pointer;
+}
+
+#panel.left #hide {
+  right: -1.2rem;
+  border-left: none;
+  border-radius: 0 10px 10px 0;
+  padding-left: 0;
+}
+
+#panel.right #close {
+  left: -1.2rem;
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+  padding-right: 0;
+}
+
+#hide i:before {
+  content: '\f104';
+}
+
+#close i:before {
+  content: '\f00d';
+}
+
+#hide.closed {
+  left: 5px !important;
+}
+
+#panel.left #hide.closed {
+  left: 5px !important;
+}
+
+#panel.right #close.closed {
+  right: 5px !important;
+}
+
+#hide.closed i:before {
+  content: '\f105';
+}
+
+#hide:hover,
+#close:hover {
+  border-color: #000;
+  color: var(--text-color);
+}
+
+@media screen and (max-width: 1000px) {
+  .panel {
+    width: 18rem;
+  }
+}

@@ -14,9 +14,9 @@ import PrintManager from './tools/PrintManager';
 import PrintMaskManager from './tools/printMaskManager';
 import { toDegrees, toRadians } from 'ol/math';
 import { MapManager, I18nManager } from '../../tools/main';
-import GirafeResizableElement from '../../base/GirafeResizableElement';
 import { unByKeyAll } from '../../tools/olutils';
 import { padNumber } from 'ol/string';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 /** Represents the status of a printing process. */
 enum PrintStatus {
@@ -43,7 +43,7 @@ interface PrintElement {
  * Be able to print the content on the map, based on the layer tree and the OL map.
  * Have actions on the print mask and on the map (rotation).
  */
-class PrintComponent extends GirafeResizableElement {
+class PrintComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -360,8 +360,6 @@ class PrintComponent extends GirafeResizableElement {
    */
   private async togglePanel(visible: boolean): Promise<void> {
     this.visible = visible;
-    const parent = this.host;
-    parent.style.display = this.visible ? 'block' : 'none';
     this.render();
   }
 
