@@ -34,6 +34,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   dock: 'left' | 'right' | 'bottom';
   prevX = 0;
   prevY = 0;
+  toggleHeight?: number;
   toggleWidth?: number;
   lastWidth = 0;
   hideWidth = 0;
@@ -111,25 +112,15 @@ class GirafeResizableElement extends GirafeHTMLElement {
       // => We reset it to the last width
       this.panel.style.width = this.lastWidth + 'px';
       this.host.style.width = this.lastWidth + 'px';
-      this.panel.style.minWidth = '';
-      this.host.style.minWidth = '';
 
       if (this.hideButton) {
         this.hideButton.classList.remove('closed');
-        if (this.dock === 'left') {
-          this.hideButton.style.left = this.panel.getBoundingClientRect().width + 'px';
-        } else if (this.dock === 'right') {
-          this.hideButton.style.right = this.panel.getBoundingClientRect().width + 'px';
-        }
       }
     } else {
       // Hide the panel
       this.lastWidth = width;
       this.panel.style.width = this.toggleWidth + 'px';
       this.host.style.width = this.toggleWidth + 'px';
-      this.panel.style.minWidth = '0';
-      this.panel.style.overflow = 'hidden';
-      this.host.style.minWidth = '0';
 
       if (this.hideButton) {
         this.hideButton.classList.add('closed');
@@ -141,10 +132,10 @@ class GirafeResizableElement extends GirafeHTMLElement {
     if (!this.panel || !this.gutter) {
       throw new Error('GirafeResizableElement.makeResizable() must be called before togglePanelHorizontally()');
     }
-    this.toggleWidth = this.gutter.getBoundingClientRect().height;
+    this.toggleHeight = this.gutter.getBoundingClientRect().height;
 
     const height = this.panel.getBoundingClientRect().height;
-    if (height <= this.toggleWidth) {
+    if (height <= this.toggleHeight) {
       // Panel is already hidden.
       // => We reset it to the last width
       this.panel.style.height = this.lastWidth + 'px';
@@ -164,8 +155,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
     } else {
       // Hide the panel
       this.lastWidth = height;
-      this.panel.style.height = this.toggleWidth + 'px';
-      this.host.style.height = this.toggleWidth + 'px';
+      this.panel.style.height = this.toggleHeight + 'px';
+      this.host.style.height = this.toggleHeight + 'px';
       this.panel.style.minHeight = '0';
       this.panel.style.overflow = 'hidden';
       this.host.style.minHeight = '0';

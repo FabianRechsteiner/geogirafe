@@ -33,13 +33,14 @@
   "license": "Apache-2.0",
   "homepage": "https://doc.geomapfish.dev",
   "dependencies": {
+    "@geoblocks/print": "^0.7.5",
     "gridjs": "6.1.1",
     "lz-string": "1.5.0",
     "on-change": "5.0.1",
     "tippy.js": "6.3.7",
     "uhtml": "3.2.2",
-    "vanilla-picker": "2.12.2",
-    "uuid": "9.0.1"
+    "uuid": "9.0.1",
+    "vanilla-picker": "2.12.2"
   },
   "peerDependencies": {
     "@geoblocks/mapfishprint": "^0.2.10",

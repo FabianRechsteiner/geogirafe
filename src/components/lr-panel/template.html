@@ -1,0 +1,15 @@
+<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+
+<div id="panel">
+  <div id="gutter"></div>
+  <slot name="main"></slot>
+  ${ this.dock === 'left' ? uHtml`
+  <div id="hide" class="hide">
+    <i class="fa-solid"></i>
+  </div>
+  ` : uHtml`
+  <div id="close" class="close">
+    <i class="fa-solid"></i>
+  </div>
+  `}
+</div>

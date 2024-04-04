@@ -165,50 +165,61 @@ girafe-search {
   right: 0;
 }
 
-#content-map {
-  position: relative;
-  flex: 1;
-}
-
-#content-bottom {
-  position: relative;
-  flex: 0;
-}
-
-#content-map section {
-  position: absolute;
+#main {
   display: flex;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-girafe-map {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-girafe-tree-view {
   position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.panel-left,
+.panel-right {
+  z-index: 1;
+  flex: none;
+}
+
+.panel-left {
   width: 25rem;
-  z-index: 90;
-  background: var(--bkg-color);
-  overflow: auto;
   box-shadow:
     0 1px 2px rgba(60, 64, 67, 0.3),
     0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
+.panel-right {
+  width: 20rem;
+  min-width: 20rem; /* Copy me inside every final child. */
+  box-shadow:
+    0 -1px 2px rgba(60, 64, 67, 0.3),
+    0 -1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+#content-map {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+
+#content-bottom {
+  flex: 0;
+  position: relative;
+}
+
+girafe-lr-panel > * {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+girafe-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .info-area {
   z-index: 10;
-  display: flex;
-  align-items: flex-start;
-  align-self: flex-end;
-  flex-direction: column;
+  position: absolute;
+  bottom: 0;
 }
 
 footer {
@@ -221,23 +232,6 @@ footer {
 girafe-selection-grid {
   position: relative;
   display: block;
-}
-
-girafe-redlining,
-girafe-print {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 20rem;
-  z-index: 90;
-  border-left: solid 1px #ddd;
-  background: var(--bkg-color);
-  overflow: visible;
-  display: none;
-  box-shadow:
-    0 1px 2px rgba(60, 64, 67, 0.3),
-    0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
 girafe-selection-window {

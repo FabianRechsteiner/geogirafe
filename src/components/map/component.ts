@@ -539,11 +539,11 @@ export default class MapComponent extends GirafeHTMLElement {
       this.map3d.setEnabled(true);
     } else if (this.state.globe.display === 'side') {
       // Side by side has been enabled
-      this.mapTarget.style.display = 'block';
-      this.mapTarget.style.width = '55%';
-      this.map3dTarget.style.display = 'block';
-      this.map3dTarget.style.left = '55%';
-      this.map3dTarget.style.width = '45%';
+      this.mapTarget.style.display = 'inline-block';
+      this.mapTarget.style.width = '45%';
+      this.map3dTarget.style.display = 'inline-block';
+      this.map3dTarget.style.left = '45%';
+      this.map3dTarget.style.width = '55%';
       await this.create3dMap();
       this.map3d.setEnabled(true);
     } else {
