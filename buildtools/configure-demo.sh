@@ -70,6 +70,7 @@ elif [ "$1" = 'mapbs' ];
 then
     echo "Preparing environment MAPBS..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/de.json $APPDIR/de.json
     curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.bs.ch/static/dummy/de.json" --silent --output $MOCKDIR/de.json
     curl "https://map.geo.bs.ch/static/dummy/en.json" --silent --output $MOCKDIR/en.json

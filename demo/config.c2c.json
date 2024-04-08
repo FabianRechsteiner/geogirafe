@@ -1,8 +1,10 @@
 {
   "languages": {
-    "de": "Mock/de.json",
-    "en": "Mock/en.json",
-    "fr": "Mock/fr.json",
+    "translations": {
+      "de": "Mock/de.json",
+      "en": "Mock/en.json",
+      "fr": "Mock/fr.json"
+    },
     "defaultLanguage": "en"
   },
   "themes": {

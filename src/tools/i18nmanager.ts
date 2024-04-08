@@ -59,11 +59,17 @@ class I18nManager extends GirafeSingleton {
 
     // Load translations
     this.loadingLanguagePromise = this.configManager.loadConfig().then(async () => {
-      if (this.configManager.Config && this.configManager.Config.languages) {
-        const url = this.configManager.Config.languages[language];
-        const response = await fetch(url);
-        const content = await response.json();
-        this.translations[language] = content[language];
+      if (this.configManager.Config && this.configManager.Config.languages.translations) {
+        let mergedTranslations: TranslationsDict = {};
+        // Translations are loaded in the order defined in the list of files
+        // If an element is present in both results, the last value overwrite all the others
+        for (const url of this.configManager.Config.languages.translations[language]) {
+          const response = await fetch(url);
+          const content = await response.json();
+          mergedTranslations = { ...mergedTranslations, ...content[language] };
+        }
+
+        this.translations[language] = mergedTranslations;
         this.loadingLanguagePromise = null;
         return this.translations[language];
       } else {

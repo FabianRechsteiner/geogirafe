@@ -54,7 +54,7 @@ describe('ConfigManager.loadConfig', () => {
   it('the new configuration entries should be present in the final configuration', async () => {
     const myConfig = { ...MockHelper.mockConfig };
     // @ts-ignore
-    myConfig.languages.de = 'https://www.my-custom-language-url.reg';
+    myConfig.languages.translations = { de: 'https://www.my-custom-language-url.reg' };
     // @ts-ignore
     myConfig.redlining = { defaultFillColor: '#333333', defaultFont: 'Verdana' };
     // @ts-ignore

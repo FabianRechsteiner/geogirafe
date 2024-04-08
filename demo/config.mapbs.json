@@ -3,9 +3,11 @@
     "locale": "de-CH"
   },
   "languages": {
-    "de": "Mock/de.json",
-    "en": "Mock/en.json",
-    "fr": "Mock/fr.json",
+    "translations": {
+      "de": ["de.json", "Mock/de.json"],
+      "en": ["Mock/en.json"],
+      "fr": ["Mock/fr.json"]
+    },
     "defaultLanguage": "de"
   },
   "themes": {
