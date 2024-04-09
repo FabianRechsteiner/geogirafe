@@ -3,7 +3,10 @@ class GirafeConfig {
     locale: string;
   };
   languages: {
-    [key: string]: string;
+    translations: {
+      [key: string]: string[];
+    };
+    defaultLanguage: string;
   };
   themes: {
     url: string;

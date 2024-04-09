@@ -3,7 +3,9 @@
     "locale": "fr-CH"
   },
   "languages": {
-    "fr": "https://map.cartoriviera.ch/static/dummy/fr.json",
+    "translations": {
+      "fr": "https://map.cartoriviera.ch/static/dummy/fr.json"
+    },
     "defaultLanguage": "fr"
   },
   "themes": {

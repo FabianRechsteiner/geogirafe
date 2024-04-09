@@ -3,7 +3,9 @@
     "locale": "fr-CH"
   },
   "languages": {
-    "fr": "Mock/fr.json",
+    "translations": {
+      "fr": "Mock/fr.json"
+    },
     "defaultLanguage": "fr"
   },
   "themes": {

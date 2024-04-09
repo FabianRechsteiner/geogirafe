@@ -73,6 +73,7 @@ if "%1"=="lie" (
 if "%1"=="mapbs" (
     echo "Preparing environment MAPBS..."
     copy demo\config.mapbs.json %APPDIR%\config.json /Y
+    copy demo\de.json %APPDIR%\de.json /Y
     curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.geo.bs.ch/static/dummy/de.json" --output %OUTPUTDIR%\de.json
     curl "https://map.geo.bs.ch/static/dummy/en.json" --output %OUTPUTDIR%\en.json
