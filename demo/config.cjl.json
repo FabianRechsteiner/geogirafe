@@ -21,7 +21,9 @@
     "useLegendIcons": true
   },
   "search": {
-    "url": "https://map.cjl.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://map.cjl.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://map.cjl.ch/printproxy/",

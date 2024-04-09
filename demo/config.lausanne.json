@@ -18,7 +18,9 @@
     "SwissTopoVectorTiles": true
   },
   "search": {
-    "url": "https://map.lausanne.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr"
+    "url": "https://map.lausanne.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://map.lausanne.ch/printproxy/",

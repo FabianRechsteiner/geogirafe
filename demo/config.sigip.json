@@ -18,7 +18,9 @@
     "SwissTopoVectorTiles": true
   },
   "search": {
-    "url": "https://www.sigip.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr"
+    "url": "https://www.sigip.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://www.sigip.ch/printproxy/",

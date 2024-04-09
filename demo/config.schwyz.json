@@ -22,7 +22,9 @@
     "hideLegendWhenLayerIsDeactivated": false
   },
   "search": {
-    "url": "https://map.geo.sz.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://map.geo.sz.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://map.geo.sz.ch/printproxy/",

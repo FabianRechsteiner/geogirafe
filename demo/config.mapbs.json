@@ -28,7 +28,9 @@
     }
   },
   "search": {
-    "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###&lang=###SEARCHLANG###"
+    "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###&lang=###SEARCHLANG###",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://map.geo.bs.ch/printproxy/",

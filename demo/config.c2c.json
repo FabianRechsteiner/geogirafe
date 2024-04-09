@@ -21,7 +21,9 @@
     "useLegendIcons": true
   },
   "search": {
-    "url": "https://geomapfish-demo-2-8.camptocamp.com/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=###SEARCHLANG###"
+    "url": "https://geomapfish-demo-2-8.camptocamp.com/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=###SEARCHLANG###",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://geomapfish-demo-2-8.camptocamp.com/printproxy/",

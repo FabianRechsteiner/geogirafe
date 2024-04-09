@@ -395,9 +395,7 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onCustomGirafeEvent(details: { action: string; layer: Layer; extent: Extent }) {
-    if (details.action === GeoEvents.zoomToExtent) {
-      this.zoomToExtent(details.extent);
-    } else if (details.action === GeoEvents.undoDraw) {
+    if (details.action === GeoEvents.undoDraw) {
       //this.redliningManager.removeLastPoint();
     }
   }
@@ -588,9 +586,6 @@ export default class MapComponent extends GirafeHTMLElement {
 
   zoomToZoom(zoom: number) {
     this.viewManager.setZoom(zoom);
-  }
-  zoomToExtent(extent: Extent) {
-    this.olMap.getView().fit(extent);
   }
 
   panToCoordinate(coordinate: Coordinate) {

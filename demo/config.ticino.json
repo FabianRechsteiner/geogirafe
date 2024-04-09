@@ -19,7 +19,9 @@
     "SwissTopoVectorTiles": true
   },
   "search": {
-    "url": "https://map.geo.ti.ch/search?limit=30&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://map.geo.ti.ch/search?limit=30&partitionlimit=15&interface=desktop&query=###SEARCHTERM###",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://map.geo.ti.ch/printproxy/",

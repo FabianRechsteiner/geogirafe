@@ -18,7 +18,9 @@
     "SwissTopoVectorTiles": true
   },
   "search": {
-    "url": "https://map.geo.llv.li/search?limit=50&partitionlimit=11&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://map.geo.llv.li/search?limit=50&partitionlimit=11&interface=desktop&query=###SEARCHTERM###",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://map.geo.llv.li/printproxy/",

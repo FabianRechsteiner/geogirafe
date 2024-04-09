@@ -139,7 +139,7 @@ class LayerManager extends GirafeSingleton {
 
     if (layer.activeState != newState) {
       console.log(`Setting Layer ${layer.name} to ${newState}`);
-      layer.activeState = newState;
+      this.getTreeItem(layer.treeItemId).activeState = newState;
     }
   }
 

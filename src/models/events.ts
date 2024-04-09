@@ -1,7 +1,6 @@
 enum GeoEvents {
   CustomEventType = 'GeoGirafe.App',
-  undoDraw = 'undoDraw',
-  zoomToExtent = 'zoomToExtent'
+  undoDraw = 'undoDraw'
 }
 
 export default GeoEvents;

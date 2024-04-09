@@ -23,7 +23,9 @@
     "useLegendIcons": true
   },
   "search": {
-    "url": "https://sitn.ne.ch/search?limit=100&partitionlimit=40&interface=desktop&query=###SEARCHTERM###&lang=fr"
+    "url": "https://sitn.ne.ch/search?limit=100&partitionlimit=40&interface=desktop&query=###SEARCHTERM###&lang=fr",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://sitn.ne.ch/printproxy/",

@@ -1,7 +1,5 @@
 import ConfigManager from '../configuration/configmanager';
 import GirafeConfig from '../configuration/girafeconfig';
-import { MapManager } from '../main';
-import { createNewMap } from '../state/mapManager';
 import { ServerOgc } from '../state/state';
 
 class MockHelper {
@@ -37,8 +35,6 @@ class MockHelper {
   public static startMocking() {
     // @ts-ignore
     ConfigManager.getInstance().config = new GirafeConfig(MockHelper.mockConfig);
-    // @ts-ignore
-    MapManager.getInstance().map = createNewMap();
   }
 
   public static stopMocking() {
