@@ -22,7 +22,9 @@
     "useLegendIcons": true
   },
   "search": {
-    "url": "https://mapnv.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://mapnv.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://mapnv.ch/printproxy/",

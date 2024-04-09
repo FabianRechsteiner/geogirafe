@@ -1,81 +1,127 @@
-import { buffer, getWidth, getHeight, Extent } from 'ol/extent';
+import Map from 'ol/Map';
+import Collection from 'ol/Collection';
+import Feature from 'ol/Feature';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import { Geometry, Point } from 'ol/geom';
+import { Style, Icon } from 'ol/style';
+import { buffer, getWidth, getHeight, getCenter, containsExtent, Extent } from 'ol/extent';
+
+import PinIcon from './images/pin.svg';
+import LayerIcon from './images/layer.svg';
+import LayerGroupIcon from './images/layergroup.svg';
+import SearchIcon from './images/search.svg';
+import CloseIcon from './images/close.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import GeoEvents from '../../models/events';
 import SearchResult from '../../models/searchresult';
 import ThemesManager from '../../tools/themesmanager';
+import MapManager from '../../tools/state/mapManager';
+import Layer from '../../models/layers/layer';
+import LayerManager from '../../tools/layermanager';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  themeManager: ThemesManager;
+  public searchIcon: string = SearchIcon;
+  public closeIcon: string = CloseIcon;
 
-  #ignoreBlur = false;
-  groupedResults: Record<string, SearchResult[]> = {};
-  forceHide: boolean = true;
+  private themeManager: ThemesManager;
+  private layerManager: LayerManager;
+  private readonly map: Map;
+  private previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
+  private previewLayer: Layer | null = null;
 
-  searchTermPlaceholder = '###SEARCHTERM###';
-  searchLangPlaceholder = '###SEARCHLANG###';
+  private ignoreBlur = false;
+  public groupedResults: Record<string, SearchResult[]> = {};
+  private allResults: SearchResult[] = [];
+  private forceHide: boolean = true;
 
-  selectedResult: HTMLElement | null = null;
-  selectedCntr: number = 0;
+  private searchTermPlaceholder = '###SEARCHTERM###';
+  private searchLangPlaceholder = '###SEARCHLANG###';
 
-  bgClr = 'rgba(255, 255, 255, 0.1)';
+  private focusedResultIndex: number = -1;
+  private focusedResult: SearchResult | null = null;
+  private selectedResult: SearchResult | null = null;
+
+  private searchBox?: HTMLInputElement;
 
   constructor() {
     super('search');
     this.themeManager = ThemesManager.getInstance();
+    this.layerManager = LayerManager.getInstance();
+    this.map = MapManager.getInstance().getMap();
+    this.createPreviewLayer();
   }
 
-  registerEvents() {
-    this.stateManager.subscribe('interface.darkFrontendMode', () => this.onChangeDarkFrontendMode());
+  private createPreviewLayer() {
+    const vectorLayer = new VectorLayer({
+      properties: {
+        addToPrintedLayers: true
+      },
+      source: new VectorSource({
+        features: this.previewFeaturesCollection
+      }),
+      style: new Style({
+        image: new Icon({
+          anchor: [0.5, 1],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'fraction',
+          src: PinIcon,
+          scale: 0.3
+        })
+      })
+    });
+    this.map.addLayer(vectorLayer);
+    vectorLayer.setZIndex(1010);
   }
 
-  onChangeDarkFrontendMode() {
-    this.bgClr = this.state.interface.darkFrontendMode ? 'rgba(34, 34, 34, 1)' : 'rgba(255, 255, 255, 1)';
+  public onMouseDown() {
+    this.ignoreBlur = true;
   }
 
-  ignoreBlur() {
-    this.#ignoreBlur = true;
-  }
-
-  onFocusIn() {
+  public onFocusIn() {
     this.forceHide = false;
     super.render();
   }
 
-  onFocusOut() {
-    if (!this.#ignoreBlur) {
+  public onFocusOut() {
+    if (!this.ignoreBlur) {
       this.forceHide = true;
       super.render();
     }
-    this.#ignoreBlur = false;
+    this.ignoreBlur = false;
+  }
+
+  public render() {
+    super.render();
+    this.searchBox = this.shadowRoot?.getElementById('search') as HTMLInputElement;
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
-      this.registerEvents();
-      super.render();
+      this.render();
       super.girafeTranslate();
     });
   }
 
-  clearSearch(purge: boolean = false) {
+  private clearSearch(purge: boolean = false) {
     if (purge) {
-      const target = this.shadowRoot?.getElementById('search') as HTMLInputElement;
-      if (target) {
-        target.value = '';
+      if (this.searchBox) {
+        this.searchBox.value = '';
       }
     }
     this.forceHide = false;
     this.groupedResults = {};
-    this.selectedCntr = 0;
-    this.selectedResult = null;
+    this.allResults = [];
+    this.clearPreview();
+    this.focusedResultIndex = -1;
+    this.focusedResult = null;
     super.render();
   }
 
-  async doSearch(e: Event) {
+  public async doSearch(e: Event) {
     const target = e.target as HTMLInputElement;
     if (target) {
       const term: string = target.value;
@@ -88,12 +134,10 @@ class SearchComponent extends GirafeHTMLElement {
         const data = await response.json();
         this.displayResults(data);
       }
-      this.selectedResult = null;
-      this.selectedCntr = 0;
     }
   }
 
-  displayResults(results: { type: string; features: SearchResult[] }) {
+  private displayResults(results: { type: string; features: SearchResult[] }) {
     // First, group the results
     results.features.forEach((result) => {
       const type = result.properties ? result.properties.layer_name : 'ERROR: Missing type in the search result';
@@ -109,35 +153,98 @@ class SearchComponent extends GirafeHTMLElement {
       resultList.push(result);
     });
 
+    // Manage a flat list with all results
+    this.allResults = Object.values(this.groupedResults).flatMap((results) => results);
+
     // And then rerender the results
     super.render();
   }
 
-  getIconClassName(type: string) {
-    // TODO: Do not hardcode values here
-    switch (type) {
-      case 'Adresse':
-        return 'fa-solid fa-location-dot';
-      case 'Basel Info (BI)':
-        return 'fa-solid fa-map-location-dot';
-      case 'Baumnummer öffentlicher Baumkataster':
-        return 'fa-solid fa-tree';
-      case 'Entsorgungsstellen':
-        return 'fa-solid fa-recycle';
-      case 'Haltestelle öffentlicher Verkehr':
-        return 'fa-solid fa-train-subway';
+  public getIcon(searchGroup: string) {
+    switch (searchGroup) {
       case 'Group':
-        return 'fa-solid fa-layer-group';
+        return LayerGroupIcon;
       case 'Layer':
-        return 'fa-solid fa-map';
+        return LayerIcon;
       default:
-        return 'fa-solid fa-globe';
+        return PinIcon;
     }
   }
 
-  onSelect(result: SearchResult) {
-    this.#ignoreBlur = false;
+  public onMouseOver(result: SearchResult) {
+    this.focusResult(result);
+  }
+
+  public onMouseLeave() {
+    // Clear preview search result, only if the result was not selected
+    if (this.selectedResult === null) {
+      this.clearPreview();
+    }
+  }
+
+  private focusResultFromIndex() {
+    const result = this.allResults[this.focusedResultIndex];
+    this.focusResult(result);
+  }
+
+  private focusResult(result: SearchResult) {
+    // Clear old selection and preview
+    this.clearPreview();
+    if (this.focusedResult) {
+      this.focusedResult.selected = false;
+    }
+
+    // Set new selected object, and activate preview
+    this.focusedResultIndex = this.allResults.findIndex((r) => r === result);
+    this.focusedResult = this.allResults[this.focusedResultIndex];
+    this.focusedResult.selected = true;
+    this.render();
+    this.preview(result);
+
+    // Scroll to selected div
+    const resultHtmlElement = this.shadow.querySelectorAll('.result')[this.focusedResultIndex];
+    resultHtmlElement.scrollIntoView({ block: 'nearest' });
+  }
+
+  private preview(result: SearchResult) {
+    if (result.bbox && this.configManager.Config.search.objectPreview) {
+      // Result with geometry
+      const feature = new Feature<Point>(new Point(getCenter(result.bbox)));
+      this.previewFeaturesCollection.push(feature);
+    } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
+      const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
+      if (!this.state.layers.layersList.includes(layer)) {
+        // Preview layer
+        this.previewLayer = layer;
+        this.state.layers.layersList.push(this.previewLayer);
+        this.layerManager.toggleLayer(this.previewLayer, 'on');
+      }
+    }
+  }
+
+  public clearPreview() {
+    // Clear preview search result
+    this.previewFeaturesCollection.clear();
+
+    // Clear preview layer
+    if (this.previewLayer) {
+      const treeItemId = this.previewLayer.treeItemId;
+      this.layerManager.toggleLayer(this.previewLayer, 'off');
+      const index = this.state.layers.layersList.findIndex((l) => l.treeItemId === treeItemId);
+      if (index >= 0) {
+        this.state.layers.layersList.splice(index, 1);
+      } else {
+        console.warn('Error while removing preview layer.');
+      }
+      this.previewLayer = null;
+    }
+  }
+
+  public onSelect(result: SearchResult) {
+    this.selectedResult = result;
+    this.ignoreBlur = false;
     this.forceHide = true;
+    this.previewLayer = null;
     super.render();
 
     if (result.bbox) {
@@ -157,24 +264,36 @@ class SearchComponent extends GirafeHTMLElement {
       console.warn('Unsupported result type');
     }
     this.onFocusOut();
-  }
 
-  selectResult() {
-    // selecting the next search result with the keyboard
-    const results = this.shadowRoot?.querySelectorAll('.result');
-
-    const next = results![this.selectedCntr] as HTMLElement;
-    if (next) {
-      if (this.selectedResult) {
-        this.selectedResult.classList.remove('active');
-      }
-      this.selectedResult = next;
-      this.selectedResult.classList.add('active');
-      this.selectedResult.scrollIntoView({ block: 'nearest' });
+    // Update searchbox with result
+    if (this.searchBox && result.properties) {
+      this.searchBox.value = result.properties.label;
     }
   }
 
-  onMouseMove() {
+  private zoomTo(extent: Extent) {
+    // We create a buffer around the extent from 50% of the width/height
+    const bufferValue = Math.max((getWidth(extent) * 50) / 100, (getHeight(extent) * 50) / 100);
+    const bufferedExtent = buffer(extent, bufferValue);
+
+    const minResolution = this.configManager.Config.search.minResolution;
+    const currentResolution = this.map.getView().getResolution()!;
+    const currentExtent = this.map.getView().calculateExtent();
+
+    if (currentResolution > minResolution) {
+      // If we are in a bigger resolution as the minimal one,
+      // Zoom to object with minResolution
+      MapManager.getInstance().zoomToExtent(bufferedExtent, minResolution);
+    } else if (!containsExtent(currentExtent, extent)) {
+      // Else, if the extent is NOT already within the current extent of the map
+      // We keep the current resolution, and just pan to object
+      this.state.position.center = getCenter(extent);
+    }
+    // Otherwise, if the serached object is already in the current map extent
+    // We do nothing
+  }
+
+  public onMouseMove() {
     // if the mouse moves, we activate the hover effect
     const results = this.shadowRoot?.querySelectorAll('.result');
     for (const result of results!) {
@@ -184,46 +303,7 @@ class SearchComponent extends GirafeHTMLElement {
     }
   }
 
-  removeHover() {
-    // if the keyboard is used, we deactivate the hover effect
-    const results = this.shadowRoot?.querySelectorAll('.result');
-    for (const result of results!) {
-      const htmlResult = result as HTMLElement;
-      htmlResult.style.backgroundColor = this.bgClr;
-    }
-  }
-
-  navigateToResult(e: KeyboardEvent) {
-    // deactivate mouse hover effect
-    this.removeHover();
-
-    if (e.key === 'ArrowDown') {
-      if (this.selectedResult) {
-        this.selectedCntr += 1;
-      }
-      this.selectResult();
-    }
-    if (e.key === 'ArrowUp') {
-      if (this.selectedResult) {
-        this.selectedCntr -= 1;
-      }
-      this.selectResult();
-    }
-    // select search result
-    if (e.key === 'Enter' && this.selectedResult !== null) {
-      const results = [];
-
-      for (const k in this.groupedResults) {
-        results.push(...this.groupedResults[k]);
-      }
-
-      this.onSelect(results[this.selectedCntr]);
-    }
-  }
-
-  onKeyDown(e: KeyboardEvent) {
-    console.log(e.key);
-
+  public onKeyDown(e: KeyboardEvent) {
     // clear search on escape
     if (e.key === 'Escape') {
       this.clearSearch(true);
@@ -242,12 +322,28 @@ class SearchComponent extends GirafeHTMLElement {
     }
   }
 
-  zoomTo(extent: Extent) {
-    // We create a buffer around the extent from 50% of the width/height
-    const bufferValue = Math.max((getWidth(extent) * 50) / 100, (getHeight(extent) * 50) / 100);
-    const bufferedExtent = buffer(extent, bufferValue);
+  private navigateToResult(e: KeyboardEvent) {
+    switch (e.key) {
+      case 'ArrowDown':
+        if (this.focusedResultIndex < this.allResults.length - 1) {
+          this.focusedResultIndex += 1;
+          this.focusResultFromIndex();
+        }
+        break;
 
-    this.messageManager.sendMessage({ action: GeoEvents.zoomToExtent, extent: bufferedExtent });
+      case 'ArrowUp':
+        if (this.focusedResultIndex > 0) {
+          this.focusedResultIndex -= 1;
+          this.focusResultFromIndex();
+        }
+        break;
+
+      case 'Enter':
+        if (this.focusedResultIndex >= 0) {
+          this.onSelect(this.allResults[this.focusedResultIndex]);
+        }
+        break;
+    }
   }
 }
 

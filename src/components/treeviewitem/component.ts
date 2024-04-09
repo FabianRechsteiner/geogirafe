@@ -6,7 +6,7 @@ import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
 import QueryBuilderComponent from '../querybuilder/component';
-import GeoEvents from '../../models/events';
+import { MapManager } from '../../tools/main';
 
 class TreeViewItemComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -215,7 +215,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
       throw new Error(`${this.layer.name} is not a LocalFile layer, this method should not be called here.`);
     }
 
-    this.messageManager.sendMessage({ action: GeoEvents.zoomToExtent, extent: this.layer.extent });
+    MapManager.getInstance().zoomToExtent(this.layer.extent);
   }
 
   swipeLayer(side: 'left' | 'right') {

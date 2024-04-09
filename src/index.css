@@ -98,6 +98,8 @@ header {
   top: 0;
   left: 0;
   right: 0;
+  display: flex;
+  flex-direction: row;
   border-bottom: solid 1px #ddd;
   background: var(--bkg-color);
   color: var(--text-color);
@@ -110,21 +112,15 @@ header {
 }
 
 girafe-theme-select {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 4.5rem;
   height: 4.5rem;
   z-index: 100;
 }
 
 .logo {
-  position: absolute;
-  left: 4.5rem;
-  bottom: 0;
   margin-bottom: 0.5rem;
-  height: 45px;
   margin-left: 1rem;
+  margin-top: 0.7rem;
 }
 
 body.dark-theme .logo-light {
@@ -137,14 +133,12 @@ body.light-theme .logo-dark {
 
 girafe-search {
   margin: 1rem auto auto 16rem;
-  display: block;
   width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #buttonbar {
-  position: absolute;
-  right: 0;
-  top: 0;
   text-align: right;
   color: var(--text-color);
   background-color: #444;

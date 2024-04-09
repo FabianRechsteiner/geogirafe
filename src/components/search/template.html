@@ -14,18 +14,29 @@
     onfocusout="${() => this.onFocusOut()}"
     onkeydown="${(e:KeyboardEvent) => this.onKeyDown(e)}" />
 
-  <a class="search-icon" href="#" title="Geogirafe search">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </a>
+  <img class="${this.allResults.length > 0 ? 'hidden' : 'search-icon'}" alt="search-icon" src="${this.searchIcon}" />
+  <button class="${this.allResults.length > 0 ? 'close-button' : 'hidden'}" onclick="${() => this.clearSearch(true)}">
+    <img class="close-icon" alt="close-icon" src="${this.closeIcon}" />
+  </button>
 
   <div
     id="results"
     class="${Object.keys(this.groupedResults).length === 0 || this.forceHide ? 'hidden' : ''}"
     onmousemove="${() => this.onMouseMove()}">
     ${Object.keys(this.groupedResults).map(group => uHtml`
-    <div class="title"><i class="${this.getIconClassName(group)}"></i><span>${group}</span></div>
+    <div class="title">
+      <img alt="result icon" src="${this.getIcon(group)}" />
+      <span>${group}</span>
+    </div>
     ${this.groupedResults[group].map(result => uHtml`
-    <div class="result" onmousedown="${() => this.ignoreBlur()}" onclick="${() => this.onSelect(result)}">
+    <div
+      role="option"
+      tabindex="0"
+      class="${result.selected ? 'result selected': 'result'}"
+      onmousedown="${() => this.onMouseDown()}"
+      onclick="${() => this.onSelect(result)}"
+      onmouseover="${() => this.onMouseOver(result)}"
+      onmouseleave="${() => this.onMouseLeave()}">
       <span>${result.properties?.label}</span>
     </div>
     `)} `)}

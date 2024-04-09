@@ -22,7 +22,9 @@
     "hideLegendWhenLayerIsDeactivated": false
   },
   "search": {
-    "url": "https://edit.geo.gr.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###"
+    "url": "https://edit.geo.gr.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###",
+    "objectPreview": true,
+    "layerPreview": true
   },
   "print": {
     "url": "https://edit.geo.gr.ch/printproxy/",

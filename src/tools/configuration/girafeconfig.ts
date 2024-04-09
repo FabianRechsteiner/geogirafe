@@ -31,6 +31,9 @@ class GirafeConfig {
   };
   search: {
     url: string;
+    objectPreview: boolean;
+    layerPreview: boolean;
+    minResolution: number;
   };
   print: {
     url: string;
@@ -124,7 +127,7 @@ class GirafeConfig {
       // The application can be started even if the search is not correctly configured
       // We just display a warning in the console
       console.warn(e);
-      this.search = { url: '' };
+      this.search = { url: '', objectPreview: false, layerPreview: false, minResolution: 0.5 };
     }
 
     try {
@@ -247,7 +250,12 @@ class GirafeConfig {
     if (!config.search.url.includes('###SEARCHTERM###')) {
       throw new Error(`search.url is missing the expected pattern. See https://doc.geomapfish.dev/docs/configuration`);
     }
-    return config.search;
+    return {
+      url: config.search.url,
+      objectPreview: config.search.objectPreview ?? false,
+      layerPreview: config.search.layerPreview ?? false,
+      minResolution: config.search.minResolution ?? 0.5
+    };
   }
 
   private initConfigTreeview(config: GirafeConfig) {
