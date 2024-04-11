@@ -4,12 +4,12 @@
   },
   "languages": {
     "translations": {
-      "fr": ["Mock/fr.json"]
+      "fr": ["https://www.sigip.ch/static/dummy/fr.json"]
     },
     "defaultLanguage": "fr"
   },
   "themes": {
-    "url": "Mock/themes.json",
+    "url": "https://www.sigip.ch/themes?background=background&interface=desktop",
     "defaultTheme": "thm_cadastre"
   },
   "basemaps": {
