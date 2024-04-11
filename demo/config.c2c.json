@@ -1,9 +1,9 @@
 {
   "languages": {
     "translations": {
-      "de": "Mock/de.json",
-      "en": "Mock/en.json",
-      "fr": "Mock/fr.json"
+      "de": ["Mock/de.json"],
+      "en": ["Mock/en.json"],
+      "fr": ["Mock/fr.json"]
     },
     "defaultLanguage": "en"
   },
