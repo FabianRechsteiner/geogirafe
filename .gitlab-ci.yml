@@ -312,7 +312,7 @@ docker-scout:
 # Perform a baseline security scan of the application using ZAP-Proxy
 zap-baseline-scan:
   stage: scan
-  image: owasp/zap2docker-stable
+  image: softwaresecurityproject/zap-stable
   needs:
     - job: pages
       artifacts: false
