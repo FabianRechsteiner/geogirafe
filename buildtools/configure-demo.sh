@@ -97,9 +97,10 @@ elif [ "$1" = 'sigip' ];
 then
     echo "Preparing environment SIGIP..."
     cp demo/config.$1.json $APPDIR/config.json
-    curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://www.sigip.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://www.sigip.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
+    echo "Cannot create Mock objects for SIGIP, the following commands are blocked when executed from AWS or GitLab Pipeline"
+    #curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
+    #curl "https://www.sigip.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    #curl "https://www.sigip.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'sitn' ];
 then
