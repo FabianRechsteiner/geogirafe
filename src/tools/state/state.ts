@@ -92,7 +92,6 @@ export default class State {
   ogcServers: Record<string, ServerOgc> = {};
 
   // Current active basemap
-  // TODO REG : This should not be nullable, but we should have a default "empty basemap" value
   activeBasemap: Basemap | null = null;
 
   // Current projection
