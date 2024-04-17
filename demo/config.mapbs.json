@@ -54,9 +54,23 @@
   },
   "map3d": {
     "terrainUrl": "https://3d.geo.dev.fgi.cloud.bs.ch/terrainproxy/028401be-a5fc-4560-a489-f64f458cd6ad_5/",
+    "terrainImagery": {
+      "url": "https://wmts.geo.bs.ch/wmts/1.0.0/BaseMap_farbig/default/3857/{z}/{y}/{x}.png",
+      "srid": 3857,
+      "minLoD": 8,
+      "maxLoD": 17,
+      "coverageArea": [6.78, 47.05, 8.6, 47.8]
+    },
     "tilesetsUrls": [
-      "https://3d.geo.bs.ch/cesium/tiles/lf-3d-luftbild-2023/tileset.json",
-      "https://3d.geo.bs.ch/cesium/tiles/bb-bauprojekte/tileset.json"
+      "https://3d.geo.bs.ch/cesium/tiles/av-bb-gebaude-ohne-bauprojekt/tileset.json",
+      "https://3d.geo.bs.ch/cesium/tiles/av-bb-weitere-objekte-und-bruecken-ohne-bauprojekt/tileset.json",
+      "https://3d.geo.bs.ch/cesium/tiles/av-bb-bewilligte-bauten-teilobjekte-im-bestand/tileset.json",
+      "https://3d.geo.bs.ch/cesium/tiles/av-bb-geplante-bauvorhaben-teilobjekte-im-bestand/tileset.json",
+      "https://3d.geo.bs.ch/cesium/tiles/av-bb-projektideen-teilobjekt-im-bestand/tileset.json",
+      "https://3d.geo.bs.ch/cesium/tiles/bb-bauprojekte/tileset.json",
+      "https://3d.geo.bs.ch/cesium/tiles/bl-gebaeude-2023/tileset.json",
+      "https://3d.geo.bs.ch/cesium/tiles/de-gebaeude-2023/tileset.json",
+      "https://3d.geo.bs.ch/cesium/tiles/fr-gebaeude-2023/tileset.json"
     ]
   },
   "bookmarks": {

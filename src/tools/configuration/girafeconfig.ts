@@ -86,6 +86,7 @@ class GirafeConfig {
   map3d?: {
     terrainImagery: {
       url: string;
+      srid: 4326 | 3857;
       minLoD: number | undefined;
       maxLoD: number | undefined;
       coverageArea: number[] | undefined;

@@ -1,6 +1,7 @@
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import { Map } from 'ol';
+
 import LayerWms from '../../../models/layers/layerwms';
 import StateManager from '../../../tools/state/statemanager';
 import type { SelectionParam } from '../../../tools/state/state';
@@ -111,7 +112,7 @@ class WmsManager {
       }
     });
 
-    // We intercept the avent in order to set an error icon if the WMS query has an error
+    // We intercept the event in order to set an error icon if the WMS query has an error
     // Otherwise we do no see anything on the client.
     source.on('imageloaderror', () => {
       for (const layerWms of layerList) {
