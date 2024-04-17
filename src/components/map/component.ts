@@ -16,7 +16,8 @@ import { EventsKey } from 'ol/events';
 import RenderEvent from 'ol/render/Event';
 import { Coordinate } from 'ol/coordinate';
 
-import { Cesium3DTileset } from 'cesium';
+import { ScreenSpaceEventHandler, Cartesian2, Cesium3DTileset } from 'cesium';
+import proj4 from 'proj4';
 
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
@@ -206,6 +207,7 @@ export default class MapComponent extends GirafeHTMLElement {
       });
       this.olMap.addLayer(this.selectionLayer);
       this.selectionLayer.setZIndex(1002);
+      this.selectionLayer.set('altitudeMode', 'clampToGround');
 
       // Create layer for focus
       const focusSource = new VectorSource({
@@ -238,6 +240,7 @@ export default class MapComponent extends GirafeHTMLElement {
       });
       this.olMap.addLayer(this.focusLayer);
       this.focusLayer.setZIndex(1003);
+      this.focusLayer.set('altitudeMode', 'clampToGround');
 
       if (this.configManager.Config.map.showScaleLine) {
         const scaleLine = new ScaleLine({
@@ -529,6 +532,34 @@ export default class MapComponent extends GirafeHTMLElement {
       this.loading = false;
       this.state.globe.loaded = true;
       super.render();
+
+      const cesiumScreenToLocalCoord = (position: Cartesian2) => {
+        const cart = Cesium.Cartographic.fromCartesian(pickOnGlobe(position));
+        const longLat = [Cesium.Math.toDegrees(cart.longitude), Cesium.Math.toDegrees(cart.latitude)];
+        return proj4('EPSG:4326', this.configManager.Config.map.srid, longLat);
+      };
+
+      const pickOnGlobe = (position: Cartesian2) => {
+        const ray = scene.camera.getPickRay(position);
+        return ray == undefined ? undefined : scene.globe.pick(ray, scene);
+      };
+
+      const eventHandler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+      eventHandler.setInputAction((event: ScreenSpaceEventHandler.PositionedEvent) => {
+        // If the click is on the map
+        if (Cesium.defined(event.position)) {
+          const topLeftScreen = event.position.clone();
+          topLeftScreen.x -= this.pixelTolerance;
+          topLeftScreen.y -= this.pixelTolerance;
+          const bottomRightScreen = event.position.clone();
+          bottomRightScreen.x += this.pixelTolerance;
+          bottomRightScreen.y += this.pixelTolerance;
+
+          const topLeft = cesiumScreenToLocalCoord(topLeftScreen);
+          const bottomRight = cesiumScreenToLocalCoord(bottomRightScreen);
+          this.select([topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]]);
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
       this.wmsManager3d = new WmsManager3d(scene);
       this.state.layers.layersList.forEach((l) => this.addAllActiveLayers3dMap(l));
