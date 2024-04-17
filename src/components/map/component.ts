@@ -20,6 +20,7 @@ import { Cesium3DTileset } from 'cesium';
 
 import SwipeManager from './tools/swipemanager';
 import WmsManager from './tools/wmsmanager';
+import WmsManager3d from './tools/wmsmanager3d';
 import OsmManager from './tools/osmmanager';
 import VectorTilesManager from './tools/vectortilesmanager';
 import WmtsManager from './tools/wmtsmanager';
@@ -39,6 +40,7 @@ import GeoEvents from '../../models/events';
 
 import MapManager from '../../tools/state/mapManager';
 import MapPosition from '../../tools/state/mapposition';
+import { BaseLayer, GroupLayer } from '../../models/main';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -63,6 +65,7 @@ export default class MapComponent extends GirafeHTMLElement {
   swipeManager!: SwipeManager;
   wmtsManager!: WmtsManager;
   wmsManager!: WmsManager;
+  wmsManager3d: WmsManager3d | null = null;
   osmManager!: OsmManager;
   viewManager!: ViewManager;
   vectorTilesManager!: VectorTilesManager;
@@ -466,7 +469,10 @@ export default class MapComponent extends GirafeHTMLElement {
             url: config.terrainImagery.url,
             minimumLevel: config.terrainImagery.minLoD ?? 0,
             maximumLevel: config.terrainImagery.maxLoD,
-            tilingScheme: new Cesium.GeographicTilingScheme(),
+            tilingScheme:
+              config.terrainImagery.srid === 3857
+                ? new Cesium.WebMercatorTilingScheme()
+                : new Cesium.GeographicTilingScheme(),
             rectangle: coverage
           })
         );
@@ -523,6 +529,19 @@ export default class MapComponent extends GirafeHTMLElement {
       this.loading = false;
       this.state.globe.loaded = true;
       super.render();
+
+      this.wmsManager3d = new WmsManager3d(scene);
+      this.state.layers.layersList.forEach((l) => this.addAllActiveLayers3dMap(l));
+    }
+  }
+
+  addAllActiveLayers3dMap(layer: BaseLayer) {
+    if (layer instanceof LayerWms) {
+      if (layer.active) {
+        this.wmsManager3d?.addLayer(layer);
+      }
+    } else if (layer instanceof GroupLayer) {
+      layer.children.forEach((l) => this.addAllActiveLayers3dMap(l));
     }
   }
 
@@ -619,6 +638,7 @@ export default class MapComponent extends GirafeHTMLElement {
     layerInfos.forEach((l) => {
       if (l instanceof LayerWms) {
         this.wmsManager.addLayer(l);
+        if (this.wmsManager3d != null) this.wmsManager3d.addLayer(l);
       } else if (l instanceof LayerWmts) {
         this.wmtsManager.addLayer(l);
       } else if (l instanceof LayerLocalFile) {
@@ -631,6 +651,7 @@ export default class MapComponent extends GirafeHTMLElement {
     layerInfos.forEach((l) => {
       if (l instanceof LayerWms) {
         this.wmsManager.removeLayer(l);
+        if (this.wmsManager3d != null) this.wmsManager3d.removeLayer(l);
       } else if (l instanceof LayerWmts) {
         if (this.wmtsManager.layerExists(l)) {
           this.wmtsManager.removeLayer(l);
@@ -667,6 +688,7 @@ layers.forEach(layerInfos => {
   onChangeOpacity(layerInfos: Layer) {
     if (layerInfos instanceof LayerWms) {
       this.wmsManager.changeOpacity(layerInfos);
+      if (this.wmsManager3d != null) this.wmsManager3d.changeOpacity(layerInfos);
     } else if (layerInfos instanceof LayerWmts) {
       if (this.wmtsManager.layerExists(layerInfos)) {
         this.wmtsManager.changeOpacity(layerInfos, layerInfos.opacity);
@@ -677,6 +699,7 @@ layers.forEach(layerInfos => {
   onChangeFilter(layerInfos: Layer) {
     if (layerInfos instanceof LayerWms) {
       this.wmsManager.changeFilter(layerInfos);
+      if (this.wmsManager3d != null) this.wmsManager3d.changeFilter(layerInfos);
     }
   }
 
@@ -684,6 +707,7 @@ layers.forEach(layerInfos => {
     // First, remove all existing basemaps
     this.wmtsManager.removeAllBasemapLayers();
     this.wmsManager.removeAllBasemapLayers();
+    if (this.wmsManager3d != null) this.wmsManager3d.removeAllBasemapLayers();
     this.osmManager.removeAllBasemapLayers();
     this.vectorTilesManager.removeAllBasemapLayers();
 
@@ -697,6 +721,7 @@ layers.forEach(layerInfos => {
         this.wmtsManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerWms) {
         this.wmsManager.addBasemapLayer(layer);
+        if (this.wmsManager3d != null) this.wmsManager3d.addBasemapLayer(layer);
       } else {
         throw new Error('Unknown basemap type');
       }
