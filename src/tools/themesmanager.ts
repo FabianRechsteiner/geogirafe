@@ -97,6 +97,12 @@ class ThemesManager extends GirafeSingleton {
   prepareBasemaps(basemapJson: GMFBackgroundLayer[]) {
     const basemaps: { [key: number]: Basemap } = {};
 
+    if (this.configManager.Config.basemaps.emptyBasemap) {
+      // Add an empty basemap
+      const emptyBasemap = new Basemap({ id: 0, name: 'Empty' });
+      basemaps[emptyBasemap.id] = emptyBasemap;
+    }
+
     if (this.configManager.Config.basemaps.OSM) {
       // Add default OSM Option
       const osmBasemap = new Basemap({ id: -1, name: 'OpenStreetMap' });

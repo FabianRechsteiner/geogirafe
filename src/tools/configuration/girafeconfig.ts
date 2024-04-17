@@ -19,6 +19,7 @@ class GirafeConfig {
     defaultBasemap: string;
     OSM: boolean;
     SwissTopoVectorTiles: boolean;
+    emptyBasemap: boolean;
   };
   treeview: {
     useCheckboxes: boolean;
@@ -274,9 +275,10 @@ class GirafeConfig {
   private initConfigBasemaps(config: GirafeConfig) {
     return {
       show: config.basemaps?.show ?? true,
-      defaultBasemap: config.basemaps?.defaultBasemap ?? '',
+      defaultBasemap: config.basemaps?.defaultBasemap ?? 'Empty',
       OSM: config.basemaps?.OSM ?? false,
-      SwissTopoVectorTiles: config.basemaps?.SwissTopoVectorTiles ?? false
+      SwissTopoVectorTiles: config.basemaps?.SwissTopoVectorTiles ?? false,
+      emptyBasemap: config.basemaps?.emptyBasemap ?? true
     };
   }
 
