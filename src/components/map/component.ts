@@ -314,14 +314,15 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onClick(e: MapBrowserEvent<UIEvent>) {
-    // Build selectionbox using the default tolerance
-    const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
-    const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);
-    const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
-    const bottomRightCoord = this.olMap.getCoordinateFromPixel(bottomRightPixel);
-    const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
-
-    this.select(extent);
+    if (this.state.selection.enabled) {
+      // Build selectionbox using the default tolerance
+      const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
+      const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);
+      const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
+      const bottomRightCoord = this.olMap.getCoordinateFromPixel(bottomRightPixel);
+      const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
+      this.select(extent);
+    }
   }
 
   onDragSelection(_e: DragBoxEvent) {
@@ -546,8 +547,8 @@ export default class MapComponent extends GirafeHTMLElement {
 
       const eventHandler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
       eventHandler.setInputAction((event: ScreenSpaceEventHandler.PositionedEvent) => {
-        // If the click is on the map
-        if (Cesium.defined(event.position)) {
+        // If the click is on the map and selection is enabled
+        if (Cesium.defined(event.position) && this.state.selection.enabled) {
           const topLeftScreen = event.position.clone();
           topLeftScreen.x -= this.pixelTolerance;
           topLeftScreen.y -= this.pixelTolerance;
