@@ -1,6 +1,7 @@
 import { MapComponent } from '../main';
 
 import ComponentManager from '../../tools/state/componentManager';
+import { StateManager, State } from '../../tools/main';
 
 import { Geometry, LineString, Point, Polygon, Circle as CircleGeom } from 'ol/geom';
 import { Collection, Feature } from 'ol';
@@ -21,6 +22,7 @@ let currentShape: RedliningShape | null = null;
 
 export default class OlRedlining {
   map: MapComponent;
+  state: State;
 
   redliningFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   redliningSource!: VectorSource;
@@ -30,7 +32,7 @@ export default class OlRedlining {
 
   constructor() {
     this.map = ComponentManager.getInstance().getComponents(MapComponent)[0];
-
+    this.state = StateManager.getInstance().state;
     // Create vector source for drawing
     this.redliningSource = new VectorSource({ features: this.redliningFeaturesCollection });
     this.redliningSource.on('addfeature', (e) => this.onFeatureAdded(e));
@@ -121,6 +123,7 @@ export default class OlRedlining {
 
   activateRedliningTool(tool: RedliningShape) {
     this.deactivateRedliningTool();
+    this.state.selection.enabled = false;
     let geometryFunction = undefined;
     let freehand = false;
     let olTool;
@@ -172,6 +175,7 @@ export default class OlRedlining {
   }
 
   deactivateRedliningTool() {
+    this.state.selection.enabled = true;
     if (this.draw) {
       this.map.olMap.removeInteraction(this.draw);
     }

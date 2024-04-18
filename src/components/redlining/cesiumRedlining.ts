@@ -4,14 +4,14 @@ import RedliningFeature from './redliningFeature';
 import RedliningShape from './redliningshape';
 
 import { MapComponent } from '../main';
+import { StateManager, ConfigManager, State } from '../../tools/main';
 import ComponentManager from '../../tools/state/componentManager';
-import { ConfigManager } from '../../tools/main';
-import StateManager from '../../tools/state/statemanager';
 
 const getPositionAsText = (p: Cartesian3) => p.x.toFixed(3) + ' ; ' + p.y.toFixed(3) + ' ; ' + p.z.toFixed(3);
 
 export default class CesiumRedlining {
   map: MapComponent;
+  state: State;
   activeShapePoints: Cartesian3[] = [];
   activeShapes: Entity[] | undefined = undefined;
   floatingPoint: Entity | undefined = undefined;
@@ -24,6 +24,7 @@ export default class CesiumRedlining {
   constructor() {
     this.configManager = ConfigManager.getInstance();
     this.map = ComponentManager.getInstance().getComponents(MapComponent)[0];
+    this.state = StateManager.getInstance().state;
 
     StateManager.getInstance().subscribe('globe.loaded', () => {
       if (StateManager.getInstance().state.globe.loaded) {
@@ -44,6 +45,7 @@ export default class CesiumRedlining {
   }
 
   activateRedlining(tool: RedliningShape) {
+    this.state.selection.enabled = false;
     this.handler!.setInputAction(this.addPoint(tool), Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler!.setInputAction(this.updateShape(tool), Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler!.setInputAction(this.terminateShape(tool), Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
@@ -57,6 +59,7 @@ export default class CesiumRedlining {
   }
 
   deactivateRedlining() {
+    this.state.selection.enabled = true;
     this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);

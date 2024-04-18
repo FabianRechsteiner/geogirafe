@@ -27,6 +27,7 @@ type Selection = {
   selectionParameters: SelectionParam[];
   selectedFeatures: Feature[];
   focusedFeature: Feature | null;
+  enabled: boolean;
 };
 
 type LayersConfig = {
@@ -158,7 +159,8 @@ export default class State {
   selection: Selection = {
     selectionParameters: [],
     selectedFeatures: [],
-    focusedFeature: null
+    focusedFeature: null,
+    enabled: true
   };
 
   theme: Theme | null = null;
