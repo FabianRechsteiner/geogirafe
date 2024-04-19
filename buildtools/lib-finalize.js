@@ -29,7 +29,7 @@ copy('CONTRIBUTING.md', sourceDir, targetDir);
 copy('LICENSE', sourceDir, targetDir);
 copy('public', sourceDir, targetDir);
 
-const fileList = findFilesRecursive(path.resolve('src', 'components'), ['.png', '.webp', '.jpg', '.jpeg']);
+const fileList = findFilesRecursive(path.resolve('src', 'components'), ['.png', '.webp', '.jpg', '.jpeg', '.svg']);
 for (const filepath of fileList) {
   const filename = path.basename(filepath);
   sourceDir = path.dirname(filepath);
