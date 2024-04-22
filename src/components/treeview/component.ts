@@ -3,10 +3,23 @@ import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
+import IconSimple from './images/simple.svg';
+import IconAdvanced from './images/advanced.svg';
+import IconLegend from './images/legend.svg';
+import IconExpand from './images/expand.svg';
+import IconTrash from './images/trash.svg';
+import IconSwiper from './images/swiper.svg';
 
 class TreeViewComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
+
+  iconGear: string = IconSimple;
+  iconGears: string = IconAdvanced;
+  iconLegend: string = IconLegend;
+  iconExpand: string = IconExpand;
+  iconTrash: string = IconTrash;
+  iconSwiper: string = IconSwiper;
 
   layerManager: LayerManager;
 

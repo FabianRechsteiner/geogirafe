@@ -1,10 +1,14 @@
-<girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-earth-europe" open="left">
-  <div slot="menu-content">
-    ${Object.entries(this.projections).map(([code, text]) => uHtml`
-    <girafe-button
-      text="${text}"
-      icon-style="fa-xl fa-solid fa-earth-europe"
-      onclick="${() => this.changeProjection(code)}"></girafe-button
-    >` )}
-  </div>
+<link rel="stylesheet" href="styles/common.css" />
+
+<girafe-menu-button open="left">
+  <button slot="menu-button" class="girafe-button-medium">
+    <img alt="menu-icon" src="${this.projIcon}" />
+    <span>Proj</span>
+  </button>
+
+  ${Object.entries(this.projections).map(([code, text]) => uHtml`
+  <button slot="menu-content" class="girafe-button-medium" onclick="${() => this.changeProjection(code)}">
+    <img alt="help-icon" src="${this.projIcon}" />
+    <span>${text}</span></button
+  >` )}
 </girafe-menu-button>

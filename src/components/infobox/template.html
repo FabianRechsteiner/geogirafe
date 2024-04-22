@@ -1,9 +1,10 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 <div class="content">
   ${(this.state.infobox.elements ?? []).map(info => uHtml`
   <div class="${info.type}">
     <span>${this.htmlUnsafe(info.text)}</span>
-    <i class="fa fa-solid fa-xmark" tip="Close message" onclick="${() => this.closeMessage(info)}"></i>
+    <button class="close-icon" onclick="${() => this.closeMessage(info)}" tip="Close message">
+      <img alt="close-icon" src="icons/close.svg" />
+    </button>
   </div>
   `)}
 </div>

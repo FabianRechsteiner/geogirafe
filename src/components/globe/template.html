@@ -1,10 +1,21 @@
-<girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-globe" text="2D / 3D" open="left">
-  <div slot="menu-content">
-    <girafe-button icon-style="fa-xl fa-solid fa-map" text="2D" onclick="this.state.globe.display='none'">
-    </girafe-button>
-    <girafe-button icon-style="fa-xl fa-solid fa-right-left" text="Both" onclick="this.state.globe.display='side'">
-    </girafe-button>
-    <girafe-button icon-style="fa-xl fa-solid fa-earth-europe" text="3D" onclick="this.state.globe.display='full'">
-    </girafe-button>
-  </div>
+<link rel="stylesheet" href="styles/common.css" />
+
+<girafe-menu-button icon-style="fa-xl fa-solid fa-globe" text="Layout" open="left">
+  <button slot="menu-button" class="girafe-button-medium">
+    <img alt="menu-icon" src="${this.iconGlobe}" />
+    <span>Layout</span>
+  </button>
+
+  <button slot="menu-content" class="girafe-button-medium" onclick="${() => this.state.globe.display='none'}">
+    <img alt="help-icon" src="${this.icon2D}" />
+    <span>2D</span>
+  </button>
+  <button slot="menu-content" class="girafe-button-medium" onclick="${() => this.state.globe.display='side'}">
+    <img alt="help-icon" src="${this.iconSplit}" />
+    <span>Dual</span>
+  </button>
+  <button slot="menu-content" class="girafe-button-medium" onclick="${() => this.state.globe.display='full'}">
+    <img alt="help-icon" src="${this.icon3D}" />
+    <span>3D</span>
+  </button>
 </girafe-menu-button>

@@ -1,11 +1,9 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="styles/common.css" />
 
-<div id="container">
-  <slot name="menu-button">
-    <button id="button" title="TODO: Generate this label from the button configuration"></button>
-  </slot>
+<div class="container">
+  <slot name="menu-button" onclick="${() => this.toggleMenu()}"> </slot>
 
-  <div id="menu-content" tabindex="-1">
+  <div class="${this.getClass()}">
     <slot name="menu-content"></slot>
   </div>
 </div>

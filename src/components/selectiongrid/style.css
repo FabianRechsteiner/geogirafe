@@ -104,10 +104,9 @@
   margin-right: 0.5rem;
 }
 
-girafe-button {
+button {
   float: right;
   margin-left: 0.5rem;
-  margin-top: 0.2rem;
 }
 
 ::-webkit-scrollbar {
@@ -125,6 +124,8 @@ girafe-button {
 
 td.gridjs-td {
   background-color: var(--bkg-color) !important;
+  padding: 0 0.5rem !important;
+  line-height: 1.2rem !important;
 }
 
 th.gridjs-th {
@@ -134,4 +135,8 @@ th.gridjs-th {
 
 .gridjs-th-content {
   color: var(--text-color) !important;
+}
+
+.tiny-margin {
+  margin: 0.1rem;
 }

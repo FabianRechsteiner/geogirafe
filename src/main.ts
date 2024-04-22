@@ -13,27 +13,25 @@ import ThemesManager from './tools/themesmanager';
 import UrlManager from './tools/urlmanager';
 import WfsManager from './tools/wfsmanager';
 
-// TODO: Migrate all these components to TypeScript
 import AboutComponent from './components/about/component';
 import BasemapComponent from './components/basemap/component';
-import ButtonComponent from './components/button/component';
 import ColorSwitcherComponent from './components/colorswitcher/component';
 import CoordinateComponent from './components/coordinate/component';
 import GlobeComponent from './components/globe/component';
 import HelpComponent from './components/help/component';
-import InfoboxComponent from './components/infobox/component.js';
+import InfoboxComponent from './components/infobox/component';
 import LanguageComponent from './components/language/component';
 import LRPanelComponent from './components/lr-panel/component';
 import MapComponent from './components/map/component';
-import MenuButtonComponent from './components/menubutton/component.js';
+import MenuButtonComponent from './components/menubutton/component';
 import NavBookmarksComponent from './components/navigation/navbookmarks/component';
 import NavHelperComponent from './components/navigation/navhelper/component';
 import PrintComponent from './components/print/component';
 import ProjectionComponent from './components/projection/component';
-import PrototypeBannerComponent from './components/prototypebanner/component.js';
+import PrototypeBannerComponent from './components/prototypebanner/component';
 import QueryBuilderComponent from './components/querybuilder/component';
 import RedliningComponent from './components/redlining/component.js';
-import ScaleComponent from './components/scale/component.js';
+import ScaleComponent from './components/scale/component';
 import SearchComponent from './components/search/component';
 import SelectionGridComponent from './components/selectiongrid/component';
 import SelectionWindowComponent from './components/selectionwindow/component';
@@ -97,7 +95,6 @@ document.geogirafe = {
 // Define components names
 customElements.define('girafe-about', AboutComponent);
 customElements.define('girafe-basemap', BasemapComponent);
-customElements.define('girafe-button', ButtonComponent);
 customElements.define('girafe-colorswitcher', ColorSwitcherComponent);
 customElements.define('girafe-coordinate', CoordinateComponent);
 customElements.define('girafe-globe-select', GlobeComponent);

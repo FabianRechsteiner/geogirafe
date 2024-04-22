@@ -3,12 +3,22 @@ import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import MapPosition from '../../../tools/state/mapposition';
 import NavBookmarksComponent from '../navbookmarks/component';
 import { Bookmark } from '../Bookmark';
+import IconAdd from './images/add.svg';
+import IconBookmark from './images/bookmark.svg';
+import IconNext from './images/next.svg';
+import IconPrevious from './images/previous.svg';
+import IconTrash from './images/trash.svg';
 
 type TippyType = typeof tippy;
 
 class NavHelperComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
+  iconAdd: string = IconAdd;
+  iconBookmark: string = IconBookmark;
+  iconNext: string = IconNext;
+  iconPrevious: string = IconPrevious;
+  iconTrash: string = IconTrash;
 
   #tooltip: TippyType;
   #positionHistory: MapPosition[] = [];

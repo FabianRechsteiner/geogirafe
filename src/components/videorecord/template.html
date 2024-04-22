@@ -1,11 +1,13 @@
-<div id="content">
-  <div class="${this.status === 'downloaded' ? '' : 'hidden'}">
-    <girafe-button icon-style="fa-2xl fa-solid fa-video" onclick="${() => this.startRecording()}"></girafe-button>
-  </div>
-  <div class="${this.status === 'recording' ? '' : 'hidden'}">
-    <girafe-button icon-style="fa-2xl fa-solid fa-circle-stop" onclick="${() => this.stopRecording()}"></girafe-button>
-  </div>
-  <div class="${this.status === 'recorded' ? '' : 'hidden'}">
-    <girafe-button icon-style="fa-2xl fa-solid fa-circle-down" onclick="${() => this.downloadRecord()}"></girafe-button>
-  </div>
-</div>
+<link rel="stylesheet" href="styles/common.css" />
+
+<button
+  class="${this.status === 'downloaded' ? 'girafe-button-big' : 'hidden'}"
+  onclick="${() => this.startRecording()}">
+  <img alt="help-icon" src="${this.videoIcon}" />
+</button>
+<button class="${this.status === 'recording' ? 'girafe-button-big' : 'hidden'}" onclick="${() => this.stopRecording()}">
+  <img alt="help-icon" src="${this.stopIcon}" />
+</button>
+<button class="${this.status === 'recorded' ? 'girafe-button-big' : 'hidden'}" onclick="${() => this.downloadRecord()}">
+  <img alt="help-icon" src="${this.downloadIcon}" />
+</button>

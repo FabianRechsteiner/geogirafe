@@ -1,44 +1,45 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="styles/common.css" />
 
 <div class="content">
   <div class="content-horizontal">
     <div class="content-vertical">
-      <girafe-button id="add-bookmark" size="small" icon-style="fa-sm fa-solid fa-plus"></girafe-button>
-      <girafe-button
-        size="small"
-        icon-style="fa-sm fa-solid fa-arrow-left"
-        class="border-top"
-        onclick="${() => this.navigateBack()}"></girafe-button>
+      <button id="add-bookmark" class="girafe-button-small">
+        <img alt="add-icon" src="${this.iconAdd}" />
+      </button>
+
+      <button class="girafe-button-small" onclick="${() => this.navigateBack()}">
+        <img alt="previous-icon" src="${this.iconPrevious}" />
+      </button>
     </div>
     <div class="content-vertical">
-      <girafe-menu-button icon-style="fa-sm fa-solid fa-bookmark" size="small" open="bottom-left">
-        <div slot="menu-content">
-          <div class="${this.hasBookmark ? 'menu-content' : 'hidden'}">
-            ${Object.values(this.bookmarks).map(bookmark => uHtml.for(bookmark)`
-            <div class="content-horizontal">
-              <girafe-button
-                text="${bookmark.name}"
-                size="large"
-                class="grow transparent border-top"
-                onclick="${() => this.navigateToPosition(bookmark.position)}"></girafe-button>
-              <girafe-button
-                size="small"
-                icon-style="fa-sm fa-solid fa-trash"
-                class="border-top transparent"
-                onclick="${() => this.removeBookmark(bookmark)}"></girafe-button>
-            </div>
-            ` )}
+      <girafe-menu-button open="bottom-left">
+        <button slot="menu-button" class="girafe-button-small">
+          <img alt="menu-icon" src="${this.iconBookmark}" />
+        </button>
+
+        <div slot="menu-content" class="${this.hasBookmark ? 'menu-content' : 'hidden'}">
+          ${Object.values(this.bookmarks).map(bookmark => uHtml.for(bookmark)`
+          <div class="content-horizontal">
+            <button
+              slot="menu-button"
+              class="girafe-button-large grow"
+              onclick="${() => this.navigateToPosition(bookmark.position)}">
+              <span>${bookmark.name}</span>
+            </button>
+            <button slot="menu-button" class="girafe-button-small" onclick="${() => this.removeBookmark(bookmark)}">
+              <img alt="menu-icon" src="${this.iconTrash}" />
+            </button>
           </div>
-          <div class="${this.hasBookmark ? 'hidden' : 'menu-content'}">
-            <girafe-button text="No bookmark yet..." size="large" class="transparent"></girafe-button>
-          </div>
+          ` )}
+        </div>
+        <div slot="menu-content" class="${this.hasBookmark ? 'hidden' : 'menu-content'}">
+          <span i18n="No bookmark">No bookmark.</span>
         </div>
       </girafe-menu-button>
-      <girafe-button
-        size="small"
-        icon-style="fa-sm fa-solid fa-arrow-right"
-        class="border-top"
-        onclick="${() => this.navigateForward()}"></girafe-button>
+
+      <button slot="menu-button" class="girafe-button-small" onclick="${() => this.navigateForward()}">
+        <img alt="menu-icon" src="${this.iconNext}" />
+      </button>
     </div>
   </div>
 </div>

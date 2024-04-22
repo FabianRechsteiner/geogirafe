@@ -1,9 +1,17 @@
+<link rel="stylesheet" href="styles/common.css" />
+
 <div id="content">
   <label for="scale" i18n="scale">Scale</label>
-  <span id="scale"></span>
-  <girafe-menu-button icon-style="fa-sm fa-solid fa-caret-up" size="small" open="up" class="transparent">
-    <div slot="menu-content">
-      <div id="container"></div>
-    </div>
+  <span id="scale">${this.getFormatedScale()}</span>
+
+  <girafe-menu-button open="up">
+    <button slot="menu-button" class="girafe-button-small">
+      <img alt="menu-icon" src="icons/caret-up.svg" />
+    </button>
+
+    ${this.configManager.Config.map.scales.map((scale) => uHtml`
+    <button slot="menu-content" class="girafe-button-large" onclick="${() => this.state.position.scale = scale}">
+      <span>${this.getFormatedScale(scale)}</span></button
+    >` )}
   </girafe-menu-button>
 </div>

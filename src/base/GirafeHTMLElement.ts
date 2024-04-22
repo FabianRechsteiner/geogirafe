@@ -174,7 +174,6 @@ class GirafeHTMLElement extends HTMLElement {
    * @param _serializedElement The element serialization as returned by the serialize method
    */
   deserialize(_serializedElement: unknown) {}
-
 }
 
 export default GirafeHTMLElement;

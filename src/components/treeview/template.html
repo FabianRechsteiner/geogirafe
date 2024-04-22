@@ -1,5 +1,5 @@
+<link rel="stylesheet" href="styles/common.css" />
 <link rel="stylesheet" href="lib/font-gis/font-gis.css" />
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 <link rel="stylesheet" href="lib/tippy.js/tippy.css" />
 <link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
 <link rel="stylesheet" href="lib/tippy.js/border.css" />
@@ -7,45 +7,50 @@
 
 <div id="panel" class="panel">
   <div class="menu">
-    <girafe-button
-      icon-style="${this.state.treeview.advanced ? 'fa-sm fa-solid fa-gear selectable' : 'fa-sm fa-solid fa-gears selectable'}"
-      size="small"
+    <button
+      class="girafe-button-small"
       tip="Advanced options"
       tip-placement="top"
-      class="options transparent"
-      onclick="${() => this.state.treeview.advanced = !this.state.treeview.advanced}"></girafe-button>
+      onclick="${() => this.state.treeview.advanced = !this.state.treeview.advanced}">
+      <img class="${this.state.treeview.advanced ? '' : 'hidden'}" alt="advanced mode icon" src="${this.iconGear}" />
+      <img class="${this.state.treeview.advanced ? 'hidden' : ''}" alt="simple mode icon" src="${this.iconGears}" />
+    </button>
 
-    <girafe-button
-      icon-style="${this.areAllLegendExpanded ? 'fa-sm fa-solid fa-bars selectable fa-rotate-270' : 'fa-sm fa-solid fa-bars selectable'}"
-      size="small"
+    <button
+      class="girafe-button-small"
       tip="Toggle all legends"
       tip-placement="top"
-      class="togglelegends transparent"
-      onclick="${() => this.toggleAllLegends()}"></girafe-button>
+      onclick="${() => this.toggleAllLegends()}">
+      <img
+        class="${this.areAllLegendExpanded ? '' : 'hidden'}"
+        alt="Toggle all legends icon"
+        src="${this.iconLegend}" />
+      <img
+        class="${this.areAllLegendExpanded ? 'hidden' : 'rotate90'}"
+        alt="Toggle all legends icon"
+        src="${this.iconLegend}" />
+    </button>
 
-    <girafe-button
-      icon-style="${this.isAllExpanded ? 'fa-sm fa-solid fa-caret-right selectable' : 'fa-sm fa-solid fa-caret-down selectable'}"
-      size="small"
+    <button
+      class="girafe-button-small"
       tip="Expand / Collapse all"
       tip-placement="top"
-      class="expandall transparent"
-      onclick="${() => this.expandAll()}"></girafe-button>
+      onclick="${() => this.expandAll()}">
+      <img class="${this.isAllExpanded ? '' : 'hidden'}" alt="Collapse all icon" src="${this.iconExpand}" />
+      <img class="${this.isAllExpanded ? 'hidden' : 'rotate90'}" alt="Expand all icon" src="${this.iconExpand}" />
+    </button>
 
-    <girafe-button
-      icon-style="fa-sm fa-solid fa-trash selectable"
-      size="small"
-      tip="Remove all layers"
-      tip-placement="top"
-      class="delete transparent"
-      onclick="${() => this.removeAll()}"></girafe-button>
+    <button class="girafe-button-small" tip="Remove all layers" tip-placement="top" onclick="${() => this.removeAll()}">
+      <img alt="Remove all layers icon" src="${this.iconTrash}" />
+    </button>
 
-    <girafe-button
-      icon-style="fa-sm fa-solid fa-left-right selectable"
-      size="small"
+    <button
+      class="${this.isSwiperVisible ? 'girafe-button-small' : 'hidden'}"
       tip="Hide Swiper"
       tip-placement="top"
-      class="${this.isSwiperVisible ? 'swipe transparent' : 'swipe hidden'}"
-      onclick="${() => this.hideSwipe()}"></girafe-button>
+      onclick="${() => this.hideSwipe()}">
+      <img alt="Remove all layers icon" src="${this.iconSwiper}" />
+    </button>
 
     <girafe-basemap tip="Select basemap"></girafe-basemap>
   </div>

@@ -1,9 +1,11 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MenuButtonComponent from '../menubutton/component';
+import LanguageIcon from './images/language.svg';
 
 class LanguageComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
+  public languageIcon: string = LanguageIcon;
 
   languages: string[] = [];
   #menuButton?: MenuButtonComponent;
@@ -39,22 +41,10 @@ class LanguageComponent extends GirafeHTMLElement {
     this.state.language = language;
   }
 
-  registerEvents() {
-    this.stateManager.subscribe('language', (_oldLanguage: string, newLanguage: string) =>
-      this.onTranslate(newLanguage)
-    );
-  }
-
-  onTranslate(language: string) {
-    this.menuButton.setText(language.toUpperCase());
-    this.menuButton.closeMenu();
-  }
-
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
       super.girafeTranslate();
-      this.registerEvents();
     });
   }
 }

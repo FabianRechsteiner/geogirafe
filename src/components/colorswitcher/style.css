@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  height: 4.6rem;
+  height: 4rem;
 }
 
 /* The switch - the box around the slider */
@@ -14,7 +14,7 @@
   width: 4rem;
   height: 50%;
   text-align: center;
-  background-color: var(--bkg-color-grad1);
+  background-color: transparent;
 }
 
 /* Hide default HTML checkbox */
@@ -31,7 +31,7 @@
   width: 3rem;
   height: 1.5rem;
   vertical-align: middle;
-  background-color: var(--bkg-color);
+  background-color: var(--bkg-color-grad2);
   -webkit-transition: 0.4s;
   transition: 0.4s;
   margin: 0 auto;

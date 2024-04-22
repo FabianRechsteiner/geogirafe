@@ -10,8 +10,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
     <link rel="manifest" href="site.webmanifest" />
 
-    <link rel="stylesheet" media="screen" href="src/index.css" />
-    <link rel="stylesheet" media="screen" href="src/index.mobile.css" />
+    <link rel="stylesheet" media="screen" href="src/styles/index.css" />
+    <link rel="stylesheet" media="screen" href="src/styles/index.mobile.css" />
+    <link rel="stylesheet" media="screen" href="src/styles/common.css" />
 
     <link
       rel="preload"
@@ -62,46 +63,49 @@
   <body>
     <header>
       <girafe-theme-select></girafe-theme-select>
-      <img class="logo logo-light" alt="geogirafe-logo" src="images/logo_small.webp" />
-      <img class="logo logo-dark" alt="geogirafe-logo" src="images/logo_black_small.webp" />
+      <img class="logo" alt="geogirafe-logo" src="images/logo_small.webp" />
       <girafe-search id="search"></girafe-search>
       <div id="buttonbar">
         <girafe-video-record></girafe-video-record>
         <girafe-nav-history></girafe-nav-history>
-        <girafe-button
-          icon-style="fa-2xl fa-solid fa-user"
-          onclick="throw new Error('Login not implemented')"></girafe-button>
+        <button class="girafe-button-big" onclick="throw new Error('Login not implemented')">
+          <img alt="help-icon" src="icons/user.svg" />
+        </button>
         <girafe-colorswitcher></girafe-colorswitcher>
-        <girafe-button
-          icon-style="fa-2xl fa-solid fa-circle-question"
-          onclick="document.geogirafe.state.interface.helpVisible = true">
-        </girafe-button>
-        <girafe-button
-          icon-style="fa-2xl fa-solid fa-share-nodes"
-          onclick="document.geogirafe.state.interface.shareVisible = true">
-        </girafe-button>
-        <girafe-menu-button icon-style="fa-2xl fa-solid fa-ellipsis-vertical">
-          <div slot="menu-content">
-            <girafe-button
-              icon-style="fa-xl fa-regular fa-pen-to-square"
-              text="Draw"
-              onclick="document.geogirafe.state.interface.redliningPanelVisible = !document.geogirafe.state.interface.redliningPanelVisible">
-            </girafe-button>
-            <girafe-button
-              icon-style="fa-xl fa-solid fa-print"
-              text="Print"
-              onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
-            </girafe-button>
-            <girafe-proj-select></girafe-proj-select>
-            <girafe-language-select></girafe-language-select>
-            <girafe-globe-select></girafe-globe-select>
-            <girafe-button
-              icon-style="fa-xl fa-solid fa-circle-info"
-              class="border-top"
-              text="about"
-              onclick="document.geogirafe.state.interface.aboutVisible = true">
-            </girafe-button>
-          </div>
+        <button class="girafe-button-big" onclick="document.geogirafe.state.interface.helpVisible = true">
+          <img alt="help-icon" src="icons/help.svg" />
+        </button>
+        <button class="girafe-button-big" onclick="document.geogirafe.state.interface.shareVisible = true">
+          <img alt="help-icon" src="icons/share.svg" />
+        </button>
+        <girafe-menu-button>
+          <button slot="menu-button" class="girafe-button-big">
+            <img alt="menu-icon" src="icons/menu.svg" />
+          </button>
+          <button
+            slot="menu-content"
+            class="girafe-button-medium"
+            onclick="document.geogirafe.state.interface.redliningPanelVisible = !document.geogirafe.state.interface.redliningPanelVisible">
+            <img alt="help-icon" src="icons/draw.svg" />
+            <span>Draw</span>
+          </button>
+          <button
+            slot="menu-content"
+            class="girafe-button-medium"
+            onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
+            <img alt="help-icon" src="icons/print.svg" />
+            <span>Print</span>
+          </button>
+          <girafe-proj-select slot="menu-content"></girafe-proj-select>
+          <girafe-language-select slot="menu-content"></girafe-language-select>
+          <girafe-globe-select slot="menu-content"></girafe-globe-select>
+          <button
+            slot="menu-content"
+            class="girafe-button-medium"
+            onclick="document.geogirafe.state.interface.aboutVisible = true">
+            <img alt="help-icon" src="icons/info.svg" />
+            <span>About</span>
+          </button>
         </girafe-menu-button>
       </div>
     </header>
