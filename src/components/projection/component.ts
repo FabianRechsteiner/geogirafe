@@ -1,9 +1,11 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MenuButtonComponent from '../menubutton/component';
+import ProjIcon from './images/proj.svg';
 
 class ProjectionComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
+  public projIcon: string = ProjIcon;
 
   projections: Record<string, string> = {};
   #menuButton?: MenuButtonComponent;
@@ -42,24 +44,10 @@ class ProjectionComponent extends GirafeHTMLElement {
     this.state.projection = projection;
   }
 
-  registerEvents() {
-    this.stateManager.subscribe('projection', (_oldProjection: string, newProjection: string) =>
-      this.onChangeProjection(newProjection)
-    );
-  }
-
-  onChangeProjection(projection: string) {
-    console.log('projection changed');
-    const text = this.projections[projection];
-    this.menuButton.setText(text);
-    this.menuButton.closeMenu();
-  }
-
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
       super.girafeTranslate();
-      this.registerEvents();
     });
   }
 }

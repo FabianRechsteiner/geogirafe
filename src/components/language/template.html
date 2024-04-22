@@ -1,10 +1,14 @@
-<girafe-menu-button id="menu-button" icon-style="fa-xl fa-solid fa-language" open="left">
-  <div slot="menu-content">
-    ${this.languages.map((language) => uHtml`
-    <girafe-button
-      text="${language.toUpperCase()}"
-      icon-style="fa-xl fa-solid fa-language"
-      onclick="${() => this.changeLanguage(language)}"></girafe-button
-    >` )}
-  </div>
+<link rel="stylesheet" href="styles/common.css" />
+
+<girafe-menu-button open="left">
+  <button slot="menu-button" class="girafe-button-medium">
+    <img alt="menu-icon" src="${this.languageIcon}" />
+    <span>Lang</span>
+  </button>
+
+  ${this.languages.map((language) => uHtml`
+  <button slot="menu-content" class="girafe-button-medium" onclick="${() => this.changeLanguage(language)}">
+    <img alt="help-icon" src="${this.languageIcon}" />
+    <span>${language.toUpperCase()}</span></button
+  >` )}
 </girafe-menu-button>

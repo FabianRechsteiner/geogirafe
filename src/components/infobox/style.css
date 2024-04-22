@@ -29,7 +29,7 @@
   color: #fff;
 }
 
-i {
+.close-icon {
   border: none;
   color: var(--text-color-grad2);
   padding: 0;
@@ -37,6 +37,7 @@ i {
   position: absolute;
   top: 0;
   right: 0;
+  width: 0.8rem;
   background-color: var(--bkg-color);
   cursor: pointer;
 }

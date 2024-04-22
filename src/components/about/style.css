@@ -21,9 +21,11 @@
 #close {
   cursor: pointer;
   float: right;
+  width: 12px;
+  color: var(--text-color);
 }
 
-img {
+img.logo {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }

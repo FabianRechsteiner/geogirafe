@@ -1,6 +1,5 @@
 export { default as AboutComponent } from './about/component';
 export { default as BasemapComponent } from './basemap/component';
-export { default as ButtonComponent } from './button/component';
 export { default as ColorSwitcherComponent } from './colorswitcher/component';
 export { default as CoordinateComponent } from './coordinate/component';
 export { default as GlobeComponent } from './globe/component';

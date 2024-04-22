@@ -1,14 +1,20 @@
-#container {
+.container {
   position: relative;
 }
 
-#menu-content {
+.hidden {
   display: none;
-  position: absolute;
-  font-size: 0;
 }
 
-#menu-content.open-bottom {
+.menu-content {
+  position: absolute;
+  display: flex;
+  font-size: 0;
+  background: var(--bkg-color);
+}
+
+.open-bottom {
+  flex-direction: column;
   top: 100%;
   left: 0;
   border-top: solid 1px #fff;
@@ -16,7 +22,8 @@
   width: fit-content;
 }
 
-#menu-content.open-bottom-left {
+.open-bottom-left {
+  flex-direction: row;
   top: 100%;
   right: 0;
   border-top: solid 1px #fff;
@@ -24,7 +31,8 @@
   width: fit-content;
 }
 
-#menu-content.open-up {
+.open-up {
+  flex-direction: column;
   bottom: 100%;
   right: 0;
   border-bottom: solid 1px #fff;
@@ -32,66 +40,10 @@
   width: fit-content;
 }
 
-#menu-content.open-left {
+.open-left {
+  flex-direction: row;
   right: 100%;
   bottom: 0;
   width: max-content;
   height: fit-content;
-}
-
-#button {
-  border: none;
-  border-right: solid 1px var(--bkg-color);
-  width: 4rem;
-  height: 4.6rem;
-  background-color: var(--bkg-color-grad1);
-  color: var(--text-color);
-  padding: 0;
-  cursor: pointer;
-  margin: 0;
-  display: inline-block;
-  line-height: 4rem;
-}
-
-#container.transparent #button {
-  background-color: transparent;
-  color: var(--text-color);
-}
-
-#container.transparent #button:hover {
-  background-color: transparent;
-  color: var(--text-color-grad1);
-}
-
-#button.small {
-  width: 2.25rem;
-  height: 2.25rem;
-  line-height: 2.25rem;
-}
-
-span {
-  font-size: 1.3rem;
-}
-
-#button.hybrid {
-  display: flex;
-  flex-direction: column;
-}
-
-#button.hybrid i {
-  display: inline-block;
-  height: 55%;
-  width: 100%;
-  line-height: 3.5rem;
-}
-
-#button.hybrid span {
-  font-size: 0.8rem;
-  height: 45%;
-  width: 100%;
-  line-height: 1.5rem;
-}
-
-#button:hover {
-  background-color: var(--bkg-color);
 }

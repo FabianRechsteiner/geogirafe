@@ -9,7 +9,7 @@ class AboutComponent extends GirafeDraggableElement {
   version!: HTMLElement;
   build!: HTMLElement;
   date!: HTMLElement;
-  logo: string = GirafeLogo;
+  public logo: string = GirafeLogo;
 
   constructor() {
     super('about');

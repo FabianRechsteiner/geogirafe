@@ -11,7 +11,6 @@ import PinIcon from './images/pin.svg';
 import LayerIcon from './images/layer.svg';
 import LayerGroupIcon from './images/layergroup.svg';
 import SearchIcon from './images/search.svg';
-import CloseIcon from './images/close.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SearchResult from '../../models/searchresult';
@@ -25,7 +24,6 @@ class SearchComponent extends GirafeHTMLElement {
   styleUrl = './style.css';
 
   public searchIcon: string = SearchIcon;
-  public closeIcon: string = CloseIcon;
 
   private themeManager: ThemesManager;
   private layerManager: LayerManager;

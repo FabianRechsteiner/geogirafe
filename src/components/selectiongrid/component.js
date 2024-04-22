@@ -5,9 +5,13 @@ import { niceCoordinates } from '../../tools/geometrytools';
 import Geometry from 'ol/geom/Geometry.js';
 import { getCenter } from 'ol/extent';
 import { LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
+import IconCenter from './images/center.svg';
+
 class SelectionGridComponent extends GirafeResizableElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
+
+  iconCenter = IconCenter;
 
   locale = null;
 
@@ -153,11 +157,12 @@ class SelectionGridComponent extends GirafeResizableElement {
       return;
     }
 
-    icons += `<girafe-button icon-style="fa-sm fa-solid fa-magnifying-glass" 
-                             size="extra-small" tip="Pan to geometry" tip-placement="right" 
-                             class="transparent" 
-                             state-action="position.center" 
-                             data-value="[${coords[0]},${coords[1]}]"></girafe-button>`;
+    icons += `<button class="girafe-button-tiny tiny-margin"
+                      tip="Pan to geometry"
+                      tip-placement="right"
+                      onclick="document.geogirafe.state.position.center = [${coords[0]},${coords[1]}]">
+                <img alt="menu-icon" src="${this.iconCenter}" />
+              </button>`;
 
     return icons;
   }
@@ -168,7 +173,7 @@ class SelectionGridComponent extends GirafeResizableElement {
       if (
         (lowerCell.includes('<a') && lowerCell.includes('href')) ||
         (lowerCell.includes('<img') && lowerCell.includes('src')) ||
-        lowerCell.includes('<girafe-button') ||
+        lowerCell.includes('<button') ||
         lowerCell.includes('<table') ||
         (lowerCell.includes('<i') && lowerCell.includes('class'))
       ) {

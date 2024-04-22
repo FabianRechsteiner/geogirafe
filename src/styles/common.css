@@ -1,0 +1,87 @@
+/* Common style (to all button of all sizes) */
+.girafe-button-big,
+.girafe-button-medium,
+.girafe-button-large,
+.girafe-button-small,
+.girafe-button-tiny {
+  border: none;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+}
+.girafe-button-big:hover,
+.girafe-button-medium:hover,
+.girafe-button-large:hover,
+.girafe-button-small:hover,
+.girafe-button-tiny:hover {
+  background-color: var(--bkg-color-grad1);
+  cursor: pointer;
+}
+
+img {
+  filter: var(--svg-filter);
+}
+
+/* Big button (icon only) */
+.girafe-button-big {
+  width: 4rem;
+  height: 4rem;
+  align-items: center;
+  padding: 1rem;
+}
+.girafe-button-big img {
+  overflow: hidden;
+}
+
+/* Medium button (icon or icon + text) */
+.girafe-button-medium {
+  flex-direction: column;
+  width: 4rem;
+  align-items: center;
+}
+.girafe-button-medium img {
+  margin: 1rem;
+  width: 1.5rem;
+}
+.girafe-button-medium span {
+  display: block;
+  margin-top: -0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Large button (long text or icon + long text) */
+.girafe-button-large {
+  flex-direction: row;
+}
+.girafe-button-large img {
+  margin: 0.3rem;
+  height: 2rem;
+}
+.girafe-button-large span {
+  line-height: 2rem;
+  height: 2rem;
+  margin: 0.3rem;
+}
+
+/* Small button (icon only) */
+.girafe-button-small {
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  padding: 0.5rem;
+}
+.girafe-button-small img {
+  overflow: hidden;
+}
+
+/* Tiny button (icon only with no padding) */
+.girafe-button-tiny {
+  width: 1rem;
+  height: 1rem;
+  align-items: center;
+  padding: 0;
+}
+.girafe-button-tiny img {
+  overflow: hidden;
+}

@@ -21,6 +21,7 @@ body {
   --lnk-active: #ff0000;
   --tst: #ff0000;
   --error-color: #bb0000;
+  --svg-filter: none;
 }
 
 /* Dark theme colors */
@@ -38,6 +39,7 @@ body.dark-theme {
   --lnk-hover: #ffffff;
   --lnk-active: #ff4040;
   --error-color: #ff6347;
+  --svg-filter: invert(1);
 }
 
 /* Styles for users who prefer dark mode at the OS level */
@@ -56,6 +58,7 @@ body.dark-theme {
     --lnk-visited: #6d4b8d;
     --lnk-hover: #ffffff;
     --lnk-active: #ff4040;
+    --svg-filter: invert(1);
   }
 
   /* Override dark mode with light mode styles if the user decides to swap */
@@ -72,6 +75,7 @@ body.dark-theme {
     --lnk-visited: #800080;
     --lnk-hover: #0099ff;
     --lnk-active: #ff0000;
+    --svg-filter: none;
   }
 }
 
@@ -102,8 +106,7 @@ header {
   flex-direction: row;
   border-bottom: solid 1px #ddd;
   background: var(--bkg-color);
-  color: var(--text-color);
-  height: 4.5rem;
+  height: 4rem;
   z-index: 100;
   justify-content: space-between;
   box-shadow:
@@ -111,24 +114,18 @@ header {
     0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
+img {
+  filter: var(--svg-filter);
+}
+
 girafe-theme-select {
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 4rem;
+  height: 4rem;
   z-index: 100;
 }
 
 .logo {
-  margin-bottom: 0.5rem;
-  margin-left: 1rem;
-  margin-top: 0.7rem;
-}
-
-body.dark-theme .logo-light {
-  display: none;
-}
-
-body.light-theme .logo-dark {
-  display: none;
+  margin: 0.2rem 1rem;
 }
 
 girafe-search {
@@ -141,7 +138,7 @@ girafe-search {
 #buttonbar {
   text-align: right;
   color: var(--text-color);
-  background-color: #444;
+  background-color: transparent;
   font-size: 0;
   padding: 0;
   display: flex;
@@ -153,7 +150,7 @@ girafe-search {
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: 4.5rem;
+  top: 4rem;
   bottom: 0;
   left: 0;
   right: 0;
