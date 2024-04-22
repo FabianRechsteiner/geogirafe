@@ -4,6 +4,7 @@ import tippy from 'tippy.js';
 import State from './tools/state/state.js';
 
 import ConfigManager from './tools/configuration/configmanager';
+import ErrorManager from './tools/errormanager.js';
 import I18nManager from './tools/i18nmanager';
 import MessageManager from './tools/messagemanager';
 import ShareManager from './tools/share/sharemanager';
@@ -79,6 +80,7 @@ tippy.setDefaultProps({ maxWidth: '' });
 
 // Initialize the managers
 ConfigManager.getInstance();
+ErrorManager.getInstance();
 I18nManager.getInstance();
 MessageManager.getInstance();
 ThemesManager.getInstance();
