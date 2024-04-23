@@ -13,8 +13,6 @@ class SelectionGridComponent extends GirafeResizableElement {
 
   iconCenter = IconCenter;
 
-  locale = null;
-
   panel = null;
   content = null;
   header = null;
@@ -37,8 +35,6 @@ class SelectionGridComponent extends GirafeResizableElement {
     this.header = this.shadow.querySelector('#header');
     this.grid = this.shadow.querySelector('#grid');
     this.panel.style.display = 'none';
-
-    this.locale = this.configManager.Config.general.locale;
 
     this.activateTooltips(false, [800, 0], 'top-end');
   }
@@ -140,16 +136,21 @@ class SelectionGridComponent extends GirafeResizableElement {
       }
     } else if (geometry instanceof LineString || geometry instanceof MultiLineString) {
       icons = '<i class="geo-type fg-polyline-pt fg-lg"></i>';
-      const length = (Math.round(geometry.getLength() * 100) / 100).toLocaleString(this.locale, {
+      const geoLength =
+        geometry instanceof MultiLineString ? geometry.getLineString().getLength() : geometry.getLength();
+      const length = (Math.round(geoLength * 100) / 100).toLocaleString(this.configManager.Config.general.locale, {
         minimumFractionDigits: 2
       });
       icons += `<span>${length}&nbsp;m</span>`;
       coords = getCenter(geometry.getExtent());
     } else if (geometry instanceof Polygon || geometry instanceof MultiPolygon) {
       icons = '<i class="geo-type fg-polygon-pt fg-lg"></i>';
-      const area = (Math.round(geometry.getArea() * 100) / 100).toLocaleString(this.locale, {
-        minimumFractionDigits: 2
-      });
+      const area = (Math.round(geometry.getArea() * 100) / 100).toLocaleString(
+        this.configManager.Config.general.locale,
+        {
+          minimumFractionDigits: 2
+        }
+      );
       icons += `<span>${area}&nbsp;m<sup>2</sup></span>`;
       coords = getCenter(geometry.getExtent());
     } else {

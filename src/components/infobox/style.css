@@ -40,6 +40,10 @@
   width: 0.8rem;
   background-color: transparent;
   cursor: pointer;
+}
+
+.content div.warning .close-icon,
+.content div.error .close-icon {
   filter: invert(1);
 }
 

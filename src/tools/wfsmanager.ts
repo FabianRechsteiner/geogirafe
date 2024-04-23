@@ -40,12 +40,12 @@ export default class WfsManager extends GirafeSingleton {
 
   async getServerWfs(wfsUrl: string) {
     if (!(wfsUrl in this.serversWfs)) {
-      await this.#initializeWfs([wfsUrl]);
+      await this.initializeWfs([wfsUrl]);
     }
     return this.serversWfs[wfsUrl];
   }
 
-  async #initializeWfs(wfsUrlsToInit: string[]) {
+  private async initializeWfs(wfsUrlsToInit: string[]) {
     for (const wfsUrl of wfsUrlsToInit) {
       if (wfsUrl in this.serversWfs) {
         continue;
@@ -61,22 +61,35 @@ export default class WfsManager extends GirafeSingleton {
 
       // Then, find all "complexType" elements
       for (const tag of xml.getElementsByTagName('complexType')) {
-        const typeName = tag.getAttribute('name');
-        if (!typeName) {
-          throw new Error('Could not find a name for the complex type');
-        }
-
-        const featureType = elementTypeToName[typeName];
-        const elements = Array.from(tag.getElementsByTagName('sequence')[0].getElementsByTagName('element'));
-
-        // If we didn't find any geometry attribute for this featureType the wfs query won't be possible
-        if (!elements.some((e) => this.manageLayerAttribute(serverWfs, e, featureType))) {
-          throw new Error('No Geometry column for the type ' + featureType);
-        }
+        this.initializeAttribute(tag, serverWfs, elementTypeToName);
       }
+
       // This WFS is now initialized
       serverWfs.initialized = true;
       this.serversWfs[wfsUrl] = serverWfs;
+    }
+  }
+
+  private initializeAttribute(tag: Element, serverWfs: ServerWfs, elementTypeToName: Record<string, string>) {
+    const typeName = tag.getAttribute('name');
+    if (!typeName) {
+      throw new Error('Could not find a name for the complex type');
+    }
+
+    const featureType = elementTypeToName[typeName];
+    const elements = Array.from(tag.getElementsByTagName('sequence')[0].getElementsByTagName('element'));
+
+    let geometryAttributeFound: boolean = false;
+    for (const element of elements) {
+      if (this.manageLayerAttribute(serverWfs, element, featureType)) {
+        geometryAttributeFound = true;
+      }
+    }
+
+    // If we didn't find any geometry attribute for this featureType, then we have a problem
+    // Because the wfs query won't be possible
+    if (!geometryAttributeFound) {
+      throw new Error('No Geometry column for the type ' + featureType);
     }
   }
 
@@ -142,7 +155,7 @@ export default class WfsManager extends GirafeSingleton {
   async wfsQuery(selectionParams: SelectionParam[]) {
     // Add all WFS layers to this.serverWfs
     for (const param of selectionParams) {
-      await this.#initializeWfs(this.getQueryableLayers(param).map((l) => l.urlWfs!));
+      await this.initializeWfs(this.getQueryableLayers(param).map((l) => l.urlWfs!));
     }
 
     const promises = [];
