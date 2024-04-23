@@ -1,5 +1,4 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import MenuButtonComponent from '../menubutton/component';
 import LanguageIcon from './images/language.svg';
 
 class LanguageComponent extends GirafeHTMLElement {
@@ -8,17 +7,9 @@ class LanguageComponent extends GirafeHTMLElement {
   public languageIcon: string = LanguageIcon;
 
   languages: string[] = [];
-  #menuButton?: MenuButtonComponent;
 
   constructor() {
     super('language');
-  }
-
-  get menuButton() {
-    if (!this.#menuButton) {
-      throw new Error('You called menuButton before render');
-    }
-    return this.#menuButton;
   }
 
   render() {
@@ -28,11 +19,10 @@ class LanguageComponent extends GirafeHTMLElement {
     }
 
     super.render();
-    this.#menuButton = this.shadow.querySelector('#menu-button')!;
 
     // Hide menu button if only one language
     if (this.languages.length == 1) {
-      this.menuButton.hide();
+      (this.shadow.host as GirafeHTMLElement).hide();
     }
   }
 

@@ -38,8 +38,9 @@
   top: 0;
   right: 0;
   width: 0.8rem;
-  background-color: var(--bkg-color);
+  background-color: transparent;
   cursor: pointer;
+  filter: invert(1);
 }
 
 span {

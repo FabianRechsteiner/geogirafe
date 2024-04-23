@@ -1,5 +1,4 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import MenuButtonComponent from '../menubutton/component';
 import ProjIcon from './images/proj.svg';
 
 class ProjectionComponent extends GirafeHTMLElement {
@@ -8,34 +7,20 @@ class ProjectionComponent extends GirafeHTMLElement {
   public projIcon: string = ProjIcon;
 
   projections: Record<string, string> = {};
-  #menuButton?: MenuButtonComponent;
 
   constructor() {
     super('projection');
   }
 
-  get menuButton() {
-    if (!this.#menuButton) {
-      throw new Error('You called menuButton before render');
-    }
-    return this.#menuButton;
-  }
-
   render() {
     // Get projections list and store it
     this.projections = this.configManager.Config.projections;
-    for (const key in this.projections) {
-      if (key.startsWith('//')) {
-        delete this.projections[key];
-      }
-    }
 
     super.render();
-    this.#menuButton = this.shadow.querySelector('#menu-button')!;
 
     // Hide menu button if only one projection
     if (Object.keys(this.projections).length == 1) {
-      this.menuButton.hide();
+      (this.shadow.host as GirafeHTMLElement).hide();
     }
   }
 
