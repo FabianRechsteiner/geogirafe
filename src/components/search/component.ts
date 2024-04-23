@@ -3,14 +3,17 @@ import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Geometry, Point } from 'ol/geom';
-import { Style, Icon } from 'ol/style';
+import { Geometry, LineString, MultiLineString, MultiPolygon, Point, Polygon } from 'ol/geom';
+import { Style, Icon, Stroke, Fill } from 'ol/style';
 import { buffer, getWidth, getHeight, getCenter, containsExtent, Extent } from 'ol/extent';
+import { Coordinate } from 'ol/coordinate';
+import Picker from 'vanilla-picker';
 
 import PinIcon from './images/pin.svg';
 import LayerIcon from './images/layer.svg';
 import LayerGroupIcon from './images/layergroup.svg';
 import SearchIcon from './images/search.svg';
+import PaintbrushIcon from './images/paintbrush.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SearchResult from '../../models/searchresult';
@@ -24,12 +27,14 @@ class SearchComponent extends GirafeHTMLElement {
   styleUrl = './style.css';
 
   public searchIcon: string = SearchIcon;
+  public paintbrushIcon: string = PaintbrushIcon;
 
   private themeManager: ThemesManager;
   private layerManager: LayerManager;
   private readonly map: Map;
   private previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   private previewLayer: Layer | null = null;
+  private previewGeoLayer: VectorLayer<VectorSource> | null = null;
 
   private ignoreBlur = false;
   public groupedResults: Record<string, SearchResult[]> = {};
@@ -45,6 +50,9 @@ class SearchComponent extends GirafeHTMLElement {
 
   private searchBox?: HTMLInputElement;
 
+  public paintSearchResults?: boolean;
+  public defaultSearchStrokeColor?: string;
+
   constructor() {
     super('search');
     this.themeManager = ThemesManager.getInstance();
@@ -54,14 +62,17 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   private createPreviewLayer() {
-    const vectorLayer = new VectorLayer({
-      properties: {
-        addToPrintedLayers: true
-      },
-      source: new VectorSource({
-        features: this.previewFeaturesCollection
-      }),
-      style: new Style({
+    this.configManager.loadConfig().then(() => {
+      this.paintSearchResults = this.configManager.Config.search.paintSearchResults;
+      this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor;
+
+      this.initColorPicker();
+      const previewStyle = new Style({
+        stroke: new Stroke({
+          color: this.configManager.Config.search.defaultStrokeColor,
+          width: this.configManager.Config.search.defaultStrokeWidth
+        }),
+        fill: new Fill({ color: this.configManager.Config.search.defaultFillColor }),
         image: new Icon({
           anchor: [0.5, 1],
           anchorXUnits: 'fraction',
@@ -69,10 +80,19 @@ class SearchComponent extends GirafeHTMLElement {
           src: PinIcon,
           scale: 0.3
         })
-      })
+      });
+      this.previewGeoLayer = new VectorLayer({
+        properties: {
+          addToPrintedLayers: true
+        },
+        source: new VectorSource({
+          features: this.previewFeaturesCollection
+        }),
+        style: previewStyle
+      });
+      this.map.addLayer(this.previewGeoLayer);
+      this.previewGeoLayer.setZIndex(1010);
     });
-    this.map.addLayer(vectorLayer);
-    vectorLayer.setZIndex(1010);
   }
 
   public onMouseDown() {
@@ -207,8 +227,41 @@ class SearchComponent extends GirafeHTMLElement {
   private preview(result: SearchResult) {
     if (result.bbox && this.configManager.Config.search.objectPreview) {
       // Result with geometry
-      const feature = new Feature<Point>(new Point(getCenter(result.bbox)));
-      this.previewFeaturesCollection.push(feature);
+      if (result.geometry) {
+        switch (result.geometry.type) {
+          case 'Point': {
+            const feature = new Feature<Point>(new Point(getCenter(result.bbox)));
+            this.previewFeaturesCollection.push(feature);
+            return;
+          }
+          case 'MultiLineString': {
+            const feature = new Feature<MultiLineString>(
+              new MultiLineString(result.geometry.coordinates as Coordinate[][])
+            );
+            this.previewFeaturesCollection.push(feature);
+            return;
+          }
+          case 'LineString': {
+            const feature = new Feature<LineString>(new LineString(result.geometry.coordinates as Coordinate[]));
+            this.previewFeaturesCollection.push(feature);
+            return;
+          }
+          case 'Polygon': {
+            const feature = new Feature<Polygon>(new Polygon(result.geometry.coordinates as Coordinate[][]));
+            this.previewFeaturesCollection.push(feature);
+            return;
+          }
+          case 'MultiPolygon': {
+            const feature = new Feature<MultiPolygon>(
+              new MultiPolygon(result.geometry.coordinates as Coordinate[][][])
+            );
+            this.previewFeaturesCollection.push(feature);
+            return;
+          }
+          default:
+            throw new Error(`Geometry type of search result is not being supported.`);
+        }
+      }
     } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
       if (!this.state.layers.layersList.includes(layer)) {
@@ -278,14 +331,16 @@ class SearchComponent extends GirafeHTMLElement {
     const currentResolution = this.map.getView().getResolution()!;
     const currentExtent = this.map.getView().calculateExtent();
 
-    if (currentResolution > minResolution) {
-      // If we are in a bigger resolution as the minimal one,
-      // Zoom to object with minResolution
-      MapManager.getInstance().zoomToExtent(bufferedExtent, minResolution);
-    } else if (!containsExtent(currentExtent, extent)) {
-      // Else, if the extent is NOT already within the current extent of the map
-      // We keep the current resolution, and just pan to object
-      this.state.position.center = getCenter(extent);
+    if (minResolution) {
+      if (currentResolution > minResolution) {
+        // If we are in a bigger resolution as the minimal one,
+        // Zoom to object with minResolution
+        MapManager.getInstance().zoomToExtent(bufferedExtent, minResolution);
+      } else if (!containsExtent(currentExtent, extent)) {
+        // Else, if the extent is NOT already within the current extent of the map
+        // We keep the current resolution, and just pan to object
+        this.state.position.center = getCenter(extent);
+      }
     }
     // Otherwise, if the serached object is already in the current map extent
     // We do nothing
@@ -342,6 +397,51 @@ class SearchComponent extends GirafeHTMLElement {
         }
         break;
     }
+  }
+
+  private initColorPicker() {
+    super.render();
+    const colorPicker = this.shadowRoot?.getElementById('colorPickerBtn');
+    if (colorPicker) {
+      const fillPicker = new Picker({
+        parent: colorPicker,
+        color: this.configManager.Config.search.defaultStrokeColor,
+        popup: 'right'
+      });
+      fillPicker.onChange = (color: Picker.Color) => {
+        // The fill color should be the selected color with a bit more transparency
+        const fillColor = [color.rgba[0], color.rgba[1], color.rgba[2], color.rgba[3] / 2];
+        this.previewGeoLayer?.setStyle(
+          new Style({
+            stroke: new Stroke({
+              color: color.hex,
+              width: this.configManager.Config.search.defaultStrokeWidth
+            }),
+            fill: new Fill({ color: fillColor }),
+            image: new Icon({
+              anchor: [0.5, 1],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'fraction',
+              src: this.getColoredPinIcon(color.hex),
+              scale: 0.3
+            })
+          })
+        );
+      };
+    }
+  }
+
+  private getColoredPinIcon(hexColor: string) {
+    const pin = `<svg xmlns="http://www.w3.org/2000/svg" 
+                      width="120" 
+                      height="120" 
+                      style="fill: ${hexColor};" 
+                      viewBox="0 0 384 512">
+                    <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 
+                             307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/>
+                 </svg>`;
+
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(pin);
   }
 }
 

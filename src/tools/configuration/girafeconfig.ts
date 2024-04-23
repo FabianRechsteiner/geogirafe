@@ -32,9 +32,13 @@ class GirafeConfig {
   };
   search: {
     url: string;
-    objectPreview: boolean;
-    layerPreview: boolean;
-    minResolution: number;
+    objectPreview?: boolean;
+    layerPreview?: boolean;
+    minResolution?: number;
+    defaultFillColor?: string;
+    defaultStrokeColor?: string;
+    defaultStrokeWidth?: number;
+    paintSearchResults?: boolean;
   };
   print: {
     url: string;
@@ -129,7 +133,9 @@ class GirafeConfig {
       // The application can be started even if the search is not correctly configured
       // We just display a warning in the console
       console.warn(e);
-      this.search = { url: '', objectPreview: false, layerPreview: false, minResolution: 0.5 };
+      this.search = {
+        url: ''
+      };
     }
 
     try {
@@ -256,7 +262,11 @@ class GirafeConfig {
       url: config.search.url,
       objectPreview: config.search.objectPreview ?? false,
       layerPreview: config.search.layerPreview ?? false,
-      minResolution: config.search.minResolution ?? 0.5
+      minResolution: config.search.minResolution ?? 0.5,
+      defaultFillColor: config.search?.defaultFillColor ?? '#3388ff7f',
+      defaultStrokeColor: config.search?.defaultStrokeColor ?? '#3388ff',
+      defaultStrokeWidth: config.search?.defaultStrokeWidth ?? 2,
+      paintSearchResults: config.search?.paintSearchResults ?? true
     };
   }
 
