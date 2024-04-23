@@ -1,14 +1,19 @@
-import { Coordinate } from "ol/coordinate";
-import { Extent } from "ol/extent";
+import { Coordinate } from 'ol/coordinate';
+import { Extent } from 'ol/extent';
+
+type GeometryResult = {
+  type: 'Point' | 'MultiPoint' | 'LineString' | 'MultiLineString' | 'Polygon' | 'MultiPolygon';
+  coordinates: Coordinate | Coordinate[] | Coordinate[][] | Coordinate[][][];
+};
+type GeometryCollectionResult = {
+  type: 'GeometryCollection';
+  geometries: GeometryCollectionResult[] | GeometryResult[];
+};
 
 class SearchResult {
-
   bbox?: Extent;
 
-  geometry?: {
-    type: 'Point' | 'LineString' | 'MultiLineString' | 'Polygon' | 'MultiPolygon';
-    coordinates: Coordinate | Coordinate[] | Coordinate[][] | Coordinate[][][];
-  };
+  geometry?: GeometryResult | GeometryCollectionResult;
 
   properties?: {
     label: string;
@@ -22,4 +27,5 @@ class SearchResult {
   selected: boolean = false;
 }
 
+export type { GeometryResult, GeometryCollectionResult };
 export default SearchResult;

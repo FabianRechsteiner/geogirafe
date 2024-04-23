@@ -3,7 +3,7 @@ import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Geometry, LineString, MultiLineString, MultiPolygon, Point, Polygon } from 'ol/geom';
+import { Geometry, LineString, MultiLineString, MultiPolygon, Point, MultiPoint, Polygon } from 'ol/geom';
 import { Style, Icon, Stroke, Fill } from 'ol/style';
 import { buffer, getWidth, getHeight, getCenter, containsExtent, Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate';
@@ -16,7 +16,7 @@ import SearchIcon from './images/search.svg';
 import PaintbrushIcon from './images/paintbrush.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import SearchResult from '../../models/searchresult';
+import SearchResult, { type GeometryResult, GeometryCollectionResult } from '../../models/searchresult';
 import ThemesManager from '../../tools/themesmanager';
 import MapManager from '../../tools/state/mapManager';
 import Layer from '../../models/layers/layer';
@@ -228,39 +228,7 @@ class SearchComponent extends GirafeHTMLElement {
     if (result.bbox && this.configManager.Config.search.objectPreview) {
       // Result with geometry
       if (result.geometry) {
-        switch (result.geometry.type) {
-          case 'Point': {
-            const feature = new Feature<Point>(new Point(getCenter(result.bbox)));
-            this.previewFeaturesCollection.push(feature);
-            return;
-          }
-          case 'MultiLineString': {
-            const feature = new Feature<MultiLineString>(
-              new MultiLineString(result.geometry.coordinates as Coordinate[][])
-            );
-            this.previewFeaturesCollection.push(feature);
-            return;
-          }
-          case 'LineString': {
-            const feature = new Feature<LineString>(new LineString(result.geometry.coordinates as Coordinate[]));
-            this.previewFeaturesCollection.push(feature);
-            return;
-          }
-          case 'Polygon': {
-            const feature = new Feature<Polygon>(new Polygon(result.geometry.coordinates as Coordinate[][]));
-            this.previewFeaturesCollection.push(feature);
-            return;
-          }
-          case 'MultiPolygon': {
-            const feature = new Feature<MultiPolygon>(
-              new MultiPolygon(result.geometry.coordinates as Coordinate[][][])
-            );
-            this.previewFeaturesCollection.push(feature);
-            return;
-          }
-          default:
-            throw new Error(`Geometry type of search result is not being supported.`);
-        }
+        this.addFeatureToPreview(result.geometry);
       }
     } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
@@ -270,6 +238,49 @@ class SearchComponent extends GirafeHTMLElement {
         this.state.layers.layersList.push(this.previewLayer);
         this.layerManager.toggleLayer(this.previewLayer, 'on');
       }
+    }
+  }
+
+  private addFeatureToPreview(geometry: GeometryResult | GeometryCollectionResult) {
+    switch (geometry.type) {
+      case 'Point': {
+        const feature = new Feature<Point>(new Point(getCenter(geometry.coordinates as Coordinate)));
+        this.previewFeaturesCollection.push(feature);
+        return;
+      }
+      case 'MultiPoint': {
+        const feature = new Feature<MultiPoint>(new MultiPoint(geometry.coordinates as Coordinate[]));
+        this.previewFeaturesCollection.push(feature);
+        return;
+      }
+      case 'MultiLineString': {
+        const feature = new Feature<MultiLineString>(new MultiLineString(geometry.coordinates as Coordinate[][]));
+        this.previewFeaturesCollection.push(feature);
+        return;
+      }
+      case 'LineString': {
+        const feature = new Feature<LineString>(new LineString(geometry.coordinates as Coordinate[]));
+        this.previewFeaturesCollection.push(feature);
+        return;
+      }
+      case 'Polygon': {
+        const feature = new Feature<Polygon>(new Polygon(geometry.coordinates as Coordinate[][]));
+        this.previewFeaturesCollection.push(feature);
+        return;
+      }
+      case 'MultiPolygon': {
+        const feature = new Feature<MultiPolygon>(new MultiPolygon(geometry.coordinates as Coordinate[][][]));
+        this.previewFeaturesCollection.push(feature);
+        return;
+      }
+      case 'GeometryCollection': {
+        geometry.geometries.forEach((geom) => {
+          this.addFeatureToPreview(geom);
+        });
+        return;
+      }
+      default:
+        throw new Error(`Geometry type of search result is not being supported.`);
     }
   }
 
