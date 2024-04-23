@@ -1,7 +1,7 @@
 import { Map } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
-import { LayerOsm } from '../../../models/main';
+import LayerOsm from '../../../models/layers/layerosm';
 
 class OsmManager {
   map: Map;

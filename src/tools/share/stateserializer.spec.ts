@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { GroupLayer, LayerWmts } from '../../models/main';
+import GroupLayer from '../../models/layers/grouplayer';
+import LayerWmts from '../../models/layers/layerwmts';
 import StateSerializer from './stateserializer';
 import MockHelper from '../tests/mockhelper';
-import { State } from '../main';
+import State from '../state/state';
 import LZString from 'lz-string';
 import { SharedState } from './sharedstate';
 

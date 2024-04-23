@@ -1,7 +1,8 @@
-import { MapComponent } from '../main';
+import MapComponent from '../map/component';
 
 import ComponentManager from '../../tools/state/componentManager';
-import { StateManager, State } from '../../tools/main';
+import StateManager from '../../tools/state/statemanager';
+import State from '../../tools/state/state';
 
 import { Geometry, LineString, Point, Polygon, Circle as CircleGeom } from 'ol/geom';
 import { Collection, Feature } from 'ol';

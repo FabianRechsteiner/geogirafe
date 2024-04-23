@@ -3,7 +3,9 @@ import type { MFPAttributes } from '@geoblocks/mapfishprint/src/types';
 import type Feature from 'ol/Feature';
 import type Geometry from 'ol/geom/Geometry';
 import type { EncodeLegendOptions, MFPLegendClass } from './MFPLegendEncoder';
-import type { State, I18nManager, MapManager } from '../../../tools/main';
+import type State from '../../../tools/state/state';
+import type I18nManager from '../../../tools/i18nmanager';
+import type MapManager from '../../../tools/state/mapManager';
 import type { MFPPrintDatasource } from './MFPTypes';
 
 import {

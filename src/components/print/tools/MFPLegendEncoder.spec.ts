@@ -6,9 +6,13 @@ import {
   createTestLayerWms,
   createTestLayerWmts
 } from '../../../tools/tests/layerhelpers';
-import { I18nManager, MapManager, StateManager } from '../../../tools/main';
+import I18nManager from '../../../tools/i18nmanager';
+import MapManager from '../../../tools/state/mapManager';
+import StateManager from '../../../tools/state/statemanager';
 import MockHelper from '../../../tools/tests/mockhelper';
-import { LayerWms, LayerWmts, GroupLayer } from '../../../models/main';
+import LayerWms from '../../../models/layers/layerwms';
+import LayerWmts from '../../../models/layers/layerwmts';
+import GroupLayer from '../../../models/layers/grouplayer';
 import { createWMTSLayers } from '../../../tools/tests/olhelpers';
 
 describe('MFPLegendEncoder', () => {

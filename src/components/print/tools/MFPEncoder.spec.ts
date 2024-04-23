@@ -1,8 +1,13 @@
 import { expect, describe, it, beforeEach, afterAll } from 'vitest';
 import MFPEncoder, { EncodeMapOptions } from './MFPEncoder';
 import MockHelper from '../../../tools/tests/mockhelper';
-import { MapManager, StateManager } from '../../../tools/main';
-import { LayerWmts, LayerWms, GroupLayer, BaseLayer, Basemap } from '../../../models/main';
+import MapManager from '../../../tools/state/mapManager';
+import StateManager from '../../../tools/state/statemanager';
+import LayerWmts from '../../../models/layers/layerwmts';
+import LayerWms from '../../../models/layers/layerwms';
+import GroupLayer from '../../../models/layers/grouplayer';
+import BaseLayer from '../../../models/layers/baselayer';
+import Basemap from '../../../models/basemap';
 import { createTestLayerWmts, createTestLayerWms, createTestGroupLayer } from '../../../tools/tests/layerhelpers';
 import { createVectorLayers, createWMTSLayers } from '../../../tools/tests/olhelpers';
 import { BaseCustomizer, MFPWmtsLayer } from '@geoblocks/mapfishprint';

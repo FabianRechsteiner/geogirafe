@@ -29,7 +29,7 @@ describe('Components architecture', () => {
     let components = getSubDirectories(componentsPath);
 
     // Then remove from this list the central components that are allowed to be used in other components
-    const centralComponents = ['button', 'menubutton', 'querybuilder'];
+    const centralComponents = ['menubutton', 'querybuilder', 'map'];
     components = components.filter((component) => !centralComponents.includes(component));
 
     // Then, check if some component is using another component.

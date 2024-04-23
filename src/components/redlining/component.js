@@ -5,7 +5,7 @@ import RedliningShape from './redliningshape';
 import OlRedlining from './olRedlining';
 import CesiumRedlining from './cesiumRedlining';
 
-import { GirafeHTMLElement } from '../../base/main';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class RedliningComponent extends GirafeHTMLElement {
   templateUrl = './template.html';

@@ -3,7 +3,7 @@ import StateManager from '../../../tools/state/statemanager';
 import type { SelectionParam } from '../../../tools/state/state';
 import LayerManager from '../../../tools/layermanager';
 import { Scene as CesiumScene, WebMapServiceImageryProvider, ImageryLayer } from 'cesium';
-import { ConfigManager } from '../../../tools/main';
+import ConfigManager from '../../../tools/configuration/configmanager';
 
 export default class WmsManager3d {
   layerManager: LayerManager;

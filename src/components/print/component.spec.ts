@@ -1,5 +1,5 @@
 import { it, expect, describe } from 'vitest';
-import { PrintComponent } from '../main';
+import PrintComponent from './component';
 
 describe('PrintComponent', () => {
   it('filterValidPrintFormats', () => {

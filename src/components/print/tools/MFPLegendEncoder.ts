@@ -1,8 +1,11 @@
-import type { GroupLayer, BaseLayer } from '../../../models/main';
+import type GroupLayer from '../../../models/layers/grouplayer';
+import type BaseLayer from '../../../models/layers/baselayer';
 import type MapManager from '../../../tools/state/mapManager';
-import type { I18nManager, State } from '../../../tools/main';
+import type I18nManager from '../../../tools/i18nmanager';
+import type State from '../../../tools/state/state';
 
-import { LayerWms, LayerWmts } from '../../../models/main';
+import LayerWms from '../../../models/layers/layerwms';
+import LayerWmts from '../../../models/layers/layerwmts';
 import GeoConsts from '../../../tools/geoconsts';
 import { isLayerVisible } from './printUtils';
 import LegendHelper from '../../../tools/legendhelper';

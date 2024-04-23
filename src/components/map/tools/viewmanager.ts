@@ -4,7 +4,7 @@ import ConfigManager from '../../../tools/configuration/configmanager';
 import GeoConsts from '../../../tools/geoconsts';
 import { Map } from 'ol';
 import { Coordinate } from 'ol/coordinate';
-import { StateManager } from '../../../tools/main';
+import StateManager from '../../../tools/state/statemanager';
 
 class ViewManager {
   map: Map;

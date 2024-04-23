@@ -1,7 +1,10 @@
-import { BaseLayer, GroupLayer, Layer } from '../../models/main';
+import BaseLayer from '../../models/layers/baselayer';
+import GroupLayer from '../../models/layers/grouplayer';
+import Layer from '../../models/layers/layer';
 import { SharedLayer, SharedState } from './sharedstate';
 import LZString from 'lz-string';
-import { LayerManager, State } from '../main';
+import LayerManager from '../layermanager';
+import State from '../state/state';
 import ComponentManager from '../state/componentManager';
 
 class StateSerializer {

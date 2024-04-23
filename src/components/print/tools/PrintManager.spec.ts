@@ -1,7 +1,7 @@
 import { expect, it, describe, beforeEach, afterAll } from 'vitest';
 import PrintManager from './PrintManager';
 import MockHelper from '../../../tools/tests/mockhelper';
-import { I18nManager } from '../../../tools/main';
+import I18nManager from '../../../tools/i18nmanager';
 import { createPointFeature } from '../../../tools/tests/olhelpers';
 
 describe('PrintManager', () => {

@@ -41,7 +41,8 @@ import GeoEvents from '../../models/events';
 
 import MapManager from '../../tools/state/mapManager';
 import MapPosition from '../../tools/state/mapposition';
-import { BaseLayer, GroupLayer } from '../../models/main';
+import BaseLayer from '../../models/layers/baselayer';
+import GroupLayer from '../../models/layers/grouplayer';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {

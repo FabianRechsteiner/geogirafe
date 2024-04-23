@@ -1,10 +1,13 @@
 import type { BaseCustomizer, MFPLayer, MFPImageLayer, MFPMap, MFPWmtsLayer } from '@geoblocks/mapfishprint';
-import type { GroupLayer, BaseLayer } from '../../../models/main';
-import type { MapManager, State } from '../../../tools/main';
+import type GroupLayer from '../../../models/layers/grouplayer';
+import type BaseLayer from '../../../models/layers/baselayer';
+import MapManager from '../../../tools/state/mapManager';
+import State from '../../../tools/state/state';
 
 import { getAbsoluteUrl, getWmtsMatrices, getWmtsUrl, MFPVectorEncoder } from '@geoblocks/mapfishprint';
 import { toDegrees } from 'ol/math';
-import { LayerWms, LayerWmts } from '../../../models/main';
+import LayerWms from '../../../models/layers/layerwms';
+import LayerWmts from '../../../models/layers/layerwmts';
 import VectorLayer from 'ol/layer/Vector';
 import { isLayerVisible } from './printUtils';
 

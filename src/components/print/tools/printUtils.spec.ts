@@ -1,4 +1,5 @@
-import type { LayerWms, LayerWmts } from '../../../models/main';
+import type LayerWms from '../../../models/layers/layerwms';
+import type LayerWmts from '../../../models/layers/layerwmts';
 import { describe, it, expect } from 'vitest';
 import { isLayerVisible } from './printUtils';
 import { createTestLayerWms, createTestLayerWmts } from '../../../tools/tests/layerhelpers';
