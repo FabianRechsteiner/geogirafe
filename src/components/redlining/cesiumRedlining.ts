@@ -3,8 +3,10 @@ import { Cartesian3, Entity } from 'cesium';
 import RedliningFeature from './redliningFeature';
 import RedliningShape from './redliningshape';
 
-import { MapComponent } from '../main';
-import { StateManager, ConfigManager, State } from '../../tools/main';
+import MapComponent from '../map/component';
+import StateManager from '../../tools/state/statemanager';
+import ConfigManager from '../../tools/configuration/configmanager';
+import State from '../../tools/state/state';
 import ComponentManager from '../../tools/state/componentManager';
 
 const getPositionAsText = (p: Cartesian3) => p.x.toFixed(3) + ' ; ' + p.y.toFixed(3) + ' ; ' + p.z.toFixed(3);

@@ -10,4 +10,3 @@ copy('tools', sourceDir, targetDir);
 copy('typings', sourceDir, targetDir);
 copy('decs.d.ts', sourceDir, targetDir);
 copy('main.lib.ts', sourceDir, targetDir);
-copy('main.lib.d.ts', sourceDir, targetDir);

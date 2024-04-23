@@ -2,7 +2,8 @@ import type { Callback } from '../../../tools/state/statemanager';
 
 import Map, { FrameState } from 'ol/Map';
 import PrintMaskLayer from './printMaskLayer';
-import { GeoConsts, StateManager } from '../../../tools/main';
+import GeoConsts from '../../../tools/geoconsts';
+import StateManager from '../../../tools/state/statemanager';
 import { getOlayerByName } from '../../../tools/olutils';
 import { Size } from 'ol/size';
 

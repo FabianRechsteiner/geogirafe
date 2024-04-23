@@ -6,7 +6,7 @@ import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
 import QueryBuilderComponent from '../querybuilder/component';
-import { MapManager } from '../../tools/main';
+import MapManager from '../../tools/state/mapManager';
 
 class TreeViewItemComponent extends GirafeHTMLElement {
   templateUrl = './template.html';

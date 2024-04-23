@@ -1,5 +1,7 @@
 import { GMFMetadata, GMFTreeItem } from '../../models/gmf';
-import { LayerWms, LayerWmts, GroupLayer } from '../../models/main';
+import LayerWms from '../../models/layers/layerwms';
+import LayerWmts from '../../models/layers/layerwmts';
+import GroupLayer from '../../models/layers/grouplayer';
 
 export const createDefaultMetadata = (options?: Partial<GMFMetadata>): GMFMetadata => {
   return {

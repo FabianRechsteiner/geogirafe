@@ -1,5 +1,6 @@
 import type { Callback } from './state/statemanager';
-import { State, StateManager } from './main';
+import State from './state/state';
+import StateManager from './state/statemanager';
 
 /**
  * Manages the toggling of state properties based on specified paths.
