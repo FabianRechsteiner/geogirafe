@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="lib/vanilla-picker/vanilla-picker.csp.css" />
+
 <div id="searchbox">
   <input
     id="search"
@@ -15,6 +17,9 @@
   <img class="${this.allResults.length > 0 ? 'hidden' : 'search-icon'}" alt="search-icon" src="${this.searchIcon}" />
   <button class="${this.allResults.length > 0 ? 'close-button' : 'hidden'}" onclick="${() => this.clearSearch(true)}">
     <img class="close-icon" alt="close-icon" src="icons/close.svg" />
+  </button>
+  <button id="colorPickerBtn" class="${this.paintSearchResults ? 'select-color-button' : 'hidden'}">
+    <img class="select-color-icon" alt="select-color-icon" src="${this.paintbrushIcon}" />
   </button>
 
   <div

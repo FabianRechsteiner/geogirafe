@@ -5,7 +5,7 @@
 #searchbox {
   background-color: var(--bkg-color);
   border-right: none;
-  height: 2.5rem;
+  height: 2.25rem;
   border-radius: 6px;
   border: none;
   width: 100%;
@@ -20,7 +20,7 @@
   margin: 0 0 0 0.5rem;
   padding-left: 0.8rem;
   border: 0;
-  height: 2.2rem;
+  height: 2.25rem;
   width: auto;
   flex: 1 1 auto;
   -ms-flex: 1 1 auto;
@@ -31,19 +31,18 @@
 }
 
 .search-icon,
-.close-icon {
+.close-icon,
+.select-color-icon {
   width: 14px;
   color: var(--text-color);
   padding: 0 1rem;
 }
 
-.close-button {
+.close-button,
+.select-color-button {
   border: none;
   padding: 0;
   background-color: transparent;
-}
-
-.close-icon:hover {
   cursor: pointer;
 }
 
