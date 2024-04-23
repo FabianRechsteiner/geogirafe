@@ -650,9 +650,10 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onChangeDarkMode() {
-    const canvas = this.shadow.querySelector('canvas');
-    if (canvas) {
-      canvas.style.filter = this.state.interface.darkMapMode ? 'invert(100%) hue-rotate(180deg)' : '';
+    if (this.state.interface.darkMapMode) {
+      this.mapTarget.classList.add('darkmap');
+    } else {
+      this.mapTarget.classList.remove('darkmap');
     }
   }
 
@@ -744,7 +745,7 @@ layers.forEach(layerInfos => {
     this.vectorTilesManager.removeAllBasemapLayers();
 
     // Then, add the selected basemaps
-    basemap.layersList.forEach((layer) => {
+    for (const layer of basemap.layersList) {
       if (layer instanceof LayerOsm) {
         this.osmManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerVectorTiles) {
@@ -757,6 +758,6 @@ layers.forEach(layerInfos => {
       } else {
         throw new Error('Unknown basemap type');
       }
-    });
+    }
   }
 }

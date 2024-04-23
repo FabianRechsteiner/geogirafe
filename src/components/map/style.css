@@ -5,6 +5,10 @@
   width: 100%;
 }
 
+#ol-map.darkmap canvas {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
 .hidden {
   display: none;
 }
