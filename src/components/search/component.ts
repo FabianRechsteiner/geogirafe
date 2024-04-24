@@ -77,7 +77,7 @@ class SearchComponent extends GirafeHTMLElement {
           anchor: [0.5, 1],
           anchorXUnits: 'fraction',
           anchorYUnits: 'fraction',
-          src: PinIcon,
+          src: this.getColoredPinIcon(this.configManager.Config.search.defaultStrokeColor as string),
           scale: 0.3
         })
       });
@@ -244,7 +244,7 @@ class SearchComponent extends GirafeHTMLElement {
   private addFeatureToPreview(geometry: GeometryResult | GeometryCollectionResult) {
     switch (geometry.type) {
       case 'Point': {
-        const feature = new Feature<Point>(new Point(getCenter(geometry.coordinates as Coordinate)));
+        const feature = new Feature<Point>(new Point(geometry.coordinates as Coordinate));
         this.previewFeaturesCollection.push(feature);
         return;
       }
