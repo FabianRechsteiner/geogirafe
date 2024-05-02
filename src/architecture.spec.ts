@@ -70,6 +70,10 @@ describe('Components architecture', () => {
         ob: path.join(__dirname, path.normalize('components/navigation/navhelper/component.ts'))
       },
       {
+        oa: path.join(__dirname, path.normalize('components/lidar/tools/manager.ts')),
+        ob: path.join(__dirname, path.normalize('components/lidar/tools/plot.ts'))
+      },
+      {
         oa: path.join(__dirname, path.normalize('models/layers/baselayer.ts')),
         ob: path.join(__dirname, path.normalize('models/layers/grouplayer.ts'))
       },

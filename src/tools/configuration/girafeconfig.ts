@@ -105,6 +105,16 @@ class GirafeConfig {
     get: string | undefined;
     post: string | undefined;
   };
+  lidar: {
+    url: string;
+  };
+  csv: {
+    encoding: string;
+    extension: string;
+    includeHeader: boolean;
+    quote: string;
+    separator: string;
+  };
 
   /**
    * Creates the configuration of the app validating the json passed or giving default values.
@@ -126,6 +136,8 @@ class GirafeConfig {
     this.projections = this.initConfigProjections(config);
     this.map = this.initConfigMap(config);
     this.bookmarks = this.initConfigBookmarks(config);
+    this.lidar = this.initConfigLidar(config);
+    this.csv = this.initConfigCsv(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -289,6 +301,29 @@ class GirafeConfig {
       OSM: config.basemaps?.OSM ?? false,
       SwissTopoVectorTiles: config.basemaps?.SwissTopoVectorTiles ?? false,
       emptyBasemap: config.basemaps?.emptyBasemap ?? true
+    };
+  }
+
+  private initConfigLidar(config: GirafeConfig) {
+    if (!config.lidar?.url) {
+      console.warn('No Lidar URL');
+    }
+    return {
+      url: config.lidar?.url ?? 'noLidarUrlInConfig'
+    };
+  }
+
+  private initConfigCsv(config: GirafeConfig) {
+    const defaultConfig = {
+      encoding: 'utf-8',
+      extension: '.csv',
+      includeHeader: true,
+      quote: "'",
+      separator: ','
+    };
+    return {
+      ...defaultConfig,
+      ...config.csv
     };
   }
 
