@@ -63,6 +63,7 @@ class PrintComponent extends GirafeHTMLElement {
   private capabilities?: MFPCapabilities;
   private configAttributeNames: string[] = [];
   private printMaskManager?: PrintMaskManager;
+  private isVisibleComponentSetup = false;
   attributeNames: string[] = [];
   printFormats: string[] = [];
   layouts: MFPCapabilitiesLayout[] = [];
@@ -88,13 +89,6 @@ class PrintComponent extends GirafeHTMLElement {
    */
   render() {
     this.visible ? this.renderComponent() : this.renderEmptyComponent();
-  }
-
-  /**
-   * Close the panel via the state.
-   */
-  closePanel() {
-    this.state.interface.printPanelVisible = false;
   }
 
   /**
@@ -296,12 +290,20 @@ class PrintComponent extends GirafeHTMLElement {
       this.render();
       return;
     }
+    if (!this.isVisibleComponentSetup) {
+      this.setupVisibleComponent();
+    }
+    this.printMaskManager?.setPossibleScales(this.scales);
+  }
+
+  private setupVisibleComponent() {
     this.updateInputRotationFromMap();
     this.state.print.maskVisible = true;
     this.printMaskManager = new PrintMaskManager(this.mapManager.getMap());
     this.printMaskManager?.setPossibleScales(this.scales);
     this.setupPrintManager();
     this.registerEvents();
+    this.isVisibleComponentSetup = true;
   }
 
   /**
@@ -310,6 +312,7 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private renderEmptyComponent() {
+    this.isVisibleComponentSetup = false;
     this.printMaskManager?.destroy();
     unByKeyAll(this.eventKeys);
     this.eventKeys.length = 0;

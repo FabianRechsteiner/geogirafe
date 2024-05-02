@@ -220,7 +220,8 @@ footer {
   flex-direction: row;
 }
 
-girafe-selection-grid {
+girafe-selection-grid,
+girafe-lidar-profile {
   position: relative;
   display: block;
 }

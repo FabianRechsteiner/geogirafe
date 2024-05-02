@@ -1,0 +1,66 @@
+<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+
+<div id="panel">
+  <div id="content">
+    <div class="${!this.isConfigLoaded() ? '' : 'hidden'}">
+      Error, can not fetch the config. Please try again later.
+    </div>
+
+    <div class="${this.isConfigLoaded() ? '' : 'hidden'}">
+      <div>
+        <button
+          class="${this.isDrawActive() ? 'no-margin active' : 'no-margin'}"
+          onclick="${() => this.toggleDrawLine()}"
+          i18n="Draw LIDAR profile line"></button>
+      </div>
+
+      ${this.isDrawActive() ? uHtml`
+      <div class="margin-top">
+        <em
+          class="small"
+          i18n="Draw a line on the map to display the corresponding LIDAR profile. Use double-click to finish the drawing.">
+        </em>
+      </div>
+      ` : uHtml``} ${ this.isLineDrawn() ? uHtml`
+      <div>
+        <button class="btn btn-default" onclick="${() => this.exportFile('csv')}" i18n="CSV export"></button>
+        <button class="btn btn-default" onclick="${() => this.exportFile('png')}" i18n="PNG export"></button>
+        <button class="btn btn-default" title="Reset profile" onclick="${() => this.resetPlot()}">
+          <span class="fa-solid fa-rotate"></span>
+        </button>
+      </div>
+      <hr />
+      <button class="btn btn-default" onclick="${() => this.setMeasureActive()}" i18n="Take measure"></button>
+      <button class="btn btn-default" title="Clear measure'" onclick="${() => this.clearMeasure()}">
+        <span class="fa-solid fa-eraser"></span>
+      </button>
+      ` : uHtml``}
+
+      <div>
+        <hr />
+        <p i18n="Material"></p>
+        <div class="select">
+          <select id="select-attributes" onchange="${(evt: Event) => this.selectPointAttribute(evt)}">
+            ${this.getAvailablePointAttributes().map( (pointAttribute) => uHtml`
+            <option value="${pointAttribute.name}" .selected="${this.isPointAttributeSelected(pointAttribute.name)}">
+              ${pointAttribute.name}
+            </option>
+            `, )}
+          </select>
+        </div>
+      </div>
+      <hr />
+      <p i18n="Classes"></p>
+      ${Object.entries(this.getClassifications()).map( ([key, value]) => uHtml`
+      <div>
+        <input
+          type="checkbox"
+          id="${value.name}"
+          .checked="${!!value.visible}"
+          oninput="${() => this.toggleClassificationVisibility(value, key)}" />
+        <label for="${value.name}">${value.name}</label>
+      </div>
+      `, )}
+    </div>
+  </div>
+</div>

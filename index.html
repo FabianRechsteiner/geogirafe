@@ -96,6 +96,13 @@
             <img alt="help-icon" src="icons/print.svg" />
             <span>Print</span>
           </button>
+          <button
+            slot="menu-content"
+            class="girafe-button-medium"
+            onclick="document.geogirafe.state.interface.lidarPanelVisible = !document.geogirafe.state.interface.lidarPanelVisible">
+            <img alt="help-icon" src="icons/lidar.svg" />
+            <span>Lidar</span>
+          </button>
           <girafe-proj-select slot="menu-content"></girafe-proj-select>
           <girafe-language-select slot="menu-content"></girafe-language-select>
           <girafe-globe-select slot="menu-content"></girafe-globe-select>
@@ -129,6 +136,7 @@
           <div slot="main">
             <girafe-redlining data-toggle-path="interface.printPanelVisible"></girafe-redlining>
             <girafe-print data-toggle-path="interface.redliningPanelVisible"></girafe-print>
+            <girafe-lidar-panel data-toggle-path="interface.lidarPanelVisible"></girafe-lidar-panel>
           </div>
         </girafe-lr-panel>
         <girafe-about></girafe-about>
@@ -139,6 +147,7 @@
       </div>
       <div id="content-bottom">
         <girafe-selection-grid dock="bottom"></girafe-selection-grid>
+        <girafe-lidar-profile id="lidar-footer" dock="bottom"></girafe-lidar-profile>
       </div>
     </div>
   </body>

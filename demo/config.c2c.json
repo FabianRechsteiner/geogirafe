@@ -61,5 +61,11 @@
     "service": "localStorage",
     "get": "",
     "post": ""
+  },
+  "lidar": {
+    "url": "https://sitn.ne.ch/pytree"
+  },
+  "csv": {
+    "separator": ";"
   }
 }

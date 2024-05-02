@@ -1,0 +1,89 @@
+#panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  overflow: auto;
+  min-width: 20rem; /* For and from parent panel */
+}
+
+.hidden {
+  display: none;
+}
+
+#content {
+  background: var(--bkg-color);
+  padding: 1.5rem;
+  margin: 0;
+  color: var(--text-color);
+}
+
+#content button {
+  margin-top: 1rem;
+  height: 3rem;
+  background-color: var(--bkg-color);
+  color: var(--text-color);
+  border-radius: 3px;
+  outline: 0;
+  border: solid 1px var(--text-color);
+  cursor: pointer;
+}
+
+#content button:hover {
+  background-color: var(--bkg-color-grad2);
+}
+
+select {
+  font-family: Arial, sans-serif;
+  appearance: none;
+  outline: 0;
+  box-shadow: none;
+  padding: 0.5rem;
+  color: var(--text-color);
+  background-color: var(--bkg-color);
+  border: solid 1px var(--text-color);
+  background-image: none;
+  cursor: pointer;
+}
+
+/* Custom Select wrapper */
+.select {
+  position: relative;
+  display: flex;
+  width: 13rem;
+  height: 2.5rem;
+  border-radius: 3px;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.select select {
+  flex-grow: 1;
+}
+
+.select::after {
+  content: '\25bc';
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.7rem;
+  border: solid 1px var(--text-color);
+  border-left-width: 0;
+  color: var(--text-color);
+  pointer-events: none;
+}
+
+/* component specific */
+#content .no-margin {
+  margin: 0;
+}
+
+#content .margin-top {
+  margin-top: 0.5rem;
+}
+
+#content .active {
+  background-color: var(--bkg-color-grad1);
+}

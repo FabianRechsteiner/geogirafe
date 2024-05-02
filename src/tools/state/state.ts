@@ -5,11 +5,13 @@ import Theme from '../../models/theme';
 import BaseLayer from '../../models/layers/baselayer';
 import LayerWms from '../../models/layers/layerwms';
 import MapPosition from './mapposition';
+import OlGeomLineString from 'ol/geom/LineString';
 
 type GraphicalInterface = {
   helpVisible: boolean;
   redliningPanelVisible: boolean;
   printPanelVisible: boolean;
+  lidarPanelVisible: boolean;
   selectionGridVisible: boolean;
   aboutVisible: boolean;
   shareVisible: boolean;
@@ -71,6 +73,11 @@ export type InfoBoxContent = {
   type: 'info' | 'warning' | 'error';
 };
 
+export type Lidar = {
+  line: OlGeomLineString | null;
+  drawActive: boolean;
+};
+
 export default class State {
   /**
    * This class is a used as the state of the application, which will be accessed behind a javascript proxy.
@@ -106,6 +113,7 @@ export default class State {
     helpVisible: false,
     redliningPanelVisible: false,
     printPanelVisible: false,
+    lidarPanelVisible: false,
     selectionGridVisible: false,
     aboutVisible: false,
     shareVisible: false,
@@ -115,6 +123,11 @@ export default class State {
 
   // Current language
   language: string | null = null;
+
+  lidar: Lidar = {
+    line: null,
+    drawActive: false
+  };
 
   // Is the application currently loading data ?
   loading = false;
