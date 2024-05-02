@@ -29,6 +29,9 @@
     "url": "https://map.cartolacote.ch/printproxy/",
     "defaultLayout": "01 A4 portrait"
   },
+  "lidar": {
+    "url": "https://map.cartolacote.ch/pytree"
+  },
   "share": {
     "service": "lstu",
     "createUrl": "https://lstu.fr/a"

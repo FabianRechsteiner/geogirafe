@@ -31,6 +31,9 @@
     "url": "https://sitn.ne.ch/printproxy/",
     "defaultLayout": "1 A4 paysage"
   },
+  "lidar": {
+    "url": "https://sitn.ne.ch/pytree"
+  },
   "share": {
     "service": "lstu",
     "createUrl": "https://lstu.fr/a"
