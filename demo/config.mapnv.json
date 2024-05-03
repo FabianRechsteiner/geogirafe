@@ -26,6 +26,9 @@
     "objectPreview": true,
     "layerPreview": true
   },
+  "lidar": {
+    "url": "https://pytree.mapnv.ch"
+  },
   "print": {
     "url": "https://mapnv.ch/printproxy/",
     "defaultLayout": "1 A4 Paysage"
