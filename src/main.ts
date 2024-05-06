@@ -60,70 +60,77 @@ declare global {
   }
 }
 
-// Default configuration for Cesium (see https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/)
-window.CESIUM_BASE_URL = 'lib/cesium/';
+try {
+  // Default configuration for Cesium (see https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/)
+  window.CESIUM_BASE_URL = 'lib/cesium/';
 
-// Register custom EPSG
-// https://epsg.io/21781
-proj4.defs(
-  'EPSG:21781',
-  '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs'
-);
-// https://epsg.io/2056
-proj4.defs(
-  'EPSG:2056',
-  '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs'
-);
-register(proj4);
+  // Register custom EPSG
+  // https://epsg.io/21781
+  proj4.defs(
+    'EPSG:21781',
+    '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs'
+  );
+  // https://epsg.io/2056
+  proj4.defs(
+    'EPSG:2056',
+    '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs'
+  );
+  register(proj4);
 
-// Override default tooltip maxWidth:
-tippy.setDefaultProps({ maxWidth: '' });
+  // Override default tooltip maxWidth:
+  tippy.setDefaultProps({ maxWidth: '' });
 
-// Initialize the managers
-ConfigManager.getInstance();
-ErrorManager.getInstance();
-CsvManager.getInstance();
-I18nManager.getInstance();
-MessageManager.getInstance();
-ThemesManager.getInstance();
-UrlManager.getInstance();
-WfsManager.getInstance();
+  // Initialize the managers
+  ConfigManager.getInstance();
+  ErrorManager.getInstance();
+  CsvManager.getInstance();
+  I18nManager.getInstance();
+  MessageManager.getInstance();
+  ThemesManager.getInstance();
+  UrlManager.getInstance();
+  WfsManager.getInstance();
 
-// Add the state to document, so that it will be accessible everywhere
-document.geogirafe = {
-  state: StateManager.getInstance().state,
-  stateManager: StateManager.getInstance(),
-  shareManager: ShareManager.getInstance()
-};
+  // Add the state to document, so that it will be accessible everywhere
+  document.geogirafe = {
+    state: StateManager.getInstance().state,
+    stateManager: StateManager.getInstance(),
+    shareManager: ShareManager.getInstance()
+  };
 
-// Define components names
-customElements.define('girafe-about', AboutComponent);
-customElements.define('girafe-basemap', BasemapComponent);
-customElements.define('girafe-colorswitcher', ColorSwitcherComponent);
-customElements.define('girafe-coordinate', CoordinateComponent);
-customElements.define('girafe-globe-select', GlobeComponent);
-customElements.define('girafe-help', HelpComponent);
-customElements.define('girafe-infobox', InfoboxComponent);
-customElements.define('girafe-language-select', LanguageComponent);
-customElements.define('girafe-lidar-panel', LidarPanelComponent);
-customElements.define('girafe-lidar-profile', LidarProfileComponent);
-customElements.define('girafe-lr-panel', LRPanelComponent);
-customElements.define('girafe-map', MapComponent);
-customElements.define('girafe-menu-button', MenuButtonComponent);
-customElements.define('girafe-nav-bookmarks', NavBookmarksComponent);
-customElements.define('girafe-nav-history', NavHelperComponent);
-customElements.define('girafe-print', PrintComponent);
-customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
-customElements.define('girafe-proj-select', ProjectionComponent);
-customElements.define('girafe-query-builder', QueryBuilderComponent);
-customElements.define('girafe-redlining', RedliningComponent);
-customElements.define('girafe-scale', ScaleComponent);
-customElements.define('girafe-search', SearchComponent);
-customElements.define('girafe-selection-grid', SelectionGridComponent);
-customElements.define('girafe-selection-window', SelectionWindowComponent);
-customElements.define('girafe-share', ShareComponent);
-customElements.define('girafe-theme-select', ThemeComponent);
-customElements.define('girafe-tree-view', TreeViewComponent);
-customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
-customElements.define('girafe-tree-view-item', TreeViewItemComponent);
-customElements.define('girafe-video-record', VideoRecordComponent);
+  // Define components names
+  customElements.define('girafe-about', AboutComponent);
+  customElements.define('girafe-basemap', BasemapComponent);
+  customElements.define('girafe-colorswitcher', ColorSwitcherComponent);
+  customElements.define('girafe-coordinate', CoordinateComponent);
+  customElements.define('girafe-globe-select', GlobeComponent);
+  customElements.define('girafe-help', HelpComponent);
+  customElements.define('girafe-infobox', InfoboxComponent);
+  customElements.define('girafe-language-select', LanguageComponent);
+  customElements.define('girafe-lidar-panel', LidarPanelComponent);
+  customElements.define('girafe-lidar-profile', LidarProfileComponent);
+  customElements.define('girafe-lr-panel', LRPanelComponent);
+  customElements.define('girafe-map', MapComponent);
+  customElements.define('girafe-menu-button', MenuButtonComponent);
+  customElements.define('girafe-nav-bookmarks', NavBookmarksComponent);
+  customElements.define('girafe-nav-history', NavHelperComponent);
+  customElements.define('girafe-print', PrintComponent);
+  customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
+  customElements.define('girafe-proj-select', ProjectionComponent);
+  customElements.define('girafe-query-builder', QueryBuilderComponent);
+  customElements.define('girafe-redlining', RedliningComponent);
+  customElements.define('girafe-scale', ScaleComponent);
+  customElements.define('girafe-search', SearchComponent);
+  customElements.define('girafe-selection-grid', SelectionGridComponent);
+  customElements.define('girafe-selection-window', SelectionWindowComponent);
+  customElements.define('girafe-share', ShareComponent);
+  customElements.define('girafe-theme-select', ThemeComponent);
+  customElements.define('girafe-tree-view', TreeViewComponent);
+  customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
+  customElements.define('girafe-tree-view-item', TreeViewItemComponent);
+  customElements.define('girafe-video-record', VideoRecordComponent);
+} finally {
+  // To prevent the FOUC effect (flash of unstyled content),
+  // the html element is set to invisible when the application starts.
+  // When all elements have been declared, the html element is made visible
+  document.documentElement.style.opacity = '1';
+}
