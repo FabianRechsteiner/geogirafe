@@ -10,6 +10,24 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
     <link rel="manifest" href="site.webmanifest" />
 
+    <!-- To prevent the FOUC effect (flash of unstyled content), 
+         the html element is set to invisible when the application starts.
+         When all elements have been declared, the html element is made visible
+         (=> see main.ts) -->
+    <style>
+      html {
+        opacity: 0;
+        transition: opacity 1s;
+      }
+    </style>
+    <noscript>
+      <style>
+        html {
+          opacity: 1;
+        }
+      </style>
+    </noscript>
+
     <link rel="stylesheet" media="screen" href="src/styles/index.css" />
     <link rel="stylesheet" media="screen" href="src/styles/index.mobile.css" />
     <link rel="stylesheet" media="screen" href="src/styles/common.css" />
