@@ -5,11 +5,20 @@
 
 <div id="panel">
   <div id="content">
-    <div id="header"></div>
+    <div id="header">
+      ${this.tabHeaders.map((th) => uHtml`
+      <button
+        id="${th.id}"
+        i18n="${th.text}"
+        class="${th.active ? 'tab active' : 'tab'}"
+        .active="${th.active}"
+        onclick="${() => this.displayGrid(th.id)}"></button>
+      `)}
+    </div>
     <div id="grid"></div>
   </div>
   <div id="gutter"></div>
-  <div id="close">
+  <button id="close" onclick="this.closePanel()">
     <i class="fa-solid"></i>
-  </div>
+  </button>
 </div>

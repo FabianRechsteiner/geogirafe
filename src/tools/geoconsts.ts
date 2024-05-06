@@ -1,6 +1,9 @@
 import { METERS_PER_UNIT as ol_METERS_PER_UNIT } from 'ol/proj';
 
 class GeoConsts {
+  /** When circles needs to be rendered as polygon of N sides. */
+  static CIRCLE_TO_POLYGON_SIDES = 64;
+
   static INCHES_PER_METER = 39.37;
 
   // TODO REG : Is this correct ?

@@ -65,6 +65,7 @@
 
 #header {
   flex: 0;
+  display: flex;
 }
 
 .tab {
