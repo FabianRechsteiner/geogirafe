@@ -1,5 +1,6 @@
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
+import WMSGetFeatureInfo from 'ol/format/WMSGetFeatureInfo';
 import { Map } from 'ol';
 
 import LayerWms from '../../../models/layers/layerwms';
@@ -7,9 +8,10 @@ import StateManager from '../../../tools/state/statemanager';
 import type { SelectionParam } from '../../../tools/state/state';
 import LayerManager from '../../../tools/layermanager';
 
-class WmsManager {
+export default class WmsManager {
   map: Map;
   layerManager: LayerManager;
+  resolutionTolerance = 5;
 
   get state() {
     return StateManager.getInstance().state;
@@ -42,6 +44,16 @@ class WmsManager {
   constructor(map: Map) {
     this.map = map;
     this.layerManager = LayerManager.getInstance();
+
+    StateManager.getInstance().subscribe(
+      'selection.selectionParameters',
+      (_oldParams: SelectionParam[], newParams: SelectionParam[]) => this.onSelectFeatures(newParams)
+    );
+  }
+
+  onSelectFeatures(selectionParams: SelectionParam[]) {
+    this.state.loading = true;
+    this.getFeatureInfo(selectionParams).then(() => (this.state.loading = false));
   }
 
   removeAllBasemapLayers() {
@@ -149,14 +161,12 @@ class WmsManager {
         delete this.independentLayers[layerWms.treeItemId];
         this.map.removeLayer(olayer);
       } else if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
-        // Get existing ol layer for this server
-        // and remove the wms layer from the source
+        // Get existing ol layer for this server and remove the wms layer from the source
         const layerDef = this.layersByUniqueServerId[layerWms.serverUniqueQueryId];
         layerDef.layersWms = layerDef.layersWms.filter((item: LayerWms) => item.treeItemId !== layerWms.treeItemId);
 
         if (layerDef.layersWms.length > 0) {
-          // There are still layers in the list.
-          // => We update the layer source
+          // There are still layers in the list. => We update the layer source
           const source = this.#createImageWMSSource(layerDef.layersWms);
           layerDef.olayer.setSource(source);
         } else {
@@ -212,8 +222,7 @@ class WmsManager {
     }
 
     if (!layerWms.hasFilter && !layerWms.isTransparent) {
-      // There is no more filter or opacity
-      // => Back to normal
+      // There is no more filter or opacity => Back to normal
       if (layerWms.treeItemId in this.independentLayers) {
         const olayer = this.independentLayers[layerWms.treeItemId].olayer;
         // We delete the layer from the transparent layers
@@ -223,8 +232,7 @@ class WmsManager {
         this.addLayer(layerWms);
       }
     } else if (layerWms.treeItemId in this.independentLayers) {
-      // The layer has already a configured filter or opacity
-      // => We just change the and/or the filter
+      // The layer has already a configured filter or opacity  => We just change the and/or the filter
       const olayer = this.independentLayers[layerWms.treeItemId].olayer;
       if (layerWms.isTransparent) {
         olayer.setOpacity(layerWms.opacity);
@@ -239,8 +247,7 @@ class WmsManager {
 
   makeLayerIndependent(layerWms: LayerWms) {
     if (layerWms.treeItemId in this.independentLayers) {
-      // The layer is already independent.
-      // => nothing to do here.
+      // The layer is already independent. => nothing to do here.
     } else if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
       // First, we remove the layer from the default layer
       this.removeLayer(layerWms);
@@ -264,18 +271,16 @@ class WmsManager {
     const selectionParams: SelectionParam[] = [];
 
     for (const key in this.layersByUniqueServerId) {
-      const layerDef = this.layersByUniqueServerId[key];
       selectionParams.push({
-        layers: layerDef.layersWms,
+        layers: this.layersByUniqueServerId[key].layersWms,
         selectionBox: extent,
         srid: this.state.projection
       });
     }
 
     for (const key in this.independentLayers) {
-      const layerDef = this.independentLayers[key];
       selectionParams.push({
-        layers: [layerDef.layerWms],
+        layers: [this.independentLayers[key].layerWms],
         selectionBox: extent,
         srid: this.state.projection
       });
@@ -283,6 +288,55 @@ class WmsManager {
 
     StateManager.getInstance().state.selection.selectionParameters = selectionParams;
   }
-}
 
-export default WmsManager;
+  async getFeatureInfo(selectionParams: SelectionParam[]) {
+    const promises: Promise<void>[] = [];
+    selectionParams.forEach((param) => {
+      const urls: Set<string> = new Set();
+      param.layers.forEach((layer) => {
+        const olLayer = this.getOLayer(layer);
+        if (layer.queryable && layer.urlWfs == null && olLayer) {
+          // Layer is queryable through WMS and is in OL
+          const url = olLayer
+            .getSource()
+            ?.getFeatureInfoUrl(
+              [
+                (param.selectionBox[0] + param.selectionBox[2]) / 2,
+                (param.selectionBox[1] + param.selectionBox[3]) / 2
+              ],
+              (olLayer.getMapInternal()?.getView().getResolution() ??
+                (olLayer.getMinResolution() + olLayer.getMaxResolution()) / 2) + this.resolutionTolerance,
+              this.state.projection,
+              {
+                INFO_FORMAT: 'application/vnd.ogc.gml',
+                FEATURE_COUNT: 300
+              }
+            );
+          if (url !== undefined) {
+            urls.add(url);
+          } else throw new Error(`Unable to construct GetFeatureInfo URL for layer ${layer.name}`);
+        }
+      });
+
+      urls.forEach((url) => {
+        promises.push(
+          fetch(url)
+            .then((r) => r.text())
+            .then((response) => {
+              const gmlFeatures = new WMSGetFeatureInfo().readFeatures(response, {
+                dataProjection: this.state.projection,
+                featureProjection: this.state.projection
+              });
+              if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length == 0) {
+                this.state.interface.selectionGridVisible = false;
+              } else {
+                this.state.selection.selectedFeatures.push(...gmlFeatures);
+                this.state.interface.selectionGridVisible = true;
+              }
+            })
+        );
+      });
+    });
+    return Promise.all(promises);
+  }
+}
