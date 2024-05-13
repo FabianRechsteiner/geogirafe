@@ -4,6 +4,9 @@ import { ServerOgc } from '../state/state';
 
 class MockHelper {
   public static mockConfig = {
+    general: {
+      locale: 'en-US'
+    },
     languages: {
       fr: 'Mock/fr.json',
       defaultLanguage: 'fr'

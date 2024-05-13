@@ -1,6 +1,6 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import { Grid, html } from 'gridjs';
-import I18nManager, { DEFAULT_LANGUAGE } from '../../tools/i18nmanager';
+import I18nManager from '../../tools/i18nmanager';
 import { niceCoordinates } from '../../tools/geometrytools';
 import { getCenter } from 'ol/extent';
 import { LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon, Circle } from 'ol/geom';
@@ -341,7 +341,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   private getGeometryIconsInfoPoint(geometry: Point): [string, number[]] {
     let icons = '<i class="geo-type fg-point fg-lg"></i>';
     const coords = geometry.getFlatCoordinates();
-    const niceCoords = niceCoordinates(coords, this.state.language ?? DEFAULT_LANGUAGE);
+    const niceCoords = niceCoordinates(coords, this.getLocale());
     icons += `<span>E ${niceCoords[0]} / N ${niceCoords[1]}</span>`;
     return [icons, coords];
   }
@@ -354,7 +354,7 @@ class SelectionGridComponent extends GirafeResizableElement {
     let icons = '<i class="geo-type fg-multipoint fg-lg"></i>';
     if (geometry.getPoints.length === 1) {
       const coords = geometry.getPoint(0).getFlatCoordinates();
-      const niceCoords = niceCoordinates(coords, this.state.language ?? DEFAULT_LANGUAGE);
+      const niceCoords = niceCoordinates(coords, this.getLocale());
       icons += `<span>E ${niceCoords[0]} / N ${niceCoords[1]}</span>`;
       return [icons, coords];
     }
@@ -445,6 +445,10 @@ class SelectionGridComponent extends GirafeResizableElement {
     } else {
       this.render();
     }
+  }
+
+  private getLocale(): string {
+    return this.configManager.Config.general.locale;
   }
 }
 
