@@ -401,7 +401,7 @@ class SelectionGridComponent extends GirafeResizableElement {
    * Formats a cell value by interpreting html tags if necessary.
    * @return The formatted cell value.
    */
-  private formatCell(cell: string, _row: any, _column: any) {
+  private formatCell(cell: string, _row: unknown, _column: unknown) {
     if (this.isNullOrUndefinedOrBlank(cell)) {
       return cell;
     }
