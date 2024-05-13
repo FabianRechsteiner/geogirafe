@@ -26,8 +26,6 @@ type AvailableLanguages = {
   [lang: string]: TranslationsDict;
 };
 
-export const DEFAULT_LANGUAGE = 'en';
-
 class I18nManager extends GirafeSingleton {
   translations: AvailableLanguages = {};
   loadingLanguagePromise: Promise<TranslationsDict> | null = null;
@@ -43,7 +41,7 @@ class I18nManager extends GirafeSingleton {
   }
 
   formatNumber(number: string | number): string {
-    return parseFloat(`${number}`).toLocaleString(this.stateManager.state.language ?? DEFAULT_LANGUAGE);
+    return parseFloat(`${number}`).toLocaleString(this.configManager.Config.general.locale);
   }
 
   async #loadTranslations(language: string): Promise<TranslationsDict> {

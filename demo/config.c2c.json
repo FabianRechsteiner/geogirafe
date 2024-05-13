@@ -1,4 +1,7 @@
 {
+  "general": {
+    "locale": "de-CH"
+  },
   "languages": {
     "translations": {
       "de": ["Mock/de.json"],

@@ -116,6 +116,8 @@ class GirafeConfig {
     separator: string;
   };
 
+  public static readonly DEFAULT_LOCALE = 'en-US';
+
   /**
    * Creates the configuration of the app validating the json passed or giving default values.
    *
@@ -125,7 +127,6 @@ class GirafeConfig {
   constructor(config: GirafeConfig) {
     // Default values are documented here : https://doc.geomapfish.dev/docs/configuration
     // NOTE: Please adapt the documentation if necessary when doing changes here.
-
     this.general = this.initConfigGeneral(config);
     this.languages = this.initConfigLanguages(config);
     this.themes = this.initConfigThemes(config);
@@ -366,7 +367,7 @@ class GirafeConfig {
 
   private initConfigGeneral(config: GirafeConfig) {
     return {
-      locale: config.general?.locale ?? 'en-US'
+      locale: config.general.locale ?? GirafeConfig.DEFAULT_LOCALE
     };
   }
 }
