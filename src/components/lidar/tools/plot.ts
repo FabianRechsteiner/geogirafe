@@ -76,7 +76,7 @@ export default class {
      * @param x .
      * @returns x .
      */
-    // @ts-ignore
+    // @ts-expect-error TODO SMS: Check this when extending the functionalities of the LIDAR component
     this.updateScaleX = (x: number) => x;
 
     /**
@@ -90,7 +90,7 @@ export default class {
      * @param y .
      * @returns y .
      */
-    // @ts-ignore
+    // @ts-expect-error TODO SMS: Check this when extending the functionalities of the LIDAR component
     this.updateScaleY = (y) => y;
 
     /**
@@ -253,7 +253,7 @@ export default class {
 
     const svg = d3select(getLidarProfileSvg() as BaseType);
 
-    // @ts-ignore
+    // @ts-expect-error TODO SMS: Check this when extending the functionalities of the LIDAR component
     svg.call(zoom).on('dblclick.zoom', null);
 
     svg.selectAll('*').remove();
@@ -332,9 +332,9 @@ export default class {
 
     const xSelect = svg.select('.x.axis');
     const ySelect = svg.select('.y.axis');
-    // @ts-ignore
+    // @ts-expect-error TODO SMS: Check this when extending the functionalities of the LIDAR component
     xSelect.call(xAxis.scale(newScaleX));
-    // @ts-ignore
+    // @ts-expect-error TODO SMS: Check this when extending the functionalities of the LIDAR component
     ySelect.call(yAxis.scale(newScaleY));
 
     const canvas = d3select(getLidarProfileCanvas() as BaseType);

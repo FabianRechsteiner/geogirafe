@@ -21,7 +21,17 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          lazy: ['gridjs', 'vanilla-picker', 'tippy.js']
+          lazy: [
+            '@geoblocks/mapfishprint',
+            '@geoblocks/print',
+            'buffer',
+            'd3',
+            'file-saver',
+            'gridjs',
+            'lz-string',
+            'tippy.js',
+            'vanilla-picker'
+          ]
         }
       }
     }

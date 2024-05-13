@@ -31,7 +31,7 @@ variables:
 # Audit NPM dependencies to find any known vulnerability
 npm-audit:
   stage: test
-  image: node:18-slim
+  image: node:20-slim
   allow_failure: true
 
   script:
@@ -43,7 +43,7 @@ npm-audit:
 # Audit NPM dependencies to find any known vulnerability
 npm-outdated:
   stage: test
-  image: node:18-slim
+  image: node:20-slim
   allow_failure: true
 
   script:
@@ -54,7 +54,7 @@ npm-outdated:
 # ESLint
 eslint:
   stage: test
-  image: node:18-slim
+  image: node:20-slim
 
   script:
     - npm ci
@@ -64,7 +64,7 @@ eslint:
 # Unit-Tests
 unittests:
   stage: test
-  image: node:18-slim
+  image: node:20-slim
 
   script:
     - npm ci
@@ -117,7 +117,7 @@ versioning:
 # Build the application for production
 build-app:
   stage: build
-  image: node:18-slim
+  image: node:20-slim
   needs:
     - job: versioning
       artifacts: true
@@ -144,7 +144,7 @@ build-app:
 # Build the library for production
 build-lib:
   stage: build
-  image: node:18-slim
+  image: node:20-slim
   needs:
     - job: versioning
       artifacts: true
@@ -168,9 +168,9 @@ build-lib:
 # Create a docker image with the production build
 publish-docker:
   stage: publish
-  image: docker:25
+  image: docker:26
   services:
-    - docker:25-dind
+    - docker:26-dind
   needs:
     - job: build-app
       artifacts: true
@@ -194,7 +194,7 @@ publish-docker:
 # Publish the library to npm
 publish-lib:
   stage: publish
-  image: node:18-slim
+  image: node:20-slim
   needs:
     - job: build-lib
       artifacts: true
@@ -287,9 +287,9 @@ pages:
 # Create a docker image with the production build
 docker-scout:
   stage: scan
-  image: docker:25
+  image: docker:26
   services:
-    - docker:25-dind
+    - docker:26-dind
   needs:
     - job: publish-docker
       artifacts: false
