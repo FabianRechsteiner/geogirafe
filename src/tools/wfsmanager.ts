@@ -165,9 +165,6 @@ export default class WfsManager extends GirafeSingleton {
       if (queryableLayers.length <= 0) {
         continue;
       }
-      if (!queryableLayers[0].urlWfs) {
-        throw new Error('The queryable Layers must have a WFS Url!');
-      }
 
       // Get the geometry column name of each layer
       // TODO REG : (not sure) This could probably be simplify by initializing a property in the ServerWfs object
@@ -195,7 +192,7 @@ export default class WfsManager extends GirafeSingleton {
         });
 
         promises.push(
-          fetch(queryableLayers[0].urlWfs, {
+          fetch(queryableLayers[0].urlWfs!, {
             method: 'POST',
             body: new XMLSerializer().serializeToString(featureRequest)
           })
@@ -212,8 +209,7 @@ export default class WfsManager extends GirafeSingleton {
         const features = new GML3().readFeatures(gml);
         selectedFeatures.push(...features);
       }
-
-      if (selectedFeatures.length === 0) {
+      if (selectedFeatures.length === 0 && this.state.selection.selectedFeatures.length == 0) {
         // No feature selected
         this.state.interface.selectionGridVisible = false;
       } else {
@@ -224,7 +220,7 @@ export default class WfsManager extends GirafeSingleton {
   }
 
   getQueryableLayers(selectionParam: SelectionParam) {
-    const queryableLayers = selectionParam.layers.filter((l) => l.queryable);
+    const queryableLayers = selectionParam.layers.filter((l) => l.queryable && l.urlWfs);
     if (queryableLayers.length > 0 && queryableLayers[0].urlWfs) {
       if (!queryableLayers.every((layer) => layer.urlWfs === queryableLayers[0].urlWfs)) {
         throw new Error('Not all layers of this list have the same WFS URL. We cannot do one WFS query.');

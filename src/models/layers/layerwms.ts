@@ -75,11 +75,6 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
         this.errorMessage = 'This layer is defined as queryable but no layer to query has been defined.';
         this.queryable = false;
       }
-      if (!this.urlWfs || this.urlWfs.length == 0) {
-        this.hasError = true;
-        this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
-        this.queryable = false;
-      }
     }
   }
 

@@ -321,8 +321,7 @@ export default class MapComponent extends GirafeHTMLElement {
       const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);
       const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
       const bottomRightCoord = this.olMap.getCoordinateFromPixel(bottomRightPixel);
-      const extent = [topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]];
-      this.select(extent);
+      this.select([topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]]);
     }
   }
 
