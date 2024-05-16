@@ -2,11 +2,18 @@
 
 <div id="panel">
   <div id="content">
-    <div class="${!this.capabilities ? '' : 'hidden'}">
-      Error, can not fetch the capabilities. Please try again later.
+    <div class="${this.getRenderState() === 'loading' ? '' : 'hidden'}">
+      <div class="message">
+        <div i18n="Connecting to the print server, please wait."></div>
+        <i class="fa-solid fa-3x fa-circle-notch fa-spin"></i>
+      </div>
     </div>
 
-    <div class="${this.capabilities ? '' : 'hidden'}">
+    <div class="${this.getRenderState() === 'error' ? '' : 'hidden'}">
+      <div class="message" i18n="The print server is unavailable. Please, try later."></div>
+    </div>
+
+    <div class="${this.getRenderState() === 'setup' ? '' : 'hidden'}">
       <div class="option">
         <label for="layout" i18n="Layout">Layout</label>
         <div class="select" onchange="${(evt:Event) => this.onLayoutChanged(evt)}">
@@ -119,24 +126,20 @@
 
       <button id="export-pdf" onclick="${() => this.print()}" i18n="Print">Print</button>
 
-      <div id="printList">
+      <div id="print-list">
         ${this.printList.map((printItem) => uHtml`
         <div id="${printItem.id}" class="print-item" title="${printItem.elementTitle}">
-          <div
-            class="cancel"
-            role="button"
-            tabindex="0"
-            onclick="${() => this.onCancelPrintElementClicked(printItem.id)}">
+          <button class="cancel" tabindex="0" onclick="${() => this.onCancelPrintElementClicked(printItem.id)}">
             <i class="fa-solid"></i>
-          </div>
-          <div class="container" role="button" tabindex="0" onclick="${() => this.onPrintElementClicked(printItem.id)}">
+          </button>
+          <button class="container" tabindex="0" onclick="${() => this.onPrintElementClicked(printItem.id)}">
             <i class="${this.getStatusClasses(printItem.status)}"></i>
             <p>
               <span i18n="${printItem.selectedLayoutName}">${printItem.selectedLayoutName}</span>
               <span>(${printItem.selectedFormat.toUpperCase()})</span>
             </p>
             <p class="time">${printItem.time}</p>
-          </div>
+          </button>
         </div>
         `)}
       </div>
