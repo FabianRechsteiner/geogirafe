@@ -19,17 +19,29 @@
   margin: 0;
 }
 
+#content .message {
+  text-align: center;
+  width: 100%;
+}
+
+#content .message * {
+  margin: 0.25rem;
+}
+
 #content div.option {
   margin-top: 0.5rem;
   display: flex;
   justify-content: space-between;
 }
 
-#content button {
+#content #export-pdf {
   float: right;
   margin-top: 1rem;
   height: 3rem;
   width: 8rem;
+}
+
+#content button {
   background-color: var(--bkg-color);
   color: var(--text-color);
   border-radius: 3px;
@@ -42,11 +54,11 @@
   background-color: var(--bkg-color-grad2);
 }
 
-#content #printList {
+#content #print-list {
   margin-top: 5rem;
 }
 
-#printList .print-item {
+#print-list .print-item {
   position: relative;
   padding: 0.5rem;
   margin-top: 0.5rem;
@@ -54,16 +66,21 @@
   color: var(--text-color);
 }
 
-#printList .print-item .container {
+#print-list .print-item .container {
+  border: none;
   display: inline;
+  text-align: unset;
+  width: 100%;
 }
 
-.print-item .cancel {
+#print-list .print-item .cancel {
   cursor: pointer;
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   color: var(--text-color-grad1);
+  border: none;
+  background-color: transparent;
 }
 
 .print-item .cancel i:before {

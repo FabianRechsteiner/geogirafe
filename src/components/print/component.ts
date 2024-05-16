@@ -63,14 +63,15 @@ class PrintComponent extends GirafeHTMLElement {
   private capabilities?: MFPCapabilities;
   private configAttributeNames: string[] = [];
   private printMaskManager?: PrintMaskManager;
-  private isVisibleComponentSetup = false;
+  private visible = false;
+  private isWithCapabilitiesComponentSetup = false;
+  private hasErrorFetchingCapabilities = false;
   attributeNames: string[] = [];
   printFormats: string[] = [];
   layouts: MFPCapabilitiesLayout[] = [];
   selectedLayout?: MFPCapabilitiesLayout;
   scales: number[] = [];
   dpis: number[] = [];
-  visible = false;
 
   constructor() {
     super('print');
@@ -89,6 +90,22 @@ class PrintComponent extends GirafeHTMLElement {
    */
   render() {
     this.visible ? this.renderComponent() : this.renderEmptyComponent();
+  }
+
+  /**
+   * @returns {string} The render state.
+   * - 'error' if there was an error fetching the capabilities.
+   * - 'setup' if the capabilities have been set up.
+   * - 'loading' if the capabilities are being fetched.
+   */
+  getRenderState(): string {
+    if (this.hasErrorFetchingCapabilities) {
+      return 'error';
+    }
+    if (this.capabilities) {
+      return 'setup';
+    }
+    return 'loading';
   }
 
   /**
@@ -282,28 +299,37 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private async renderComponentCapabilitiesPart() {
-    if (!this.capabilities) {
-      if (!(await this.initComponentConfig())) {
-        return;
+    if (this.capabilities) {
+      // We have loaded capabilities, then renders it normally.
+      if (!this.isWithCapabilitiesComponentSetup) {
+        this.setupWithCapabilitiesComponent();
       }
-      // Render again, with capabilities and related elements well set.
-      this.render();
+      this.printMaskManager?.setPossibleScales(this.scales);
       return;
     }
-    if (!this.isVisibleComponentSetup) {
-      this.setupVisibleComponent();
+
+    // If we don't have capabilities and no error (not tried to load them), then load them.
+    if (!this.hasErrorFetchingCapabilities) {
+      await this.initComponentConfig();
+      // Render again with capabilities options or error.
+      this.render();
     }
-    this.printMaskManager?.setPossibleScales(this.scales);
+    // Otherwise, does nothing ("on error" state).
   }
 
-  private setupVisibleComponent() {
+  /**
+   * Setup "visible" component (with capabilities) related functions.
+   * Do not update things related to the panel itself (that would need another render()).
+   * @private
+   */
+  private setupWithCapabilitiesComponent() {
     this.updateInputRotationFromMap();
     this.state.print.maskVisible = true;
     this.printMaskManager = new PrintMaskManager(this.mapManager.getMap());
     this.printMaskManager?.setPossibleScales(this.scales);
     this.setupPrintManager();
     this.registerEvents();
-    this.isVisibleComponentSetup = true;
+    this.isWithCapabilitiesComponentSetup = true;
   }
 
   /**
@@ -312,7 +338,8 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private renderEmptyComponent() {
-    this.isVisibleComponentSetup = false;
+    this.hasErrorFetchingCapabilities = false;
+    this.isWithCapabilitiesComponentSetup = false;
     this.printMaskManager?.destroy();
     unByKeyAll(this.eventKeys);
     this.eventKeys.length = 0;
@@ -416,14 +443,15 @@ class PrintComponent extends GirafeHTMLElement {
 
   /**
    * Load the application config and then fetch the capabilities and initialize the print.
-   * @returns the fetched print capabilities or undefined in case of error.
    * @private
    */
-  private async initComponentConfig(): Promise<MFPCapabilities | undefined> {
+  private async initComponentConfig() {
     await this.loadConfig();
     await this.fetchCapabilities();
     this.initFromCapabilities();
-    return this.capabilities;
+    if (!this.capabilities) {
+      this.hasErrorFetchingCapabilities = true;
+    }
   }
 
   /**
