@@ -4,7 +4,7 @@ _(What is this Merge-Request for)_
 
 ## Job done
 
-_(Explain shortly was was done, and wath are the important things to know ab out those changes)_
+_(Explain shortly was was done, and what are the important things to know about those changes)_
 
 ## Definition of Done
 
@@ -25,9 +25,5 @@ _(Explain shortly was was done, and wath are the important things to know ab out
 - [ ] If unitests could be added in certain places, the developer has been informed.
 - [ ] Merge-Request was merged on main branch.
 - [ ] All pipelines work.
-- [ ] The bugfix was tested on demo environment.
+- [ ] The changes were tested on demo environment.
 - [ ] Application performance has not been degraded by the modifications.
-
-## Authors
-
-%{co_authored_by}
