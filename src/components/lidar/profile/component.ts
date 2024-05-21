@@ -1,12 +1,13 @@
 import GirafeResizableElement from '../../../base/GirafeResizableElement';
 import OlGeomLineString from 'ol/geom/LineString';
-
+import closeSvg from '../images/close.svg?raw';
 /**
  * Container to draw the Lidar profile.
  */
-class LidarProfileComponent extends GirafeResizableElement {
+export default class LidarProfileComponent extends GirafeResizableElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
+  closeSvg = closeSvg;
   private visible = false;
 
   constructor() {
@@ -33,22 +34,12 @@ class LidarProfileComponent extends GirafeResizableElement {
     this.state.lidar.line = null;
   }
 
-  /**
-   * Event about visibility that must be always listened by this component, even hidden.
-   * @private
-   */
   private registerVisibilityEvents() {
     this.stateManager.subscribe('lidar.line', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
-  /**
-   * Set the visibility of the panel.
-   * @private
-   */
   private async togglePanel(line: OlGeomLineString): Promise<void> {
     this.visible = !!line;
     this.render();
   }
 }
-
-export default LidarProfileComponent;

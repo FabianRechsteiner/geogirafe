@@ -14,7 +14,5 @@
     </div>
   </div>
   <div id="gutter"></div>
-  <div id="close">
-    <i class="fa-solid" oninput="${() => this.closePanel()}"></i>
-  </div>
+  <button id="close" onclick="${() => this.closePanel()}">${this.htmlUnsafe(this.closeSvg)}</button>
 </div>

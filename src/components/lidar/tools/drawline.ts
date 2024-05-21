@@ -1,7 +1,12 @@
+import State from '../../../tools/state/state';
+
 import olCollection from 'ol/Collection';
 import olInteractionDraw from 'ol/interaction/Draw';
 import olStyleStyle from 'ol/style/Style';
 import olStyleStroke from 'ol/style/Stroke';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+
 import type OlMap from 'ol/Map';
 import type OlGeomLineString from 'ol/geom/LineString';
 import type OlCollection from 'ol/Collection';
@@ -9,8 +14,6 @@ import type OlFeature from 'ol/Feature';
 import type OlGeomGeometry from 'ol/geom/Geometry';
 import type OlInteractionDraw from 'ol/interaction/Draw';
 import type { DrawEvent } from 'ol/interaction/Draw';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
 
 type StoreLineChangeFn = (line: OlGeomLineString | null) => void;
 type StoreDrawActiveChangeFn = (active: boolean) => void;
@@ -21,15 +24,17 @@ type StoreDrawActiveChangeFn = (active: boolean) => void;
  * You have to call the "setupSave" method to let this class update your system
  * when a line is drawn or deleted and when the draw line is de/activated.
  */
-export class DrawLine {
+export default class DrawLine {
   private readonly features: OlCollection<OlFeature<OlGeomGeometry>>;
   private readonly interaction: OlInteractionDraw;
   private readonly vectorLayer: VectorLayer<VectorSource>;
   private storeLineChangeFn: StoreLineChangeFn;
   private storeDrawActiveFn: StoreDrawActiveChangeFn;
   private map?: OlMap;
+  private state: State;
 
-  constructor() {
+  constructor(state: State) {
+    this.state = state;
     this.features = new olCollection();
     const source = new VectorSource({
       useSpatialIndex: false,
@@ -50,31 +55,15 @@ export class DrawLine {
       type: 'LineString',
       features: this.features
     });
-    this.storeLineChangeFn = (_line: OlGeomLineString | null) => {
-      console.log('Save line not set. Call setupSave fn first.');
-    };
-    this.storeDrawActiveFn = (_active: boolean) => {
-      console.log('Save draw active not set. Call setupSave fn first.');
-    };
-  }
-
-  /**
-   * Setup callback functions to call on drawline de/activation and line update.
-   */
-  setupSave(storeLineChangeFn: StoreLineChangeFn, storeDrawActiveFn: StoreDrawActiveChangeFn) {
-    this.storeLineChangeFn = storeLineChangeFn;
-    this.storeDrawActiveFn = storeDrawActiveFn;
+    this.storeLineChangeFn = (line: OlGeomLineString | null) => (this.state.lidar.line = line);
+    this.storeDrawActiveFn = (active: boolean) => (this.state.lidar.drawActive = active);
   }
 
   /**
    * The line to set. Pass `null` to clear the line.
    */
   setLine(line: OlGeomLineString | null) {
-    if (line) {
-      this.storeLineChangeFn(line);
-    } else {
-      this.clear();
-    }
+    line ? this.storeLineChangeFn(line) : this.clear();
   }
 
   /**
@@ -120,8 +109,8 @@ export class DrawLine {
     // Update the profile with the new geometry.
     this.interaction.on('drawend', (event: DrawEvent) => {
       this.setLine((event.feature as OlFeature<OlGeomLineString>).getGeometry() ?? null);
-      // using timeout to prevent double click to zoom the map
       setTimeout(() => {
+        // using timeout to prevent double click to zoom the map
         this.interaction.setActive(false);
         this.storeDrawActiveFn(false);
       }, 0);
@@ -136,6 +125,3 @@ export class DrawLine {
     this.storeLineChangeFn(null);
   }
 }
-
-const drawLine = new DrawLine();
-export default drawLine;

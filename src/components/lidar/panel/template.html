@@ -25,14 +25,15 @@
       <div>
         <button class="btn btn-default" onclick="${() => this.exportFile('csv')}" i18n="CSV export"></button>
         <button class="btn btn-default" onclick="${() => this.exportFile('png')}" i18n="PNG export"></button>
+        <button class="btn btn-default" onclick="${() => this.exportFile('kml')}" i18n="KML export"></button>
         <button class="btn btn-default" title="Reset profile" onclick="${() => this.resetPlot()}">
-          <span class="fa-solid fa-rotate"></span>
+          <img src="${this.rotateSvgUrl}" alt="Reset profile" />
         </button>
       </div>
       <hr />
       <button class="btn btn-default" onclick="${() => this.setMeasureActive()}" i18n="Take measure"></button>
-      <button class="btn btn-default" title="Clear measure'" onclick="${() => this.clearMeasure()}">
-        <span class="fa-solid fa-eraser"></span>
+      <button class="btn btn-default" title="Clear measure" onclick="${() => this.clearMeasure()}">
+        <img src="${this.eraserSvgUrl}" alt="Clear measure" />
       </button>
       ` : uHtml``}
 

@@ -27,26 +27,23 @@
 
 #close {
   border: none;
-  color: #777;
   padding: 0;
   margin: 0.5rem;
   width: 1rem;
   height: 1rem;
-  line-height: 1rem;
   position: absolute;
   top: 0;
   right: 0;
-  background-color: var(--bkg-color);
   cursor: pointer;
+  background-color: transparent;
 }
 
-#close i:before {
-  content: '\f00d';
+#close svg {
+  fill: #777;
 }
 
-#close:hover {
-  border-color: #000;
-  color: #000;
+#close svg:hover {
+  fill: #000;
 }
 
 #content {
@@ -67,11 +64,9 @@
   position: relative;
   overflow: hidden;
   padding: 0.5rem;
-  border-top: solid 0.06rem black;
   background: var(--bkg-color);
   height: 20rem;
   display: flex;
-  color: var(--text-color);
 }
 
 #gmf-lidarprofile-container .lidarprofile {
