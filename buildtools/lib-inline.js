@@ -6,7 +6,7 @@ function main() {
   const fileList = findFilesRecursive(path.resolve('src', 'components'), ['.ts', '.js']);
   for (const filepath of fileList) {
     console.info(`Integrating inline HTML for file ${filepath}`);
-    const newCode = inlineTemplate(filepath);
+    const newCode = inlineTemplate(filepath).code;
     const newFilePath = filepath.replace('src', path.join('dist', 'lib-src-inline'));
 
     fs.mkdirSync(path.dirname(newFilePath), { recursive: true });

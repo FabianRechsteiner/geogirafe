@@ -83,12 +83,11 @@ export function inlineTemplate(filename) {
 
     // Add missing import (uHtml)
     magicString.prepend(`import { html as uHtml } from 'uhtml';\n`);
-
-    // Return the new code with inline HTML template
-    const newCode = magicString.toString();
-    return newCode;
   }
 
-  // No template to integrate, just return the initial content
-  return code;
+  // Return the code and the corresponding sourcemap
+  return {
+    code: magicString.toString(),
+    map: magicString.generateMap()
+  };
 }
