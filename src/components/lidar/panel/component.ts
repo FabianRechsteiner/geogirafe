@@ -1,18 +1,21 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import LidarProfileConfig from '../tools/profileconfig';
+import DrawLine from '../tools/drawline';
+import MapManager from '../../../tools/state/mapManager';
+import CsvManager from '../../../tools/csvManager';
+import lidarProfileManager from '../tools/manager';
+import { LidarInterface } from '../tools/lidarinterface';
+
+import type { LidarProfileManager } from '../tools/manager';
+import type { Callback } from '../../../tools/state/statemanager';
 import type {
   LidarProfileServerConfigClassification,
   LidarProfileServerConfigClassifications,
   LidarProfileServerConfigPointAttribute
 } from '../tools/profileconfig';
-import drawLineInstance from '../tools/drawline';
-import MapManager from '../../../tools/state/mapManager';
-import CsvManager from '../../../tools/csvManager';
-import type { Callback } from '../../../tools/state/statemanager';
-import type OlGeomLineString from 'ol/geom/LineString';
-import lidarProfileManager from '../tools/manager';
-import type { LidarProfileManager } from '../tools/manager';
-import { LidarInterface } from '../tools/lidarinterface';
+
+import eraserSvgUrl from '../images/eraser.svg';
+import rotateSvgUrl from '../images/rotate.svg';
 
 /**
  * Class representing the Lidar Panel Component.
@@ -20,15 +23,18 @@ import { LidarInterface } from '../tools/lidarinterface';
  * Activate and deactivate Lidar tool.
  * Manage draw line for lidar.
  */
-class LidarPanelComponent extends GirafeHTMLElement {
+export default class LidarPanelComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
+
+  eraserSvgUrl = eraserSvgUrl;
+  rotateSvgUrl = rotateSvgUrl;
 
   private csvManager: CsvManager;
   private profileConfig: LidarProfileConfig | null = null;
   private profileManager: LidarProfileManager;
   private visible = false;
-  private drawLine = drawLineInstance;
+  private drawLine: DrawLine;
   private lidarInterface?: LidarInterface;
   private mapManager: MapManager;
   private readonly eventsCallbacks: Callback[] = [];
@@ -39,6 +45,7 @@ class LidarPanelComponent extends GirafeHTMLElement {
     this.csvManager = CsvManager.getInstance();
     this.mapManager = MapManager.getInstance();
     this.profileManager = lidarProfileManager;
+    this.drawLine = new DrawLine(this.state);
   }
 
   connectedCallback() {
@@ -223,29 +230,13 @@ class LidarPanelComponent extends GirafeHTMLElement {
     await this.profileConfig.initProfileConfig();
     this.profileManager.init(this.profileConfig, this.mapManager.getMap());
     this.lidarInterface = new LidarInterface(this.profileConfig, this.csvManager);
-    this.drawLine.setupSave(
-      (line: OlGeomLineString | null) => {
-        this.state.lidar.line = line;
-      },
-      (drawActive) => {
-        this.state.lidar.drawActive = drawActive;
-      }
-    );
     return this.isConfigLoaded();
   }
 
-  /**
-   * Event about visibility that must be always listened by this component, even hidden.
-   * @private
-   */
   private registerVisibilityEvents() {
     this.stateManager.subscribe('interface.lidarPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
-  /**
-   * Set the visibility of the panel.
-   * @private
-   */
   private async togglePanel(visible: boolean): Promise<void> {
     this.visible = visible;
     this.render();
@@ -277,5 +268,3 @@ class LidarPanelComponent extends GirafeHTMLElement {
     );
   }
 }
-
-export default LidarPanelComponent;

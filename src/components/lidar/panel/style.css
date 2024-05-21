@@ -35,6 +35,11 @@
   background-color: var(--bkg-color-grad2);
 }
 
+#content button img {
+  width: 1rem;
+  height: 1rem;
+}
+
 select {
   font-family: Arial, sans-serif;
   appearance: none;

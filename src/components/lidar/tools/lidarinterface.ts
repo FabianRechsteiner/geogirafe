@@ -1,8 +1,13 @@
+import lidarProfileManager, { LidarProfileManager } from './manager';
+import KML from 'ol/format/KML';
+import Feature from 'ol/Feature';
+import { saveAs } from 'file-saver';
+import StateManager from '../../../tools/state/statemanager';
+
 import type OlGeomLineString from 'ol/geom/LineString';
 import type LidarProfileConfig from './profileconfig';
 import type CsvManager from '../../../tools/csvManager';
 import type { LidarProfileServerConfigClassification, LidarProfileServerConfigPointAttribute } from './profileconfig';
-import lidarProfileManager, { LidarProfileManager } from './manager';
 
 /**
  * Interface/helper class between the UI panel and the Lidar manager.
@@ -125,17 +130,17 @@ export class LidarInterface {
    * Export the profile to a file (csv or png).
    */
   exportFile(fileType: string) {
-    if (fileType === 'csv') {
-      this.csvExport();
-      return;
+    switch (fileType) {
+      case 'csv':
+        return this.csvExport();
+      case 'png':
+        return this.pngExport();
+      case 'kml':
+        return this.kmlExport();
     }
-    this.pngExport();
   }
 
-  /**
-   * Export the profile data to CSV file
-   */
-  private csvExport(): void {
+  private csvExport() {
     const points = this.profileManager.utils.getFlatPointsByDistance(this.profileManager.profilePoints) || [];
     const csvData = this.profileManager.utils.getCSVData(points);
     const headerColumnNames = Object.keys(points[0]);
@@ -145,15 +150,24 @@ export class LidarInterface {
     this.csvManager.startDownload(csvData, headerColumns, 'LIDAR_profile.csv');
   }
 
-  /**
-   * Export the current d3 chart to PNG file
-   */
-  private pngExport(): void {
+  private pngExport() {
     const clientConfig = this.profileConfig?.clientConfig;
     if (!clientConfig) {
       return;
     }
     this.profileManager.utils.downloadProfileAsImageFile(clientConfig);
+  }
+
+  private kmlExport() {
+    if (this.line) {
+      const kml = new KML().writeFeatures([new Feature({ geometry: this.line })], {
+        dataProjection: 'EPSG:4326',
+        featureProjection: StateManager.getInstance().state.projection
+      });
+      saveAs(new Blob([kml], { type: 'text/plain;charset=utf-8' }), 'profile.kml');
+    } else {
+      console.warn('A line should be drawn before being exporting to KML');
+    }
   }
 
   /**
