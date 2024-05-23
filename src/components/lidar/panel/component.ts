@@ -199,6 +199,7 @@ export default class LidarPanelComponent extends GirafeHTMLElement {
    * @private
    */
   private setupVisibleComponent() {
+    this.state.selection.enabled = false;
     this.registerEvents();
     this.drawLine.setMap(this.mapManager.getMap());
     this.drawLine.setActive(true);
@@ -210,6 +211,7 @@ export default class LidarPanelComponent extends GirafeHTMLElement {
    * @private
    */
   private renderEmptyComponent() {
+    this.state.selection.enabled = true;
     this.isVisibleComponentSetup = false;
     this.drawLine.setActive(false);
     this.stateManager.unsubscribe(this.eventsCallbacks);

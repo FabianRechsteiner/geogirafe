@@ -63,10 +63,13 @@ class RedliningComponent extends GirafeHTMLElement {
     this.drawingList = this.shadow.querySelector('#drawingList');
     this.toolSelected = this.disableButton;
 
+    this.state.selection.enabled = false;
     this.registerEvents();
   }
 
   renderEmptyComponent() {
+    this.state.extendedState.redlining.activeTool = null;
+    this.state.selection.enabled = true;
     this.unregisterEvents();
     this.renderEmpty();
   }

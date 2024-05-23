@@ -53,8 +53,8 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   /**
    * @returns The WindowFeature at the currently focused index.
    */
-  getWindowFeature(): WindowFeature {
-    return this.windowFeatures[this.focusedIndex];
+  getWindowFeature(): WindowFeature | null {
+    return this.windowFeatures[this.focusedIndex] ?? null;
   }
 
   /**
@@ -70,6 +70,9 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    */
   onFocusWindowFeature(index: number) {
     const windowFeature = this.selectedWindowFeature(index);
+    if (!windowFeature) {
+      return;
+    }
     this.state.selection.focusedFeature = windowFeature.feature;
     // Get content.
     this.displayedProperties = Object.entries(windowFeature.notOlProperties).filter((keyValue) => {
@@ -157,7 +160,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * @returns The selected window feature.
    * @private
    */
-  private selectedWindowFeature(index: number): WindowFeature {
+  private selectedWindowFeature(index: number): WindowFeature | null {
     this.focusedIndex = getValidIndex(index, this.maxIndex);
     return this.getWindowFeature();
   }
