@@ -323,6 +323,7 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private setupWithCapabilitiesComponent() {
+    this.state.selection.enabled = false;
     this.updateInputRotationFromMap();
     this.state.print.maskVisible = true;
     this.printMaskManager = new PrintMaskManager(this.mapManager.getMap());
@@ -338,6 +339,7 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private renderEmptyComponent() {
+    this.state.selection.enabled = true;
     this.hasErrorFetchingCapabilities = false;
     this.isWithCapabilitiesComponentSetup = false;
     this.printMaskManager?.destroy();

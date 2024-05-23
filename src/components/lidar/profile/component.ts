@@ -21,7 +21,6 @@ export default class LidarProfileComponent extends GirafeResizableElement {
 
   /**
    * Render the component regarding its visibility.
-   * Fetch the print capabilities at first rendering, then render the print mask too and register to events.
    */
   render() {
     this.visible ? super.render() : this.renderEmpty();

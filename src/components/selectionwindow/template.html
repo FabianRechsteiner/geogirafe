@@ -2,7 +2,7 @@
 
 <div id="draggable" class="${this.visible ? 'ctx' : 'hidden'}">
   <div id="header">
-    <p i18n="${this.getWindowFeature().id}"></p>
+    <p i18n="${this.getWindowFeature()?.id}"></p>
     <button id="close" onclick="${() => this.closeWindow()}">
       <i class="fa-solid"></i>
     </button>
