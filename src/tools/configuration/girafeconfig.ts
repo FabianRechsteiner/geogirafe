@@ -8,6 +8,9 @@ class GirafeConfig {
     };
     defaultLanguage: string;
   };
+  interface: {
+    defaultSelectionComponent: string;
+  };
   themes: {
     url: string;
     defaultTheme: string;
@@ -129,6 +132,7 @@ class GirafeConfig {
     // NOTE: Please adapt the documentation if necessary when doing changes here.
     this.general = this.initConfigGeneral(config);
     this.languages = this.initConfigLanguages(config);
+    this.interface = this.initConfigInterface(config);
     this.themes = this.initConfigThemes(config);
     this.basemaps = this.initConfigBasemaps(config);
     this.treeview = this.initConfigTreeview(config);
@@ -363,6 +367,15 @@ class GirafeConfig {
       throw new Error(`Configuration for languages is required. See https://doc.geomapfish.dev/docs/configuration.`);
     }
     return config.languages;
+  }
+
+  private initConfigInterface(config: GirafeConfig) {
+    return {
+      ...{
+        defaultSelectionComponent: 'window'
+      },
+      ...config.interface
+    };
   }
 
   private initConfigGeneral(config: GirafeConfig) {

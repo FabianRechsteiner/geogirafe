@@ -37,6 +37,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   toggleHeight?: number;
   toggleWidth?: number;
   lastWidth = 0;
+  lastHeight = 0;
   hideWidth = 0;
 
   get host(): HTMLElement {
@@ -56,6 +57,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   render() {
+    this.restoreLastDimensions();
     super.render();
     this.makeResizable();
   }
@@ -89,7 +91,28 @@ class GirafeResizableElement extends GirafeHTMLElement {
   }
 
   closePanel() {
-    throw new Error('This function must be overriden to close the associated panel');
+    this.clean();
+    throw new Error('This function must be overriden to close and clean the associated panel');
+  }
+
+  clean() {
+    this.host.style.width = '';
+    this.host.style.height = '';
+  }
+
+  private restoreLastDimensions() {
+    if (this.lastWidth) {
+      this.host.style.width = this.lastWidth + 'px';
+      if (this.panel) {
+        this.panel.style.width = this.lastWidth + 'px';
+      }
+    }
+    if (this.lastHeight) {
+      this.host.style.height = this.lastHeight + 'px';
+      if (this.panel) {
+        this.panel.style.height = this.lastHeight + 'px';
+      }
+    }
   }
 
   #togglePanel() {
@@ -137,9 +160,9 @@ class GirafeResizableElement extends GirafeHTMLElement {
     const height = this.panel.getBoundingClientRect().height;
     if (height <= this.toggleHeight) {
       // Panel is already hidden.
-      // => We reset it to the last width
-      this.panel.style.height = this.lastWidth + 'px';
-      this.host.style.height = this.lastWidth + 'px';
+      // => We reset it to the last height
+      this.panel.style.height = this.lastHeight + 'px';
+      this.host.style.height = this.lastHeight + 'px';
       this.panel.style.minHeight = '';
       this.host.style.minHeight = '';
 
@@ -154,7 +177,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
       }
     } else {
       // Hide the panel
-      this.lastWidth = height;
+      this.lastHeight = height;
       this.panel.style.height = this.toggleHeight + 'px';
       this.host.style.height = this.toggleHeight + 'px';
       this.panel.style.minHeight = '0';
@@ -194,6 +217,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
       }
       this.panel.style.width = newWidth + 'px';
       this.host.style.width = newWidth + 'px';
+      this.lastWidth = newWidth;
     } else if (this.dock === 'bottom') {
       const newHeight = this.panelRect.height + newY;
       /*if (!this.isNullOrUndefined(this.hideButton)) {
@@ -204,6 +228,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
       }*/
       this.panel.style.height = newHeight + 'px';
       this.host.style.height = newHeight + 'px';
+      this.lastHeight = newHeight;
     }
 
     if (this.hideButton) {

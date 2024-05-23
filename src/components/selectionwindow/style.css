@@ -1,27 +1,72 @@
+.ctx {
+  --window-header-height: 2rem;
+  --window-footer-height: 2rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
 #draggable {
-  border: solid 1px #666;
+  border: solid 1px var(--text-color-grad1);
   border-radius: 3px;
   box-shadow:
     0 1px 2px rgba(60, 64, 67, 0.3),
     0 1px 3px 1px rgba(60, 64, 67, 0.15);
   background: var(--bkg-color);
+  width: 100%;
+  height: 100%;
 }
 
 #header {
-  padding: 0.5rem;
+  height: var(--window-header-height);
+  padding: 0 0.5rem;
   cursor: move;
   z-index: 10;
-  background-color: #666;
-  color: var(--text-color);
+  background-color: var(--text-color-grad2);
+  color: var(--bkg-color);
   text-align: center;
 }
 
+#header p {
+  line-height: var(--window-header-height);
+  margin: 0;
+}
+
+#close {
+  border: none;
+  color: var(--text-color);
+  padding: 0;
+  margin: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  line-height: 1rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+#close i:before {
+  content: '\f00d';
+}
+
+#close:hover {
+  border-color: #000;
+  color: #000;
+}
+
 #content {
-  padding: 1rem 2rem;
-  width: 26rem;
-  height: 12rem;
+  width: 100%;
+  height: calc(100% - (var(--window-header-height) + var(--window-footer-height)));
   overflow-y: auto;
   scrollbar-width: thin;
+  color: var(--text-color);
+}
+
+#content div {
+  padding: 1rem 2rem;
 }
 
 table {
@@ -32,7 +77,7 @@ table {
 td.label {
   text-align: right;
   padding-right: 1rem;
-  color: #666;
+  color: var(--text-color-grad1);
   width: 8rem;
   vertical-align: top;
 }
@@ -42,29 +87,36 @@ td.label:after {
 }
 
 #footer {
-  color: #aaa;
-  height: 2rem;
-  border-top: solid 1px #999;
+  height: var(--window-footer-height);
+  color: var(--text-color-grad1);
+  border-top: solid 1px var(--text-color-grad1);
 }
 
-#previous {
-  padding: 0.5rem;
-  cursor: pointer;
-  position: absolute;
-  left: 0;
-  bottom: 0;
+#footer div {
+  display: flex;
+  justify-content: space-between;
 }
 
-#next {
+.prevnext {
+  flex-grow: 1;
+  border: none;
+  background-color: unset;
+  color: var(--text-color-grad1);
   padding: 0.5rem;
   cursor: pointer;
-  position: absolute;
-  right: 0;
-  bottom: 0;
+}
+
+#previous i {
+  float: left;
+}
+
+#next i {
+  float: right;
 }
 
 #counter {
-  line-height: 2rem;
+  line-height: var(--window-footer-height);
+  height: var(--window-footer-height);
   text-align: center;
   margin-top: 0;
 }

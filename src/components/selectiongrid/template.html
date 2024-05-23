@@ -6,7 +6,7 @@
 <div id="panel">
   <div id="content">
     <div id="header">
-      ${this.tabHeaders.map((th) => uHtml`
+      ${this.getTabHeaders().map((th) => uHtml`
       <button
         id="${th.id}"
         i18n="${th.text}"

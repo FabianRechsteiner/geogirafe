@@ -5,7 +5,7 @@ import BaseLayer from 'ol/layer/Base';
 
 /** The singleton containing the main OpenLayers map accessible from everywhere */
 export default class MapManager extends GirafeSingleton {
-  private readonly map = new Map({layers: []});
+  private readonly map = new Map({ layers: [] });
 
   public getMap() {
     return this.map;
