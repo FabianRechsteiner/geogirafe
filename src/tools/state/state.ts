@@ -12,7 +12,8 @@ type GraphicalInterface = {
   redliningPanelVisible: boolean;
   printPanelVisible: boolean;
   lidarPanelVisible: boolean;
-  selectionGridVisible: boolean;
+  selectionComponentVisible: boolean;
+  selectionComponent: string;
   aboutVisible: boolean;
   shareVisible: boolean;
   darkMapMode: boolean;
@@ -114,7 +115,8 @@ export default class State {
     redliningPanelVisible: false,
     printPanelVisible: false,
     lidarPanelVisible: false,
-    selectionGridVisible: false,
+    selectionComponentVisible: false,
+    selectionComponent: '',
     aboutVisible: false,
     shareVisible: false,
     darkMapMode: false,

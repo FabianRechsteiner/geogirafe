@@ -155,7 +155,7 @@ class LocalFileManager {
       const features = activeLayer.olayer.getSource()?.getFeaturesInExtent(extent);
       if (features && features.length > 0) {
         this.stateManager.state.selection.selectedFeatures.push(...features);
-        this.stateManager.state.interface.selectionGridVisible = true;
+        this.stateManager.state.interface.selectionComponentVisible = true;
       }
     }
   }

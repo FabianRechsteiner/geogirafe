@@ -22,6 +22,9 @@ body {
   --tst: #ff0000;
   --error-color: #bb0000;
   --svg-filter: none;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 /* Dark theme colors */
@@ -228,9 +231,11 @@ girafe-lidar-profile {
 
 girafe-selection-window {
   position: absolute;
+  bottom: 1rem;
+  right: 25rem;
   z-index: 100;
-  background: var(--bkg-color);
-  display: none;
+  width: 400px;
+  height: 240px;
 }
 
 girafe-nav-history {

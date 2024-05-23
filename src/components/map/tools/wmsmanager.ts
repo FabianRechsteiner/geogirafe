@@ -328,10 +328,10 @@ export default class WmsManager {
                 featureProjection: this.state.projection
               });
               if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length == 0) {
-                this.state.interface.selectionGridVisible = false;
+                this.state.interface.selectionComponentVisible = false;
               } else {
                 this.state.selection.selectedFeatures.push(...gmlFeatures);
-                this.state.interface.selectionGridVisible = true;
+                this.state.interface.selectionComponentVisible = true;
               }
             })
         );

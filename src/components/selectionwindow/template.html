@@ -1,11 +1,43 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
-<div id="draggable">
-  <div id="header">HEADER</div>
-  <div id="content"></div>
+<div id="draggable" class="${this.visible ? 'ctx' : 'hidden'}">
+  <div id="header">
+    <p i18n="${this.getWindowFeature().id}"></p>
+    <button id="close" onclick="${() => this.closeWindow()}">
+      <i class="fa-solid"></i>
+    </button>
+  </div>
+  <div id="content">
+    <div>
+      <table>
+        <tr class="hidden">
+          <th>Label</th>
+          <th>Value</th>
+        </tr>
+        ${this.displayedProperties.map((keyValue) => uHtml`
+        <tr>
+          <td class="label" i18n="${keyValue[0]}"></td>
+          <td class="value">${keyValue[1]}</td>
+        </tr>
+        `)}
+      </table>
+    </div>
+  </div>
   <div id="footer">
-    <a id="previous"><i class="fa-solid fa-xl fa-circle-arrow-left"></i></a>
-    <a id="next"><i class="fa-solid fa-xl fa-circle-arrow-right"></i></a>
-    <p id="counter">1/5</p>
+    <div class="${this.maxIndex > 0 ? '' : 'hidden'}">
+      <button id="previous" class="prevnext" onclick="${() => this.onFocusWindowFeature(this.focusedIndex - 1)}">
+        <i class="fa-solid fa-xl fa-circle-arrow-left"></i>
+      </button>
+      <div id="counter">
+        <span class="${this.maxIndex > 0 ? '' : 'hidden'}">
+          <span>${this.focusedIndex + 1}</span>
+          <span>/</span>
+          <span>${this.maxIndex + 1}</span>
+        </span>
+      </div>
+      <button id="next" class="prevnext" onclick="${() => this.onFocusWindowFeature(this.focusedIndex + 1)}">
+        <i class="fa-solid fa-xl fa-circle-arrow-right"></i>
+      </button>
+    </div>
   </div>
 </div>

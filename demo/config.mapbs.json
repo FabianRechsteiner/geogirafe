@@ -10,6 +10,9 @@
     },
     "defaultLanguage": "de"
   },
+  "interface": {
+    "defaultSelectionComponent": "grid"
+  },
   "themes": {
     "url": "Mock/themes.json",
     "defaultTheme": ""
