@@ -28,7 +28,7 @@ export default class FormatGridGeomValue {
                       tip="Pan to geometry"
                       tip-placement="right"
                       onclick="document.geogirafe.state.position.center = [${coords[0]},${coords[1]}]">
-                <img alt="menu-icon" src="${this.iconCenter}" />
+                <img alt="recenter-icon" src="${this.iconCenter}" />
               </button>`;
 
     return icons;
