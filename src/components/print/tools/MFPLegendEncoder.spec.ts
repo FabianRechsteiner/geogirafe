@@ -1,10 +1,10 @@
 import { it, describe, expect, beforeEach, afterAll } from 'vitest';
 import { EncodeLegendOptions, LegendURLDPI, MFPLegendClass, MFPLegendEncoder } from './MFPLegendEncoder';
 import {
-  createDefaultMetadata,
   createTestGroupLayer,
   createTestLayerWms,
-  createTestLayerWmts
+  createTestLayerWmts,
+  createTestOgcServer
 } from '../../../tools/tests/layerhelpers';
 import I18nManager from '../../../tools/i18nmanager';
 import MapManager from '../../../tools/state/mapManager';
@@ -13,7 +13,7 @@ import MockHelper from '../../../tools/tests/mockhelper';
 import LayerWms from '../../../models/layers/layerwms';
 import LayerWmts from '../../../models/layers/layerwmts';
 import GroupLayer from '../../../models/layers/grouplayer';
-import { createWMTSLayers } from '../../../tools/tests/olhelpers';
+import { createOlWmtsLayer } from '../../../tools/tests/olhelpers';
 
 describe('MFPLegendEncoder', () => {
   let encoder = new MFPLegendEncoder();
@@ -51,9 +51,9 @@ describe('MFPLegendEncoder', () => {
     let layerWmts: LayerWmts;
     let layerGroup: GroupLayer;
     beforeEach(() => {
-      layerWms = createTestLayerWms({});
-      layerWmts = createTestLayerWmts({});
-      layerGroup = createTestGroupLayer({});
+      layerWms = createTestLayerWms();
+      layerWmts = createTestLayerWmts();
+      layerGroup = createTestGroupLayer();
       layerGroup.children = [layerWms, layerWmts];
       StateManager.getInstance().state.layers.layersList = [layerGroup];
     });
@@ -113,7 +113,7 @@ describe('MFPLegendEncoder', () => {
   describe('encodeLayerWmtsLegendClasses()', () => {
     let layer: LayerWmts;
     beforeEach(() => {
-      layer = createTestLayerWmts({});
+      layer = createTestLayerWmts();
     });
 
     it('should return null if the layer is out of resolution', () => {
@@ -125,7 +125,7 @@ describe('MFPLegendEncoder', () => {
     });
 
     it('should return the encoded WMTS legend class with configured legend image', () => {
-      layer._olayer = createWMTSLayers();
+      layer._olayer = createOlWmtsLayer();
       layer.legendImage = 'https://legend.net';
       const result = encoder.encodeLayerWmtsLegendClasses(layer);
       expect(result).toEqual({
@@ -135,7 +135,7 @@ describe('MFPLegendEncoder', () => {
     });
 
     it('should return the encoded WMTS legend class', () => {
-      layer._olayer = createWMTSLayers();
+      layer._olayer = createOlWmtsLayer();
       layer._olayer.set('capabilitiesStyles', [{ LegendURL: [{ href: 'https://legend-from-cap.net' }] }]);
       const result = encoder.encodeLayerWmtsLegendClasses(layer);
       expect(result).toEqual({
@@ -148,7 +148,7 @@ describe('MFPLegendEncoder', () => {
   describe('encodeLayerWmsLegendClasses', () => {
     let layer: LayerWms;
     beforeEach(() => {
-      layer = createTestLayerWms({});
+      layer = createTestLayerWms();
     });
 
     it('should return null if the layer is not visible or inactive', () => {
@@ -171,18 +171,16 @@ describe('MFPLegendEncoder', () => {
 
     it('should return MFPLegendClass with one classe', () => {
       layer.layers = 'foo';
-      layer.url = 'https://test.com';
       const result = encoder.encodeLayerWmsLegendClasses(layer);
       expect(result?.name).toEqual('testWms');
       // One layer = no subclass, complete directly the current class.
       expect(result?.icons).toEqual([
-        'https://test.com?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000'
+        'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000'
       ]);
     });
 
     it('should return MFPLegendClass with two classes and query-params', () => {
       layer.layers = 'foo,bar';
-      layer.url = 'https://test.com';
       const result = encoder.encodeLayerWmsLegendClasses(layer);
       expect(result?.name).toEqual('testWms');
       // Two layer = new subclass.
@@ -191,24 +189,21 @@ describe('MFPLegendEncoder', () => {
       expect(classes[0]).toEqual({
         name: 'foo',
         icons: [
-          'https://test.com?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000'
+          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000'
         ]
       });
       expect(classes[1]).toEqual({
         name: 'bar',
         icons: [
-          'https://test.com?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000'
+          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000'
         ]
       });
     });
 
     it('should return MFPLegendClass with one class, params, and no title', () => {
       layer.layers = 'foo,bar';
-      layer.url = 'https://test.com';
-      const ogcServerName = 'test server';
-      const ogcServer = MockHelper.getServerOgc();
-      layer.serverName = ogcServerName;
-      StateManager.getInstance().state.ogcServers = { [ogcServerName]: ogcServer };
+      const ogcServer = createTestOgcServer();
+      StateManager.getInstance().state.ogcServers = { [ogcServer.name]: ogcServer };
       setPartialOptions({
         showGroupsTitle: false,
         params: { [ogcServer.type]: { filtered: 'houses' } }
@@ -223,13 +218,13 @@ describe('MFPLegendEncoder', () => {
       expect(classes[0]).toEqual({
         name: 'foo',
         icons: [
-          'https://test.com?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000&filtered=houses'
+          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000&filtered=houses'
         ]
       });
       expect(classes[1]).toEqual({
         name: 'bar',
         icons: [
-          'https://test.com?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000&filtered=houses'
+          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000&filtered=houses'
         ]
       });
     });
@@ -254,12 +249,8 @@ describe('MFPLegendEncoder', () => {
 
   it('getMetadataLegendImage', () => {
     const wms = createTestLayerWms({
-      gmfOptions: {
-        metadata: createDefaultMetadata({
-          legendImage: 'testUrl',
-          hiDPILegendImages: { '300': 'testHiDpiUrl' }
-        })
-      }
+      legendImage: 'testUrl',
+      hiDPILegendImages: { '300': 'testHiDpiUrl' }
     });
 
     setPartialOptions({ dpi: undefined });

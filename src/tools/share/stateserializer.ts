@@ -55,7 +55,7 @@ class StateSerializer {
     return compressedState;
   }
 
-  private getSerializedLayerTree(layers: BaseLayer[]) {
+  public getSerializedLayerTree(layers: BaseLayer[]) {
     const sharedLayers = [];
     for (const layer of layers) {
       const sharedLayer = this.getSerializedLayer(layer);

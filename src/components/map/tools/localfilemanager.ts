@@ -22,20 +22,7 @@ class LocalFileManager {
     }
   > = {};
 
-  layerGroup: GroupLayer = new GroupLayer(
-    {
-      id: 0,
-      name: 'Local Files',
-      metadata: {
-        isLegendExpanded: false,
-        wasLegendExpanded: false,
-        exclusiveGroup: false,
-        isExpanded: true,
-        isChecked: true
-      }
-    },
-    0
-  );
+  layerGroup: GroupLayer = new GroupLayer(0, 'LocalFiles', 0, { isDefaultChecked: true, isDefaultExpanded: true });
 
   constructor(map: Map) {
     this.map = map;

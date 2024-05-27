@@ -1,5 +1,11 @@
-import { GMFTreeItem } from '../gmf';
 import BaseLayer from './baselayer';
+
+export type GroupLayerOptions = {
+  isDefaultChecked?: boolean;
+  disclaimer?: string;
+  isDefaultExpanded?: boolean;
+  isExclusiveGroup?: boolean;
+};
 
 class GroupLayer extends BaseLayer {
   /**
@@ -16,14 +22,30 @@ class GroupLayer extends BaseLayer {
 
   children: BaseLayer[] = [];
 
-  constructor(elem: GMFTreeItem, order: number) {
-    const isDefaultChecked = elem.metadata?.isChecked ?? false;
-    const disclaimer = elem.metadata?.disclaimer ?? null;
-    super(elem.id, elem.name, order, isDefaultChecked, disclaimer);
+  constructor(id: number, name: string, order: number, options?: GroupLayerOptions) {
+    super(id, name, order, options);
+    this.isExpanded = options?.isDefaultExpanded || false;
+    this.isExclusiveGroup = options?.isExclusiveGroup ?? false;
+  }
 
-    const isDefaultExpanded = elem.metadata?.isExpanded ?? false;
-    this.isExpanded = isDefaultExpanded;
-    this.isExclusiveGroup = elem.metadata?.exclusiveGroup ?? false;
+  clone(): GroupLayer {
+    const options = {
+      isDefaultChecked: this.isDefaultChecked,
+      disclaimer: this.disclaimer,
+      isDefaultExpanded: this.isExpanded,
+      isExclusiveGroup: this.isExclusiveGroup
+    };
+    const clonedObject = new GroupLayer(this.id, this.name, this.order, options);
+    clonedObject.activeState = this.activeState;
+
+    // Clone childs
+    for (const child of this.children) {
+      const clonedChild = child.clone();
+      clonedChild.parent = clonedObject;
+      clonedObject.children.push(clonedChild);
+    }
+
+    return clonedObject;
   }
 
   get active() {

@@ -20,20 +20,7 @@ afterAll(() => {
 
 describe('StateSerializer.getSerializedLayer', () => {
   it('should return serialized data for a GroupLayer (id, order)', () => {
-    const groupLayer = new GroupLayer(
-      {
-        id: 11,
-        name: 'Group 1',
-        metadata: {
-          isLegendExpanded: false,
-          wasLegendExpanded: false,
-          exclusiveGroup: false,
-          isExpanded: false,
-          isChecked: false
-        }
-      },
-      10
-    );
+    const groupLayer = new GroupLayer(11, 'Group 1', 10);
     // @ts-ignore
     const sharedLayer = serializer.getSerializedLayer(groupLayer);
 
@@ -47,20 +34,7 @@ describe('StateSerializer.getSerializedLayer', () => {
   });
 
   it('should return serialized data for a GroupLayer (isExpanded)', () => {
-    const groupLayer = new GroupLayer(
-      {
-        id: 11,
-        name: 'Group 1',
-        metadata: {
-          isLegendExpanded: false,
-          wasLegendExpanded: false,
-          exclusiveGroup: false,
-          isExpanded: true,
-          isChecked: false
-        }
-      },
-      10
-    );
+    const groupLayer = new GroupLayer(11, 'Group 1', 10, { isDefaultExpanded: true });
     // @ts-ignore
     const sharedLayer = serializer.getSerializedLayer(groupLayer);
 
@@ -74,20 +48,7 @@ describe('StateSerializer.getSerializedLayer', () => {
   });
 
   it('should return serialized data for a GroupLayer (isChecked)', () => {
-    const groupLayer = new GroupLayer(
-      {
-        id: 11,
-        name: 'Group 1',
-        metadata: {
-          isLegendExpanded: false,
-          wasLegendExpanded: false,
-          exclusiveGroup: false,
-          isExpanded: false,
-          isChecked: false
-        }
-      },
-      10
-    );
+    const groupLayer = new GroupLayer(11, 'Group 1', 10);
     groupLayer.activeState = 'on';
 
     // @ts-ignore
@@ -103,37 +64,9 @@ describe('StateSerializer.getSerializedLayer', () => {
   });
 
   it('should return serialized data for a GroupLayer with children', () => {
-    const groupLayer = new GroupLayer(
-      {
-        id: 11,
-        name: 'Group 1',
-        metadata: {
-          isLegendExpanded: false,
-          wasLegendExpanded: false,
-          exclusiveGroup: false,
-          isExpanded: false,
-          isChecked: false
-        }
-      },
-      10
-    );
+    const groupLayer = new GroupLayer(11, 'Group 1', 10);
 
-    const wmtsLayer = new LayerWmts(
-      {
-        id: 21,
-        name: 'Layer WMTS 1',
-        url: 'https://test.url/',
-        layer: 'test_layer',
-        metadata: {
-          isLegendExpanded: false,
-          wasLegendExpanded: false,
-          exclusiveGroup: false,
-          isExpanded: false,
-          isChecked: false
-        }
-      },
-      20
-    );
+    const wmtsLayer = new LayerWmts(21, 'Layer WMTS 1', 20, 'https://test.url/', 'test_layer');
     groupLayer.children.push(wmtsLayer);
     // @ts-ignore
     const sharedLayer = serializer.getSerializedLayer(groupLayer);

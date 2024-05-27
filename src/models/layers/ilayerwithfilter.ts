@@ -1,5 +1,5 @@
 interface ILayerWithFilter {
-  filter: string | null;
+  filter?: string;
   get hasFilter(): boolean;
 }
 

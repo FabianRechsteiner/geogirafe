@@ -53,7 +53,7 @@ class SwipeManager {
   activateSwipeForWmts(layer: LayerWmts, side: 'left' | 'right') {
     if (this.wmtsManager.layerExists(layer)) {
       const olayer = this.wmtsManager.getLayer(layer)!;
-      this.#activateSwipeForLayer(layer.layers!, olayer, side);
+      this.#activateSwipeForLayer(layer.layer, olayer, side);
     } else {
       throw new Error('Cannot swipe this layer: it does not exist.');
     }

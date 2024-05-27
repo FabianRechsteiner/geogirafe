@@ -28,10 +28,10 @@ export interface GMFChildLayer {
 export interface GMFTreeItem {
   id: number;
   name: string;
-  metadata: GMFMetadata;
+  metadata?: GMFMetadata;
   ogcServer?: string;
   children?: GMFTreeItem[];
-  type?: string;
+  type?: 'OSM' | 'WMS' | 'WMTS' | 'VectorTiles';
   url?: string;
   style?: string;
   source?: string;
@@ -64,4 +64,12 @@ export interface GMFGroup extends GMFTreeItem {
 export interface GMFBackgroundLayer extends GMFTreeItem {
   children?: Array<GMFTreeItem>;
   mixed?: boolean;
+}
+
+export interface GMFServerOgc {
+  url: string;
+  wfsSupport: boolean;
+  urlWfs?: string;
+  type: string;
+  imageType: string;
 }

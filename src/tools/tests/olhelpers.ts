@@ -38,7 +38,7 @@ export const styleFn = ((feature: Feature): Style => {
   });
 }) as StyleLike;
 
-export const createVectorLayers = (): VectorLayer<VectorSource> => {
+export const createOlVectorLayer = (): VectorLayer<VectorSource> => {
   const features = [createPointFeature()];
   features[0].setStyle(styleFn);
   return new VectorLayer({
@@ -51,7 +51,7 @@ export const createVectorLayers = (): VectorLayer<VectorSource> => {
   });
 };
 
-export const createWMTSLayers = (): TileLayer<WMTS> => {
+export const createOlWmtsLayer = (): TileLayer<WMTS> => {
   return new TileLayer({
     source: new WMTS({
       layer: 'test',

@@ -6,6 +6,7 @@ import BaseLayer from '../../models/layers/baselayer';
 import LayerWms from '../../models/layers/layerwms';
 import MapPosition from './mapposition';
 import OlGeomLineString from 'ol/geom/LineString';
+import ServerOgc from '../../models/serverogc';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -52,14 +53,6 @@ type PrintConfig = {
   format: string | null;
   scale: number | null;
   dpi: number | null;
-};
-
-export type ServerOgc = {
-  url: string;
-  wfsSupport: boolean;
-  urlWfs: string;
-  type: string;
-  imageType: string;
 };
 
 // Current 3D-Globe state

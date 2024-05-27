@@ -46,12 +46,12 @@ class WmtsManager {
   #addLayerInternal(layer: LayerWmts, isBasemap: boolean) {
     this.#getWmtsCapabilities(layer.url, (capabilities) => {
       const options = optionsFromCapabilities(capabilities, {
-        layer: layer.layers,
+        layer: layer.layer,
         projection: this.state.projection
       });
 
       if (options === null) {
-        console.log('Cannot create WMTS layer for layer ' + layer.layers);
+        console.warn('Cannot create WMTS layer for layer ' + layer.layer);
         return;
       }
 
@@ -65,7 +65,7 @@ class WmtsManager {
             'A dimension ' +
               key +
               ' was defined for the WMTS layer ' +
-              layer.layers +
+              layer.layer +
               ' but the server does not seem to accept it.'
           );
         }
@@ -103,7 +103,7 @@ class WmtsManager {
 
   enrichWmtsLayerFromCapabilities(layer: LayerWmts, olayer: TileLayer<WMTS>, capabilities: Record<string, unknown>) {
     const layers = (capabilities?.Contents as Record<string, Record<string, string>[]>).Layer ?? [];
-    const matchLayer = layers.find((elt) => elt.Identifier == layer.layers);
+    const matchLayer = layers.find((elt) => elt.Identifier == layer.layer);
     if (matchLayer) {
       olayer.set('capabilitiesStyles', matchLayer.Style);
     } else {

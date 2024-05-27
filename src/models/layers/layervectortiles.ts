@@ -1,5 +1,11 @@
-import { GMFTreeItem } from '../gmf';
 import Layer from './layer';
+
+type LayerVectorTilesOptions = {
+  projection?: string,
+  isDefaultChecked?: boolean, 
+  disclaimer?: string,
+  opacity?: number
+}
 
 class LayerVectorTiles extends Layer {
   /**
@@ -10,16 +16,27 @@ class LayerVectorTiles extends Layer {
    * For example, any method doing <this.xxx = value> is forbidden here, because the modification be known from the proxy
    */
 
-  public style?: string;
-  public source?: string;
-  public projection?: string | null;
+  public style: string;
+  public source: string;
+  public projection?: string;
 
-  constructor(elem: GMFTreeItem, order: number) {
-    super(elem, order);
+  constructor(id: number, name: string, order: number, style: string, source: string, options?: LayerVectorTilesOptions) {
+    super(id, name, order, options);
+    this.style = style;
+    this.source = source;
+    this.projection = options?.projection;
+  }
 
-    this.style = elem.style;
-    this.projection = elem.projection;
-    this.source = elem.source;
+  clone() {
+    const options = {
+      projection: this.projection,
+      isDefaultChecked: this.isDefaultChecked, 
+      disclaimer: this.disclaimer,
+      opacity: this.opacity
+    }
+    const clonedObject = new LayerVectorTiles(this.id, this.name, this.order, this.style, this.source, options);
+    clonedObject.activeState = this.activeState;
+    return clonedObject;
   }
 }
 

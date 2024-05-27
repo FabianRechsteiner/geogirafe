@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="styles/common.css" />
 
-<button title="Theme Selection" onclick="${() => this.toggleThemesList()}" onblur="${() => this.onBlur()}">
+<button class="main" title="Theme Selection" onclick="${() => this.toggleThemesList()}" onblur="${() => this.onBlur()}">
   <div class="${(this.state.loading ? 'hidden' : '')}">
     <i class="fa-2x fa-solid fa-layer-group"></i>
   </div>
@@ -8,11 +9,28 @@
     <i class="fa-2x fa-solid fa-circle-notch fa-spin"></i>
   </div>
 </button>
-<ul id="themes">
+<div class="${(this.menuOpen ? 'themes' : 'hidden')}">
   ${Object.values(this.state.themes ?? {}).map(theme => uHtml.for(theme)`
-  <div onmousedown="${() => this.ignoreBlur()}" onclick="${() => this.onThemeChanged(theme)}">
+  <button class="theme" onmousedown="${() => this.onThemeChanged(theme)}">
     <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
     <span i18n="${theme.name}">${theme.name}</span>
+  </button>
+  `)} ${Object.values(this.customThemes ?? {}).map(theme => uHtml.for(theme)`
+  <div class="custom-theme">
+    <button class="select" onmousedown="${() => this.onThemeChanged(theme)}">
+      <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
+      <span i18n="${theme.name}">${theme.name}</span>
+    </button>
+    <button class="girafe-button-small delete" onmousedown="${(e:Event) => this.onDeleteTheme(theme, e)}">
+      <img alt="delete-icon" src="icons/close.svg" />
+    </button>
   </div>
   `)}
-</ul>
+
+  <div class="new-theme">
+    <button class="select" onmousedown="${() => this.onAddCustomTheme()}">
+      <img alt="Create new theme" src="${this.newIcon}" />
+      <span i18n="Create new theme">Create new theme</span>
+    </button>
+  </div>
+</div>

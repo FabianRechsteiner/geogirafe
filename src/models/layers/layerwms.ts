@@ -1,7 +1,28 @@
-import { GMFChildLayer, GMFTreeItem } from '../gmf';
+import { GMFTreeItem } from '../gmf';
+import ServerOgc from '../serverogc';
 import ILayerWithFilter from './ilayerwithfilter';
 import ILayerWithLegend from './ilayerwithlegend';
 import Layer from './layer';
+
+export type LayerWmsOptions = {
+  isDefaultChecked?: boolean;
+  disclaimer?: string;
+  opacity?: number;
+  minResolution?: number;
+  maxResolution?: number;
+  layers?: string;
+  style?: string;
+  legend?: string;
+  iconUrl?: string;
+  legendRule?: string;
+  legendImage?: string;
+  isLegendExpanded?: boolean;
+  wasLegendExpanded?: boolean;
+  hiDPILegendImages?: Record<string, string>;
+  printNativeAngle?: boolean;
+  queryable?: boolean;
+  queryLayers?: string;
+};
 
 class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   /**
@@ -13,10 +34,8 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
    */
 
   // Base WMS attributes
-  public serverName: string;
-  public url: string;
-  public urlWfs: string | null;
-  public imageType?: string;
+  public ogcServer: ServerOgc;
+
   public minResolution?: number;
   public maxResolution?: number;
   public layers?: string;
@@ -30,52 +49,60 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   public isLegendExpanded: boolean;
   public wasLegendExpanded: boolean;
   public hiDPILegendImages?: Record<string, string>;
-  public printNativeAngle?: boolean;
+  public printNativeAngle?: boolean; // TODO BGE Is it correct to have it at this level (should be for groups) ?
 
   // If the layer is queryable
-  public queryable = false;
-  public queryLayers: string | null = null;
-  public filter: string | null = null;
+  public queryable: boolean;
+  public queryLayers?: string;
+  public filter?: string;
 
-  constructor(elem: GMFTreeItem, serverName: string, url: string, urlWfs: string | null, order: number) {
-    super(elem, order);
-    this.serverName = serverName;
-    this.url = url;
-    this.urlWfs = urlWfs;
-    this.imageType = elem.imageType;
-    this.minResolution = elem.minResolutionHint;
-    this.maxResolution = elem.maxResolutionHint;
-    this.style = elem.style;
+  constructor(id: number, name: string, order: number, ogcServer: ServerOgc, options?: GMFTreeItem | LayerWmsOptions) {
+    let opts = options ?? {};
+    opts = LayerWms.isGMFTreeItem(opts) ? LayerWms.getOptionsFromGMFTreeItem(opts) : opts;
+    super(id, name, order, opts);
+    this.ogcServer = ogcServer;
 
-    this.legend = elem.metadata.legend;
-    this.iconUrl = elem.metadata.iconUrl;
-    this.legendRule = elem.metadata.legendRule;
-    this.legendImage = elem.metadata.legendImage;
-    this.isLegendExpanded = elem.metadata.isLegendExpanded ?? false;
-    this.wasLegendExpanded = this.isLegendExpanded;
-    this.hiDPILegendImages = elem.metadata.hiDPILegendImages;
-    // TODO BGE Is it correct to have it at this level (should be for groups) ?
-    this.printNativeAngle = elem.metadata.printNativeAngle;
-    this.layers = elem.layers;
+    this.minResolution = opts?.minResolution;
+    this.maxResolution = opts?.maxResolution;
+    this.layers = opts?.layers;
+    this.style = opts?.style;
+    this.legend = opts?.legend;
+    this.iconUrl = opts?.iconUrl;
+    this.legendRule = opts?.legendRule;
+    this.legendImage = opts?.legendImage;
+    this.isLegendExpanded = opts?.isLegendExpanded || false;
+    this.wasLegendExpanded = opts?.wasLegendExpanded || !this.isLegendExpanded;
+    this.hiDPILegendImages = opts?.hiDPILegendImages;
+    this.printNativeAngle = opts?.printNativeAngle;
+    this.queryable = opts?.queryable || false;
+    this.queryLayers = opts?.queryLayers;
+  }
 
-    if (!elem.childLayers || elem.childLayers.length === 0) {
-      // We are on a WMS Layer, but it doesn't have any childlayer.
-      // This is probably a configuration error in the backend
-      console.warn(`WMS Layer ${elem.name} has no defined child-layer`);
-      return;
-    }
-    const childLayers = elem.childLayers;
-    // TODO REG: Is it possible that 1 childlayer is queryable, and another one not ?
-    this.queryable = childLayers[0].queryable;
-    this.queryLayers = this.queryable ? childLayers.map((l: GMFChildLayer) => l.name).join(',') : '';
+  clone(): LayerWms {
+    const options = {
+      isDefaultChecked: this.isDefaultChecked,
+      disclaimer: this.disclaimer,
+      opacity: this.opacity,
+      minResolution: this.minResolution,
+      maxResolution: this.maxResolution,
+      layers: this.layers,
+      style: this.style,
+      legend: this.legend,
+      iconUrl: this.iconUrl,
+      legendRule: this.legendRule,
+      legendImage: this.legendImage,
+      isLegendExpanded: this.isLegendExpanded,
+      wasLegendExpanded: this.wasLegendExpanded,
+      hiDPILegendImages: this.hiDPILegendImages,
+      printNativeAngle: this.printNativeAngle,
+      queryable: this.queryable,
+      queryLayers: this.queryLayers
+    };
 
-    if (this.queryable) {
-      if (!this.queryLayers || this.queryLayers.length == 0) {
-        this.hasError = true;
-        this.errorMessage = 'This layer is defined as queryable but no layer to query has been defined.';
-        this.queryable = false;
-      }
-    }
+    const clonedObject = new LayerWms(this.id, this.name, this.order, this.ogcServer, options);
+    clonedObject.filter = this.filter;
+    clonedObject.activeState = this.activeState;
+    return clonedObject;
   }
 
   hasRestrictedResolution() {
@@ -83,11 +110,46 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   }
 
   get hasFilter() {
-    return this.filter !== null && this.filter !== undefined && this.filter !== '';
+    return this.filter !== undefined && this.filter !== '';
   }
 
   get serverUniqueQueryId() {
-    return this.serverName + this.imageType;
+    return this.ogcServer.name + this.ogcServer.imageType;
+  }
+
+  private static isGMFTreeItem(options: GMFTreeItem | LayerWmsOptions): options is GMFTreeItem {
+    return 'id' in options;
+  }
+
+  private static getOptionsFromGMFTreeItem(options: GMFTreeItem): LayerWmsOptions {
+    const opts: LayerWmsOptions = {
+      isDefaultChecked: options.metadata?.isChecked,
+      disclaimer: options.metadata?.disclaimer,
+      opacity: 1, // TODO REG : Set default opacity
+      minResolution: options.minResolutionHint,
+      maxResolution: options.maxResolutionHint,
+      layers: options.layers,
+      style: options.style,
+      legend: options.metadata?.legend,
+      iconUrl: options.metadata?.iconUrl,
+      legendRule: options.metadata?.legendRule,
+      legendImage: options.metadata?.legendImage,
+      isLegendExpanded: options.metadata?.isLegendExpanded,
+      wasLegendExpanded: options.metadata?.wasLegendExpanded,
+      printNativeAngle: options.metadata?.printNativeAngle,
+      hiDPILegendImages: options.metadata?.hiDPILegendImages
+    };
+
+    if (options.childLayers) {
+      for (const child of options.childLayers) {
+        if (child.queryable) {
+          opts.queryable = true;
+          opts.queryLayers = opts.queryLayers ? ',' + child.name : child.name;
+        }
+      }
+    }
+
+    return opts;
   }
 }
 

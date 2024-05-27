@@ -1,6 +1,11 @@
 import GroupLayer from './grouplayer';
 import { v4 as uuidv4 } from 'uuid';
 
+type BaseLayerOptions = {
+  isDefaultChecked?: boolean, 
+  disclaimer?: string
+}
+
 abstract class BaseLayer {
   /**
    * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
@@ -15,7 +20,7 @@ abstract class BaseLayer {
   public name: string;
   public order: number;
   public isDefaultChecked: boolean;
-  public disclaimer: string | null = null;
+  public disclaimer?: string;
 
   public hasError: boolean = false;
   public errorMessage: string | null = null;
@@ -23,16 +28,17 @@ abstract class BaseLayer {
   public abstract activeState: string;
   public abstract get active(): boolean;
   public abstract get inactive(): boolean;
+  public abstract clone(): BaseLayer;
 
   public parent: GroupLayer | null = null;
 
-  constructor(id: number, name: string, order: number, isDefaultChecked: boolean, disclaimer: string | null) {
+  constructor(id: number, name: string, order: number, options?: BaseLayerOptions) {
     this.id = id;
     this.treeItemId = uuidv4();
     this.name = name;
     this.order = order;
-    this.isDefaultChecked = isDefaultChecked;
-    this.disclaimer = disclaimer;
+    this.isDefaultChecked = options?.isDefaultChecked || false;
+    this.disclaimer = options?.disclaimer;
   }
 
   /**

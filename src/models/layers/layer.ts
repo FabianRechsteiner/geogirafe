@@ -1,7 +1,12 @@
-import { GMFTreeItem } from '../gmf';
 import BaseLayer from './baselayer';
 
-class Layer extends BaseLayer {
+type LayerOptions = {
+  isDefaultChecked?: boolean, 
+  disclaimer?: string,
+  opacity?: number
+}
+
+abstract class Layer extends BaseLayer {
   /**
    * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
    * This means that each modification made to its properties must come from outside,
@@ -11,15 +16,11 @@ class Layer extends BaseLayer {
    */
 
   public activeState: 'on' | 'off' = 'off';
-  public opacity: number = 1;
+  public opacity: number;
 
-  // Is this layer used as basemap ?
-  basemap = false;
-
-  constructor(elem: GMFTreeItem, order: number) {
-    const isDefaultChecked = elem.metadata?.isChecked ?? false;
-    const disclaimer = elem.metadata?.disclaimer ?? null;
-    super(elem.id, elem.name, order, isDefaultChecked, disclaimer);
+  constructor(id: number, name: string, order: number, options?: LayerOptions) {
+    super(id, name, order, options);
+    this.opacity = options?.opacity ?? 1;
   }
 
   get isTransparent() {

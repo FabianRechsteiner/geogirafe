@@ -21,24 +21,16 @@ class LayerLocalFile extends Layer implements ILayerWithLegend {
   public extent: Extent;
 
   constructor(file: File, features: Feature<Geometry>[], extent: Extent) {
-    const locale = ConfigManager.getInstance().Config.general.locale;
-    const elem = {
-      id: 0,
-      name: file.name,
-      metadata: {
-        isLegendExpanded: true,
-        wasLegendExpanded: false,
-        exclusiveGroup: false,
-        isExpanded: false,
-        isChecked: true
-      }
-    };
-    super(elem, 0);
+    super(0, file.name, 0, { isDefaultChecked: true });
     this._features = features;
     this.extent = extent;
-    this.lastModifiedDate = new Date(file.lastModified).toLocaleDateString(locale);
+    this.lastModifiedDate = new Date(file.lastModified).toLocaleDateString(ConfigManager.getInstance().Config.general.locale);
     this.isLegendExpanded = true;
     this.wasLegendExpanded = false;
+  }
+
+  clone(): LayerLocalFile {
+    throw new Error('Cannot clone layer for local file.');
   }
 }
 
