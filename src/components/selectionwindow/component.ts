@@ -1,10 +1,12 @@
-import GirafeDraggableElement from '../../base/GirafeDraggableElement';
-import type { Callback } from '../../tools/state/statemanager';
-import { debounce } from '../../tools/debounce';
 import type OlFeature from 'ol/Feature';
-import FeatureToGridDataById from '../../tools/featuretogriddatabyid';
+import { getCenter } from 'ol/extent';
+import GirafeDraggableElement from '../../base/GirafeDraggableElement';
+import { debounce } from '../../tools/debounce';
+import type { Callback } from '../../tools/state/statemanager';
 import type { GridDataById } from '../../tools/featuretogriddatabyid';
+import FeatureToGridDataById from '../../tools/featuretogriddatabyid';
 import { getValidIndex } from '../../tools/utils';
+import IconCenter from './images/center.svg';
 
 /**
  * Represents a Feature displayed in the SelectionWindowComponent.
@@ -32,6 +34,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   visible = false;
   focusedIndex = 0;
   maxIndex = 0;
+  iconCenter = IconCenter;
   displayedProperties: [string, unknown][] = [];
 
   constructor() {
@@ -55,6 +58,19 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    */
   getWindowFeature(): WindowFeature {
     return this.windowFeatures[this.focusedIndex] ?? null;
+  }
+
+  /**
+   * Recenter the map view based on the current feature.
+   */
+  recenter() {
+    const windowFeature = this.getWindowFeature();
+    const extent = windowFeature?.feature?.getGeometry()?.getExtent();
+    if (!extent) {
+      console.error('Invalid feature to recenter on.');
+      return;
+    }
+    this.state.position.center = getCenter(extent);
   }
 
   /**

@@ -90,14 +90,11 @@ td.label:after {
   height: var(--window-footer-height);
   color: var(--text-color-grad1);
   border-top: solid 1px var(--text-color-grad1);
-}
-
-#footer div {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
-.prevnext {
+button {
   flex-grow: 1;
   border: none;
   background-color: unset;
@@ -106,12 +103,21 @@ td.label:after {
   cursor: pointer;
 }
 
+button > img {
+  max-height: calc(var(--window-header-height) / 2);
+}
+
 #previous i {
   float: left;
 }
 
 #next i {
   float: right;
+}
+
+#tools {
+  display: flex;
+  justify-content: space-around;
 }
 
 #counter {

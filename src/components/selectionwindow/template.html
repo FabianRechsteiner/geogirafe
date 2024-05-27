@@ -24,20 +24,29 @@
     </div>
   </div>
   <div id="footer">
-    <div class="${this.maxIndex > 0 ? '' : 'hidden'}">
-      <button id="previous" class="prevnext" onclick="${() => this.onFocusWindowFeature(this.focusedIndex - 1)}">
-        <i class="fa-solid fa-xl fa-circle-arrow-left"></i>
-      </button>
-      <div id="counter">
-        <span class="${this.maxIndex > 0 ? '' : 'hidden'}">
-          <span>${this.focusedIndex + 1}</span>
-          <span>/</span>
-          <span>${this.maxIndex + 1}</span>
-        </span>
-      </div>
-      <button id="next" class="prevnext" onclick="${() => this.onFocusWindowFeature(this.focusedIndex + 1)}">
-        <i class="fa-solid fa-xl fa-circle-arrow-right"></i>
+    <button
+      id="previous"
+      class="${this.maxIndex > 0 ? '' : 'hidden'}"
+      onclick="${() => this.onFocusWindowFeature(this.focusedIndex - 1)}">
+      <i class="fa-solid fa-xl fa-circle-arrow-left"></i>
+    </button>
+    <div id="counter" class="${this.maxIndex > 0 ? '' : 'hidden'}">
+      <span class="${this.maxIndex > 0 ? '' : 'hidden'}">
+        <span>${this.focusedIndex + 1}</span>
+        <span>/</span>
+        <span>${this.maxIndex + 1}</span>
+      </span>
+    </div>
+    <div class="tools">
+      <button onclick="${() => this.recenter()}">
+        <img alt="recenter-icon" src="${this.iconCenter}" />
       </button>
     </div>
+    <button
+      id="next"
+      class="${this.maxIndex > 0 ? '' : 'hidden'}"
+      onclick="${() => this.onFocusWindowFeature(this.focusedIndex + 1)}">
+      <i class="fa-solid fa-xl fa-circle-arrow-right"></i>
+    </button>
   </div>
 </div>
