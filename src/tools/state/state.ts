@@ -29,7 +29,7 @@ export type SelectionParam = {
 type Selection = {
   selectionParameters: SelectionParam[];
   selectedFeatures: Feature[];
-  focusedFeature: Feature | null;
+  focusedFeatures: Feature[] | null;
   enabled: boolean;
 };
 
@@ -174,7 +174,7 @@ export default class State {
   selection: Selection = {
     selectionParameters: [],
     selectedFeatures: [],
-    focusedFeature: null,
+    focusedFeatures: null,
     enabled: true
   };
 

@@ -5,15 +5,10 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { platformModifierKeyOnly } from 'ol/events/condition';
 import { DragBox } from 'ol/interaction';
-import { getVectorContext } from 'ol/render';
-import { easeOut } from 'ol/easing';
-import { unByKey } from 'ol/Observable';
 import { ScaleLine } from 'ol/control';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
 import { Extent } from 'ol/extent';
 import { Geometry } from 'ol/geom';
-import { EventsKey } from 'ol/events';
-import RenderEvent from 'ol/render/Event';
 import { Coordinate } from 'ol/coordinate';
 
 import { ScreenSpaceEventHandler, Cartesian2, Cesium3DTileset } from 'cesium';
@@ -43,6 +38,7 @@ import MapManager from '../../tools/state/mapManager';
 import MapPosition from '../../tools/state/mapposition';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
+import { FocusFeature } from './tools/focusfeature';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -80,16 +76,15 @@ export default class MapComponent extends GirafeHTMLElement {
 
   // For object selection
   selectedFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
-  focusedFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   selectionLayer!: VectorLayer<VectorSource>;
-  focusLayer!: VectorLayer<VectorSource>;
-  focusAnimation: EventsKey | null = null;
   pixelTolerance = 10;
   dragbox!: DragBox;
+  focusFeature: FocusFeature;
 
   constructor() {
     super('map');
     this.olMap = MapManager.getInstance().getMap();
+    this.focusFeature = new FocusFeature();
   }
 
   registerEvents() {
@@ -122,8 +117,9 @@ export default class MapComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('selection.selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) =>
       this.onFeaturesSelected(newFeatures)
     );
-    this.stateManager.subscribe('selection.focusedFeature', (_oldFeature: Feature, newFeature: Feature) =>
-      this.onFeatureFocused(newFeature)
+    this.stateManager.subscribe(
+      'selection.focusedFeatures',
+      (_oldFeature: Feature[] | null, newFeature: Feature[] | null) => this.focusFeature.setFocusedFeatures(newFeature)
     );
     this.stateManager.subscribe(
       'layers.swipedLayers',
@@ -209,39 +205,6 @@ export default class MapComponent extends GirafeHTMLElement {
       this.olMap.addLayer(this.selectionLayer);
       this.selectionLayer.setZIndex(1002);
       this.selectionLayer.set('altitudeMode', 'clampToGround');
-
-      // Create layer for focus
-      const focusSource = new VectorSource({
-        features: this.focusedFeaturesCollection
-      });
-      focusSource.on('addfeature', (e) => {
-        this.flash(e.feature!);
-      });
-      this.focusLayer = new VectorLayer({
-        properties: {
-          addToPrintedLayers: true
-        },
-        source: selectionSource,
-        // TODO REG: Change default focus color
-        style: new Style({
-          stroke: new Stroke({
-            color: this.configManager.Config.selection.defaultFocusStrokeColor,
-            width: this.configManager.Config.selection.defaultFocusStrokeWidth
-          }),
-          fill: new Fill({ color: this.configManager.Config.selection.defaultFocusFillColor }),
-          image: new Circle({
-            radius: 7,
-            fill: new Fill({ color: this.configManager.Config.selection.defaultFocusFillColor }),
-            stroke: new Stroke({
-              color: this.configManager.Config.selection.defaultFocusStrokeColor,
-              width: this.configManager.Config.selection.defaultFocusStrokeWidth
-            })
-          })
-        })
-      });
-      this.olMap.addLayer(this.focusLayer);
-      this.focusLayer.setZIndex(1003);
-      this.focusLayer.set('altitudeMode', 'clampToGround');
 
       if (this.configManager.Config.map.showScaleLine) {
         const scaleLine = new ScaleLine({
@@ -336,59 +299,6 @@ export default class MapComponent extends GirafeHTMLElement {
     // Layers selectable today are WMS and Local files
     this.wmsManager.selectFeatures(extent);
     this.localFileManager.selectFeatures(extent);
-  }
-
-  flash(feature: Feature) {
-    const duration = 2000;
-    const startStart = Date.now();
-    let start = startStart;
-    const flashGeom = feature.getGeometry()!.clone();
-    // First deactivate the current animation
-    // (We only want one animated object)
-    if (this.focusAnimation !== null) {
-      unByKey(this.focusAnimation);
-    }
-    this.focusAnimation = this.selectionLayer.on('postrender', (e) => animate(this, e));
-
-    function animate(_this: MapComponent, e: RenderEvent) {
-      const frameState = e.frameState!;
-      const elapsed = frameState.time - start;
-      if (elapsed >= duration) {
-        start = Date.now();
-      }
-      const vectorContext = getVectorContext(e);
-      const elapsedRatio = elapsed / duration;
-      // radius will be 5 at start and 30 at end.
-      const radius = easeOut(elapsedRatio) * 25 + 5;
-      const opacity = easeOut(1 - elapsedRatio);
-
-      // For lines
-      const elapsed2 = frameState.time - startStart;
-      const offset = Math.floor(elapsed2 / 100) % 48;
-
-      const style = new Style({
-        image: new Circle({
-          radius: radius,
-          stroke: new Stroke({
-            color: 'rgba(255, 0, 0, ' + opacity + ')',
-            width: 0.25 + opacity
-          })
-        }),
-        stroke: new Stroke({
-          color: [255, 0, 0, 1],
-          width: 12,
-          lineDash: [16, 32],
-          lineDashOffset: offset
-        })
-      });
-
-      vectorContext.setStyle(style);
-      vectorContext.drawGeometry(flashGeom);
-      // TODO BGE: Animation are bad for performances and should be optimized. First by re-rendering only the
-      //  concerned layer and not the whole map. the style must be cached too, etc.
-      // tell OpenLayers to continue postrender animation
-      _this.olMap.render();
-    }
   }
 
   connectedCallback() {
@@ -613,11 +523,6 @@ export default class MapComponent extends GirafeHTMLElement {
         this.selectedFeaturesCollection.push(feature);
       }
     }
-  }
-
-  onFeatureFocused(feature: Feature) {
-    this.focusedFeaturesCollection.clear();
-    this.focusedFeaturesCollection.push(feature);
   }
 
   onPositionChanged(position: MapPosition) {
