@@ -49,14 +49,9 @@ class StateDeserializer {
     }
 
     // Set all layers
-    for (const sharedLayer of sharedState.l) {
-      const layer = this.deserializeLayer(sharedLayer);
-      if (layer) {
-        this.state.layers.layersList.push(layer);
-      } else {
-        // TODO REG : Add infobox ?
-        console.warn(`Cannot find layer with id ${sharedLayer.i} in the available layers`);
-      }
+    const deserializedLayers = this.getDeserializedLayerTree(sharedState.l);
+    for (const deserializedLayer of deserializedLayers) {
+      this.state.layers.layersList.push(deserializedLayer)
     }
 
     // Set drawn objects
@@ -66,30 +61,44 @@ class StateDeserializer {
     }
   }
 
-  private deserializeLayer(sharedLayer: SharedLayer) {
-    const layer = this.findBaseLayerById(sharedLayer.i);
-    if (layer) {
-      layer.order = sharedLayer.o;
-      layer.isDefaultChecked = Boolean(sharedLayer.c);
-      if (layer instanceof GroupLayer) {
-        layer.isExpanded = Boolean(sharedLayer.e);
-      } else if (layer instanceof Layer && this.layerManager.isLayerWithLegend(layer)) {
-        layer.isLegendExpanded = Boolean(sharedLayer.e);
+  public getDeserializedLayerTree(sharedLayers: SharedLayer[]) {
+    const layersList: BaseLayer[] = [];
+    for (const sharedLayer of sharedLayers) {
+      const originalLayer = this.findBaseLayerById(sharedLayer.i);
+      if (originalLayer) {
+        // When deserializing the layer, we clone it, 
+        // otherwise the following operation will also
+        // affect the layer referenced in other themes
+        const layer = originalLayer.clone();
+        this.deserializeLayer(layer, sharedLayer);
+        layersList.push(layer);
+      } else {
+        // TODO REG : Add infobox ?
+        console.warn(`Cannot find layer with id ${sharedLayer.i} in the available layers`);
       }
+    }
+    return layersList;
+  }
 
+  private deserializeLayer(layer: BaseLayer, sharedLayer: SharedLayer) {
+    layer.order = sharedLayer.o;
+    layer.isDefaultChecked = Boolean(sharedLayer.c);
+    if (layer instanceof GroupLayer) {
+      layer.isExpanded = Boolean(sharedLayer.e);
       // Manage children
       // TODO REG : Today we do not manage if a layer was remove from the group.
-      for (const sharedChild of sharedLayer.z) {
-        const child = this.deserializeLayer(sharedChild);
-        if (!child) {
-          console.warn(`Cannot find layer with id ${sharedChild.i} in the available layers`);
+      for (const child of layer.children) {
+        const serializedChild = sharedLayer.z.find(l => l.i == child.id);
+        if (serializedChild) {
+          this.deserializeLayer(child, serializedChild);
+        }
+        else {
+          console.warn(`Cannot find layer with id ${child.id} in the available layers`);
         }
       }
-
-      return layer;
+    } else if (layer instanceof Layer && this.layerManager.isLayerWithLegend(layer)) {
+      layer.isLegendExpanded = Boolean(sharedLayer.e);
     }
-
-    return null;
   }
 
   private findBaseLayerById(layerId: number): BaseLayer | null {

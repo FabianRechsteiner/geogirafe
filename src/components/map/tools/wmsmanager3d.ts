@@ -28,7 +28,7 @@ export default class WmsManager3d {
     if (!(layerWms.serverUniqueQueryId in this.layersRecord)) {
       this.layersRecord[layerWms.serverUniqueQueryId] = [];
     }
-    const newImagery = this.newImagery(layerWms.url, layerWms.layers!);
+    const newImagery = this.newImagery(layerWms.ogcServer.url, layerWms.layers!);
     this.layersRecord[layerWms.serverUniqueQueryId].push({
       layers: layerWms,
       imagery: newImagery
@@ -37,7 +37,7 @@ export default class WmsManager3d {
   }
 
   addBasemapLayer(layerWms: LayerWms) {
-    this.baseLayers.push(this.newImagery(layerWms.url, layerWms.layers!));
+    this.baseLayers.push(this.newImagery(layerWms.ogcServer.url, layerWms.layers!));
   }
 
   newImagery(url: string, layers: string, format: string = 'image/png') {

@@ -3,13 +3,16 @@ import MFPEncoder, { EncodeMapOptions } from './MFPEncoder';
 import MockHelper from '../../../tools/tests/mockhelper';
 import MapManager from '../../../tools/state/mapManager';
 import StateManager from '../../../tools/state/statemanager';
-import LayerWmts from '../../../models/layers/layerwmts';
-import LayerWms from '../../../models/layers/layerwms';
 import GroupLayer from '../../../models/layers/grouplayer';
 import BaseLayer from '../../../models/layers/baselayer';
 import Basemap from '../../../models/basemap';
-import { createTestLayerWmts, createTestLayerWms, createTestGroupLayer } from '../../../tools/tests/layerhelpers';
-import { createVectorLayers, createWMTSLayers } from '../../../tools/tests/olhelpers';
+import {
+  createTestLayerWmts,
+  createTestLayerWms,
+  createTestGroupLayer,
+  createTestOgcServer
+} from '../../../tools/tests/layerhelpers';
+import { createOlVectorLayer, createOlWmtsLayer } from '../../../tools/tests/olhelpers';
 import { BaseCustomizer, MFPWmtsLayer } from '@geoblocks/mapfishprint';
 
 describe('MFPEncoder', () => {
@@ -48,18 +51,17 @@ describe('MFPEncoder', () => {
     let layers: BaseLayer[];
     beforeEach(() => {
       layers = [...Array(3)].map((_, index) => {
-        const layer = createTestLayerWms({});
-        layer.url = 'https://test-wms.ch';
+        const layer = createTestLayerWms();
         layer.layers = `wms-${index}`;
         return layer;
       });
 
-      const wmtsLayer = createTestLayerWmts({});
-      wmtsLayer._olayer = createWMTSLayers();
+      const wmtsLayer = createTestLayerWmts();
+      wmtsLayer._olayer = createOlWmtsLayer();
       layers.push(wmtsLayer);
 
       groupLayers = [...Array(4)].map((_) => {
-        return createTestGroupLayer({});
+        return createTestGroupLayer();
       });
       groupLayers[0].children = [layers[0], layers[1]];
       groupLayers[1].children = [layers[2]];
@@ -76,13 +78,13 @@ describe('MFPEncoder', () => {
     it('encode the map', () => {
       StateManager.getInstance().state.layers.layersList = topLevelGroup;
 
-      const baseMap = createTestLayerWmts({});
-      baseMap._olayer = createWMTSLayers();
+      const baseMap = createTestLayerWmts();
+      baseMap._olayer = createOlWmtsLayer();
       baseMap.name = 'basemap-below';
       const activeBasemap = (StateManager.getInstance().state.activeBasemap = new Basemap({ id: 1, name: 'test' }));
       activeBasemap.layersList = [baseMap];
 
-      const vectorLayer = createVectorLayers();
+      const vectorLayer = createOlVectorLayer();
       vectorLayer.set('addToPrintedLayers', true);
       MapManager.getInstance().getMap().addLayer(vectorLayer);
 
@@ -100,24 +102,17 @@ describe('MFPEncoder', () => {
   });
 
   describe('encodeImageLayer method', () => {
-    let layer: LayerWms;
-    beforeEach(() => {
-      layer = createTestLayerWms({});
-    });
-
     it('should return null for not visible layer', () => {
-      layer.opacity = 0;
+      const layer = createTestLayerWms({ opacity: 0 });
       const result = encoder.encodeImageLayer(layer);
       expect(result).toEqual(null);
     });
 
     it('should encode a wms layer', () => {
-      layer.layers = 'tree,plant';
-      layer.url = 'https://wms-layer.net';
-      layer.opacity = 0.6;
+      const layer = createTestLayerWms({ layers: 'tree,plant', opacity: 0.6 });
       const result = encoder.encodeImageLayer(layer);
       expect(result).toEqual({
-        baseURL: 'https://wms-layer.net/',
+        baseURL: 'https://ogc.test.url/',
         customParams: {
           TRANSPARENT: 'true'
         },
@@ -133,19 +128,15 @@ describe('MFPEncoder', () => {
   });
 
   describe('encodeTileWmtsLayer', () => {
-    let layer: LayerWmts;
-    beforeEach(() => {
-      layer = createTestLayerWmts({});
-    });
-
     it('Testing encodeTileWmtsLayer method with inactive layer', () => {
-      layer.opacity = 0;
+      const layer = createTestLayerWmts({ opacity: 0 });
       const result = encoder.encodeTileWmtsLayer(layer);
       expect(result).toBe(null);
     });
 
     it('Testing encodeTileWmtsLayer method', () => {
-      layer._olayer = createWMTSLayers();
+      const layer = createTestLayerWmts();
+      layer._olayer = createOlWmtsLayer();
       const result = encoder.encodeTileWmtsLayer(layer) as MFPWmtsLayer;
       const urls = layer._olayer.getSource()?.getUrls() ?? [];
       expect(result?.baseURL).toEqual(urls[0]);
@@ -156,13 +147,13 @@ describe('MFPEncoder', () => {
       expect(result?.type).toBe('wmts');
     });
 
-    it('Testing encodeTileWmtsLayer method with wms layer', () => {
-      layer._olayer = createWMTSLayers();
+    it('Testing encodeTileWmtsLayer method with a WMTS Layer which has a configured WMS layer for the print. ', () => {
+      const layer = createTestLayerWmts();
+      layer._olayer = createOlWmtsLayer();
       layer.wmsLayers = 'wms-print-layer';
-      const ogcServerName = 'test server';
-      const ogcServer = MockHelper.getServerOgc();
-      StateManager.getInstance().state.ogcServers = { [ogcServerName]: ogcServer };
-      layer.ogcServer = ogcServerName;
+      const ogcServer = createTestOgcServer();
+      StateManager.getInstance().state.ogcServers = { [ogcServer.name]: ogcServer };
+      layer.ogcServer = ogcServer;
       const result = encoder.encodeTileWmtsLayer(layer) as MFPWmtsLayer;
       // More test in the dedicated tests suits below.
       expect(result?.type).toBe('wms');
@@ -170,30 +161,23 @@ describe('MFPEncoder', () => {
   });
 
   describe('encodeWmsFromWmtsLayer', () => {
-    let layer: LayerWmts;
-    beforeEach(() => {
-      layer = createTestLayerWmts({});
-    });
-
     it('should return null if the ogcServer is missing', () => {
+      const layer = createTestLayerWmts();
       const result = encoder.encodeWmsFromWmtsLayer(layer);
       expect(result).toBeNull();
     });
 
     it('should correctly encode a WMS layer from a WMTS layer', async () => {
-      const ogcServerName = 'test server';
-      const ogcServer = MockHelper.getServerOgc();
-      StateManager.getInstance().state.ogcServers = { [ogcServerName]: ogcServer };
-      layer.ogcServer = ogcServerName;
-      layer.printLayers = 'printed-wms-replacing-wmts';
-      layer.opacity = 0.6;
+      const ogcServer = createTestOgcServer();
+      StateManager.getInstance().state.ogcServers = { [ogcServer.name]: ogcServer };
+      const layer = createTestLayerWmts({ printLayers: 'printed-wms-replacing-wmts', opacity: 0.6 }, ogcServer);
       const result = encoder.encodeWmsFromWmtsLayer(layer);
       expect(result).toEqual({
-        baseURL: 'https://test.com/',
+        baseURL: 'https://ogc.test.url/',
         customParams: {
           TRANSPARENT: 'true'
         },
-        imageFormat: 'image/jpg',
+        imageFormat: 'image/png',
         layers: ['printed-wms-replacing-wmts'],
         opacity: 0.6,
         serverType: 'mapserver',

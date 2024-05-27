@@ -1,4 +1,3 @@
-import { GMFTreeItem } from '../gmf';
 import Layer from './layer';
 import LayerConsts from './layerconsts';
 
@@ -12,19 +11,13 @@ class LayerOsm extends Layer {
    */
 
   constructor(order: number) {
-    const data: GMFTreeItem = {
-      id: LayerConsts.LayerOsmId,
-      name: 'OpenStreetMap',
-      type: 'OSM',
-      metadata: {
-        isLegendExpanded: false,
-        wasLegendExpanded: false,
-        exclusiveGroup: false,
-        isExpanded: false,
-        isChecked: false
-      }
-    };
-    super(data, order);
+    super(LayerConsts.LayerOsmId, 'OpenStreetMap', order);
+  }
+
+  clone() {
+    const clonedObject = new LayerOsm(this.order);
+    clonedObject.activeState = this.activeState;
+    return clonedObject;
   }
 }
 

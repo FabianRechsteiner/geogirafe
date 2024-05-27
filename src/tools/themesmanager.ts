@@ -114,22 +114,15 @@ class ThemesManager extends GirafeSingleton {
       // Add default Vector Tiles
       const vectorBasemap = new Basemap({ id: -2, name: 'Vector-Tiles' });
       basemaps[vectorBasemap.id] = vectorBasemap;
-      const data: GMFTreeItem = {
-        id: LayerConsts.LayerSwisstopoVectorTilesId,
-        name: 'Vector-Tiles',
-        type: 'VectorTiles',
-        style: 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
-        source: 'leichtebasiskarte_v3.0.1',
-        projection: 'EPSG:3857',
-        metadata: {
-          isLegendExpanded: false,
-          wasLegendExpanded: false,
-          exclusiveGroup: false,
-          isExpanded: false,
-          isChecked: false
-        }
-      };
-      vectorBasemap.layersList.push(new LayerVectorTiles(data, 0));
+      const vectorTilesLayer = new LayerVectorTiles(
+        LayerConsts.LayerSwisstopoVectorTilesId,
+        'Vector-Tiles',
+        0,
+        'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
+        'leichtebasiskarte_v3.0.1',
+        { projection: 'EPSG:3857' }
+      );
+      vectorBasemap.layersList.push(vectorTilesLayer);
     }
 
     basemapJson.forEach((elem: GMFBackgroundLayer) => {
@@ -142,11 +135,17 @@ class ThemesManager extends GirafeSingleton {
       if (elem.children) {
         // Multiple layers
         elem.children.forEach((child: GMFTreeItem) => {
-          basemap.layersList.push(this.prepareThemeLayer(child, null, order));
+          const layer = this.prepareThemeLayer(child, null, order);
+          if (layer) {
+            basemap.layersList.push(layer);
+          }
         });
       } else {
         // Only one layer in this basemap
-        basemap.layersList.push(this.prepareThemeLayer(elem, null, order));
+        const layer = this.prepareThemeLayer(elem, null, order);
+        if (layer) {
+          basemap.layersList.push(layer);
+        }
       }
     });
 
@@ -163,7 +162,9 @@ class ThemesManager extends GirafeSingleton {
       const theme = new Theme(themeJson);
       themeJson.children.forEach((layerJson: GMFTreeItem) => {
         const layer = this.prepareThemeLayer(layerJson, null, order);
-        theme._layersTree.push(layer);
+        if (layer) {
+          theme._layersTree.push(layer);
+        }
       });
       themes[index] = theme;
     });
@@ -184,7 +185,7 @@ class ThemesManager extends GirafeSingleton {
     const ogcServerName = elem.ogcServer ? elem.ogcServer : parentServer;
 
     // Create Layer
-    let layer: BaseLayer;
+    let layer: BaseLayer | null = null;
     switch (elem.type) {
       case 'OSM': {
         layer = new LayerOsm(order.value);
@@ -192,40 +193,55 @@ class ThemesManager extends GirafeSingleton {
       }
 
       case 'VectorTiles': {
-        layer = new LayerVectorTiles(elem, order.value);
+        const options = {
+          projection: elem.projection,
+          isDefaultChecked: elem.metadata?.isChecked,
+          disclaimer: elem.metadata?.disclaimer,
+          opacity: 1 // TODO REG : Set default opacity
+        };
+        layer = new LayerVectorTiles(elem.id, elem.name, order.value, elem.style!, elem.source!, options);
         break;
       }
 
       case 'WMTS': {
-        layer = new LayerWmts(elem, order.value);
+        const ogcServer = elem.metadata?.ogcServer ? this.state.ogcServers[elem.metadata?.ogcServer] : undefined;
+        layer = new LayerWmts(elem.id, elem.name, order.value, elem.url!, elem.layer!, elem, ogcServer);
         break;
       }
 
       case 'WMS': {
         if (ogcServerName) {
           const ogcServer = this.state.ogcServers[ogcServerName];
-          const urlWfs = ogcServer.wfsSupport ? ogcServer.urlWfs : null;
-          layer = new LayerWms(elem, ogcServerName, ogcServer.url, urlWfs, order.value);
+          layer = new LayerWms(elem.id, elem.name, order.value, ogcServer, elem);
         } else {
-          layer = new Layer(elem, order.value);
-          this.layerManager.setError(
-            layer,
-            `No OGC-Server was found for layer ${elem.name}, please verify the backend configuration.`
-          );
+          // Layer is invalid : it does not have any OGC-Server
+          this.state.infobox.elements.push({
+            id: uuidv4(),
+            text: `Layer ${elem.name} (id=${elem.id}) is invalid and cannot be created: missing OGC-Server.`,
+            type: 'error'
+          });
         }
         break;
       }
 
       default: {
         // Group
-        const group = new GroupLayer(elem, order.value);
+        const options = {
+          isDefaultChecked: elem.metadata?.isChecked,
+          disclaimer: elem.metadata?.disclaimer,
+          isDefaultExpanded: elem.metadata?.isExpanded,
+          isExclusiveGroup: elem.metadata?.exclusiveGroup
+        };
+        const group = new GroupLayer(elem.id, elem.name, order.value, options);
 
         // Append childs
         if (elem.children) {
           elem.children.forEach((child: GMFTreeItem) => {
             const childLayer = this.prepareThemeLayer(child, ogcServerName, order);
-            childLayer.parent = group;
-            group.children.push(childLayer);
+            if (childLayer) {
+              childLayer.parent = group;
+              group.children.push(childLayer);
+            }
           });
         }
         layer = group;

@@ -6,7 +6,7 @@ import { createTestLayerWms, createTestLayerWmts } from '../../../tools/tests/la
 
 describe('isLayerVisible tests', () => {
   it('should test layer visibility based on opacity', () => {
-    const layer: LayerWms = createTestLayerWms({});
+    const layer: LayerWms = createTestLayerWms();
     expect(isLayerVisible(layer)).toBe(true);
     layer.opacity = 0.5;
     expect(isLayerVisible(layer)).toBe(true);
@@ -15,7 +15,7 @@ describe('isLayerVisible tests', () => {
   });
 
   it('should test layer visibility based on resolution', () => {
-    const layer: LayerWmts = createTestLayerWmts({});
+    const layer: LayerWmts = createTestLayerWmts();
     expect(isLayerVisible(layer)).toBe(true);
     expect(isLayerVisible(layer, 200)).toBe(true);
     expect(isLayerVisible(layer, 125)).toBe(true);

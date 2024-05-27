@@ -159,7 +159,7 @@ export class MFPLegendEncoder {
     }
 
     const ogcServers = this.options?.state.ogcServers;
-    const ogcServer = ogcServers ? ogcServers[layerWms.serverName] : undefined;
+    const ogcServer = ogcServers ? ogcServers[layerWms.ogcServer.name] : undefined;
     const serverType = ogcServer?.type ?? '';
     const dpi = this.options?.dpi ?? GeoConsts.SCREEN_DOTS_PER_INCH;
 
@@ -179,7 +179,7 @@ export class MFPLegendEncoder {
     }
     const layerNames = layerWms.layers?.split(',') ?? [];
     layerNames.forEach((name) => {
-      const url = LegendHelper.getWMSLegendURL(layerWms.url, name, {
+      const url = LegendHelper.getWMSLegendURL(layerWms.ogcServer.url, name, {
         dpi,
         serverType,
         scale: this.options?.scale,

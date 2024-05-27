@@ -92,20 +92,20 @@ export default class WmsManager {
   }
 
   #createImageWMSSource(layerList: LayerWms[]) {
-    const url = layerList[0].url;
+    const url = layerList[0].ogcServer.url;
     // Verify that all objects have the same URL.
     // If not, we have a problem, we should not be in this function.
     const sameUrlForAll = layerList.every((layer: LayerWms) => {
-      return layer.url === url;
+      return layer.ogcServer.url === url;
     });
     if (!sameUrlForAll) {
       throw new Error('Not all layers of this list have the same server URL. We should not be in this function.');
     }
 
-    const imageType = layerList[0].imageType;
+    const imageType = layerList[0].ogcServer.imageType;
     // Same check for imageType
     const sameImageTypeForAll = layerList.every((layer: LayerWms) => {
-      return layer.url === url;
+      return layer.ogcServer.url === url;
     });
     if (!sameImageTypeForAll) {
       throw new Error('Not all layers of this list have the same image type. We should not be in this function.');
@@ -295,7 +295,7 @@ export default class WmsManager {
       const urls: Set<string> = new Set();
       param.layers.forEach((layer) => {
         const olLayer = this.getOLayer(layer);
-        if (layer.queryable && layer.urlWfs == null && olLayer) {
+        if (layer.queryable && !layer.ogcServer.urlWfs && olLayer) {
           // Layer is queryable through WMS and is in OL
           const url = olLayer
             .getSource()

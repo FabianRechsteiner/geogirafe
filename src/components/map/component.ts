@@ -138,6 +138,10 @@ export default class MapComponent extends GirafeHTMLElement {
       (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer)
     );
     this.stateManager.subscribe(
+      /layers\.swipedLayers\..*\.opacity/,
+      (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer)
+    );
+    this.stateManager.subscribe(
       /layers\.layersList\..*\.filter/,
       (_oldFilter: string, _newFilter: string, layer: Layer) => this.onChangeFilter(layer)
     );

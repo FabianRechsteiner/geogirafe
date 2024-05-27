@@ -1,6 +1,5 @@
 import ConfigManager from '../configuration/configmanager';
 import GirafeConfig from '../configuration/girafeconfig';
-import { ServerOgc } from '../state/state';
 
 class MockHelper {
   public static mockConfig = {
@@ -43,16 +42,6 @@ class MockHelper {
   public static stopMocking() {
     // @ts-ignore
     ConfigManager.getInstance().config = null;
-  }
-
-  public static getServerOgc(): ServerOgc {
-    return {
-      url: 'https://test.com',
-      urlWfs: 'https://test.com/wfs',
-      wfsSupport: true,
-      imageType: 'image/jpg',
-      type: 'mapserver'
-    };
   }
 }
 

@@ -147,8 +147,8 @@ export default class MFPEncoder {
     if (!isLayerVisible(layerWms, this.options?.printResolution)) {
       return null;
     }
-    let url = layerWms.url;
-    if (layerWms.url.startsWith('//')) {
+    let url = layerWms.ogcServer.url;
+    if (layerWms.ogcServer.url.startsWith('//')) {
       url = window.location.protocol + url;
     }
     const url_url = new URL(url);
@@ -159,7 +159,7 @@ export default class MFPEncoder {
       });
     }
 
-    const ogcServer = this.options?.state.ogcServers[layerWms.serverName];
+    const ogcServer = this.options?.state.ogcServers[layerWms.ogcServer.name];
     let serverType = ogcServer?.type;
     if (serverType === 'arcgis') {
       serverType = undefined;
@@ -179,7 +179,7 @@ export default class MFPEncoder {
 
     const object = {
       baseURL: getAbsoluteUrl(url_url.origin + url_url.pathname),
-      imageFormat: layerWms.imageType ?? 'image/png',
+      imageFormat: layerWms.ogcServer.imageType ?? 'image/png',
       layers: layers,
       customParams: customParams,
       serverType: serverType,
@@ -245,35 +245,9 @@ export default class MFPEncoder {
       console.error('Missing ogcServer');
       return null;
     }
-    const ogcServers = this.options?.state.ogcServers;
-    const ogcServer = ogcServers ? ogcServers[layerWmts.ogcServer] : undefined;
-    const layers = layerWmts.printLayers ?? layerWmts.wmsLayers ?? '';
-    const layerWms = new LayerWms(
-      {
-        id: 0,
-        name: layers,
-        url: ogcServer?.url,
-        imageType: ogcServer?.imageType ?? 'image/png',
-        childLayers: [
-          {
-            name: layers,
-            queryable: false
-          }
-        ],
-        metadata: {
-          isLegendExpanded: false,
-          wasLegendExpanded: false,
-          exclusiveGroup: false,
-          isExpanded: false,
-          isChecked: false
-        },
-        layers: layers
-      },
-      layerWmts.ogcServer,
-      ogcServer?.url ?? '',
-      '',
-      0
-    );
+
+    const printLayers = layerWmts.printLayers ?? layerWmts.wmsLayers ?? '';
+    const layerWms = new LayerWms(0, printLayers, 0, layerWmts.ogcServer, { layers: printLayers });
     layerWms.opacity = layerWmts.opacity;
     return this.encodeImageLayer(layerWms);
   }

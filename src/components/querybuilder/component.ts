@@ -21,14 +21,14 @@ class QueryBuilderComponent extends GirafeHTMLElement {
   }
 
   render() {
-    if (!this.layer.urlWfs) {
+    if (!this.layer.ogcServer.urlWfs) {
       throw new Error('No WFS URL found. Please verify the Layer type.');
     }
 
     super.render();
 
     WfsManager.getInstance()
-      .getServerWfs(this.layer.urlWfs)
+      .getServerWfs(this.layer.ogcServer.urlWfs)
       .then((serverWfs) => {
         this.layerAttributes = serverWfs.layers[this.layer.name];
         this.loading = false;

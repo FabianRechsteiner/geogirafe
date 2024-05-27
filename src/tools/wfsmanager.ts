@@ -155,7 +155,7 @@ export default class WfsManager extends GirafeSingleton {
   async wfsQuery(selectionParams: SelectionParam[]) {
     // Add all WFS layers to this.serverWfs
     for (const param of selectionParams) {
-      await this.initializeWfs(this.getQueryableLayers(param).map((l) => l.urlWfs!));
+      await this.initializeWfs(this.getQueryableLayers(param).map((l) => l.ogcServer.urlWfs!));
     }
 
     const promises = [];
@@ -192,7 +192,7 @@ export default class WfsManager extends GirafeSingleton {
         });
 
         promises.push(
-          fetch(queryableLayers[0].urlWfs!, {
+          fetch(queryableLayers[0].ogcServer.urlWfs!, {
             method: 'POST',
             body: new XMLSerializer().serializeToString(featureRequest)
           })
@@ -220,9 +220,9 @@ export default class WfsManager extends GirafeSingleton {
   }
 
   getQueryableLayers(selectionParam: SelectionParam) {
-    const queryableLayers = selectionParam.layers.filter((l) => l.queryable && l.urlWfs);
-    if (queryableLayers.length > 0 && queryableLayers[0].urlWfs) {
-      if (!queryableLayers.every((layer) => layer.urlWfs === queryableLayers[0].urlWfs)) {
+    const queryableLayers = selectionParam.layers.filter((l) => l.queryable && l.ogcServer.urlWfs);
+    if (queryableLayers.length > 0 && queryableLayers[0].ogcServer.urlWfs) {
+      if (!queryableLayers.every((layer) => layer.ogcServer.urlWfs === queryableLayers[0].ogcServer.urlWfs)) {
         throw new Error('Not all layers of this list have the same WFS URL. We cannot do one WFS query.');
       }
     }

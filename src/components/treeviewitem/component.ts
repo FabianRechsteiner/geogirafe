@@ -81,7 +81,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     // TODO REG : remove this ! when a reactoring of the Layer class has been done
     for (const l of this.layer.layers!.split(',')) {
       const wmsSource = new ImageWMS({
-        url: this.layer.url,
+        url: this.layer.ogcServer.url,
         params: { LAYERS: l },
         ratio: 1
       });
