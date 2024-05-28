@@ -7,6 +7,7 @@ import type { GridDataById } from '../../tools/featuretogriddatabyid';
 import FeatureToGridDataById from '../../tools/featuretogriddatabyid';
 import { getValidIndex } from '../../tools/utils';
 import IconCenter from './images/center.svg';
+import ResizeWindow from '../../tools/resizewindow';
 
 /**
  * Represents a Feature displayed in the SelectionWindowComponent.
@@ -29,6 +30,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   private readonly eventsCallbacks: Callback[] = [];
   private isVisibleComponentSetup = false;
   private debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
+  private resizeWindow: ResizeWindow | null = null;
   private featureToGridData = new FeatureToGridDataById({ removeEmptyColumns: false });
   private windowFeatures: WindowFeature[] = [];
   visible = false;
@@ -77,7 +79,8 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * Closes the window and deselect the selected features.
    */
   closeWindow() {
-    this.state.interface.selectionComponentVisible = false;
+    this.visible = false;
+    this.state.interface.selectionComponentVisible = false; // Will render it again.
     this.state.selection.focusedFeatures = null;
     this.state.selection.selectedFeatures = [];
   }
@@ -117,6 +120,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    */
   private setupVisibleComponent() {
     this.isVisibleComponentSetup = true;
+    this.resizeWindow = new ResizeWindow(this.shadow);
     this.makeDraggable();
     this.registerEvents();
   }
@@ -127,6 +131,8 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * @private
    */
   private renderComponentEmpty() {
+    this.resizeWindow?.destroy();
+    this.resizeWindow = null;
     this.stateManager.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
     this.isVisibleComponentSetup = false;

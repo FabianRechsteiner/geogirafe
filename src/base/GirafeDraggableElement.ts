@@ -47,12 +47,19 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   makeDraggable() {
     this.div = this.shadow.querySelector('#draggable')!;
     this.header = this.shadow.querySelector('#header')!;
+    this.setDefaultPosition();
     this.header.onmousedown = (e) => this.dragMouseDown(this, e);
 
     this.closeButton = this.shadow.getElementById('close')!;
     if (!this.isNullOrUndefined(this.closeButton)) {
       this.closeButton.onclick = () => this.closeWindow();
     }
+  }
+
+  private setDefaultPosition() {
+    const css = getComputedStyle(this.host);
+    this.host.style.top = css.top;
+    this.host.style.left = css.left;
   }
 
   closeWindow() {
