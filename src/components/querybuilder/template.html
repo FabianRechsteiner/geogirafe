@@ -9,7 +9,7 @@
     <div class="custom-select">
       <select id="attribute" name="attribute" onchange="${() => this.attributeChanged()}">
         <option value="" disabled selected>Select attribute...</option>
-        ${this.layerAttributes.map(attr => uHtml.for(attr)`
+        ${this.layerAttributes.map(attr => uHtmlFor(attr, attr.name)`
         <option i18n="${attr.name}" value="${attr.name}">${attr.name}</option>
         `)}
       </select>

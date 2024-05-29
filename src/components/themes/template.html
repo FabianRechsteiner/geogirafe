@@ -10,12 +10,12 @@
   </div>
 </button>
 <div class="${(this.menuOpen ? 'themes' : 'hidden')}">
-  ${Object.values(this.state.themes ?? {}).map(theme => uHtml.for(theme)`
+  ${Object.values(this.state.themes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
   <button class="theme" onmousedown="${() => this.onThemeChanged(theme)}">
     <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
     <span i18n="${theme.name}">${theme.name}</span>
   </button>
-  `)} ${Object.values(this.customThemes ?? {}).map(theme => uHtml.for(theme)`
+  `)} ${Object.values(this.customThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
   <div class="custom-theme">
     <button class="select" onmousedown="${() => this.onThemeChanged(theme)}">
       <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />

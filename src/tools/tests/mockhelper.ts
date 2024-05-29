@@ -1,5 +1,6 @@
 import ConfigManager from '../configuration/configmanager';
 import GirafeConfig from '../configuration/girafeconfig';
+import I18nManager from '../i18nmanager';
 
 class MockHelper {
   public static mockConfig = {
@@ -7,7 +8,9 @@ class MockHelper {
       locale: 'en-US'
     },
     languages: {
-      fr: 'Mock/fr.json',
+      translations: {
+        fr: ['Mock/fr.json']
+      },
       defaultLanguage: 'fr'
     },
     themes: {
@@ -37,6 +40,7 @@ class MockHelper {
   public static startMocking() {
     // @ts-ignore
     ConfigManager.getInstance().config = new GirafeConfig(MockHelper.mockConfig);
+    I18nManager.getInstance().translations = { fr: {} };
   }
 
   public static stopMocking() {

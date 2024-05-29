@@ -89,8 +89,8 @@
   </div>
 </div>
 
-${(this.layer as LayerWms)?.layers?.split(',').map((l:string) => uHtml`<img
-  class="${this.layer instanceof LayerWms && this.layer.legend && this.layer.isLegendExpanded ? 'legend-image' : 'legend-image hidden'}"
+${Object.keys(this.legendUrls).map((l:string) => uHtml`<img
+  class="${this.layer instanceof LayerWms && this.layer.isLegendExpanded ? 'legend-image' : 'legend-image hidden'}"
   alt="${'Legend for ' + l}"
   src="${this.legendUrls[l]}" />` )}
 
