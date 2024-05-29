@@ -128,6 +128,7 @@ class GirafeHTMLElement extends HTMLElement {
    */
   render() {
     if (this.template) {
+      this.show();
       uRender(this.shadow, this.template);
     } else {
       console.warn(`Cannot render: no template has been defined for component ${this.name}.`);
@@ -164,6 +165,7 @@ class GirafeHTMLElement extends HTMLElement {
    * Useful to render a placeholder for not visible component.
    */
   renderEmpty() {
+    this.hide();
     uRender(this.shadow, uHtml`<span style="display: none">${this.name}</span>`);
   }
 
