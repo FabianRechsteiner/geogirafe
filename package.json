@@ -5,7 +5,7 @@
     "name": "GeoGirafe PSC",
     "url": "https://doc.geomapfish.dev"
   },
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
@@ -41,7 +41,7 @@
     "lz-string": "1.5.0",
     "on-change": "5.0.1",
     "tippy.js": "6.3.7",
-    "uhtml": "3.2.2",
+    "uhtml": "4.5.9",
     "uuid": "9.0.1",
     "vanilla-picker": "2.12.3"
   },
@@ -55,21 +55,22 @@
     "proj4": "^2.9.2"
   },
   "devDependencies": {
+    "@geoblocks/mapfishprint": "0.2.14",
     "@types/babel__generator": "7.6.8",
     "@types/d3": "7.4.3",
     "@types/file-saver": "2.0.7",
     "@types/istanbul-lib-coverage": "2.0.6",
     "@types/proj4": "2.5.5",
     "@types/uuid": "9.0.8",
-    "@typescript-eslint/eslint-plugin": "7.8.0",
-    "@typescript-eslint/parser": "7.8.0",
+    "@typescript-eslint/eslint-plugin": "7.10.0",
+    "@typescript-eslint/parser": "7.10.0",
     "cesium": "1.117.0",
     "cross-env": "7.0.3",
     "eslint": "8.56.0",
     "font-gis": "1.0.5",
     "fs-extra": "11.2.0",
-    "jsdom": "^24.0.0",
-    "lint-staged": "15.2.2",
+    "jsdom": "24.1.0",
+    "lint-staged": "15.2.5",
     "magic-string": "0.30.10",
     "ol": "9.1.0",
     "ol-mapbox-style": "12.3.2",
@@ -78,7 +79,7 @@
     "proj4": "2.11.0",
     "typescript": "5.4.5",
     "vite": "5.2.11",
-    "vite-plugin-static-copy": "1.0.4",
+    "vite-plugin-static-copy": "1.0.5",
     "vitest": "1.6.0"
   },
   "types": "./main.lib.d.ts",

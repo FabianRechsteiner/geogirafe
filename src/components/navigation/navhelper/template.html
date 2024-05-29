@@ -18,7 +18,7 @@
         </button>
 
         <div slot="menu-content" class="${this.hasBookmark ? 'menu-content' : 'hidden'}">
-          ${Object.values(this.bookmarks).map(bookmark => uHtml.for(bookmark)`
+          ${Object.values(this.bookmarks).map(bookmark => uHtmlFor(bookmark, bookmark.name)`
           <div class="content-horizontal">
             <button
               slot="menu-button"

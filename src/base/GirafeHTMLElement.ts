@@ -1,5 +1,4 @@
-import { render as uRender, html as uHtml } from 'uhtml';
-import { Renderable } from '../typings/uhtml';
+import { render as uRender, html as uHtml, Hole } from 'uhtml';
 import tippy from 'tippy.js';
 import I18nManager from '../tools/i18nmanager';
 import MessageManager from '../tools/messagemanager';
@@ -12,7 +11,7 @@ type TippyType = typeof tippy;
 class GirafeHTMLElement extends HTMLElement {
   templateUrl: string | null = null;
   styleUrl: string | null = null;
-  template?: Renderable | (() => Renderable);
+  template?: Hole | (() => Hole);
   name: string;
   shadow: ShadowRoot;
 
@@ -21,6 +20,8 @@ class GirafeHTMLElement extends HTMLElement {
   messageManager: MessageManager;
   configManager: ConfigManager;
   stateManager: StateManager;
+
+  private unsafeCache = new Map<string, TemplateStringsArray>();
 
   get state() {
     return this.stateManager.state;
@@ -126,16 +127,36 @@ class GirafeHTMLElement extends HTMLElement {
    * Render the component's template.
    */
   render() {
-    uRender(this.shadow, this.template);
+    if (this.template) {
+      uRender(this.shadow, this.template);
+    } else {
+      console.warn(`Cannot render: no template has been defined for component ${this.name}.`);
+    }
   }
 
   /**
    * Convert the string in parameter with uHtml and return it.
-   * This allows to convert a string with html in right an html object.
+   * This allows to convert a string with html in a right html object.
    * For example, htmlUnsafe('<div></div>') will return an html div object.
    */
   htmlUnsafe(str: string) {
-    return uHtml([str]);
+    // NOTE REG: If this method is used much more in the future, we will have to take care of memory leaks
+    // see discussion here: https://github.com/WebReflection/uhtml/issues/126
+    const template = this.getUnsafeTemplate(str);
+    return uHtml(template);
+  }
+
+  /**
+   * Convert a string to TemplateStringsArray
+   * Manage a cache of all the created objects to limit memory usage
+   */
+  private getUnsafeTemplate(str: string): TemplateStringsArray {
+    let template = this.unsafeCache.get(str);
+    if (!template) {
+      template = [str] as unknown as TemplateStringsArray;
+      this.unsafeCache.set(str, template);
+    }
+    return template;
   }
 
   /**

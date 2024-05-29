@@ -55,8 +55,8 @@
     <girafe-basemap tip="Select basemap"></girafe-basemap>
   </div>
   <div class="treeview-list">
-    ${this.state.layers.layersList.map(layer => (layer instanceof GroupLayer) ? uHtml.for(layer)`<girafe-tree-view-group
-      groupid="${layer.treeItemId}"></girafe-tree-view-group
-    >` : uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>` )}
+    ${this.state.layers.layersList.map(layer => (layer instanceof GroupLayer) ? uHtmlFor(layer,
+    layer.treeItemId)`<girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>` :
+    uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>` )}
   </div>
 </div>

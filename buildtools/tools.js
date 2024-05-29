@@ -77,12 +77,16 @@ export function inlineTemplate(filename) {
       const htmlFileContent = fs.readFileSync(htmlFilePath, 'utf8');
       const htmlCode = `template = () => { return uHtml\`${styleCode}\n${htmlFileContent}\`; }`;
       magicString.overwrite(htmlFound.index, htmlFound.index + htmlFound[0].length, htmlCode);
+
+      // Add missing import (uHtml)
+      magicString.prepend(`import { html as uHtml } from 'uhtml';\n`);
+      if (htmlFileContent.includes('uHtmlFor')) {
+        // Include uHtmlFor if it is used in the template
+        magicString.prepend(`import { htmlFor as uHtmlFor } from 'uhtml/keyed';\n`);
+      }
     } catch (error) {
       console.error(`Error reading HTML file for ${filename}: ${error}`);
     }
-
-    // Add missing import (uHtml)
-    magicString.prepend(`import { html as uHtml } from 'uhtml';\n`);
   }
 
   // Return the code and the corresponding sourcemap

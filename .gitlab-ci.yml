@@ -48,7 +48,10 @@ npm-outdated:
 
   script:
     - npm ci
-    - npm outdated
+    # Fail if a non-dev dependency is outdated
+    - npm outdated --omit=dev
+    # Run npm outdated on all dependencies but do not fail
+    - npm outdated || true
 
 #################################
 # ESLint

@@ -62,10 +62,5 @@ export default defineConfig({
     // Define relative base path in cesium for loading assets
     // https://vitejs.dev/config/shared-options.html#define
     CESIUM_BASE_URL: JSON.stringify(cesiumBaseUrl)
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: 'vitestGlobalSetup.js'
   }
 });
