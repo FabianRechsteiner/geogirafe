@@ -1,11 +1,15 @@
-import fs from 'node:fs';
 import path from 'path';
 import { findFilesRecursive, copy, deleteDirectory } from './tools.js';
 
+// Copy common styles of the application
+let sourceDir = 'src';
+let targetDir = path.join('dist', 'lib', '');
+copy('styles', sourceDir, targetDir);
+
 // Copy buildtools that should be added to package
 console.info(`Copying the BuildTools...`);
-let sourceDir = 'buildtools';
-let targetDir = path.join('dist', 'lib', 'buildtools');
+sourceDir = 'buildtools';
+targetDir = path.join('dist', 'lib', 'buildtools');
 copy('tools.js', sourceDir, targetDir);
 copy('lib-inline.js', sourceDir, targetDir);
 copy('vite-inline-templates-plugin.js', sourceDir, targetDir);
