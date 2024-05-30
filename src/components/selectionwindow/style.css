@@ -126,3 +126,88 @@ button > img {
   text-align: center;
   margin-top: 0;
 }
+
+/* ==== Under - to resize ==== */
+.resizer {
+  --resize-size: 6px;
+  --negative-resize-size: -6px;
+}
+
+button.resizer {
+  position: absolute;
+  background-color: transparent;
+  border: none;
+}
+
+.resizer.corner {
+  width: var(--resize-size);
+  height: var(--resize-size);
+}
+
+.resizer.top-bottom {
+  width: calc(100% - (2 * var(--resize-size)));
+  height: var(--resize-size);
+}
+
+.resizer.left-right {
+  width: var(--resize-size);
+  height: calc(100% - (2 * var(--resize-size)));
+}
+
+.resizer.tl:hover,
+.resizer.br:hover {
+  cursor: nw-resize;
+}
+
+.resizer.tr:hover,
+.resizer.bl:hover {
+  cursor: ne-resize;
+}
+
+.resizer.top-bottom:hover {
+  cursor: n-resize;
+}
+
+.resizer.left-right:hover {
+  cursor: e-resize;
+}
+
+.resizer.tl {
+  top: var(--negative-resize-size);
+  left: var(--negative-resize-size);
+}
+
+.resizer.t {
+  top: var(--negative-resize-size);
+  left: var(--resize-size);
+}
+
+.resizer.tr {
+  top: var(--negative-resize-size);
+  right: var(--negative-resize-size);
+}
+
+.resizer.r {
+  top: var(--resize-size);
+  right: var(--negative-resize-size);
+}
+
+.resizer.br {
+  bottom: var(--negative-resize-size);
+  right: var(--negative-resize-size);
+}
+
+.resizer.b {
+  bottom: var(--negative-resize-size);
+  left: var(--resize-size);
+}
+
+.resizer.bl {
+  bottom: var(--negative-resize-size);
+  left: var(--negative-resize-size);
+}
+
+.resizer.l {
+  top: var(--resize-size);
+  left: var(--negative-resize-size);
+}

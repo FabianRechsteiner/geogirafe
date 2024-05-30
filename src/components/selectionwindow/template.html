@@ -1,6 +1,14 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
 <div id="draggable" class="${this.visible ? 'ctx' : 'hidden'}">
+  <button tabindex="-1" class="resizer tl corner"></button>
+  <button tabindex="-1" class="resizer t top-bottom"></button>
+  <button tabindex="-1" class="resizer tr corner"></button>
+  <button tabindex="-1" class="resizer r left-right"></button>
+  <button tabindex="-1" class="resizer br corner"></button>
+  <button tabindex="-1" class="resizer b top-bottom"></button>
+  <button tabindex="-1" class="resizer bl corner"></button>
+  <button tabindex="-1" class="resizer l left-right"></button>
   <div id="header">
     <p i18n="${this.getWindowFeature()?.id}"></p>
     <button id="close" onclick="${() => this.closeWindow()}">

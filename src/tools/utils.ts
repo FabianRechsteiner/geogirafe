@@ -19,3 +19,11 @@ export const getValidIndex = (index: number, maxIndex?: number): number => {
   }
   return index < 0 ? maxIndex : index % (maxIndex + 1);
 };
+
+/**
+ * Returns a value bounded between a minimum and maximum limit.
+ * @returns The bounded value.
+ */
+export const minMax = (value: number, minLimit: number, maxLimit: number): number => {
+  return Math.min(Math.max(value, minLimit), maxLimit);
+};
