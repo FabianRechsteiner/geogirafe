@@ -1,5 +1,19 @@
 import path from 'path';
+import fs from 'fs-extra';
 import { findFilesRecursive, copy, deleteDirectory } from './tools.js';
+
+// Reference main files
+const filecontent = `/// <reference path="./components/main.d.ts" />
+/// <reference path="./base/main.d.ts" />
+/// <reference path="./models/main.d.ts" />
+/// <reference path="./tools/main.d.ts" />
+/// <reference path="./decs.d.ts" />
+  `;
+const filepath = path.resolve('dist', 'lib', 'main.d.ts');
+console.log(`Write File ${filepath}`);
+const existingContent = fs.readFileSync(filepath, 'utf-8');
+const newContent = filecontent + '\n' + existingContent;
+fs.writeFileSync(filepath, newContent);
 
 // Copy common styles of the application
 let sourceDir = 'src';
@@ -21,7 +35,7 @@ sourceDir = path.join('dist', 'lib-src-inline');
 targetDir = path.join('dist', 'lib');
 copy('typings', sourceDir, targetDir);
 copy('decs.d.ts', sourceDir, targetDir);
-copy('main.lib.d.ts', sourceDir, targetDir);
+copy('main.d.ts', sourceDir, targetDir);
 
 // Copy assets
 console.info(`Copying the Assets...`);

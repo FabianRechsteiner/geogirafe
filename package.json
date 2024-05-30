@@ -82,10 +82,10 @@
     "vite-plugin-static-copy": "1.0.5",
     "vitest": "1.6.0"
   },
-  "types": "./main.lib.d.ts",
+  "types": "./main.d.ts",
   "exports": {
     ".": {
-      "import": "./main.lib.js"
+      "import": "./main.js"
     },
     "./base": {
       "import": "./base/main.js"
@@ -116,6 +116,7 @@
     "start": "tsc && vite serve --port 8080",
     "start-rebundle-deps": "tsc && vite serve --force --port 8080",
     "build": "node buildtools/app-clean.js && tsc && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
+    "preview": "vite preview",
     "build-lib": "node buildtools/lib-clean.js && node buildtools/lib-inline.js && node buildtools/lib-collect.js && node buildtools/lib-main-file.js && tsc --project tsconfig.lib.json && node buildtools/lib-finalize.js",
     "publish-lib": "cd dist/lib && npm publish",
     "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile dist",

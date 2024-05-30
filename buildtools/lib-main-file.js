@@ -40,19 +40,6 @@ const generateExportStatements = (mainFilePath, componentsPath) => {
   fs.writeFileSync(newFilePath, outputFileContent);
 };
 
-const generateMainTs = () => {
-  const filecontent = `/// <reference path="./components/main.d.ts" />
-/// <reference path="./base/main.d.ts" />
-/// <reference path="./models/main.d.ts" />
-/// <reference path="./tools/main.d.ts" />
-/// <reference path="./typings/uhtml.d.ts" />
-/// <reference path="./decs.d.ts" />
-  `;
-  const filepath = path.resolve('dist', 'lib-src-inline', 'main.lib.d.ts');
-  console.log(`Write File ${filepath}`);
-  fs.writeFileSync(filepath, filecontent);
-};
-
 // base main.ts
 const basePath = path.resolve('src', 'base');
 const fileListBase = findFilesRecursive(basePath, ['.ts', '.js']);
@@ -79,6 +66,3 @@ const fileListModels = findFilesRecursive(modelsPath, ['.ts', '.js']);
 const fileListModelsFilter = fileListModels.filter((filepath) => !filepath.match(/.*(test|\.spec).*/i));
 const mainModelsPath = path.join(modelsPath, 'main.ts');
 generateExportStatements(mainModelsPath, fileListModelsFilter);
-
-// Generate main.lib.d.ts
-generateMainTs();

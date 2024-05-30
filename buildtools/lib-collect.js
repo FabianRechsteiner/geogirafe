@@ -9,4 +9,4 @@ copy('models', sourceDir, targetDir);
 copy('tools', sourceDir, targetDir);
 copy('typings', sourceDir, targetDir);
 copy('decs.d.ts', sourceDir, targetDir);
-copy('main.lib.ts', sourceDir, targetDir);
+copy('main.ts', sourceDir, targetDir);
