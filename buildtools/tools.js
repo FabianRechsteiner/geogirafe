@@ -90,8 +90,15 @@ export function inlineTemplate(filename) {
   }
 
   // Return the code and the corresponding sourcemap
+  const sourcemap = magicString.generateMap({
+    source: filename,
+    file: filename + '.map',
+    includeContent: true,
+    hires: true
+  });
+
   return {
     code: magicString.toString(),
-    map: magicString.generateMap()
+    map: sourcemap.toString()
   };
 }
