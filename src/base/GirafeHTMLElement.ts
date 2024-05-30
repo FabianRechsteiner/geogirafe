@@ -14,6 +14,7 @@ class GirafeHTMLElement extends HTMLElement {
   template?: Hole | (() => Hole);
   name: string;
   shadow: ShadowRoot;
+  initialDisplayValue?: string;
 
   activeTooltips: TippyType[] = [];
 
@@ -128,6 +129,11 @@ class GirafeHTMLElement extends HTMLElement {
    */
   render() {
     if (this.template) {
+      if (!this.initialDisplayValue) {
+        // Remember the initial display value
+        this.initialDisplayValue = getComputedStyle(this).display ?? 'block';
+      }
+
       this.show();
       uRender(this.shadow, this.template);
     } else {
@@ -180,7 +186,9 @@ class GirafeHTMLElement extends HTMLElement {
    * Show the component (display: block).
    */
   show() {
-    this.style.display = 'block';
+    if (this.initialDisplayValue) {
+      this.style.display = this.initialDisplayValue;
+    }
   }
 
   /**
