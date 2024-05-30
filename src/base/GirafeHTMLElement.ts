@@ -14,7 +14,7 @@ class GirafeHTMLElement extends HTMLElement {
   template?: Hole | (() => Hole);
   name: string;
   shadow: ShadowRoot;
-  initialDisplayValue?: string;
+  displayStyle?: string;
 
   activeTooltips: TippyType[] = [];
 
@@ -129,11 +129,7 @@ class GirafeHTMLElement extends HTMLElement {
    */
   render() {
     if (this.template) {
-      if (!this.initialDisplayValue) {
-        // Remember the initial display value
-        this.initialDisplayValue = getComputedStyle(this).display ?? 'block';
-      }
-
+      this.defineDisplayStyle();
       this.show();
       uRender(this.shadow, this.template);
     } else {
@@ -171,8 +167,23 @@ class GirafeHTMLElement extends HTMLElement {
    * Useful to render a placeholder for not visible component.
    */
   renderEmpty() {
+    this.defineDisplayStyle();
     this.hide();
     uRender(this.shadow, uHtml`<span style="display: none">${this.name}</span>`);
+  }
+
+  /**
+   * Remeber the initial display configuration of the component
+   * To be able to restore it
+   */
+  private defineDisplayStyle() {
+    if (!this.displayStyle) {
+      // Remember the initial display style
+      this.displayStyle = getComputedStyle(this).display ?? 'block';
+      if (this.displayStyle === 'none') {
+        this.displayStyle = 'block';
+      }
+    }
   }
 
   /**
@@ -186,8 +197,8 @@ class GirafeHTMLElement extends HTMLElement {
    * Show the component (display: block).
    */
   show() {
-    if (this.initialDisplayValue) {
-      this.style.display = this.initialDisplayValue;
+    if (this.displayStyle) {
+      this.style.display = this.displayStyle;
     }
   }
 
