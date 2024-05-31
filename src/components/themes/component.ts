@@ -77,6 +77,7 @@ class ThemeComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       super.render();
+      this.activateTooltips(false, [800, 0], 'top');
       this.registerEvents();
     });
   }
