@@ -85,7 +85,7 @@ class GirafeConfig {
     srid: string;
     startZoom: string;
     startPosition: string;
-    maxExtent: string;
+    maxExtent?: string;
     scales: number[];
     constrainScales: boolean;
     constrainRotation: boolean;
@@ -205,9 +205,6 @@ class GirafeConfig {
       throw new Error(`Configuration for projections is required. See https://doc.geomapfish.dev/docs/configuration`);
     }
     if (!config.map?.startZoom) {
-      throw new Error(`Configuration for projections is required. See https://doc.geomapfish.dev/docs/configuration`);
-    }
-    if (!config.map?.maxExtent) {
       throw new Error(`Configuration for projections is required. See https://doc.geomapfish.dev/docs/configuration`);
     }
     return {
