@@ -36,7 +36,7 @@ class ViewManager {
 
     this.configManager = ConfigManager.getInstance();
     this.center = this.configManager.Config.map.startPosition.split(',').map(Number);
-    this.zoom = Number(this.configManager.Config.map.startZoom);
+    this.state.position.zoom = Number(this.configManager.Config.map.startZoom);
     this.constrainScales = this.configManager.Config.map.constrainScales;
     this.constrainRotation = this.configManager.Config.map.constrainRotation;
     this.extent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
