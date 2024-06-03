@@ -25,7 +25,7 @@ class ViewManager {
   scale: number | null = null;
 
   center: number[];
-  extent: number[];
+  extent?: number[];
   scales: number[];
   allowedResolutions: number[];
   constrainScales: boolean;
@@ -39,7 +39,7 @@ class ViewManager {
     this.zoom = Number(this.configManager.Config.map.startZoom);
     this.constrainScales = this.configManager.Config.map.constrainScales;
     this.constrainRotation = this.configManager.Config.map.constrainRotation;
-    this.extent = this.configManager.Config.map.maxExtent.split(',').map(Number);
+    this.extent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
 
     this.scales = this.configManager.Config.map.scales;
     this.allowedResolutions = this.scalesToResolutions(this.scales);
@@ -99,7 +99,6 @@ class ViewManager {
     const currentResolution = currentView.getResolution()!;
     const currentCenter = currentView.getCenter()!;
     const currentRotation = currentView.getRotation();
-    const currentExtent = currentView.get('extent');
 
     // ... to new ones
     const newCenter = transform(currentCenter, currentProjection, this.projection);
@@ -109,10 +108,16 @@ class ViewManager {
       getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') * currentMPU;
     const newPointResolution = getPointResolution(this.projection, 1 / newMPU, newCenter, 'm') * newMPU;
     const newResolution = (currentResolution * currentPointResolution) / newPointResolution;
-    const newExtentPoint1 = transform([currentExtent[0], currentExtent[1]], currentProjection, this.projection);
-    const newExtentPoint2 = transform([currentExtent[2], currentExtent[3]], currentProjection, this.projection);
-    const newExtent = [newExtentPoint1[0], newExtentPoint1[1], newExtentPoint2[0], newExtentPoint2[1]];
     this.allowedResolutions = this.scalesToResolutions(this.scales);
+
+    // If there is a configured max extent, convert it.
+    const currentExtent = currentView.get('extent');
+    let newExtent;
+    if (currentExtent) {
+      const newExtentPoint1 = transform([currentExtent[0], currentExtent[1]], currentProjection, this.projection);
+      const newExtentPoint2 = transform([currentExtent[2], currentExtent[3]], currentProjection, this.projection);
+      newExtent = [newExtentPoint1[0], newExtentPoint1[1], newExtentPoint2[0], newExtentPoint2[1]];
+    }
 
     const newView = new View({
       center: newCenter,
