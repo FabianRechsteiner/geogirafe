@@ -22,11 +22,14 @@ import VectorTilesManager from './tools/vectortilesmanager';
 import WmtsManager from './tools/wmtsmanager';
 import ViewManager from './tools/viewmanager';
 import LocalFileManager from './tools/localfilemanager';
+import CogManager from './tools/cogmanager';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 import Basemap from '../../models/basemap';
 import Layer from '../../models/layers/layer';
+import LayerCog from '../../models/layers/layercog';
+import LayerXYZ from '../../models/layers/layerxyz';
 import LayerOsm from '../../models/layers/layerosm';
 import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
@@ -39,6 +42,7 @@ import MapPosition from '../../tools/state/mapposition';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import { FocusFeature } from './tools/focusfeature';
+import XyzManager from './tools/xyzmanager';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -65,6 +69,8 @@ export default class MapComponent extends GirafeHTMLElement {
   wmsManager!: WmsManager;
   wmsManager3d: WmsManager3d | null = null;
   osmManager!: OsmManager;
+  cogManager!: CogManager;
+  xyzManager!: XyzManager;
   viewManager!: ViewManager;
   vectorTilesManager!: VectorTilesManager;
   localFileManager!: LocalFileManager;
@@ -161,6 +167,8 @@ export default class MapComponent extends GirafeHTMLElement {
     // Initialize managers
     this.wmsManager = new WmsManager(this.olMap);
     this.osmManager = new OsmManager(this.olMap);
+    this.cogManager = new CogManager(this.olMap);
+    this.xyzManager = new XyzManager(this.olMap);
     this.viewManager = new ViewManager(this.olMap);
     this.vectorTilesManager = new VectorTilesManager(this.olMap);
     this.localFileManager = new LocalFileManager(this.olMap);
@@ -585,6 +593,10 @@ export default class MapComponent extends GirafeHTMLElement {
         this.wmtsManager.addLayer(l);
       } else if (l instanceof LayerLocalFile) {
         this.localFileManager.addLayer(l);
+      } else if (l instanceof LayerCog) {
+        this.cogManager.addLayer(l);
+      } else if (l instanceof LayerXYZ) {
+        this.xyzManager.addLayer(l);
       }
     });
   }
@@ -600,6 +612,10 @@ export default class MapComponent extends GirafeHTMLElement {
         }
       } else if (l instanceof LayerLocalFile) {
         this.localFileManager.removeLayer(l);
+      } else if (l instanceof LayerCog) {
+        this.cogManager.removeLayer(l);
+      } else if (l instanceof LayerXYZ) {
+        this.xyzManager.removeLayer(l);
       }
     });
   }
@@ -651,6 +667,8 @@ layers.forEach(layerInfos => {
     this.wmsManager.removeAllBasemapLayers();
     if (this.wmsManager3d != null) this.wmsManager3d.removeAllBasemapLayers();
     this.osmManager.removeAllBasemapLayers();
+    this.cogManager.removeAllBasemapLayers();
+    this.xyzManager.removeAllBasemapLayers();
     this.vectorTilesManager.removeAllBasemapLayers();
 
     // Then, add the selected basemaps
@@ -659,6 +677,10 @@ layers.forEach(layerInfos => {
         this.osmManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerVectorTiles) {
         this.vectorTilesManager.addBasemapLayer(layer);
+      } else if (layer instanceof LayerCog) {
+        this.cogManager.addBasemapLayer(layer);
+      } else if (layer instanceof LayerXYZ) {
+        this.xyzManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerWmts) {
         this.wmtsManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerWms) {

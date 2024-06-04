@@ -31,7 +31,7 @@ export interface GMFTreeItem {
   metadata?: GMFMetadata;
   ogcServer?: string;
   children?: GMFTreeItem[];
-  type?: 'OSM' | 'WMS' | 'WMTS' | 'VectorTiles';
+  type?: 'OSM' | 'WMS' | 'WMTS' | 'VectorTiles' | 'COG' | 'XYZ';
   url?: string;
   style?: string;
   source?: string;
