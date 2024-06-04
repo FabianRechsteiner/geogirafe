@@ -15,6 +15,8 @@ import LayerWms from '../models/layers/layerwms';
 import LayerManager from './layermanager';
 import ShareManager from './share/sharemanager';
 import LayerConsts from '../models/layers/layerconsts';
+import LayerCog from '../models/layers/layercog';
+import LayerXYZ from '../models/layers/layerxyz';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -221,6 +223,16 @@ class ThemesManager extends GirafeSingleton {
             type: 'error'
           });
         }
+        break;
+      }
+
+      case 'COG': {
+        layer = new LayerCog(elem.id, elem.name, order.value, elem.url!, elem);
+        break;
+      }
+
+      case 'XYZ': {
+        layer = new LayerXYZ(elem.id, elem.name, order.value, elem.url!, elem);
         break;
       }
 
