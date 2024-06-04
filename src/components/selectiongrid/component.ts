@@ -54,9 +54,10 @@ class SelectionGridComponent extends GirafeResizableElement {
   }
 
   /**
-   * Closes the panel and deselect the selected features.
+   * Clean the grid, closes the panel and deselect the selected features.
    */
   closePanel() {
+    this.selectionGridManager.emptyGrid();
     this.state.interface.selectionComponentVisible = false;
     this.state.selection.selectedFeatures = [];
     super.clean();
@@ -130,14 +131,18 @@ class SelectionGridComponent extends GirafeResizableElement {
     this.selectionGridManager.tabHeaders = [];
     // No feature ? Close.
     if (this.isNullOrUndefined(features) || features!.length <= 0) {
-      this.state.interface.selectionComponentVisible = false;
-      this.selectionGridManager.emptyGrid();
+      this.closePanel();
       return;
     }
     // Otherwise, transforms features to grid data.
     this.selectionGridManager.featuresToGridData(features!);
-    // Activate and display the first tab.
-    this.displayGrid(Object.keys(this.selectionGridManager.idTab)[0]);
+    const tabIds = Object.keys(this.selectionGridManager.idTab);
+    // No tab ? Close the panel.
+    if (!tabIds.length) {
+      this.closePanel();
+    }
+    // Otherwise, activate and display the first tab.
+    this.displayGrid(tabIds[0]);
   }
 
   /**

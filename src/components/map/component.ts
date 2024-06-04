@@ -300,8 +300,10 @@ export default class MapComponent extends GirafeHTMLElement {
   select(extent: number[]) {
     // Reset current selection
     this.state.selection.selectedFeatures = [];
-    // Layers selectable today are WMS and Local files
+    this.state.selection.selectionParameters = [];
+    // Layers selectable today are WMS, WMTS (with wms layer) and Local files
     this.wmsManager.selectFeatures(extent);
+    this.wmtsManager.selectFeatures(extent);
     this.localFileManager.selectFeatures(extent);
   }
 

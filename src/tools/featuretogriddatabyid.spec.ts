@@ -13,7 +13,7 @@ const getFeatures = (): OlFeature[] => {
     new OlFeature({ col1: 'value7', col2: 'value8' }),
     new OlFeature({ col1: 'value5', col2: 'value6', col3: undefined })
   ];
-  fts[0].setId('foo.1');
+  fts[0].setId('f.oo');
   fts[1].setId('bar');
   // features[2] doesn't have id.
   fts[3].setId('bar');
@@ -37,7 +37,7 @@ describe('FeatureToGridDataById', () => {
   test('toGridDataById', () => {
     featureToGridDataById = new FeatureToGridDataById({ removeEmptyColumns: false });
     const gridDataById: GridDataById = featureToGridDataById.toGridDataById(features);
-    expect(gridDataById['foo']).toStrictEqual({
+    expect(gridDataById['f.oo']).toStrictEqual({
       columns: ['col1', 'col2'],
       data: [['value1', 'value2']],
       features: [features[0]],
@@ -86,6 +86,22 @@ describe('FeatureToGridDataById', () => {
     });
   });
 
+  test('toGridDataById with some features without data', () => {
+    featureToGridDataById = new FeatureToGridDataById({ removeEmptyColumns: false });
+    const withEmptyFeatures = [new OlFeature({ col1: 'value1' }), new OlFeature({}), new OlFeature({})];
+    withEmptyFeatures[0].setId('foo');
+    withEmptyFeatures[1].setId('foo');
+    withEmptyFeatures[2].setId('bar');
+    const gridDataById: GridDataById = featureToGridDataById.toGridDataById(withEmptyFeatures);
+    expect(gridDataById['foo']).toStrictEqual({
+      columns: ['col1'],
+      data: [['value1']],
+      features: [withEmptyFeatures[0]],
+      notOlProperties: [{ col1: 'value1' }]
+    });
+    expect(gridDataById['bar']).toBeUndefined();
+  });
+
   test('createGridDataWithColumns', () => {
     const gridData: GridData = FeatureToGridDataById.createGridDataWithColumns(features[0].getProperties());
     expect(gridData.columns).toEqual(['col1', 'col2']);
@@ -119,7 +135,7 @@ describe('FeatureToGridDataById', () => {
 
   test('getUserFeatureId', () => {
     let id = FeatureToGridDataById.getUserFeatureId(features[0]);
-    expect(id).toEqual('foo');
+    expect(id).toEqual('f.oo');
 
     id = FeatureToGridDataById.getUserFeatureId(features[1]);
     expect(id).toEqual('bar');

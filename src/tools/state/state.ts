@@ -1,12 +1,14 @@
-import Layer from '../../models/layers/layer';
-import Feature from 'ol/Feature';
-import Basemap from '../../models/basemap';
-import Theme from '../../models/theme';
-import BaseLayer from '../../models/layers/baselayer';
-import LayerWms from '../../models/layers/layerwms';
 import MapPosition from './mapposition';
-import OlGeomLineString from 'ol/geom/LineString';
-import ServerOgc from '../../models/serverogc';
+import type Layer from '../../models/layers/layer';
+import type Feature from 'ol/Feature';
+import type Basemap from '../../models/basemap';
+import type Theme from '../../models/theme';
+import type BaseLayer from '../../models/layers/baselayer';
+import type LayerWms from '../../models/layers/layerwms';
+import type OlGeomLineString from 'ol/geom/LineString';
+import type ServerOgc from '../../models/serverogc';
+import type OLayerImage from 'ol/layer/Image';
+import type OSourceImageWMS from 'ol/source/ImageWMS';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -23,6 +25,7 @@ type GraphicalInterface = {
 
 export type SelectionParam = {
   layers: LayerWms[];
+  oLayer?: OLayerImage<OSourceImageWMS>;
   selectionBox: number[];
   srid: string;
 };

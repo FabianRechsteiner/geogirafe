@@ -209,6 +209,11 @@ export default class WfsManager extends GirafeSingleton {
         const features = new GML3().readFeatures(gml);
         selectedFeatures.push(...features);
       }
+      // Removes numbers identification from the id (id.test.1234 => id.test).
+      selectedFeatures.forEach((feature) => {
+        const id = `${feature.getId()}`.split('.');
+        feature.setId(id.slice(0, id.length - 1).join('.'));
+      });
       if (selectedFeatures.length === 0 && this.state.selection.selectedFeatures.length == 0) {
         // No feature selected
         this.state.interface.selectionComponentVisible = false;

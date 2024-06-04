@@ -286,57 +286,68 @@ export default class WmsManager {
       });
     }
 
-    StateManager.getInstance().state.selection.selectionParameters = selectionParams;
+    this.state.selection.selectionParameters.push(...selectionParams);
   }
 
   async getFeatureInfo(selectionParams: SelectionParam[]) {
     const promises: Promise<void>[] = [];
     selectionParams.forEach((param) => {
-      const urls: Set<string> = new Set();
-      param.layers.forEach((layer) => {
-        const olLayer = this.getOLayer(layer);
-        if (layer.queryable && !layer.ogcServer.urlWfs && olLayer) {
-          // Layer is queryable through WMS and is in OL
-          const url = olLayer
-            .getSource()
-            ?.getFeatureInfoUrl(
-              [
-                (param.selectionBox[0] + param.selectionBox[2]) / 2,
-                (param.selectionBox[1] + param.selectionBox[3]) / 2
-              ],
-              (olLayer.getMapInternal()?.getView().getResolution() ??
-                (olLayer.getMinResolution() + olLayer.getMaxResolution()) / 2) + this.resolutionTolerance,
-              this.state.projection,
-              {
-                INFO_FORMAT: 'application/vnd.ogc.gml',
-                FEATURE_COUNT: 300
-              }
-            );
-          if (url !== undefined) {
-            urls.add(url);
-          } else throw new Error(`Unable to construct GetFeatureInfo URL for layer ${layer.name}`);
-        }
-      });
-
-      urls.forEach((url) => {
+      const urlsAndLayerNames = this.getFeatureInfoUrl(param);
+      Object.keys(urlsAndLayerNames).forEach((url) => {
         promises.push(
           fetch(url)
             .then((r) => r.text())
-            .then((response) => {
-              const gmlFeatures = new WMSGetFeatureInfo().readFeatures(response, {
-                dataProjection: this.state.projection,
-                featureProjection: this.state.projection
-              });
-              if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length == 0) {
-                this.state.interface.selectionComponentVisible = false;
-              } else {
-                this.state.selection.selectedFeatures.push(...gmlFeatures);
-                this.state.interface.selectionComponentVisible = true;
-              }
-            })
+            .then((response) => this.handleGetFeatureInfoResponse(response, url, urlsAndLayerNames))
         );
       });
     });
     return Promise.all(promises);
+  }
+
+  private getFeatureInfoUrl(param: SelectionParam): Record<string, string> {
+    /* Url-layerName (feature id) objects. */
+    const urlsAndLayerNames: Record<string, string> = {};
+    param.layers.forEach((layer) => {
+      const olLayer = param.oLayer ?? this.getOLayer(layer);
+      if (!layer.queryable || layer.ogcServer.urlWfs || !olLayer) {
+        return;
+      }
+      // Layer is queryable through WMS and has an OL layer.
+      const url = olLayer
+        .getSource()
+        ?.getFeatureInfoUrl(
+          [(param.selectionBox[0] + param.selectionBox[2]) / 2, (param.selectionBox[1] + param.selectionBox[3]) / 2],
+          (olLayer.getMapInternal()?.getView().getResolution() ?? this.state.position.resolution) +
+            this.resolutionTolerance,
+          this.state.projection,
+          {
+            INFO_FORMAT: 'application/vnd.ogc.gml',
+            FEATURE_COUNT: 300
+          }
+        );
+      if (url !== undefined) {
+        urlsAndLayerNames[url] = layer.name;
+      } else throw new Error(`Unable to construct GetFeatureInfo URL for layer ${layer.name}`);
+    });
+    return urlsAndLayerNames;
+  }
+
+  private handleGetFeatureInfoResponse(response: string, url: string, urlsAndLayerNames: Record<string, string>) {
+    const gmlFeatures = new WMSGetFeatureInfo().readFeatures(response, {
+      dataProjection: this.state.projection,
+      featureProjection: this.state.projection
+    });
+    // Set the feature id with the layer name.
+    gmlFeatures.forEach((feature) => {
+      if (!feature.getId()) {
+        feature.setId(urlsAndLayerNames[url]);
+      }
+    });
+    if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length == 0) {
+      this.state.interface.selectionComponentVisible = false;
+    } else {
+      this.state.selection.selectedFeatures.push(...gmlFeatures);
+      this.state.interface.selectionComponentVisible = true;
+    }
   }
 }

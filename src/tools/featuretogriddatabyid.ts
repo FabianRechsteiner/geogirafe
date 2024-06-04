@@ -70,6 +70,10 @@ export default class FeatureToGridDataById {
   private addFeatureToGridDataById(gridDataById: GridDataById, feature: OlFeature): GridDataById {
     const featureId = FeatureToGridDataById.getUserFeatureId(feature);
     const notOlProperties = deleteFeatureOlParams(feature, this.options.keepGeomProperty);
+    if (!Object.keys(notOlProperties).length) {
+      // Don't keep feature without properties.
+      return gridDataById;
+    }
     if (!Object.keys(gridDataById).includes(featureId)) {
       gridDataById[featureId] = FeatureToGridDataById.createGridDataWithColumns(notOlProperties);
     }
@@ -138,12 +142,11 @@ export default class FeatureToGridDataById {
   }
 
   /**
-   * Retrieves the ID of a given feature in a user-friendly way.
-   * @return The ID of the feature. If the ID is undefined, returns 'UNKNOWN'. Otherwise, returns the ID split at the first period.
+   * @return The ID of the feature or 'UNKNOWN' if undefined.
    * @static
    */
   static getUserFeatureId(feature: OlFeature): string {
     const id = feature.getId();
-    return id === undefined ? 'UNKNOWN' : `${id}`.split('.')[0];
+    return id === undefined ? 'UNKNOWN' : `${id}`;
   }
 }
