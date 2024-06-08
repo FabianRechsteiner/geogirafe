@@ -1,4 +1,4 @@
-import { inlineTemplate } from './tools';
+import { inlineTemplate } from './tools.js';
 
 const InlineTemplatesPlugin = function () {
   return {

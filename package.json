@@ -99,11 +99,8 @@
     "./tools": {
       "import": "./tools/main.js"
     },
-    "./vite-inline-templates-plugin": {
-      "import": "./buildtools/vite-inline-templates-plugin.js"
-    },
-    "./vite-restart-plugin": {
-      "import": "./buildtools/vite-restart-plugin.js"
+    "./buildtools": {
+      "import": "./buildtools/main.js"
     }
   },
   "bin": {
