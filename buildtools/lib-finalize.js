@@ -25,6 +25,7 @@ console.info(`Copying the BuildTools...`);
 sourceDir = 'buildtools';
 targetDir = path.join('dist', 'lib', 'buildtools');
 copy('tools.js', sourceDir, targetDir);
+copy('main.js', sourceDir, targetDir);
 copy('lib-inline.js', sourceDir, targetDir);
 copy('vite-inline-templates-plugin.js', sourceDir, targetDir);
 copy('vite-restart-plugin.js', sourceDir, targetDir);
