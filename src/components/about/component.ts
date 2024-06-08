@@ -6,9 +6,9 @@ class AboutComponent extends GirafeDraggableElement {
   styleUrl = './style.css';
 
   loaded = false;
-  version!: HTMLElement;
-  build!: HTMLElement;
-  date!: HTMLElement;
+  version!: string;
+  build!: string;
+  date!: string;
   public logo: string = GirafeLogo;
 
   constructor() {
