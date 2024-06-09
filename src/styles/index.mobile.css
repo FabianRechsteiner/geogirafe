@@ -1,23 +1,17 @@
-@media screen and (max-width: 1240px) {
-  girafe-search {
-    width: 24rem;
-  }
-}
-
+/* 
+  Those styles are temporary. 
+  They allow a first draft display on mobile for development purpose only. 
+  Keep in mind that there is not official support of mobile yet. 
+  But this will coming soon!
+*/
 @media screen and (max-width: 1000px) {
-  girafe-search {
-    width: 100%;
-    left: 0px;
-    border-radius: 0;
-    margin: 4.5rem 0 0 0;
-    background-color: var(--bkg-color);
-  }
-  girafe-tree-view {
-    top: 2.5rem;
-    width: 18rem;
-  }
-
-  girafe-coordinate {
-    display: none;
+  girafe-coordinate,
+  girafe-video-record,
+  girafe-nav-history,
+  girafe-colorswitcher,
+  button.help,
+  button.share,
+  .logo {
+    display: none !important;
   }
 }

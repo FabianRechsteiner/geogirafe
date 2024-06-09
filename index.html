@@ -86,14 +86,14 @@
       <div id="buttonbar">
         <girafe-video-record></girafe-video-record>
         <girafe-nav-history></girafe-nav-history>
-        <button class="girafe-button-big" onclick="throw new Error('Login not implemented')">
+        <button class="girafe-button-big login" onclick="throw new Error('Login not implemented')">
           <img alt="help-icon" src="icons/user.svg" />
         </button>
         <girafe-colorswitcher></girafe-colorswitcher>
-        <button class="girafe-button-big" onclick="document.geogirafe.state.interface.helpVisible = true">
+        <button class="girafe-button-big help" onclick="document.geogirafe.state.interface.helpVisible = true">
           <img alt="help-icon" src="icons/help.svg" />
         </button>
-        <button class="girafe-button-big" onclick="document.geogirafe.state.interface.shareVisible = true">
+        <button class="girafe-button-big share" onclick="document.geogirafe.state.interface.shareVisible = true">
           <img alt="help-icon" src="icons/share.svg" />
         </button>
         <girafe-menu-button>
@@ -138,7 +138,9 @@
     <div id="content">
       <div id="main">
         <girafe-lr-panel class="panel-left" dock="left">
-          <girafe-tree-view slot="main"></girafe-tree-view>
+          <div slot="main">
+            <girafe-tree-view slot="main"></girafe-tree-view>
+          </div>
         </girafe-lr-panel>
         <div id="content-map">
           <girafe-map></girafe-map>

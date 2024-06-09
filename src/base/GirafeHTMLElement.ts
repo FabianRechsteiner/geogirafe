@@ -173,7 +173,7 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   /**
-   * Remeber the initial display configuration of the component
+   * Remember the initial display configuration of the component
    * To be able to restore it
    */
   private defineDisplayStyle() {
