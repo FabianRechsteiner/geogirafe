@@ -469,7 +469,7 @@ export class LidarProfileManager {
    * @private
    */
   getHTMLError_(): string {
-    const errorInfoTxt = this.i18nManager.getTranslation('LIDAR profile service error');
+    const errorInfoTxt = this.i18nManager.getTranslation('LiDAR profile service error');
     const errorOfflineTxt = this.i18nManager.getTranslation('It might be offline');
     const errorOutsideTxt = this.i18nManager.getTranslation(
       'Or did you attempt to draw a profile outside data extent?'
