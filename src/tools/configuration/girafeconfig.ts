@@ -308,7 +308,7 @@ class GirafeConfig {
 
   private initConfigLidar(config: GirafeConfig) {
     if (!config.lidar?.url) {
-      console.warn('No Lidar URL');
+      console.warn('No LiDAR URL');
     }
     return {
       url: config.lidar?.url ?? 'noLidarUrlInConfig'

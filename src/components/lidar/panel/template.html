@@ -11,14 +11,14 @@
         <button
           class="${this.isDrawActive() ? 'no-margin active' : 'no-margin'}"
           onclick="${() => this.toggleDrawLine()}"
-          i18n="Draw LIDAR profile line"></button>
+          i18n="Draw LiDAR profile line"></button>
       </div>
 
       ${this.isDrawActive() ? uHtml`
       <div class="margin-top">
         <em
           class="small"
-          i18n="Draw a line on the map to display the corresponding LIDAR profile. Use double-click to finish the drawing.">
+          i18n="Draw a line on the map to display the corresponding LiDAR profile. Use double-click to finish the drawing.">
         </em>
       </div>
       ` : uHtml``} ${ this.isLineDrawn() ? uHtml`
