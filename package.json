@@ -117,6 +117,8 @@
     "build-lib": "node buildtools/lib-clean.js && node buildtools/lib-inline.js && node buildtools/lib-collect.js && node buildtools/lib-main-file.js && tsc --project tsconfig.lib.json && node buildtools/lib-finalize.js",
     "publish-lib": "cd dist/lib && npm publish",
     "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile dist",
+    "build-apk": "docker run -v ./dist:/geogirafe/dist -v ./buildtools:/geogirafe/buildtools geogirafe/cordova-builder bash -c \"cp /geogirafe/buildtools/cordova/apk-build.sh . && chmod u+x apk-build.sh && ./apk-build.sh\"",
+    "build-apk-win": "docker run -v %cd%/dist:/geogirafe/dist -v %cd%/buildtools:/geogirafe/buildtools geogirafe/cordova-builder bash -c \"cp /geogirafe/buildtools/cordova/apk-build.sh . && chmod u+x apk-build.sh && ./apk-build.sh\"",
     "test": "vitest --run",
     "test-watch": "vitest",
     "configure-demo": "bash -C './buildtools/configure-demo.sh'",

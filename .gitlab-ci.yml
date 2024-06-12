@@ -127,7 +127,7 @@ build-app:
   when: on_success
 
   before_script:
-    - apt update && apt -y install jq brotli
+    - apt update && apt -y install jq
   script:
     - npm ci
     - npm run build
@@ -136,12 +136,41 @@ build-app:
     # Generate Version Number
     - version=$(jq -r '.version' package.json)
     - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > dist/app/about.json
-    # Compress all files
-    - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
-    - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec gzip -k -f {} \;
+
   artifacts:
     paths:
       - dist/app
+
+#################################
+# Build an Android APK Package
+build-apk:
+  stage: build
+  image: geogirafe/cordova-builder
+  needs:
+    - job: build-app
+      artifacts: true
+  when: on_success
+
+  before_script:
+    - ls
+  script:
+    - cordova create GeoGirafe dev.geomapfish.geogirafe GeoGirafe
+    - cd GeoGirafe && cordova platform add android && cordova requirements && cd ..
+    - rm -Rf GeoGirafe/www/*
+    - rm GeoGirafe/config.xml
+    - cp -R dist/app/* GeoGirafe/www/
+    - cp buildtools/cordova/config.xml GeoGirafe/
+    - cp buildtools/cordova/girafe.png GeoGirafe/
+    - sed -i 's#</body>#  <script src="cordova.js"></script>\n  </body>#g' GeoGirafe/www/index.html
+    # Use MapBS as default configuration for GeoGirafe APK during the CI
+    - chmod +x buildtools/configure-demo.sh && ./buildtools/configure-demo.sh "mapbs" "GeoGirafe/www"
+    - cd GeoGirafe && cordova build android && cd ..
+    - mkdir -p dist/apk
+    - cp GeoGirafe/platforms/android/app/build/outputs/apk/debug/app-debug.apk dist/apk/geogirafe.apk
+
+  artifacts:
+    paths:
+      - dist/apk
 
 #################################
 # Build the library for production
@@ -168,6 +197,31 @@ build-lib:
       - dist/lib
 
 #################################
+# Optimize files with gzip and brotli before deploying
+optimize:
+  stage: publish
+  needs:
+    - job: build-app
+      artifacts: true
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+    - when: never
+
+  before_script:
+    - apt update && apt -y install brotli
+
+  script:
+    # Compress all files
+    - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
+    - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec gzip -k -f {} \;
+
+  artifacts:
+    paths:
+      - dist/app
+
+#################################
 # Create a docker image with the production build
 publish-docker:
   stage: publish
@@ -175,7 +229,7 @@ publish-docker:
   services:
     - docker:26-dind
   needs:
-    - job: build-app
+    - job: optimize
       artifacts: true
 
   rules:
@@ -234,7 +288,7 @@ pages:
   stage: pages
   image: debian:stable-slim
   needs:
-    - job: build-app
+    - job: optimize
       artifacts: true
 
   rules:
