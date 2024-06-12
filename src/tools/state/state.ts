@@ -10,7 +10,7 @@ import ServerOgc from '../../models/serverogc';
 
 type GraphicalInterface = {
   helpVisible: boolean;
-  redliningPanelVisible: boolean;
+  drawingPanelVisible: boolean;
   printPanelVisible: boolean;
   lidarPanelVisible: boolean;
   selectionComponentVisible: boolean;
@@ -105,7 +105,7 @@ export default class State {
   // Interface configuration (visible panels, ...)
   interface: GraphicalInterface = {
     helpVisible: false,
-    redliningPanelVisible: false,
+    drawingPanelVisible: false,
     printPanelVisible: false,
     lidarPanelVisible: false,
     selectionComponentVisible: false,

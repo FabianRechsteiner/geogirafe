@@ -1,13 +1,13 @@
 import GeoEvents from '../../models/events';
 import Picker from 'vanilla-picker/csp';
-import RedliningFeature from './redliningFeature';
-import RedliningShape from './redliningshape';
-import OlRedlining from './olRedlining';
-import CesiumRedlining from './cesiumRedlining';
+import DrawingFeature from './drawingFeature';
+import DrawingShape from './drawingshape';
+import OlDrawing from './olDrawing';
+import CesiumDrawing from './cesiumDrawing';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
-class RedliningComponent extends GirafeHTMLElement {
+class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
@@ -27,17 +27,17 @@ class RedliningComponent extends GirafeHTMLElement {
   toolSelected = null;
   drawingList = null;
 
-  olRedlining = undefined;
-  cesiumRedlining = undefined;
+  olDrawing = undefined;
+  cesiumDrawing = undefined;
 
   constructor() {
-    super('redlining');
-    this.state.extendedState.redlining = {
+    super('drawing');
+    this.state.extendedState.drawing = {
       activeTool: null,
       features: []
     };
-    this.olRedlining = new OlRedlining();
-    this.cesiumRedlining = new CesiumRedlining();
+    this.olDrawing = new OlDrawing();
+    this.cesiumDrawing = new CesiumDrawing();
   }
 
   render() {
@@ -68,49 +68,49 @@ class RedliningComponent extends GirafeHTMLElement {
   }
 
   renderEmptyComponent() {
-    this.state.extendedState.redlining.activeTool = null;
+    this.state.extendedState.drawing.activeTool = null;
     this.state.selection.enabled = true;
     this.unregisterEvents();
     this.renderEmpty();
   }
 
   registerVisibilityEvents() {
-    this.stateManager.subscribe('interface.redliningPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
+    this.stateManager.subscribe('interface.drawingPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
   serialize() {
-    return this.state.extendedState.redlining.features.map((feature) => feature.serialize());
+    return this.state.extendedState.drawing.features.map((feature) => feature.serialize());
   }
 
   deserialize(serializedFeatures) {
     serializedFeatures.forEach((serializedFeature) => {
-      const feature = RedliningFeature.deserialize(serializedFeature);
+      const feature = DrawingFeature.deserialize(serializedFeature);
       this.addFeature(feature);
     });
   }
 
   addFeature(feature) {
     // Currently, as we are using olCesium, feature are automatically replicated to Cesium
-    if (this.olRedlining != undefined) {
-      this.olRedlining.addFeature(feature);
+    if (this.olDrawing != undefined) {
+      this.olDrawing.addFeature(feature);
     }
   }
 
   registerEvents() {
     this.eventsCallbacks.push(
-      this.stateManager.subscribe('extendedState.redlining.features', (oldFeatures, newFeatures) =>
+      this.stateManager.subscribe('extendedState.drawing.features', (oldFeatures, newFeatures) =>
         this.onFeaturesChanged(oldFeatures, newFeatures)
       )
     );
     this.disableButton.addEventListener('click', (e) => this.deactivateDraw(e));
-    this.pointButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Point));
-    this.lineButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Polyline));
-    this.squareButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Square));
-    this.rectangleButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Rectangle));
-    this.polygonButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Polygon));
-    this.circleButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.Disk));
-    this.freelineButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.FreehandPolyline));
-    this.freepolygonButton.addEventListener('click', (e) => this.activateDraw(e, RedliningShape.FreehandPolygon));
+    this.pointButton.addEventListener('click', (e) => this.activateDraw(e, DrawingShape.Point));
+    this.lineButton.addEventListener('click', (e) => this.activateDraw(e, DrawingShape.Polyline));
+    this.squareButton.addEventListener('click', (e) => this.activateDraw(e, DrawingShape.Square));
+    this.rectangleButton.addEventListener('click', (e) => this.activateDraw(e, DrawingShape.Rectangle));
+    this.polygonButton.addEventListener('click', (e) => this.activateDraw(e, DrawingShape.Polygon));
+    this.circleButton.addEventListener('click', (e) => this.activateDraw(e, DrawingShape.Disk));
+    this.freelineButton.addEventListener('click', (e) => this.activateDraw(e, DrawingShape.FreehandPolyline));
+    this.freepolygonButton.addEventListener('click', (e) => this.activateDraw(e, DrawingShape.FreehandPolygon));
     this.undoButton.addEventListener('click', () => this.messageManager.sendMessage({ action: GeoEvents.undoDraw }));
   }
 
@@ -138,7 +138,7 @@ class RedliningComponent extends GirafeHTMLElement {
     this.toolSelected = e.target.parentElement;
     this.toolSelected.className = 'selected';
 
-    this.state.extendedState.redlining.activeTool = tool;
+    this.state.extendedState.drawing.activeTool = tool;
   }
 
   deactivateDraw(e) {
@@ -148,7 +148,7 @@ class RedliningComponent extends GirafeHTMLElement {
     this.toolSelected = e.target.parentElement;
     this.toolSelected.className = 'selected';
 
-    this.state.extendedState.redlining.activeTool = null;
+    this.state.extendedState.drawing.activeTool = null;
   }
 
   connectedCallback() {
@@ -193,7 +193,7 @@ class RedliningComponent extends GirafeHTMLElement {
     nameinput.value = feature.name;
     nameinput.className = 'name';
     nameinput.oninput = (e) => {
-      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.drawing.features.find((f) => f.id === feature.id);
       changedFeature.name = e.target.value;
     };
     container.appendChild(nameinput);
@@ -205,7 +205,7 @@ class RedliningComponent extends GirafeHTMLElement {
     const textminus = document.createElement('i');
     textminus.className = 'fa-solid fa-minus';
     textminus.onclick = () => {
-      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.drawing.features.find((f) => f.id === feature.id);
       changedFeature.textSize = changedFeature.textSize - 1;
     };
     textdiv.appendChild(textminus);
@@ -213,7 +213,7 @@ class RedliningComponent extends GirafeHTMLElement {
     const textplus = document.createElement('i');
     textplus.className = 'fa-solid fa-plus';
     textplus.onclick = () => {
-      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.drawing.features.find((f) => f.id === feature.id);
       changedFeature.textSize = changedFeature.textSize + 1;
     };
     textdiv.appendChild(textplus);
@@ -225,16 +225,16 @@ class RedliningComponent extends GirafeHTMLElement {
     fill.className = 'fa-solid fa-paint-roller';
     container.appendChild(fill);
     const fillColor = this.isNullOrUndefined(feature.fillColor)
-      ? this.configManager.Config.redlining.defaultFillColor
+      ? this.configManager.Config.drawing.defaultFillColor
       : feature.fillColor;
     const fillPicker = new Picker({ parent: fill, color: fillColor, popup: 'left' });
     // Message when color changed
     fillPicker.onChange = (color) => {
-      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.drawing.features.find((f) => f.id === feature.id);
       changedFeature.fillColor = color.hex;
     };
     fillPicker.onDone = (color) => {
-      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.drawing.features.find((f) => f.id === feature.id);
       changedFeature.fillColor = color.hex;
     };
 
@@ -243,16 +243,16 @@ class RedliningComponent extends GirafeHTMLElement {
     stroke.className = 'fa-solid fa-paintbrush';
     container.appendChild(stroke);
     const strokeColor = this.isNullOrUndefined(feature.strokeColor)
-      ? this.configManager.Config.redlining.defaultStrokeColor
+      ? this.configManager.Config.drawing.defaultStrokeColor
       : feature.fillColor;
     const strokePicker = new Picker({ parent: stroke, color: strokeColor, popup: 'left' });
     // Message when color changed
     strokePicker.onChange = (color) => {
-      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.drawing.features.find((f) => f.id === feature.id);
       changedFeature.strokeColor = color.hex;
     };
     strokePicker.onDone = (color) => {
-      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.drawing.features.find((f) => f.id === feature.id);
       changedFeature.strokeColor = color.hex;
     };
 
@@ -263,10 +263,10 @@ class RedliningComponent extends GirafeHTMLElement {
     slider.min = 0;
     slider.max = 10;
     slider.value = this.isNullOrUndefined(feature.strokeWidth)
-      ? this.configManager.Config.redlining.defaultStrokeWidth
+      ? this.configManager.Config.drawing.defaultStrokeWidth
       : feature.strokeWidth;
     slider.oninput = (e) => {
-      const changedFeature = this.state.extendedState.redlining.features.find((f) => f.id === feature.id);
+      const changedFeature = this.state.extendedState.drawing.features.find((f) => f.id === feature.id);
       changedFeature.strokeWidth = e.target.value;
     };
     container.appendChild(slider);
@@ -288,11 +288,11 @@ class RedliningComponent extends GirafeHTMLElement {
 
   deleteFeature(feature) {
     if (confirm('Do you want to delete this feature?')) {
-      this.state.extendedState.redlining.features = this.state.extendedState.redlining.features.filter((f) => {
+      this.state.extendedState.drawing.features = this.state.extendedState.drawing.features.filter((f) => {
         return f.id != feature.id;
       });
     }
   }
 }
 
-export default RedliningComponent;
+export default DrawingComponent;

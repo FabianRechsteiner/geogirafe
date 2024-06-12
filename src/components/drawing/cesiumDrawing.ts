@@ -1,7 +1,7 @@
 import * as Cesium from 'cesium';
 import { Cartesian3, Entity } from 'cesium';
-import RedliningFeature from './redliningFeature';
-import RedliningShape from './redliningshape';
+import DrawingFeature from './drawingFeature';
+import DrawingShape from './drawingshape';
 
 import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
@@ -11,7 +11,7 @@ import ComponentManager from '../../tools/state/componentManager';
 
 const getPositionAsText = (p: Cartesian3) => p.x.toFixed(3) + ' ; ' + p.y.toFixed(3) + ' ; ' + p.z.toFixed(3);
 
-export default class CesiumRedlining {
+export default class CesiumDrawing {
   map: MapComponent;
   state: State;
   activeShapePoints: Cartesian3[] = [];
@@ -40,27 +40,27 @@ export default class CesiumRedlining {
 
   registerEvents() {
     this.map.stateManager.subscribe(
-      'extendedState.redlining.activeTool',
-      (_oldTool: string | null, newTool: RedliningShape | null) =>
-        newTool === null ? this.deactivateRedlining() : this.activateRedlining(newTool)
+      'extendedState.drawing.activeTool',
+      (_oldTool: string | null, newTool: DrawingShape | null) =>
+        newTool === null ? this.deactivateDrawing() : this.activateDrawing(newTool)
     );
   }
 
-  activateRedlining(tool: RedliningShape) {
+  activateDrawing(tool: DrawingShape) {
     this.state.selection.enabled = false;
     this.handler!.setInputAction(this.addPoint(tool), Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler!.setInputAction(this.updateShape(tool), Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler!.setInputAction(this.terminateShape(tool), Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
     this.floatingPoint = this.entities!.add({
       point: {
-        color: Cesium.Color.fromCssColorString(this.configManager!.Config.redlining.defaultStrokeColor),
+        color: Cesium.Color.fromCssColorString(this.configManager!.Config.drawing.defaultStrokeColor),
         pixelSize: 5,
         heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
       }
     });
   }
 
-  deactivateRedlining() {
+  deactivateDrawing() {
     this.state.selection.enabled = true;
     this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
@@ -78,16 +78,16 @@ export default class CesiumRedlining {
     return ray == undefined ? undefined : this.scene!.globe.pick(ray, this.scene!);
   }
 
-  terminateShape(tool: RedliningShape) {
+  terminateShape(tool: DrawingShape) {
     return () => {
       const newCesiumEntityPoints = this.activeShapePoints.slice(0, this.activeShapePoints.length - 1);
-      let newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, new RedliningFeature(tool));
+      let newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, new DrawingFeature(tool));
       newCesiumEntities.forEach((e) => this.entities!.add(e));
       if (this.activeShapes) {
         this.activeShapes.forEach((e) => this.entities!.remove(e));
       }
 
-      const newFeature = new RedliningFeature(tool);
+      const newFeature = new DrawingFeature(tool);
 
       const updateStyle = () => {
         newCesiumEntities.forEach((e) => this.entities!.remove(e));
@@ -109,13 +109,13 @@ export default class CesiumRedlining {
     };
   }
 
-  updateShape(tool: RedliningShape) {
+  updateShape(tool: DrawingShape) {
     return (event: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
       const newPosition = this.pickOnGlobe(event.endPosition);
 
       if (Cesium.defined(newPosition)) {
         if (Cesium.defined(this.activeShapes)) {
-          if (tool == RedliningShape.FreehandPolyline || tool == RedliningShape.FreehandPolygon) {
+          if (tool == DrawingShape.FreehandPolyline || tool == DrawingShape.FreehandPolygon) {
             this.activeShapePoints.push(newPosition);
           } else {
             this.activeShapePoints[this.activeShapePoints.length - 1] = newPosition;
@@ -126,7 +126,7 @@ export default class CesiumRedlining {
     };
   }
 
-  addPoint(tool: RedliningShape) {
+  addPoint(tool: DrawingShape) {
     return (event: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
       const earthPosition = this.pickOnGlobe(event.position);
 
@@ -136,16 +136,16 @@ export default class CesiumRedlining {
 
         if (this.activeShapePoints.length === 1) {
           this.activeShapePoints.push(earthPosition); // Add a point for the one under the cursor
-          this.activeShapes = this.getShapes(tool, this.activeShapePoints, new RedliningFeature(tool));
+          this.activeShapes = this.getShapes(tool, this.activeShapePoints, new DrawingFeature(tool));
           this.activeShapes.forEach((e) => this.entities!.add(e));
         }
 
         // Tools that automatically terminate the shape after a fixed number of points
         if (
-          (tool === RedliningShape.Point && this.activeShapePoints.length === 2) ||
-          (tool === RedliningShape.Disk && this.activeShapePoints.length === 3) ||
-          (tool === RedliningShape.Square && this.activeShapePoints.length === 3) ||
-          (tool === RedliningShape.Rectangle && this.activeShapePoints.length === 3)
+          (tool === DrawingShape.Point && this.activeShapePoints.length === 2) ||
+          (tool === DrawingShape.Disk && this.activeShapePoints.length === 3) ||
+          (tool === DrawingShape.Square && this.activeShapePoints.length === 3) ||
+          (tool === DrawingShape.Rectangle && this.activeShapePoints.length === 3)
         ) {
           return this.terminateShape(tool)();
         }
@@ -194,7 +194,7 @@ export default class CesiumRedlining {
           position: Cartesian3.lerp(pos[index], pos[index + 1], 0.5, new Cartesian3()),
           label: {
             heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-            text: RedliningFeature.formatDistance(Cartesian3.distance(pos[index], pos[index + 1])),
+            text: DrawingFeature.formatDistance(Cartesian3.distance(pos[index], pos[index + 1])),
             font: font,
             pixelOffset: new Cesium.Cartesian2(0.0, -15),
             fillColor: Cesium.Color.fromCssColorString('#000000')
@@ -229,7 +229,7 @@ export default class CesiumRedlining {
       .reduce((a, b) => a + b, 0);
   }
 
-  generateEntityOutline(positionsGenerator: Cesium.CallbackProperty.Callback, feature: RedliningFeature) {
+  generateEntityOutline(positionsGenerator: Cesium.CallbackProperty.Callback, feature: DrawingFeature) {
     return {
       positions: new Cesium.CallbackProperty(positionsGenerator, false),
       clampToGround: true,
@@ -238,24 +238,24 @@ export default class CesiumRedlining {
     };
   }
 
-  getShapes(tool: RedliningShape, positions: Cartesian3[], feature: RedliningFeature) {
+  getShapes(tool: DrawingShape, positions: Cartesian3[], feature: DrawingFeature) {
     const fillColor = Cesium.Color.fromCssColorString(feature.fillColor);
     const strokeColor = Cesium.Color.fromCssColorString(feature.strokeColor);
     const font = feature.fontSize + 'px' + feature.font;
 
     switch (tool) {
-      case RedliningShape.Polyline:
+      case DrawingShape.Polyline:
         return [
           new Cesium.Entity({ polyline: this.generateEntityOutline(() => positions, feature) }),
           ...this.getPolyLineLabels(positions, font)
         ];
-      case RedliningShape.FreehandPolyline:
+      case DrawingShape.FreehandPolyline:
         return [
           new Cesium.Entity({ polyline: this.generateEntityOutline(() => positions, feature) }),
           new Cesium.Entity({
             position: positions[Math.ceil(positions.length / 2)],
             label: {
-              text: RedliningFeature.formatDistance(
+              text: DrawingFeature.formatDistance(
                 positions
                   .slice(0, -1)
                   .map((_, i) => Cartesian3.distance(positions[i], positions[i + 1]))
@@ -267,7 +267,7 @@ export default class CesiumRedlining {
             }
           })
         ];
-      case RedliningShape.Polygon:
+      case DrawingShape.Polygon:
         return [
           new Cesium.Entity({
             polygon: {
@@ -281,14 +281,14 @@ export default class CesiumRedlining {
             position: this.getPolygonCenter(positions),
             label: {
               heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: RedliningFeature.formatArea(this.getPolygonArea(positions)),
+              text: DrawingFeature.formatArea(this.getPolygonArea(positions)),
               font: font,
               pixelOffset: new Cesium.Cartesian2(0.0, -15),
               fillColor: Cesium.Color.fromCssColorString('#000000')
             }
           })
         ];
-      case RedliningShape.FreehandPolygon:
+      case DrawingShape.FreehandPolygon:
         return [
           new Cesium.Entity({
             polygon: {
@@ -301,14 +301,14 @@ export default class CesiumRedlining {
             position: this.getPolygonCenter([...positions]),
             label: {
               heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: RedliningFeature.formatArea(this.getPolygonArea([...positions])),
+              text: DrawingFeature.formatArea(this.getPolygonArea([...positions])),
               font: font,
               pixelOffset: new Cesium.Cartesian2(0.0, -15),
               fillColor: Cesium.Color.fromCssColorString('#000000')
             }
           })
         ];
-      case RedliningShape.Point:
+      case DrawingShape.Point:
         return [
           new Cesium.Entity({
             position: positions[0],
@@ -325,7 +325,7 @@ export default class CesiumRedlining {
             }
           })
         ];
-      case RedliningShape.Disk:
+      case DrawingShape.Disk:
         return [
           new Cesium.Entity({
             position: positions[0],
@@ -354,14 +354,14 @@ export default class CesiumRedlining {
             position: positions[0],
             label: {
               heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: RedliningFeature.formatArea(Math.PI * Math.pow(Cartesian3.distance(positions[0], positions[1]), 2)),
+              text: DrawingFeature.formatArea(Math.PI * Math.pow(Cartesian3.distance(positions[0], positions[1]), 2)),
               font: font,
               pixelOffset: new Cesium.Cartesian2(0.0, -15),
               fillColor: Cesium.Color.fromCssColorString('#000000')
             }
           })
         ];
-      case RedliningShape.Square:
+      case DrawingShape.Square:
         return [
           new Cesium.Entity({
             polygon: {
@@ -383,7 +383,7 @@ export default class CesiumRedlining {
             position: positions[0],
             label: {
               heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: RedliningFeature.formatArea(
+              text: DrawingFeature.formatArea(
                 Math.pow(Math.SQRT2 * Cartesian3.distance(positions[0], positions[1]), 2)
               ),
               font: font,
@@ -392,7 +392,7 @@ export default class CesiumRedlining {
             }
           })
         ];
-      case RedliningShape.Rectangle:
+      case DrawingShape.Rectangle:
         return [
           new Cesium.Entity({
             polygon: {
@@ -408,7 +408,7 @@ export default class CesiumRedlining {
             position: this.getPolygonCenter([...positions]),
             label: {
               heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: RedliningFeature.formatArea(this.getPolygonArea(this.makeRectangle(positions[0], positions[1]))),
+              text: DrawingFeature.formatArea(this.getPolygonArea(this.makeRectangle(positions[0], positions[1]))),
               font: font,
               pixelOffset: new Cesium.Cartesian2(0.0, -15),
               fillColor: Cesium.Color.fromCssColorString('#000000')

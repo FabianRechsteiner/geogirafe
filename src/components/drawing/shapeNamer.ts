@@ -1,8 +1,8 @@
-import RedliningShape from './redliningshape';
+import DrawingShape from './drawingshape';
 
 export default class ShapeNamer {
-  static getRandomName(type: RedliningShape) {
-    return adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + RedliningShape[type];
+  static getRandomName(type: DrawingShape) {
+    return adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + DrawingShape[type];
   }
 }
 

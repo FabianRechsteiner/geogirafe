@@ -1,4 +1,4 @@
-enum RedliningShape {
+enum DrawingShape {
   Point,
   Polyline,
   Polygon,
@@ -9,4 +9,4 @@ enum RedliningShape {
   FreehandPolygon
 }
 
-export default RedliningShape;
+export default DrawingShape;

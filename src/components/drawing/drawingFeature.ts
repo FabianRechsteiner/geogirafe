@@ -1,12 +1,12 @@
 import ConfigManager from '../../tools/configuration/configmanager';
 import StateManager from '../../tools/state/statemanager';
-import RedliningShape from './redliningshape';
+import DrawingShape from './drawingshape';
 import ShapeNamer from './shapeNamer';
 import { v4 as uuidv4 } from 'uuid';
 
-type RedliningConfig = {
-  activeTool: RedliningShape | null;
-  features: RedliningFeature[];
+type DrawingConfig = {
+  activeTool: DrawingShape | null;
+  features: DrawingFeature[];
 };
 
 type SerializedFeature = {
@@ -17,13 +17,13 @@ type SerializedFeature = {
   fz: number;
   f: string;
   g: object;
-  t: RedliningShape;
+  t: DrawingShape;
 };
 
-export default class RedliningFeature {
+export default class DrawingFeature {
   private _uid: string = uuidv4();
   private _onRemove = () => {};
-  private _tool: RedliningShape;
+  private _tool: DrawingShape;
 
   private _name: string;
   private _nameCb = (_: string) => {};
@@ -45,8 +45,8 @@ export default class RedliningFeature {
 
   private _geojson: object;
 
-  constructor(tool: RedliningShape, geojson: object = {}, name: string | null = null) {
-    const defaultConfig = ConfigManager.getInstance().Config.redlining;
+  constructor(tool: DrawingShape, geojson: object = {}, name: string | null = null) {
+    const defaultConfig = ConfigManager.getInstance().Config.drawing;
 
     this._tool = tool;
     this._name = name == null ? ShapeNamer.getRandomName(tool) : name;
@@ -149,7 +149,7 @@ export default class RedliningFeature {
     this._onRemove();
   }
   addToState() {
-    const state = StateManager.getInstance().state.extendedState.redlining as RedliningConfig;
+    const state = StateManager.getInstance().state.extendedState.drawing as DrawingConfig;
     state.features.push(this);
   }
 
@@ -167,7 +167,7 @@ export default class RedliningFeature {
   }
 
   static deserialize(serializedFeature: SerializedFeature) {
-    const newFeature = new RedliningFeature(serializedFeature.t, serializedFeature.g, serializedFeature.n);
+    const newFeature = new DrawingFeature(serializedFeature.t, serializedFeature.g, serializedFeature.n);
     newFeature.strokeColor = serializedFeature.sc;
     newFeature.strokeWidth = serializedFeature.sw;
     newFeature.fillColor = serializedFeature.fc;
@@ -183,9 +183,9 @@ export default class RedliningFeature {
   }
 
   static formatDistance(dist: number) {
-    return dist > 100 ? RedliningFeature.round(dist / 1000) + ' km' : RedliningFeature.round(dist) + ' m';
+    return dist > 100 ? DrawingFeature.round(dist / 1000) + ' km' : DrawingFeature.round(dist) + ' m';
   }
   static formatArea(area: number) {
-    return area > 10000 ? RedliningFeature.round(area / 1000000) + ' km²' : RedliningFeature.round(area) + ' m²';
+    return area > 10000 ? DrawingFeature.round(area / 1000000) + ' km²' : DrawingFeature.round(area) + ' m²';
   }
 }

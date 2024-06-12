@@ -325,7 +325,7 @@ export default class MapComponent extends GirafeHTMLElement {
 
   onCustomGirafeEvent(details: { action: string; layer: Layer; extent: Extent }) {
     if (details.action === GeoEvents.undoDraw) {
-      //this.redliningManager.removeLastPoint();
+      //this.drawingManager.removeLastPoint();
     }
   }
 

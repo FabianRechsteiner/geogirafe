@@ -19,7 +19,7 @@ describe('StateToggleManager class', () => {
   let stateToggleManager: StateToggleManager;
   const paths = [
     'interface.helpVisible',
-    'interface.redliningPanelVisible',
+    'interface.drawingPanelVisible',
     'interface.printPanelVisible',
     'state.language'
   ];
@@ -27,7 +27,7 @@ describe('StateToggleManager class', () => {
   beforeAll(() => {
     state = stateManager.state;
     state.interface.helpVisible = true;
-    state.interface.redliningPanelVisible = false;
+    state.interface.drawingPanelVisible = false;
     state.interface.printPanelVisible = true;
     state.language = 'fr';
     stateToggleManager = new StateToggleManager(paths, stateManager);
@@ -35,22 +35,22 @@ describe('StateToggleManager class', () => {
 
   it('initToggle', () => {
     expect(state.interface.helpVisible).toBeTruthy();
-    expect(state.interface.redliningPanelVisible).toBeFalsy();
+    expect(state.interface.drawingPanelVisible).toBeFalsy();
     expect(state.interface.printPanelVisible).toBeFalsy();
     expect(state.language).toEqual('fr');
   });
 
   it('toggles by watching', () => {
-    state.interface.redliningPanelVisible = true;
+    state.interface.drawingPanelVisible = true;
     expect(state.interface.helpVisible).toBeFalsy();
-    expect(state.interface.redliningPanelVisible).toBeTruthy();
+    expect(state.interface.drawingPanelVisible).toBeTruthy();
     expect(state.interface.printPanelVisible).toBeFalsy();
   });
 
   it('deactivateAll', () => {
     stateToggleManager.deactivateAll();
     expect(state.interface.helpVisible).toBeFalsy();
-    expect(state.interface.redliningPanelVisible).toBeFalsy();
+    expect(state.interface.drawingPanelVisible).toBeFalsy();
     expect(state.interface.printPanelVisible).toBeFalsy();
   });
 

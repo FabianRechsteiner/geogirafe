@@ -67,7 +67,7 @@ class GirafeConfig {
     defaultFocusStrokeColor: string;
     defaultFocusStrokeWidth: number;
   };
-  redlining: {
+  drawing: {
     defaultFillColor: string;
     defaultStrokeColor: string;
     defaultStrokeWidth: number;
@@ -137,7 +137,7 @@ class GirafeConfig {
     this.basemaps = this.initConfigBasemaps(config);
     this.treeview = this.initConfigTreeview(config);
     this.selection = this.initConfigSelection(config);
-    this.redlining = this.initConfigRedlining(config);
+    this.drawing = this.initConfigDrawing(config);
     this.projections = this.initConfigProjections(config);
     this.map = this.initConfigMap(config);
     this.bookmarks = this.initConfigBookmarks(config);
@@ -219,13 +219,13 @@ class GirafeConfig {
     };
   }
 
-  private initConfigRedlining(config: GirafeConfig) {
+  private initConfigDrawing(config: GirafeConfig) {
     return {
-      defaultFillColor: config.redlining?.defaultFillColor ?? '#6666ff7f',
-      defaultStrokeColor: config.redlining?.defaultStrokeColor ?? '#0000ff',
-      defaultStrokeWidth: config.redlining?.defaultStrokeWidth ?? 2,
-      defaultTextSize: config.redlining?.defaultTextSize ?? 12,
-      defaultFont: config.redlining?.defaultFont ?? 'Arial'
+      defaultFillColor: config.drawing?.defaultFillColor ?? '#6666ff7f',
+      defaultStrokeColor: config.drawing?.defaultStrokeColor ?? '#0000ff',
+      defaultStrokeWidth: config.drawing?.defaultStrokeWidth ?? 2,
+      defaultTextSize: config.drawing?.defaultTextSize ?? 12,
+      defaultFont: config.drawing?.defaultFont ?? 'Arial'
     };
   }
 

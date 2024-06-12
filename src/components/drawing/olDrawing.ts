@@ -15,19 +15,19 @@ import VectorLayer from 'ol/layer/Vector';
 import { getArea, getLength } from 'ol/sphere.js';
 import GeoJSON from 'ol/format/GeoJSON';
 
-import RedliningFeature from './redliningFeature';
-import RedliningShape from './redliningshape';
+import DrawingFeature from './drawingFeature';
+import DrawingShape from './drawingshape';
 
 // Global required because the ol Draw tool creates a new ol Feature without the possibility of giving it the GeoGirafe shape
-let currentShape: RedliningShape | null = null;
+let currentShape: DrawingShape | null = null;
 
-export default class OlRedlining {
+export default class OlDrawing {
   map: MapComponent;
   state: State;
 
-  redliningFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
-  redliningSource!: VectorSource;
-  redliningLayer: VectorLayer<VectorSource> | null = null;
+  drawingFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
+  drawingSource!: VectorSource;
+  drawingLayer: VectorLayer<VectorSource> | null = null;
   draw: Draw | null = null;
   snap!: Snap;
 
@@ -35,23 +35,23 @@ export default class OlRedlining {
     this.map = ComponentManager.getInstance().getComponents(MapComponent)[0];
     this.state = StateManager.getInstance().state;
     // Create vector source for drawing
-    this.redliningSource = new VectorSource({ features: this.redliningFeaturesCollection });
-    this.redliningSource.on('addfeature', (e) => this.onFeatureAdded(e));
+    this.drawingSource = new VectorSource({ features: this.drawingFeaturesCollection });
+    this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
 
-    this.redliningLayer = new VectorLayer({
+    this.drawingLayer = new VectorLayer({
       properties: {
         addToPrintedLayers: true
       },
-      source: this.redliningSource
+      source: this.drawingSource
     });
-    this.redliningLayer.setZIndex(1001);
-    this.redliningLayer.set('altitudeMode', 'clampToGround');
+    this.drawingLayer.setZIndex(1001);
+    this.drawingLayer.set('altitudeMode', 'clampToGround');
 
-    this.map.olMap.addLayer(this.redliningLayer);
+    this.map.olMap.addLayer(this.drawingLayer);
     this.registerEvents();
   }
 
-  addFeature(feature: RedliningFeature) {
+  addFeature(feature: DrawingFeature) {
     let olFeature: Feature;
     // As GeoJson does not support disk, we check for our own case.
     // We allow the any type, to avoid defining a generic type for all GeoJson standard + our implementation
@@ -63,14 +63,14 @@ export default class OlRedlining {
       const olFeatureLike = new GeoJSON().readFeatures(feature.geojson)[0];
       olFeature = new Feature(olFeatureLike.getGeometry());
     }
-    this.redliningSource.addFeature(olFeature);
+    this.drawingSource.addFeature(olFeature);
     const updateStyle = () => olFeature.setStyle(this.getStyle(feature, olFeature.getGeometry() as Geometry));
     feature.onNameChange(updateStyle);
     feature.onFillColorChange(updateStyle);
     feature.onStrokeColorChange(updateStyle);
     feature.onStrokeWidthChange(updateStyle);
     feature.onFontSizeChange(updateStyle);
-    feature.onRemove(() => this.redliningFeaturesCollection.remove(olFeature));
+    feature.onRemove(() => this.drawingFeaturesCollection.remove(olFeature));
     feature.update();
   }
 
@@ -79,7 +79,7 @@ export default class OlRedlining {
       const olFeature = e.feature;
       let geoJson = {};
       // GeoJson does not support disks, so we create our own definition
-      if (currentShape == RedliningShape.Disk) {
+      if (currentShape == DrawingShape.Disk) {
         const circleGeom = olFeature.getGeometry()! as CircleGeom;
         geoJson = {
           type: 'Feature',
@@ -92,21 +92,21 @@ export default class OlRedlining {
       } else {
         geoJson = JSON.parse(new GeoJSON().writeFeature(olFeature));
       }
-      const newFeature = new RedliningFeature(currentShape, geoJson);
+      const newFeature = new DrawingFeature(currentShape, geoJson);
       const updateStyle = () => olFeature.setStyle(this.getStyle(newFeature, olFeature.getGeometry() as Geometry));
       newFeature.onNameChange(updateStyle);
       newFeature.onFillColorChange(updateStyle);
       newFeature.onStrokeColorChange(updateStyle);
       newFeature.onStrokeWidthChange(updateStyle);
       newFeature.onFontSizeChange(updateStyle);
-      newFeature.onRemove(() => this.redliningFeaturesCollection.remove(olFeature));
+      newFeature.onRemove(() => this.drawingFeaturesCollection.remove(olFeature));
       newFeature.update();
       newFeature.addToState();
     }
   }
 
-  onFeaturesChanged(oldFeatures: RedliningFeature[], newFeatures: RedliningFeature[]) {
-    let deletedFeatures: RedliningFeature[] = [];
+  onFeaturesChanged(oldFeatures: DrawingFeature[], newFeatures: DrawingFeature[]) {
+    let deletedFeatures: DrawingFeature[] = [];
     if (Array.isArray(newFeatures) && Array.isArray(oldFeatures)) {
       deletedFeatures = oldFeatures.filter((f) => !newFeatures.includes(f));
     } else if (oldFeatures != undefined) {
@@ -116,45 +116,45 @@ export default class OlRedlining {
   }
 
   deleteFeature(feature: Feature) {
-    const toRemove = this.redliningFeaturesCollection.getArray().find((f) => f.getId() === feature.getId());
+    const toRemove = this.drawingFeaturesCollection.getArray().find((f) => f.getId() === feature.getId());
     if (toRemove != undefined) {
-      this.redliningFeaturesCollection.remove(toRemove!);
+      this.drawingFeaturesCollection.remove(toRemove!);
     }
   }
 
-  activateRedliningTool(tool: RedliningShape) {
-    this.deactivateRedliningTool();
+  activateDrawingTool(tool: DrawingShape) {
+    this.deactivateDrawingTool();
     this.state.selection.enabled = false;
     let geometryFunction = undefined;
     let freehand = false;
     let olTool;
 
     switch (tool) {
-      case RedliningShape.Point:
+      case DrawingShape.Point:
         olTool = 'Point';
         break;
-      case RedliningShape.Polyline:
+      case DrawingShape.Polyline:
         olTool = 'LineString';
         break;
-      case RedliningShape.Polygon:
+      case DrawingShape.Polygon:
         olTool = 'Polygon';
         break;
-      case RedliningShape.Disk:
+      case DrawingShape.Disk:
         olTool = 'Circle';
         break;
-      case RedliningShape.Square:
+      case DrawingShape.Square:
         olTool = 'Circle';
         geometryFunction = createRegularPolygon(4);
         break;
-      case RedliningShape.Rectangle:
+      case DrawingShape.Rectangle:
         olTool = 'Circle';
         geometryFunction = createBox();
         break;
-      case RedliningShape.FreehandPolyline:
+      case DrawingShape.FreehandPolyline:
         olTool = 'LineString';
         freehand = true;
         break;
-      case RedliningShape.FreehandPolygon:
+      case DrawingShape.FreehandPolygon:
         olTool = 'Polygon';
         freehand = true;
         break;
@@ -163,19 +163,19 @@ export default class OlRedlining {
     currentShape = tool;
 
     this.draw = new Draw({
-      source: this.redliningSource,
+      source: this.drawingSource,
       type: olTool as Type,
       freehand: freehand,
       geometryFunction: geometryFunction,
-      style: (featureLike) => this.getStyle(new RedliningFeature(tool), featureLike.getGeometry() as Geometry)
+      style: (featureLike) => this.getStyle(new DrawingFeature(tool), featureLike.getGeometry() as Geometry)
     });
     this.map.olMap.addInteraction(this.draw);
-    this.map.olMap.addInteraction(new Modify({ source: this.redliningSource }));
-    this.snap = new Snap({ source: this.redliningSource });
+    this.map.olMap.addInteraction(new Modify({ source: this.drawingSource }));
+    this.snap = new Snap({ source: this.drawingSource });
     this.map.olMap.addInteraction(this.snap);
   }
 
-  deactivateRedliningTool() {
+  deactivateDrawingTool() {
     this.state.selection.enabled = true;
     if (this.draw) {
       this.map.olMap.removeInteraction(this.draw);
@@ -187,13 +187,13 @@ export default class OlRedlining {
 
   registerEvents() {
     this.map.stateManager.subscribe(
-      'extendedState.redlining.activeTool',
-      (_oldTool: string | null, newTool: RedliningShape | null) =>
-        newTool === null ? this.deactivateRedliningTool() : this.activateRedliningTool(newTool)
+      'extendedState.drawing.activeTool',
+      (_oldTool: string | null, newTool: DrawingShape | null) =>
+        newTool === null ? this.deactivateDrawingTool() : this.activateDrawingTool(newTool)
     );
     this.map.stateManager.subscribe(
-      'extendedState.redlining.features',
-      (previous: RedliningFeature[], current: RedliningFeature[]) => this.onFeaturesChanged(previous, current)
+      'extendedState.drawing.features',
+      (previous: DrawingFeature[], current: DrawingFeature[]) => this.onFeaturesChanged(previous, current)
     );
   }
 
@@ -201,8 +201,8 @@ export default class OlRedlining {
     this.draw!.removeLastPoint();
   }
 
-  // TODO Move as much parameters as possible into RedliningFeature
-  getStyle(feature: RedliningFeature, geometry: Geometry) {
+  // TODO Move as much parameters as possible into DrawingFeature
+  getStyle(feature: DrawingFeature, geometry: Geometry) {
     const font = 'Bold ' + feature.fontSize + 'px/1 ' + feature.font;
 
     const defaultStyle = new Style({
@@ -249,29 +249,29 @@ export default class OlRedlining {
     // If the shape is being constructed (ex. it is a polygon for which only two points are placed yet)
     if (
       geometry.getType() == 'LineString' &&
-      feature.type !== RedliningShape.Polyline &&
-      feature.type !== RedliningShape.FreehandPolyline
+      feature.type !== DrawingShape.Polyline &&
+      feature.type !== DrawingShape.FreehandPolyline
     ) {
       return [];
     }
 
-    if (feature.type == RedliningShape.Point || geometry.getType() === 'Point') {
+    if (feature.type == DrawingShape.Point || geometry.getType() === 'Point') {
       const point = geometry as Point;
       const coord = point.getCoordinates();
-      addLabel(point, RedliningFeature.round(coord[0]) + ' ; ' + RedliningFeature.round(coord[1]));
-    } else if (feature.type == RedliningShape.Polyline) {
+      addLabel(point, DrawingFeature.round(coord[0]) + ' ; ' + DrawingFeature.round(coord[1]));
+    } else if (feature.type == DrawingShape.Polyline) {
       (geometry as LineString).forEachSegment((a, b) => {
         const segment = new LineString([a, b]);
-        addLabel(new Point(segment.getCoordinateAt(0.5)), RedliningFeature.formatDistance(getLength(segment)));
+        addLabel(new Point(segment.getCoordinateAt(0.5)), DrawingFeature.formatDistance(getLength(segment)));
       });
-    } else if (feature.type == RedliningShape.Polygon) {
+    } else if (feature.type == DrawingShape.Polygon) {
       const polygon = geometry as Polygon;
       new LineString(polygon.getCoordinates()[0]).forEachSegment((a, b) => {
         const segment = new LineString([a, b]);
-        addLabel(new Point(segment.getCoordinateAt(0.5)), RedliningFeature.formatDistance(getLength(segment)));
+        addLabel(new Point(segment.getCoordinateAt(0.5)), DrawingFeature.formatDistance(getLength(segment)));
       });
-      addLabel(polygon.getInteriorPoint(), RedliningFeature.formatArea(getArea(polygon)));
-    } else if (feature.type == RedliningShape.Disk) {
+      addLabel(polygon.getInteriorPoint(), DrawingFeature.formatArea(getArea(polygon)));
+    } else if (feature.type == DrawingShape.Disk) {
       const circle = geometry as CircleGeom;
       const radius = circle.getRadius();
       const center = circle.getCenter();
@@ -280,35 +280,35 @@ export default class OlRedlining {
       radiusLineStyle.getText()!.setText('');
       radiusLineStyle.setGeometry(radiusLine);
       styles.push(radiusLineStyle);
-      addLabel(new Point(radiusLine.getCoordinateAt(0.5)), RedliningFeature.formatDistance(radius));
-    } else if (feature.type == RedliningShape.FreehandPolygon) {
+      addLabel(new Point(radiusLine.getCoordinateAt(0.5)), DrawingFeature.formatDistance(radius));
+    } else if (feature.type == DrawingShape.FreehandPolygon) {
       const polygon = geometry as Polygon;
-      addLabel(polygon.getInteriorPoint(), RedliningFeature.formatArea(getArea(polygon)));
+      addLabel(polygon.getInteriorPoint(), DrawingFeature.formatArea(getArea(polygon)));
       let lengthSum = 0;
       const line = new LineString(polygon.getCoordinates()[0]);
       line.forEachSegment((a, b) => {
         lengthSum += getLength(new LineString([a, b]));
       });
-      addLabel(new Point(line.getCoordinates()[0]), RedliningFeature.formatDistance(lengthSum));
-    } else if (feature.type == RedliningShape.FreehandPolyline) {
+      addLabel(new Point(line.getCoordinates()[0]), DrawingFeature.formatDistance(lengthSum));
+    } else if (feature.type == DrawingShape.FreehandPolyline) {
       const line = geometry as LineString;
       let lengthSum = 0;
       line.forEachSegment((a, b) => {
         lengthSum += getLength(new LineString([a, b]));
       });
-      addLabel(new Point(line.getCoordinates()[0]), RedliningFeature.formatDistance(lengthSum));
-    } else if (feature.type == RedliningShape.Rectangle) {
+      addLabel(new Point(line.getCoordinates()[0]), DrawingFeature.formatDistance(lengthSum));
+    } else if (feature.type == DrawingShape.Rectangle) {
       const rect = geometry as Polygon;
       const segment1 = new LineString([rect.getCoordinates()[0][0], rect.getCoordinates()[0][1]]);
-      addLabel(new Point(segment1.getCoordinateAt(0.5)), RedliningFeature.formatDistance(getLength(segment1)));
+      addLabel(new Point(segment1.getCoordinateAt(0.5)), DrawingFeature.formatDistance(getLength(segment1)));
       const segment2 = new LineString([rect.getCoordinates()[0][1], rect.getCoordinates()[0][2]]);
-      addLabel(new Point(segment2.getCoordinateAt(0.5)), RedliningFeature.formatDistance(getLength(segment2)));
-      addLabel(rect.getInteriorPoint(), RedliningFeature.formatArea(getArea(rect)));
-    } else if (feature.type == RedliningShape.Square) {
+      addLabel(new Point(segment2.getCoordinateAt(0.5)), DrawingFeature.formatDistance(getLength(segment2)));
+      addLabel(rect.getInteriorPoint(), DrawingFeature.formatArea(getArea(rect)));
+    } else if (feature.type == DrawingShape.Square) {
       const square = geometry as Polygon;
       const segment = new LineString([square.getCoordinates()[0][0], square.getCoordinates()[0][1]]);
-      addLabel(new Point(segment.getCoordinateAt(0.5)), RedliningFeature.formatDistance(getLength(segment)));
-      addLabel(square.getInteriorPoint(), RedliningFeature.formatArea(getArea(square)));
+      addLabel(new Point(segment.getCoordinateAt(0.5)), DrawingFeature.formatDistance(getLength(segment)));
+      addLabel(square.getInteriorPoint(), DrawingFeature.formatArea(getArea(square)));
     }
     return styles;
   }
