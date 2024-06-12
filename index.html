@@ -103,7 +103,7 @@
           <button
             slot="menu-content"
             class="girafe-button-medium"
-            onclick="document.geogirafe.state.interface.redliningPanelVisible = !document.geogirafe.state.interface.redliningPanelVisible">
+            onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
             <img alt="help-icon" src="icons/draw.svg" />
             <span>Draw</span>
           </button>
@@ -154,8 +154,8 @@
         </div>
         <girafe-lr-panel class="panel-right" dock="right">
           <div slot="main">
-            <girafe-redlining data-toggle-path="interface.printPanelVisible"></girafe-redlining>
-            <girafe-print data-toggle-path="interface.redliningPanelVisible"></girafe-print>
+            <girafe-drawing data-toggle-path="interface.printPanelVisible"></girafe-drawing>
+            <girafe-print data-toggle-path="interface.drawingPanelVisible"></girafe-print>
             <girafe-lidar-panel data-toggle-path="interface.lidarPanelVisible"></girafe-lidar-panel>
           </div>
         </girafe-lr-panel>

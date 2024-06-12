@@ -51,13 +51,13 @@ class StateDeserializer {
     // Set all layers
     const deserializedLayers = this.getDeserializedLayerTree(sharedState.l);
     for (const deserializedLayer of deserializedLayers) {
-      this.state.layers.layersList.push(deserializedLayer)
+      this.state.layers.layersList.push(deserializedLayer);
     }
 
     // Set drawn objects
-    const redliningComponents = ComponentManager.getInstance().getComponentsByName('redlining');
-    if (redliningComponents != undefined && sharedState.f != undefined) {
-      redliningComponents[0].deserialize(sharedState.f);
+    const drawingComponents = ComponentManager.getInstance().getComponentsByName('drawing');
+    if (drawingComponents != undefined && sharedState.f != undefined) {
+      drawingComponents[0].deserialize(sharedState.f);
     }
   }
 
@@ -66,7 +66,7 @@ class StateDeserializer {
     for (const sharedLayer of sharedLayers) {
       const originalLayer = this.findBaseLayerById(sharedLayer.i);
       if (originalLayer) {
-        // When deserializing the layer, we clone it, 
+        // When deserializing the layer, we clone it,
         // otherwise the following operation will also
         // affect the layer referenced in other themes
         const layer = originalLayer.clone();
@@ -88,11 +88,10 @@ class StateDeserializer {
       // Manage children
       // TODO REG : Today we do not manage if a layer was remove from the group.
       for (const child of layer.children) {
-        const serializedChild = sharedLayer.z.find(l => l.i == child.id);
+        const serializedChild = sharedLayer.z.find((l) => l.i == child.id);
         if (serializedChild) {
           this.deserializeLayer(child, serializedChild);
-        }
-        else {
+        } else {
           console.warn(`Cannot find layer with id ${child.id} in the available layers`);
         }
       }

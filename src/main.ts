@@ -33,7 +33,7 @@ import PrintComponent from './components/print/component';
 import ProjectionComponent from './components/projection/component';
 import PrototypeBannerComponent from './components/prototypebanner/component';
 import QueryBuilderComponent from './components/querybuilder/component';
-import RedliningComponent from './components/redlining/component.js';
+import DrawingComponent from './components/drawing/component.js';
 import ScaleComponent from './components/scale/component';
 import SearchComponent from './components/search/component';
 import SelectionGridComponent from './components/selectiongrid/component';
@@ -117,7 +117,7 @@ try {
   customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
   customElements.define('girafe-proj-select', ProjectionComponent);
   customElements.define('girafe-query-builder', QueryBuilderComponent);
-  customElements.define('girafe-redlining', RedliningComponent);
+  customElements.define('girafe-drawing', DrawingComponent);
   customElements.define('girafe-scale', ScaleComponent);
   customElements.define('girafe-search', SearchComponent);
   customElements.define('girafe-selection-grid', SelectionGridComponent);

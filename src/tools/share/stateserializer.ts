@@ -40,9 +40,9 @@ class StateSerializer {
     };
 
     // Drawn features
-    const redliningComponents = ComponentManager.getInstance().getComponentsByName('redlining');
-    if (redliningComponents != undefined) {
-      sharedState.f = redliningComponents[0].serialize();
+    const drawingComponents = ComponentManager.getInstance().getComponentsByName('drawing');
+    if (drawingComponents != undefined) {
+      sharedState.f = drawingComponents[0].serialize();
     }
 
     // Is there a basemap ?

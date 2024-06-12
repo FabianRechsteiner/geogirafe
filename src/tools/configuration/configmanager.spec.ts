@@ -34,7 +34,7 @@ describe('ConfigManager.loadConfig', () => {
       expect(config.themes.imagesUrlPrefix).toEqual('');
       expect(config.general.locale).toEqual(GirafeConfig.DEFAULT_LOCALE);
       expect(config.selection.defaultFocusStrokeColor).toEqual('#ff0000');
-      expect(config.redlining.defaultTextSize).toEqual(12);
+      expect(config.drawing.defaultTextSize).toEqual(12);
       expect(config.basemaps.OSM).toEqual(false);
       expect(config.map.showScaleLine).toEqual(true);
     });
@@ -56,7 +56,7 @@ describe('ConfigManager.loadConfig', () => {
     // @ts-ignore
     myConfig.languages.translations = { de: 'https://www.my-custom-language-url.reg' };
     // @ts-ignore
-    myConfig.redlining = { defaultFillColor: '#333333', defaultFont: 'Verdana' };
+    myConfig.drawing = { defaultFillColor: '#333333', defaultFont: 'Verdana' };
     // @ts-ignore
     manager.config = new GirafeConfig(myConfig);
     manager.loadConfig().then((config) => {
