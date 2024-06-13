@@ -16,6 +16,7 @@ export interface GMFMetadata {
   disclaimer?: string;
   hiDPILegendImages?: Record<string, string>;
   printLayers?: string;
+  queryLayers?: string;
   wmsLayers?: string;
   printNativeAngle?: boolean;
 }

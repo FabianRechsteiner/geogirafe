@@ -96,9 +96,14 @@ export class FocusFeature {
     if (!features || !this.focusLayer) {
       return;
     }
+    const geometries = features.map((feature) => feature.getGeometry()).filter((geometry) => geometry) as Geometry[];
+    // No geometry ? Exit the loop.
+    if (!geometries.length) {
+      return;
+    }
     this.focusAnimation = this.focusLayer.on('postrender', (renderEvent) => {
-      features.forEach((feature) => {
-        const flashGeom = feature.getGeometry()!.clone();
+      geometries.forEach((geometry) => {
+        const flashGeom = geometry.clone();
         this.animate(renderEvent, flashGeom);
       });
       // Tell OpenLayers to continue postrender animation (loop).

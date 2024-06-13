@@ -12,6 +12,7 @@ export type LayerWmtsOptions = {
   imageType?: string;
   style?: string;
   wmsLayers?: string;
+  queryLayers?: string;
   printLayers?: string;
   minResolution?: number;
   maxResolution?: number;
@@ -41,6 +42,7 @@ class LayerWmts extends Layer {
   // TODO REG : Shouldn't we link here directly an object of type LayerWMS ?
   public ogcServer?: ServerOgc;
   public wmsLayers?: string;
+  public queryLayers?: string;
   public printLayers?: string;
   public hiDPILegendImages?: Record<string, string>;
 
@@ -66,6 +68,7 @@ class LayerWmts extends Layer {
     this.imageType = opts.imageType;
     this.style = opts.style;
     this.wmsLayers = opts.wmsLayers;
+    this.queryLayers = opts.queryLayers;
     this.printLayers = opts.printLayers;
     this.minResolution = opts.minResolution;
     this.maxResolution = opts.maxResolution;
@@ -82,6 +85,7 @@ class LayerWmts extends Layer {
       imageType: this.imageType,
       style: this.style,
       ogcServer: this.ogcServer,
+      queryLayers: this.queryLayers,
       wmsLayers: this.wmsLayers,
       printLayers: this.printLayers,
       minResolution: this.minResolution,
@@ -114,6 +118,7 @@ class LayerWmts extends Layer {
       imageType: options.imageType,
       style: options.style,
       wmsLayers: options.metadata?.wmsLayers,
+      queryLayers: options.metadata?.queryLayers,
       printLayers: options.metadata?.printLayers,
       minResolution: options.minResolutionHint,
       maxResolution: options.maxResolutionHint,

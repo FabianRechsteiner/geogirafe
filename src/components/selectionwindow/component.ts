@@ -59,7 +59,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * @returns The WindowFeature at the currently focused index.
    */
   getWindowFeature(): WindowFeature {
-    return this.windowFeatures[this.focusedIndex] ?? null;
+    return this.windowFeatures[this.focusedIndex];
   }
 
   /**
@@ -174,6 +174,10 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     this.windowFeatures = SelectionWindowComponent.createWindowFeatures(
       this.featureToGridData.toGridDataById(features ?? [])
     );
+    if (!this.windowFeatures.length) {
+      this.closeWindow();
+      return;
+    }
     this.maxIndex = this.windowFeatures.length - 1;
     this.onFocusWindowFeature(0);
   }

@@ -1,10 +1,14 @@
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import TileLayer from 'ol/layer/Tile';
-import { Map } from 'ol';
-import { Layer as OLayer } from 'ol/layer';
-import LayerWmts from '../../../models/layers/layerwmts';
+import type { Map } from 'ol';
+import type { Layer as OLayer } from 'ol/layer';
+import type LayerWmts from '../../../models/layers/layerwmts';
+import type { SelectionParam } from '../../../tools/state/state';
 import StateManager from '../../../tools/state/statemanager';
+import LayerWms from '../../../models/layers/layerwms';
+import OLayerImage from 'ol/layer/Image';
+import OSourceImageWMS from 'ol/source/ImageWMS';
 
 class WmtsManager {
   map: Map;
@@ -139,6 +143,39 @@ class WmtsManager {
     } else {
       throw new Error('Cannot change opacity for this layer: it does not exist');
     }
+  }
+
+  selectFeatures(extent: number[]) {
+    const selectionParams: SelectionParam[] = [];
+    Object.values(this.wmtsLayers).forEach((wmtsItem) => {
+      const wmtsLayer = wmtsItem.layerWmts;
+      const queryLayers = wmtsLayer.wmsLayers ?? wmtsLayer.queryLayers;
+      if (!queryLayers || !wmtsLayer.ogcServer) {
+        return;
+      }
+      const ogcServer = { ...wmtsLayer.ogcServer };
+      ogcServer.urlWfs = undefined; // To use GetFeatureInfo and not WFS getFeature.
+      const layers = queryLayers.split(',').map((wmsLayer) => {
+        return new LayerWms(0, wmsLayer, 0, ogcServer, {
+          queryLayers,
+          layers: queryLayers,
+          queryable: true
+        });
+      });
+      const oLayer = new OLayerImage({
+        source: new OSourceImageWMS({
+          url: layers[0].ogcServer.url,
+          params: { LAYERS: queryLayers }
+        })
+      });
+      selectionParams.push({
+        layers: layers,
+        oLayer: oLayer,
+        selectionBox: extent,
+        srid: this.state.projection
+      });
+    });
+    StateManager.getInstance().state.selection.selectionParameters.push(...selectionParams);
   }
 
   #getWmtsCapabilities(url: string, callback: (capabilities: Record<string, unknown>) => void) {
