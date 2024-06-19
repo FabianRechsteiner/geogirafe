@@ -1,0 +1,58 @@
+<link rel="stylesheet" href="styles/common.mobile.css" />
+
+<button
+  class="girafe-button-big"
+  title="Theme Selection"
+  onclick="${() => this.toggleThemesList()}"
+  onblur="${() => this.onBlur()}">
+  <img alt="menu-icon" src="icons/themes.svg" />
+</button>
+
+<div class="${(this.menuOpen ? 'themes' : 'hidden')}">
+  <h2 class="${(this.showBasemaps) ? '' : 'hidden'}">Basemaps</h2>
+  <div class="${(this.showBasemaps) ? 'category' : 'hidden'}">
+    ${Object.values(this.state.basemaps).map(basemap => uHtmlFor(basemap, basemap.id)`
+    <button
+      class="theme"
+      onmousedown="${() => this.changeBasemap(basemap)}"
+      onmouseup="${() => this.mouseUp()}"
+      onblur="${() => this.onBlur()}">
+      <img alt="${'Icon for ' + basemap.name}" src="images/basemap.png" />
+      <span i18n="${basemap.name}">${basemap.name}</span>
+    </button>
+    `)}
+  </div>
+
+  <h2>Themes</h2>
+  <div class="category row2">
+    ${Object.values(this.state.themes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
+    <button
+      class="theme"
+      onmousedown="${() => this.onThemeChanged(theme)}"
+      onmouseup="${() => this.mouseUp()}"
+      onblur="${() => this.onBlur()}">
+      <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
+      <span i18n="${theme.name}">${theme.name}</span>
+    </button>
+    `)}
+  </div>
+
+  <h2 class="${this.state.layers.layersList.length > 0 ? '' : 'hidden'}">Layers</h2>
+  <div class="${this.state.layers.layersList.length > 0 ? 'category row22' : 'hidden'}">
+    ${this.state.layers.layersList.filter(baselayer => (baselayer instanceof Layer)).map(layer => uHtmlFor(layer,
+    layer.treeItemId)`
+    <button
+      class="theme"
+      onmousedown="${() => this.onLayerSelected(layer)}"
+      onmouseup="${() => this.mouseUp()}"
+      onblur="${() => this.onBlur()}">
+      <img
+        alt="${'Icon for ' + layer.name}"
+        src="${this.state.selectedTheme!.icon}"
+        class="${layer.active ? 'selected' : 'unselected'}" />
+      <span i18n="${layer.parent!.name}">${layer.parent!.name}</span>
+      <span i18n="${layer.name}">${layer.name}</span>
+    </button>
+    `)}
+  </div>
+</div>

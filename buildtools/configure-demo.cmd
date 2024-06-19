@@ -28,6 +28,7 @@ if "%1"=="cartolacote" (
 if "%1"=="cartoriviera" (
     echo "Preparing environment CARTORIVIERA..."
     copy demo\config.cartoriviera.json %APPDIR%\config.json /Y
+    copy demo\config.cartoriviera.mobile.json %APPDIR%\config.mobile.json /Y
     curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.cartoriviera.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
     curl "https://map.cartoriviera.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
@@ -73,6 +74,7 @@ if "%1"=="lie" (
 if "%1"=="mapbs" (
     echo "Preparing environment MAPBS..."
     copy demo\config.mapbs.json %APPDIR%\config.json /Y
+    copy demo\config.mapbs.mobile.json %APPDIR%\config.mobile.json /Y
     copy demo\de.json %APPDIR%\de.json /Y
     curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.geo.bs.ch/static/dummy/de.json" --output %OUTPUTDIR%\de.json
@@ -112,6 +114,7 @@ if "%1"=="sigip" (
 if "%1"=="sitn" (
     echo "Preparing environment SITN..."
     copy demo\config.sitn.json %APPDIR%\config.json /Y
+    copy demo\config.sitn.mobile.json %APPDIR%\config.mobile.json /Y
     curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://sitn.ne.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
     curl "https://sitn.ne.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json

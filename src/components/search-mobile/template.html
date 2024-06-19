@@ -1,0 +1,35 @@
+<link rel="stylesheet" href="lib/vanilla-picker/vanilla-picker.csp.css" />
+
+<div id="searchbox">
+  <input
+    id="search"
+    length="20"
+    maxlength="1000"
+    autocomplete="off"
+    autocorrect="off"
+    i18n="Search"
+    placeholder="Search..."
+    oninput="${(e:Event) => this.doSearch(e)}"
+    onkeydown="${(e:KeyboardEvent) => this.onKeyDown(e)}" />
+
+  <img class="${this.allResults.length > 0 ? 'hidden' : 'search-icon'}" alt="search-icon" src="${this.searchIcon}" />
+  <button class="${this.allResults.length > 0 ? 'close-button' : 'hidden'}" onclick="${() => this.clearSearch(true)}">
+    <img class="close-icon" alt="close-icon" src="icons/close.svg" />
+  </button>
+</div>
+
+<div id="results" class="${Object.keys(this.groupedResults).length === 0 || this.forceHide ? 'hidden' : ''}">
+  ${Object.keys(this.groupedResults).map(group => uHtml`
+  <div class="title">
+    <img alt="result icon" src="${this.getIcon(group)}" />
+    <span>${group}</span>
+  </div>
+  ${this.groupedResults[group].map(result => uHtml`
+  <button
+    class="${result.selected ? 'result selected': 'result'}"
+    onmousedown="${() => this.onMouseDown()}"
+    onclick="${() => this.onSelect(result)}">
+    ${result.properties?.label}
+  </button>
+  `)} `)}
+</div>

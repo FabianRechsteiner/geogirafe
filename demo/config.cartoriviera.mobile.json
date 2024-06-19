@@ -1,0 +1,11 @@
+{
+  "themes": {
+    "url": "https://map.cartoriviera.ch/themes?background=background&interface=mobile"
+  },
+  "search": {
+    "url": "https://map.cartoriviera.ch/search?limit=90&partitionlimit=15&interface=mobile&query=###SEARCHTERM###"
+  },
+  "map": {
+    "constrainScales": false
+  }
+}

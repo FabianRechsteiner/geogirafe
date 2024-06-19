@@ -23,10 +23,6 @@ class BasemapComponent extends GirafeHTMLElement {
     });
   }
 
-  render() {
-    super.render();
-  }
-
   onBasemapsLoaded(basemaps: { [key: number]: Basemap }) {
     super.render();
 

@@ -42,11 +42,16 @@ describe('Components architecture', () => {
       const regex = / *import *\{? *([\w, ]+)\}? *from *'(.*)';?/gm;
       const matches = code.matchAll(regex);
       for (const match of matches) {
-        const importPath = match[2];
+        const importClass = match[1].trim();
+        const importPath = match[2].trim();
         for (const component of components) {
           if (!importPath.includes('../../tools/') && importPath.includes(`/${component}/`)) {
             // This import is using an import of another component
-            errors.push(`Illegal dependency: the component ${tsFile} is referencing another component ${importPath}`);
+            // We allow it only if it is extended
+            const extendRegex = new RegExp(' *class *\\w+ *extends *' + importClass, 'gm');
+            if (!code.match(extendRegex)) {
+              errors.push(`Illegal dependency: the component ${tsFile} is referencing another component ${importPath}`);
+            }
           }
         }
       }

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="GeoGirafe is an flexible application to build online geoportals." />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="manifest" href="site.webmanifest" />
+
+    <!-- To prevent the FOUC effect (flash of unstyled content),
+         the html element is set to invisible when the application starts.
+         When all elements have been declared, the html element is made visible
+         (=> see main.ts) -->
+    <style>
+      html {
+        opacity: 0;
+        transition: opacity 1s;
+      }
+    </style>
+    <noscript>
+      <style>
+        html {
+          opacity: 1;
+        }
+      </style>
+    </noscript>
+
+    <link rel="stylesheet" media="screen" href="src/styles/mobile.css" />
+    <link rel="stylesheet" media="screen" href="src/styles/common.mobile.css" />
+
+    <script>
+      if (navigator && navigator.serviceWorker) {
+        //navigator.serviceWorker.register('sw.js');
+      }
+    </script>
+
+    <script type="module" src="src/main.mobile.ts"></script>
+    <title>GeoGirafe</title>
+  </head>
+
+  <body>
+    <girafe-theme-select></girafe-theme-select>
+    <button
+      class="switch3d girafe-button-big"
+      onclick="document.geogirafe.state.globe.display = document.geogirafe.state.globe.display==='full'?'none':'full'">
+      <img alt="help-icon" src="icons/globe.svg" />
+    </button>
+    <girafe-search></girafe-search>
+    <div id="content">
+      <girafe-map></girafe-map>
+    </div>
+  </body>
+</html>
