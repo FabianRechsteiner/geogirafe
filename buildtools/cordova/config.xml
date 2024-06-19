@@ -5,8 +5,9 @@
     <author email="guillaume.remy@bs.ch" href="https://doc.geomapfish.dev">
         Guillaume REMY
     </author>
-    <icon src="girafe.png" />
-    <content src="index.html" />
+    <preference name="Fullscreen" value="true" />
+    <icon src="app-icon.png" />
+    <content src="mobile.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
 </widget>

@@ -43,14 +43,22 @@
 }
 
 .ol-zoom {
-  right: 1rem;
-  top: 1rem;
+  right: 2rem !important;
+  top: 2rem !important;
   left: unset !important;
 }
 
 .ol-rotate {
-  right: 1rem !important;
-  top: 4rem !important;
+  top: 7rem !important;
+  right: 2rem !important;
+}
+
+.ol-zoom-in,
+.ol-zoom-out,
+.ol-rotate-reset {
+  width: 2rem !important;
+  height: 2rem !important;
+  cursor: pointer;
 }
 
 .ol-scale-line {
@@ -138,3 +146,15 @@ input[type=range]::-ms-thumb {
   cursor: pointer;
 }
 */
+
+@media screen and (max-width: 1000px) {
+  .ol-zoom {
+    top: 46vh !important;
+    right: 0.5rem !important;
+  }
+
+  .ol-rotate {
+    top: calc(46vh + 5rem) !important;
+    right: 0.5rem !important;
+  }
+}

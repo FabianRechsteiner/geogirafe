@@ -29,6 +29,7 @@ elif [ "$1" = 'cartoriviera' ];
 then
     echo "Preparing environment CARTORIVIERA..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
     echo "Cannot create Mock objects for cartoriviera, the following commands are blocked when executed from AWS or GitLab Pipeline"
     #curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     #curl "https://map.cartoriviera.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
@@ -70,6 +71,7 @@ elif [ "$1" = 'mapbs' ];
 then
     echo "Preparing environment MAPBS..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
     cp demo/de.json $APPDIR/de.json
     curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.bs.ch/static/dummy/de.json" --silent --output $MOCKDIR/de.json
@@ -106,6 +108,7 @@ elif [ "$1" = 'sitn' ];
 then
     echo "Preparing environment SITN..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
     curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://sitn.ne.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
     curl "https://sitn.ne.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json

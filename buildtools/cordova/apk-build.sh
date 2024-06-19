@@ -1,3 +1,9 @@
+PREFIX="/geogirafe"
+if [ "$1" = 'ci' ];
+then
+  PREFIX=".."
+fi
+
 # Initialize Cordova Project
 cordova create GeoGirafe dev.geomapfish.geogirafe GeoGirafe
 cd GeoGirafe
@@ -8,14 +14,27 @@ cordova requirements
 # and add the needed configuration
 rm -Rf www/*
 rm config.xml
-cp -R /geogirafe/dist/app/* www/
-cp /geogirafe/buildtools/cordova/config.xml .
-cp /geogirafe/buildtools/cordova/girafe.png .
-sed -i 's#</body>#  <script src="cordova.js"></script>\n  </body>#g' www/index.html
+cp -R ${PREFIX}/dist/app/* www/
+rm -Rf www/assets/*.js.map
+cp ${PREFIX}/buildtools/cordova/config.xml .
+cp ${PREFIX}/buildtools/cordova/app-icon.png .
+sed -i 's#</body>#  <script src="cordova.js"></script>\n  </body>#g' www/mobile.html
+mkdir -p ${PREFIX}/dist/apk
 
-# Build the APK
-cordova build android
-
-# Copy the APK to output
-mkdir -p /geogirafe/dist/apk
-cp /src/GeoGirafe/platforms/android/app/build/outputs/apk/debug/app-debug.apk /geogirafe/dist/apk/geogirafe.apk
+if [ "$1" = 'ci' ];
+then
+  # Build for CI
+  chmod +x ${PREFIX}/buildtools/configure-demo.sh 
+  # MapBS
+  cd .. && buildtools/configure-demo.sh "mapbs" "GeoGirafe/www" && cd GeoGirafe
+  cordova build android
+  cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ${PREFIX}/dist/apk/geogirafe-mapbs.apk
+  # SITN
+  cd .. && buildtools/configure-demo.sh "sitn" "GeoGirafe/www" && cd GeoGirafe
+  cordova build android
+  cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ${PREFIX}/dist/apk/geogirafe-sitn.apk
+else
+  # Build for local
+  cordova build android
+  cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ${PREFIX}/dist/apk/geogirafe.apk
+fi

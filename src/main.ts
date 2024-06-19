@@ -45,6 +45,11 @@ import TreeViewItemComponent from './components/treeviewitem/component';
 import TreeViewGroupComponent from './components/treeviewgroup/component';
 import VideoRecordComponent from './components/videorecord/component';
 
+// Redirect to mobile interface if we are on mobile
+if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
+  window.location.href = 'mobile.html';
+}
+
 // Extend default Document and Window interfaces
 declare global {
   interface Document {

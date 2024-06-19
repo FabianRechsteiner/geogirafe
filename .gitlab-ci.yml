@@ -154,19 +154,7 @@ build-apk:
   before_script:
     - ls
   script:
-    - cordova create GeoGirafe dev.geomapfish.geogirafe GeoGirafe
-    - cd GeoGirafe && cordova platform add android && cordova requirements && cd ..
-    - rm -Rf GeoGirafe/www/*
-    - rm GeoGirafe/config.xml
-    - cp -R dist/app/* GeoGirafe/www/
-    - cp buildtools/cordova/config.xml GeoGirafe/
-    - cp buildtools/cordova/girafe.png GeoGirafe/
-    - sed -i 's#</body>#  <script src="cordova.js"></script>\n  </body>#g' GeoGirafe/www/index.html
-    # Use MapBS as default configuration for GeoGirafe APK during the CI
-    - chmod +x buildtools/configure-demo.sh && ./buildtools/configure-demo.sh "mapbs" "GeoGirafe/www"
-    - cd GeoGirafe && cordova build android && cd ..
-    - mkdir -p dist/apk
-    - cp GeoGirafe/platforms/android/app/build/outputs/apk/debug/app-debug.apk dist/apk/geogirafe.apk
+    - chmod +x ./buildtools/cordova/apk-build.sh && ./buildtools/cordova/apk-build.sh "ci"
 
   artifacts:
     paths:

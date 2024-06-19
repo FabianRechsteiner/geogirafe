@@ -12,6 +12,8 @@
   display: flex;
   flex-direction: row;
   box-shadow: var(--bx-shdw);
+  position: absolute;
+  z-index: 101;
 }
 
 #search {
@@ -47,16 +49,16 @@
 }
 
 #results {
-  z-index: 1000;
-  margin-top: 0.1rem;
-  margin-bottom: 0.5rem;
-  position: absolute;
-  top: 3.5rem;
-  width: 36rem;
-  max-height: 31rem;
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   background-color: var(--bkg-color);
   overflow-x: hidden;
   scrollbar-width: thin;
+  bottom: 0;
+  padding-top: 7vh;
 }
 
 .result,

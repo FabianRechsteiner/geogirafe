@@ -1,14 +1,20 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 <link rel="stylesheet" href="styles/common.css" />
 
-<button class="main" title="Theme Selection" onclick="${() => this.toggleThemesList()}" onblur="${() => this.onBlur()}">
-  <div class="${(this.state.loading ? 'hidden' : '')}">
-    <i class="fa-2x fa-solid fa-layer-group"></i>
-  </div>
-  <div class="${(this.state.loading ? '' : 'hidden')}">
-    <i class="fa-2x fa-solid fa-circle-notch fa-spin"></i>
-  </div>
+<button
+  class="${(this.state.loading ? 'hidden' : 'girafe-button-big dark')}"
+  title="Theme Selection"
+  onclick="${() => this.toggleThemesList()}"
+  onblur="${() => this.onBlur()}">
+  <img alt="menu-icon" src="icons/themes.svg" />
 </button>
+<button
+  class="${(this.state.loading ? 'girafe-button-big dark' : 'hidden')}"
+  title="Theme Selection"
+  onclick="${() => this.toggleThemesList()}"
+  onblur="${() => this.onBlur()}">
+  <img alt="menu-icon" src="icons/loading.svg" class="spin" />
+</button>
+
 <div class="${(this.menuOpen ? 'themes' : 'hidden')}">
   ${Object.values(this.state.themes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
   <button class="theme" onmousedown="${() => this.onThemeChanged(theme)}">

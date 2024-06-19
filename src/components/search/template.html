@@ -32,16 +32,14 @@
       <span>${group}</span>
     </div>
     ${this.groupedResults[group].map(result => uHtml`
-    <div
-      role="option"
-      tabindex="0"
+    <button
       class="${result.selected ? 'result selected': 'result'}"
       onmousedown="${() => this.onMouseDown()}"
       onclick="${() => this.onSelect(result)}"
       onmouseover="${() => this.onMouseOver(result)}"
       onmouseleave="${() => this.onMouseLeave()}">
-      <span>${result.properties?.label}</span>
-    </div>
+      ${result.properties?.label}
+    </button>
     `)} `)}
   </div>
 </div>

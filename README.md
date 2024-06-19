@@ -139,11 +139,18 @@ This will output (beside others) a transpiled version of GeoGirafe's library par
 npm run publish-lib --access public
 ```
 
-### Using Docker
+## Build the Android Application
+
+Make sure you have build the application for production before with `npm run build`.  
+The file `config.json` present in the `dist\app` directory will be used.
+
+### Build the library
 
 ```bash
-docker run -v $PWD:/src node:18-slim bash -c "cd /src && npm install && npm run build"
+npm run build-apk
 ```
+
+This will output an APK package of GeoGirafe into [dist/apk](dist/apk).
 
 ## Deployment
 

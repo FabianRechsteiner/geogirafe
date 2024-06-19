@@ -6,7 +6,6 @@ import DownloadIcon from './images/download.svg';
 
 class VideoRecordComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
 
   public videoIcon: string = VideoIcon;
   public stopIcon: string = StopIcon;

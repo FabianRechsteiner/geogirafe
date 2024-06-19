@@ -38,8 +38,8 @@ class SearchComponent extends GirafeHTMLElement {
 
   private ignoreBlur = false;
   public groupedResults: Record<string, SearchResult[]> = {};
-  private allResults: SearchResult[] = [];
-  private forceHide: boolean = true;
+  protected allResults: SearchResult[] = [];
+  protected forceHide: boolean = true;
 
   private searchTermPlaceholder = '###SEARCHTERM###';
   private searchLangPlaceholder = '###SEARCHLANG###';
@@ -124,7 +124,7 @@ class SearchComponent extends GirafeHTMLElement {
     });
   }
 
-  private clearSearch(purge: boolean = false) {
+  protected clearSearch(purge: boolean = false) {
     if (purge) {
       if (this.searchBox) {
         this.searchBox.value = '';

@@ -1,3 +1,17 @@
+/* Common general styles */
+.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Common style (to all button of all sizes) */
 .girafe-button-big,
 .girafe-button-medium,
@@ -17,6 +31,15 @@
 .girafe-button-tiny:hover {
   background-color: var(--bkg-color-grad1);
   cursor: pointer;
+}
+
+.girafe-button-big.dark,
+.girafe-button-medium.dark,
+.girafe-button-large.dark,
+.girafe-button-small.dark,
+.girafe-button-tiny.dark {
+  background-color: var(--bkg-color);
+  filter: invert(1);
 }
 
 img {

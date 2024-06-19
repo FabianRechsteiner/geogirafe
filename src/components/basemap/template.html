@@ -8,7 +8,7 @@
   <div slot="menu-content" id="container">
     ${Object.values(this.state.basemaps).map(basemap => uHtmlFor(basemap, basemap.id)`
     <button class="girafe-button-large" onclick="${() => this.changeBasemap(basemap)}">
-      <img alt="basemap-icon" src="icons/basemap.svg" />
+      <img alt="basemap-icon" src="images/basemap.png" />
       <span i18n="${basemap.name}">${basemap.name}</span></button
     >` )}
   </div>

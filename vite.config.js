@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
 import RestartPlugin from './buildtools/vite-restart-plugin';
@@ -19,6 +20,10 @@ export default defineConfig({
     sourcemap: true,
     emptyOutDir: true,
     rollupOptions: {
+      input: {
+        desktop: resolve(__dirname, 'index.html'),
+        mobile: resolve(__dirname, 'mobile.html')
+      },
       output: {
         manualChunks: {
           lazy: [
