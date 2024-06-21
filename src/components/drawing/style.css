@@ -1,89 +1,73 @@
 #panel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  overflow: visible;
   min-width: 20rem; /* For and from parent panel */
 }
-
-#content {
-  background: var(--bkg-color);
-  padding: 1.5rem;
-  margin: 0;
+#panel > div {
+  padding: 1rem 1.5rem 1rem 1.5rem;
 }
 
-#content button {
+#panel #drawingListContainer {
+  overflow: scroll;
+}
+
+#panel button {
   border: solid 1px var(--bkg-color);
   color: var(--text-color-grad2);
   height: 2.4rem;
   width: 2.4rem;
-  text-align: left;
   padding: 0;
-  padding-left: 0.5rem;
   background-color: var(--bkg-color);
   cursor: pointer;
 }
 
-#content button:hover {
+#panel button:hover {
   border: solid 1px var(--text-color-grad2);
 }
 
-#content button.selected {
+#panel button.selected {
   border: solid 1px var(--text-color-grad2);
   background-color: var(--text-color-grad2);
   color: var(--bkg-color);
 }
 
 #drawingList {
-  min-height: 5rem;
-  background-color: var(--bkg-color);
-  padding-top: 2rem;
-  margin-right: 1rem;
+  display: flex;
+  flex-flow: column;
+  gap: 0.15rem;
+}
+
+#drawingList .featureLine {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
 }
 
 #drawingList div.girafe {
-  display: inline-block;
-  position: relative;
-  padding: 0.5rem;
-  margin-top: 0.1rem;
-  margin-right: 0.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 0.3rem;
   border: solid 1px var(--text-color);
-  text-align: left;
-  width: 100%;
-  max-width: 16rem;
-  min-width: 13rem;
-  color: var(--text-color-grad2);
-}
-
-#drawingList div.girafe:hover {
-  color: var(--text-color);
 }
 
 #drawingList input.name {
-  display: block;
   border: none;
 }
 
-#drawingList i {
-  position: relative;
-  cursor: pointer;
-  margin-right: 1rem;
-  display: inline;
+#drawingList .icon {
+  width: 14px;
+  height: 14px;
+  fill: var(--text-color);
+  margin: 3px;
 }
 
-#drawingList .text-opts {
-  position: absolute;
-  right: 0;
-  top: 0.5rem;
+#drawingList .icon:hover {
+  fill: var(--text-color-grad2);
 }
 
-input.slider {
-  position: relative;
-  width: 6rem;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 1rem;
+.picker_wrapper.popup {
+  position: fixed !important;
+  transform: translate(-120%, -5%);
 }

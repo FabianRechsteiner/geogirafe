@@ -33,7 +33,7 @@ import PrintComponent from './components/print/component';
 import ProjectionComponent from './components/projection/component';
 import PrototypeBannerComponent from './components/prototypebanner/component';
 import QueryBuilderComponent from './components/querybuilder/component';
-import DrawingComponent from './components/drawing/component.js';
+import DrawingComponent from './components/drawing/component';
 import ScaleComponent from './components/scale/component';
 import SearchComponent from './components/search/component';
 import SelectionGridComponent from './components/selectiongrid/component';

@@ -1,6 +1,5 @@
 import MapComponent from '../map/component';
 
-import ComponentManager from '../../tools/state/componentManager';
 import StateManager from '../../tools/state/statemanager';
 import State from '../../tools/state/state';
 
@@ -21,6 +20,8 @@ import DrawingShape from './drawingshape';
 // Global required because the ol Draw tool creates a new ol Feature without the possibility of giving it the GeoGirafe shape
 let currentShape: DrawingShape | null = null;
 
+const addedFeatures: Feature<Geometry>[] = [];
+
 export default class OlDrawing {
   map: MapComponent;
   state: State;
@@ -31,17 +32,15 @@ export default class OlDrawing {
   draw: Draw | null = null;
   snap!: Snap;
 
-  constructor() {
-    this.map = ComponentManager.getInstance().getComponents(MapComponent)[0];
+  constructor(map: MapComponent) {
+    this.map = map;
     this.state = StateManager.getInstance().state;
     // Create vector source for drawing
     this.drawingSource = new VectorSource({ features: this.drawingFeaturesCollection });
     this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
 
     this.drawingLayer = new VectorLayer({
-      properties: {
-        addToPrintedLayers: true
-      },
+      properties: { addToPrintedLayers: true },
       source: this.drawingSource
     });
     this.drawingLayer.setZIndex(1001);
@@ -49,6 +48,27 @@ export default class OlDrawing {
 
     this.map.olMap.addLayer(this.drawingLayer);
     this.registerEvents();
+  }
+
+  registerEvents() {
+    this.map.stateManager.subscribe(
+      'extendedState.drawing.activeTool',
+      (_oldTool: string | null, newTool: DrawingShape | null) =>
+        newTool === null ? this.deactivateDrawingTool() : this.activateDrawingTool(newTool)
+    );
+    this.map.stateManager.subscribe(
+      'extendedState.drawing.features',
+      (previous: DrawingFeature[], current: DrawingFeature[]) => this.onFeaturesChanged(previous, current)
+    );
+  }
+
+  onFeaturesChanged(oldFeatures: DrawingFeature[], newFeatures: DrawingFeature[]) {
+    const newIds = newFeatures.map((f) => f.id);
+    const oldIds = oldFeatures.map((f) => f.id);
+    const deleted = oldFeatures.filter((f) => !newIds.includes(f.id));
+    const added = newFeatures.filter((f) => !oldIds.includes(f.id));
+    deleted.forEach((f) => f.remove());
+    added.forEach((f) => this.addFeature(f));
   }
 
   addFeature(feature: DrawingFeature) {
@@ -60,9 +80,16 @@ export default class OlDrawing {
     if (geojson.geometry.type == 'Disk') {
       olFeature = new Feature(new CircleGeom(geojson.geometry.center, geojson.geometry.radius));
     } else {
-      const olFeatureLike = new GeoJSON().readFeatures(feature.geojson)[0];
-      olFeature = new Feature(olFeatureLike.getGeometry());
+      let olFeatureDecoded;
+      if (geojson.geometry.type == 'GeometryCollection') {
+        // Compatibility of feature coming from Cesium
+        olFeatureDecoded = new GeoJSON().readFeatures(geojson.geometry.geometries[1])[0];
+      } else {
+        olFeatureDecoded = new GeoJSON().readFeatures(feature.geojson)[0];
+      }
+      olFeature = new Feature(olFeatureDecoded.getGeometry());
     }
+    addedFeatures.push(olFeature);
     this.drawingSource.addFeature(olFeature);
     const updateStyle = () => olFeature.setStyle(this.getStyle(feature, olFeature.getGeometry() as Geometry));
     feature.onNameChange(updateStyle);
@@ -70,12 +97,12 @@ export default class OlDrawing {
     feature.onStrokeColorChange(updateStyle);
     feature.onStrokeWidthChange(updateStyle);
     feature.onFontSizeChange(updateStyle);
-    feature.onRemove(() => this.drawingFeaturesCollection.remove(olFeature));
+    feature.remove = () => this.drawingFeaturesCollection.remove(olFeature);
     feature.update();
   }
 
   onFeatureAdded(e: VectorSourceEvent) {
-    if (e.feature && currentShape !== null) {
+    if (e.feature && currentShape !== null && !addedFeatures.includes(e.feature)) {
       const olFeature = e.feature;
       let geoJson = {};
       // GeoJson does not support disks, so we create our own definition
@@ -93,26 +120,9 @@ export default class OlDrawing {
         geoJson = JSON.parse(new GeoJSON().writeFeature(olFeature));
       }
       const newFeature = new DrawingFeature(currentShape, geoJson);
-      const updateStyle = () => olFeature.setStyle(this.getStyle(newFeature, olFeature.getGeometry() as Geometry));
-      newFeature.onNameChange(updateStyle);
-      newFeature.onFillColorChange(updateStyle);
-      newFeature.onStrokeColorChange(updateStyle);
-      newFeature.onStrokeWidthChange(updateStyle);
-      newFeature.onFontSizeChange(updateStyle);
-      newFeature.onRemove(() => this.drawingFeaturesCollection.remove(olFeature));
-      newFeature.update();
       newFeature.addToState();
+      addedFeatures.push(olFeature);
     }
-  }
-
-  onFeaturesChanged(oldFeatures: DrawingFeature[], newFeatures: DrawingFeature[]) {
-    let deletedFeatures: DrawingFeature[] = [];
-    if (Array.isArray(newFeatures) && Array.isArray(oldFeatures)) {
-      deletedFeatures = oldFeatures.filter((f) => !newFeatures.includes(f));
-    } else if (oldFeatures != undefined) {
-      deletedFeatures.push(...oldFeatures);
-    }
-    deletedFeatures.forEach((f) => f.remove());
   }
 
   deleteFeature(feature: Feature) {
@@ -167,7 +177,7 @@ export default class OlDrawing {
       type: olTool as Type,
       freehand: freehand,
       geometryFunction: geometryFunction,
-      style: (featureLike) => this.getStyle(new DrawingFeature(tool), featureLike.getGeometry() as Geometry)
+      style: (featureLike) => this.getStyle(new DrawingFeature(tool, {}, ''), featureLike.getGeometry() as Geometry)
     });
     this.map.olMap.addInteraction(this.draw);
     this.map.olMap.addInteraction(new Modify({ source: this.drawingSource }));
@@ -183,18 +193,6 @@ export default class OlDrawing {
     if (this.snap) {
       this.map.olMap.removeInteraction(this.snap);
     }
-  }
-
-  registerEvents() {
-    this.map.stateManager.subscribe(
-      'extendedState.drawing.activeTool',
-      (_oldTool: string | null, newTool: DrawingShape | null) =>
-        newTool === null ? this.deactivateDrawingTool() : this.activateDrawingTool(newTool)
-    );
-    this.map.stateManager.subscribe(
-      'extendedState.drawing.features',
-      (previous: DrawingFeature[], current: DrawingFeature[]) => this.onFeaturesChanged(previous, current)
-    );
   }
 
   removeLastPoint() {

@@ -21,6 +21,7 @@ class GirafeHTMLElement extends HTMLElement {
   messageManager: MessageManager;
   configManager: ConfigManager;
   stateManager: StateManager;
+  componentManager: ComponentManager;
 
   private unsafeCache = new Map<string, TemplateStringsArray>();
 
@@ -35,7 +36,8 @@ class GirafeHTMLElement extends HTMLElement {
     this.configManager = ConfigManager.getInstance();
     this.messageManager = MessageManager.getInstance();
     this.stateManager = StateManager.getInstance();
-    ComponentManager.getInstance().registerComponent(this);
+    this.componentManager = ComponentManager.getInstance();
+    this.componentManager.registerComponent(this);
 
     this.shadow = this.attachShadow({ mode: 'open' });
 

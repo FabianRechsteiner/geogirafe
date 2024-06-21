@@ -4,12 +4,12 @@ import DrawingShape from './drawingshape';
 import ShapeNamer from './shapeNamer';
 import { v4 as uuidv4 } from 'uuid';
 
-type DrawingConfig = {
-  activeTool: DrawingShape | null;
-  features: DrawingFeature[];
-};
+export class DrawingState {
+  activeTool: DrawingShape | null = null;
+  features: DrawingFeature[] = [];
+}
 
-type SerializedFeature = {
+export type SerializedFeature = {
   n: string;
   sc: string;
   sw: number;
@@ -21,8 +21,9 @@ type SerializedFeature = {
 };
 
 export default class DrawingFeature {
+  remove = () => {};
+
   private _uid: string = uuidv4();
-  private _onRemove = () => {};
   private _tool: DrawingShape;
 
   private _name: string;
@@ -47,7 +48,6 @@ export default class DrawingFeature {
 
   constructor(tool: DrawingShape, geojson: object = {}, name: string | null = null) {
     const defaultConfig = ConfigManager.getInstance().Config.drawing;
-
     this._tool = tool;
     this._name = name == null ? ShapeNamer.getRandomName(tool) : name;
     this._strokeColor = defaultConfig.defaultStrokeColor;
@@ -124,11 +124,15 @@ export default class DrawingFeature {
     this._fontCb = f;
   }
 
-  get id() {
-    return this._uid;
-  }
   get geojson() {
     return this._geojson;
+  }
+  set geojson(v) {
+    this._geojson = v;
+  }
+
+  get id() {
+    return this._uid;
   }
   get type() {
     return this._tool;
@@ -142,15 +146,8 @@ export default class DrawingFeature {
     this._fontSizeCb(this._fontSize);
   }
 
-  onRemove(f: () => void) {
-    this._onRemove = f;
-  }
-  remove() {
-    this._onRemove();
-  }
   addToState() {
-    const state = StateManager.getInstance().state.extendedState.drawing as DrawingConfig;
-    state.features.push(this);
+    (StateManager.getInstance().state.extendedState.drawing as DrawingState).features.push(this);
   }
 
   serialize(): SerializedFeature {
