@@ -1,5 +1,7 @@
 import * as Cesium from 'cesium';
 import { Cartesian3, Entity } from 'cesium';
+import KML from 'ol/format/KML';
+import GeoJSON from 'ol/format/GeoJSON';
 import DrawingFeature from './drawingFeature';
 import DrawingShape from './drawingshape';
 
@@ -92,7 +94,7 @@ export default class CesiumDrawing {
       const updateStyle = () => {
         newCesiumEntities.forEach((e) => this.entities!.remove(e));
         newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, newFeature);
-        newCesiumEntities.forEach((s) => this.entities!.add(s));
+        newCesiumEntities.forEach((e) => this.entities!.add(e));
       };
 
       newFeature.onNameChange(updateStyle);
@@ -100,9 +102,20 @@ export default class CesiumDrawing {
       newFeature.onStrokeColorChange(updateStyle);
       newFeature.onStrokeWidthChange(updateStyle);
       newFeature.onFontSizeChange(updateStyle);
-      newFeature.onRemove(() => newCesiumEntities.forEach((e) => this.entities!.remove(e)));
+      newFeature.remove = () => newCesiumEntities.forEach((e) => this.entities!.remove(e));
       newFeature.update();
-      newFeature.addToState();
+
+      const newCesiumEntitiesCollection = new Cesium.EntityCollection();
+      newCesiumEntities.forEach((e) => newCesiumEntitiesCollection.add(e));
+
+      Cesium.exportKml({ entities: newCesiumEntitiesCollection }).then((res) => {
+        const olFeatures = new KML().readFeatures((res as Cesium.exportKmlResultKml).kml, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: this.state.projection
+        });
+        newFeature.geojson = JSON.parse(new GeoJSON().writeFeature(olFeatures[0]));
+        newFeature.addToState();
+      });
 
       this.activeShapes = undefined;
       this.activeShapePoints = [];
