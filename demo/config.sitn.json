@@ -4,12 +4,15 @@
   },
   "languages": {
     "translations": {
-      "fr": ["Mock/fr.json"]
+      "fr": ["https://sitn.ne.ch/static/dummy/fr.json"]
     },
     "defaultLanguage": "fr"
   },
+  "interface": {
+    "defaultSelectionComponent": "grid"
+  },
   "themes": {
-    "url": "Mock/themes.json",
+    "url": "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop",
     "defaultTheme": "main"
   },
   "basemaps": {
@@ -67,7 +70,9 @@
       "https://sitn.ne.ch/3dtiles/vdt/P4_cesium/patch4_cesium.json",
       "https://sitn.ne.ch/3dtiles/vdt/P5_cesium/patch5_cesium.json",
       "https://sitn.ne.ch/3dtiles/vdt/P6_Est_cesium/est_cesium.json",
-      "https://sitn.ne.ch/3dtiles/vdt/P6_Ouest_cesium/ouest_cesium.json"
+      "https://sitn.ne.ch/3dtiles/vdt/P6_Ouest_cesium/ouest_cesium.json",
+      "https://uzuflycesium.s3.amazonaws.com/LeLanderon/3Dtiles/LeLanderon_3DTiles_OUT/Scene/LeLanderon_3DTiles_OUT.json",
+      "https://uzuflycesium.s3.amazonaws.com/LeLanderon/3Dtiles/LeLanderon_3Dtiles_IN_Raw/Scene/LeLanderon_3Dtiles_IN_Raw.json"
     ]
   },
   "bookmarks": {
