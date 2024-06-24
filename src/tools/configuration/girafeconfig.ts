@@ -60,6 +60,7 @@ class GirafeConfig {
     };
   };
   selection: {
+    maxFeature: number;
     defaultFillColor: string;
     defaultStrokeColor: string;
     defaultStrokeWidth: number;
@@ -243,6 +244,7 @@ class GirafeConfig {
 
   private initConfigSelection(config: GirafeConfig) {
     return {
+      maxFeature: config.selection?.maxFeature ?? 300,
       defaultFillColor: config.selection?.defaultFillColor ?? '#ff66667f',
       defaultStrokeColor: config.selection?.defaultStrokeColor ?? '#ff3333',
       defaultStrokeWidth: config.selection?.defaultStrokeWidth ?? 4,
