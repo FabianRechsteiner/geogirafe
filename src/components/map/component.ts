@@ -7,7 +7,6 @@ import { platformModifierKeyOnly } from 'ol/events/condition';
 import { DragBox } from 'ol/interaction';
 import { ScaleLine } from 'ol/control';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
-import { Extent } from 'ol/extent';
 import { Geometry } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
 
@@ -35,7 +34,6 @@ import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
-import GeoEvents from '../../models/events';
 
 import MapManager from '../../tools/state/mapManager';
 import MapPosition from '../../tools/state/mapposition';
@@ -94,8 +92,6 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.messageManager.register(this.onCustomGirafeEvent.bind(this));
-
     this.swiper.addEventListener('input', () => this.olMap.render());
 
     this.stateManager.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) =>
@@ -324,12 +320,6 @@ export default class MapComponent extends GirafeHTMLElement {
       this.listenOpenLayersEvents();
       this.registerEvents();
     });
-  }
-
-  onCustomGirafeEvent(details: { action: string; layer: Layer; extent: Extent }) {
-    if (details.action === GeoEvents.undoDraw) {
-      //this.drawingManager.removeLastPoint();
-    }
   }
 
   onSwipedLayersChanged(swipedLayers: { left: Layer[]; right: Layer[] }) {

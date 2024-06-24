@@ -1,6 +1,5 @@
 enum GeoEvents {
-  CustomEventType = 'GeoGirafe.App',
-  undoDraw = 'undoDraw'
+  CustomEventType = 'GeoGirafe.App'
 }
 
 export default GeoEvents;

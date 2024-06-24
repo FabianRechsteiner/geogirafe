@@ -2,20 +2,20 @@ import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 import State from './tools/state/state.js';
 
-import ConfigManager from './tools/configuration/configmanager.js';
-import ErrorManager from './tools/errormanager.js';
-import CsvManager from './tools/csvManager.js';
-import I18nManager from './tools/i18nmanager.js';
-import MessageManager from './tools/messagemanager.js';
-import ShareManager from './tools/share/sharemanager.js';
-import StateManager from './tools/state/statemanager.js';
-import ThemesManager from './tools/themesmanager.js';
-import UrlManager from './tools/urlmanager.js';
-import WfsManager from './tools/wfsmanager.js';
+import ConfigManager from './tools/configuration/configmanager';
+import ErrorManager from './tools/errormanager';
+import CsvManager from './tools/csvManager';
+import I18nManager from './tools/i18nmanager';
+import MessageManager from './tools/messagemanager';
+import ShareManager from './tools/share/sharemanager';
+import StateManager from './tools/state/statemanager';
+import ThemesManager from './tools/themesmanager';
+import UrlManager from './tools/urlmanager';
+import WfsManager from './tools/wfsmanager';
 
-import MapComponent from './components/map/component.js';
-import MobileSearchComponent from './components/search-mobile/component.js';
-import MobileThemeComponent from './components/themes-mobile/component.js';
+import MapComponent from './components/map/component';
+import MobileSearchComponent from './components/search-mobile/component';
+import MobileThemeComponent from './components/themes-mobile/component';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
