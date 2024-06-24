@@ -5,7 +5,6 @@ import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
 import GeoJSON from 'ol/format/GeoJSON';
 
-import GeoEvents from '../../models/events';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { Callback } from '../../tools/state/statemanager';
 import MapComponent from '../map/component';
@@ -42,7 +41,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
     { elem: null, selector: '#freeline', tool: DrawingShape.FreehandPolyline },
     { elem: null, selector: '#freepolygon', tool: DrawingShape.FreehandPolygon }
   ];
-  undoButton: Element | null = null;
   toolSelected: Element | null = null;
   drawingList: Element | null = null;
 
@@ -66,7 +64,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.activateTooltips(false, [800, 0], 'top-end');
     this.buttons.forEach((b) => (b.elem = this.shadow.querySelector(b.selector)));
     this.toolSelected = this.buttons[0].elem;
-    this.undoButton = this.shadow.querySelector('#undo');
     this.drawingList = this.shadow.querySelector('#drawingList');
     this.state.selection.enabled = false;
     this.registerEvents();
@@ -85,16 +82,12 @@ export default class DrawingComponent extends GirafeHTMLElement {
     );
     this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
     this.buttons.forEach((b) => b.elem?.addEventListener('click', () => this.setTool(b.elem!, b.tool)));
-    this.undoButton?.addEventListener('click', () => this.messageManager.sendMessage({ action: GeoEvents.undoDraw }));
   }
 
   unregisterEvents() {
     this.stateManager.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
     this.buttons.forEach((b) => b.elem?.removeEventListener('click', () => this.setTool(b.elem!, b.tool)));
-    this.undoButton?.removeEventListener('click', () =>
-      this.messageManager.sendMessage({ action: GeoEvents.undoDraw })
-    );
   }
 
   registerVisibilityEvents() {

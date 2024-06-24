@@ -195,10 +195,6 @@ export default class OlDrawing {
     }
   }
 
-  removeLastPoint() {
-    this.draw!.removeLastPoint();
-  }
-
   // TODO Move as much parameters as possible into DrawingFeature
   getStyle(feature: DrawingFeature, geometry: Geometry) {
     const font = 'Bold ' + feature.fontSize + 'px/1 ' + feature.font;
