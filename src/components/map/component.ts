@@ -290,14 +290,15 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onClick(e: MapBrowserEvent<UIEvent>) {
-    if (this.state.selection.enabled) {
-      // Build selectionbox using the default tolerance
-      const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
-      const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);
-      const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
-      const bottomRightCoord = this.olMap.getCoordinateFromPixel(bottomRightPixel);
-      this.select([topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]]);
+    if (!this.state.selection.enabled) {
+      return;
     }
+    // Build selection box using the default tolerance.
+    const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
+    const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);
+    const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
+    const bottomRightCoord = this.olMap.getCoordinateFromPixel(bottomRightPixel);
+    this.select([topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]]);
   }
 
   onDragSelection(_e: DragBoxEvent) {

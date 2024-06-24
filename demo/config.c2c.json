@@ -17,6 +17,9 @@
     "url": "Mock/themes.json",
     "defaultTheme": "Demo"
   },
+  "selection": {
+    "maxFeature": 100
+  },
   "basemaps": {
     "show": true,
     "defaultBasemap": "OSM map",

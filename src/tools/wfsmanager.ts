@@ -7,6 +7,7 @@ import StateManager from './state/statemanager';
 import { SelectionParam } from './state/state';
 import LayerWms from '../models/layers/layerwms';
 import ServerWfs from '../models/serverwfs';
+import ConfigManager from './configuration/configmanager';
 
 export default class WfsManager extends GirafeSingleton {
   messageManager: MessageManager;
@@ -15,22 +16,25 @@ export default class WfsManager extends GirafeSingleton {
     return this.stateManager.state;
   }
 
-  //TODO: make this configurable
-  maxFeatures: number = 10000;
-
-  serversWfs: Record<string, ServerWfs> = {};
-  featureTypeToGeometryColumnName: { [key: string]: string } = {};
+  private serversWfs: Record<string, ServerWfs> = {};
+  private featureTypeToGeometryColumnName: { [key: string]: string } = {};
+  private maxFeatures: number = 300;
 
   constructor(type: string) {
     super(type);
 
     this.stateManager = StateManager.getInstance();
     this.messageManager = MessageManager.getInstance();
-
     this.stateManager.subscribe(
       'selection.selectionParameters',
       (_oldParams: SelectionParam[], newParams: SelectionParam[]) => this.onSelectFeatures(newParams)
     );
+
+    ConfigManager.getInstance()
+      .loadConfig()
+      .then((config) => {
+        this.maxFeatures = config.selection.maxFeature ?? this.maxFeatures;
+      });
   }
 
   onSelectFeatures(selectionParams: SelectionParam[]) {
@@ -201,13 +205,26 @@ export default class WfsManager extends GirafeSingleton {
     }
 
     // Wait the result of all promises to display responses
+    let maxFeatureReached = false;
     return Promise.all(promises).then(async (responses) => {
       const selectedFeatures = [];
       for (const element of responses) {
         const gml = await element.text();
         // TODO REG: Do we always want to use the format GML3 here ?
         const features = new GML3().readFeatures(gml);
+        if (features.length >= this.maxFeatures) {
+          maxFeatureReached = true;
+        }
         selectedFeatures.push(...features);
+      }
+      const infoId = 'wfs_max_feature_reached';
+      this.state.infobox.elements = this.state.infobox.elements.filter((element) => element.id !== infoId);
+      if (maxFeatureReached) {
+        this.state.infobox.elements.push({
+          id: infoId,
+          text: 'Some results are not selected because you have reached the maximum limit.',
+          type: 'warning'
+        });
       }
       // Removes numbers identification from the id (id.test.1234 => id.test).
       selectedFeatures.forEach((feature) => {
