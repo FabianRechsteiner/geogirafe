@@ -354,19 +354,14 @@ export default class MapComponent extends GirafeHTMLElement {
       window.Cesium = Cesium;
 
       const olcs = await import('olcs');
-      const OLCesium = olcs.default;
 
       // Initialize the 3D Map
-      this.map3d = new OLCesium({
+      this.map3d = new olcs.default({
         map: this.olMap,
         target: this.map3dTarget,
         time: () => {
           const date = new Date(timeDatePicker.value);
-          if (isNaN(date.getTime())) {
-            return Cesium.JulianDate.now();
-          } else {
-            return Cesium.JulianDate.fromDate(date);
-          }
+          return isNaN(date.getTime()) ? Cesium.JulianDate.now() : Cesium.JulianDate.fromDate(date);
         }
       });
       const scene = this.map3d.getCesiumScene();
