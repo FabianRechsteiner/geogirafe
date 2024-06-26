@@ -1,6 +1,5 @@
 import Picker, { Color } from 'vanilla-picker';
-import DrawingFeature, { DrawingState, SerializedFeature } from './drawingFeature';
-import DrawingShape from './drawingshape';
+import DrawingFeature, { DrawingState, SerializedFeature, DrawingShape } from './drawingFeature';
 import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -45,13 +44,15 @@ export default class DrawingComponent extends GirafeHTMLElement {
   drawingList: Element | null = null;
 
   olDrawing: OlDrawing;
-  cesiumDrawing: CesiumDrawing = new CesiumDrawing();
+  cesiumDrawing: CesiumDrawing;
 
   constructor() {
     super('drawing');
     this.state.extendedState.drawing = new DrawingState();
     this.drawingState = this.state.extendedState.drawing as DrawingState;
-    this.olDrawing = new OlDrawing(this.componentManager.getComponents(MapComponent)[0]);
+    const map = this.componentManager.getComponents(MapComponent)[0];
+    this.olDrawing = new OlDrawing(map);
+    this.cesiumDrawing = new CesiumDrawing(map);
   }
 
   render() {
@@ -131,6 +132,11 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const added = newFeatures.filter((f) => !oldIds.includes(f.id));
     deleted.forEach((f) => this.removeFeatureFromList(f));
     added.forEach((f) => this.addFeatureToList(f));
+    this.olDrawing.addFeatures(added);
+    this.olDrawing.deleteFeatures(deleted);
+    // OlCesium is currently managing features in Cesium
+    //this.cesiumDrawing.addFeatures(added)
+    //this.cesiumDrawing.deleteFeatures(deleted)
   }
 
   onProjectionChanged(oldProj: string, newProj: string) {

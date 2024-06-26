@@ -1,8 +1,6 @@
-import DrawingShape from './drawingshape';
-
 export default class ShapeNamer {
-  static getRandomName(type: DrawingShape) {
-    return adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + DrawingShape[type];
+  static getRandomName(suffix: String) {
+    return adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + suffix;
   }
 }
 

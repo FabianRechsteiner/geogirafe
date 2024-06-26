@@ -2,19 +2,18 @@ import * as Cesium from 'cesium';
 import { Cartesian3, Entity } from 'cesium';
 import KML from 'ol/format/KML';
 import GeoJSON from 'ol/format/GeoJSON';
-import DrawingFeature from './drawingFeature';
-import DrawingShape from './drawingshape';
+import DrawingFeature, { DrawingShape } from './drawingFeature';
 
 import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
 import ConfigManager from '../../tools/configuration/configmanager';
 import State from '../../tools/state/state';
-import ComponentManager from '../../tools/state/componentManager';
+import proj4 from 'proj4';
 
 const getPositionAsText = (p: Cartesian3) => p.x.toFixed(3) + ' ; ' + p.y.toFixed(3) + ' ; ' + p.z.toFixed(3);
 
 export default class CesiumDrawing {
-  map: MapComponent;
+  configManager: ConfigManager;
   state: State;
   activeShapePoints: Cartesian3[] = [];
   activeShapes: Entity[] | undefined = undefined;
@@ -23,50 +22,44 @@ export default class CesiumDrawing {
   scene: Cesium.Scene | undefined = undefined;
   handler: Cesium.ScreenSpaceEventHandler | undefined = undefined;
   entities: Cesium.EntityCollection | undefined = undefined;
-  configManager: ConfigManager | undefined = undefined;
 
-  constructor() {
+  constructor(map: MapComponent) {
     this.configManager = ConfigManager.getInstance();
-    this.map = ComponentManager.getInstance().getComponents(MapComponent)[0];
     this.state = StateManager.getInstance().state;
-
     StateManager.getInstance().subscribe('globe.loaded', () => {
       if (StateManager.getInstance().state.globe.loaded) {
-        this.scene = this.map.map3d.getCesiumScene();
+        this.scene = map.map3d.getCesiumScene();
         this.handler = new Cesium.ScreenSpaceEventHandler(this.scene!.canvas);
-        this.entities = this.map.map3d.getDataSourceDisplay().defaultDataSource.entities;
-        this.registerEvents();
+        this.entities = map.map3d.getDataSourceDisplay().defaultDataSource.entities;
+        map.stateManager.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
+          newTool === null ? this.deactivateTool() : this.activateTool(newTool)
+        );
       }
     });
   }
 
-  registerEvents() {
-    this.map.stateManager.subscribe(
-      'extendedState.drawing.activeTool',
-      (_oldTool: string | null, newTool: DrawingShape | null) =>
-        newTool === null ? this.deactivateDrawing() : this.activateDrawing(newTool)
-    );
-  }
-
-  activateDrawing(tool: DrawingShape) {
+  activateTool(tool: DrawingShape) {
     this.state.selection.enabled = false;
     this.handler!.setInputAction(this.addPoint(tool), Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler!.setInputAction(this.updateShape(tool), Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-    this.handler!.setInputAction(this.terminateShape(tool), Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    this.handler!.setInputAction(
+      this.removeLastPointAndTerminateShape(tool),
+      Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+    );
     this.floatingPoint = this.entities!.add({
       point: {
-        color: Cesium.Color.fromCssColorString(this.configManager!.Config.drawing.defaultStrokeColor),
+        color: Cesium.Color.fromCssColorString(this.configManager.Config.drawing.defaultStrokeColor),
         pixelSize: 5,
         heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
       }
     });
   }
 
-  deactivateDrawing() {
+  deactivateTool() {
     this.state.selection.enabled = true;
     this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-    this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+    this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
     if (this.floatingPoint) {
       this.entities!.remove(this.floatingPoint);
       this.floatingPoint = undefined;
@@ -80,31 +73,47 @@ export default class CesiumDrawing {
     return ray == undefined ? undefined : this.scene!.globe.pick(ray, this.scene!);
   }
 
-  terminateShape(tool: DrawingShape) {
+  removeLastPointAndTerminateShape(tool: DrawingShape) {
     return () => {
-      const newCesiumEntityPoints = this.activeShapePoints.slice(0, this.activeShapePoints.length - 1);
-      let newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, new DrawingFeature(tool));
+      this.activeShapePoints = this.activeShapePoints.slice(0, this.activeShapePoints.length - 1);
+      this.terminateShape(tool);
+    };
+  }
+
+  terminateShape(tool: DrawingShape) {
+    const newCesiumEntityPoints = this.activeShapePoints.slice(0, this.activeShapePoints.length - 1);
+    let newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, new DrawingFeature(tool));
+    if (this.activeShapes) {
+      this.activeShapes.forEach((e) => this.entities!.remove(e));
+    }
+
+    const newFeature = new DrawingFeature(tool);
+
+    // The following code will be useful when we will remove OLCesium
+    /*newCesiumEntities.forEach((e) => this.entities!.add(e));
+    const updateStyle = (feature:DrawingFeature) => {
+      newCesiumEntities.forEach((e) => this.entities!.remove(e));
+      newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, feature);
       newCesiumEntities.forEach((e) => this.entities!.add(e));
-      if (this.activeShapes) {
-        this.activeShapes.forEach((e) => this.entities!.remove(e));
-      }
+    }
+    newFeature.onChange = updateStyle;
+    updateStyle(newFeature)*/
 
-      const newFeature = new DrawingFeature(tool);
-
-      const updateStyle = () => {
-        newCesiumEntities.forEach((e) => this.entities!.remove(e));
-        newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, newFeature);
-        newCesiumEntities.forEach((e) => this.entities!.add(e));
+    if (tool == DrawingShape.Disk) {
+      const center = Cesium.Ellipsoid.WGS84.cartesianToCartographic(
+        newCesiumEntities[0].position?.getValue(Cesium.JulianDate.now())!
+      );
+      const centerCoord = [Cesium.Math.toDegrees(center.longitude), Cesium.Math.toDegrees(center.latitude)];
+      newFeature.geojson = {
+        type: 'Feature',
+        geometry: {
+          type: 'Disk',
+          center: proj4('EPSG:4326', this.state.projection, centerCoord),
+          radius: newCesiumEntities[0].ellipse?.semiMajorAxis?.getValue(Cesium.JulianDate.now())
+        }
       };
-
-      newFeature.onNameChange(updateStyle);
-      newFeature.onFillColorChange(updateStyle);
-      newFeature.onStrokeColorChange(updateStyle);
-      newFeature.onStrokeWidthChange(updateStyle);
-      newFeature.onFontSizeChange(updateStyle);
-      newFeature.remove = () => newCesiumEntities.forEach((e) => this.entities!.remove(e));
-      newFeature.update();
-
+      newFeature.addToState();
+    } else {
       const newCesiumEntitiesCollection = new Cesium.EntityCollection();
       newCesiumEntities.forEach((e) => newCesiumEntitiesCollection.add(e));
 
@@ -116,10 +125,10 @@ export default class CesiumDrawing {
         newFeature.geojson = JSON.parse(new GeoJSON().writeFeature(olFeatures[0]));
         newFeature.addToState();
       });
+    }
 
-      this.activeShapes = undefined;
-      this.activeShapePoints = [];
-    };
+    this.activeShapes = undefined;
+    this.activeShapePoints = [];
   }
 
   updateShape(tool: DrawingShape) {
@@ -143,8 +152,8 @@ export default class CesiumDrawing {
     return (event: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
       const earthPosition = this.pickOnGlobe(event.position);
 
+      // If the cursor is pointing in the map
       if (Cesium.defined(earthPosition)) {
-        // If the cursor is pointing in the map
         this.activeShapePoints.push(earthPosition);
 
         if (this.activeShapePoints.length === 1) {
@@ -160,7 +169,7 @@ export default class CesiumDrawing {
           (tool === DrawingShape.Square && this.activeShapePoints.length === 3) ||
           (tool === DrawingShape.Rectangle && this.activeShapePoints.length === 3)
         ) {
-          return this.terminateShape(tool)();
+          return this.terminateShape(tool);
         }
       }
     };
