@@ -4,9 +4,9 @@
   },
   "languages": {
     "translations": {
-      "de": ["Mock/de.json"],
-      "en": ["Mock/en.json"],
-      "fr": ["Mock/fr.json"]
+      "de": ["de.json", "Mock/de.json"],
+      "en": ["en.json", "Mock/en.json"],
+      "fr": ["fr.json", "Mock/fr.json"]
     },
     "defaultLanguage": "en"
   },

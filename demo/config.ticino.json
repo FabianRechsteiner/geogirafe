@@ -4,7 +4,7 @@
   },
   "languages": {
     "translations": {
-      "en": ["Mock/en.json"]
+      "en": ["it.json", "Mock/en.json"]
     },
     "defaultLanguage": "en"
   },
