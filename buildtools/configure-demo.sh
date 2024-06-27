@@ -11,6 +11,9 @@ if [ "$1" = 'c2c' ];
 then
     echo "Preparing environment CAMPTOCAMP..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/de.json $APPDIR/de.json
+    cp demo/fr.json $APPDIR/fr.json
+    cp demo/en.json $APPDIR/en.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/de.json" --silent --output $MOCKDIR/de.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/en.json" --silent --output $MOCKDIR/en.json
@@ -21,6 +24,7 @@ elif [ "$1" = 'cartolacote' ];
 then
     echo "Preparing environment CARTOLACOTE..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/fr.json $APPDIR/fr.json
     curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.cartolacote.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
     curl "https://map.cartolacote.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
@@ -30,6 +34,7 @@ then
     echo "Preparing environment CARTORIVIERA..."
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
+    cp demo/fr.json $APPDIR/fr.json
     echo "Cannot create Mock objects for cartoriviera, the following commands are blocked when executed from AWS or GitLab Pipeline"
     #curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     #curl "https://map.cartoriviera.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
@@ -39,6 +44,7 @@ elif [ "$1" = 'cjl' ];
 then
     echo "Preparing environment CARTOJURALEMAN..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/fr.json $APPDIR/fr.json
     curl "https://map.cjl.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.cjl.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
     curl "https://map.cjl.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
@@ -47,6 +53,7 @@ elif [ "$1" = 'geogr' ];
 then
     echo "Preparing environment GEOGR..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/de.json $APPDIR/de.json
     curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --silent --output $MOCKDIR/de.json
     curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
@@ -55,6 +62,7 @@ elif [ "$1" = 'lausanne' ];
 then
     echo "Preparing environment LAUSANNE..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/fr.json $APPDIR/fr.json
     curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.lausanne.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
     curl "https://map.lausanne.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
@@ -63,6 +71,7 @@ elif [ "$1" = 'lie' ];
 then
     echo "Preparing environment LIE..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/de.json $APPDIR/de.json
     curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.llv.li/static/dummy/de.json" --silent --output $MOCKDIR/de.json
     curl "https://map.geo.llv.li/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
@@ -73,6 +82,8 @@ then
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
     cp demo/de.json $APPDIR/de.json
+    cp demo/fr.json $APPDIR/fr.json
+    cp demo/en.json $APPDIR/en.json
     curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.bs.ch/static/dummy/de.json" --silent --output $MOCKDIR/de.json
     curl "https://map.geo.bs.ch/static/dummy/en.json" --silent --output $MOCKDIR/en.json
@@ -83,6 +94,7 @@ elif [ "$1" = 'mapnv' ];
 then
     echo "Preparing environment MAPNV..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/fr.json $APPDIR/fr.json
     curl "https://mapnv.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://mapnv.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
     curl "https://mapnv.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
@@ -91,6 +103,7 @@ elif [ "$1" = 'schwyz' ];
 then
     echo "Preparing environment SCHWYZ..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/de.json $APPDIR/de.json
     curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.sz.ch/static-ngeo/build/de.json" --silent --output $MOCKDIR/de.json
     curl "https://map.geo.sz.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
@@ -99,6 +112,7 @@ elif [ "$1" = 'sigip' ];
 then
     echo "Preparing environment SIGIP..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/fr.json $APPDIR/fr.json
     echo "Cannot create Mock objects for SIGIP, the following commands are blocked when executed from AWS or GitLab Pipeline"
     #curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     #curl "https://www.sigip.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
@@ -109,6 +123,7 @@ then
     echo "Preparing environment SITN..."
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
+    cp demo/fr.json $APPDIR/fr.json
     curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://sitn.ne.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
     curl "https://sitn.ne.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
@@ -117,6 +132,7 @@ elif [ "$1" = 'ticino' ];
 then
     echo "Preparing environment TICINO..."
     cp demo/config.$1.json $APPDIR/config.json
+    cp demo/it.json $APPDIR/it.json
     curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.ti.ch/static/dummy/en.json" --silent --output $MOCKDIR/en.json
     curl "https://map.geo.ti.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
