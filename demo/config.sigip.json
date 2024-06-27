@@ -4,7 +4,7 @@
   },
   "languages": {
     "translations": {
-      "fr": ["https://www.sigip.ch/static/dummy/fr.json"]
+      "fr": ["fr.json", "https://www.sigip.ch/static/dummy/fr.json"]
     },
     "defaultLanguage": "fr"
   },

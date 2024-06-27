@@ -21,6 +21,7 @@ import ThemesManager from '../../tools/themesmanager';
 import MapManager from '../../tools/state/mapManager';
 import Layer from '../../models/layers/layer';
 import LayerManager from '../../tools/layermanager';
+import { parseCoordinates } from '../../tools/geometrytools';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -35,6 +36,7 @@ class SearchComponent extends GirafeHTMLElement {
   private previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   private previewLayer: Layer | null = null;
   private previewGeoLayer: VectorLayer<VectorSource> | null = null;
+  private maxExtent?: number[];
 
   private ignoreBlur = false;
   public groupedResults: Record<string, SearchResult[]> = {};
@@ -43,6 +45,7 @@ class SearchComponent extends GirafeHTMLElement {
 
   private searchTermPlaceholder = '###SEARCHTERM###';
   private searchLangPlaceholder = '###SEARCHLANG###';
+  private COORD_REGEX = /^(\d+[.,]?\d*)\s*[,;/\s]\s*(\d+[.,]?\d*)$/;
 
   private focusedResultIndex: number = -1;
   private focusedResult: SearchResult | null = null;
@@ -65,6 +68,7 @@ class SearchComponent extends GirafeHTMLElement {
     this.configManager.loadConfig().then(() => {
       this.paintSearchResults = this.configManager.Config.search.paintSearchResults;
       this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor;
+      this.maxExtent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
 
       this.initColorPicker();
       const previewStyle = new Style({
@@ -140,19 +144,56 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   public async doSearch(e: Event) {
-    const target = e.target as HTMLInputElement;
-    if (target) {
-      const term: string = target.value;
-      this.clearSearch();
-      if (term.length > 0) {
-        const url = this.configManager.Config.search.url
-          .replace(this.searchTermPlaceholder, term)
-          .replace(this.searchLangPlaceholder, this.state.language!);
-        const response = await fetch(url);
-        const data = await response.json();
-        this.displayResults(data);
-      }
+    const target = e.target! as HTMLInputElement;
+    const term = target.value.trim();
+    this.clearSearch();
+
+    if (this.COORD_REGEX.test(term)) {
+      this.displayCoordinates(term);
+      return;
     }
+    if (term.length > 0) {
+      const url = this.configManager.Config.search.url
+        .replace(this.searchTermPlaceholder, term)
+        .replace(this.searchLangPlaceholder, this.state.language!);
+      const response = await fetch(url);
+      const data = await response.json();
+      this.displayResults(data);
+    }
+  }
+
+  /**
+   * Will render the result of the search with coordinates
+   * @param term typed string
+   */
+  private displayCoordinates(term: string) {
+    const matches = this.COORD_REGEX.exec(term)!;
+    let coord1 = parseFloat(matches[1].replace(',', '.'));
+    let coord2 = parseFloat(matches[2].replace(',', '.'));
+
+    const current_srid = this.map.getView().getProjection().getCode();
+    const [east_coord, north_coord] = parseCoordinates([coord1, coord2], this.maxExtent, current_srid);
+    // Don't show result if no corresponding coordinates were parsed
+    if (!east_coord || !north_coord) {
+      return;
+    }
+
+    const result = {
+      bbox: [east_coord, north_coord, east_coord, north_coord],
+      geometry: {
+        type: 'Point',
+        coordinates: [east_coord, north_coord]
+      },
+      properties: {
+        label: `${coord1} ${coord2}`,
+        layer_name: 'recenter_map'
+      }
+    } as SearchResult;
+
+    this.allResults = [result];
+    this.groupedResults['recenter_map'] = [result];
+    super.render();
+    super.girafeTranslate();
   }
 
   private displayResults(results: { type: string; features: SearchResult[] }) {
@@ -176,6 +217,7 @@ class SearchComponent extends GirafeHTMLElement {
 
     // And then rerender the results
     super.render();
+    super.girafeTranslate();
   }
 
   public getIcon(searchGroup: string) {
