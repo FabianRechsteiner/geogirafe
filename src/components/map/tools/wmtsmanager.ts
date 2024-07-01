@@ -22,7 +22,13 @@ class WmtsManager {
     }
   > = {};
 
-  basemapLayers: OLayer[] = [];
+  basemapLayers: Record<
+    string,
+    {
+      olayer: OLayer;
+      layerWmts: LayerWmts;
+    }
+  > = {};
 
   get state() {
     return StateManager.getInstance().state;
@@ -33,10 +39,10 @@ class WmtsManager {
   }
 
   removeAllBasemapLayers() {
-    this.basemapLayers.forEach((basemap) => {
-      this.map.removeLayer(basemap);
+    Object.values(this.basemapLayers).forEach((basemap) => {
+      this.map.removeLayer(basemap.olayer);
     });
-    this.basemapLayers = [];
+    this.basemapLayers = {};
   }
 
   addLayer(layer: LayerWmts) {
@@ -84,7 +90,7 @@ class WmtsManager {
 
       let zindex;
       if (isBasemap) {
-        this.basemapLayers.push(olayer);
+        this.basemapLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
         zindex = -5000 - layer.order;
       } else {
         this.wmtsLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
@@ -147,7 +153,8 @@ class WmtsManager {
 
   selectFeatures(extent: number[]) {
     const selectionParams: SelectionParam[] = [];
-    Object.values(this.wmtsLayers).forEach((wmtsItem) => {
+    const allWmtsLayers = [...Object.values(this.basemapLayers), ...Object.values(this.wmtsLayers)];
+    allWmtsLayers.forEach((wmtsItem) => {
       const wmtsLayer = wmtsItem.layerWmts;
       const queryLayers = wmtsLayer.wmsLayers ?? wmtsLayer.queryLayers;
       if (!queryLayers || !wmtsLayer.ogcServer) {
