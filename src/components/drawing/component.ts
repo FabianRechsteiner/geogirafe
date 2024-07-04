@@ -13,6 +13,7 @@ import paintRollerIcon from './assets/paint-roller.svg?raw';
 import paintBrushIcon from './assets/paintbrush.svg?raw';
 import plusIcon from './assets/plus.svg?raw';
 import trashIcon from './assets/trash.svg?raw';
+import locateIcon from './assets/locate.svg?raw';
 
 let lastMouseX: number = 0;
 let lastMouseY: number = 0;
@@ -79,9 +80,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.eventsCallbacks.push(
-      this.stateManager.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news))
+      this.stateManager.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news)),
+      this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news))
     );
-    this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
     this.buttons.forEach((b) => b.elem?.addEventListener('click', () => this.setTool(b.elem!, b.tool)));
   }
 
@@ -132,26 +133,27 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const added = newFeatures.filter((f) => !oldIds.includes(f.id));
     deleted.forEach((f) => this.removeFeatureFromList(f));
     added.forEach((f) => this.addFeatureToList(f));
-    this.olDrawing.addFeatures(added);
     this.olDrawing.deleteFeatures(deleted);
+    this.olDrawing.addFeatures(added);
     // OlCesium is currently managing features in Cesium
     //this.cesiumDrawing.addFeatures(added)
     //this.cesiumDrawing.deleteFeatures(deleted)
   }
 
   onProjectionChanged(oldProj: string, newProj: string) {
-    const geoJson = new GeoJSON();
-    let features: DrawingFeature[] = [];
-    this.drawingState.features.forEach((f) => {
-      // TODO Handle the case of disks
-      f.geojson = geoJson.writeFeatureObject(
-        geoJson.readFeature(f.geojson, { dataProjection: oldProj, featureProjection: newProj })
-      );
-      features.push(f);
-    });
-    // Refresh all the listeners
-    this.drawingState.features = [];
-    this.drawingState.features = features;
+    if (oldProj != null && oldProj != newProj) {
+      const geoJson = new GeoJSON();
+      let features: DrawingFeature[] = [...this.drawingState.features];
+      features.forEach((f) => {
+        // TODO Handle the case of disks
+        f.geojson = geoJson.writeFeatureObject(
+          geoJson.readFeature(f.geojson, { dataProjection: oldProj, featureProjection: newProj })
+        );
+      });
+      // Refresh all the listeners
+      this.drawingState.features = [];
+      this.drawingState.features = features;
+    }
   }
 
   createDiv(id = '', className = '', content = '', onclick = (_: MouseEvent) => {}) {
@@ -167,6 +169,8 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const container = this.createDiv('f-' + feature.id, 'girafe');
     const lineOne = this.createDiv('', 'featureLine');
     const lineTwo = this.createDiv('', 'featureLine');
+
+    lineOne.appendChild(this.createDiv('', 'icon', locateIcon, () => this.olDrawing.centerViewOnFeature(feature)));
 
     // Label
     const nameInput = document.createElement('input');

@@ -4,7 +4,7 @@ import StateManager from '../../tools/state/statemanager';
 import State from '../../tools/state/state';
 
 import { Collection, Feature } from 'ol';
-import { Geometry, LineString, Point, Polygon, Circle as CircleGeom } from 'ol/geom';
+import { Geometry, LineString, Point, Polygon, Circle as CircleGeom, SimpleGeometry } from 'ol/geom';
 import { createBox, createRegularPolygon } from 'ol/interaction/Draw';
 import { Type } from 'ol/geom/Geometry';
 import { Style, Stroke, Text, Fill, Circle, RegularShape } from 'ol/style';
@@ -78,6 +78,7 @@ export default class OlDrawing {
       const toRemove = this.featuresMap.get(feature.id)?.feature;
       if (toRemove != undefined) {
         this.drawingSource.removeFeature(toRemove);
+        this.featuresMap.delete(feature.id);
       }
     });
   }
@@ -173,6 +174,13 @@ export default class OlDrawing {
     }
     if (this.snap) {
       this.map.olMap.removeInteraction(this.snap);
+    }
+  }
+
+  centerViewOnFeature(feature: DrawingFeature) {
+    const olFeature = this.featuresMap.get(feature.id)?.feature;
+    if (olFeature != undefined) {
+      this.map.olMap.getView().fit(olFeature.getGeometry()! as SimpleGeometry);
     }
   }
 
