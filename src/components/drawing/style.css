@@ -42,12 +42,12 @@
   display: inline-grid;
   grid-auto-flow: column;
   align-items: center;
+  width: 100%;
 }
 
 #drawingList div.girafe {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
   padding: 0.3rem;
   border: solid 1px var(--text-color);
 }
