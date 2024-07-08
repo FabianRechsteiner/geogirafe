@@ -119,6 +119,10 @@ class GirafeConfig {
     quote: string;
     separator: string;
   };
+  offline?: {
+    downloadStartZoom: number;
+    downloadEndZoom: number;
+  };
 
   public static readonly DEFAULT_LOCALE = 'en-US';
 
@@ -144,6 +148,7 @@ class GirafeConfig {
     this.bookmarks = this.initConfigBookmarks(config);
     this.lidar = this.initConfigLidar(config);
     this.csv = this.initConfigCsv(config);
+    this.offline = this.initConfigOffline(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -329,6 +334,11 @@ class GirafeConfig {
       ...defaultConfig,
       ...config.csv
     };
+  }
+
+  private initConfigOffline(config: GirafeConfig) {
+    // This can be null, that's not a problem. No default value either.
+    return config.offline;
   }
 
   private initConfigBookmarks(config: GirafeConfig) {

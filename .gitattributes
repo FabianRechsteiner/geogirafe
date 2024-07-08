@@ -1,0 +1,2 @@
+buildtools/cordova/apk-build.sh text eol=lf
+buildtools/configure-demo.sh text eol=lf

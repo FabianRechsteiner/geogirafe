@@ -1,5 +1,5 @@
 export default class ShapeNamer {
-  static getRandomName(suffix: String) {
+  static getRandomName(suffix: string) {
     return adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + suffix;
   }
 }

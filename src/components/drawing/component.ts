@@ -143,7 +143,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
   onProjectionChanged(oldProj: string, newProj: string) {
     if (oldProj != null && oldProj != newProj) {
       const geoJson = new GeoJSON();
-      let features: DrawingFeature[] = [...this.drawingState.features];
+      const features: DrawingFeature[] = [...this.drawingState.features];
       features.forEach((f) => {
         // TODO Handle the case of disks
         f.geojson = geoJson.writeFeatureObject(

@@ -8,6 +8,11 @@ fi
 cordova create GeoGirafe dev.geomapfish.geogirafe GeoGirafe
 cd GeoGirafe
 cordova platform add android
+# TODO REG: Perhaps the following line could be necessary for iOS ?
+# cordova plugin add cordova-plugin-indexeddb
+# This plugin allow to detect online and offline mode, 
+# because the standard addEventListener('offline') does not work in the app
+cordova plugin add cordova-plugin-network-information
 cordova requirements
 
 # Copy sources of GeoGirafe to Cordova Project

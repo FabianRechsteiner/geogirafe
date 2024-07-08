@@ -168,8 +168,8 @@ class SearchComponent extends GirafeHTMLElement {
    */
   private displayCoordinates(term: string) {
     const matches = this.COORD_REGEX.exec(term)!;
-    let coord1 = parseFloat(matches[1].replace(',', '.'));
-    let coord2 = parseFloat(matches[2].replace(',', '.'));
+    const coord1 = parseFloat(matches[1].replace(',', '.'));
+    const coord2 = parseFloat(matches[2].replace(',', '.'));
 
     const current_srid = this.map.getView().getProjection().getCode();
     const [east_coord, north_coord] = parseCoordinates([coord1, coord2], this.maxExtent, current_srid);

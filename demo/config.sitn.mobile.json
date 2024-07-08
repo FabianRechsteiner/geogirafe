@@ -7,5 +7,9 @@
   },
   "map": {
     "constrainScales": false
+  },
+  "offline": {
+    "downloadStartZoom": 9,
+    "downloadEndZoom": 13
   }
 }
