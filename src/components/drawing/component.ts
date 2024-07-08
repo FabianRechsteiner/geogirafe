@@ -2,10 +2,11 @@ import Picker, { Color } from 'vanilla-picker';
 import DrawingFeature, { DrawingState, SerializedFeature, DrawingShape } from './drawingFeature';
 import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
-import GeoJSON from 'ol/format/GeoJSON';
+import { KML, GeoJSON, GPX } from 'ol/format';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { Callback } from '../../tools/state/statemanager';
+import { download } from '../../tools/download';
 import MapComponent from '../map/component';
 
 import minusIcon from './assets/minus.svg?raw';
@@ -14,6 +15,7 @@ import paintBrushIcon from './assets/paintbrush.svg?raw';
 import plusIcon from './assets/plus.svg?raw';
 import trashIcon from './assets/trash.svg?raw';
 import locateIcon from './assets/locate.svg?raw';
+import optionsIcon from './assets/options.svg?raw';
 
 let lastMouseX: number = 0;
 let lastMouseY: number = 0;
@@ -180,9 +182,54 @@ export default class DrawingComponent extends GirafeHTMLElement {
     nameInput.oninput = (e) => (feature.name = (e.target as HTMLInputElement).value);
     lineOne.appendChild(nameInput);
 
+    // Options menu
+    const optionsMenuDiv = this.createDiv('', 'optionsMenu');
+    if (feature.type != DrawingShape.Disk) {
+      const buttonGeoJson = document.createElement('button');
+      buttonGeoJson.innerText = 'Export as GeoJSON';
+      buttonGeoJson.addEventListener('click', () => this.exportFeature(feature, 'geojson'));
+      optionsMenuDiv.appendChild(buttonGeoJson);
+
+      const buttonKML = document.createElement('button');
+      buttonKML.innerText = 'Export as KML';
+      buttonKML.addEventListener('click', () => this.exportFeature(feature, 'kml'));
+      optionsMenuDiv.appendChild(buttonKML);
+    }
+    if (
+      feature.type == DrawingShape.Point ||
+      feature.type == DrawingShape.Polyline ||
+      feature.type == DrawingShape.FreehandPolyline
+    ) {
+      const buttonGPX = document.createElement('button');
+      buttonGPX.innerText = 'Export as GPX';
+      buttonGPX.addEventListener('click', () => this.exportFeature(feature, 'gpx'));
+      optionsMenuDiv.appendChild(buttonGPX);
+    }
+
+    optionsMenuDiv.style.display = 'none';
+    (this.shadowRoot?.querySelector('#panel') as HTMLElement).addEventListener(
+      'click',
+      () => (optionsMenuDiv.style.display = 'none')
+    );
+    container.appendChild(optionsMenuDiv);
+
     // Label options
     lineOne.appendChild(this.createDiv('', 'icon', minusIcon, () => feature.fontSize--));
     lineOne.appendChild(this.createDiv('', 'icon', plusIcon, () => feature.fontSize++));
+    lineOne.appendChild(
+      this.createDiv('', 'icon', optionsIcon, (e) => {
+        const isDisplayed = optionsMenuDiv.style.display == 'none';
+        Array.from(this.shadowRoot?.querySelectorAll('.optionsMenu')!).forEach(
+          (x) => ((x as HTMLElement).style.display = 'none')
+        );
+        if (isDisplayed) {
+          e.stopPropagation();
+          optionsMenuDiv.style.display = 'inline-block';
+        } else {
+          optionsMenuDiv.style.display = 'none';
+        }
+      })
+    );
 
     // Color Selector (Fill)
     const fill = this.createDiv('', 'icon', paintRollerIcon, setLastMousePosition);
@@ -247,6 +294,20 @@ export default class DrawingComponent extends GirafeHTMLElement {
   deleteFeature(feature: DrawingFeature) {
     if (confirm('Do you want to delete this feature ?')) {
       this.drawingState.features = this.drawingState.features.filter((f) => f.id != feature.id);
+    }
+  }
+
+  exportFeature(feature: DrawingFeature, format: 'geojson' | 'kml' | 'gpx') {
+    const olFeature = this.olDrawing.createOlFeature(feature);
+    switch (format) {
+      case 'geojson':
+        return download(new GeoJSON().writeFeature(olFeature), feature.name + '.geojson', '.geojson');
+      case 'kml':
+        return download(new KML().writeFeatures([olFeature]), feature.name + '.kml', '.kml');
+      case 'gpx':
+        return download(new GPX().writeFeatures([olFeature]), feature.name + '.gpx', '.gpx');
+      default:
+        console.warn(`Unsupported feature export format : ${format}`);
     }
   }
 }

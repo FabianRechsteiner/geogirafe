@@ -9,10 +9,12 @@
 }
 
 #panel #drawingListContainer {
-  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1;
 }
 
-#panel button {
+#panel #toolbar button {
   border: solid 1px var(--bkg-color);
   color: var(--text-color-grad2);
   height: 2.4rem;
@@ -22,11 +24,11 @@
   cursor: pointer;
 }
 
-#panel button:hover {
+#panel #toolbar button:hover {
   border: solid 1px var(--text-color-grad2);
 }
 
-#panel button.selected {
+#panel #toolbar button.selected {
   border: solid 1px var(--text-color-grad2);
   background-color: var(--text-color-grad2);
   color: var(--bkg-color);
@@ -39,13 +41,12 @@
 }
 
 #drawingList .featureLine {
-  display: inline-grid;
-  grid-auto-flow: column;
-  align-items: center;
+  display: flex;
   width: 100%;
 }
 
 #drawingList div.girafe {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   padding: 0.3rem;
@@ -54,6 +55,7 @@
 
 #drawingList input.name {
   border: none;
+  width: inherit;
 }
 
 #drawingList .icon {
@@ -61,6 +63,7 @@
   height: 14px;
   fill: var(--text-color);
   margin: 3px;
+  flex-shrink: 0;
 }
 
 #drawingList .icon:hover {
@@ -70,4 +73,30 @@
 .picker_wrapper.popup {
   position: fixed !important;
   transform: translate(-120%, -5%);
+}
+
+#panel .optionsMenu {
+  position: absolute;
+  z-index: 100;
+  top: 25px;
+  right: 5px;
+  background-color: var(--bkg-color);
+  border: 1px solid;
+  padding: 0;
+  width: 130px;
+}
+
+#panel .optionsMenu button {
+  padding: 5px;
+  width: 100%;
+  background-color: var(--bkg-color);
+  border: none;
+}
+
+#panel .optionsMenu button:hover {
+  background-color: var(--bkg-color-grad1);
+}
+
+#panel .optionsMenu button:active {
+  background-color: var(--bkg-color-grad2);
 }

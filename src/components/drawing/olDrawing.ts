@@ -50,22 +50,7 @@ export default class OlDrawing {
     features.forEach((feature) => {
       let olFeature = this.featuresMap.get(feature.id)?.feature;
       if (olFeature == undefined) {
-        // As GeoJson does not support disk, we check for our own case.
-        // We allow the any type, to avoid defining a generic type for all GeoJson standard + our implementation
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const geojson = feature.geojson as any;
-        if (geojson.geometry.type == 'Disk') {
-          olFeature = new Feature(new CircleGeom(geojson.geometry.center, geojson.geometry.radius));
-        } else {
-          let olFeatureDecoded;
-          if (geojson.geometry.type == 'GeometryCollection') {
-            // Compatibility of feature coming from Cesium
-            olFeatureDecoded = new GeoJSON().readFeatures(geojson.geometry.geometries[1])[0];
-          } else {
-            olFeatureDecoded = new GeoJSON().readFeatures(feature.geojson)[0];
-          }
-          olFeature = new Feature(olFeatureDecoded.getGeometry());
-        }
+        olFeature = this.createOlFeature(feature);
         this.featuresMap.set(feature.id, { feature: olFeature, shape: feature.type });
         this.drawingSource.addFeature(olFeature);
       }
@@ -112,6 +97,25 @@ export default class OlDrawing {
         feature.addToState();
       }
     }
+  }
+
+  createOlFeature(feature: DrawingFeature) {
+    let olFeature;
+    const geojson = feature.geojson as any;
+    if (geojson.geometry.type == 'Disk') {
+      olFeature = new Feature(new CircleGeom(geojson.geometry.center, geojson.geometry.radius));
+    } else {
+      let olFeatureDecoded;
+      if (geojson.geometry.type == 'GeometryCollection') {
+        // Compatibility of feature coming from Cesium
+        olFeatureDecoded = new GeoJSON().readFeatures(geojson.geometry.geometries[1])[0];
+      } else {
+        olFeatureDecoded = new GeoJSON().readFeatures(feature.geojson)[0];
+      }
+      olFeature = new Feature(olFeatureDecoded.getGeometry());
+    }
+    olFeature.setStyle(this.getStyle(feature, olFeature));
+    return olFeature;
   }
 
   activateTool(tool: DrawingShape) {
