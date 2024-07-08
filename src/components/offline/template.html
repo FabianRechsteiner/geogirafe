@@ -1,0 +1,14 @@
+<link rel="stylesheet" href="styles/common.mobile.css" />
+
+<button
+  class="${(this.state.isOffline || (this.downloadStartZoom && this.downloadStartZoom > this.state.position.zoom)) ? 'hidden' : 'offline-download girafe-button-big'}"
+  onclick="${() => this.exportData()}">
+  <img alt="download-icon" src="icons/offline-download.svg" />
+</button>
+
+<img class="${this.state.isOffline ? 'offline-status' : 'hidden'}" alt="offline-icon" src="icons/offline.svg" />
+
+<progress
+  class="${this.downloadInProgress ? 'progress-download' : 'hidden'}"
+  max="100"
+  value="${this.downloadProgressValue}"></progress>

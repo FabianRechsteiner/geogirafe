@@ -180,6 +180,9 @@ export default class State {
     elements: [] as InfoBoxContent[]
   };
 
+  // Indicates is the application is currently used in offline mode
+  isOffline: boolean = false;
+
   // The State object is defined as <not extensible> by the StateManager.
   // This property can be used by third-parts components or extensions
   // to add custom attributes to the state.

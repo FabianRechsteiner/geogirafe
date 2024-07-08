@@ -82,7 +82,7 @@ export default class CesiumDrawing {
 
   terminateShape(tool: DrawingShape) {
     const newCesiumEntityPoints = this.activeShapePoints.slice(0, this.activeShapePoints.length - 1);
-    let newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, new DrawingFeature(tool));
+    const newCesiumEntities = this.getShapes(tool, newCesiumEntityPoints, new DrawingFeature(tool));
     if (this.activeShapes) {
       this.activeShapes.forEach((e) => this.entities!.remove(e));
     }
@@ -101,7 +101,7 @@ export default class CesiumDrawing {
 
     if (tool == DrawingShape.Disk) {
       const center = Cesium.Ellipsoid.WGS84.cartesianToCartographic(
-        newCesiumEntities[0].position?.getValue(Cesium.JulianDate.now())!
+        newCesiumEntities[0].position!.getValue(Cesium.JulianDate.now())!
       );
       const centerCoord = [Cesium.Math.toDegrees(center.longitude), Cesium.Math.toDegrees(center.latitude)];
       newFeature.geojson = {

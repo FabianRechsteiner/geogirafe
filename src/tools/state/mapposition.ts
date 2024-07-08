@@ -2,9 +2,9 @@ import { Coordinate } from 'ol/coordinate';
 
 class MapPosition {
   center: Coordinate = [];
-  zoom: number | null = null;
+  zoom: number = 0;
   resolution: number = 100; /* dummy default value because it should never be null. It will be recalculated when the map will be created */
-  scale: number | null = 0;
+  scale: number = 0;
 
   get isValid() {
     if (Number.isNaN(this.resolution)) {

@@ -8,6 +8,7 @@ import ErrorManager from './tools/errormanager.js';
 import CsvManager from './tools/csvManager';
 import I18nManager from './tools/i18nmanager';
 import MessageManager from './tools/messagemanager';
+import OfflineManager from './tools/offline/offlinemanager';
 import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
 import ThemesManager from './tools/themesmanager';
@@ -57,6 +58,7 @@ declare global {
       state: State;
       stateManager: StateManager;
       shareManager: ShareManager;
+      offlineManager: OfflineManager;
     };
   }
   interface Window {
@@ -99,7 +101,8 @@ try {
   document.geogirafe = {
     state: StateManager.getInstance().state,
     stateManager: StateManager.getInstance(),
-    shareManager: ShareManager.getInstance()
+    shareManager: ShareManager.getInstance(),
+    offlineManager: OfflineManager.getInstance()
   };
 
   // Define components names

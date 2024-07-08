@@ -51,6 +51,7 @@ export default defineConfig({
         { src: `${cesiumSource}/Workers`, dest: cesiumBaseUrl },
         { src: `${cesiumSource}/Assets`, dest: cesiumBaseUrl },
         { src: `${cesiumSource}/Widgets`, dest: cesiumBaseUrl },
+        { src: 'service-worker.js', dest: '' },
         { src: 'src/styles/*.css', dest: 'styles/' },
         { src: 'node_modules/ol/ol.css', dest: 'lib/ol/' },
         { src: 'node_modules/gridjs/dist/theme/mermaid.min.css', dest: 'lib/gridjs/' },
