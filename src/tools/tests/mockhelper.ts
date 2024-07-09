@@ -1,6 +1,6 @@
 import ConfigManager from '../configuration/configmanager';
 import GirafeConfig from '../configuration/girafeconfig';
-import I18nManager from '../i18nmanager';
+import I18nManager from '../i18n/i18nmanager';
 
 class MockHelper {
   public static mockConfig = {
@@ -34,13 +34,17 @@ class MockHelper {
     },
     print: {
       url: 'https://print.url'
+    },
+    offline: {
+      downloadStartZoom: 5,
+      downloadEndZoom: 8
     }
   };
 
   public static startMocking() {
     // @ts-ignore
     ConfigManager.getInstance().config = new GirafeConfig(MockHelper.mockConfig);
-    I18nManager.getInstance().translations = { fr: {} };
+    I18nManager.getInstance().translations = { fr: { a: 'translated_a', b: 'translated_b' } };
   }
 
   public static stopMocking() {

@@ -1,6 +1,6 @@
-import ConfigManager from './configuration/configmanager';
-import StateManager from './state/statemanager';
-import GirafeSingleton from '../base/GirafeSingleton';
+import ConfigManager from '../configuration/configmanager';
+import StateManager from '../state/statemanager';
+import GirafeSingleton from '../../base/GirafeSingleton';
 
 /**
  * A dictionary that holds translation strings.
@@ -9,7 +9,7 @@ import GirafeSingleton from '../base/GirafeSingleton';
  *  'layer': 'couche'
  * }
  */
-type TranslationsDict = {
+export type TranslationsDict = {
   [lang: string]: string;
 };
 
@@ -44,7 +44,7 @@ class I18nManager extends GirafeSingleton {
     return parseFloat(`${number}`).toLocaleString(this.configManager.Config.general.locale);
   }
 
-  async #loadTranslations(language: string): Promise<TranslationsDict> {
+  private async loadTranslations(language: string): Promise<TranslationsDict> {
     if (this.loadingLanguagePromise) {
       // There's already a promise for loading translations
       // => return it instead of starting another request
@@ -59,7 +59,10 @@ class I18nManager extends GirafeSingleton {
 
     // Load translations
     this.loadingLanguagePromise = this.configManager.loadConfig().then(async () => {
-      if (this.configManager.Config && this.configManager.Config.languages.translations) {
+      if (
+        this.configManager.Config?.languages.translations &&
+        language in this.configManager.Config.languages.translations
+      ) {
         let mergedTranslations: TranslationsDict = {};
         // Translations are loaded in the order defined in the list of files
         // If an element is present in both results, the last value overwrite all the others
@@ -87,34 +90,35 @@ class I18nManager extends GirafeSingleton {
     if (translation !== undefined && translation !== null) {
       return translation;
     }
-    // console.log('no translation for ' + key);
     return key;
   }
 
-  translate(dom: DocumentFragment) {
-    if (this.stateManager.state && this.stateManager.state.language) {
-      this.#loadTranslations(this.stateManager.state.language).then(() => {
-        const toTranslate = dom.querySelectorAll('[i18n]');
-        toTranslate.forEach((item) => {
-          const key = item.getAttribute('i18n');
-          if (!key) {
-            return;
-          }
-          let translation: string;
-          if (item.hasAttribute('i18nFn')) {
-            translation = this.getFnTranslated(item, key);
-          } else {
-            translation = this.getTranslation(key);
-          }
-          if (item.hasAttribute('placeholder')) {
-            item.setAttribute('placeholder', translation);
-          } else {
-            // Default : simply set innerHTML.
-            item.innerHTML = translation;
-          }
-        });
-      });
+  async translate(dom: DocumentFragment): Promise<void> {
+    if (!this.stateManager.state?.language) {
+      return;
     }
+
+    await this.loadTranslations(this.stateManager.state.language);
+
+    const toTranslate = dom.querySelectorAll('[i18n]');
+    toTranslate.forEach((item) => {
+      const key = item.getAttribute('i18n');
+      if (!key) {
+        return;
+      }
+      let translation: string;
+      if (item.hasAttribute('i18nFn')) {
+        translation = this.getFnTranslated(item, key);
+      } else {
+        translation = this.getTranslation(key);
+      }
+      if (item.hasAttribute('placeholder')) {
+        item.setAttribute('placeholder', translation);
+      } else {
+        // Default : simply set innerHTML.
+        item.innerHTML = translation;
+      }
+    });
   }
 
   private getFnTranslated(item: Element, key: string): string {

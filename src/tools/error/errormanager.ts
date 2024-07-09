@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import GirafeSingleton from '../base/GirafeSingleton';
-import ConfigManager from './configuration/configmanager';
-import StateManager from './state/statemanager';
+import GirafeSingleton from '../../base/GirafeSingleton';
+import ConfigManager from '../configuration/configmanager';
+import StateManager from '../state/statemanager';
 
 class ErrorManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -46,8 +46,8 @@ ${stack}
 
     // Listen to all unhandled HTTPRequest rejections
     window.addEventListener('unhandledrejection', (error) => {
-      const title = `Unhandled rejection: ${error.reason.message}`;
-      const stack = error.reason.stack;
+      const title = `Unhandled rejection: ${error.reason?.message}`;
+      const stack = error.reason?.stack;
 
       this.stateManager.state.infobox.elements.push({
         id: uuidv4(),

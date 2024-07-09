@@ -1,5 +1,5 @@
 import type OlFeature from 'ol/Feature';
-import { deleteFeatureOlParams } from './olutils';
+import { deleteFeatureOlParams } from './utils/olutils';
 
 /**
  * Represents a grid data organized by unique ids.

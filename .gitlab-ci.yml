@@ -73,10 +73,23 @@ unittests:
     - npm ci
     - npm run test
 
+  artifacts:
+    paths:
+      - coverage/lcov.info
+
 #################################
 # Quality, readability, reliability and security checks with Sonarcloud
 sonarcloud-check:
   stage: test
+  needs:
+    - job: unittests
+      artifacts: true
+
+  rules:
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+    - when: never
+
   image:
     name: sonarsource/sonar-scanner-cli:5
     entrypoint: ['']
@@ -86,9 +99,6 @@ sonarcloud-check:
       - .sonar/cache
   script:
     - sonar-scanner
-  only:
-    - merge_requests
-    - main
 
 #################################
 # Static Application Security Testing with GitLab

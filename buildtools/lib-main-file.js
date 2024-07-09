@@ -16,7 +16,11 @@ const extractClassName = (filePath) => {
 const generateExportStatements = (mainFilePath, componentsPath) => {
   const exportStatements = [];
 
-  componentsPath.forEach((filePath) => {
+  for (const filePath of componentsPath) {
+    if (filePath.endsWith('.spec.ts')) {
+      // Do not manage test files
+      continue;
+    }
     console.log(`Handling ${filePath}`);
     const className = extractClassName(filePath);
     if (className) {
@@ -31,7 +35,7 @@ const generateExportStatements = (mainFilePath, componentsPath) => {
 
       exportStatements.push(`export { default as ${className} } from '${cleanPath}';`);
     }
-  });
+  }
 
   const outputFileContent = exportStatements.join('\n');
 

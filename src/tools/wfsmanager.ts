@@ -2,7 +2,6 @@ import { WFS } from 'ol/format';
 import GML3 from 'ol/format/GML3';
 
 import GirafeSingleton from '../base/GirafeSingleton';
-import MessageManager from './messagemanager';
 import StateManager from './state/statemanager';
 import { SelectionParam } from './state/state';
 import LayerWms from '../models/layers/layerwms';
@@ -10,7 +9,6 @@ import ServerWfs from '../models/serverwfs';
 import ConfigManager from './configuration/configmanager';
 
 export default class WfsManager extends GirafeSingleton {
-  messageManager: MessageManager;
   stateManager: StateManager;
   get state() {
     return this.stateManager.state;
@@ -24,7 +22,6 @@ export default class WfsManager extends GirafeSingleton {
     super(type);
 
     this.stateManager = StateManager.getInstance();
-    this.messageManager = MessageManager.getInstance();
     this.stateManager.subscribe(
       'selection.selectionParameters',
       (_oldParams: SelectionParam[], newParams: SelectionParam[]) => this.onSelectFeatures(newParams)

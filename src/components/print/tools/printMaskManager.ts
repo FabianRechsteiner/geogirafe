@@ -4,7 +4,7 @@ import Map, { FrameState } from 'ol/Map';
 import PrintMaskLayer from './printMaskLayer';
 import GeoConsts from '../../../tools/geoconsts';
 import StateManager from '../../../tools/state/statemanager';
-import { getOlayerByName } from '../../../tools/olutils';
+import { getOlayerByName } from '../../../tools/utils/olutils';
 import { Size } from 'ol/size';
 
 const PRINT_MASK_LAYER_NAME = 'PrintMask';

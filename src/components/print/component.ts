@@ -14,8 +14,8 @@ import PrintManager from './tools/PrintManager';
 import PrintMaskManager from './tools/printMaskManager';
 import { toDegrees, toRadians } from 'ol/math';
 import MapManager from '../../tools/state/mapManager';
-import I18nManager from '../../tools/i18nmanager';
-import { unByKeyAll } from '../../tools/olutils';
+import I18nManager from '../../tools/i18n/i18nmanager';
+import { unByKeyAll } from '../../tools/utils/olutils';
 import { padNumber } from 'ol/string';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 

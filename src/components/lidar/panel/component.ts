@@ -2,7 +2,7 @@ import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import LidarProfileConfig from '../tools/profileconfig';
 import DrawLine from '../tools/drawline';
 import MapManager from '../../../tools/state/mapManager';
-import CsvManager from '../../../tools/csvManager';
+import CsvManager from '../../../tools/export/csvmanager';
 import lidarProfileManager from '../tools/manager';
 import { LidarInterface } from '../tools/lidarinterface';
 

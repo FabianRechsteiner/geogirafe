@@ -1,7 +1,7 @@
 import type GroupLayer from '../../../models/layers/grouplayer';
 import type BaseLayer from '../../../models/layers/baselayer';
 import type MapManager from '../../../tools/state/mapManager';
-import type I18nManager from '../../../tools/i18nmanager';
+import type I18nManager from '../../../tools/i18n/i18nmanager';
 import type State from '../../../tools/state/state';
 
 import LayerWms from '../../../models/layers/layerwms';

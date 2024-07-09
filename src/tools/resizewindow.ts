@@ -1,4 +1,4 @@
-import { minMax } from './utils';
+import { minMax } from './utils/utils';
 
 /**
  * Enum representing different directions.

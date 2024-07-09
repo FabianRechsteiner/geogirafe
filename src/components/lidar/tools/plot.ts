@@ -17,7 +17,7 @@ import {
 import { LidarProfileManager } from './manager';
 import { LidarProfilePoints, LidarPoint } from './utils';
 import { LidarProfileServerConfigClassification, LidarProfileServerConfigClassifications } from './profileconfig';
-import I18nManager from '../../../tools/i18nmanager';
+import I18nManager from '../../../tools/i18n/i18nmanager';
 import { getLidarProfileCanvas, getLidarProfileContainer, getLidarProfileSvg } from './domselector';
 
 export default class {

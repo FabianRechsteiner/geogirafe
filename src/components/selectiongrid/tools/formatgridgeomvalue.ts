@@ -1,7 +1,7 @@
 import type OlGeomGeometry from 'ol/geom/Geometry';
 import { Circle, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
 import { getCenter } from 'ol/extent';
-import { polygonFromCircle } from '../../../tools/olutils';
+import { polygonFromCircle } from '../../../tools/utils/olutils';
 import { niceCoordinates } from '../../../tools/geometrytools';
 import IconCenter from '../images/center.svg';
 

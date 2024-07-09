@@ -24,7 +24,6 @@
   height: 0;
 }
 
-/* The slider */
 .slider {
   position: relative;
   cursor: pointer;
@@ -35,6 +34,7 @@
   -webkit-transition: 0.4s;
   transition: 0.4s;
   margin: 0 auto;
+  border-radius: 1rem;
 }
 
 .slider:before {
@@ -47,27 +47,15 @@
   background-color: var(--text-color-grad1);
   -webkit-transition: 0.4s;
   transition: 0.4s;
+  border-radius: 50%;
 }
 
-input:checked + .slider {
+.checked .slider {
   background-color: #222;
 }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #222;
-}
-
-input:checked + .slider:before {
+.checked .slider:before {
   -webkit-transform: translateX(18px);
   -ms-transform: translateX(18px);
   transform: translateX(18px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 1rem;
-}
-
-.slider.round:before {
-  border-radius: 50%;
 }

@@ -101,6 +101,7 @@ export default class OlDrawing {
 
   createOlFeature(feature: DrawingFeature) {
     let olFeature;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const geojson = feature.geojson as any;
     if (geojson.geometry.type == 'Disk') {
       olFeature = new Feature(new CircleGeom(geojson.geometry.center, geojson.geometry.radius));

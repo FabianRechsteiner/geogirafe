@@ -1,7 +1,6 @@
 import { render as uRender, html as uHtml, Hole } from 'uhtml';
 import tippy from 'tippy.js';
-import I18nManager from '../tools/i18nmanager';
-import MessageManager from '../tools/messagemanager';
+import I18nManager from '../tools/i18n/i18nmanager';
 import ConfigManager from '../tools/configuration/configmanager';
 import StateManager from '../tools/state/statemanager';
 import ComponentManager from '../tools/state/componentManager';
@@ -18,7 +17,6 @@ class GirafeHTMLElement extends HTMLElement {
 
   activeTooltips: TippyType[] = [];
 
-  messageManager: MessageManager;
   configManager: ConfigManager;
   stateManager: StateManager;
   componentManager: ComponentManager;
@@ -34,7 +32,6 @@ class GirafeHTMLElement extends HTMLElement {
     this.name = name;
 
     this.configManager = ConfigManager.getInstance();
-    this.messageManager = MessageManager.getInstance();
     this.stateManager = StateManager.getInstance();
     this.componentManager = ComponentManager.getInstance();
     this.componentManager.registerComponent(this);
@@ -71,20 +68,9 @@ class GirafeHTMLElement extends HTMLElement {
     return val === undefined || val === null || val === '';
   }
 
-  delayed(functionToWatch: () => boolean, functionToExecute: () => void) {
-    const observer = new MutationObserver((_mutations, obs) => {
-      if (functionToWatch()) {
-        functionToExecute();
-        obs.disconnect();
-      }
-    });
-
-    observer.observe(this.shadow, { childList: true, subtree: true });
-  }
-
-  getParentOfType(parentNodeName: string, elem: Node | null): Node | null {
+  getParentOfType(parentNodeName: string, elem: Node | null, initialElem: Node | null = elem): Node | null {
     // Stop case : we found null or an object of the right type
-    if (elem === null || elem.nodeName === parentNodeName) {
+    if (elem === null || (elem !== initialElem && elem.nodeName === parentNodeName)) {
       return elem;
     }
 
@@ -96,7 +82,7 @@ class GirafeHTMLElement extends HTMLElement {
       parent = elem.parentNode;
     }
 
-    return this.getParentOfType(parentNodeName, parent);
+    return this.getParentOfType(parentNodeName, parent, elem);
   }
 
   activateTooltips(arrow: boolean, delay: [number, number], defaultPlacement: string) {
@@ -184,6 +170,21 @@ class GirafeHTMLElement extends HTMLElement {
       this.displayStyle = getComputedStyle(this).display ?? 'block';
       if (this.displayStyle === 'none') {
         this.displayStyle = 'block';
+      }
+    }
+  }
+
+  /**
+   * In the templates, sometimes for accessibility reasons, we have to support the KeyDown Event
+   * In those case, we often juste want to do the same as the click event when Enter or Space is pressed
+   * Then this method can be used : it just calls the click event on the same element
+   */
+  simulateClick(e: KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const target = e.target as HTMLInputElement;
+      if (target) {
+        target.click();
       }
     }
   }

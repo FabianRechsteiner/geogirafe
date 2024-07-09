@@ -1,16 +1,21 @@
 <div class="container">
-  <label class="switch">
+  <label class="${this.state.interface.darkFrontendMode ? 'switch checked' : 'switch'}">
+    Dark mode on interface
     <input
-      id="frontendColorSwitcher"
       type="checkbox"
-      onclick="${() => this.state.interface.darkFrontendMode = !this.state.interface.darkFrontendMode}" />
-    <span tip="Dark mode on interface" class="slider round"></span>
+      onclick="${() => this.darkFrontendModeToggled()}"
+      onkeydown="${(e:KeyboardEvent) => this.simulateClick(e)}"
+      ?checked="${this.state.interface.darkFrontendMode}" />
+
+    <span tip="Dark mode on interface" class="slider"></span>
   </label>
-  <label class="switch">
+  <label class="${this.state.interface.darkMapMode ? 'switch checked' : 'switch'}">
+    Dark mode on map
     <input
-      id="mapColorSwitcher"
       type="checkbox"
-      onclick="${() => this.state.interface.darkMapMode = !this.state.interface.darkMapMode}" />
-    <span tip="Dark mode on map" class="slider round"></span>
+      onclick="${() => this.state.interface.darkMapMode = !this.state.interface.darkMapMode}"
+      onkeydown="${(e:KeyboardEvent) => this.simulateClick(e)}"
+      ?checked="${this.state.interface.darkMapMode}" />
+    <span tip="Dark mode on map" class="slider"></span>
   </label>
 </div>

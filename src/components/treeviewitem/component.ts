@@ -64,7 +64,6 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     // Manage Legend
     if (this.layer.legend) {
       if (this.layer.legendImage) {
-        // TODO REG : remove this ! when a refactoring of the Layer class has been done
         this.legendUrls[this.layer.layers!] = this.layer.legendImage;
       } else {
         this.legendUrls = this.getLegendImageUrlFromWms(false);
@@ -78,7 +77,6 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     }
 
     const legends: Record<string, string> = {};
-    // TODO REG : remove this ! when a reactoring of the Layer class has been done
     for (const l of this.layer.layers!.split(',')) {
       const wmsSource = new ImageWMS({
         url: this.layer.ogcServer.url,

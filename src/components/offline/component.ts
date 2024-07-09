@@ -32,13 +32,8 @@ class OfflineComponent extends GirafeHTMLElement {
     });
   }
 
-  // TODO REG : Add UT : should work without basemaps
   exportData() {
-    // Get the list of all active WMTS Layers
-    const basemapLayers = (this.stateManager.state.activeBasemap?.layersList.filter((l) => l instanceof LayerWmts) ||
-      []) as LayerWmts[];
-    const activeLayers = this.state.layers.layersList.filter((l) => l instanceof LayerWmts && l.active) as LayerWmts[];
-    const allWmtsLayers = [...basemapLayers, ...activeLayers];
+    const allWmtsLayers = this.getAllWmtsLayers();
 
     const message = `This will export all the data for the layers [${allWmtsLayers.map((l) => l.name).join(', ')}].`;
     if (confirm(message)) {
@@ -49,6 +44,17 @@ class OfflineComponent extends GirafeHTMLElement {
       const bbox = map.getView().calculateExtent(map.getSize());
       this.offlineManager.exportWMTSTiles(bbox, allWmtsLayers, this.progressCallback.bind(this));
     }
+  }
+
+  /**
+   * Gets the list of all active WMTS layers
+   */
+  private getAllWmtsLayers() {
+    const basemapLayers = (this.stateManager.state.activeBasemap?.layersList.filter((l) => l instanceof LayerWmts) ||
+      []) as LayerWmts[];
+    const activeLayers = this.state.layers.layersList.filter((l) => l instanceof LayerWmts && l.active) as LayerWmts[];
+    const allWmtsLayers = [...basemapLayers, ...activeLayers];
+    return allWmtsLayers;
   }
 
   progressCallback(progress: number) {

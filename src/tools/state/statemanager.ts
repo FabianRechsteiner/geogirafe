@@ -1,5 +1,4 @@
-/* eslint @typescript-eslint/no-explicit-any: 1 */
-// TODO REG : Deactivate this exception in eslint when this type-error will be solved
+/* eslint @typescript-eslint/no-explicit-any: 0 */
 
 import GirafeSingleton from '../../base/GirafeSingleton';
 import State from './state';

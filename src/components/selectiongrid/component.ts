@@ -1,7 +1,7 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import type { Callback } from '../../tools/state/statemanager';
 import type OlFeature from 'ol/Feature';
-import { debounce } from '../../tools/debounce';
+import { debounce } from '../../tools/utils/debounce';
 import SelectionGridManager from './tools/selectiongridmanager';
 import type { TabHeader } from './tools/selectiongridmanager';
 

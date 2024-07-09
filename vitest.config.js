@@ -4,6 +4,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: 'src/tools/tests/globalmocking.ts'
+    setupFiles: 'src/tools/tests/globalmocking.ts',
+    coverage: {
+      reporter: ['text', 'lcov'],
+      exclude: ['buildtools', 'demo', 'public']
+    }
   }
 });

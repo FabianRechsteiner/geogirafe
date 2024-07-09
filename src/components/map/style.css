@@ -133,20 +133,6 @@ input[type='range']::-moz-range-thumb {
   white-space: nowrap;
 }
 
-/* TODO REG: Verify styling on Edge and Safari */
-/*
-input[type=range]::-ms-thumb {
-  margin-top: 1px;
-  box-shadow: 0px 0px 0px 50555C;
-  border: 2px solid #50555C;
-  height: 14px;
-  width: 40px;
-  border-radius: 5px;
-  background: #FFFFFF;
-  cursor: pointer;
-}
-*/
-
 @media screen and (max-width: 1000px) {
   .ol-zoom {
     top: 46vh !important;

@@ -3,8 +3,8 @@ import type { LidarProfilePoints } from './utils';
 import LidarProfileUtils from './utils';
 import LidarProfilePlot from './plot';
 import LidarProfileMeasure from './measure';
-import { debounce } from '../../../tools/debounce';
-import I18nManager from '../../../tools/i18nmanager';
+import { debounce } from '../../../tools/utils/debounce';
+import I18nManager from '../../../tools/i18n/i18nmanager';
 
 import olLayerVector from 'ol/layer/Vector';
 import olOverlay from 'ol/Overlay';

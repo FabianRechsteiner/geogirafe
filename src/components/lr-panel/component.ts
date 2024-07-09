@@ -1,5 +1,5 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
-import StateToggleManager from '../../tools/stateToggleManager';
+import StateToggleManager from '../../tools/state/stateToggleManager';
 
 /**
  * A panel component that extends GirafeResizableElement.

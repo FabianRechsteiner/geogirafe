@@ -5,7 +5,7 @@
     id="name"
     type="text"
     placeholder="Enter name..."
-    onkeypress="${(e: KeyboardEvent) => { if (e.key === 'Enter') this.saveBookmark(); }}" />
+    onkeydown="${(e: KeyboardEvent) => { if (e.key === 'Enter') this.saveBookmark(); }}" />
 
   <button tip="Add bookmark" onclick="${() => this.saveBookmark()}">
     <i class="fa-sm fa-solid fa-check"></i>

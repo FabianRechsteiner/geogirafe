@@ -1,5 +1,5 @@
 import type OlFeature from 'ol/Feature';
-import I18nManager from '../../../tools/i18nmanager';
+import I18nManager from '../../../tools/i18n/i18nmanager';
 import FeatureToGridDataById, { GridData } from '../../../tools/featuretogriddatabyid';
 import OlGeomGeometry from 'ol/geom/Geometry';
 import { html, Grid } from 'gridjs';
