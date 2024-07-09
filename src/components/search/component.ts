@@ -395,7 +395,7 @@ class SearchComponent extends GirafeHTMLElement {
         this.state.position.center = getCenter(extent);
       }
     }
-    // Otherwise, if the serached object is already in the current map extent
+    // Otherwise, if the searched object is already in the current map extent
     // We do nothing
   }
 

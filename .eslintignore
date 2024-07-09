@@ -1,4 +1,3 @@
 src/tools/tests
 src/typings
 *.spec.ts
-src/main.lib.d.ts

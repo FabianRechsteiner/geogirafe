@@ -6,7 +6,7 @@ import {
   createTestLayerWmts,
   createTestOgcServer
 } from '../../../tools/tests/layerhelpers';
-import I18nManager from '../../../tools/i18nmanager';
+import I18nManager from '../../../tools/i18n/i18nmanager';
 import MapManager from '../../../tools/state/mapManager';
 import StateManager from '../../../tools/state/statemanager';
 import MockHelper from '../../../tools/tests/mockhelper';

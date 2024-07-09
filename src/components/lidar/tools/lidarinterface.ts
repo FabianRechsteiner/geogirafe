@@ -6,7 +6,7 @@ import StateManager from '../../../tools/state/statemanager';
 
 import type OlGeomLineString from 'ol/geom/LineString';
 import type LidarProfileConfig from './profileconfig';
-import type CsvManager from '../../../tools/csvManager';
+import type CsvManager from '../../../tools/export/csvmanager';
 import type { LidarProfileServerConfigClassification, LidarProfileServerConfigPointAttribute } from './profileconfig';
 
 /**

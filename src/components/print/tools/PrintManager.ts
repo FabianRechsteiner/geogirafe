@@ -4,7 +4,7 @@ import type Feature from 'ol/Feature';
 import type Geometry from 'ol/geom/Geometry';
 import type { EncodeLegendOptions, MFPLegendClass } from './MFPLegendEncoder';
 import type State from '../../../tools/state/state';
-import type I18nManager from '../../../tools/i18nmanager';
+import type I18nManager from '../../../tools/i18n/i18nmanager';
 import type MapManager from '../../../tools/state/mapManager';
 import type { MFPPrintDatasource } from './MFPTypes';
 
@@ -17,7 +17,7 @@ import {
 } from '@geoblocks/mapfishprint';
 import { MFPLegendEncoder } from './MFPLegendEncoder';
 import MFPEncoder from './MFPEncoder';
-import { deleteFeatureOlParams } from '../../../tools/olutils';
+import { deleteFeatureOlParams } from '../../../tools/utils/olutils';
 import { intersects } from 'ol/extent';
 
 /**

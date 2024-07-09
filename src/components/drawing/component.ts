@@ -6,7 +6,7 @@ import { KML, GeoJSON, GPX } from 'ol/format';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { Callback } from '../../tools/state/statemanager';
-import { download } from '../../tools/download';
+import { download } from '../../tools/export/download';
 import MapComponent from '../map/component';
 
 import minusIcon from './assets/minus.svg?raw';
@@ -219,7 +219,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
     lineOne.appendChild(
       this.createDiv('', 'icon', optionsIcon, (e) => {
         const isDisplayed = optionsMenuDiv.style.display == 'none';
-        Array.from(this.shadowRoot?.querySelectorAll('.optionsMenu')!).forEach(
+        Array.from(this.shadowRoot!.querySelectorAll('.optionsMenu')).forEach(
           (x) => ((x as HTMLElement).style.display = 'none')
         );
         if (isDisplayed) {

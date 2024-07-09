@@ -4,15 +4,13 @@ import tippy from 'tippy.js';
 import State from './tools/state/state.js';
 
 import ConfigManager from './tools/configuration/configmanager';
-import ErrorManager from './tools/errormanager.js';
-import CsvManager from './tools/csvManager';
-import I18nManager from './tools/i18nmanager';
-import MessageManager from './tools/messagemanager';
+import ErrorManager from './tools/error/errormanager.js';
+import CsvManager from './tools/export/csvmanager.js';
+import I18nManager from './tools/i18n/i18nmanager.js';
 import OfflineManager from './tools/offline/offlinemanager';
 import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
 import ThemesManager from './tools/themesmanager';
-import UrlManager from './tools/urlmanager';
 import WfsManager from './tools/wfsmanager';
 
 import AboutComponent from './components/about/component';
@@ -92,9 +90,7 @@ try {
   ErrorManager.getInstance();
   CsvManager.getInstance();
   I18nManager.getInstance();
-  MessageManager.getInstance();
   ThemesManager.getInstance();
-  UrlManager.getInstance();
   WfsManager.getInstance();
 
   // Add the state to document, so that it will be accessible everywhere

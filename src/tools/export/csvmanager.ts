@@ -1,8 +1,8 @@
 import { download } from './download';
-import GirafeSingleton from '../base/GirafeSingleton';
-import ConfigManager from './configuration/configmanager';
-import I18nManager from './i18nmanager';
-import GirafeConfig from './configuration/girafeconfig';
+import GirafeSingleton from '../../base/GirafeSingleton';
+import ConfigManager from '../configuration/configmanager';
+import I18nManager from '../i18n/i18nmanager';
+import GirafeConfig from '../configuration/girafeconfig';
 
 /**
  * Definition for grid columns.

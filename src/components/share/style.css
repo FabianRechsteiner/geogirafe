@@ -63,11 +63,16 @@
   display: flex;
 }
 
-.social img {
-  width: 3rem;
+.social button {
   margin: auto;
   margin-top: 3rem;
   cursor: pointer;
+  border: none;
+  background-color: transparent;
+}
+
+.social img {
+  width: 3rem;
   opacity: 0.7;
 }
 

@@ -6,7 +6,7 @@ import { fromCircle } from 'ol/geom/Polygon.js';
 
 import { unByKey } from 'ol/Observable';
 import { Circle } from 'ol/geom';
-import GeoConsts from './geoconsts';
+import GeoConsts from '../geoconsts';
 
 /**
  * Unsubscribe to all OpenLayer listeners.

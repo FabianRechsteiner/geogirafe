@@ -13,7 +13,7 @@ import type {
   LidarProfileServerConfigClassifications,
   LidarProfileServerConfigLevels
 } from './profileconfig';
-import I18nManager from '../../../tools/i18nmanager';
+import I18nManager from '../../../tools/i18n/i18nmanager';
 import { getLidarProfileCanvas, getLidarProfileSvg } from './domselector';
 import { Buffer } from 'buffer';
 

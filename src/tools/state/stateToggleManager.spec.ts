@@ -1,8 +1,8 @@
 import { it, describe, expect, beforeAll, afterAll } from 'vitest';
 import StateToggleManager from './stateToggleManager';
-import MockHelper from './tests/mockhelper';
-import StateManager from './state/statemanager';
-import State from './state/state';
+import MockHelper from '../tests/mockhelper';
+import StateManager from '../state/statemanager';
+import State from '../state/state';
 let stateManager: StateManager;
 
 beforeAll(() => {

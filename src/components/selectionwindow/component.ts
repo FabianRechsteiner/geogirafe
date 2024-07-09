@@ -1,11 +1,11 @@
 import type OlFeature from 'ol/Feature';
 import { getCenter } from 'ol/extent';
 import GirafeDraggableElement from '../../base/GirafeDraggableElement';
-import { debounce } from '../../tools/debounce';
+import { debounce } from '../../tools/utils/debounce';
 import type { Callback } from '../../tools/state/statemanager';
 import type { GridDataById } from '../../tools/featuretogriddatabyid';
 import FeatureToGridDataById from '../../tools/featuretogriddatabyid';
-import { getValidIndex } from '../../tools/utils';
+import { getValidIndex } from '../../tools/utils/utils';
 import IconCenter from './images/center.svg';
 import ResizeWindow from '../../tools/resizewindow';
 

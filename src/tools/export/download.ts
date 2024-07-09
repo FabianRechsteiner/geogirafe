@@ -1,4 +1,4 @@
-import { isSafari } from './utils';
+import { isSafari } from '../utils/utils';
 import { saveAs } from 'file-saver';
 
 /**

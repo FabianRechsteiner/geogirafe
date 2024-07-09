@@ -28,10 +28,18 @@
       </div>
 
       <div class="social">
-        <img alt="share-facebook" src="${this.facebookLogo}" onclick="${() => this.shareFacebook()}" />
-        <img alt="share-twitter" src="${this.twitterLogo}" onclick="${() => this.shareTwitter()}" />
-        <img alt="share-linkedin" src="${this.linkedInLogo}" onclick="${() => this.shareLinkedIn()}" />
-        <img alt="share-mail" src="${this.mailLogo}" onclick="${() => this.shareMail()}" />
+        <button onclick="${() => this.shareFacebook()}">
+          <img alt="share-facebook" src="${this.facebookLogo}" />
+        </button>
+        <button onclick="${() => this.shareTwitter()}">
+          <img alt="share-twitter" src="${this.twitterLogo}" />
+        </button>
+        <button onclick="${() => this.shareLinkedIn()}">
+          <img alt="share-linkedin" src="${this.linkedInLogo}" />
+        </button>
+        <button onclick="${() => this.shareMail()}">
+          <img alt="share-mail" src="${this.mailLogo}" />
+        </button>
       </div>
     </div>
   </div>
