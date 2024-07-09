@@ -44,7 +44,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
     { elem: null, selector: '#freepolygon', tool: DrawingShape.FreehandPolygon }
   ];
   toolSelected: Element | null = null;
-  drawingList: Element | null = null;
 
   olDrawing: OlDrawing;
   cesiumDrawing: CesiumDrawing;
@@ -68,7 +67,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.activateTooltips(false, [800, 0], 'top-end');
     this.buttons.forEach((b) => (b.elem = this.shadow.querySelector(b.selector)));
     this.toolSelected = this.buttons[0].elem;
-    this.drawingList = this.shadow.querySelector('#drawingList');
     this.state.selection.enabled = false;
     this.registerEvents();
   }
@@ -81,21 +79,21 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.eventsCallbacks.push(
-      this.stateManager.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news)),
-      this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news))
-    );
-    this.buttons.forEach((b) => b.elem?.addEventListener('click', () => this.setTool(b.elem!, b.tool)));
+    if (this.eventsCallbacks.length == 0) {
+      this.eventsCallbacks.push(
+        this.stateManager.subscribe('extendedState.drawing.features', (olds, news) =>
+          this.onFeaturesChanged(olds, news)
+        ),
+        this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news))
+      );
+      this.buttons.forEach((b) => b.elem?.addEventListener('click', () => this.setTool(b.elem!, b.tool)));
+    }
   }
 
   unregisterEvents() {
     this.stateManager.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
     this.buttons.forEach((b) => b.elem?.removeEventListener('click', () => this.setTool(b.elem!, b.tool)));
-  }
-
-  registerVisibilityEvents() {
-    this.stateManager.subscribe('interface.drawingPanelVisible', (_, newValue) => this.togglePanel(newValue));
   }
 
   serialize() {
@@ -118,7 +116,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      this.registerVisibilityEvents();
+      this.stateManager.subscribe('interface.drawingPanelVisible', (_, newValue) => this.togglePanel(newValue));
     });
   }
 
@@ -278,7 +276,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
     container.appendChild(lineOne);
     container.appendChild(lineTwo);
-    this.drawingList?.appendChild(container);
+    this.shadow.querySelector('#drawingList')?.appendChild(container);
   }
 
   removeFeatureFromList(feature: DrawingFeature) {

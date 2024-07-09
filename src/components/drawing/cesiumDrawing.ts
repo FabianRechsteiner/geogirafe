@@ -18,7 +18,6 @@ export default class CesiumDrawing {
   activeShapePoints: Cartesian3[] = [];
   activeShapes: Entity[] | undefined = undefined;
   floatingPoint: Entity | undefined = undefined;
-
   scene: Cesium.Scene | undefined = undefined;
   handler: Cesium.ScreenSpaceEventHandler | undefined = undefined;
   entities: Cesium.EntityCollection | undefined = undefined;
@@ -134,7 +133,6 @@ export default class CesiumDrawing {
   updateShape(tool: DrawingShape) {
     return (event: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
       const newPosition = this.pickOnGlobe(event.endPosition);
-
       if (Cesium.defined(newPosition)) {
         if (Cesium.defined(this.activeShapes)) {
           if (tool == DrawingShape.FreehandPolyline || tool == DrawingShape.FreehandPolygon) {
@@ -155,7 +153,6 @@ export default class CesiumDrawing {
       // If the cursor is pointing in the map
       if (Cesium.defined(earthPosition)) {
         this.activeShapePoints.push(earthPosition);
-
         if (this.activeShapePoints.length === 1) {
           this.activeShapePoints.push(earthPosition); // Add a point for the one under the cursor
           this.activeShapes = this.getShapes(tool, this.activeShapePoints, new DrawingFeature(tool));
@@ -293,7 +290,10 @@ export default class CesiumDrawing {
         return [
           new Cesium.Entity({
             polygon: {
-              hierarchy: new Cesium.CallbackProperty(() => new Cesium.PolygonHierarchy(positions), false),
+              hierarchy: new Cesium.CallbackProperty(
+                () => new Cesium.PolygonHierarchy([...positions, positions[0]]),
+                false
+              ),
               material: fillColor
             },
             polyline: this.generateEntityOutline(() => [...positions, positions[0]], feature)
@@ -314,7 +314,10 @@ export default class CesiumDrawing {
         return [
           new Cesium.Entity({
             polygon: {
-              hierarchy: new Cesium.CallbackProperty(() => new Cesium.PolygonHierarchy([...positions]), false),
+              hierarchy: new Cesium.CallbackProperty(
+                () => new Cesium.PolygonHierarchy([...positions, positions[0]]),
+                false
+              ),
               material: fillColor
             },
             polyline: this.generateEntityOutline(() => [...positions, positions[0]], feature)
