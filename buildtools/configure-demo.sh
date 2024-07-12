@@ -134,7 +134,7 @@ then
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/it.json $APPDIR/it.json
     curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://map.geo.ti.ch/static/dummy/en.json" --silent --output $MOCKDIR/en.json
+    curl "https://map.geo.ti.ch/static/dummy/it.json" --silent --output $MOCKDIR/it.json
     curl "https://map.geo.ti.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 else
