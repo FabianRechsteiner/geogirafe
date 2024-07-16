@@ -141,7 +141,7 @@ if "%1"=="ticino" (
     copy demo\config.ticino.json %APPDIR%\config.json /Y
     copy demo\it.json %APPDIR%\it.json /Y
     curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
-    curl "https://map.geo.ti.ch/static/dummy/en.json" --output %OUTPUTDIR%\en.json
+    curl "https://map.geo.ti.ch/static/dummy/it.json" --output %OUTPUTDIR%\it.json
     curl "https://map.geo.ti.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )

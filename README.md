@@ -95,7 +95,7 @@ npm run configure-demo <environment>
 npm run configure-demo-win <environment>
 ```
 
-This will automatically copy the `config.yaml` file in the right place, and download the needed Mock objects.
+This will automatically copy the `config.json` file in the right place, and download the needed Mock objects.
 
 > Please note that today, the GeoGirafe Viewer is using a backend based on GeoMapFish.
 > The services you will have to use in your configuration must therefore be compliant with GeoMapFish.
@@ -143,8 +143,6 @@ npm run publish-lib --access public
 
 Make sure you have build the application for production before with `npm run build`.  
 The file `config.json` present in the `dist\app` directory will be used.
-
-### Build the library
 
 ```bash
 npm run build-apk
