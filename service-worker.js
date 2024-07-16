@@ -55,19 +55,23 @@ function handleInstall() {
 
 async function handleFetchEvent(event) {
   let response = await fetchAndCache(event.request);
-  if (!response) {
-    // Fetch was unsuccessful. We try to load the data from cache.
-    response = await loadFromCache(event.request);
-  }
-  if (!response) {
-    // Not found in cache. We try to load from indexedDB
-    response = await loadFromIndexedDB(event.request);
-  }
-  if (!response) {
-    // Cannot fetch and not found anywhere.
-    // TODO REG: Should we use another response code here?
-    // return new Response(null, { status: 503 });
-    response = new Response(null, { status: 204 });
+
+  // Use cache only for GET queries
+  if (event.request.method === 'GET') {
+    if (!response) {
+      // Fetch was unsuccessful. We try to load the data from cache.
+      response = await loadFromCache(event.request);
+    }
+    if (!response) {
+      // Not found in cache. We try to load from indexedDB
+      response = await loadFromIndexedDB(event.request);
+    }
+    if (!response) {
+      // Cannot fetch and not found anywhere.
+      // TODO REG: Should we use another response code here?
+      // return new Response(null, { status: 503 });
+      response = new Response(null, { status: 204 });
+    }
   }
 
   return response;
@@ -81,7 +85,7 @@ async function fetchAndCache(request) {
   let response;
   try {
     response = await fetch(request);
-    if (cacheCount < maxCacheCount && response.type !== 'opaque') {
+    if (cacheCount < maxCacheCount && request.method === 'GET' && response.type !== 'opaque') {
       // Fetch was successful. We cache the result if necessary and return the response.
       cacheCount++;
       console.debug(`SW ${cacheCount}/${maxCacheCount} caching ${request.url} for offline use.`);
