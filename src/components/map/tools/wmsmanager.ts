@@ -105,7 +105,7 @@ export default class WmsManager {
     const imageType = layerList[0].ogcServer.imageType;
     // Same check for imageType
     const sameImageTypeForAll = layerList.every((layer: LayerWms) => {
-      return layer.ogcServer.url === url;
+      return layer.ogcServer.imageType === imageType;
     });
     if (!sameImageTypeForAll) {
       throw new Error('Not all layers of this list have the same image type. We should not be in this function.');
