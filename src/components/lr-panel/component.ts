@@ -11,10 +11,8 @@ import StateToggleManager from '../../tools/state/stateToggleManager';
  * To have the toggle on the state working, the component must have this structure, with
  * a slot="main" and children with the data-toggle-path set:
  * <girafe-lr-panel>
- *   <div slot="main">
- *     <any data-toggle-path="my.state.path1.to.boolean"></any>
- *     <any data-toggle-path="my.state.path2.to.boolean"></any>
- *   </div>
+ *   <any slot="main" data-toggle-path="my.state.path1.to.boolean"></any>
+ *   <any slot="main" data-toggle-path="my.state.path2.to.boolean"></any>
  * </girafe-lr-panel>
  */
 class LRPanelComponent extends GirafeResizableElement {
@@ -25,7 +23,12 @@ class LRPanelComponent extends GirafeResizableElement {
   constructor() {
     super('lr-panel');
     this.render();
-    this.panel?.classList.add(this.dock);
+
+    // Add the dock mode as class on the panel to allow setting differents styles
+    // depending on the docking position
+    const panel = this.shadow.getElementById('panel');
+    panel?.classList.add(this.dock);
+
     const togglePaths = this.retrieveTogglePaths();
     this.stateToggleManager = new StateToggleManager(togglePaths, this.stateManager);
     this.showOnChildChange(togglePaths);
@@ -43,17 +46,15 @@ class LRPanelComponent extends GirafeResizableElement {
    * Retrieve the (valid boolean) toggle paths from child elements of the main slot.
    */
   private retrieveTogglePaths(): string[] {
-    const slots = [...(this.panel?.querySelectorAll('slot') || [])];
-    const mainSlot = slots.filter((node) => node.name === 'main')[0];
-    const slotContent = mainSlot.assignedNodes()[0] as HTMLElement;
-    const elements = [...slotContent.children] as HTMLElement[];
+    const elements = this.shadow.querySelectorAll('slot')[0].assignedNodes();
     const togglePaths: string[] = [];
-    [...elements].forEach((element) => {
-      const togglePath = element.dataset['togglePath'];
+    for (const element of elements) {
+      const togglePath = (element as HTMLElement).dataset['togglePath'];
       if (togglePath) {
         togglePaths.push(togglePath);
       }
-    });
+    }
+
     return StateToggleManager.filterValidTogglePaths(this.stateManager, togglePaths);
   }
 

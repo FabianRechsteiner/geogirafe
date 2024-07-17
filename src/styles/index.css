@@ -174,6 +174,8 @@ girafe-search {
 
 .panel-left {
   width: 25rem;
+  min-width: 20rem;
+  max-width: 50rem;
   box-shadow:
     0 1px 2px rgba(60, 64, 67, 0.3),
     0 1px 3px 1px rgba(60, 64, 67, 0.15);
@@ -181,7 +183,8 @@ girafe-search {
 
 .panel-right {
   width: 20rem;
-  min-width: 20rem; /* Copy me inside every final child. */
+  min-width: 20rem;
+  max-width: 40rem;
   box-shadow:
     0 -1px 2px rgba(60, 64, 67, 0.3),
     0 -1px 3px 1px rgba(60, 64, 67, 0.15);
