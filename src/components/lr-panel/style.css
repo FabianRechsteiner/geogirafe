@@ -87,9 +87,3 @@ slot {
   border-color: #000;
   color: var(--text-color);
 }
-
-@media screen and (max-width: 1000px) {
-  .panel {
-    width: 18rem;
-  }
-}

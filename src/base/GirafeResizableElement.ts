@@ -10,12 +10,8 @@ Example:
 
 <div id="panel" dock="left">
   <div id="gutter"></div>
-  <div id="hide">
-    <i class="fa-solid"></i>
-  </div>
-  <div id="close">
-    <i class="fa-solid"></i>
-  </div>
+  <div id="hide"></div>
+  <div id="close"></div>
 </div>
 
 Then in order to make an component resizable,
@@ -26,27 +22,26 @@ That's it.
 */
 
 class GirafeResizableElement extends GirafeHTMLElement {
-  panel?: HTMLElement;
-  panelRect?: DOMRect;
   gutter?: HTMLElement;
   hideButton?: HTMLElement;
   closeButton?: HTMLElement;
   dock: 'left' | 'right' | 'bottom';
   prevX = 0;
   prevY = 0;
-  toggleHeight?: number;
-  toggleWidth?: number;
+
+  toggleSize: number = 0;
+
   lastWidth = 0;
+  minWidth?: number;
+  maxWidth?: number;
+
   lastHeight = 0;
-  hideWidth = 0;
+  minHeight?: number;
+  maxHeight?: number;
 
-  get host(): HTMLElement {
-    return (this.shadow.getRootNode() as ShadowRoot).host as HTMLElement;
-  }
-
-  constructor(component: string) {
+  constructor(component: string, docking?: 'left' | 'right' | 'bottom') {
     super(component);
-    const dock = this.getAttribute('dock');
+    const dock = docking ?? this.getAttribute('dock');
     if (!dock) {
       this.dock = 'right';
     } else if (dock === 'left' || dock === 'right' || dock === 'bottom') {
@@ -56,190 +51,181 @@ class GirafeResizableElement extends GirafeHTMLElement {
     }
   }
 
-  render() {
+  public render() {
     this.restoreLastDimensions();
     super.render();
     this.makeResizable();
   }
 
-  makeResizable() {
-    this.panel = this.shadow.querySelector('#panel')!;
+  public makeResizable() {
     this.gutter = this.shadow.querySelector('#gutter')!;
-    this.gutter.onmousedown = (e) => this.#mousedown(e);
-    this.gutter.ondblclick = () => this.#togglePanel();
-    this.hideButton = this.shadow.getElementById('hide')!;
+    this.gutter.onmousedown = (e) => this.mousedown(e);
+    this.gutter.ondblclick = () => this.togglePanelInternal();
+
+    this.hideButton = this.shadow.getElementById('hide') || undefined;
     if (this.hideButton) {
-      this.hideButton.onclick = () => this.#togglePanel();
+      this.hideButton.onclick = () => this.togglePanelInternal();
     }
-    this.closeButton = this.shadow.getElementById('close')!;
+    this.closeButton = this.shadow.getElementById('close') || undefined;
     if (this.closeButton) {
       this.closeButton.onclick = () => this.closePanel();
     }
+
+    this.toggleSize =
+      this.dock === 'bottom' ? this.gutter.getBoundingClientRect().height : this.gutter.getBoundingClientRect().width;
+    this.initSizeLimits();
   }
 
-  #mousedown(e: MouseEvent) {
+  private initSizeLimits() {
+    // If there is a configured minWidth or maxWidth, we have to take care of it
+    const css = getComputedStyle(this);
+    const minWidth = parseFloat(css.minWidth);
+    this.minWidth = isNaN(minWidth) ? undefined : minWidth;
+
+    const maxWidth = parseFloat(css.maxWidth);
+    this.maxWidth = isNaN(maxWidth) ? undefined : maxWidth;
+
+    const minHeight = parseFloat(css.minHeight);
+    this.minHeight = isNaN(minHeight) ? undefined : minHeight;
+
+    const maxHeight = parseFloat(css.maxHeight);
+    this.maxHeight = isNaN(maxHeight) ? undefined : maxHeight;
+  }
+
+  private mousedown(e: MouseEvent) {
     e.preventDefault();
-    document.onmousemove = (e) => this.#mousemove(e);
-    document.onmouseup = () => this.#mouseup();
+    document.onmousemove = (e) => this.mousemove(e);
+    document.onmouseup = () => this.mouseup();
 
     this.prevX = e.x;
     this.prevY = e.y;
-    this.panelRect = this.panel!.getBoundingClientRect();
-    if (this.hideButton) {
-      this.hideWidth = this.hideButton.getBoundingClientRect().width;
+
+    this.lastWidth = parseFloat(getComputedStyle(this).width);
+    this.lastHeight = parseFloat(getComputedStyle(this).height);
+  }
+
+  private mousemove(e: MouseEvent) {
+    e.preventDefault();
+    const newX = this.prevX - e.x;
+    const newY = this.prevY - e.y;
+
+    if (this.dock === 'left') {
+      this.resizePanelLeft(newX);
+    } else if (this.dock === 'right') {
+      this.resizePanelRight(newX);
+    } else if (this.dock === 'bottom') {
+      this.resizePanelBottom(newY);
     }
   }
 
-  closePanel() {
-    this.clean();
+  private mouseup() {
+    // stop moving when mouse button is released
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+
+  protected closePanel() {
     throw new Error('This function must be overriden to close and clean the associated panel');
   }
 
-  clean() {
-    this.host.style.width = '';
-    this.host.style.height = '';
+  protected clean() {
+    this.style.width = '';
+    this.style.height = '';
   }
 
   private restoreLastDimensions() {
     if (this.lastWidth) {
-      this.host.style.width = this.lastWidth + 'px';
-      if (this.panel) {
-        this.panel.style.width = this.lastWidth + 'px';
-      }
+      this.style.width = this.lastWidth + 'px';
     }
     if (this.lastHeight) {
-      this.host.style.height = this.lastHeight + 'px';
-      if (this.panel) {
-        this.panel.style.height = this.lastHeight + 'px';
-      }
+      this.style.height = this.lastHeight + 'px';
     }
   }
 
-  #togglePanel() {
+  private togglePanelInternal() {
     if (this.dock === 'left' || this.dock === 'right') {
-      this.#togglePanelVertically();
+      this.togglePanelVertically();
     } else {
-      this.#togglePanelHorizontally();
+      this.togglePanelHorizontally();
     }
   }
 
-  #togglePanelVertically() {
-    if (!this.panel || !this.gutter) {
-      throw new Error('GirafeResizableElement.makeResizable() must be called before togglePanelVertically()');
-    }
-    this.toggleWidth = this.gutter.getBoundingClientRect().width;
-
-    const width = this.panel.getBoundingClientRect().width;
-    if (width <= this.toggleWidth) {
+  private togglePanelVertically() {
+    const width = this.getBoundingClientRect().width;
+    if (width <= this.toggleSize) {
       // Panel is already hidden.
       // => We reset it to the last width
-      this.panel.style.width = this.lastWidth + 'px';
-      this.host.style.width = this.lastWidth + 'px';
-
+      this.style.width = this.lastWidth + 'px';
+      this.style.minWidth = this.minWidth + 'px';
       if (this.hideButton) {
         this.hideButton.classList.remove('closed');
       }
     } else {
       // Hide the panel
       this.lastWidth = width;
-      this.panel.style.width = this.toggleWidth + 'px';
-      this.host.style.width = this.toggleWidth + 'px';
-
+      this.style.width = this.toggleSize + 'px';
+      this.style.minWidth = '0';
       if (this.hideButton) {
         this.hideButton.classList.add('closed');
       }
     }
   }
 
-  #togglePanelHorizontally() {
-    if (!this.panel || !this.gutter) {
-      throw new Error('GirafeResizableElement.makeResizable() must be called before togglePanelHorizontally()');
-    }
-    this.toggleHeight = this.gutter.getBoundingClientRect().height;
-
-    const height = this.panel.getBoundingClientRect().height;
-    if (height <= this.toggleHeight) {
+  private togglePanelHorizontally() {
+    const height = this.getBoundingClientRect().height;
+    if (height <= this.toggleSize) {
       // Panel is already hidden.
       // => We reset it to the last height
-      this.panel.style.height = this.lastHeight + 'px';
-      this.host.style.height = this.lastHeight + 'px';
-      this.panel.style.minHeight = '';
-      this.host.style.minHeight = '';
-
+      this.style.height = this.lastHeight + 'px';
+      this.style.minWidth = this.minHeight + 'px';
       if (this.hideButton) {
         this.hideButton.classList.remove('closed');
-        if (this.dock === 'bottom') {
-          this.hideButton.style.bottom = this.panel.getBoundingClientRect().height + 'px';
-        }
-        // else if (this.dock === 'right') {
-        //   this.hideButton.style.right = this.panel.getBoundingClientRect().width + "px";
-        // }
       }
     } else {
       // Hide the panel
       this.lastHeight = height;
-      this.panel.style.height = this.toggleHeight + 'px';
-      this.host.style.height = this.toggleHeight + 'px';
-      this.panel.style.minHeight = '0';
-      this.panel.style.overflow = 'hidden';
-      this.host.style.minHeight = '0';
-
+      this.style.height = this.toggleSize + 'px';
+      this.style.minHeight = '0';
       if (this.hideButton) {
         this.hideButton.classList.add('closed');
       }
     }
   }
 
-  #mousemove(e: MouseEvent) {
-    if (!this.panel || !this.panelRect) {
-      throw new Error('GirafeResizableElement.makeResizable() must be called before this mousemove()');
+  private getLimitedWidth(width: number) {
+    if (this.minWidth && width < this.minWidth) {
+      return this.minWidth;
     }
-    e.preventDefault();
-    const newX = this.prevX - e.x;
-    const newY = this.prevY - e.y;
-    if (this.dock === 'left') {
-      const newWidth = this.panelRect.width - newX;
-      if (this.hideButton) {
-        this.hideButton.style.left = this.panel.getBoundingClientRect().width + 'px';
-      }
-      if (this.closeButton) {
-        this.closeButton.style.left = this.panel.getBoundingClientRect().width + 'px';
-      }
-      this.panel.style.width = newWidth + 'px';
-      this.host.style.width = newWidth + 'px';
-    } else if (this.dock === 'right') {
-      const newWidth = this.panelRect.width + newX;
-      if (this.hideButton) {
-        this.hideButton.style.right = this.panel.getBoundingClientRect().width + 'px';
-      }
-      if (this.closeButton) {
-        this.closeButton.style.right = this.panel.getBoundingClientRect().width + 'px';
-      }
-      this.panel.style.width = newWidth + 'px';
-      this.host.style.width = newWidth + 'px';
-      this.lastWidth = newWidth;
-    } else if (this.dock === 'bottom') {
-      const newHeight = this.panelRect.height + newY;
-      /*if (!this.isNullOrUndefined(this.hideButton)) {
-        this.hideButton.style.bottom = this.panel.getBoundingClientRect().width + "px";
-      }*/
-      /*if (!this.isNullOrUndefined(this.closeButton)) {
-        this.closeButton.style.right = this.panel.getBoundingClientRect().width + "px";
-      }*/
-      this.panel.style.height = newHeight + 'px';
-      this.host.style.height = newHeight + 'px';
-      this.lastHeight = newHeight;
+    if (this.maxWidth && width > this.maxWidth) {
+      return this.maxWidth;
     }
-
-    if (this.hideButton) {
-      this.hideButton.classList.remove('closed');
-    }
+    return width;
   }
 
-  #mouseup() {
-    // stop moving when mouse button is released:
-    document.onmouseup = null;
-    document.onmousemove = null;
+  private getLimitedHeight(height: number) {
+    if (this.minHeight && height < this.minHeight) {
+      return this.minHeight;
+    }
+    if (this.maxHeight && height > this.maxHeight) {
+      return this.maxHeight;
+    }
+
+    return height;
+  }
+
+  private resizePanelLeft(newX: number) {
+    const newWidth = this.getLimitedWidth(this.lastWidth - newX);
+    this.style.width = newWidth + 'px';
+  }
+
+  private resizePanelRight(newX: number) {
+    const newWidth = this.getLimitedWidth(this.lastWidth + newX);
+    this.style.width = newWidth + 'px';
+  }
+
+  private resizePanelBottom(newY: number) {
+    const newHeight = this.getLimitedHeight(this.lastHeight + newY);
+    this.style.height = newHeight + 'px';
   }
 }
 

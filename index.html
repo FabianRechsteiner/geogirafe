@@ -137,9 +137,7 @@
     <div id="content">
       <div id="main">
         <girafe-lr-panel class="panel-left" dock="left">
-          <div slot="main">
-            <girafe-tree-view slot="main"></girafe-tree-view>
-          </div>
+          <girafe-tree-view slot="main"></girafe-tree-view>
         </girafe-lr-panel>
         <div id="content-map">
           <girafe-map></girafe-map>
@@ -152,11 +150,9 @@
           </div>
         </div>
         <girafe-lr-panel class="panel-right" dock="right">
-          <div slot="main">
-            <girafe-drawing data-toggle-path="interface.printPanelVisible"></girafe-drawing>
-            <girafe-print data-toggle-path="interface.drawingPanelVisible"></girafe-print>
-            <girafe-lidar-panel data-toggle-path="interface.lidarPanelVisible"></girafe-lidar-panel>
-          </div>
+          <girafe-drawing slot="main" data-toggle-path="interface.printPanelVisible"></girafe-drawing>
+          <girafe-print slot="main" data-toggle-path="interface.drawingPanelVisible"></girafe-print>
+          <girafe-lidar-panel slot="main" data-toggle-path="interface.lidarPanelVisible"></girafe-lidar-panel>
         </girafe-lr-panel>
         <girafe-about></girafe-about>
         <girafe-share></girafe-share>
