@@ -2,9 +2,9 @@ import GroupLayer from './grouplayer';
 import { v4 as uuidv4 } from 'uuid';
 
 type BaseLayerOptions = {
-  isDefaultChecked?: boolean, 
-  disclaimer?: string
-}
+  isDefaultChecked?: boolean;
+  disclaimer?: string;
+};
 
 abstract class BaseLayer {
   /**

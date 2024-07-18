@@ -1,10 +1,10 @@
 import BaseLayer from './baselayer';
 
 type LayerOptions = {
-  isDefaultChecked?: boolean, 
-  disclaimer?: string,
-  opacity?: number
-}
+  isDefaultChecked?: boolean;
+  disclaimer?: string;
+  opacity?: number;
+};
 
 abstract class Layer extends BaseLayer {
   /**

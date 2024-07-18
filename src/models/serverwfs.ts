@@ -1,27 +1,24 @@
-export type LayerAttribute = {
-  name: string;
-  type: 'string' | 'integer' | 'double' | 'long' | 'date';
-};
+import { XmlTypes } from './xmlTypes';
 
-class ServerWfs {
+export interface LayerAttribute<WfsXmlTypes = XmlTypes> {
+  name: string;
+  type: WfsXmlTypes;
+}
+
+class ServerWfs<WfsXmlTypes = XmlTypes> {
   name: string;
   url: string;
-  layers: Record<string, LayerAttribute[]>;
+  layers: Record<string, LayerAttribute<WfsXmlTypes>[]> = {};
+  featureTypeToGeometryColumnName: { [key: string]: string } = {};
   initialized: boolean;
 
   constructor(name: string, url: string) {
     this.name = name;
     this.url = url;
-    this.layers = {};
     this.initialized = false;
   }
 
   addLayerAttribute(layer: string, name: string, type: string) {
-    if (!['string', 'integer', 'double', 'long', 'date'].includes(type)) {
-      console.warn(`Unmanaged attribute type: ${type}.`);
-      return;
-    }
-
     if (!(layer in this.layers)) {
       // Layer does not exists yet
       this.layers[layer] = [];
@@ -29,8 +26,35 @@ class ServerWfs {
 
     this.layers[layer].push({
       name: name,
-      type: type as 'string' | 'integer' | 'double' | 'long' | 'date'
+      type: type as WfsXmlTypes
     });
+  }
+
+  getGeometryColumnNameToFeatureTypes(featureTypes: string[]): Record<string, string[]> {
+    if (!this.initialized) {
+      throw new Error('Initialize WFS server before trying to get geometry column names.');
+    }
+    const geometryColumnNameToFeatureType: Record<string, string[]> = {};
+
+    for (const featureType of featureTypes) {
+      if (!(featureType in this.layers)) {
+        console.warn(
+          'featureType ' +
+            featureType +
+            ' is unknown to WFS server ' +
+            this.url +
+            '\n- available featureTypes: ' +
+            Object.keys(this.layers).join(', ')
+        );
+      }
+      const geometryColumnName = this.featureTypeToGeometryColumnName[featureType];
+      if (!(geometryColumnName in geometryColumnNameToFeatureType)) {
+        geometryColumnNameToFeatureType[geometryColumnName] = [];
+      }
+      geometryColumnNameToFeatureType[geometryColumnName].push(featureType);
+    }
+
+    return geometryColumnNameToFeatureType;
   }
 }
 

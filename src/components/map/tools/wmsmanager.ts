@@ -7,6 +7,7 @@ import LayerWms from '../../../models/layers/layerwms';
 import StateManager from '../../../tools/state/statemanager';
 import type { SelectionParam } from '../../../tools/state/state';
 import LayerManager from '../../../tools/layermanager';
+import WfsManager from '../../../tools/wfs/wfsmanager';
 
 export default class WmsManager {
   map: Map;
@@ -238,7 +239,7 @@ export default class WmsManager {
         olayer.setOpacity(layerWms.opacity);
       }
       if (layerWms.hasFilter) {
-        (olayer.getSource() as ImageWMS).updateParams({ FILTER: layerWms.filter });
+        (olayer.getSource() as ImageWMS).updateParams({ FILTER: WfsManager.wmsGetMapFilter(layerWms) });
       }
     } else if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
       this.makeLayerIndependent(layerWms);
@@ -258,7 +259,7 @@ export default class WmsManager {
         opacity: layerWms.opacity
       });
       if (layerWms.hasFilter) {
-        source.updateParams({ FILTER: layerWms.filter });
+        (olayer.getSource() as ImageWMS).updateParams({ FILTER: WfsManager.wmsGetMapFilter(layerWms) });
       }
       this.independentLayers[layerWms.treeItemId] = { layerWms: layerWms, olayer: olayer };
       this.map.addLayer(olayer);
@@ -272,7 +273,7 @@ export default class WmsManager {
 
     for (const key in this.layersByUniqueServerId) {
       selectionParams.push({
-        layers: this.layersByUniqueServerId[key].layersWms,
+        _layers: this.layersByUniqueServerId[key].layersWms,
         selectionBox: extent,
         srid: this.state.projection
       });
@@ -280,7 +281,7 @@ export default class WmsManager {
 
     for (const key in this.independentLayers) {
       selectionParams.push({
-        layers: [this.independentLayers[key].layerWms],
+        _layers: [this.independentLayers[key].layerWms],
         selectionBox: extent,
         srid: this.state.projection
       });
@@ -307,8 +308,8 @@ export default class WmsManager {
   private getFeatureInfoUrl(param: SelectionParam): Record<string, string> {
     /* Url-layerName (feature id) objects. */
     const urlsAndLayerNames: Record<string, string> = {};
-    param.layers.forEach((layer) => {
-      const olLayer = param.oLayer ?? this.getOLayer(layer);
+    param._layers.forEach((layer) => {
+      const olLayer = param._oLayer ?? this.getOLayer(layer);
       if (!layer.queryable || layer.ogcServer.urlWfs || !olLayer) {
         return;
       }

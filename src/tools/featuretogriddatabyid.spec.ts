@@ -13,10 +13,10 @@ const getFeatures = (): OlFeature[] => {
     new OlFeature({ col1: 'value7', col2: 'value8' }),
     new OlFeature({ col1: 'value5', col2: 'value6', col3: undefined })
   ];
-  fts[0].setId('f.oo');
-  fts[1].setId('bar');
+  fts[0].setId('f.oo.1');
+  fts[1].setId('bar.23');
   // features[2] doesn't have id.
-  fts[3].setId('bar');
+  fts[3].setId('bar.45');
   return fts;
 };
 
@@ -133,14 +133,14 @@ describe('FeatureToGridDataById', () => {
     expect(emptyColumnIndices).toStrictEqual([2]);
   });
 
-  test('getUserFeatureId', () => {
-    let id = FeatureToGridDataById.getUserFeatureId(features[0]);
+  test('getUserFeatureType', () => {
+    let id = FeatureToGridDataById.getUserFeatureType(features[0]);
     expect(id).toEqual('f.oo');
 
-    id = FeatureToGridDataById.getUserFeatureId(features[1]);
+    id = FeatureToGridDataById.getUserFeatureType(features[1]);
     expect(id).toEqual('bar');
 
-    id = FeatureToGridDataById.getUserFeatureId(features[2]);
+    id = FeatureToGridDataById.getUserFeatureType(features[2]);
     expect(id).toEqual('UNKNOWN');
   });
 });

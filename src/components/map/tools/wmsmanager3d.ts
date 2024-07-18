@@ -97,7 +97,7 @@ export default class WmsManager3d {
     for (const key in this.layersRecord) {
       const layerDef = this.layersRecord[key];
       selectionParams.push({
-        layers: layerDef.map((l) => l.layers),
+        _layers: layerDef.map((l) => l.layers),
         selectionBox: extent,
         srid: state.projection
       });

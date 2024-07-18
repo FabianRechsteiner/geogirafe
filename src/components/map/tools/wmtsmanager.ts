@@ -176,8 +176,8 @@ class WmtsManager {
         })
       });
       selectionParams.push({
-        layers: layers,
-        oLayer: oLayer,
+        _layers: layers,
+        _oLayer: oLayer,
         selectionBox: extent,
         srid: this.state.projection
       });

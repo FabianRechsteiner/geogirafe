@@ -11,7 +11,7 @@ import OfflineManager from './tools/offline/offlinemanager';
 import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
 import ThemesManager from './tools/themesmanager';
-import WfsManager from './tools/wfsmanager';
+import WfsManager from './tools/wfs/wfsmanager.js';
 
 import AboutComponent from './components/about/component';
 import BasemapComponent from './components/basemap/component';
