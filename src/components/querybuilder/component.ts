@@ -1,17 +1,19 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import LayerWms from '../../models/layers/layerwms';
-import WfsManager from '../../tools/wfsmanager';
+import WfsManager from '../../tools/wfs/wfsmanager';
 import { LayerAttribute } from '../../models/serverwfs';
-import FilterHelper from './tools/filterhelper';
+import { WfsFilter, WfsOperator } from '../../tools/wfs/wfsfilter';
+import { xmlNumberTypesStrList, xmlStringTypesStrList } from '../../models/xmlTypes';
 
 class QueryBuilderComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
   loading: boolean = true;
+  deactivated: boolean = false;
   layer: LayerWms;
   layerAttributes: LayerAttribute[] = [];
-  currentAttributeType: 'string' | 'integer' | 'double' | 'long' | 'date' | null = null;
+  currentLayerAttribute?: LayerAttribute = undefined;
 
   showVal: boolean = false;
 
@@ -27,38 +29,57 @@ class QueryBuilderComponent extends GirafeHTMLElement {
 
     super.render();
 
-    WfsManager.getInstance()
-      .getServerWfs(this.layer.ogcServer.urlWfs)
-      .then((serverWfs) => {
-        this.layerAttributes = serverWfs.layers[this.layer.name];
-        this.loading = false;
-        super.render();
-        super.girafeTranslate();
-        this.activateTooltips(false, [800, 0], 'top-end');
-      });
+    WfsManager.getServerWfs(this.layer).then((serverWfs) => {
+      const queryLayers = this.layer.queryLayers!.split(',');
+
+      const stackedLayerAttributes = queryLayers.map((l: string) => serverWfs.layers[l]);
+      const layerAttributesCount: Record<string, number> = {};
+      for (const la of stackedLayerAttributes.flat()) {
+        if (layerAttributesCount[la.name] === undefined) {
+          layerAttributesCount[la.name] = 0;
+        }
+        layerAttributesCount[la.name]++;
+      }
+      const commonAttributesNames = Object.keys(layerAttributesCount).filter(
+        (k) => layerAttributesCount[k] === queryLayers.length
+      );
+      const commonAttributes = stackedLayerAttributes[0]
+        ? stackedLayerAttributes[0].filter((la) => commonAttributesNames.includes(la.name))
+        : [];
+
+      this.deactivated = commonAttributes.length === 0;
+      if (this.deactivated) {
+        console.log(
+          'Filtering for layer group ' +
+            this.layer.name +
+            " is deactivated because the queryLayers don't have common attributes."
+        );
+      }
+      this.layerAttributes = commonAttributes;
+      this.loading = false;
+      super.render();
+      super.girafeTranslate();
+      this.activateTooltips(false, [800, 0], 'top-end');
+    });
   }
 
   get isString() {
     // TODO REG: Manage the type date as a separate type
-    return this.currentAttributeType === 'string' || this.currentAttributeType === 'date';
+    return xmlStringTypesStrList.includes(this.currentLayerAttribute?.type ?? '');
   }
 
   get isNumber() {
-    return (
-      this.currentAttributeType === 'integer' ||
-      this.currentAttributeType === 'double' ||
-      this.currentAttributeType === 'long'
-    );
+    return xmlNumberTypesStrList.includes(this.currentLayerAttribute?.type ?? '');
   }
 
   attributeChanged() {
     const attributeSelect = this.shadow.getElementById('attribute') as HTMLSelectElement;
-    const layerAttribute = this.layerAttributes.find((attr) => (attr.name = attributeSelect.value));
+    const layerAttribute = this.layerAttributes.find((attr) => attr.name == attributeSelect.value);
     if (!layerAttribute) {
       throw new Error('Why is this object null ? This should never happen...');
     }
 
-    this.currentAttributeType = layerAttribute.type;
+    this.currentLayerAttribute = layerAttribute;
     super.render();
   }
 
@@ -68,30 +89,41 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     super.render();
   }
 
-  filter() {
+  onValueKeyPress(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      this.filter();
+    }
+  }
+
+  getFilterElements() {
     const attributeSelect = this.shadow.getElementById('attribute') as HTMLSelectElement;
     const operatorSelect = this.shadow.getElementById('operator') as HTMLSelectElement;
-    const val = this.shadow.getElementById('val') as HTMLInputElement;
+    const valueInput = this.shadow.getElementById('val') as HTMLInputElement;
+    return [attributeSelect, operatorSelect, valueInput];
+  }
 
-    this.layer.filter = FilterHelper.getFilter(
-      operatorSelect.value,
-      attributeSelect.value,
-      this.currentAttributeType,
-      val.value
-    );
-    console.log(this.layer.filter);
+  getFilter() {
+    const [attributeSelect, operatorSelect, val] = this.getFilterElements();
+
+    const property = attributeSelect.value;
+    const operator = operatorSelect.value as WfsOperator;
+    const value = val.value;
+    const filter = new WfsFilter(property, operator, value, this.currentLayerAttribute?.type);
+    return filter;
+  }
+
+  filter() {
+    this.layer.filter = this.getFilter();
   }
 
   removeFilter() {
-    const attributeSelect = this.shadow.getElementById('attribute') as HTMLSelectElement;
-    const operatorSelect = this.shadow.getElementById('operator') as HTMLSelectElement;
-    const val = this.shadow.getElementById('val') as HTMLInputElement;
+    const [attributeSelect, operatorSelect, val] = this.getFilterElements();
 
-    this.layer.filter = '';
+    this.layer.filter = undefined;
     attributeSelect.value = '';
     operatorSelect.value = '';
     val.value = '';
-    this.currentAttributeType = null;
+    this.currentLayerAttribute = undefined;
     this.showVal = false;
     super.render();
   }

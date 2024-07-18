@@ -1,16 +1,22 @@
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 
-<div>
+<div id="wfs-filter-querybuilder">
   <div class="${this.loading ? 'loading' : 'loading hidden'}">
     <i class="fa-xl fa-solid fa-circle-notch fa-spin"></i>
     Loading server configuration...
   </div>
-  <div class="${this.loading ? 'content hidden' : 'content'}">
+  <div class="${this.deactivated ? 'deactivated' : 'deactivated hidden'}">
+    <i class="fa-xl fa-solid fa-xmark"></i>
+    Filtering deactivated: layers in layergroup don't have identical attributes.
+  </div>
+  <div class="${this.loading || this.deactivated ? 'content hidden' : 'content'}">
     <div class="custom-select">
       <select id="attribute" name="attribute" onchange="${() => this.attributeChanged()}">
-        <option value="" disabled selected>Select attribute...</option>
+        <option value="" disabled ?selected="${!this.currentLayerAttribute}">Select attribute...</option>
         ${this.layerAttributes.map(attr => uHtmlFor(attr, attr.name)`
-        <option i18n="${attr.name}" value="${attr.name}">${attr.name}</option>
+        <option i18n="${attr.name}" value="${attr.name}" ?selected="${this.currentLayerAttribute?.name==attr.name}">
+          ${attr.name}
+        </option>
         `)}
       </select>
     </div>
@@ -31,7 +37,12 @@
       </select>
     </div>
 
-    <input id="val" type="text" class="${this.showVal ? '' : 'hidden'}" placeholder="Enter value..." />
+    <input
+      id="val"
+      type="text"
+      class="${this.showVal ? '' : 'hidden'}"
+      placeholder="Enter value..."
+      onkeypress="${(e:KeyboardEvent)=>this.onValueKeyPress(e)}" />
 
     <button tip="Apply filter" onclick="${() => this.filter()}">
       <i class="fa-sm fa-solid fa-filter"></i>

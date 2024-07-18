@@ -10,6 +10,10 @@
   margin: 0.8rem;
 }
 
+.deactivated i {
+  margin: 0.8rem;
+}
+
 button {
   border: none;
   border-right: solid 1px var(--bkg-color);

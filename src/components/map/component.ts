@@ -9,6 +9,7 @@ import { ScaleLine } from 'ol/control';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
 import { Geometry } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
+import { Extent } from 'ol/extent';
 
 import { ScreenSpaceEventHandler, Cartesian2, Cesium3DTileset } from 'cesium';
 import proj4 from 'proj4';
@@ -34,6 +35,7 @@ import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
+import GeoEvents from '../../models/events';
 
 import MapManager from '../../tools/state/mapManager';
 import MapPosition from '../../tools/state/mapposition';
@@ -322,6 +324,14 @@ export default class MapComponent extends GirafeHTMLElement {
     });
   }
 
+  onCustomGirafeEvent(details: { action: string; layer: Layer; extent: Extent }) {
+    if (details.action === GeoEvents.zoomToExtent) {
+      this.zoomToExtent(details.extent);
+    } else if (details.action === GeoEvents.undoDraw) {
+      //this.redliningManager.removeLastPoint();
+    }
+  }
+
   onSwipedLayersChanged(swipedLayers: { left: Layer[]; right: Layer[] }) {
     if (swipedLayers.left.length === 0 && swipedLayers.right.length === 0) {
       // TODO REG: Better manage WMS in order to combine swiped layers again in a unique olayer
@@ -542,6 +552,9 @@ export default class MapComponent extends GirafeHTMLElement {
 
   zoomToZoom(zoom: number) {
     this.viewManager.setZoom(zoom);
+  }
+  zoomToExtent(extent: Extent) {
+    this.olMap.getView().fit(extent);
   }
 
   panToCoordinate(coordinate: Coordinate) {

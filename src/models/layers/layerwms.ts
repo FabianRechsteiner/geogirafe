@@ -1,4 +1,5 @@
-import { GMFTreeItem } from '../gmf';
+import WfsFilter from '../../tools/wfs/wfsfilter';
+import { GMFChildLayer, GMFTreeItem } from '../gmf';
 import ServerOgc from '../serverogc';
 import ILayerWithFilter from './ilayerwithfilter';
 import ILayerWithLegend from './ilayerwithlegend';
@@ -36,6 +37,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   // Base WMS attributes
   public ogcServer: ServerOgc;
 
+  public urlWfs: string | null;
   public minResolution?: number;
   public maxResolution?: number;
   public layers?: string;
@@ -52,9 +54,9 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   public printNativeAngle?: boolean; // TODO BGE Is it correct to have it at this level (should be for groups) ?
 
   // If the layer is queryable
-  public queryable: boolean;
+  public queryable: boolean = false;
   public queryLayers?: string;
-  public filter?: string;
+  public filter?: WfsFilter;
 
   constructor(id: number, name: string, order: number, ogcServer: ServerOgc, options?: GMFTreeItem | LayerWmsOptions) {
     let opts = options ?? {};
@@ -62,6 +64,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     super(id, name, order, opts);
     this.ogcServer = ogcServer;
 
+    this.urlWfs = ogcServer.wfsSupport && ogcServer.urlWfs ? ogcServer.urlWfs : null;
     this.minResolution = opts?.minResolution;
     this.maxResolution = opts?.maxResolution;
     this.layers = opts?.layers;
@@ -76,6 +79,14 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     this.printNativeAngle = opts?.printNativeAngle;
     this.queryable = opts?.queryable || false;
     this.queryLayers = opts?.queryLayers;
+
+    if (this.queryable) {
+      if (!this.urlWfs || this.urlWfs.length == 0) {
+        this.hasError = true;
+        this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
+        this.queryable = false;
+      }
+    }
   }
 
   clone(): LayerWms {
@@ -110,7 +121,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   }
 
   get hasFilter() {
-    return this.filter !== undefined && this.filter !== '';
+    return this.filter !== null && this.filter !== undefined;
   }
 
   get serverUniqueQueryId() {
@@ -141,12 +152,11 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     };
 
     if (options.childLayers) {
-      for (const child of options.childLayers) {
-        if (child.queryable) {
-          opts.queryable = true;
-          opts.queryLayers = opts.queryLayers ? ',' + child.name : child.name;
-        }
-      }
+      opts.queryLayers = options.childLayers
+        .filter((l: GMFChildLayer) => l.queryable)
+        .map((l: GMFChildLayer) => l.name)
+        .join(',');
+      opts.queryable = opts.queryLayers.length > 0;
     }
 
     return opts;

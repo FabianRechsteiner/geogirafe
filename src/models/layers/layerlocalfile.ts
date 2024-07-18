@@ -24,7 +24,9 @@ class LayerLocalFile extends Layer implements ILayerWithLegend {
     super(0, file.name, 0, { isDefaultChecked: true });
     this._features = features;
     this.extent = extent;
-    this.lastModifiedDate = new Date(file.lastModified).toLocaleDateString(ConfigManager.getInstance().Config.general.locale);
+    this.lastModifiedDate = new Date(file.lastModified).toLocaleDateString(
+      ConfigManager.getInstance().Config.general.locale
+    );
     this.isLegendExpanded = true;
     this.wasLegendExpanded = false;
   }

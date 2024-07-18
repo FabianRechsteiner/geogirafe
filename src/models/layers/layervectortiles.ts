@@ -1,11 +1,11 @@
 import Layer from './layer';
 
 type LayerVectorTilesOptions = {
-  projection?: string,
-  isDefaultChecked?: boolean, 
-  disclaimer?: string,
-  opacity?: number
-}
+  projection?: string;
+  isDefaultChecked?: boolean;
+  disclaimer?: string;
+  opacity?: number;
+};
 
 class LayerVectorTiles extends Layer {
   /**
@@ -20,7 +20,14 @@ class LayerVectorTiles extends Layer {
   public source: string;
   public projection?: string;
 
-  constructor(id: number, name: string, order: number, style: string, source: string, options?: LayerVectorTilesOptions) {
+  constructor(
+    id: number,
+    name: string,
+    order: number,
+    style: string,
+    source: string,
+    options?: LayerVectorTilesOptions
+  ) {
     super(id, name, order, options);
     this.style = style;
     this.source = source;
@@ -30,10 +37,10 @@ class LayerVectorTiles extends Layer {
   clone() {
     const options = {
       projection: this.projection,
-      isDefaultChecked: this.isDefaultChecked, 
+      isDefaultChecked: this.isDefaultChecked,
       disclaimer: this.disclaimer,
       opacity: this.opacity
-    }
+    };
     const clonedObject = new LayerVectorTiles(this.id, this.name, this.order, this.style, this.source, options);
     clonedObject.activeState = this.activeState;
     return clonedObject;

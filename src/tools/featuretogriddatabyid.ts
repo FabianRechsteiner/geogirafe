@@ -68,16 +68,16 @@ export default class FeatureToGridDataById {
    * @private
    */
   private addFeatureToGridDataById(gridDataById: GridDataById, feature: OlFeature): GridDataById {
-    const featureId = FeatureToGridDataById.getUserFeatureId(feature);
+    const featureType = FeatureToGridDataById.getUserFeatureType(feature);
     const notOlProperties = deleteFeatureOlParams(feature, this.options.keepGeomProperty);
     if (!Object.keys(notOlProperties).length) {
       // Don't keep feature without properties.
       return gridDataById;
     }
-    if (!Object.keys(gridDataById).includes(featureId)) {
-      gridDataById[featureId] = FeatureToGridDataById.createGridDataWithColumns(notOlProperties);
+    if (!Object.keys(gridDataById).includes(featureType)) {
+      gridDataById[featureType] = FeatureToGridDataById.createGridDataWithColumns(notOlProperties);
     }
-    const gridData = gridDataById[featureId];
+    const gridData = gridDataById[featureType];
 
     // Add feature and not OL properties backref
     gridData.features.push(feature);
@@ -148,5 +148,17 @@ export default class FeatureToGridDataById {
   static getUserFeatureId(feature: OlFeature): string {
     const id = feature.getId();
     return id === undefined ? 'UNKNOWN' : `${id}`;
+  }
+  static getUserFeatureType(feature: OlFeature): string {
+    const id = feature.getId();
+    if (!id) {
+      return 'UNKNOWN';
+    }
+    const splitId = `${id}`.split('.');
+    if (splitId.length <= 1) {
+      return `${id}`;
+    }
+    splitId.pop();
+    return splitId.join('.');
   }
 }

@@ -10,7 +10,7 @@ import OfflineManager from './tools/offline/offlinemanager';
 import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
 import ThemesManager from './tools/themesmanager';
-import WfsManager from './tools/wfsmanager';
+import WfsManager from './tools/wfs/wfsmanager.js';
 
 import MapComponent from './components/map/component';
 import MobileSearchComponent from './components/search-mobile/component';

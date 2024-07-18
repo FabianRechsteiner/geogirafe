@@ -24,8 +24,8 @@ type GraphicalInterface = {
 };
 
 export type SelectionParam = {
-  layers: LayerWms[];
-  oLayer?: OLayerImage<OSourceImageWMS>;
+  _layers: LayerWms[];
+  _oLayer?: OLayerImage<OSourceImageWMS>;
   selectionBox: number[];
   srid: string;
 };

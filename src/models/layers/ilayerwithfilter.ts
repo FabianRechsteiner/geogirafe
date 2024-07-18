@@ -1,5 +1,7 @@
+import WfsFilter from '../../tools/wfs/wfsfilter';
+
 interface ILayerWithFilter {
-  filter?: string;
+  filter?: WfsFilter;
   get hasFilter(): boolean;
 }
 
