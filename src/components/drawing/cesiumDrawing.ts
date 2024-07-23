@@ -1,7 +1,6 @@
 import * as Cesium from 'cesium';
 import { Cartesian3, Entity } from 'cesium';
-import KML from 'ol/format/KML';
-import GeoJSON from 'ol/format/GeoJSON';
+import { KML, GeoJSON } from 'ol/format';
 import DrawingFeature, { DrawingShape } from './drawingFeature';
 
 import MapComponent from '../map/component';
@@ -260,7 +259,7 @@ export default class CesiumDrawing {
   getShapes(tool: DrawingShape, positions: Cartesian3[], feature: DrawingFeature) {
     const fillColor = Cesium.Color.fromCssColorString(feature.fillColor);
     const strokeColor = Cesium.Color.fromCssColorString(feature.strokeColor);
-    const font = feature.fontSize + 'px' + feature.font;
+    const font = feature.nameFontSize + 'px' + feature.font;
 
     switch (tool) {
       case DrawingShape.Polyline:

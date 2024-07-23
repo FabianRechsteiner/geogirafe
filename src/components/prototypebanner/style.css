@@ -1,19 +1,4 @@
-:host {
-  position: fixed;
-  bottom: 50px;
-  right: -80px;
-  width: 300px;
-  height: 40px;
-  z-index: 9;
-  transform: rotate(-45deg);
-  line-height: 40px;
-  background: #d62f2fcc;
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-:host > a {
+a {
   color: white;
   text-decoration: none;
   text-transform: uppercase;

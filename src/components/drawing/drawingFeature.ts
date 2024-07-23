@@ -24,9 +24,14 @@ export type SerializedFeature = {
   sc: string;
   sw: number;
   fc: string;
-  fz: number;
+  nfz: number;
+  mfz: number;
   f: string;
   g: object;
+  dn: boolean;
+  dm: boolean;
+  nc: string;
+  mc: string;
   t: DrawingShape;
 };
 
@@ -34,12 +39,17 @@ export default class DrawingFeature {
   private _uid: string = uuidv4();
   private _tool: DrawingShape;
   private _name: string;
+  private _nameColor: string;
   private _strokeColor: string;
   private _strokeWidth: number;
   private _fillColor: string;
-  private _fontSize: number;
+  private _nameFontSize: number;
+  private _measureFontSize: number;
+  private _measureColor: string;
   private _font: string;
   private _geojson: object;
+  public _displayName: boolean = true;
+  public _displayMeasure: boolean = true;
 
   public onChange: (f: DrawingFeature) => void = () => {};
 
@@ -50,9 +60,12 @@ export default class DrawingFeature {
     this._strokeColor = defaultConfig.defaultStrokeColor;
     this._strokeWidth = defaultConfig.defaultStrokeWidth;
     this._fillColor = defaultConfig.defaultFillColor;
-    this._fontSize = defaultConfig.defaultTextSize;
+    this._nameFontSize = defaultConfig.defaultTextSize;
+    this._measureFontSize = defaultConfig.defaultTextSize;
     this._font = defaultConfig.defaultFont;
     this._geojson = geojson;
+    this._nameColor = '#000000';
+    this._measureColor = '#000000';
   }
 
   get name() {
@@ -87,11 +100,19 @@ export default class DrawingFeature {
     this.onChange(this);
   }
 
-  get fontSize() {
-    return this._fontSize;
+  get nameFontSize() {
+    return this._nameFontSize;
   }
-  set fontSize(v) {
-    this._fontSize = v;
+  set nameFontSize(v) {
+    this._nameFontSize = v;
+    this.onChange(this);
+  }
+
+  get measureFontSize() {
+    return this._measureFontSize;
+  }
+  set measureFontSize(v) {
+    this._measureFontSize = v;
     this.onChange(this);
   }
 
@@ -117,6 +138,38 @@ export default class DrawingFeature {
     this._uid = id;
   }
 
+  get displayName() {
+    return this._displayName;
+  }
+  set displayName(v) {
+    this._displayName = v;
+    this.onChange(this);
+  }
+
+  get displayMeasure() {
+    return this._displayMeasure;
+  }
+  set displayMeasure(v) {
+    this._displayMeasure = v;
+    this.onChange(this);
+  }
+
+  get nameColor() {
+    return this._nameColor;
+  }
+  set nameColor(v) {
+    this._nameColor = v;
+    this.onChange(this);
+  }
+
+  get measureColor() {
+    return this._measureColor;
+  }
+  set measureColor(v) {
+    this._measureColor = v;
+    this.onChange(this);
+  }
+
   get type() {
     return this._tool;
   }
@@ -131,10 +184,15 @@ export default class DrawingFeature {
       sc: this._strokeColor,
       sw: this._strokeWidth,
       fc: this._fillColor,
-      fz: this._fontSize,
+      nfz: this._nameFontSize,
+      mfz: this._measureFontSize,
       f: this._font,
       g: this._geojson,
-      t: this._tool
+      t: this._tool,
+      dn: this._displayName,
+      dm: this._displayMeasure,
+      nc: this._nameColor,
+      mc: this._measureColor
     };
   }
 
@@ -143,9 +201,14 @@ export default class DrawingFeature {
     newFeature.strokeColor = serializedFeature.sc;
     newFeature.strokeWidth = serializedFeature.sw;
     newFeature.fillColor = serializedFeature.fc;
-    newFeature.fontSize = serializedFeature.fz;
+    newFeature.nameFontSize = serializedFeature.nfz;
+    newFeature.measureFontSize = serializedFeature.mfz;
     newFeature.font = serializedFeature.f;
     newFeature._geojson = serializedFeature.g;
+    newFeature.displayName = serializedFeature.dn;
+    newFeature.displayMeasure = serializedFeature.dm;
+    newFeature.nameColor = serializedFeature.nc;
+    newFeature.measureColor = serializedFeature.mc;
     newFeature.addToState();
     return newFeature;
   }
