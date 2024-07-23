@@ -192,6 +192,7 @@ girafe-search {
 
 #content-map {
   display: flex;
+  position: relative;
   width: 100%;
   overflow: hidden;
 }
@@ -266,4 +267,19 @@ girafe-share {
 .tippy-box[data-theme~='error'] {
   background-color: var(--error-color);
   white-space: pre-line;
+}
+
+girafe-prototype-banner {
+  position: absolute;
+  bottom: 50px;
+  right: -80px;
+  width: 300px;
+  height: 40px;
+  z-index: 9;
+  transform: rotate(-45deg);
+  line-height: 40px;
+  background: #d62f2fcc;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
 }

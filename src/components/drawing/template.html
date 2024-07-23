@@ -1,37 +1,78 @@
 <link rel="stylesheet" href="lib/font-gis/font-gis.css" />
 <link rel="stylesheet" href="lib/vanilla-picker/vanilla-picker.csp.css" />
-
 <div id="panel">
   <div id="toolbar">
-    <button id="disable" tip="Disable drawing" class="selected">
-      <i class="fg-arrow-o fg-lg"></i>
-    </button>
-    <button id="point" tip="Point">
-      <i class="fg-point fg-lg"></i>
-    </button>
-    <button id="line" tip="Line">
-      <i class="fg-polyline-pt fg-lg"></i>
-    </button>
-    <button id="polygon" tip="Polygon">
-      <i class="fg-polygon-pt fg-lg"></i>
-    </button>
-    <button id="square" tip="Square">
-      <i class="fg-square-pt fg-lg"></i>
-    </button>
-    <button id="rectangle" tip="Rectangle">
-      <i class="fg-rectangle-pt fg-lg"></i>
-    </button>
-    <button id="circle" tip="Circle">
-      <i class="fg-circle-o fg-lg"></i>
-    </button>
-    <button id="freeline" tip="Freehand line">
-      <i class="fg-polyline fg-lg"></i>
-    </button>
-    <button id="freepolygon" tip="Freehand polygon">
-      <i class="fg-polygon-o fg-lg"></i>
-    </button>
+    <button id="disable" tip="Disable drawing" class="selected"><i class="fg-arrow-o fg-lg"></i></button>
+    <button id="point" tip="Point"><i class="fg-point fg-lg"></i></button>
+    <button id="line" tip="Line"><i class="fg-polyline-pt fg-lg"></i></button>
+    <button id="polygon" tip="Polygon"><i class="fg-polygon-pt fg-lg"></i></button>
+    <button id="square" tip="Square"><i class="fg-square-pt fg-lg"></i></button>
+    <button id="rectangle" tip="Rectangle"><i class="fg-rectangle-pt fg-lg"></i></button>
+    <button id="circle" tip="Circle"><i class="fg-circle-o fg-lg"></i></button>
+    <button id="freeline" tip="Freehand line"><i class="fg-polyline fg-lg"></i></button>
+    <button id="freepolygon" tip="Freehand polygon"><i class="fg-polygon-o fg-lg"></i></button>
   </div>
   <div id="drawingListContainer">
     <div id="drawingList"></div>
+  </div>
+  <div id="options" class="disabled">
+    <input id="optionsTitle" type="text" value="${this.curFeature?.name}" />
+    <div id="optionsText">
+      <div id="optionsTextLines">
+        <span>Name</span>
+        <button class="icon" id="visibleIconName" onclick="${()=>this.toggleNameVisibility()}"></button>
+        <span>Font</span>
+        <input
+          id="optionsNameFontSize"
+          type="number"
+          min="1"
+          value="${this.curFeature?.nameFontSize}"
+          oninput="${()=>this.onOptionsChange()}" />
+        <span>pt</span>
+        <div class="icon colorPicker" id="nameColorPicker"></div>
+        <span>Measures</span>
+        <button class="icon" id="visibleIconMeasure" onclick="${()=>this.toggleMeasureVisibility()}"></button>
+        <span>Font</span>
+        <input
+          id="optionsMeasuresFontSize"
+          type="number"
+          min="1"
+          value="${this.curFeature?.measureFontSize}"
+          oninput="${()=>this.onOptionsChange()}" />
+        <span>pt</span>
+        <div class="icon colorPicker" id="measureColorPicker"></div>
+      </div>
+    </div>
+    <hr />
+    <div id="optionsColor">
+      <div id="optionsColorLine">
+        <span>Stroke color</span>
+        <div class="icon colorPicker" id="strokePicker"></div>
+        <span id="fillPickerSpan">Fill color</span>
+        <div class="icon colorPicker" id="fillPicker"></div>
+      </div>
+    </div>
+    <hr />
+    <div id="optionsLine">
+      <div id="optionsLineLines">
+        <span>Line width</span>
+        <input
+          id="optionsStrokeWidth"
+          type="number"
+          min="1"
+          value="${this.curFeature?.strokeWidth}"
+          oninput="${()=>this.onOptionsChange()}" />
+        <span>px</span>
+      </div>
+    </div>
+    <hr />
+    <div id="optionsExport">
+      <div id="optionsExportLine">
+        <span>Export</span>
+        <button onclick='${() =>this.exportFeature(this.curFeature!, "geojson")}'>GeoJson</button>
+        <button onclick='${() =>this.exportFeature(this.curFeature!, "kml")}'>KML</button>
+        <button onclick='${() =>this.exportFeature(this.curFeature!, "gpx")}'>GPX</button>
+      </div>
+    </div>
   </div>
 </div>

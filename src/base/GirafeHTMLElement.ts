@@ -5,8 +5,6 @@ import ConfigManager from '../tools/configuration/configmanager';
 import StateManager from '../tools/state/statemanager';
 import ComponentManager from '../tools/state/componentManager';
 
-type TippyType = typeof tippy;
-
 class GirafeHTMLElement extends HTMLElement {
   templateUrl: string | null = null;
   styleUrl: string | null = null;
@@ -15,17 +13,13 @@ class GirafeHTMLElement extends HTMLElement {
   shadow: ShadowRoot;
   displayStyle?: string;
 
-  activeTooltips: TippyType[] = [];
+  activeTooltips: (typeof tippy)[] = [];
 
   configManager: ConfigManager;
   stateManager: StateManager;
   componentManager: ComponentManager;
 
   private unsafeCache = new Map<string, TemplateStringsArray>();
-
-  get state() {
-    return this.stateManager.state;
-  }
 
   constructor(name: string) {
     super();
@@ -39,6 +33,14 @@ class GirafeHTMLElement extends HTMLElement {
     this.shadow = this.attachShadow({ mode: 'open' });
 
     this.stateManager.subscribe('language', (_oldLanguage: string, _newLanguage: string) => this.girafeTranslate());
+  }
+
+  get state() {
+    return this.stateManager.state;
+  }
+
+  getById<T = HTMLElement>(id: string) {
+    return this.shadow.querySelector('#' + id)! as T;
   }
 
   async loadConfig() {

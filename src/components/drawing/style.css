@@ -1,3 +1,46 @@
+input {
+  border: 1px solid var(--bkg-color-grad1);
+  width: inherit;
+  padding-right: 0;
+}
+input:focus {
+  border: 1px solid var(--lt-color-gray-900);
+}
+
+button {
+  border: solid 1px var(--bkg-color);
+  color: var(--text-color-grad2);
+  padding: 0;
+  background-color: var(--bkg-color);
+  cursor: pointer;
+}
+button:hover {
+  border: solid 1px var(--text-color-grad2);
+}
+button.selected {
+  border: solid 1px var(--text-color-grad2);
+  background-color: var(--text-color-grad2);
+  color: var(--bkg-color);
+}
+#toolbar button {
+  height: 2.4rem;
+  width: 2.4rem;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  fill: var(--text-color);
+  margin: 3px;
+  flex-shrink: 0;
+}
+.icon:hover {
+  fill: var(--text-color-grad2);
+}
+.colorPicker {
+  border-radius: 5px;
+}
+
 #panel {
   display: flex;
   flex-direction: column;
@@ -7,95 +50,90 @@
   padding: 1rem 1.5rem 1rem 1.5rem;
 }
 
-#panel #drawingListContainer {
+#drawingListContainer {
   overflow-y: auto;
   overflow-x: hidden;
   flex-grow: 1;
 }
-
-#panel #toolbar button {
-  border: solid 1px var(--bkg-color);
-  color: var(--text-color-grad2);
-  height: 2.4rem;
-  width: 2.4rem;
-  padding: 0;
-  background-color: var(--bkg-color);
-  cursor: pointer;
-}
-
-#panel #toolbar button:hover {
-  border: solid 1px var(--text-color-grad2);
-}
-
-#panel #toolbar button.selected {
-  border: solid 1px var(--text-color-grad2);
-  background-color: var(--text-color-grad2);
-  color: var(--bkg-color);
-}
-
 #drawingList {
   display: flex;
   flex-flow: column;
   gap: 0.15rem;
 }
-
-#drawingList .featureLine {
-  display: flex;
-  width: 100%;
+#drawingList div.selected {
+  box-shadow: 0px 0px 3px 3px lightgrey;
 }
-
-#drawingList div.girafe {
+#drawingList .girafe {
   position: relative;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   padding: 0.3rem;
   border: solid 1px var(--text-color);
 }
-
-#drawingList input.name {
-  border: none;
-  width: inherit;
+#drawingList .girafe span {
+  flex-grow: 1;
+  padding-left: 5px;
 }
 
-#drawingList .icon {
-  width: 14px;
-  height: 14px;
-  fill: var(--text-color);
-  margin: 3px;
-  flex-shrink: 0;
-}
-
-#drawingList .icon:hover {
-  fill: var(--text-color-grad2);
-}
-
-.picker_wrapper.popup {
-  position: fixed !important;
-  transform: translate(-120%, -5%);
-}
-
-#panel .optionsMenu {
-  position: absolute;
+#options {
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px -3px 3px -1px rgba(60, 64, 67, 0.49);
+  position: relative;
   z-index: 100;
-  top: 25px;
-  right: 5px;
-  background-color: var(--bkg-color);
-  border: 1px solid;
-  padding: 0;
-  width: 130px;
 }
-
-#panel .optionsMenu button {
-  padding: 5px;
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+#optionsTitle {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+#options hr {
   width: 100%;
-  background-color: var(--bkg-color);
+  margin: 8px;
+}
+#optionsTextLines,
+#optionsColorLine,
+#optionsLineLines,
+#optionsExportLine {
+  display: grid;
+  align-items: center;
+}
+#optionsText {
+  margin: auto;
+}
+#optionsTextLines {
+  grid-template-columns: 65px 40px 35px 40px 20px 25px;
+}
+#optionsTextLines button:hover {
   border: none;
 }
-
-#panel .optionsMenu button:hover {
-  background-color: var(--bkg-color-grad1);
+#optionsColor {
+  margin: auto;
+}
+#optionsColorLine {
+  grid-template-columns: 77px 70px 56px 26px;
+}
+#optionsLine {
+  margin: auto;
+}
+#optionsLineLines {
+  grid-template-columns: 60px 40px 20px;
+}
+#optionsExport {
+  margin: auto;
+}
+#optionsExportLine {
+  grid-template-columns: 60px 60px 45px 45px;
 }
 
-#panel .optionsMenu button:active {
-  background-color: var(--bkg-color-grad2);
+.picker_wrapper {
+  transform: translateX(-250px);
+}
+.picker_arrow {
+  transform: translateX(200px) rotate(90deg) scaleX(-1) !important;
 }

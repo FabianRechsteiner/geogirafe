@@ -5,45 +5,45 @@ import CesiumDrawing from './cesiumDrawing';
 import { KML, GeoJSON, GPX } from 'ol/format';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import { Callback } from '../../tools/state/statemanager';
 import { download } from '../../tools/export/download';
 import MapComponent from '../map/component';
 
-import minusIcon from './assets/minus.svg?raw';
-import paintRollerIcon from './assets/paint-roller.svg?raw';
-import paintBrushIcon from './assets/paintbrush.svg?raw';
-import plusIcon from './assets/plus.svg?raw';
 import trashIcon from './assets/trash.svg?raw';
 import locateIcon from './assets/locate.svg?raw';
-import optionsIcon from './assets/options.svg?raw';
+import visibleIcon from './assets/visible.svg?raw';
+import notVisibleIcon from './assets/notVisible.svg?raw';
 
-let lastMouseX: number = 0;
-let lastMouseY: number = 0;
-const setLastMousePosition = (e: MouseEvent) => {
-  lastMouseX = e.clientX;
-  lastMouseY = e.clientY;
-};
+function createDiv(id = '', className = '', content = '', onclick = (_: MouseEvent) => {}) {
+  const element = document.createElement('div');
+  element.id = id;
+  element.className = className;
+  element.innerHTML = content;
+  element.onclick = onclick;
+  return element;
+}
 
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
   visible = false;
-  eventsCallbacks: Callback[] = [];
+  renderedOnce = false;
   drawingState: DrawingState;
+  colorPickers: [any, () => string][] = [];
 
-  buttons: { elem: HTMLElement | null; selector: string; tool: DrawingShape | null }[] = [
-    { elem: null, selector: '#disable', tool: null },
-    { elem: null, selector: '#point', tool: DrawingShape.Point },
-    { elem: null, selector: '#line', tool: DrawingShape.Polyline },
-    { elem: null, selector: '#square', tool: DrawingShape.Square },
-    { elem: null, selector: '#rectangle', tool: DrawingShape.Rectangle },
-    { elem: null, selector: '#polygon', tool: DrawingShape.Polygon },
-    { elem: null, selector: '#circle', tool: DrawingShape.Disk },
-    { elem: null, selector: '#freeline', tool: DrawingShape.FreehandPolyline },
-    { elem: null, selector: '#freepolygon', tool: DrawingShape.FreehandPolygon }
+  buttons: { id: string; tool: DrawingShape | null }[] = [
+    { id: 'disable', tool: null },
+    { id: 'point', tool: DrawingShape.Point },
+    { id: 'line', tool: DrawingShape.Polyline },
+    { id: 'square', tool: DrawingShape.Square },
+    { id: 'rectangle', tool: DrawingShape.Rectangle },
+    { id: 'polygon', tool: DrawingShape.Polygon },
+    { id: 'circle', tool: DrawingShape.Disk },
+    { id: 'freeline', tool: DrawingShape.FreehandPolyline },
+    { id: 'freepolygon', tool: DrawingShape.FreehandPolygon }
   ];
   toolSelected: Element | null = null;
+  curFeature: DrawingFeature | null = null;
 
   olDrawing: OlDrawing;
   cesiumDrawing: CesiumDrawing;
@@ -58,42 +58,62 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   render() {
-    this.visible ? this.renderComponent() : this.renderEmptyComponent();
-  }
-
-  renderComponent() {
     super.render();
     super.girafeTranslate();
     this.activateTooltips(false, [800, 0], 'top-end');
-    this.buttons.forEach((b) => (b.elem = this.shadow.querySelector(b.selector)));
-    this.toolSelected = this.buttons[0].elem;
-    this.state.selection.enabled = false;
-    this.registerEvents();
+    this.visible ? this.renderComponent() : this.hide();
+    this.state.selection.enabled = !this.visible;
+    this.setTool();
   }
 
-  renderEmptyComponent() {
-    this.drawingState.activeTool = null;
-    this.state.selection.enabled = true;
-    this.unregisterEvents();
-    this.renderEmpty();
-  }
-
-  registerEvents() {
-    if (this.eventsCallbacks.length == 0) {
-      this.eventsCallbacks.push(
-        this.stateManager.subscribe('extendedState.drawing.features', (olds, news) =>
-          this.onFeaturesChanged(olds, news)
-        ),
-        this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news))
+  renderComponent() {
+    this.show();
+    if (!this.renderedOnce) {
+      this.renderedOnce = true;
+      this.buttons.forEach((b) => {
+        this.getById(b.id).addEventListener('click', () => this.setTool(b.tool));
+      });
+      this.stateManager.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news));
+      this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
+      this.getById('visibleIconName').innerHTML = visibleIcon;
+      this.getById('visibleIconMeasure').innerHTML = visibleIcon;
+      this.addColorPicker(
+        'nameColorPicker',
+        (c) => (this.curFeature!.nameColor = c.hex),
+        () => this.curFeature!.nameColor
       );
-      this.buttons.forEach((b) => b.elem?.addEventListener('click', () => this.setTool(b.elem!, b.tool)));
+      this.addColorPicker(
+        'measureColorPicker',
+        (c) => (this.curFeature!.measureColor = c.hex),
+        () => this.curFeature!.measureColor
+      );
+      this.addColorPicker(
+        'fillPicker',
+        (c) => (this.curFeature!.fillColor = c.hex),
+        () => this.curFeature!.fillColor
+      );
+      this.addColorPicker(
+        'strokePicker',
+        (c) => (this.curFeature!.strokeColor = c.hex),
+        () => this.curFeature!.strokeColor
+      );
+      this.getById('optionsTitle').oninput = (e) => {
+        this.curFeature!.name = (e.target as HTMLInputElement).value;
+        this.getById('name-f-' + this.curFeature!.id).innerHTML = this.curFeature!.name;
+        this.render();
+      };
     }
   }
 
-  unregisterEvents() {
-    this.stateManager.unsubscribe(this.eventsCallbacks);
-    this.eventsCallbacks.length = 0;
-    this.buttons.forEach((b) => b.elem?.removeEventListener('click', () => this.setTool(b.elem!, b.tool)));
+  addColorPicker(id: string, set: (c: typeof Color) => any, get: () => string) {
+    const picker = new Picker({ parent: this.getById(id), popup: 'top' });
+    const update = (c: typeof Color) => {
+      set(c);
+      this.getById(id).style.backgroundColor = c.hex;
+    };
+    picker.onChange = update;
+    picker.onDone = update;
+    this.colorPickers.push([picker, get]);
   }
 
   serialize() {
@@ -104,11 +124,11 @@ export default class DrawingComponent extends GirafeHTMLElement {
     serializedFeatures.forEach((f) => this.drawingState.features.push(DrawingFeature.deserialize(f)));
   }
 
-  setTool(element: HTMLElement, tool: DrawingShape | null = null) {
+  setTool(tool: DrawingShape | null = null) {
     if (this.toolSelected !== null) {
       this.toolSelected.className = '';
     }
-    this.toolSelected = element;
+    this.toolSelected = this.getById(this.buttons.find((x) => x.tool == tool)!.id)!;
     this.toolSelected.className = 'selected';
     this.drawingState.activeTool = tool;
   }
@@ -131,7 +151,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const oldIds = oldFeatures.map((f) => f.id);
     const deleted = oldFeatures.filter((f) => !newIds.includes(f.id));
     const added = newFeatures.filter((f) => !oldIds.includes(f.id));
-    deleted.forEach((f) => this.removeFeatureFromList(f));
+    deleted.forEach((f) => this.getById('f-' + f.id).remove());
     added.forEach((f) => this.addFeatureToList(f));
     this.olDrawing.deleteFeatures(deleted);
     this.olDrawing.addFeatures(added);
@@ -156,156 +176,89 @@ export default class DrawingComponent extends GirafeHTMLElement {
     }
   }
 
-  createDiv(id = '', className = '', content = '', onclick = (_: MouseEvent) => {}) {
-    const element = document.createElement('div');
-    element.id = id;
-    element.className = className;
-    element.innerHTML = content;
-    element.onclick = onclick;
-    return element;
-  }
-
   addFeatureToList(feature: DrawingFeature) {
-    const container = this.createDiv('f-' + feature.id, 'girafe');
-    const lineOne = this.createDiv('', 'featureLine');
-    const lineTwo = this.createDiv('', 'featureLine');
-
-    lineOne.appendChild(this.createDiv('', 'icon', locateIcon, () => this.olDrawing.centerViewOnFeature(feature)));
-
-    // Label
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.value = feature.name;
-    nameInput.className = 'name';
-    nameInput.oninput = (e) => (feature.name = (e.target as HTMLInputElement).value);
-    lineOne.appendChild(nameInput);
-
-    // Options menu
-    const optionsMenuDiv = this.createDiv('', 'optionsMenu');
-    if (feature.type != DrawingShape.Disk) {
-      const buttonGeoJson = document.createElement('button');
-      buttonGeoJson.innerText = 'Export as GeoJSON';
-      buttonGeoJson.addEventListener('click', () => this.exportFeature(feature, 'geojson'));
-      optionsMenuDiv.appendChild(buttonGeoJson);
-
-      const buttonKML = document.createElement('button');
-      buttonKML.innerText = 'Export as KML';
-      buttonKML.addEventListener('click', () => this.exportFeature(feature, 'kml'));
-      optionsMenuDiv.appendChild(buttonKML);
-    }
-    if (
-      feature.type == DrawingShape.Point ||
-      feature.type == DrawingShape.Polyline ||
-      feature.type == DrawingShape.FreehandPolyline
-    ) {
-      const buttonGPX = document.createElement('button');
-      buttonGPX.innerText = 'Export as GPX';
-      buttonGPX.addEventListener('click', () => this.exportFeature(feature, 'gpx'));
-      optionsMenuDiv.appendChild(buttonGPX);
-    }
-
-    optionsMenuDiv.style.display = 'none';
-    (this.shadowRoot?.querySelector('#panel') as HTMLElement).addEventListener(
-      'click',
-      () => (optionsMenuDiv.style.display = 'none')
-    );
-    container.appendChild(optionsMenuDiv);
-
-    // Label options
-    lineOne.appendChild(this.createDiv('', 'icon', minusIcon, () => feature.fontSize--));
-    lineOne.appendChild(this.createDiv('', 'icon', plusIcon, () => feature.fontSize++));
-    lineOne.appendChild(
-      this.createDiv('', 'icon', optionsIcon, (e) => {
-        const isDisplayed = optionsMenuDiv.style.display == 'none';
-        Array.from(this.shadowRoot!.querySelectorAll('.optionsMenu')).forEach(
-          (x) => ((x as HTMLElement).style.display = 'none')
-        );
-        if (isDisplayed) {
-          e.stopPropagation();
-          optionsMenuDiv.style.display = 'inline-block';
-        } else {
-          optionsMenuDiv.style.display = 'none';
-        }
-      })
-    );
-
-    // Color Selector (Fill)
-    const fill = this.createDiv('', 'icon', paintRollerIcon, setLastMousePosition);
-    const fillColor = feature.fillColor ?? this.configManager.Config.drawing.defaultFillColor;
-    const fillPicker = new Picker({ parent: fill, color: fillColor, popup: 'left' });
-    fillPicker.onChange = (color: typeof Color) => (feature.fillColor = color.hex);
-    fillPicker.onDone = (color: typeof Color) => (feature.fillColor = color.hex);
-    fillPicker.onOpen = () =>
-      this.shadowRoot?.querySelectorAll('.picker_wrapper').forEach((e) => {
-        const element = e as HTMLElement;
-        if (element.style.display != 'none') {
-          element.style.top = Math.min(window.innerHeight - 300, lastMouseY) + 'px';
-          element.style.left = lastMouseX + 'px';
-        }
-      });
-    lineTwo.appendChild(fill);
-
-    // Color Selector (Stroke)
-    const stroke = this.createDiv('', 'icon', paintBrushIcon, setLastMousePosition);
-    const strokeColor = feature.strokeColor ?? this.configManager.Config.drawing.defaultStrokeColor;
-    const strokePicker = new Picker({ parent: stroke, color: strokeColor, popup: 'left' });
-    strokePicker.onChange = (color: typeof Color) => (feature.strokeColor = color.hex);
-    strokePicker.onDone = (color: typeof Color) => (feature.strokeColor = color.hex);
-    strokePicker.onOpen = () =>
-      this.shadowRoot?.querySelectorAll('.picker_wrapper').forEach((e) => {
-        const element = e as HTMLElement;
-        if (element.style.display != 'none') {
-          element.style.top = Math.min(window.innerHeight - 300, lastMouseY) + 'px';
-          element.style.left = lastMouseX + 'px';
-        }
-      });
-    lineTwo.appendChild(stroke);
-
-    // StrokeWidth slider
-    const slider = document.createElement('input');
-    slider.type = 'range';
-    slider.className = 'slider';
-    slider.min = '0';
-    slider.max = '10';
-    slider.value = (feature.strokeWidth ?? this.configManager.Config.drawing.defaultStrokeWidth).toString();
-    slider.oninput = (e) => (feature.strokeWidth = parseInt((e.target as HTMLInputElement).value));
-    lineTwo.appendChild(slider);
-
-    // Trash
-    lineTwo.appendChild(this.createDiv('', 'icon', trashIcon, () => this.deleteFeature(feature)));
-
-    container.appendChild(lineOne);
-    container.appendChild(lineTwo);
-    this.shadow.querySelector('#drawingList')?.appendChild(container);
+    const container = createDiv('f-' + feature.id, 'girafe');
+    container.onclick = () => {
+      if (this.drawingState.features.map((f) => f.id).includes(feature.id)) {
+        Array.from(this.getById('drawingList').children).forEach((e) => e.classList.remove('selected'));
+        container.classList.add('selected');
+        this.curFeature = feature;
+        this.updateOptionPanel();
+      }
+    };
+    container.appendChild(createDiv('', 'icon', locateIcon, () => this.olDrawing.centerViewOnFeature(feature)));
+    const name = document.createElement('span');
+    name.id = 'name-f-' + feature.id;
+    name.innerHTML = feature.name;
+    container.appendChild(name);
+    container.appendChild(createDiv('', 'icon', trashIcon, () => this.deleteFeature(feature)));
+    this.getById('drawingList').appendChild(container);
   }
 
-  removeFeatureFromList(feature: DrawingFeature) {
-    const elementId = 'f-' + feature.id;
-    const divToRemove = this.shadow.getElementById(elementId);
-    if (divToRemove != null) {
-      divToRemove.remove();
-    } else {
-      console.warn(`Tried to remove the non existing feature ${elementId}`);
+  updateOptionPanel() {
+    if (this.curFeature != null) {
+      this.getById('options').classList.remove('disabled');
+      this.colorPickers.forEach((val) => val[0].setColor(val[1]()));
+      this.getById('visibleIconName').innerHTML = this.curFeature.displayName ? visibleIcon : notVisibleIcon;
+      this.getById('visibleIconMeasure').innerHTML = this.curFeature.displayMeasure ? visibleIcon : notVisibleIcon;
+      if (
+        this.curFeature.type == DrawingShape.Point ||
+        this.curFeature.type == DrawingShape.Polyline ||
+        this.curFeature.type == DrawingShape.FreehandPolyline
+      ) {
+        this.getById('fillPickerSpan').classList.add('disabled');
+        this.getById('fillPicker').classList.add('disabled');
+      } else {
+        this.getById('fillPickerSpan').classList.remove('disabled');
+        this.getById('fillPicker').classList.remove('disabled');
+      }
+      this.render();
     }
   }
 
   deleteFeature(feature: DrawingFeature) {
-    if (confirm('Do you want to delete this feature ?')) {
+    if (confirm(`Do you want to remove "${feature.name}" ?`)) {
       this.drawingState.features = this.drawingState.features.filter((f) => f.id != feature.id);
+      this.curFeature = null;
+      this.getById('options').classList.add('disabled');
+    }
+  }
+
+  onOptionsChange() {
+    if (this.curFeature != null) {
+      this.curFeature.nameFontSize = parseInt(this.getById<HTMLInputElement>('optionsNameFontSize').value);
+      this.curFeature.measureFontSize = parseInt(this.getById<HTMLInputElement>('optionsMeasuresFontSize').value);
+      this.curFeature.strokeWidth = parseInt(this.getById<HTMLInputElement>('optionsStrokeWidth').value);
+    }
+  }
+
+  toggleNameVisibility() {
+    if (this.curFeature != null) {
+      this.curFeature.displayName = !this.curFeature.displayName;
+      this.getById('visibleIconName').innerHTML = this.curFeature.displayName ? visibleIcon : notVisibleIcon;
+    }
+  }
+
+  toggleMeasureVisibility() {
+    if (this.curFeature != null) {
+      this.curFeature.displayMeasure = !this.curFeature.displayMeasure;
+      this.getById('visibleIconMeasure').innerHTML = this.curFeature.displayMeasure ? visibleIcon : notVisibleIcon;
     }
   }
 
   exportFeature(feature: DrawingFeature, format: 'geojson' | 'kml' | 'gpx') {
-    const olFeature = this.olDrawing.createOlFeature(feature);
-    switch (format) {
-      case 'geojson':
-        return download(new GeoJSON().writeFeature(olFeature), feature.name + '.geojson', '.geojson');
-      case 'kml':
-        return download(new KML().writeFeatures([olFeature]), feature.name + '.kml', '.kml');
-      case 'gpx':
-        return download(new GPX().writeFeatures([olFeature]), feature.name + '.gpx', '.gpx');
-      default:
-        console.warn(`Unsupported feature export format : ${format}`);
+    if (feature != null) {
+      const olFeature = this.olDrawing.createOlFeature(feature);
+      switch (format) {
+        case 'geojson':
+          return download(new GeoJSON().writeFeature(olFeature), feature.name + '.geojson', '.geojson');
+        case 'kml':
+          return download(new KML().writeFeatures([olFeature]), feature.name + '.kml', '.kml');
+        case 'gpx':
+          return download(new GPX().writeFeatures([olFeature]), feature.name + '.gpx', '.gpx');
+        default:
+          console.warn(`Unsupported feature export format : ${format}`);
+      }
     }
   }
 }
