@@ -1,4 +1,5 @@
 export type UrlShortenerResponse = {
+  success: boolean;
   shorturl: string;
   qrcode?: string;
 };

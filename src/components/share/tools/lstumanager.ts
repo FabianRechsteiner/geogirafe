@@ -26,6 +26,7 @@ class LstuManager implements IUrlShortener {
     params.append('format', 'json');
 
     const errorResponse = {
+      success: false,
       shorturl: longUrl
     };
 
@@ -42,6 +43,7 @@ class LstuManager implements IUrlShortener {
       if (response_data.success) {
         const data = response_data as LstuSuccessResponse;
         return {
+          success: true,
           shorturl: data.short,
           qrcode: `data:image/png;base64, ${data.qrcode}`
         };

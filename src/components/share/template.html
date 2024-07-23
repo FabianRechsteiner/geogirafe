@@ -22,7 +22,7 @@
       </div>
 
       <img alt="share-qrcode" class="${(this.qrCode ? 'qrcode' : 'hidden')}" src="${this.qrCode}" />
-      <div class="${(this.qrCode ? 'hidden' : 'qrcode error')}">
+      <div class="${(this.success ? 'hidden' : 'qrcode error')}">
         <i class="fa-solid fa-circle-exclamation tool error"></i>
         Error, can not fetch the shortener service. Please try again later.
       </div>

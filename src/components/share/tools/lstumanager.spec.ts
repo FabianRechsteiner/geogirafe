@@ -31,6 +31,7 @@ describe('LstuManager.shortenUrl', () => {
     });
 
     expect(response).toStrictEqual({
+      success: false,
       shorturl: longUrl
     });
   });

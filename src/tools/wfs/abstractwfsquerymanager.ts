@@ -141,7 +141,7 @@ abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
     return geometryAttributeFound;
   }
 
-  validateLayerAttributeType(type: any): type is WfsXmlTypes {
+  validateLayerAttributeType(type: string) {
     return xmlTypesStrList.includes(type);
   }
 

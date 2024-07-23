@@ -16,6 +16,7 @@ class ShareComponent extends GirafeDraggableElement {
 
   shareLink?: string;
   qrCode?: string;
+  success: boolean = true;
   twitterLogo: string = TwitterLogo;
   facebookLogo: string = FacebookLogo;
   linkedInLogo: string = LinkedInLogo;
@@ -40,7 +41,7 @@ class ShareComponent extends GirafeDraggableElement {
     // Initialize UrlShortener
     switch (this.configManager.Config.share.service) {
       case 'gmf':
-        this.urlShortener = new GmfManager();
+        this.urlShortener = new GmfManager(this.configManager.Config.share.createUrl);
         break;
       case 'lstu':
         this.urlShortener = new LstuManager(this.configManager.Config.share.createUrl);
@@ -63,6 +64,7 @@ class ShareComponent extends GirafeDraggableElement {
 
       const response = await this.urlShortener.shortenUrl(longurl);
       this.shareLink = response.shorturl;
+      this.success = response.success;
       this.qrCode = response.qrcode;
       this.loading = false;
       this.render();

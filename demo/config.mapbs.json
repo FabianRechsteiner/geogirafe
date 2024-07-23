@@ -40,8 +40,8 @@
     "defaultLayout": "print_A4_hochformat"
   },
   "share": {
-    "service": "lstu",
-    "createUrl": "https://lstu.fr/a"
+    "service": "gmf",
+    "createUrl": "https://map.geo.test.bs.ch/short/create"
   },
   "projections": {
     "EPSG:3857": "W-M",

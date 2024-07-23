@@ -110,6 +110,7 @@
   "files": [
     "**/*"
   ],
+  "browser": "main.js",
   "scripts": {
     "start": "tsc && vite serve --port 8080",
     "start-rebundle-deps": "tsc && vite serve --force --port 8080",
