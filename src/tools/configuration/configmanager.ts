@@ -31,7 +31,6 @@ class ConfigManager extends GirafeSingleton {
     }
 
     // Load config
-    console.log('Loading Application Configuration...');
     this.loadingPromise = (async () => {
       const response = await fetch('config.json');
       let jsonConfig = await response.json();

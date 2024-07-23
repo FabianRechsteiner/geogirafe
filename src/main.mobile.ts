@@ -6,6 +6,7 @@ import ConfigManager from './tools/configuration/configmanager';
 import ErrorManager from './tools/error/errormanager.js';
 import CsvManager from './tools/export/csvmanager.js';
 import I18nManager from './tools/i18n/i18nmanager.js';
+import LogManager from './tools/logging/logmanager.js';
 import OfflineManager from './tools/offline/offlinemanager';
 import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
@@ -99,30 +100,35 @@ try {
   );
   register(proj4);
 
-  // Tell configmanager it should load the mobile configuration as well
+  // Tell configManager it should load the mobile configuration as well
   ConfigManager.initMobile();
 
   // Initialize the managers
-  ConfigManager.getInstance();
-  ErrorManager.getInstance();
-  CsvManager.getInstance();
-  I18nManager.getInstance();
-  ThemesManager.getInstance();
-  WfsManager.getInstance();
+  ConfigManager.getInstance().loadConfig()
+  LogManager.getInstance().initLogging().then(()=>{
+    ErrorManager.getInstance();
+    CsvManager.getInstance();
+    I18nManager.getInstance();
+    ThemesManager.getInstance();
+    WfsManager.getInstance();
+    LogManager.getInstance();
 
-  // Add the state to document, so that it will be accessible everywhere
-  document.geogirafe = {
-    state: StateManager.getInstance().state,
-    stateManager: StateManager.getInstance(),
-    shareManager: ShareManager.getInstance(),
-    offlineManager: OfflineManager.getInstance()
-  };
+    // Add the state to document, so that it will be accessible everywhere
+    document.geogirafe = {
+      state: StateManager.getInstance().state,
+      stateManager: StateManager.getInstance(),
+      shareManager: ShareManager.getInstance(),
+      offlineManager: OfflineManager.getInstance()
+    };
 
-  // Define components names
-  customElements.define('girafe-map', MapComponent);
-  customElements.define('girafe-search', MobileSearchComponent);
-  customElements.define('girafe-theme-select', MobileThemeComponent);
-  customElements.define('girafe-offline', OfflineComponent);
+    // Define components names
+    customElements.define('girafe-map', MapComponent);
+    customElements.define('girafe-search', MobileSearchComponent);
+    customElements.define('girafe-theme-select', MobileThemeComponent);
+    customElements.define('girafe-offline', OfflineComponent);
+  });
+  
+
 } finally {
   // To prevent the FOUC effect (flash of unstyled content),
   // the html element is set to invisible when the application starts.

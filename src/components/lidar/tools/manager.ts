@@ -57,7 +57,7 @@ export class LidarProfileManager {
 
   private isPlotSetup: boolean;
   private line: OlGeomLineString | null;
-  private i18nManager: I18nManager;
+  private i18nManager: I18nManager | null = null;
 
   utils: LidarProfileUtils;
 
@@ -67,7 +67,6 @@ export class LidarProfileManager {
    * Requires access to a Pytree webservice: https://github.com/sitn/pytree
    */
   constructor() {
-    this.i18nManager = I18nManager.getInstance();
     this.plot = null;
     this.measure = null;
     this.config = null;
@@ -119,6 +118,7 @@ export class LidarProfileManager {
    * @param map The map.
    */
   init(config: LidarProfileConfig, map: OlMap): void {
+    this.i18nManager = I18nManager.getInstance();
     this.config = config;
     this.plot = new LidarProfilePlot(this);
     this.measure = new LidarProfileMeasure(this);
@@ -226,7 +226,7 @@ export class LidarProfileManager {
     this.config.clientConfig.pointSum = 0;
     const profileWidth = this.config.clientConfig.autoWidth ? maxLODWith.width : this.config.serverConfig.width ?? 0;
 
-    const profileWidthTxt = this.i18nManager.getTranslation('Profile width: ');
+    const profileWidthTxt = this.i18nManager?.getTranslation('Profile width: ');
     d3select(getLidarProfileWidthInfo() as BaseType).html(`${profileWidthTxt} ${profileWidth}m`);
     const initialLOD = this.config.serverConfig.initialLOD ?? 0;
 
@@ -273,7 +273,7 @@ export class LidarProfileManager {
     const lodInfo = d3select(getLidarProfileLodInfo() as BaseType);
     if (this.config.serverConfig.debug) {
       let html = lodInfo.html();
-      const loadingLodTxt = this.i18nManager.getTranslation('Loading LOD: ');
+      const loadingLodTxt = this.i18nManager?.getTranslation('Loading LOD: ');
       html += `${loadingLodTxt} ${minLOD}-${maxLOD}..<br>`;
       lodInfo.html(html);
     }
@@ -298,8 +298,8 @@ export class LidarProfileManager {
         }
         if (this.config.serverConfig.debug) {
           let html = lodInfo.html();
-          const lodTxt = this.i18nManager.getTranslation('LOD: ');
-          const loadedTxt = this.i18nManager.getTranslation('loaded');
+          const lodTxt = this.i18nManager?.getTranslation('LOD: ');
+          const loadedTxt = this.i18nManager?.getTranslation('loaded');
           html += `${lodTxt} ${minLOD}-${maxLOD} ${loadedTxt}<br>`;
           lodInfo.html(html);
         }
@@ -469,12 +469,12 @@ export class LidarProfileManager {
    * @private
    */
   getHTMLError_(): string {
-    const errorInfoTxt = this.i18nManager.getTranslation('LiDAR profile service error');
-    const errorOfflineTxt = this.i18nManager.getTranslation('It might be offline');
-    const errorOutsideTxt = this.i18nManager.getTranslation(
+    const errorInfoTxt = this.i18nManager?.getTranslation('LiDAR profile service error');
+    const errorOfflineTxt = this.i18nManager?.getTranslation('It might be offline');
+    const errorOutsideTxt = this.i18nManager?.getTranslation(
       'Or did you attempt to draw a profile outside data extent?'
     );
-    const errorNoPointError = this.i18nManager.getTranslation(
+    const errorNoPointError = this.i18nManager?.getTranslation(
       'Or did you attempt to draw such a small profile that no point was returned?'
     );
     return `

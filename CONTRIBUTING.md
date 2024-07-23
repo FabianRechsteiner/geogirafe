@@ -92,7 +92,7 @@ A big thank to all the contributors of GeoGirafe, in alphabetical order:
 - Arnaud Poncet-Montanges @ponceta (SIGIP)
 - Ben Koch @beeekey (OpenGIS)
 - Benjamin Gerber @ger-benjamin (Camptocamp SA)
-- Clemens Rudert @crud3_r (OpenGIS)
+- Clemens Rudert @crud3_rt (OpenGIS)
 - Corentin Junod @D0lpic (SITN Neuchâtel)
 - Daniel Gnerre @gnerred (Cartoriviera)
 - Didier Dupertuis @dddpt (OpenGIS)

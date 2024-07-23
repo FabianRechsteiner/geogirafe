@@ -1,17 +1,18 @@
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 import tippy from 'tippy.js';
-import State from './tools/state/state.js';
+import State from './tools/state/state';
 
 import ConfigManager from './tools/configuration/configmanager';
-import ErrorManager from './tools/error/errormanager.js';
-import CsvManager from './tools/export/csvmanager.js';
-import I18nManager from './tools/i18n/i18nmanager.js';
+import ErrorManager from './tools/error/errormanager';
+import CsvManager from './tools/export/csvmanager';
+import I18nManager from './tools/i18n/i18nmanager';
+import LogManager from './tools/logging/logmanager';
 import OfflineManager from './tools/offline/offlinemanager';
 import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
 import ThemesManager from './tools/themesmanager';
-import WfsManager from './tools/wfs/wfsmanager.js';
+import WfsManager from './tools/wfs/wfsmanager';
 
 import AboutComponent from './components/about/component';
 import BasemapComponent from './components/basemap/component';
@@ -87,51 +88,55 @@ try {
 
   // Initialize the managers
   ConfigManager.getInstance();
-  ErrorManager.getInstance();
-  CsvManager.getInstance();
-  I18nManager.getInstance();
-  ThemesManager.getInstance();
-  WfsManager.getInstance();
+  LogManager.getInstance()
+    .initLogging()
+    .then(() => {
+      ErrorManager.getInstance();
+      CsvManager.getInstance();
+      I18nManager.getInstance();
+      ThemesManager.getInstance();
+      WfsManager.getInstance();
 
-  // Add the state to document, so that it will be accessible everywhere
-  document.geogirafe = {
-    state: StateManager.getInstance().state,
-    stateManager: StateManager.getInstance(),
-    shareManager: ShareManager.getInstance(),
-    offlineManager: OfflineManager.getInstance()
-  };
+      // Add the state to document, so that it will be accessible everywhere
+      document.geogirafe = {
+        state: StateManager.getInstance().state,
+        stateManager: StateManager.getInstance(),
+        shareManager: ShareManager.getInstance(),
+        offlineManager: OfflineManager.getInstance()
+      };
 
-  // Define components names
-  customElements.define('girafe-about', AboutComponent);
-  customElements.define('girafe-basemap', BasemapComponent);
-  customElements.define('girafe-colorswitcher', ColorSwitcherComponent);
-  customElements.define('girafe-coordinate', CoordinateComponent);
-  customElements.define('girafe-globe-select', GlobeComponent);
-  customElements.define('girafe-help', HelpComponent);
-  customElements.define('girafe-infobox', InfoboxComponent);
-  customElements.define('girafe-language-select', LanguageComponent);
-  customElements.define('girafe-lidar-panel', LidarPanelComponent);
-  customElements.define('girafe-lidar-profile', LidarProfileComponent);
-  customElements.define('girafe-lr-panel', LRPanelComponent);
-  customElements.define('girafe-map', MapComponent);
-  customElements.define('girafe-menu-button', MenuButtonComponent);
-  customElements.define('girafe-nav-bookmarks', NavBookmarksComponent);
-  customElements.define('girafe-nav-history', NavHelperComponent);
-  customElements.define('girafe-print', PrintComponent);
-  customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
-  customElements.define('girafe-proj-select', ProjectionComponent);
-  customElements.define('girafe-query-builder', QueryBuilderComponent);
-  customElements.define('girafe-drawing', DrawingComponent);
-  customElements.define('girafe-scale', ScaleComponent);
-  customElements.define('girafe-search', SearchComponent);
-  customElements.define('girafe-selection-grid', SelectionGridComponent);
-  customElements.define('girafe-selection-window', SelectionWindowComponent);
-  customElements.define('girafe-share', ShareComponent);
-  customElements.define('girafe-theme-select', ThemeComponent);
-  customElements.define('girafe-tree-view', TreeViewComponent);
-  customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
-  customElements.define('girafe-tree-view-item', TreeViewItemComponent);
-  customElements.define('girafe-video-record', VideoRecordComponent);
+      // Define components names
+      customElements.define('girafe-about', AboutComponent);
+      customElements.define('girafe-basemap', BasemapComponent);
+      customElements.define('girafe-colorswitcher', ColorSwitcherComponent);
+      customElements.define('girafe-coordinate', CoordinateComponent);
+      customElements.define('girafe-globe-select', GlobeComponent);
+      customElements.define('girafe-help', HelpComponent);
+      customElements.define('girafe-infobox', InfoboxComponent);
+      customElements.define('girafe-language-select', LanguageComponent);
+      customElements.define('girafe-lidar-panel', LidarPanelComponent);
+      customElements.define('girafe-lidar-profile', LidarProfileComponent);
+      customElements.define('girafe-lr-panel', LRPanelComponent);
+      customElements.define('girafe-map', MapComponent);
+      customElements.define('girafe-menu-button', MenuButtonComponent);
+      customElements.define('girafe-nav-bookmarks', NavBookmarksComponent);
+      customElements.define('girafe-nav-history', NavHelperComponent);
+      customElements.define('girafe-print', PrintComponent);
+      customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
+      customElements.define('girafe-proj-select', ProjectionComponent);
+      customElements.define('girafe-query-builder', QueryBuilderComponent);
+      customElements.define('girafe-drawing', DrawingComponent);
+      customElements.define('girafe-scale', ScaleComponent);
+      customElements.define('girafe-search', SearchComponent);
+      customElements.define('girafe-selection-grid', SelectionGridComponent);
+      customElements.define('girafe-selection-window', SelectionWindowComponent);
+      customElements.define('girafe-share', ShareComponent);
+      customElements.define('girafe-theme-select', ThemeComponent);
+      customElements.define('girafe-tree-view', TreeViewComponent);
+      customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
+      customElements.define('girafe-tree-view-item', TreeViewItemComponent);
+      customElements.define('girafe-video-record', VideoRecordComponent);
+    });
 } finally {
   // To prevent the FOUC effect (flash of unstyled content),
   // the html element is set to invisible when the application starts.

@@ -19,6 +19,7 @@ class OfflineManager extends GirafeSingleton {
   private database?: IDBDatabase;
   private map: Map;
   private stateManager: StateManager;
+  private configManager: ConfigManager;
 
   private get state() {
     return this.stateManager.state;
@@ -45,6 +46,7 @@ class OfflineManager extends GirafeSingleton {
   constructor(type: string) {
     super(type);
     this.stateManager = StateManager.getInstance();
+    this.configManager = ConfigManager.getInstance();
     this.map = MapManager.getInstance().getMap();
     this.map.addLayer(this.vectorLayer);
   }
@@ -133,11 +135,12 @@ class OfflineManager extends GirafeSingleton {
     this.storeVersion = storeVersion;
     this.dbCacheName = dbCacheName;
     this.database = await this.openIndexedDB();
-
+    await this.configManager.loadConfig();
     this.serviceWorker.postMessage({
       storeVersion: this.storeVersion,
       dbCacheName: this.dbCacheName,
-      tilesStoreName: this.tilesStoreName
+      tilesStoreName: this.tilesStoreName,
+      logLevel: this.configManager.Config.general.logLevel
     });
   }
 

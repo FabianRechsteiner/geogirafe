@@ -15,6 +15,7 @@
 var storeVersion; // Version of the store. Value is defined by OfflineManager.
 var dbCacheName; // Name of the cache for downloaded data. Value is defined by OfflineManager.
 var tilesStoreName; // Name of the store used to downloaded tiles. Value is defined by OfflineManager.
+var logLevel; // Current log level. Value is defined by OfflineManager.
 
 const offlineTimeout = 3000; // Timeout in case of not reacheable IndexedDB. (3 sec.)
 const appCacheName = 'pages'; // Name of the cache for application pages
@@ -31,17 +32,21 @@ self.addEventListener('fetch', (event) => {
  * Read values coming from OfflineManager
  */
 function handleMessage(event) {
+  if (event.data.logLevel) {
+    logLevel = event.data.logLevel;
+    log(`LogLevel changed: ${dbCacheName}`);
+  }
   if (event.data.tilesStoreName) {
     tilesStoreName = event.data.tilesStoreName;
-    console.debug(`SW tilesStoreName changed: ${tilesStoreName}`);
+    log(`SW tilesStoreName changed: ${tilesStoreName}`);
   }
   if (event.data.storeVersion) {
     storeVersion = event.data.storeVersion;
-    console.debug(`SW storeVersion changed: ${storeVersion}`);
+    log(`SW storeVersion changed: ${storeVersion}`);
   }
   if (event.data.dbCacheName) {
     dbCacheName = event.data.dbCacheName;
-    console.debug(`SW dbCacheName changed: ${dbCacheName}`);
+    log(`SW dbCacheName changed: ${dbCacheName}`);
   }
 }
 
@@ -50,7 +55,7 @@ function handleMessage(event) {
  */
 function handleInstall() {
   self.skipWaiting();
-  console.debug('SW Service Worker installed');
+  log('SW Service Worker installed');
 }
 
 async function handleFetchEvent(event) {
@@ -88,7 +93,7 @@ async function fetchAndCache(request) {
     if (cacheCount < maxCacheCount && request.method === 'GET' && response.type !== 'opaque') {
       // Fetch was successful. We cache the result if necessary and return the response.
       cacheCount++;
-      console.debug(`SW ${cacheCount}/${maxCacheCount} caching ${request.url} for offline use.`);
+      log(`SW ${cacheCount}/${maxCacheCount} caching ${request.url} for offline use.`);
       const copy = response.clone();
       const cache = await caches.open(appCacheName);
       await cache.put(request, copy);
@@ -128,10 +133,10 @@ async function loadFromIndexedDB(request) {
       dbRequest.onsuccess = () => {
         if (dbRequest.result) {
           const blob = dbRequest.result.data;
-          console.debug('SW Tile found in Cache.');
+          log('SW Tile found in Cache.');
           resolve(new Response(blob));
         } else {
-          console.debug('SW Tile not found in cache.');
+          log('SW Tile not found in cache.');
           resolve(new Response(null, { status: 204 }));
         }
       };
@@ -171,4 +176,10 @@ async function openIndexedDB() {
       }
     };
   });
+}
+
+function log(str) {
+  if (logLevel === 'debug') {
+    console.debug(str);
+  }
 }

@@ -1,6 +1,7 @@
 class GirafeConfig {
   general: {
     locale: string;
+    logLevel: 'debug' | 'info' | 'warn' | 'error';
   };
   languages: {
     translations: {
@@ -315,7 +316,7 @@ class GirafeConfig {
 
   private initConfigLidar(config: GirafeConfig) {
     if (!config.lidar?.url) {
-      console.warn('No LiDAR URL');
+      console.info('No LiDAR URL');
     }
     return {
       url: config.lidar?.url ?? 'noLidarUrlInConfig'
@@ -389,7 +390,10 @@ class GirafeConfig {
 
   private initConfigGeneral(config: GirafeConfig) {
     return {
-      locale: config.general.locale ?? GirafeConfig.DEFAULT_LOCALE
+      locale: config.general.locale ?? GirafeConfig.DEFAULT_LOCALE,
+      // NOTE REG: Small hack specific to Vite: When running in debug mode, we force the logLevel to debug.
+      // Otherwise we will always have to manually activate it.
+      logLevel: import.meta.env.DEV ? 'debug' : config.general.logLevel ?? 'warn'
     };
   }
 }
