@@ -28,7 +28,6 @@ class GirafeSingleton {
       GirafeSingleton.initializingSingletons[type] = true;
       try {
         // Get the child constructor, and create and instance of the child
-        console.log(`Creating Singleton ${type}`);
         const singleton = new this(type);
         GirafeSingleton.instances[type] = singleton as GirafeSingleton;
       } finally {

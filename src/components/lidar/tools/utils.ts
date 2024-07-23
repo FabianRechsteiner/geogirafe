@@ -57,11 +57,6 @@ type NiceLOD = {
 };
 
 export default class {
-  private i18nManager: I18nManager;
-
-  constructor() {
-    this.i18nManager = I18nManager.getInstance();
-  }
 
   /**
    * Clip a linestring with start and end measure given by D3 Chart domain
@@ -271,7 +266,7 @@ export default class {
       // Let the user download the image.
       canvas.toBlob((blob) => {
         if (!blob) {
-          window.alert(this.i18nManager.getTranslation('No graph to export in PNG!'));
+          window.alert(I18nManager.getInstance().getTranslation('No graph to export in PNG!'));
           return;
         }
         saveAs(blob, 'LIDAR_profile.png');

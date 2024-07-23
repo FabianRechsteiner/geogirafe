@@ -5,7 +5,8 @@ import I18nManager from '../i18n/i18nmanager';
 class MockHelper {
   public static mockConfig = {
     general: {
-      locale: 'en-US'
+      locale: 'en-US',
+      logLevel: 'debug'
     },
     languages: {
       translations: {
@@ -38,6 +39,9 @@ class MockHelper {
     offline: {
       downloadStartZoom: 5,
       downloadEndZoom: 8
+    },
+    lidar: {
+      url: 'https://pytree.test.url'
     }
   };
 
