@@ -92,7 +92,6 @@ export default class WfsManager extends GirafeSingleton {
       // No feature selectedFeaturesPerParamselected
       this.state.interface.selectionComponentVisible = false;
     } else {
-      console.debug('WfsMamager.onSelectFeatures(): selectedFeatures', selectedFeatures);
       this.state.selection.selectedFeatures.push(...selectedFeatures);
       this.state.interface.selectionComponentVisible = true;
     }

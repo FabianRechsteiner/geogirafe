@@ -161,7 +161,6 @@ class WmtsManager {
         return;
       }
       const ogcServer = { ...wmtsLayer.ogcServer };
-      ogcServer.urlWfs = undefined; // To use GetFeatureInfo and not WFS getFeature.
       const layers = queryLayers.split(',').map((wmsLayer) => {
         return new LayerWms(0, wmsLayer, 0, ogcServer, {
           queryLayers,
