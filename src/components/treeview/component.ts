@@ -8,7 +8,6 @@ import IconAdvanced from './images/advanced.svg';
 import IconLegend from './images/legend.svg';
 import IconExpand from './images/expand.svg';
 import IconTrash from './images/trash.svg';
-import IconSwiper from './images/swiper.svg';
 
 class TreeViewComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -19,16 +18,11 @@ class TreeViewComponent extends GirafeHTMLElement {
   iconLegend: string = IconLegend;
   iconExpand: string = IconExpand;
   iconTrash: string = IconTrash;
-  iconSwiper: string = IconSwiper;
 
   layerManager: LayerManager;
 
   isAllExpanded: boolean = false;
   areAllLegendExpanded: boolean = true;
-
-  get isSwiperVisible() {
-    return this.state.layers.swipedLayers.left.length > 0 || this.state.layers.swipedLayers.right.length > 0;
-  }
 
   constructor() {
     super('treeview');
@@ -41,7 +35,6 @@ class TreeViewComponent extends GirafeHTMLElement {
     this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) =>
       this.onLayersListChanged(oldLayers, newLayers)
     );
-    this.stateManager.subscribe('layers.swipedLayers', () => super.render());
     this.stateManager.subscribe('treeview.advanced', () => super.render());
   }
 
@@ -127,14 +120,8 @@ class TreeViewComponent extends GirafeHTMLElement {
     for (const layer of this.stateManager.state.layers.layersList) {
       this.layerManager.toggle(layer, 'off');
     }
-    this.hideSwipe();
     this.state.layers.layersList = [];
     this.state.selectedTheme = null;
-  }
-
-  hideSwipe() {
-    this.state.layers.swipedLayers = { left: [], right: [] };
-    super.render();
   }
 }
 

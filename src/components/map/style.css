@@ -123,6 +123,25 @@ input[type='range']::-moz-range-thumb {
   cursor: ew-resize;
 }
 
+.close-swiper {
+  position: absolute;
+  top: 0;
+  transform: translateX(-3px);
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--ol-background-color);
+  color: var(--ol-subtle-foreground-color);
+  border-radius: 4px;
+  border-width: 1px;
+  cursor: pointer;
+}
+
+.close-swiper:hover,
+.close-swiper:focus {
+  outline: 1px solid var(--ol-subtle-foreground-color);
+  color: var(--ol-foreground-color);
+}
+
 .ol-viewport .tooltip {
   position: relative;
   background: rgba(0, 0, 0, 0.5);

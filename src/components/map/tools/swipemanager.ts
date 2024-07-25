@@ -15,6 +15,7 @@ import LocalFileManager from './localfilemanager';
 class SwipeManager {
   map: Map;
   swiper: HTMLInputElement;
+  closeButton: HTMLButtonElement;
   swiperEventListeners: Record<
     string,
     {
@@ -33,6 +34,7 @@ class SwipeManager {
   constructor(
     map: Map,
     swiper: HTMLInputElement,
+    closeButton: HTMLButtonElement,
     wmtsManager: WmtsManager,
     wmsManager: WmsManager,
     localFileManager: LocalFileManager
@@ -48,6 +50,7 @@ class SwipeManager {
     this.wmtsManager = wmtsManager;
     this.wmsManager = wmsManager;
     this.localFileManager = localFileManager;
+    this.closeButton = closeButton;
   }
 
   activateSwipeForWmts(layer: LayerWmts, side: 'left' | 'right') {
@@ -81,10 +84,12 @@ class SwipeManager {
 
   #setSwiperVisible() {
     this.swiper.style.display = 'block';
+    this.closeButton.style.display = 'block';
   }
 
   #hideSwiper() {
     this.swiper.style.display = 'none';
+    this.closeButton.style.display = 'none';
   }
 
   /*deactivateSwipeForWms(layerInfos) {

@@ -64,6 +64,7 @@ export default class MapComponent extends GirafeHTMLElement {
   map3dTarget!: HTMLDivElement;
   loading: boolean = false;
   swiper!: HTMLInputElement;
+  closeSwiperButton!: HTMLButtonElement;
   swipeManager!: SwipeManager;
   wmtsManager!: WmtsManager;
   wmsManager!: WmsManager;
@@ -94,7 +95,12 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.swiper.addEventListener('input', () => this.olMap.render());
+    this.swiper.addEventListener('input', () => {
+      this.olMap.render();
+      this.updateCloseSwiperPosition();
+    });
+
+    this.closeSwiperButton.onclick = () => (this.state.layers.swipedLayers = { left: [], right: [] });
 
     this.stateManager.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) =>
       this.onChangeBasemap(newBasemap)
@@ -154,6 +160,7 @@ export default class MapComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
+    this.activateTooltips(false, [800, 0], 'right');
 
     this.srid = this.configManager.Config.map.srid;
 
@@ -172,9 +179,11 @@ export default class MapComponent extends GirafeHTMLElement {
     this.localFileManager = new LocalFileManager(this.olMap);
     this.wmtsManager = new WmtsManager(this.olMap);
     this.swiper = this.shadow.getElementById('swiper') as HTMLInputElement;
+    this.closeSwiperButton = this.shadow.getElementById('close-swiper') as HTMLButtonElement;
     this.swipeManager = new SwipeManager(
       this.olMap,
       this.swiper,
+      this.closeSwiperButton,
       this.wmtsManager,
       this.wmsManager,
       this.localFileManager
@@ -340,6 +349,7 @@ export default class MapComponent extends GirafeHTMLElement {
     } else {
       this.swipeLayersOnSide(swipedLayers.left, 'left');
       this.swipeLayersOnSide(swipedLayers.right, 'right');
+      this.updateCloseSwiperPosition();
     }
   }
 
@@ -353,6 +363,18 @@ export default class MapComponent extends GirafeHTMLElement {
         this.swipeManager.activateSwipeForLocalFile(layer, side);
       }
     }
+  }
+
+  /**
+   * updates icon position when swipe is moved
+   */
+  updateCloseSwiperPosition() {
+    const sliderValue = parseFloat(this.swiper.value);
+    const max = parseFloat(this.swiper.max);
+    const min = parseFloat(this.swiper.min);
+    const percent = (sliderValue - min) / (max - min);
+    const offset = percent * this.swiper.offsetWidth;
+    this.closeSwiperButton.style.left = `${offset}px`;
   }
 
   async create3dMap() {
