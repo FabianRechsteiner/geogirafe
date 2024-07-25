@@ -3,7 +3,7 @@ import GirafeSingleton from '../base/GirafeSingleton';
 import Basemap from '../models/basemap';
 import Layer from '../models/layers/layer';
 import Theme from '../models/theme';
-import { GMFBackgroundLayer, GMFTheme, GMFTreeItem } from '../models/gmf';
+import { GMFBackgroundLayer, GMFServerOgc, GMFTheme, GMFTreeItem } from '../models/gmf';
 import ConfigManager from './configuration/configmanager';
 import StateManager from './state/statemanager';
 import GroupLayer from '../models/layers/grouplayer';
@@ -17,6 +17,7 @@ import ShareManager from './share/sharemanager';
 import LayerConsts from '../models/layers/layerconsts';
 import LayerCog from '../models/layers/layercog';
 import LayerXYZ from '../models/layers/layerxyz';
+import ServerOgc from '../models/serverogc';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -63,7 +64,7 @@ class ThemesManager extends GirafeSingleton {
   async loadThemes() {
     const response = await fetch(this.configManager.Config.themes.url);
     const content = await response.json();
-    this.state.ogcServers = content['ogcServers'];
+    this.state.ogcServers = this.prepareOgcServers(content['ogcServers']);
     if (this.configManager.Config.basemaps.show) {
       this.state.basemaps = this.prepareBasemaps(content['background_layers']);
     }
@@ -94,6 +95,16 @@ class ThemesManager extends GirafeSingleton {
         console.warn(`The default theme ${this.configManager.Config.themes.defaultTheme} could not be found.`);
       }
     }
+  }
+
+  prepareOgcServers(ogcServerJson: Record<string, GMFServerOgc>) {
+    const servers: { [key: string]: ServerOgc } = {};
+    for (const serverName of Object.keys(ogcServerJson)) {
+      const server = new ServerOgc(serverName, ogcServerJson[serverName]);
+      servers[serverName] = server;
+    }
+
+    return servers;
   }
 
   prepareBasemaps(basemapJson: GMFBackgroundLayer[]) {
