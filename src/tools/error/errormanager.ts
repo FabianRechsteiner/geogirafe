@@ -49,11 +49,18 @@ ${stack}
       const title = `Unhandled rejection: ${error.reason?.message}`;
       const stack = error.reason?.stack;
 
-      this.stateManager.state.infobox.elements.push({
-        id: uuidv4(),
-        text: this.getErrorMessage(title, stack),
-        type: 'error'
-      });
+      // suppresses multiple errormessage with the same Text
+      let pending_msgs = [];
+      for (const ele of this.stateManager.state.infobox.elements) {
+        pending_msgs.push(ele.text);
+      }
+
+      if (!pending_msgs.includes(this.getErrorMessage(title, stack)))
+        this.stateManager.state.infobox.elements.push({
+          id: uuidv4(),
+          text: this.getErrorMessage(title, stack),
+          type: 'error'
+        });
 
       return false;
     });
