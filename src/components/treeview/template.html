@@ -47,8 +47,13 @@
     <girafe-basemap tip="Select basemap"></girafe-basemap>
   </div>
   <div class="treeview-list">
-    ${this.state.layers.layersList.map(layer => (layer instanceof GroupLayer) ? uHtmlFor(layer,
-    layer.treeItemId)`<girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>` :
-    uHtml`<girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>` )}
+    <!-- prettier-ignore -->
+    ${this.state.layers.layersList.map(layer => (layer instanceof ThemeLayer) ? uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-theme themeid="${layer.treeItemId}"></girafe-tree-view-theme>
+    ` : (layer instanceof GroupLayer) ? uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>
+    ` : uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>
+    ` )}
   </div>
 </div>

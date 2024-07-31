@@ -1,37 +1,23 @@
 import BaseLayer from '../../../models/layers/baselayer';
 import GroupLayer from '../../../models/layers/grouplayer';
 import Layer from '../../../models/layers/layer';
-import Theme from '../../../models/theme';
+import ThemeLayer from '../../../models/layers/themelayer';
 import { SharedLayer } from '../../../tools/share/sharedstate';
 import StateDeserializer from '../../../tools/share/statedeserializer';
-import StateSerializer from '../../../tools/share/stateserializer';
-import CustomIcon from '../images/custom.svg';
+import CustomTheme from './customtheme';
 
 class CustomThemesManager {
-  private counterId: number;
-  public customThemes: Theme[] = [];
-  private customThemesSerialized: Record<string, SharedLayer[]> = {};
-  customIcon: string = CustomIcon;
-
-  constructor(minId: number) {
-    this.counterId = minId;
-  }
+  public customThemes: CustomTheme[] = [];
 
   public addTheme(themeName: string, layersList: BaseLayer[]) {
-    const theme = new Theme({
-      id: this.counterId++,
-      name: themeName,
-      icon: this.customIcon
-    });
-
+    const theme = new CustomTheme(themeName);
     for (const layerBase of layersList) {
       const layer = layerBase.clone();
       this.manageActiveStateForClonedObject(layer);
-      theme._layersTree.push(layer);
+      theme.layers.push(layer);
     }
 
     this.customThemes.push(theme);
-    this.customThemesSerialized[theme.name] = new StateSerializer().getSerializedLayerTree(theme._layersTree);
     this.saveCustomThemes();
   }
 
@@ -44,18 +30,17 @@ class CustomThemesManager {
     if (layer instanceof Layer) {
       layer.isDefaultChecked = layer.active;
       layer.activeState = 'off';
-    } else if (layer instanceof GroupLayer) {
+    } else if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       for (const child of layer.children) {
         this.manageActiveStateForClonedObject(child);
       }
     }
   }
 
-  public deleteTheme(theme: Theme) {
+  public deleteTheme(theme: CustomTheme) {
     const index = this.customThemes.findIndex((item) => item === theme);
     if (index >= 0) {
       this.customThemes.splice(index, 1);
-      delete this.customThemesSerialized[theme.name];
       this.saveCustomThemes();
     } else {
       throw new Error('The custom theme to be removed cannot be found in the list of custom themes');
@@ -63,29 +48,23 @@ class CustomThemesManager {
   }
 
   saveCustomThemes() {
-    localStorage.setItem('custom-themes', JSON.stringify(this.customThemesSerialized));
+    const serializedobject: Record<string, SharedLayer[]> = {};
+    for (const customTheme of this.customThemes) {
+      serializedobject[customTheme.name] = customTheme.getSerialized();
+    }
+    localStorage.setItem('custom-themes', JSON.stringify(serializedobject));
   }
 
   public loadCustomThemes() {
     try {
       const localThemes = localStorage.getItem('custom-themes');
       if (localThemes) {
-        this.customThemesSerialized = JSON.parse(localThemes);
-        for (const customThemeName in this.customThemesSerialized) {
-          const theme = new Theme({
-            id: this.counterId++,
-            name: customThemeName,
-            icon: this.customIcon
-          });
-
-          const layerTree = new StateDeserializer().getDeserializedLayerTree(
-            this.customThemesSerialized[customThemeName]
-          );
-          for (const layerBase of layerTree) {
-            theme._layersTree.push(layerBase);
-          }
-
-          this.customThemes.push(theme);
+        const serializedCustomThemes = JSON.parse(localThemes);
+        for (const customThemeName in serializedCustomThemes) {
+          const customTheme = new CustomTheme(customThemeName);
+          const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedCustomThemes[customThemeName]);
+          customTheme.layers.push(...layerTree);
+          this.customThemes.push(customTheme);
         }
       }
     } catch (error) {

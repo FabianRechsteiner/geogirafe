@@ -7,3 +7,4 @@ node_modules
 public/Mock
 public/*.json
 vite.config.js.timestamp-*.mjs
+.npm

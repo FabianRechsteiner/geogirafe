@@ -24,8 +24,8 @@ Please ensure you agree with the license of the project before contributing.
 
 ### 1. Activate the pre-commit hooks
 
-To enforce a consistent style of the code in the whole application, we have decided to use [prettier](https://prettier.io/).  
-If you commit regularly, prettier should be integrated in the git pre-commit hooks.  
+To enforce a consistent style of the code in the whole application, we have decided to use [prettier](https://prettier.io/).
+If you commit regularly, prettier should be integrated in the git pre-commit hooks.
 This can be done with the following command:
 
 ```
@@ -82,7 +82,7 @@ You can contact us through the following channels:
 
 ## Thank you!
 
-> «&nbsp;We ourselves feel that what we are doing is just a drop in the ocean.  
+> «&nbsp;We ourselves feel that what we are doing is just a drop in the ocean.
 > But the ocean would be less because of that missing drop.&nbsp;»
 
 A big thank to all the contributors of GeoGirafe, in alphabetical order:

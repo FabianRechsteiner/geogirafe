@@ -50,7 +50,7 @@ ${stack}
       const stack = error.reason?.stack;
 
       // suppresses multiple errormessage with the same Text
-      let pending_msgs = [];
+      const pending_msgs = [];
       for (const ele of this.stateManager.state.infobox.elements) {
         pending_msgs.push(ele.text);
       }

@@ -57,7 +57,6 @@ type NiceLOD = {
 };
 
 export default class {
-
   /**
    * Clip a linestring with start and end measure given by D3 Chart domain
    *

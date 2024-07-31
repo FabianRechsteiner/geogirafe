@@ -3,7 +3,7 @@ import ShareManager from '../../tools/share/sharemanager';
 import Layer from '../../models/layers/layer';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MapManager from '../../tools/state/mapManager';
-import Theme from '../../models/theme';
+import ThemeLayer from '../../models/layers/themelayer';
 import LayerManager from '../../tools/layermanager';
 import BaseLayer from '../../models/layers/baselayer';
 
@@ -39,9 +39,9 @@ class MobileThemeComponent extends GirafeHTMLElement {
     this.preventBlur = false;
   }
 
-  onThemeChanged(theme: Theme) {
+  onThemeChanged(theme: ThemeLayer) {
     this.preventBlur = true;
-    this.state.selectedTheme = theme;
+    this.state.themes.lastSelectedTheme = theme;
 
     if (theme.location != null || theme.zoom != null) {
       const view = MapManager.getInstance().getMap().getView();

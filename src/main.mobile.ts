@@ -104,31 +104,31 @@ try {
   ConfigManager.initMobile();
 
   // Initialize the managers
-  ConfigManager.getInstance().loadConfig()
-  LogManager.getInstance().initLogging().then(()=>{
-    ErrorManager.getInstance();
-    CsvManager.getInstance();
-    I18nManager.getInstance();
-    ThemesManager.getInstance();
-    WfsManager.getInstance();
-    LogManager.getInstance();
+  ConfigManager.getInstance().loadConfig();
+  LogManager.getInstance()
+    .initLogging()
+    .then(() => {
+      ErrorManager.getInstance();
+      CsvManager.getInstance();
+      I18nManager.getInstance();
+      ThemesManager.getInstance();
+      WfsManager.getInstance();
+      LogManager.getInstance();
 
-    // Add the state to document, so that it will be accessible everywhere
-    document.geogirafe = {
-      state: StateManager.getInstance().state,
-      stateManager: StateManager.getInstance(),
-      shareManager: ShareManager.getInstance(),
-      offlineManager: OfflineManager.getInstance()
-    };
+      // Add the state to document, so that it will be accessible everywhere
+      document.geogirafe = {
+        state: StateManager.getInstance().state,
+        stateManager: StateManager.getInstance(),
+        shareManager: ShareManager.getInstance(),
+        offlineManager: OfflineManager.getInstance()
+      };
 
-    // Define components names
-    customElements.define('girafe-map', MapComponent);
-    customElements.define('girafe-search', MobileSearchComponent);
-    customElements.define('girafe-theme-select', MobileThemeComponent);
-    customElements.define('girafe-offline', OfflineComponent);
-  });
-  
-
+      // Define components names
+      customElements.define('girafe-map', MapComponent);
+      customElements.define('girafe-search', MobileSearchComponent);
+      customElements.define('girafe-theme-select', MobileThemeComponent);
+      customElements.define('girafe-offline', OfflineComponent);
+    });
 } finally {
   // To prevent the FOUC effect (flash of unstyled content),
   // the html element is set to invisible when the application starts.

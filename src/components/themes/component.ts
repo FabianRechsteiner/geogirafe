@@ -1,7 +1,8 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import Theme from '../../models/theme';
+import ThemeLayer from '../../models/layers/themelayer';
 import MapManager from '../../tools/state/mapManager';
 import NewIcon from './images/new.svg';
+import CustomTheme from './tools/customtheme';
 import CustomThemesManager from './tools/customthemesmanager';
 
 class ThemeComponent extends GirafeHTMLElement {
@@ -11,7 +12,7 @@ class ThemeComponent extends GirafeHTMLElement {
   newIcon: string = NewIcon;
 
   private readonly mapManager: MapManager;
-  private customThemesManager?: CustomThemesManager;
+  private customThemesManager = new CustomThemesManager();
   public menuOpen: boolean = false;
 
   public get customThemes() {
@@ -25,12 +26,12 @@ class ThemeComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.stateManager.subscribe('loading', () => super.render());
-    this.stateManager.subscribe('themes', () => {
-      const startThemesId = Math.max(...Object.values(this.state.themes).map((t) => t.id)) + 1;
-      this.customThemesManager = new CustomThemesManager(startThemesId);
-      this.customThemesManager.loadCustomThemes();
-      super.render();
-      super.girafeTranslate();
+    this.stateManager.subscribe('themes.isLoaded', () => {
+      if (this.state.themes.isLoaded) {
+        this.customThemesManager.loadCustomThemes();
+        super.render();
+        super.girafeTranslate();
+      }
     });
   }
 
@@ -44,8 +45,8 @@ class ThemeComponent extends GirafeHTMLElement {
     super.render();
   }
 
-  onThemeChanged(theme: Theme) {
-    this.state.selectedTheme = theme;
+  onThemeChanged(theme: ThemeLayer) {
+    this.state.themes.lastSelectedTheme = theme;
     this.onBlur();
 
     if (theme.location != null || theme.zoom != null) {
@@ -58,18 +59,33 @@ class ThemeComponent extends GirafeHTMLElement {
     }
   }
 
+  onCustomThemeChanged(customTheme: CustomTheme) {
+    if (customTheme.hasThemes) {
+      for (let i = customTheme.layers.length - 1; i >= 0; --i) {
+        const theme = customTheme.layers[i];
+        if (theme instanceof ThemeLayer) {
+          this.state.themes.lastSelectedTheme = theme;
+        } else {
+          throw new Error('There is an error in the custom');
+        }
+      }
+    } else {
+      this.state.themes.lastSelectedTheme = customTheme.getThemeLayer();
+    }
+  }
+
   onAddCustomTheme() {
     const themeName = prompt('Please give a name to you new custom theme:');
     if (themeName !== null && themeName.trim().length > 0) {
-      this.customThemesManager!.addTheme(themeName, this.state.layers.layersList);
+      this.customThemesManager.addTheme(themeName, this.state.layers.layersList);
       super.render();
     }
   }
 
-  onDeleteTheme(theme: Theme, e: Event) {
+  onDeleteCustomTheme(themelayer: CustomTheme, e: Event) {
     e.stopPropagation();
     if (confirm('Do you want to delete this theme?')) {
-      this.customThemesManager!.deleteTheme(theme);
+      this.customThemesManager.deleteTheme(themelayer);
       super.render();
     }
   }

@@ -36,7 +36,8 @@ class StateManager extends GirafeSingleton {
         // Adding object in the state with a name starting by a symbol will avoid to Proxy this object
         // (The Proxy API changes the class!) and prevent to listen changes on this object.
         ignoreUnderscores: true,
-        ignoreSymbols: true
+        ignoreSymbols: true,
+        ignoreDetached: true
       }
     );
 

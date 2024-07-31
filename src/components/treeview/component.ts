@@ -1,6 +1,7 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
+import ThemeLayer from '../../models/layers/themelayer';
 import LayerManager from '../../tools/layermanager';
 import LayerWms from '../../models/layers/layerwms';
 import IconSimple from './images/simple.svg';
@@ -31,20 +32,10 @@ class TreeViewComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('selectedTheme', () => this.onThemeChanged());
     this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) =>
       this.onLayersListChanged(oldLayers, newLayers)
     );
     this.stateManager.subscribe('treeview.advanced', () => super.render());
-  }
-
-  onThemeChanged() {
-    if (this.state.selectedTheme != null) {
-      this.state.layers.layersList = [...this.state.selectedTheme._layersTree];
-      this.activateDefaultLayers(this.state.layers.layersList);
-    } else {
-      this.state.layers.layersList = [];
-    }
   }
 
   onLayersListChanged(oldLayers: BaseLayer[], newLayers: BaseLayer[]) {
@@ -66,7 +57,7 @@ class TreeViewComponent extends GirafeHTMLElement {
       if (layer instanceof LayerWms) {
         this.layerManager.initializeLegends(layer);
       }
-      if (layer instanceof GroupLayer) {
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
         this.activateDefaultLayers(layer.children);
       }
     }
@@ -93,7 +84,7 @@ class TreeViewComponent extends GirafeHTMLElement {
 
   #expandAllRecursive(layers: BaseLayer[]) {
     for (const layer of layers) {
-      if (layer instanceof GroupLayer) {
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
         layer.isExpanded = this.isAllExpanded;
         this.#expandAllRecursive(layer.children);
       }
@@ -110,7 +101,7 @@ class TreeViewComponent extends GirafeHTMLElement {
     for (const layer of layers) {
       if (layer instanceof LayerWms && layer.legend) {
         layer.isLegendExpanded = this.areAllLegendExpanded;
-      } else if (layer instanceof GroupLayer) {
+      } else if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
         this.#toggleAllLegendsRecursive(layer.children);
       }
     }
@@ -121,7 +112,7 @@ class TreeViewComponent extends GirafeHTMLElement {
       this.layerManager.toggle(layer, 'off');
     }
     this.state.layers.layersList = [];
-    this.state.selectedTheme = null;
+    this.state.themes.lastSelectedTheme = null;
   }
 }
 
