@@ -1,20 +1,38 @@
+import DrawingFeature, { DrawingShape } from './drawingFeature';
 import MapComponent from '../map/component';
-
 import StateManager from '../../tools/state/statemanager';
 import State from '../../tools/state/state';
-
 import { Collection, Feature } from 'ol';
 import { Geometry, LineString, Point, Polygon, Circle as CircleGeom, SimpleGeometry } from 'ol/geom';
-import { createBox, createRegularPolygon } from 'ol/interaction/Draw';
+import { createBox, createRegularPolygon, SketchCoordType } from 'ol/interaction/Draw';
 import { Type } from 'ol/geom/Geometry';
 import { Style, Stroke, Text, Fill, Circle, RegularShape } from 'ol/style';
 import { Modify, Snap, Draw } from 'ol/interaction';
 import VectorSource, { VectorSourceEvent } from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { getArea, getLength } from 'ol/sphere.js';
 import GeoJSON from 'ol/format/GeoJSON';
+import { Projection } from 'ol/proj';
+import { Coordinate } from 'ol/coordinate';
 
-import DrawingFeature, { DrawingShape } from './drawingFeature';
+function getLength(coordinates: Coordinate[]) {
+  return new LineString(coordinates).getLength();
+}
+
+function getArea(polygon: Polygon) {
+  return polygon.getArea();
+}
+
+function getHalfPoint(coordinates: Coordinate[]) {
+  return new Point(new LineString(coordinates).getCoordinateAt(0.5));
+}
+
+function fixLastLength(length: number, coordinates: SketchCoordType, scale: number = 1) {
+  const coord = coordinates as Coordinate[];
+  if (coord.length > 1 && length > 0) {
+    const lastLine = [coord[coord.length - 2], coord[coord.length - 1]];
+    coord[coord.length - 1] = new LineString(lastLine).getCoordinateAt(length / (getLength(lastLine) * scale));
+  }
+}
 
 export default class OlDrawing {
   map: MapComponent;
@@ -24,20 +42,23 @@ export default class OlDrawing {
   snap!: Snap;
   currentShape: DrawingShape | null = null;
   featuresMap: Map<string, { feature: Feature<Geometry>; shape: DrawingShape }> = new Map();
+  fixedLength: number = 0;
 
   constructor(map: MapComponent) {
     this.map = map;
     this.state = StateManager.getInstance().state;
     this.drawingSource = new VectorSource({ features: new Collection() });
     this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
-    const drawingLayer = new VectorLayer({
-      properties: { addToPrintedLayers: true },
-      source: this.drawingSource
-      //style: (f, _) => this.getStyle(null, f as Feature<Geometry>)
-    });
-    drawingLayer.setZIndex(1001);
-    drawingLayer.set('altitudeMode', 'clampToGround');
-    this.map.olMap.addLayer(drawingLayer);
+    this.map.olMap.addLayer(
+      new VectorLayer({
+        source: this.drawingSource,
+        zIndex: 1001,
+        properties: {
+          addToPrintedLayers: true,
+          altitudeMode: 'clampToGround'
+        }
+      })
+    );
     this.map.stateManager.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
       newTool === null ? this.deactivateTool() : this.activateTool(newTool)
     );
@@ -57,11 +78,11 @@ export default class OlDrawing {
   }
 
   deleteFeatures(features: DrawingFeature[]) {
-    features.forEach((feature) => {
-      const toRemove = this.featuresMap.get(feature.id)?.feature;
+    features.forEach((f) => {
+      const toRemove = this.featuresMap.get(f.id)?.feature;
       if (toRemove != undefined) {
         this.drawingSource.removeFeature(toRemove);
-        this.featuresMap.delete(feature.id);
+        this.featuresMap.delete(f.id);
       }
     });
   }
@@ -74,61 +95,83 @@ export default class OlDrawing {
     this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
 
     if (e.feature && this.currentShape !== null) {
-      const olFeature = e.feature;
-
       // If the shape is not in the state already
       if (
         !Array.from(this.featuresMap.values())
           .map((x) => x.feature)
-          .includes(olFeature)
+          .includes(e.feature)
       ) {
         let geoJson = {};
         // GeoJson does not support disks, so we create our own definition
         if (this.currentShape == DrawingShape.Disk) {
-          const circleGeom = olFeature.getGeometry()! as CircleGeom;
+          const disk = e.feature.getGeometry()! as CircleGeom;
           geoJson = {
             type: 'Feature',
             geometry: {
               type: 'Disk',
-              center: circleGeom.getCenter(),
-              radius: circleGeom.getRadius()
+              center: disk.getCenter(),
+              radius: disk.getRadius()
             }
           };
         } else {
-          geoJson = JSON.parse(new GeoJSON().writeFeature(olFeature));
+          geoJson = JSON.parse(new GeoJSON().writeFeature(e.feature));
         }
         const feature = new DrawingFeature(this.currentShape, geoJson);
-        this.featuresMap.set(feature.id, { feature: olFeature, shape: feature.type });
+        this.featuresMap.set(feature.id, { feature: e.feature, shape: feature.type });
         feature.addToState();
       }
     }
   }
 
   createOlFeature(feature: DrawingFeature) {
+    const geometry = (feature.geojson as any).geometry;
     let olFeature;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const geojson = feature.geojson as any;
-    if (geojson.geometry.type == 'Disk') {
-      olFeature = new Feature(new CircleGeom(geojson.geometry.center, geojson.geometry.radius));
+    if (geometry.type == 'Disk') {
+      olFeature = new Feature(new CircleGeom(geometry.center, geometry.radius));
     } else {
-      let olFeatureDecoded;
-      if (geojson.geometry.type == 'GeometryCollection') {
-        // Compatibility of feature coming from Cesium
-        olFeatureDecoded = new GeoJSON().readFeatures(geojson.geometry.geometries[1])[0];
-      } else {
-        olFeatureDecoded = new GeoJSON().readFeatures(feature.geojson)[0];
-      }
-      olFeature = new Feature(olFeatureDecoded.getGeometry());
+      olFeature = new Feature(new GeoJSON().readFeatures(feature.geojson)[0].getGeometry());
     }
     olFeature.setStyle(this.getStyle(feature, olFeature));
     return olFeature;
   }
 
+  setFixedLength(length: number) {
+    this.fixedLength = Number.isNaN(length) ? 0 : length;
+  }
+
+  createLineStringFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
+    fixLastLength(this.fixedLength, coordinates);
+    geom = geom ?? new LineString(coordinates as Coordinate[]);
+    geom.setCoordinates(coordinates);
+    return geom;
+  }
+
+  createSquareFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry, proj: Projection) {
+    fixLastLength(this.fixedLength, coordinates, Math.SQRT2);
+    return createRegularPolygon(4)(coordinates, geom, proj);
+  }
+
+  createPolygonFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
+    const coord = coordinates[0] as Coordinate[];
+    fixLastLength(this.fixedLength, coord);
+    geom = geom ?? new Polygon([coord]);
+    geom.setCoordinates([coord]);
+    return geom;
+  }
+
+  createDiskFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
+    const coord = coordinates as Coordinate[];
+    fixLastLength(this.fixedLength, coord);
+    geom = geom ?? new CircleGeom(coord[0], getLength(coord));
+    (geom as CircleGeom).setCenterAndRadius(coord[0], getLength(coord));
+    return geom;
+  }
+
   activateTool(tool: DrawingShape) {
     this.deactivateTool();
     this.state.selection.enabled = false;
-    let geometryFunction = undefined;
-    let freehand = false;
+    this.currentShape = tool;
+    let geomFunction = undefined;
     let olTool;
 
     switch (tool) {
@@ -137,39 +180,42 @@ export default class OlDrawing {
         break;
       case DrawingShape.Polyline:
         olTool = 'LineString';
+        geomFunction = this.createLineStringFixedLength.bind(this);
         break;
       case DrawingShape.Polygon:
         olTool = 'Polygon';
+        geomFunction = this.createPolygonFixedLength.bind(this);
         break;
       case DrawingShape.Disk:
         olTool = 'Circle';
+        geomFunction = this.createDiskFixedLength.bind(this);
         break;
       case DrawingShape.Square:
         olTool = 'Circle';
-        geometryFunction = createRegularPolygon(4);
+        geomFunction = this.createSquareFixedLength.bind(this);
         break;
       case DrawingShape.Rectangle:
         olTool = 'Circle';
-        geometryFunction = createBox();
+        geomFunction = createBox();
         break;
       case DrawingShape.FreehandPolyline:
         olTool = 'LineString';
-        freehand = true;
         break;
       case DrawingShape.FreehandPolygon:
         olTool = 'Polygon';
-        freehand = true;
         break;
     }
-
-    this.currentShape = tool;
 
     this.draw = new Draw({
       source: this.drawingSource,
       type: olTool as Type,
-      freehand: freehand,
-      geometryFunction: geometryFunction,
+      freehand: tool == DrawingShape.FreehandPolyline || tool == DrawingShape.FreehandPolygon,
+      geometryFunction: geomFunction,
       style: (f) => this.getStyle(new DrawingFeature(tool, {}, ''), f as Feature<Geometry>)
+    });
+    this.map.olMap.on('dblclick', () => {
+      this.draw?.removeLastPoint();
+      this.draw?.finishDrawing();
     });
     this.map.olMap.addInteraction(this.draw);
     this.map.olMap.addInteraction(new Modify({ source: this.drawingSource }));
@@ -194,14 +240,6 @@ export default class OlDrawing {
     }
   }
 
-  getDistance(feature: DrawingFeature, length: number) {
-    return feature.displayMeasure ? DrawingFeature.formatDistance(length) : '';
-  }
-
-  getArea(feature: DrawingFeature, area: number) {
-    return feature.displayMeasure ? DrawingFeature.formatArea(area) : '';
-  }
-
   // TODO Move as much parameters as possible into DrawingFeature
   getStyle(feature: DrawingFeature | null, olFeature: Feature<Geometry>) {
     if (feature == null) {
@@ -212,7 +250,6 @@ export default class OlDrawing {
     const geometry = olFeature.getGeometry() as Geometry;
     const measureFont = 'Bold ' + feature.measureFontSize + 'px/1 ' + feature.font;
     const nameFont = 'Bold ' + feature.nameFontSize + 'px/1 ' + feature.font;
-
     const defaultStyle = new Style({
       stroke: new Stroke({ color: feature.strokeColor, width: feature.strokeWidth }),
       fill: new Fill({ color: feature.fillColor }),
@@ -240,9 +277,7 @@ export default class OlDrawing {
         points: 3,
         angle: Math.PI,
         displacement: [0, 8],
-        fill: new Fill({
-          color: 'rgba(0, 0, 0, 0.4)'
-        })
+        fill: new Fill({ color: 'rgba(0, 0, 0, 0.4)' })
       })
     });
 
@@ -267,58 +302,61 @@ export default class OlDrawing {
     }
 
     if (feature.type == DrawingShape.Point || geometry.getType() === 'Point') {
-      const point = geometry as Point;
-      if (feature.displayMeasure) {
-        const coord = point.getCoordinates();
-        addLabel(point, DrawingFeature.round(coord[0]) + ' ; ' + DrawingFeature.round(coord[1]));
-      }
+      addLabel(geometry as Point, feature.getCoordText((geometry as Point).getCoordinates()));
     } else if (feature.type == DrawingShape.Polyline) {
-      (geometry as LineString).forEachSegment((a, b) => {
-        const segment = new LineString([a, b]);
-        addLabel(new Point(segment.getCoordinateAt(0.5)), this.getDistance(feature, getLength(segment)));
-      });
+      (geometry as LineString).forEachSegment((a, b) =>
+        addLabel(getHalfPoint([a, b]), feature.getLengthText(getLength([a, b])))
+      );
     } else if (feature.type == DrawingShape.Polygon) {
       const polygon = geometry as Polygon;
-      new LineString(polygon.getCoordinates()[0]).forEachSegment((a, b) => {
-        const segment = new LineString([a, b]);
-        addLabel(new Point(segment.getCoordinateAt(0.5)), this.getDistance(feature, getLength(segment)));
-      });
-      addLabel(polygon.getInteriorPoint(), this.getArea(feature, getArea(polygon)));
+      const segments = this.ensurePolygonIsProperlyClosed(polygon);
+      new LineString(segments).forEachSegment((a, b) =>
+        addLabel(getHalfPoint([a, b]), feature.getLengthText(getLength([a, b])))
+      );
+      addLabel(polygon.getInteriorPoint(), feature.getAreaText(getArea(polygon)));
     } else if (feature.type == DrawingShape.Disk) {
-      const circle = geometry as CircleGeom;
-      const radius = circle.getRadius();
-      const center = circle.getCenter();
-      const radiusLine = new LineString([center, [center[0] + radius, center[1]]]);
+      const radius = (geometry as CircleGeom).getRadius();
+      const center = (geometry as CircleGeom).getCenter();
+      const radiusLine = [center, [center[0] + radius, center[1]]];
       const radiusLineStyle = defaultStyle.clone();
       radiusLineStyle.getText()!.setText('');
-      radiusLineStyle.setGeometry(radiusLine);
+      radiusLineStyle.setGeometry(new LineString(radiusLine));
       styles.push(radiusLineStyle);
-      addLabel(new Point(radiusLine.getCoordinateAt(0.5)), this.getDistance(feature, radius));
+      addLabel(getHalfPoint(radiusLine), feature.getLengthText(radius));
     } else if (feature.type == DrawingShape.FreehandPolygon) {
       const polygon = geometry as Polygon;
-      addLabel(polygon.getInteriorPoint(), this.getArea(feature, getArea(polygon)));
-      let lengthSum = 0;
-      const line = new LineString(polygon.getCoordinates()[0]);
-      line.forEachSegment((a, b) => (lengthSum += getLength(new LineString([a, b]))));
-      addLabel(new Point(line.getCoordinates()[0]), this.getDistance(feature, lengthSum));
+      this.ensurePolygonIsProperlyClosed(polygon);
+      addLabel(polygon.getInteriorPoint(), feature.getAreaText(getArea(polygon)));
+      addLabel(
+        new Point(polygon.getCoordinates()[0][0]),
+        feature.getLengthText(getLength(polygon.getCoordinates()[0]))
+      );
     } else if (feature.type == DrawingShape.FreehandPolyline) {
       const line = geometry as LineString;
-      let lengthSum = 0;
-      line.forEachSegment((a, b) => (lengthSum += getLength(new LineString([a, b]))));
-      addLabel(new Point(line.getCoordinates()[0]), this.getDistance(feature, lengthSum));
+      addLabel(new Point(line.getCoordinates()[0]), feature.getLengthText(getLength(line.getCoordinates())));
     } else if (feature.type == DrawingShape.Rectangle) {
       const rect = geometry as Polygon;
-      const segment1 = new LineString([rect.getCoordinates()[0][0], rect.getCoordinates()[0][1]]);
-      addLabel(new Point(segment1.getCoordinateAt(0.5)), this.getDistance(feature, getLength(segment1)));
-      const segment2 = new LineString([rect.getCoordinates()[0][1], rect.getCoordinates()[0][2]]);
-      addLabel(new Point(segment2.getCoordinateAt(0.5)), this.getDistance(feature, getLength(segment2)));
-      addLabel(rect.getInteriorPoint(), this.getArea(feature, getArea(rect)));
+      const segment1 = [rect.getCoordinates()[0][0], rect.getCoordinates()[0][1]];
+      const segment2 = [rect.getCoordinates()[0][1], rect.getCoordinates()[0][2]];
+      addLabel(getHalfPoint(segment1), feature.getLengthText(getLength(segment1)));
+      addLabel(getHalfPoint(segment2), feature.getLengthText(getLength(segment2)));
+      addLabel(rect.getInteriorPoint(), feature.getAreaText(getArea(rect)));
     } else if (feature.type == DrawingShape.Square) {
       const square = geometry as Polygon;
-      const segment = new LineString([square.getCoordinates()[0][0], square.getCoordinates()[0][1]]);
-      addLabel(new Point(segment.getCoordinateAt(0.5)), this.getDistance(feature, getLength(segment)));
-      addLabel(square.getInteriorPoint(), this.getArea(feature, getArea(square)));
+      const segment = [square.getCoordinates()[0][0], square.getCoordinates()[0][1]];
+      addLabel(getHalfPoint(segment), feature.getLengthText(getLength(segment)));
+      addLabel(square.getInteriorPoint(), feature.getAreaText(getArea(square)));
     }
     return styles;
+  }
+
+  ensurePolygonIsProperlyClosed(polygon: Polygon) {
+    const coordinates = polygon.getCoordinates()[0];
+    let segments = [...coordinates];
+    if (coordinates.length > 2 && coordinates[0][0] != coordinates[coordinates.length - 1][0]) {
+      segments = [...coordinates, coordinates[0]];
+      polygon.setCoordinates([segments]);
+    }
+    return segments;
   }
 }

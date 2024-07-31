@@ -1,15 +1,62 @@
 import * as Cesium from 'cesium';
-import { Cartesian3, Entity } from 'cesium';
+import {
+  CallbackProperty,
+  Cartesian2,
+  Cartesian3,
+  Cartographic,
+  Color,
+  EllipsoidGeodesic,
+  Entity,
+  ScreenSpaceEventType
+} from 'cesium';
 import { KML, GeoJSON } from 'ol/format';
 import DrawingFeature, { DrawingShape } from './drawingFeature';
-
 import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
 import ConfigManager from '../../tools/configuration/configmanager';
 import State from '../../tools/state/state';
 import proj4 from 'proj4';
 
-const getPositionAsText = (p: Cartesian3) => p.x.toFixed(3) + ' ; ' + p.y.toFixed(3) + ' ; ' + p.z.toFixed(3);
+const CLAMP_TO_GROUND = Cesium.HeightReference.CLAMP_TO_GROUND;
+const positionToText = (p: Cartesian3) => p.x.toFixed(3) + ' ; ' + p.y.toFixed(3) + ' ; ' + p.z.toFixed(3);
+
+function getLength(start: Cartesian3, end: Cartesian3) {
+  return new EllipsoidGeodesic(Cartographic.fromCartesian(start), Cartographic.fromCartesian(end)).surfaceDistance;
+}
+
+function fixLastLength(length: number, coord: Cartesian3[]) {
+  const pointCarto = new EllipsoidGeodesic(
+    Cartographic.fromCartesian(coord[coord.length - 2]),
+    Cartographic.fromCartesian(coord[coord.length - 1])
+  ).interpolateUsingSurfaceDistance(length);
+  coord[coord.length - 1] = Cartographic.toCartesian(pointCarto);
+}
+
+function createLabel(text: string, font: string, fill: Color = Color.fromCssColorString('#000000')) {
+  return {
+    text: text,
+    font: font,
+    pixelOffset: new Cartesian2(0.0, -15),
+    fillColor: fill,
+    heightReference: CLAMP_TO_GROUND
+  };
+}
+
+function createPoint(color: Color) {
+  return { color: color, pixelSize: 5, heightReference: CLAMP_TO_GROUND };
+}
+
+function getPolygonCenter(positions: Cartesian3[]) {
+  return Cartesian3.divideByScalar(
+    positions.reduce((p1, p2) => Cartesian3.add(p1, p2, new Cartesian3()), new Cartesian3()),
+    positions.length,
+    new Cartesian3()
+  );
+}
+
+function getCallback(value: any) {
+  return new CallbackProperty(value, false);
+}
 
 export default class CesiumDrawing {
   configManager: ConfigManager;
@@ -20,12 +67,13 @@ export default class CesiumDrawing {
   scene: Cesium.Scene | undefined = undefined;
   handler: Cesium.ScreenSpaceEventHandler | undefined = undefined;
   entities: Cesium.EntityCollection | undefined = undefined;
+  fixedLength: number = 0;
 
   constructor(map: MapComponent) {
     this.configManager = ConfigManager.getInstance();
     this.state = StateManager.getInstance().state;
     StateManager.getInstance().subscribe('globe.loaded', () => {
-      if (StateManager.getInstance().state.globe.loaded) {
+      if (this.state.globe.loaded) {
         this.scene = map.map3d.getCesiumScene();
         this.handler = new Cesium.ScreenSpaceEventHandler(this.scene!.canvas);
         this.entities = map.map3d.getDataSourceDisplay().defaultDataSource.entities;
@@ -36,28 +84,25 @@ export default class CesiumDrawing {
     });
   }
 
+  setFixedLength(length: number) {
+    this.fixedLength = Number.isNaN(length) ? 0 : length;
+  }
+
   activateTool(tool: DrawingShape) {
     this.state.selection.enabled = false;
-    this.handler!.setInputAction(this.addPoint(tool), Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    this.handler!.setInputAction(this.updateShape(tool), Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-    this.handler!.setInputAction(
-      this.removeLastPointAndTerminateShape(tool),
-      Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
-    );
+    this.handler!.setInputAction(this.addPoint(tool), ScreenSpaceEventType.LEFT_CLICK);
+    this.handler!.setInputAction(this.updateShape(tool), ScreenSpaceEventType.MOUSE_MOVE);
+    this.handler!.setInputAction(this.removeLastPointAndTerminateShape(tool), ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
     this.floatingPoint = this.entities!.add({
-      point: {
-        color: Cesium.Color.fromCssColorString(this.configManager.Config.drawing.defaultStrokeColor),
-        pixelSize: 5,
-        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
-      }
+      point: createPoint(Color.fromCssColorString(this.configManager.Config.drawing.defaultStrokeColor))
     });
   }
 
   deactivateTool() {
     this.state.selection.enabled = true;
-    this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-    this.handler!.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    this.handler!.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    this.handler!.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    this.handler!.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
     if (this.floatingPoint) {
       this.entities!.remove(this.floatingPoint);
       this.floatingPoint = undefined;
@@ -66,7 +111,7 @@ export default class CesiumDrawing {
 
   // Actions
 
-  pickOnGlobe(position: Cesium.Cartesian2) {
+  pickOnGlobe(position: Cartesian2) {
     const ray = this.scene!.camera.getPickRay(position);
     return ray == undefined ? undefined : this.scene!.globe.pick(ray, this.scene!);
   }
@@ -112,15 +157,18 @@ export default class CesiumDrawing {
       };
       newFeature.addToState();
     } else {
-      const newCesiumEntitiesCollection = new Cesium.EntityCollection();
-      newCesiumEntities.forEach((e) => newCesiumEntitiesCollection.add(e));
-
-      Cesium.exportKml({ entities: newCesiumEntitiesCollection }).then((res) => {
+      const entitiesCollection = new Cesium.EntityCollection();
+      entitiesCollection.add(newCesiumEntities[0]);
+      Cesium.exportKml({ entities: entitiesCollection }).then((res) => {
         const olFeatures = new KML().readFeatures((res as Cesium.exportKmlResultKml).kml, {
           dataProjection: 'EPSG:4326',
           featureProjection: this.state.projection
         });
         newFeature.geojson = JSON.parse(new GeoJSON().writeFeature(olFeatures[0]));
+        const geojson = newFeature.geojson as any;
+        if (geojson.geometry.type == 'GeometryCollection') {
+          geojson.geometry = geojson.geometry.geometries[1];
+        }
         newFeature.addToState();
       });
     }
@@ -132,14 +180,18 @@ export default class CesiumDrawing {
   updateShape(tool: DrawingShape) {
     return (event: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
       const newPosition = this.pickOnGlobe(event.endPosition);
-      if (Cesium.defined(newPosition)) {
-        if (Cesium.defined(this.activeShapes)) {
-          if (tool == DrawingShape.FreehandPolyline || tool == DrawingShape.FreehandPolygon) {
-            this.activeShapePoints.push(newPosition);
-          } else {
-            this.activeShapePoints[this.activeShapePoints.length - 1] = newPosition;
+      if (newPosition != undefined && this.activeShapes != undefined) {
+        if (tool == DrawingShape.FreehandPolyline || tool == DrawingShape.FreehandPolygon) {
+          this.activeShapePoints.push(newPosition);
+        } else {
+          this.activeShapePoints[this.activeShapePoints.length - 1] = newPosition;
+          if (this.fixedLength > 0 && tool != DrawingShape.Rectangle) {
+            const factor = tool == DrawingShape.Square ? Math.SQRT2 / 2 : 1;
+            fixLastLength(this.fixedLength * factor, this.activeShapePoints);
           }
         }
+      }
+      if (newPosition != undefined) {
         this.floatingPoint!.position = new Cesium.ConstantPositionProperty(newPosition);
       }
     };
@@ -150,7 +202,7 @@ export default class CesiumDrawing {
       const earthPosition = this.pickOnGlobe(event.position);
 
       // If the cursor is pointing in the map
-      if (Cesium.defined(earthPosition)) {
+      if (earthPosition != undefined) {
         this.activeShapePoints.push(earthPosition);
         if (this.activeShapePoints.length === 1) {
           this.activeShapePoints.push(earthPosition); // Add a point for the one under the cursor
@@ -187,7 +239,7 @@ export default class CesiumDrawing {
     pos3Carto.latitude = pos2Carto.latitude;
     const pos4Carto = pos1Carto.clone();
     pos4Carto.longitude = pos2Carto.longitude;
-    return [pos1, Cesium.Cartographic.toCartesian(pos3Carto), pos2, Cesium.Cartographic.toCartesian(pos4Carto), pos1];
+    return [pos1, Cartographic.toCartesian(pos3Carto), pos2, Cartographic.toCartesian(pos4Carto), pos1];
   }
 
   makeRegularPolygon(center: Cartesian3, firstPosition: Cartesian3, nbEdges: number) {
@@ -205,238 +257,151 @@ export default class CesiumDrawing {
     return [...positions, positions[0]];
   }
 
-  getPolyLineLabels(pos: Cartesian3[], font: string) {
-    return pos.slice(0, -2).map(
-      (_, index) =>
-        new Cesium.Entity({
-          position: Cartesian3.lerp(pos[index], pos[index + 1], 0.5, new Cartesian3()),
-          label: {
-            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-            text: DrawingFeature.formatDistance(Cartesian3.distance(pos[index], pos[index + 1])),
-            font: font,
-            pixelOffset: new Cesium.Cartesian2(0.0, -15),
-            fillColor: Cesium.Color.fromCssColorString('#000000')
-          }
-        })
-    );
-  }
-
-  getPolygonCenter(positions: Cartesian3[]) {
-    return Cartesian3.divideByScalar(
-      positions.reduce((p1, p2) => Cartesian3.add(p1, p2, new Cartesian3()), new Cartesian3()),
-      positions.length,
-      new Cartesian3()
-    );
-  }
-
   getPolygonArea(positions: Cartesian3[]) {
-    const center = this.getPolygonCenter(positions);
     if (positions.length < 3) {
       return 0;
     }
-
+    const center = getPolygonCenter(positions);
     return positions
       .slice(0, -2)
       .map((_, i) => {
-        const a = Cartesian3.distance(positions[i], positions[i + 1]);
-        const b = Cartesian3.distance(positions[i], center);
-        const c = Cartesian3.distance(center, positions[i + 1]);
+        const a = getLength(positions[i], positions[i + 1]);
+        const b = getLength(positions[i], center);
+        const c = getLength(center, positions[i + 1]);
         const s = (a + b + c) / 2;
         return Math.sqrt(s * (s - a) * (s - b) * (s - c));
       })
       .reduce((a, b) => a + b, 0);
   }
 
-  generateEntityOutline(positionsGenerator: Cesium.CallbackProperty.Callback, feature: DrawingFeature) {
+  getPolyline(positions: () => Cartesian3[], feature: DrawingFeature) {
     return {
-      positions: new Cesium.CallbackProperty(positionsGenerator, false),
+      positions: new CallbackProperty(positions, false),
       clampToGround: true,
       width: feature.strokeWidth,
-      material: Cesium.Color.fromCssColorString(feature.strokeColor)
+      material: Color.fromCssColorString(feature.strokeColor)
     };
   }
 
-  getShapes(tool: DrawingShape, positions: Cartesian3[], feature: DrawingFeature) {
-    const fillColor = Cesium.Color.fromCssColorString(feature.fillColor);
-    const strokeColor = Cesium.Color.fromCssColorString(feature.strokeColor);
+  getPolyLineLabels(feature: DrawingFeature, pos: Cartesian3[], font: string) {
+    return pos.slice(0, -2).map(
+      (_, index) =>
+        new Entity({
+          position: Cartesian3.lerp(pos[index], pos[index + 1], 0.5, new Cartesian3()),
+          label: createLabel(feature.getLengthText(getLength(pos[index], pos[index + 1])), font)
+        })
+    );
+  }
+
+  getShapes(tool: DrawingShape, pos: Cartesian3[], feature: DrawingFeature) {
+    const fillColor = Color.fromCssColorString(feature.fillColor);
+    const strokeColor = Color.fromCssColorString(feature.strokeColor);
     const font = feature.nameFontSize + 'px' + feature.font;
 
     switch (tool) {
+      case DrawingShape.Point:
+        return [
+          new Entity({
+            position: pos[0],
+            point: createPoint(strokeColor),
+            label: createLabel(positionToText(pos[0]), font)
+          })
+        ];
       case DrawingShape.Polyline:
         return [
-          new Cesium.Entity({ polyline: this.generateEntityOutline(() => positions, feature) }),
-          ...this.getPolyLineLabels(positions, font)
-        ];
-      case DrawingShape.FreehandPolyline:
-        return [
-          new Cesium.Entity({ polyline: this.generateEntityOutline(() => positions, feature) }),
-          new Cesium.Entity({
-            position: positions[Math.ceil(positions.length / 2)],
-            label: {
-              text: DrawingFeature.formatDistance(
-                positions
-                  .slice(0, -1)
-                  .map((_, i) => Cartesian3.distance(positions[i], positions[i + 1]))
-                  .reduce((a, b) => a + b, 0)
-              ),
-              font: font,
-              pixelOffset: new Cesium.Cartesian2(0.0, -15),
-              fillColor: Cesium.Color.fromCssColorString('#000000')
-            }
-          })
+          new Entity({ polyline: this.getPolyline(() => pos, feature) }),
+          ...this.getPolyLineLabels(feature, pos, font)
         ];
       case DrawingShape.Polygon:
         return [
-          new Cesium.Entity({
+          new Entity({
             polygon: {
-              hierarchy: new Cesium.CallbackProperty(
-                () => new Cesium.PolygonHierarchy([...positions, positions[0]]),
-                false
-              ),
+              hierarchy: getCallback(() => new Cesium.PolygonHierarchy(pos)),
               material: fillColor
             },
-            polyline: this.generateEntityOutline(() => [...positions, positions[0]], feature)
+            polyline: this.getPolyline(() => [...pos, pos[0]], feature)
           }),
-          ...this.getPolyLineLabels(positions, font),
-          new Cesium.Entity({
-            position: this.getPolygonCenter(positions),
-            label: {
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: DrawingFeature.formatArea(this.getPolygonArea(positions)),
-              font: font,
-              pixelOffset: new Cesium.Cartesian2(0.0, -15),
-              fillColor: Cesium.Color.fromCssColorString('#000000')
-            }
+          ...this.getPolyLineLabels(feature, pos, font),
+          new Entity({
+            position: getPolygonCenter(pos),
+            label: createLabel(feature.getAreaText(this.getPolygonArea(pos)), font)
+          })
+        ];
+      case DrawingShape.FreehandPolyline:
+        return [
+          new Entity({ polyline: this.getPolyline(() => pos, feature) }),
+          new Entity({
+            position: pos[Math.ceil(pos.length / 2)],
+            label: createLabel(
+              feature.getLengthText(
+                pos
+                  .slice(0, -1)
+                  .map((_, i) => getLength(pos[i], pos[i + 1]))
+                  .reduce((a, b) => a + b, 0)
+              ),
+              font
+            )
           })
         ];
       case DrawingShape.FreehandPolygon:
         return [
-          new Cesium.Entity({
+          new Entity({
             polygon: {
-              hierarchy: new Cesium.CallbackProperty(
-                () => new Cesium.PolygonHierarchy([...positions, positions[0]]),
-                false
-              ),
+              hierarchy: getCallback(() => new Cesium.PolygonHierarchy(pos)),
               material: fillColor
             },
-            polyline: this.generateEntityOutline(() => [...positions, positions[0]], feature)
+            polyline: this.getPolyline(() => [...pos, pos[0]], feature)
           }),
-          new Cesium.Entity({
-            position: this.getPolygonCenter([...positions]),
-            label: {
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: DrawingFeature.formatArea(this.getPolygonArea([...positions])),
-              font: font,
-              pixelOffset: new Cesium.Cartesian2(0.0, -15),
-              fillColor: Cesium.Color.fromCssColorString('#000000')
-            }
-          })
-        ];
-      case DrawingShape.Point:
-        return [
-          new Cesium.Entity({
-            position: positions[0],
-            point: {
-              color: strokeColor,
-              pixelSize: 5,
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
-            },
-            label: {
-              text: getPositionAsText(positions[0]),
-              font: font,
-              pixelOffset: new Cesium.Cartesian2(0.0, -15),
-              fillColor: Cesium.Color.fromCssColorString('#000000')
-            }
+          new Entity({
+            position: getPolygonCenter([...pos]),
+            label: createLabel(feature.getAreaText(this.getPolygonArea([...pos])), font)
           })
         ];
       case DrawingShape.Disk:
         return [
-          new Cesium.Entity({
-            position: positions[0],
+          new Entity({
+            position: pos[0],
             ellipse: {
-              semiMinorAxis: new Cesium.CallbackProperty(
-                () => Cartesian3.magnitude(this.leveledCenterToMouse(positions)),
-                false
-              ),
-              semiMajorAxis: new Cesium.CallbackProperty(
-                () => Cartesian3.magnitude(this.leveledCenterToMouse(positions)),
-                false
-              ),
+              semiMinorAxis: getCallback(() => Cartesian3.magnitude(this.leveledCenterToMouse(pos))),
+              semiMajorAxis: getCallback(() => Cartesian3.magnitude(this.leveledCenterToMouse(pos))),
               material: fillColor
             },
-            polyline: this.generateEntityOutline(
-              () => this.makeRegularPolygon(positions[0], positions[positions.length - 1], 300),
-              feature
-            ),
-            point: {
-              color: strokeColor,
-              pixelSize: 5,
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
-            }
+            polyline: this.getPolyline(() => this.makeRegularPolygon(pos[0], pos[pos.length - 1], 300), feature),
+            point: createPoint(strokeColor)
           }),
-          new Cesium.Entity({
-            position: positions[0],
-            label: {
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: DrawingFeature.formatArea(Math.PI * Math.pow(Cartesian3.distance(positions[0], positions[1]), 2)),
-              font: font,
-              pixelOffset: new Cesium.Cartesian2(0.0, -15),
-              fillColor: Cesium.Color.fromCssColorString('#000000')
-            }
+          new Entity({
+            position: pos[0],
+            label: createLabel(feature.getAreaText(Math.PI * Math.pow(getLength(pos[0], pos[1]), 2)), font)
           })
         ];
       case DrawingShape.Square:
         return [
-          new Cesium.Entity({
+          new Entity({
             polygon: {
-              hierarchy: new Cesium.CallbackProperty(
-                () =>
-                  new Cesium.PolygonHierarchy(
-                    this.makeRegularPolygon(positions[0], positions[positions.length - 1], 4)
-                  ),
-                false
+              hierarchy: getCallback(
+                () => new Cesium.PolygonHierarchy(this.makeRegularPolygon(pos[0], pos[pos.length - 1], 4))
               ),
               material: fillColor
             },
-            polyline: this.generateEntityOutline(
-              () => this.makeRegularPolygon(positions[0], positions[positions.length - 1], 4),
-              feature
-            )
+            polyline: this.getPolyline(() => this.makeRegularPolygon(pos[0], pos[pos.length - 1], 4), feature)
           }),
-          new Cesium.Entity({
-            position: positions[0],
-            label: {
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: DrawingFeature.formatArea(
-                Math.pow(Math.SQRT2 * Cartesian3.distance(positions[0], positions[1]), 2)
-              ),
-              font: font,
-              pixelOffset: new Cesium.Cartesian2(0.0, -15),
-              fillColor: Cesium.Color.fromCssColorString('#000000')
-            }
+          new Entity({
+            position: pos[0],
+            label: createLabel(feature.getAreaText(Math.pow(Math.SQRT2 * getLength(pos[0], pos[1]), 2)), font)
           })
         ];
       case DrawingShape.Rectangle:
         return [
-          new Cesium.Entity({
+          new Entity({
             polygon: {
-              hierarchy: new Cesium.CallbackProperty(
-                () => new Cesium.PolygonHierarchy(this.makeRectangle(positions[0], positions[1])),
-                false
-              ),
+              hierarchy: getCallback(() => new Cesium.PolygonHierarchy(this.makeRectangle(pos[0], pos[1]))),
               material: fillColor
             },
-            polyline: this.generateEntityOutline(() => this.makeRectangle(positions[0], positions[1]), feature)
+            polyline: this.getPolyline(() => this.makeRectangle(pos[0], pos[1]), feature)
           }),
-          new Cesium.Entity({
-            position: this.getPolygonCenter([...positions]),
-            label: {
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              text: DrawingFeature.formatArea(this.getPolygonArea(this.makeRectangle(positions[0], positions[1]))),
-              font: font,
-              pixelOffset: new Cesium.Cartesian2(0.0, -15),
-              fillColor: Cesium.Color.fromCssColorString('#000000')
-            }
+          new Entity({
+            position: getPolygonCenter([...pos]),
+            label: createLabel(feature.getAreaText(this.getPolygonArea(this.makeRectangle(pos[0], pos[1]))), font)
           })
         ];
       default:
