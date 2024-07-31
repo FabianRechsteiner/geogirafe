@@ -7,6 +7,7 @@ import StateManager from './state/statemanager';
 import LayerWms from '../models/layers/layerwms';
 import ILayerWithLegend from '../models/layers/ilayerwithlegend';
 import ILayerWithFilter from '../models/layers/ilayerwithfilter';
+import ThemeLayer from '../models/layers/themelayer';
 
 class LayerManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -54,6 +55,12 @@ class LayerManager extends GirafeSingleton {
           return child;
         }
       }
+      if (layer instanceof ThemeLayer) {
+        const child = this.#getLayerRecursive(layer.children, treeItemId);
+        if (child) {
+          return child;
+        }
+      }
     }
 
     return null;
@@ -73,14 +80,14 @@ class LayerManager extends GirafeSingleton {
 
   toggle(layer: BaseLayer, state: 'on' | 'off') {
     if (layer instanceof GroupLayer) {
-      this.toggleGroup(layer, state);
+      this.toggleGroupOrTheme(layer, state);
     } else if (layer instanceof Layer) {
       this.toggleLayer(layer, state);
     }
   }
 
   onLayerToggled(layer: BaseLayer) {
-    if (layer instanceof GroupLayer) {
+    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       // Toggle parents if necessary
       this.#manageExclusiveGroups(layer);
       this.#toggleParent(layer);
@@ -143,42 +150,45 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  toggleGroup(group: GroupLayer, state?: 'on' | 'off' | 'semi') {
+  toggleGroupOrTheme(groupOrTheme: GroupLayer | ThemeLayer, state?: 'on' | 'off' | 'semi') {
     let newState: 'on' | 'off' | 'semi';
     if (state) {
       newState = state;
-    } else if (group.activeState === 'off') {
+    } else if (groupOrTheme.activeState === 'off') {
       newState = 'on';
     } else {
       newState = 'off';
     }
 
-    if (group.activeState != newState) {
-      console.log(`Setting Group ${group.name} to ${newState}`);
-      group.activeState = newState;
+    if (groupOrTheme.activeState != newState) {
+      console.log(`Setting Group ${groupOrTheme.name} to ${newState}`);
+      groupOrTheme.activeState = newState;
     }
   }
 
   #toggleParent(layer: BaseLayer) {
     if (layer.parent) {
-      if (layer.parent.isExclusiveGroup) {
+      if (
+        (layer.parent instanceof GroupLayer && layer.parent.isExclusiveGroup) ||
+        (layer.parent instanceof ThemeLayer && layer.parent.isExclusiveTheme)
+      ) {
         if (this.#isAnyChildActive(layer.parent)) {
-          this.toggleGroup(layer.parent, 'on');
+          this.toggleGroupOrTheme(layer.parent, 'on');
         } else {
-          this.toggleGroup(layer.parent, 'off');
+          this.toggleGroupOrTheme(layer.parent, 'off');
         }
       } else if (this.#areAllChildrenActive(layer.parent)) {
-        this.toggleGroup(layer.parent, 'on');
+        this.toggleGroupOrTheme(layer.parent, 'on');
       } else if (this.#areAllChildrenInactive(layer.parent)) {
-        this.toggleGroup(layer.parent, 'off');
+        this.toggleGroupOrTheme(layer.parent, 'off');
       } else {
-        this.toggleGroup(layer.parent, 'semi');
+        this.toggleGroupOrTheme(layer.parent, 'semi');
       }
     }
   }
 
-  #toggleChilds(group: GroupLayer, state: 'on' | 'off') {
-    if (group.active && group.isExclusiveGroup && group.children.length >= 1) {
+  #toggleChilds(group: GroupLayer | ThemeLayer, state: 'on' | 'off') {
+    if (group instanceof GroupLayer && group.active && group.isExclusiveGroup && group.children.length >= 1) {
       // We activate a group, and this group is an exclusive group.
       // If there isn't any active child yet, we activate the first one
       if (!this.#isAnyChildActive(group)) {
@@ -198,16 +208,18 @@ class LayerManager extends GirafeSingleton {
     // It means only 1 child can be activated at the same time.
     // Therefore, we have to deactivate all other childs for the parent group.
     if (
-      (layer.active || (layer instanceof GroupLayer && layer.semiActive)) &&
+      (layer.active || ((layer instanceof GroupLayer || layer instanceof ThemeLayer) && layer.semiActive)) &&
       layer.parent != null &&
-      layer.parent.isExclusiveGroup
+      ((layer.parent instanceof GroupLayer && layer.parent.isExclusiveGroup) ||
+        (layer.parent instanceof ThemeLayer && layer.parent.isExclusiveTheme))
     ) {
       // Deactivate all other layers
       for (const child of layer.parent.children) {
         const otherLayer = this.getTreeItem(child.treeItemId);
         if (
           otherLayer.treeItemId !== layer.treeItemId &&
-          (otherLayer.active || (otherLayer instanceof GroupLayer && otherLayer.semiActive))
+          (otherLayer.active ||
+            ((otherLayer instanceof GroupLayer || otherLayer instanceof ThemeLayer) && otherLayer.semiActive))
         ) {
           this.toggle(otherLayer, 'off');
         }
@@ -215,9 +227,9 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  #areAllChildrenActive(group: GroupLayer) {
+  #areAllChildrenActive(groupOrTheme: GroupLayer | ThemeLayer) {
     let allActive = true;
-    for (const child of group.children) {
+    for (const child of groupOrTheme.children) {
       if (!child.active) {
         allActive = false;
       }
@@ -225,9 +237,9 @@ class LayerManager extends GirafeSingleton {
     return allActive;
   }
 
-  #areAllChildrenInactive(group: GroupLayer) {
+  #areAllChildrenInactive(groupOrTheme: GroupLayer | ThemeLayer) {
     let allInactive = true;
-    for (const child of group.children) {
+    for (const child of groupOrTheme.children) {
       if (!child.inactive) {
         allInactive = false;
       }
@@ -235,8 +247,8 @@ class LayerManager extends GirafeSingleton {
     return allInactive;
   }
 
-  #isAnyChildActive(group: GroupLayer) {
-    for (const child of group.children) {
+  #isAnyChildActive(groupOrTheme: GroupLayer | ThemeLayer) {
+    for (const child of groupOrTheme.children) {
       if (child.active) {
         return true;
       }

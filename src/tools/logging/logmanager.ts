@@ -15,8 +15,8 @@ export default class LogManager extends GirafeSingleton {
     this.configManager = ConfigManager.getInstance();
   }
 
-  async initLogging(){
-    await this.configManager.loadConfig()
+  async initLogging() {
+    await this.configManager.loadConfig();
     console.debug = this.debug.bind(this);
     console.log = this.log.bind(this);
     console.info = this.info.bind(this);
@@ -28,7 +28,7 @@ export default class LogManager extends GirafeSingleton {
    * Write log to output if the current loglevel is debug, info, warn or error
    * @returns true if the log was written, false instead
    */
-  private debug(message: unknown, ...optionalParams: unknown[]){
+  private debug(message: unknown, ...optionalParams: unknown[]) {
     if (this.configManager.Config.general.logLevel === 'debug') {
       this.defaultDebug(message, ...optionalParams);
       return true;
@@ -40,7 +40,7 @@ export default class LogManager extends GirafeSingleton {
    * Write log to output if the current loglevel is info, warn or error
    * @returns true if the log was written, false instead
    */
-  private log(message: unknown, ...optionalParams: unknown[]){
+  private log(message: unknown, ...optionalParams: unknown[]) {
     if (
       this.configManager.Config.general.logLevel === 'debug' ||
       this.configManager.Config.general.logLevel === 'info'
@@ -55,14 +55,14 @@ export default class LogManager extends GirafeSingleton {
    * Write log to output if the current loglevel is info, warn or error
    * @returns true if the log was written, false instead
    */
-  private info(message: unknown, ...optionalParams: unknown[]){
+  private info(message: unknown, ...optionalParams: unknown[]) {
     if (
       this.configManager.Config.general.logLevel === 'debug' ||
       this.configManager.Config.general.logLevel === 'info'
     ) {
       this.defaultInfo(message, ...optionalParams);
       return true;
-    } 
+    }
     return false;
   }
 
@@ -70,7 +70,7 @@ export default class LogManager extends GirafeSingleton {
    * Write log to output if the current loglevel is warn or error
    * @returns true if the log was written, false instead
    */
-  private warn(message: unknown, ...optionalParams: unknown[]){
+  private warn(message: unknown, ...optionalParams: unknown[]) {
     if (
       this.configManager.Config.general.logLevel === 'debug' ||
       this.configManager.Config.general.logLevel === 'info' ||
@@ -86,9 +86,8 @@ export default class LogManager extends GirafeSingleton {
    * Write log to output if the current loglevel is error
    * @returns true if the log was written, false instead
    */
-  private error(message: unknown, ...optionalParams: unknown[]){
+  private error(message: unknown, ...optionalParams: unknown[]) {
     this.defaultError(message, ...optionalParams);
     return true;
   }
-
 }

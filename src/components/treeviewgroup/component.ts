@@ -2,6 +2,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import LayerManager from '../../tools/layermanager';
+import ThemeLayer from '../../models/layers/themelayer';
 
 class TreeViewGroupComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -71,7 +72,7 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
   }
 
   toggle(state?: 'on' | 'off' | 'semi') {
-    this.layerManager.toggleGroup(this.group, state);
+    this.layerManager.toggleGroupOrTheme(this.group, state);
   }
 
   connectedCallback() {
@@ -93,12 +94,26 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
 
   deleteGroup() {
     this.deactivateGroup(this.group);
-    const index = this.state.layers.layersList.findIndex((g) => g.id === this.group.id);
+    if (!this.deleteGroupRecursive(this.state.layers.layersList)) {
+      // Group could not be deleted. Why ?
+      throw new Error(`The group {this.group.name} could not be deleted.`);
+    }
+  }
+
+  private deleteGroupRecursive(layersList: BaseLayer[]): boolean {
+    const index = layersList.findIndex((g) => g.id === this.group.id);
     if (index >= 0) {
-      this.state.layers.layersList.splice(index, 1);
+      layersList.splice(index, 1);
+      return true;
     } else {
-      // TODO REG : manage subgroup deletion
-      console.log('cannot delete this group. Probably a subgroup, this is not managed yet.');
+      for (const layer of layersList) {
+        if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+          if (this.deleteGroupRecursive(layer.children)) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
   }
 }

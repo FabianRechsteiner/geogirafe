@@ -15,7 +15,8 @@
   },
   "themes": {
     "url": "Mock/themes.json",
-    "defaultTheme": ""
+    "defaultTheme": "",
+    "selectionMode": "add"
   },
   "basemaps": {
     "defaultBasemap": "Grundkarte farbig",

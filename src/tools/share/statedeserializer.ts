@@ -7,6 +7,7 @@ import LayerManager from '../layermanager';
 import StateManager from '../state/statemanager';
 
 import ComponentManager from '../state/componentManager';
+import ThemeLayer from '../../models/layers/themelayer';
 
 class StateDeserializer {
   stateManager: StateManager;
@@ -64,12 +65,8 @@ class StateDeserializer {
   public getDeserializedLayerTree(sharedLayers: SharedLayer[]) {
     const layersList: BaseLayer[] = [];
     for (const sharedLayer of sharedLayers) {
-      const originalLayer = this.findBaseLayerById(sharedLayer.i);
-      if (originalLayer) {
-        // When deserializing the layer, we clone it,
-        // otherwise the following operation will also
-        // affect the layer referenced in other themes
-        const layer = originalLayer.clone();
+      const layer = this.findBaseLayerById(sharedLayer.i);
+      if (layer) {
         this.deserializeLayer(layer, sharedLayer);
         layersList.push(layer);
       } else {
@@ -83,16 +80,19 @@ class StateDeserializer {
   private deserializeLayer(layer: BaseLayer, sharedLayer: SharedLayer) {
     layer.order = sharedLayer.o;
     layer.isDefaultChecked = Boolean(sharedLayer.c);
-    if (layer instanceof GroupLayer) {
+    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       layer.isExpanded = Boolean(sharedLayer.e);
       // Manage children
-      // TODO REG : Today we do not manage if a layer was remove from the group.
-      for (const child of layer.children) {
+      // Ad remove unnecessary childs
+      for (let i = layer.children.length - 1; i >= 0; i--) {
+        const child = layer.children[i];
         const serializedChild = sharedLayer.z.find((l) => l.i == child.id);
         if (serializedChild) {
           this.deserializeLayer(child, serializedChild);
         } else {
-          console.warn(`Cannot find layer with id ${child.id} in the available layers`);
+          // This child exists in the original layer, but not in the shared state.
+          // => We have to remove it from the current object
+          layer.children.splice(i, 1);
         }
       }
     } else if (layer instanceof Layer && this.layerManager.isLayerWithLegend(layer)) {
@@ -101,8 +101,8 @@ class StateDeserializer {
   }
 
   private findBaseLayerById(layerId: number): BaseLayer | null {
-    for (const theme of Object.values(this.state.themes)) {
-      const layer = this.findLayerRecursive(theme._layersTree, layerId);
+    for (const theme of Object.values(this.state.themes._allThemes)) {
+      const layer = this.findLayerRecursive(theme, layerId);
       if (layer) {
         return layer;
       }
@@ -110,15 +110,21 @@ class StateDeserializer {
     return null;
   }
 
-  private findLayerRecursive(layers: BaseLayer[], layerId: number): BaseLayer | null {
-    for (const layer of layers) {
-      if (layer.id === layerId) {
-        return layer;
-      }
-      if (layer instanceof GroupLayer) {
-        const child = this.findLayerRecursive(layer.children, layerId);
-        if (child) {
-          return child;
+  private findLayerRecursive(layer: BaseLayer, layerId: number): BaseLayer | null {
+    if (layer.id === layerId) {
+      // When deserializing the layer, we clone it,
+      // otherwise the following operation will also
+      // affect the layer referenced in other themes
+      const foundLayer = layer.clone();
+      return foundLayer;
+    }
+
+    // Else, we call recursively on the children
+    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+      for (const childLayer of layer.children) {
+        const foundChild = this.findLayerRecursive(childLayer, layerId);
+        if (foundChild) {
+          return foundChild;
         }
       }
     }

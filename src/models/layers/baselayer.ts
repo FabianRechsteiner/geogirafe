@@ -1,4 +1,5 @@
 import GroupLayer from './grouplayer';
+import ThemeLayer from './themelayer';
 import { v4 as uuidv4 } from 'uuid';
 
 type BaseLayerOptions = {
@@ -30,7 +31,7 @@ abstract class BaseLayer {
   public abstract get inactive(): boolean;
   public abstract clone(): BaseLayer;
 
-  public parent: GroupLayer | null = null;
+  public parent: ThemeLayer | GroupLayer | null = null;
 
   constructor(id: number, name: string, order: number, options?: BaseLayerOptions) {
     this.id = id;

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import StateManager from './statemanager';
 import State from './state';
 import onChange from 'on-change';
-import Theme from '../../models/theme';
+import ThemeLayer from '../../models/layers/themelayer';
 import LayerOsm from '../../models/layers/layerosm';
 import MockHelper from '../tests/mockhelper';
 
@@ -282,8 +282,8 @@ describe('StateManager.subscribe', () => {
       controlValue = 2;
     };
     try {
-      manager.state.themes = {};
-      manager.subscribe('themes', callback);
+      manager.state.ogcServers = {};
+      manager.subscribe('ogcServers', callback);
       expect(controlValue).toEqual(1);
     } finally {
       manager.unsubscribe(callback);
@@ -353,15 +353,15 @@ describe('StateManager.subscribe', () => {
       controlValue = 2;
     };
     try {
-      const theme = new Theme({ id: 1, name: 'test', icon: 'iconpath' });
-      theme._layersTree.push(new LayerOsm(0));
-      manager.state.themes[theme.id] = theme;
+      const theme = new ThemeLayer(1, 'test', 0, 'iconpath');
+      theme.children.push(new LayerOsm(0));
+      manager.state.themes._allThemes[theme.id] = theme;
       manager.subscribe(/.*/, callback);
       controlValue = 1;
-      manager.state.themes[theme.id]._layersTree[0].name = 'new name';
+      manager.state.themes._allThemes[theme.id].children[0].name = 'new name';
       expect(controlValue).toEqual(1);
-      manager.state.themes[theme.id].name = 'new name';
-      expect(controlValue).toEqual(2);
+      manager.state.themes._allThemes[theme.id].name = 'new name';
+      expect(controlValue).toEqual(1);
     } finally {
       manager.unsubscribe(callback);
     }

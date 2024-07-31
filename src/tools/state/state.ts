@@ -4,6 +4,7 @@ import type Feature from 'ol/Feature';
 import type Basemap from '../../models/basemap';
 import type Theme from '../../models/theme';
 import type BaseLayer from '../../models/layers/baselayer';
+import type ThemeLayer from '../../models/layers/themelayer';
 import type LayerWms from '../../models/layers/layerwms';
 import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
@@ -35,6 +36,12 @@ type Selection = {
   selectedFeatures: Feature[];
   focusedFeatures: Feature[] | null;
   enabled: boolean;
+};
+
+type ThemesConfig = {
+  _allThemes: Record<number, ThemeLayer>;
+  isLoaded: boolean;
+  lastSelectedTheme: ThemeLayer | null;
 };
 
 type LayersConfig = {
@@ -86,7 +93,11 @@ export default class State {
 
   // All themes from themes.json
   // Dictionary where the key is the id of the theme
-  themes: Record<number, Theme> = {};
+  themes: ThemesConfig = {
+    _allThemes: {},
+    isLoaded: false,
+    lastSelectedTheme: null
+  };
 
   // All basemaps from themes.json
   // Dictionary where the key is the id of the basemap
@@ -132,9 +143,6 @@ export default class State {
 
   // Current position configuration of the map
   position: MapPosition = new MapPosition();
-
-  // Lastly selected theme
-  selectedTheme: Theme | null = null;
 
   // Current layers configuration
   layers: LayersConfig = {

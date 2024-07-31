@@ -25,7 +25,7 @@
 
   <h2>Themes</h2>
   <div class="category row2">
-    ${Object.values(this.state.themes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
+    ${Object.values(this.state.themes._allThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
     <button
       class="theme"
       onmousedown="${() => this.onThemeChanged(theme)}"
@@ -48,7 +48,7 @@
       onblur="${() => this.onBlur()}">
       <img
         alt="${'Icon for ' + layer.name}"
-        src="${this.state.selectedTheme!.icon}"
+        src="${this.state.themes.lastSelectedTheme!.icon}"
         class="${layer.active ? 'selected' : 'unselected'}" />
       <span i18n="${layer.parent!.name}">${layer.parent!.name}</span>
       <span i18n="${layer.name}">${layer.name}</span>

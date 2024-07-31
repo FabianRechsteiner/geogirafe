@@ -43,6 +43,7 @@ import ThemeComponent from './components/themes/component';
 import TreeViewComponent from './components/treeview/component';
 import TreeViewItemComponent from './components/treeviewitem/component';
 import TreeViewGroupComponent from './components/treeviewgroup/component';
+import TreeViewThemeComponent from './components/treeviewtheme/component';
 import VideoRecordComponent from './components/videorecord/component';
 
 // Redirect to mobile interface if we are on mobile
@@ -135,6 +136,7 @@ try {
       customElements.define('girafe-tree-view', TreeViewComponent);
       customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
       customElements.define('girafe-tree-view-item', TreeViewItemComponent);
+      customElements.define('girafe-tree-view-theme', TreeViewThemeComponent);
       customElements.define('girafe-video-record', VideoRecordComponent);
     });
 } finally {

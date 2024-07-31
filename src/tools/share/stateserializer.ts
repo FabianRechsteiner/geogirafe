@@ -6,6 +6,7 @@ import LZString from 'lz-string';
 import LayerManager from '../layermanager';
 import State from '../state/state';
 import ComponentManager from '../state/componentManager';
+import ThemeLayer from '../../models/layers/themelayer';
 
 class StateSerializer {
   layerManager: LayerManager;
@@ -66,7 +67,7 @@ class StateSerializer {
 
   private getSerializedLayer(layer: BaseLayer): SharedLayer {
     let isExpanded = false;
-    if (layer instanceof GroupLayer) {
+    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       isExpanded = layer.isExpanded;
     } else if (layer instanceof Layer && this.layerManager.isLayerWithLegend(layer)) {
       isExpanded = layer.isLegendExpanded;
@@ -74,7 +75,7 @@ class StateSerializer {
 
     // Manage children
     const sharedChildren: SharedLayer[] = [];
-    if (layer instanceof GroupLayer) {
+    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       for (const child of layer.children) {
         const sharedChild = this.getSerializedLayer(child);
         sharedChildren.push(sharedChild);

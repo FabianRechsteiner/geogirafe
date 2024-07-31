@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from 'uuid';
 import GirafeSingleton from '../base/GirafeSingleton';
 import Basemap from '../models/basemap';
 import Layer from '../models/layers/layer';
-import Theme from '../models/theme';
 import { GMFBackgroundLayer, GMFServerOgc, GMFTheme, GMFTreeItem } from '../models/gmf';
 import ConfigManager from './configuration/configmanager';
 import StateManager from './state/statemanager';
@@ -18,6 +17,7 @@ import LayerConsts from '../models/layers/layerconsts';
 import LayerCog from '../models/layers/layercog';
 import LayerXYZ from '../models/layers/layerxyz';
 import ServerOgc from '../models/serverogc';
+import ThemeLayer from '../models/layers/themelayer';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -37,8 +37,9 @@ class ThemesManager extends GirafeSingleton {
     this.layerManager = LayerManager.getInstance();
     this.shareManager = ShareManager.getInstance();
 
-    this.stateManager.subscribe('selectedTheme', (_oldTheme: Theme | null, newTheme: Theme | null) =>
-      this.onChangeTheme(newTheme)
+    this.stateManager.subscribe(
+      'themes.lastSelectedTheme',
+      (_oldTheme: ThemeLayer | null, newTheme: ThemeLayer | null) => this.onChangeTheme(newTheme)
     );
 
     this.initialize();
@@ -68,7 +69,8 @@ class ThemesManager extends GirafeSingleton {
     if (this.configManager.Config.basemaps.show) {
       this.state.basemaps = this.prepareBasemaps(content['background_layers']);
     }
-    this.state.themes = this.prepareThemes(content['themes']);
+    this.state.themes._allThemes = this.prepareThemes(content['themes']);
+    this.state.themes.isLoaded = true;
 
     if (this.configManager.Config.themes.showErrorsOnStart) {
       // Display themes errors only if configured so.
@@ -86,10 +88,10 @@ class ThemesManager extends GirafeSingleton {
   setDefaultTheme() {
     // Set default theme if any
     if (!this.isNullOrUndefinedOrBlank(this.configManager.Config.themes.defaultTheme)) {
-      const themes = Object.values(this.state.themes);
+      const themes = Object.values(this.state.themes._allThemes);
       const defaultTheme = themes.find((t) => t.name === this.configManager.Config.themes.defaultTheme);
       if (defaultTheme) {
-        this.state.selectedTheme = defaultTheme;
+        this.state.themes.lastSelectedTheme = defaultTheme;
       } else {
         // The default theme was not found
         console.warn(`The default theme ${this.configManager.Config.themes.defaultTheme} could not be found.`);
@@ -166,17 +168,17 @@ class ThemesManager extends GirafeSingleton {
   }
 
   prepareThemes(themesJson: GMFTheme[]) {
-    const themes: { [key: number]: Theme } = {};
+    const themes: { [key: number]: ThemeLayer } = {};
     const order = { value: 0 };
     themesJson.forEach((themeJson: GMFTheme, index: number) => {
       if (!themeJson.icon.startsWith('http') && this.configManager.Config.themes.imagesUrlPrefix) {
         themeJson.icon = this.configManager.Config.themes.imagesUrlPrefix + themeJson.icon;
       }
-      const theme = new Theme(themeJson);
+      const theme = new ThemeLayer(themeJson['id'], themeJson['name'], index, themeJson['icon']);
       themeJson.children.forEach((layerJson: GMFTreeItem) => {
         const layer = this.prepareThemeLayer(layerJson, null, order);
         if (layer) {
-          theme._layersTree.push(layer);
+          theme.children.push(layer);
         }
       });
       themes[index] = theme;
@@ -275,30 +277,75 @@ class ThemesManager extends GirafeSingleton {
     return layer;
   }
 
-  onChangeTheme(theme: Theme | null) {
-    // Deactivate all active layers
-    for (const element of this.state.layers.layersList) {
-      element.activeState = 'off';
+  onChangeTheme(theme: ThemeLayer | null) {
+    if (!theme) {
+      // Theme is null, nothing to do here
+      return;
     }
 
-    // Add the current theme
-    const layersList: Layer[] = [];
-    if (theme) {
-      theme._layersTree.forEach((layer) => {
-        this.addLayerToLoadedList(layersList, layer);
-      });
+    if (this.configManager.Config.themes.selectionMode === 'replace') {
+      // Mode is <replace>
+      // 1. Deactivate all active layers
+      for (const element of this.state.layers.layersList) {
+        element.activeState = 'off';
+      }
+      // 2. Add new layers
+      const clone = theme.clone();
+      this.state.layers.layersList = clone.children;
+    } else {
+      // Mode is <add>
+      // 1. Add new theme to the list if is not in the list yet
+      if (!this.state.layers.layersList.find((l) => l.id == theme.id)) {
+        this.state.layers.layersList = this.getNewLayersListForAdd(theme);
+      } else {
+        console.info(`The theme ${theme.name} is already present in the treeview.`);
+      }
     }
-
-    // Update state only once at the end of the process to prevent 1000 of events to be sent
-    this.state.layers.layersList = layersList;
   }
 
-  addLayerToLoadedList(layersList: BaseLayer[], layer: BaseLayer) {
-    layersList.push(layer);
-    if (layer instanceof GroupLayer) {
-      layer.children.forEach((child) => {
-        this.addLayerToLoadedList(layersList, child);
-      });
+  private getNewLayersListForAdd(theme: ThemeLayer): BaseLayer[] {
+    // TODO REG : There seems to be a new problem with on-change
+    // When using unshift to add an element at the beginning of a list, the path in on-change is not updated
+    // And the object is considered as detatched.
+    // As workaround, we can clone the object to force the recreation of a new object
+    // And we have to keep the existing treeviewitem ot be able to enable/disable the same layers.
+    const clone = theme.clone();
+    const existingList: BaseLayer[] = [clone];
+    for (const theme of this.state.layers.layersList) {
+      const clonedTheme = theme.clone();
+      this.workaroundResetInitialTreeViewItemId(theme, clonedTheme);
+      existingList.push(clonedTheme);
+    }
+    return existingList;
+  }
+
+  public getNewLayersListForRemove(theme: ThemeLayer): BaseLayer[] {
+    // TODO REG : There seems to be a new problem with on-change
+    // When using unshift to add an element at the beginning of a list, the path in on-change is not updated
+    // And the object is considered as detatched.
+    // As workaround, we can clone the object to force the recreation of a new object
+    // And we have to keep the existing treeviewitem ot be able to enable/disable the same layers.
+    const newList: BaseLayer[] = [];
+    for (const elem of this.state.layers.layersList) {
+      if (elem.treeItemId !== theme.treeItemId) {
+        // This item should be kept.
+        const clone = elem.clone();
+        this.workaroundResetInitialTreeViewItemId(elem, clone);
+        newList.push(clone);
+      }
+    }
+    return newList;
+  }
+
+  private workaroundResetInitialTreeViewItemId(initial: BaseLayer, clone: BaseLayer) {
+    clone.treeItemId = initial.treeItemId;
+    if (
+      (initial instanceof ThemeLayer || initial instanceof GroupLayer) &&
+      (clone instanceof ThemeLayer || clone instanceof GroupLayer)
+    ) {
+      for (let i = 0; i < initial.children.length; ++i) {
+        this.workaroundResetInitialTreeViewItemId(initial.children[i], clone.children[i]);
+      }
     }
   }
 
@@ -321,8 +368,8 @@ class ThemesManager extends GirafeSingleton {
   }
 
   #findBaseLayerByName(layername: string): BaseLayer {
-    for (const theme of Object.values(this.state.themes)) {
-      const layer = this.#findLayerRecursive(theme._layersTree, layername);
+    for (const theme of Object.values(this.state.themes._allThemes)) {
+      const layer = this.#findLayerRecursive(theme.children, layername);
       if (layer) {
         return layer;
       }

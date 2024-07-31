@@ -16,18 +16,18 @@
 </button>
 
 <div class="${(this.menuOpen ? 'themes' : 'hidden')}">
-  ${Object.values(this.state.themes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
+  ${Object.values(this.state.themes._allThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
   <button class="theme" onmousedown="${() => this.onThemeChanged(theme)}">
     <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
     <span i18n="${theme.name}">${theme.name}</span>
   </button>
   `)} ${Object.values(this.customThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
   <div class="custom-theme">
-    <button class="select" onmousedown="${() => this.onThemeChanged(theme)}">
+    <button class="select" onmousedown="${() => this.onCustomThemeChanged(theme)}">
       <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
       <span i18n="${theme.name}">${theme.name}</span>
     </button>
-    <button class="girafe-button-small delete" onmousedown="${(e:Event) => this.onDeleteTheme(theme, e)}">
+    <button class="girafe-button-small delete" onmousedown="${(e:Event) => this.onDeleteCustomTheme(theme, e)}">
       <img alt="delete-icon" src="icons/close.svg" />
     </button>
   </div>
