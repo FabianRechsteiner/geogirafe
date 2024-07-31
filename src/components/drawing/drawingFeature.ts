@@ -48,8 +48,8 @@ export default class DrawingFeature {
   private _measureColor: string;
   private _font: string;
   private _geojson: object;
-  public _displayName: boolean = true;
-  public _displayMeasure: boolean = true;
+  private _displayName: boolean = true;
+  private _displayMeasure: boolean = true;
 
   public onChange: (f: DrawingFeature) => void = () => {};
 
@@ -196,6 +196,26 @@ export default class DrawingFeature {
     };
   }
 
+  getLengthText(length: number) {
+    if (this.displayMeasure) {
+      return length > 100 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m';
+    } else {
+      return '';
+    }
+  }
+
+  getAreaText(area: number) {
+    if (this.displayMeasure) {
+      return area > 10000 ? (area / 1000000).toFixed(2) + ' km²' : area.toFixed(2) + ' m²';
+    } else {
+      return '';
+    }
+  }
+
+  getCoordText(coord: number[]) {
+    return this.displayMeasure ? coord[0].toFixed(2) + ' ; ' + coord[1].toFixed(2) : '';
+  }
+
   static deserialize(serializedFeature: SerializedFeature) {
     const newFeature = new DrawingFeature(serializedFeature.t, serializedFeature.g, serializedFeature.n);
     newFeature.strokeColor = serializedFeature.sc;
@@ -211,16 +231,5 @@ export default class DrawingFeature {
     newFeature.measureColor = serializedFeature.mc;
     newFeature.addToState();
     return newFeature;
-  }
-
-  static round(nb: number) {
-    return nb.toFixed(2);
-  }
-
-  static formatDistance(dist: number) {
-    return dist > 100 ? DrawingFeature.round(dist / 1000) + ' km' : DrawingFeature.round(dist) + ' m';
-  }
-  static formatArea(area: number) {
-    return area > 10000 ? DrawingFeature.round(area / 1000000) + ' km²' : DrawingFeature.round(area) + ' m²';
   }
 }

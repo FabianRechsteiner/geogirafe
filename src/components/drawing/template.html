@@ -11,6 +11,12 @@
     <button id="circle" tip="Circle"><i class="fg-circle-o fg-lg"></i></button>
     <button id="freeline" tip="Freehand line"><i class="fg-polyline fg-lg"></i></button>
     <button id="freepolygon" tip="Freehand polygon"><i class="fg-polygon-o fg-lg"></i></button>
+    <div id="toolParameters">
+      <input type="checkbox" id="fixedLengthEnabled" />
+      <label class="fixedLengthElement disabled" for="fixedLengthValue">Fix length to </label>
+      <input class="fixedLengthElement disabled" type="number" id="fixedLengthValue" />
+      <label class="fixedLengthElement disabled" for="fixedLengthValue">meters</label>
+    </div>
   </div>
   <div id="drawingListContainer">
     <div id="drawingList"></div>

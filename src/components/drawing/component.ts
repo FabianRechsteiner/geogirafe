@@ -13,7 +13,7 @@ import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
 
-function createDiv(id = '', className = '', content = '', onclick = (_: MouseEvent) => {}) {
+function createDiv(id = '', className = '', content = '', onclick = () => {}) {
   const element = document.createElement('div');
   element.id = id;
   element.className = className;
@@ -101,6 +101,22 @@ export default class DrawingComponent extends GirafeHTMLElement {
         this.curFeature!.name = (e.target as HTMLInputElement).value;
         this.getById('name-f-' + this.curFeature!.id).innerHTML = this.curFeature!.name;
         this.render();
+      };
+      this.getById('fixedLengthValue').oninput = (e) => {
+        const val = parseFloat((e.target as HTMLInputElement).value);
+        this.olDrawing.setFixedLength(val);
+        this.cesiumDrawing.setFixedLength(val);
+      };
+      this.getById('fixedLengthEnabled').onchange = (e) => {
+        const elements = Array.from(this.shadowRoot?.querySelectorAll('.fixedLengthElement')!);
+        if ((e.target as HTMLInputElement).checked) {
+          elements.forEach((e) => e.classList.remove('disabled'));
+          this.getById<HTMLInputElement>('fixedLengthValue').dispatchEvent(new Event('input'));
+        } else {
+          elements.forEach((e) => e.classList.add('disabled'));
+          this.olDrawing.setFixedLength(0);
+          this.cesiumDrawing.setFixedLength(0);
+        }
       };
     }
   }

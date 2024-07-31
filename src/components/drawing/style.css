@@ -39,6 +39,17 @@ button.selected {
 }
 .colorPicker {
   border-radius: 5px;
+  border: 1px solid black;
+}
+.picker_wrapper {
+  transform: translateX(-250px);
+}
+.picker_arrow {
+  transform: translateX(200px) rotate(90deg) scaleX(-1) !important;
+}
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 #panel {
@@ -48,6 +59,14 @@ button.selected {
 }
 #panel > div {
   padding: 1rem 1.5rem 1rem 1.5rem;
+}
+
+#toolParameters {
+  display: grid;
+  grid-template-columns: auto auto 60px auto;
+  align-items: center;
+  padding-top: 0;
+  margin-top: 10px;
 }
 
 #drawingListContainer {
@@ -83,10 +102,6 @@ button.selected {
   position: relative;
   z-index: 100;
 }
-.disabled {
-  pointer-events: none;
-  opacity: 0.5;
-}
 #optionsTitle {
   margin-bottom: 20px;
   text-align: center;
@@ -112,28 +127,17 @@ button.selected {
 #optionsTextLines button:hover {
   border: none;
 }
-#optionsColor {
+#optionsColor,
+#optionsLine,
+#optionsExport {
   margin: auto;
 }
 #optionsColorLine {
   grid-template-columns: 77px 70px 56px 26px;
 }
-#optionsLine {
-  margin: auto;
-}
 #optionsLineLines {
   grid-template-columns: 60px 40px 20px;
 }
-#optionsExport {
-  margin: auto;
-}
 #optionsExportLine {
   grid-template-columns: 60px 60px 45px 45px;
-}
-
-.picker_wrapper {
-  transform: translateX(-250px);
-}
-.picker_arrow {
-  transform: translateX(200px) rotate(90deg) scaleX(-1) !important;
 }
