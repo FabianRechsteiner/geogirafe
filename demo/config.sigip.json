@@ -10,7 +10,8 @@
   },
   "themes": {
     "url": "https://www.sigip.ch/themes?background=background&interface=desktop",
-    "defaultTheme": "thm_cadastre"
+    "defaultTheme": "thm_cadastre",
+    "selectionMode": "add"
   },
   "basemaps": {
     "defaultBasemap": "grp_background_asitvd.fond_couleur",

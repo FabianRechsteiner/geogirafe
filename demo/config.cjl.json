@@ -10,7 +10,8 @@
   },
   "themes": {
     "url": "Mock/themes.json",
-    "defaultTheme": "cadastre_thm"
+    "defaultTheme": "cadastre_thm",
+    "selectionMode": "add"
   },
   "basemaps": {
     "defaultBasemap": "Plan ville",
