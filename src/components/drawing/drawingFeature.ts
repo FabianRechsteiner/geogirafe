@@ -213,7 +213,13 @@ export default class DrawingFeature {
   }
 
   getCoordText(coord: number[]) {
-    return this.displayMeasure ? coord[0].toFixed(2) + ' ; ' + coord[1].toFixed(2) : '';
+    if (!this.displayMeasure) {
+      return '';
+    } else if (coord.length > 2) {
+      return 'E ' + coord[0].toFixed(2) + '\nN ' + coord[1].toFixed(2) + '\nH ' + coord[2].toFixed(2);
+    } else {
+      return 'E ' + coord[0].toFixed(2) + '\nN ' + coord[1].toFixed(2);
+    }
   }
 
   static deserialize(serializedFeature: SerializedFeature) {
