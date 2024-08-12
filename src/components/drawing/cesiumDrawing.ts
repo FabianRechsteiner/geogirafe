@@ -14,7 +14,6 @@ import { KML, GeoJSON } from 'ol/format';
 import DrawingFeature, { DrawingShape } from './drawingFeature';
 import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
-import ConfigManager from '../../tools/configuration/configmanager';
 import State from '../../tools/state/state';
 import proj4 from 'proj4';
 
@@ -30,12 +29,7 @@ function getLength(start: Cartesian3, end: Cartesian3) {
   return new EllipsoidGeodesic(Cartographic.fromCartesian(start), Cartographic.fromCartesian(end)).surfaceDistance;
 }
 
-function createLabel(
-  text: string,
-  font: string | null = null,
-  offset = -15,
-  fill: Color = Color.fromCssColorString('#000000')
-) {
+function createLabel(text: string, font: string | null = null, offset = -15, fill: Color | null = null) {
   if (font == null) {
     const feature = new DrawingFeature(DrawingShape.Point);
     font = feature.nameFontSize + 'px' + feature.font;
@@ -44,14 +38,14 @@ function createLabel(
     text: text,
     font: font,
     pixelOffset: new Cartesian2(0.0, offset),
-    fillColor: fill,
+    fillColor: fill ?? Color.fromCssColorString('#000000'),
     heightReference: CLAMP_TO_GROUND
   };
 }
 
 function createPoint(color: Color | null = null) {
   if (color == null) {
-    color = Color.fromCssColorString(ConfigManager.getInstance().Config.drawing.defaultStrokeColor);
+    color = Color.fromCssColorString(new DrawingFeature(DrawingShape.Point).strokeColor);
   }
   return { color: color, pixelSize: 5, heightReference: CLAMP_TO_GROUND };
 }
@@ -109,7 +103,6 @@ function getPolygonEntity(positions: Cartesian3[], feature: DrawingFeature) {
 }
 
 export default class CesiumDrawing {
-  configManager: ConfigManager;
   state: State;
   activeShapePoints: Cartesian3[] = [];
   activeShapes: Entity[] = [];
@@ -120,7 +113,6 @@ export default class CesiumDrawing {
   fixedLength: number = 0;
 
   constructor(map: MapComponent) {
-    this.configManager = ConfigManager.getInstance();
     this.state = StateManager.getInstance().state;
     StateManager.getInstance().subscribe('globe.loaded', () => {
       if (this.state.globe.loaded) {

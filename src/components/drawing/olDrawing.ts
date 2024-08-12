@@ -62,6 +62,16 @@ export default class OlDrawing {
     this.map.stateManager.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
       newTool === null ? this.deactivateTool() : this.activateTool(newTool)
     );
+
+    // OlCesium duplicates drawn shapes when 3D view is open if its eventListener is not removed
+    StateManager.getInstance().subscribe('globe.loaded', () => {
+      if (this.state.globe.loaded) {
+        this.drawingSource
+          .getListeners('addfeature')
+          ?.forEach((l) => this.drawingSource.removeEventListener('addfeature', l));
+        this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
+      }
+    });
   }
 
   addFeatures(features: DrawingFeature[]) {
@@ -88,12 +98,6 @@ export default class OlDrawing {
   }
 
   onFeatureAdded(e: VectorSourceEvent) {
-    // Otherwise Ol-Cesium injects an event during initialization that duplicated the features
-    this.drawingSource
-      .getListeners('addfeature')
-      ?.forEach((l) => this.drawingSource.removeEventListener('addfeature', l));
-    this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
-
     if (e.feature && this.currentShape !== null) {
       // If the shape is not in the state already
       if (
