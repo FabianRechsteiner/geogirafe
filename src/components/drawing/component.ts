@@ -1,8 +1,12 @@
 import Picker, { Color } from 'vanilla-picker';
+import { v4 as uuidv4 } from 'uuid';
 import DrawingFeature, { DrawingState, SerializedFeature, DrawingShape } from './drawingFeature';
 import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
+
 import { KML, GeoJSON, GPX } from 'ol/format';
+import { Polygon } from 'ol/geom';
+import Feature from 'ol/Feature';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { download } from '../../tools/export/download';
@@ -217,11 +221,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
       this.colorPickers.forEach((val) => val[0].setColor(val[1]()));
       this.getById('visibleIconName').innerHTML = this.curFeature.displayName ? visibleIcon : notVisibleIcon;
       this.getById('visibleIconMeasure').innerHTML = this.curFeature.displayMeasure ? visibleIcon : notVisibleIcon;
-      if (
-        this.curFeature.type == DrawingShape.Point ||
-        this.curFeature.type == DrawingShape.Polyline ||
-        this.curFeature.type == DrawingShape.FreehandPolyline
-      ) {
+      if (this.curFeature.isPointOrPolyline()) {
         this.getById('fillPickerSpan').classList.add('disabled');
         this.getById('fillPicker').classList.add('disabled');
       } else {
@@ -264,16 +264,41 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   exportFeature(feature: DrawingFeature, format: 'geojson' | 'kml' | 'gpx') {
     if (feature != null) {
-      const olFeature = this.olDrawing.createOlFeature(feature);
+      let olFeature = this.olDrawing.createOlFeature(feature);
+      if (feature.type == DrawingShape.Disk) {
+        const geojson = feature.geojson as any;
+        const style = olFeature.getStyle();
+        olFeature = new Feature(
+          new Polygon([DrawingFeature.circleToPolygon(geojson.geometry.center, geojson.geometry.radius)])
+        );
+        olFeature.setStyle(style);
+      }
       switch (format) {
         case 'geojson':
-          return download(new GeoJSON().writeFeature(olFeature), feature.name + '.geojson', '.geojson');
+          return download(
+            JSON.stringify(new GeoJSON().writeFeatureObject(olFeature, { featureProjection: this.state.projection })),
+            feature.name + '.geojson',
+            '.geojson'
+          );
         case 'kml':
-          return download(new KML().writeFeatures([olFeature]), feature.name + '.kml', '.kml');
+          return download(
+            new KML().writeFeatures([olFeature], { featureProjection: this.state.projection }),
+            feature.name + '.kml',
+            '.kml'
+          );
         case 'gpx':
-          return download(new GPX().writeFeatures([olFeature]), feature.name + '.gpx', '.gpx');
-        default:
-          console.warn(`Unsupported feature export format : ${format}`);
+          if (!feature.isPointOrPolyline()) {
+            return this.state.infobox.elements.push({
+              id: uuidv4(),
+              text: 'Warning : The GPX format only supports points and polylines',
+              type: 'warning'
+            });
+          }
+          return download(
+            new GPX().writeFeatures([olFeature], { featureProjection: this.state.projection }),
+            feature.name + '.gpx',
+            '.gpx'
+          );
       }
     }
   }
