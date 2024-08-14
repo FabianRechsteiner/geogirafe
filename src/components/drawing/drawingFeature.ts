@@ -36,7 +36,6 @@ export type SerializedFeature = {
 };
 
 export default class DrawingFeature {
-  private _uid: string = uuidv4();
   private _tool: DrawingShape;
   private _name: string;
   private _nameColor: string;
@@ -47,11 +46,12 @@ export default class DrawingFeature {
   private _measureFontSize: number;
   private _measureColor: string;
   private _font: string;
-  private _geojson: object;
   private _displayName: boolean = true;
   private _displayMeasure: boolean = true;
 
-  public onChange: (f: DrawingFeature) => void = () => {};
+  geojson: object;
+  id: string = uuidv4();
+  onChange: (f: DrawingFeature) => void = () => {};
 
   constructor(tool: DrawingShape, geojson: object = {}, name: string | null = null) {
     const defaultConfig = ConfigManager.getInstance().Config.drawing;
@@ -63,7 +63,7 @@ export default class DrawingFeature {
     this._nameFontSize = defaultConfig.defaultTextSize;
     this._measureFontSize = defaultConfig.defaultTextSize;
     this._font = defaultConfig.defaultFont;
-    this._geojson = geojson;
+    this.geojson = geojson;
     this._nameColor = '#000000';
     this._measureColor = '#000000';
   }
@@ -124,20 +124,6 @@ export default class DrawingFeature {
     this.onChange(this);
   }
 
-  get geojson() {
-    return this._geojson;
-  }
-  set geojson(v) {
-    this._geojson = v;
-  }
-
-  get id() {
-    return this._uid;
-  }
-  set id(id: string) {
-    this._uid = id;
-  }
-
   get displayName() {
     return this._displayName;
   }
@@ -187,7 +173,7 @@ export default class DrawingFeature {
       nfz: this._nameFontSize,
       mfz: this._measureFontSize,
       f: this._font,
-      g: this._geojson,
+      g: this.geojson,
       t: this._tool,
       dn: this._displayName,
       dm: this._displayMeasure,
@@ -222,6 +208,14 @@ export default class DrawingFeature {
     }
   }
 
+  isPointOrPolyline() {
+    return (
+      this.type == DrawingShape.Point ||
+      this.type == DrawingShape.Polyline ||
+      this.type == DrawingShape.FreehandPolyline
+    );
+  }
+
   static deserialize(serializedFeature: SerializedFeature) {
     const newFeature = new DrawingFeature(serializedFeature.t, serializedFeature.g, serializedFeature.n);
     newFeature.strokeColor = serializedFeature.sc;
@@ -230,12 +224,20 @@ export default class DrawingFeature {
     newFeature.nameFontSize = serializedFeature.nfz;
     newFeature.measureFontSize = serializedFeature.mfz;
     newFeature.font = serializedFeature.f;
-    newFeature._geojson = serializedFeature.g;
+    newFeature.geojson = serializedFeature.g;
     newFeature.displayName = serializedFeature.dn;
     newFeature.displayMeasure = serializedFeature.dm;
     newFeature.nameColor = serializedFeature.nc;
     newFeature.measureColor = serializedFeature.mc;
     newFeature.addToState();
     return newFeature;
+  }
+
+  static circleToPolygon(center: number[], radius: number, nbEdges: number = 300) {
+    const positions: number[][] = [];
+    for (let i = 0; i < 2 * Math.PI; i += (2 * Math.PI) / nbEdges) {
+      positions.push([center[0] + radius * Math.cos(i), center[1] + radius * Math.sin(i)]);
+    }
+    return [...positions, positions[0]];
   }
 }
