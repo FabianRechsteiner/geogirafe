@@ -42,8 +42,8 @@
   width: 2.3rem;
   height: 2.3rem;
   line-height: 2.3rem;
-  background-color: #444;
-  color: #fff;
+  background-color: var(--bkg-color-grad2);
+  color: var(--text-color);
   padding: 0;
   cursor: pointer;
   margin: 0;
@@ -73,6 +73,7 @@
 .social img {
   width: 3rem;
   opacity: 0.7;
+  filter: var(--svg-filter);
 }
 
 .social img:hover {
@@ -81,14 +82,14 @@
 
 input {
   border-radius: 0.25rem;
-  background-color: #fff;
+  background-color: var(--bkg-color);
   padding-left: 1rem;
-  color: #000;
+  color: var(--text-color);
   font-size: 0.9rem;
   flex-grow: 1;
 }
 
 .error {
   order: 3;
-  color: #b00;
+  color: var(--error-color);
 }

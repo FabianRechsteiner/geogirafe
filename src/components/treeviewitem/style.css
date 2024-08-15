@@ -60,7 +60,7 @@ i {
 
 .error {
   order: 3;
-  color: #b00;
+  color: var(--error-color);
 }
 
 .text {

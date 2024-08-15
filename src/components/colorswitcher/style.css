@@ -51,7 +51,7 @@
 }
 
 .checked .slider {
-  background-color: #222;
+  background-color: var(--bkg-color-grad2);
 }
 
 .checked .slider:before {
