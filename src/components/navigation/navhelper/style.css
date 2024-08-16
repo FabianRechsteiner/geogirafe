@@ -12,7 +12,7 @@
   display: inline-flex;
   flex-direction: column;
   width: max-content;
-  background-color: #fff;
+  background-color: var(--bkg-color);
 }
 
 .border-top {

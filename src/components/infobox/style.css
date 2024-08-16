@@ -20,7 +20,7 @@
 }
 
 .content div.warning {
-  background-color: orange;
+  background-color: var(--warning-color);
   color: #fff;
 }
 
@@ -57,7 +57,7 @@ span {
 }
 
 .content div.warning i {
-  background-color: orange;
+  background-color: var(--warning-color);
   color: #fff;
 }
 

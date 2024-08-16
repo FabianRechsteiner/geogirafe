@@ -28,6 +28,7 @@
 img.logo {
   margin-top: 1rem;
   margin-bottom: 1rem;
+  filter: var(--svg-filter);
 }
 
 h3 {

@@ -22,6 +22,7 @@ body {
   --lnk-active: #ff0000;
   --tst: #ff0000;
   --error-color: #bb0000;
+  --warning-color: #ffa500;
   --svg-filter: none;
   max-width: 100vw;
   max-height: 100vh;
@@ -266,6 +267,10 @@ girafe-share {
 
 .border-top {
   border-top: solid 1px #fff;
+}
+
+.tippy-box {
+  background-color: var(--bkg-color) !important;
 }
 
 .tippy-box[data-theme~='error'] {
