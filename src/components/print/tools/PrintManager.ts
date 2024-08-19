@@ -17,7 +17,7 @@ import {
 } from '@geoblocks/mapfishprint';
 import { MFPLegendEncoder } from './MFPLegendEncoder';
 import MFPEncoder from './MFPEncoder';
-import { deleteFeatureOlParams } from '../../../tools/utils/olutils';
+import { removeUnwantedOlParams } from '../../../tools/utils/olutils';
 import { intersects } from 'ol/extent';
 
 /**
@@ -144,7 +144,7 @@ export default class PrintManager {
         const id = feature.getId();
         const rawTitle = id === undefined ? 'UNKNOWN' : `${id}`.split('.')[0];
         const title = i18nManager.getTranslation(rawTitle);
-        const properties = deleteFeatureOlParams(feature);
+        const properties = removeUnwantedOlParams(feature);
         const datasource = datasources.find((datasource) => datasource.title === title);
         const values = Object.values(properties);
         if (datasource) {

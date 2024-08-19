@@ -24,13 +24,25 @@ export const getOlayerByName = (map: Map, layerName: string): BaseLayer | undefi
 
 /**
  * Clone the properties of the given feature and delete ol properties to keep only the feature "app" properties.
+ * Handle map server values served as object and serve them as "simple" values.
  */
-export const deleteFeatureOlParams = (feature: Feature, keepGeom = false): Record<string, unknown> => {
+export const removeUnwantedOlParams = (feature: Feature, keepGeom = false): Record<string, unknown> => {
   const properties = { ...feature.getProperties() };
   delete properties.boundedBy;
   if (!keepGeom) {
     delete properties[feature.getGeometryName()];
   }
+  // Handle map server values served as object.
+  Object.keys(properties).forEach((key) => {
+    const value = properties[key];
+    if (typeof value === 'object') {
+      if (value['xsi:nil'] === 'true') {
+        properties[key] = undefined;
+      } else if (value['_content_']) {
+        properties[key] = value['_content_'];
+      }
+    }
+  });
   return properties;
 };
 
