@@ -59,6 +59,8 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const map = this.componentManager.getComponents(MapComponent)[0];
     this.olDrawing = new OlDrawing(map);
     this.cesiumDrawing = new CesiumDrawing(map);
+    this.stateManager.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news));
+    this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
   }
 
   render() {
@@ -77,8 +79,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
       this.buttons.forEach((b) => {
         this.getById(b.id).addEventListener('click', () => this.setTool(b.tool));
       });
-      this.stateManager.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news));
-      this.stateManager.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
       this.getById('visibleIconName').innerHTML = visibleIcon;
       this.getById('visibleIconMeasure').innerHTML = visibleIcon;
       this.addColorPicker(
