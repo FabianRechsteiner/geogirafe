@@ -1,5 +1,5 @@
 import type OlFeature from 'ol/Feature';
-import { deleteFeatureOlParams } from './utils/olutils';
+import { removeUnwantedOlParams } from './utils/olutils';
 
 /**
  * Represents a grid data organized by unique ids.
@@ -69,7 +69,7 @@ export default class FeatureToGridDataById {
    */
   private addFeatureToGridDataById(gridDataById: GridDataById, feature: OlFeature): GridDataById {
     const featureType = FeatureToGridDataById.getUserFeatureType(feature);
-    const notOlProperties = deleteFeatureOlParams(feature, this.options.keepGeomProperty);
+    const notOlProperties = removeUnwantedOlParams(feature, this.options.keepGeomProperty);
     if (!Object.keys(notOlProperties).length) {
       // Don't keep feature without properties.
       return gridDataById;

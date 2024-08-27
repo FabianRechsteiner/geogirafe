@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getOlayerByName, deleteFeatureOlParams } from './olutils';
+import { getOlayerByName, removeUnwantedOlParams } from './olutils';
 import { Map } from 'ol';
 import BaseLayer from 'ol/layer/Base';
 import Feature from 'ol/Feature';
@@ -23,16 +23,47 @@ describe('getOlayerByName function', () => {
 });
 
 describe('deleteFeatureOlParams', () => {
-  it('Deletes ol properties from given features', () => {
-    const feature = new Feature({
+  const getFeature = () => {
+    return new Feature({
       name: 'Test Feature',
       geometry: new Point([0, 0]),
-      boundedBy: 'xyz'
+      boundedBy: 'xyz',
+      anObject: {
+        test: 'true'
+      },
+      undefinedObject: {
+        'xsi:nil': 'true',
+        '_content_': 'foo'
+      },
+      notUndefinedObject: {
+        'xsi:nil': 'false',
+        '_content_': 'bar'
+      }
     });
+  };
+  it('Deletes ol properties from given feature', () => {
+    const feature = getFeature();
     expect(feature.getProperties()[feature.getGeometryName()]).toBeDefined();
-    const modifiedFeature = deleteFeatureOlParams(feature);
-    expect(modifiedFeature).toEqual({ name: 'Test Feature' });
-    expect(modifiedFeature.boundedBy).toBeUndefined();
+    const modifiedFeature = removeUnwantedOlParams(feature);
+    expect(modifiedFeature).toEqual({
+      name: 'Test Feature',
+      anObject: {
+        test: 'true'
+      },
+      undefinedObject: undefined,
+      notUndefinedObject: 'bar'
+    });
     expect(modifiedFeature[feature.getGeometryName()]).toBeUndefined();
+    expect(modifiedFeature.boundedBy).toBeUndefined();
+  });
+
+  it('Deletes ol properties from given feature, but keep geom', () => {
+    const feature = getFeature();
+    expect(feature.getProperties()[feature.getGeometryName()]).toBeDefined();
+    const modifiedFeature = removeUnwantedOlParams(feature, true);
+    expect(Object.keys(modifiedFeature).length).toBe(5);
+    expect(modifiedFeature.name).toEqual('Test Feature');
+    expect(modifiedFeature[feature.getGeometryName()]).toBeDefined();
+    expect(modifiedFeature.boundedBy).toBeUndefined();
   });
 });
