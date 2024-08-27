@@ -31,9 +31,11 @@ export default defineConfig({
             '@geoblocks/print',
             'buffer',
             'd3',
+            'error-stack-parser',
             'file-saver',
             'gridjs',
             'lz-string',
+            'source-map-js',
             'tippy.js',
             'vanilla-picker'
           ]

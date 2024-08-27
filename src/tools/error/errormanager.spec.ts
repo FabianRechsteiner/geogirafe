@@ -18,12 +18,12 @@ describe('ErrorManager', () => {
     MockHelper.stopMocking();
   });
 
-  it('should listen to all uncaught errors and add error message to infobox', () => {
+  it('should listen to all uncaught errors and add error message to infobox', async () => {
     const error = new Error('Test error');
     const stack = 'Error stack trace';
     error.stack = stack;
 
-    window.onerror!(error.message, 'testfile.js', 10, 20, error);
+    await window.onerror!(error.message, 'testfile.js', 10, 20, error);
 
     expect(StateManager.getInstance().state.infobox.elements.length).toEqual(1);
     const element = StateManager.getInstance().state.infobox.elements[0];
@@ -33,14 +33,14 @@ describe('ErrorManager', () => {
     expect(element.text).toContain(encodeURIComponent('Test error'));
   });
 
-  it('should listen to all unhandledrejection and add error message to infobox', () => {
+  it('should listen to all unhandledrejection and add error message to infobox', async () => {
     const reason = new Error('Unhandled rejection');
     const stack = 'Rejection stack trace';
     reason.stack = stack;
 
     const event = new CustomEvent('unhandledrejection', { detail: { reason } });
     Object.assign(event, { reason });
-    window.dispatchEvent(event);
+    await window.dispatchEvent(event);
 
     expect(StateManager.getInstance().state.infobox.elements.length).toEqual(1);
     const element = StateManager.getInstance().state.infobox.elements[0];
@@ -50,10 +50,10 @@ describe('ErrorManager', () => {
     expect(element.text).toContain(encodeURIComponent('Unhandled rejection'));
   });
 
-  it('should handle unknown rejection without reason and stack', () => {
+  it('should handle unknown rejection without reason and stack', async () => {
     const event = new CustomEvent('unhandledrejection', { detail: {} });
     Object.assign(event, {});
-    window.dispatchEvent(event);
+    await window.dispatchEvent(event);
 
     expect(StateManager.getInstance().state.infobox.elements.length).toEqual(1);
     const element = StateManager.getInstance().state.infobox.elements[0];
@@ -61,18 +61,28 @@ describe('ErrorManager', () => {
     expect(element.type).toEqual('error');
   });
 
-  it('should add all errors to infobox', () => {
+  it('should add all errors to infobox', async () => {
     const error = new Error('Test error');
-
-    window.onerror!(error.message, 'testfile.js', 10, 20, error);
+    await window.onerror!(error.message, 'testfile.js', 10, 20, error);
     expect(StateManager.getInstance().state.infobox.elements.length).toEqual(1);
 
-    window.onerror!(error.message, 'testfile.js', 10, 20, error);
+    const error2 = new Error('Test error 2');
+    await window.onerror!(error.message, 'testfile2.js', 10, 20, error2);
     expect(StateManager.getInstance().state.infobox.elements.length).toEqual(2);
 
     const event = new CustomEvent('unhandledrejection', { detail: {} });
-    Object.assign(event, {});
-    window.dispatchEvent(event);
+    Object.assign(event, { error });
+    await window.dispatchEvent(event);
     expect(StateManager.getInstance().state.infobox.elements.length).toEqual(3);
+  });
+
+  it('should not add dupplicated errors to infobox', async () => {
+    const error = new Error('Test error');
+
+    await window.onerror!(error.message, 'testfile.js', 10, 20, error);
+    expect(StateManager.getInstance().state.infobox.elements.length).toEqual(1);
+
+    await window.onerror!(error.message, 'testfile.js', 10, 20, error);
+    expect(StateManager.getInstance().state.infobox.elements.length).toEqual(1);
   });
 });
