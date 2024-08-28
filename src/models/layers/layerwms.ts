@@ -8,6 +8,7 @@ import Layer from './layer';
 export type LayerWmsOptions = {
   isDefaultChecked?: boolean;
   disclaimer?: string;
+  metadataUrl?: string;
   opacity?: number;
   minResolution?: number;
   maxResolution?: number;
@@ -92,6 +93,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   clone(): LayerWms {
     const options = {
       isDefaultChecked: this.isDefaultChecked,
+      metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       opacity: this.opacity,
       minResolution: this.minResolution,
@@ -135,6 +137,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   private static getOptionsFromGMFTreeItem(options: GMFTreeItem): LayerWmsOptions {
     const opts: LayerWmsOptions = {
       isDefaultChecked: options.metadata?.isChecked,
+      metadataUrl: options.metadata?.metadataUrl,
       disclaimer: options.metadata?.disclaimer,
       opacity: 1, // TODO REG : Set default opacity
       minResolution: options.minResolutionHint,

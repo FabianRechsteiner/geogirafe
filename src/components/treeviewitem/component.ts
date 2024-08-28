@@ -237,6 +237,14 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     this.state.layers.swipedLayers = newSwipedLayers;
   }
 
+  showMetadata() {
+    this.state.metadata = {
+      title: this.layer.name,
+      url: this.layer.metadataUrl ?? null
+    };
+    this.state.interface.metadataVisible = true;
+  }
+
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();

@@ -121,6 +121,11 @@ class GirafeConfig {
     quote: string;
     separator: string;
   };
+  metadata: {
+    metadataUrlPrefix: string;
+    defaultWindowWidth: string;
+    defaultWindowHeight: string;
+  };
   offline?: {
     downloadStartZoom: number;
     downloadEndZoom: number;
@@ -150,6 +155,7 @@ class GirafeConfig {
     this.bookmarks = this.initConfigBookmarks(config);
     this.lidar = this.initConfigLidar(config);
     this.csv = this.initConfigCsv(config);
+    this.metadata = this.initConfigMetadata(config);
     this.offline = this.initConfigOffline(config);
 
     try {
@@ -335,6 +341,18 @@ class GirafeConfig {
     return {
       ...defaultConfig,
       ...config.csv
+    };
+  }
+
+  private initConfigMetadata(config: GirafeConfig) {
+    const defaultConfig = {
+      metadataUrlPrefix: '',
+      defaultWindowWidth: '960px',
+      defaultWindowHeight: '460px'
+    };
+    return {
+      ...defaultConfig,
+      ...config.metadata
     };
   }
 

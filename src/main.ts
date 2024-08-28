@@ -20,6 +20,7 @@ import ColorSwitcherComponent from './components/colorswitcher/component';
 import CoordinateComponent from './components/coordinate/component';
 import GlobeComponent from './components/globe/component';
 import HelpComponent from './components/help/component';
+import MetadataWindowComponent from './components/metadatawindow/component';
 import InfoboxComponent from './components/infobox/component';
 import LanguageComponent from './components/language/component';
 import LidarPanelComponent from './components/lidar/panel/component';
@@ -113,6 +114,7 @@ try {
       customElements.define('girafe-coordinate', CoordinateComponent);
       customElements.define('girafe-globe-select', GlobeComponent);
       customElements.define('girafe-help', HelpComponent);
+      customElements.define('girafe-metadata-window', MetadataWindowComponent);
       customElements.define('girafe-infobox', InfoboxComponent);
       customElements.define('girafe-language-select', LanguageComponent);
       customElements.define('girafe-lidar-panel', LidarPanelComponent);

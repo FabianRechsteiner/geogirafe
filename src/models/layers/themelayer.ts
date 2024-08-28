@@ -4,6 +4,7 @@ import { Coordinate } from 'ol/coordinate';
 export type ThemeLayerOptions = {
   isDefaultChecked?: boolean;
   disclaimer?: string;
+  metadataUrl?: string;
   isDefaultExpanded?: boolean;
   isExclusiveTheme?: boolean;
 };
