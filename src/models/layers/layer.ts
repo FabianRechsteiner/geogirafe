@@ -3,6 +3,7 @@ import BaseLayer from './baselayer';
 type LayerOptions = {
   isDefaultChecked?: boolean;
   disclaimer?: string;
+  metadataUrl?: string;
   opacity?: number;
 };
 

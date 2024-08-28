@@ -65,8 +65,13 @@ i {
   width: 0;
 }
 
-.delete {
+.metadata {
   order: 5;
+  padding: 0.45rem;
+}
+
+.delete {
+  order: 6;
   padding-top: 0.45rem;
 }
 

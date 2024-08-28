@@ -253,6 +253,7 @@ class ThemesManager extends GirafeSingleton {
         // Group
         const options = {
           isDefaultChecked: elem.metadata?.isChecked,
+          metadataUrl: elem.metadata?.metadataUrl,
           disclaimer: elem.metadata?.disclaimer,
           isDefaultExpanded: elem.metadata?.isExpanded,
           isExclusiveGroup: elem.metadata?.exclusiveGroup

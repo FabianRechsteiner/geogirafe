@@ -3,6 +3,7 @@ import BaseLayer from './baselayer';
 export type GroupLayerOptions = {
   isDefaultChecked?: boolean;
   disclaimer?: string;
+  metadataUrl?: string;
   isDefaultExpanded?: boolean;
   isExclusiveGroup?: boolean;
 };
@@ -31,6 +32,7 @@ class GroupLayer extends BaseLayer {
   clone(): GroupLayer {
     const options = {
       isDefaultChecked: this.isDefaultChecked,
+      metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       isDefaultExpanded: this.isExpanded,
       isExclusiveGroup: this.isExclusiveGroup

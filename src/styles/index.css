@@ -265,6 +265,14 @@ girafe-share {
   transform: translate(-50%, -50%);
 }
 
+girafe-metadata-window {
+  position: absolute;
+  z-index: 100;
+  background: var(--bkg-color);
+  top: 1rem;
+  left: 2rem;
+}
+
 .border-top {
   border-top: solid 1px #fff;
 }

@@ -81,5 +81,10 @@
     "service": "localStorage",
     "get": "",
     "post": ""
+  },
+  "metadata": {
+    "metadataUrlPrefix": "https://map.geo.bs.ch",
+    "defaultWindowWidth": "500px",
+    "defaultWindowHeight": "350px"
   }
 }

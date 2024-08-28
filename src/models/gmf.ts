@@ -14,6 +14,7 @@ export interface GMFMetadata {
   legendRule?: string;
   legendImage?: string;
   disclaimer?: string;
+  metadataUrl?: string;
   hiDPILegendImages?: Record<string, string>;
   printLayers?: string;
   queryLayers?: string;

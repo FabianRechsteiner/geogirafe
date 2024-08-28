@@ -92,6 +92,14 @@ class TreeViewGroupComponent extends GirafeHTMLElement {
     }
   }
 
+  showMetadata() {
+    this.state.metadata = {
+      title: this.group.name,
+      url: this.group.metadataUrl ?? null
+    };
+    this.state.interface.metadataVisible = true;
+  }
+
   deleteGroup() {
     this.deactivateGroup(this.group);
     if (!this.deleteGroupRecursive(this.state.layers.layersList)) {

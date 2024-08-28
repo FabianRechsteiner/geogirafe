@@ -7,6 +7,7 @@ import WMTS from 'ol/source/WMTS';
 export type LayerWmtsOptions = {
   isDefaultChecked?: boolean;
   disclaimer?: string;
+  metadataUrl?: string;
   opacity?: number;
   dimensions?: Record<string, object>;
   imageType?: string;
@@ -79,6 +80,7 @@ class LayerWmts extends Layer {
   clone(): LayerWmts {
     const options = {
       isDefaultChecked: this.isDefaultChecked,
+      metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       opacity: this.opacity,
       dimensions: this.dimensions,
@@ -112,6 +114,7 @@ class LayerWmts extends Layer {
   private static getOptionsFromGMFTreeItem(options: GMFTreeItem): LayerWmtsOptions {
     return {
       isDefaultChecked: options.metadata?.isChecked,
+      metadataUrl: options.metadata?.metadataUrl,
       disclaimer: options.metadata?.disclaimer,
       opacity: 1, // TODO REG : Set default opacity
       dimensions: options.dimensions,

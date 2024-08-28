@@ -4,6 +4,7 @@ type LayerVectorTilesOptions = {
   projection?: string;
   isDefaultChecked?: boolean;
   disclaimer?: string;
+  metadataUrl?: string;
   opacity?: number;
 };
 
@@ -38,6 +39,7 @@ class LayerVectorTiles extends Layer {
     const options = {
       projection: this.projection,
       isDefaultChecked: this.isDefaultChecked,
+      metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       opacity: this.opacity
     };

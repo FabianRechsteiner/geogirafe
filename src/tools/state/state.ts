@@ -19,6 +19,7 @@ type GraphicalInterface = {
   selectionComponentVisible: boolean;
   selectionComponent: string;
   aboutVisible: boolean;
+  metadataVisible: boolean;
   shareVisible: boolean;
   darkMapMode: boolean;
   darkFrontendMode: boolean;
@@ -82,6 +83,11 @@ export type Lidar = {
   drawActive: boolean;
 };
 
+export type Metadata = {
+  title: string | null;
+  url: string | null;
+};
+
 export default class State {
   /**
    * This class is a used as the state of the application, which will be accessed behind a javascript proxy.
@@ -125,6 +131,7 @@ export default class State {
     selectionComponentVisible: false,
     selectionComponent: '',
     aboutVisible: false,
+    metadataVisible: false,
     shareVisible: false,
     darkMapMode: false,
     darkFrontendMode: false
@@ -186,6 +193,11 @@ export default class State {
 
   infobox = {
     elements: [] as InfoBoxContent[]
+  };
+
+  metadata: Metadata = {
+    title: null,
+    url: null
   };
 
   // Indicates is the application is currently used in offline mode

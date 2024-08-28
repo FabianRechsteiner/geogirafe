@@ -4,6 +4,7 @@ import Layer from './layer';
 type LayerXYZTilesOptions = {
   isDefaultChecked?: boolean;
   disclaimer?: string;
+  metadataUrl?: string;
   opacity?: number;
 };
 
@@ -28,6 +29,7 @@ class LayerXYZ extends Layer {
   clone() {
     const options = {
       isDefaultChecked: this.isDefaultChecked,
+      metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       opacity: this.opacity
     };
@@ -43,6 +45,7 @@ class LayerXYZ extends Layer {
   private static getOptionsFromGMFTreeItem(options: GMFTreeItem): LayerXYZTilesOptions {
     return {
       isDefaultChecked: options.metadata?.isChecked,
+      metadataUrl: options.metadata?.metadataUrl,
       disclaimer: options.metadata?.disclaimer,
       opacity: 1 // TODO REG : Set default opacity
     };

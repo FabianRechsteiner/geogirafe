@@ -50,6 +50,12 @@
     >${this.group.name}</span
   >
 
+  <!-- Metadata icon -->
+  <i
+    class="${this.group.metadataUrl ? 'fa fa-solid fa-circle-info tool metadata selectable' : 'metadata hidden'}"
+    tip="More information"
+    onclick="${() => this.showMetadata()}"></i>
+
   <!-- Remove icon -->
   <i
     class="fa fa-solid fa-xmark tool delete selectable"

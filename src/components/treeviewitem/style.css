@@ -107,8 +107,13 @@ i {
   order: 11;
 }
 
-.legend {
+.metadata {
   order: 12;
+  padding-right: 0.15rem;
+}
+
+.legend {
+  order: 13;
 }
 
 .item i.advanced {
