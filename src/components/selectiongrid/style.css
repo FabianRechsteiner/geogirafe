@@ -89,17 +89,6 @@
   flex: 1;
 }
 
-.gridjs-wrapper {
-  overflow-x: hidden !important;
-  height: 100% !important;
-  width: 100% !important;
-}
-
-.gridjs-container {
-  height: 100%;
-  width: 100%;
-}
-
 .geo-type {
   margin-right: 0.5rem;
 }
@@ -115,26 +104,6 @@ button {
 
 ::-webkit-scrollbar-thumb {
   background: #999;
-}
-
-.gridjs-table {
-  background-color: var(--bkg-color) !important;
-  color: var(--text-color);
-}
-
-td.gridjs-td {
-  background-color: var(--bkg-color) !important;
-  padding: 0 0.5rem !important;
-  line-height: 1.2rem !important;
-}
-
-th.gridjs-th {
-  color: var(--text-color-grad2);
-  background-color: var(--bkg-color-grad2) !important;
-}
-
-.gridjs-th-content {
-  color: var(--text-color) !important;
 }
 
 .tiny-margin {

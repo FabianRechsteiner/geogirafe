@@ -141,7 +141,13 @@ export default class SelectionTabulatorManager {
 
   columnsToGridColumns(columns: string[]): ColumnDefinition[] {
     const columnDefinition: ColumnDefinition[] = [];
-    columns.map((column) => columnDefinition.push({ title: column, field: column }));
+    columns.map((column) =>
+      columnDefinition.push({
+        title: I18nManager.getInstance().getTranslation(column),
+        field: column,
+        formatter: 'html'
+      })
+    );
 
     columnDefinition.forEach((column) => {
       if (column.title === 'geometry' || column.title === 'geom') {
