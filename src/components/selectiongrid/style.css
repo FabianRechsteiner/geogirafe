@@ -6,7 +6,6 @@
 }
 
 #panel {
-  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -140,4 +139,20 @@ th.gridjs-th {
 
 .tiny-margin {
   margin: 0.1rem;
+}
+
+/* Define the style when the column is not sorted */
+.tabulator-col[aria-sort='none'] .tabulator-col-sorter i {
+  color: #999;
+}
+
+/* Define the style when the column is sorted in ascending order */
+.tabulator-col[aria-sort='asc'] .tabulator-col-sorter i {
+  color: #f00;
+}
+
+/* Define the style when the column is sorted in descending order */
+.tabulator-col[aria-sort='desc'] .tabulator-col-sorter i {
+  color: #f00;
+  transform: scaleY(-1); /* flip the icon vertically so the arrow points down */
 }

@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="lib/gridjs/mermaid.min.css" />
 <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
 <link rel="stylesheet" href="lib/font-gis/font-gis.css" />
+<link rel="stylesheet" href="../../../node_modules/tabulator-tables/dist/css/tabulator.css" />
 
 <div id="panel">
   <div id="content">
@@ -12,10 +13,10 @@
         i18n="${th.text}"
         class="${th.active ? 'tab active' : 'tab'}"
         .active="${th.active}"
-        onclick="${() => this.displayGrid(th.id)}"></button>
+        onclick="${() => this.displayGrid(th.id, true)}"></button>
       `)}
     </div>
-    <div id="grid"></div>
+    <div id="tabulator"></div>
   </div>
   <div id="gutter"></div>
   <button id="close" onclick="this.closePanel()">

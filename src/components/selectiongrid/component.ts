@@ -3,6 +3,7 @@ import type { Callback } from '../../tools/state/statemanager';
 import type OlFeature from 'ol/Feature';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionGridManager from './tools/selectiongridmanager';
+import SelectionTabulatorManager from './tools/selectiontabulatormanager';
 import type { TabHeader } from './tools/selectiongridmanager';
 
 /**
@@ -17,6 +18,7 @@ class SelectionGridComponent extends GirafeResizableElement {
 
   private readonly eventsCallbacks: Callback[] = [];
   private readonly selectionGridManager = new SelectionGridManager();
+  private readonly selectionTabulatorManager = new SelectionTabulatorManager();
   private isVisibleComponentSetup = false;
   private debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
   visible = false;
@@ -41,16 +43,20 @@ class SelectionGridComponent extends GirafeResizableElement {
    * @returns The current array of TabHeader objects.
    */
   getTabHeaders(): TabHeader[] {
-    return this.selectionGridManager.tabHeaders;
+    return this.selectionTabulatorManager.tabHeaders;
   }
 
   /**
    * Activates the specified tab, renders the grid, and displays the grid for the specified id.
    */
-  displayGrid(id: string) {
-    this.selectionGridManager.activateTab(id);
+  displayGrid(id: string, replaceData: boolean = false) {
+    if (replaceData) {
+      this.selectionTabulatorManager.replaceData(id);
+    }
+
+    this.selectionTabulatorManager.activateTab(id);
     this.render();
-    this.selectionGridManager.displayGrid(id);
+    this.selectionTabulatorManager.displayGrid(id);
   }
 
   /**
@@ -70,7 +76,6 @@ class SelectionGridComponent extends GirafeResizableElement {
   private renderComponent() {
     super.render();
     super.girafeTranslate();
-    this.selectionGridManager.setGridElement(this.shadow.querySelector('#grid'));
     this.activateTooltips(false, [800, 0], 'top-end');
     if (!this.isVisibleComponentSetup) {
       this.setupVisibleComponent();
@@ -128,15 +133,19 @@ class SelectionGridComponent extends GirafeResizableElement {
    * @private
    */
   private onFeaturesSelected(features: OlFeature[] | null) {
-    this.selectionGridManager.tabHeaders = [];
+    this.selectionTabulatorManager.tabHeaders = [];
     // No feature ? Close.
     if (this.isNullOrUndefined(features) || features!.length <= 0) {
       this.closePanel();
       return;
     }
-    // Otherwise, transforms features to grid data.
-    this.selectionGridManager.featuresToGridData(features!);
-    const tabIds = Object.keys(this.selectionGridManager.idTab);
+
+    this.selectionTabulatorManager.featuresToGridData(features!);
+    const tabIds = Object.keys(this.selectionTabulatorManager.idTab);
+
+    //define table element
+    this.selectionTabulatorManager.setElement(this.shadow.querySelector('#tabulator') as HTMLElement);
+
     // No tab ? Close the panel.
     if (!tabIds.length) {
       this.closePanel();
