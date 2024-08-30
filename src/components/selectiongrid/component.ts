@@ -2,9 +2,7 @@ import GirafeResizableElement from '../../base/GirafeResizableElement';
 import type { Callback } from '../../tools/state/statemanager';
 import type OlFeature from 'ol/Feature';
 import { debounce } from '../../tools/utils/debounce';
-import SelectionGridManager from './tools/selectiongridmanager';
-import SelectionTabulatorManager from './tools/selectiontabulatormanager';
-import type { TabHeader } from './tools/selectiongridmanager';
+import SelectionTabulatorManager, { type TabHeader } from './tools/selectiontabulatormanager';
 
 /**
  * Represents a selection grid component based on GridJs.
@@ -17,7 +15,6 @@ class SelectionGridComponent extends GirafeResizableElement {
   styleUrl = './style.css';
 
   private readonly eventsCallbacks: Callback[] = [];
-  private readonly selectionGridManager = new SelectionGridManager();
   private readonly selectionTabulatorManager = new SelectionTabulatorManager();
   private isVisibleComponentSetup = false;
   private debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
@@ -63,7 +60,6 @@ class SelectionGridComponent extends GirafeResizableElement {
    * Clean the grid, closes the panel and deselect the selected features.
    */
   closePanel() {
-    this.selectionGridManager.emptyGrid();
     this.state.interface.selectionComponentVisible = false;
     this.state.selection.selectedFeatures = [];
     super.clean();
@@ -121,7 +117,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   private registerEvents() {
     this.eventsCallbacks.push(
       this.stateManager.subscribe('selection.selectedFeatures', (_oldFeatures, newFeatures) => {
-        // Use debounce to avoid quicly closing the grid on selection change.
+        // Use debounce to avoid quickly closing the grid on selection change.
         this.debounceOnFeaturesSelected(newFeatures);
       })
     );
