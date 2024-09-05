@@ -56,6 +56,8 @@ class SearchComponent extends GirafeHTMLElement {
   public paintSearchResults?: boolean;
   public defaultSearchStrokeColor?: string;
 
+  private abortController = new AbortController();
+
   constructor() {
     super('search');
     this.themeManager = ThemesManager.getInstance();
@@ -144,6 +146,12 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   public async doSearch(e: Event) {
+    // Cancel any previous search
+    this.abortController.abort();
+    // Create a new controller for the new request
+    const currentAbortController = new AbortController();
+    this.abortController = currentAbortController;
+
     const target = e.target! as HTMLInputElement;
     const term = target.value.trim();
     this.clearSearch();
@@ -156,9 +164,17 @@ class SearchComponent extends GirafeHTMLElement {
       const url = this.configManager.Config.search.url
         .replace(this.searchTermPlaceholder, term)
         .replace(this.searchLangPlaceholder, this.state.language!);
-      const response = await fetch(url);
-      const data = await response.json();
-      this.displayResults(data);
+      try {
+        const response = await fetch(url, { signal: this.abortController.signal });
+        const data = await response.json();
+        this.displayResults(data);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          // Request was aborted, ignore the error
+          console.debug('Multiple parallel search: previous request was aborted.');
+          return;
+        }
+      }
     }
   }
 
@@ -199,7 +215,18 @@ class SearchComponent extends GirafeHTMLElement {
   private displayResults(results: { type: string; features: SearchResult[] }) {
     // First, group the results
     results.features.forEach((result) => {
-      const type = result.properties ? result.properties.layer_name : 'ERROR: Missing type in the search result';
+      let type = 'Unknown layer type';
+      if (result.properties) {
+        if (result.properties.layer_name) {
+          type = result.properties.layer_name;
+        } else if (result.properties.actions[0].action === 'add_theme') {
+          type = 'add_theme';
+        } else if (result.properties.actions[0].action === 'add_group') {
+          type = 'add_group';
+        } else if (result.properties.actions[0].action === 'add_layer') {
+          type = 'add_layer';
+        }
+      }
 
       let resultList: SearchResult[];
       if (type in this.groupedResults) {
@@ -277,7 +304,7 @@ class SearchComponent extends GirafeHTMLElement {
       if (!this.state.layers.layersList.includes(layer)) {
         // Preview layer
         this.previewLayer = layer;
-        this.state.layers.layersList.push(this.previewLayer);
+        this.state.layers.layersList.unshift(this.previewLayer);
         this.layerManager.toggleLayer(this.previewLayer, 'on');
       }
     }
@@ -354,15 +381,20 @@ class SearchComponent extends GirafeHTMLElement {
     if (result.bbox) {
       // Result with geometry
       this.zoomTo(result.bbox);
+    } else if (result.properties?.actions[0].action === 'add_theme') {
+      const theme = this.themeManager.findThemeByName(result.properties?.actions[0].data);
+      if (!this.state.layers.layersList.includes(theme)) {
+        this.state.layers.layersList.unshift(theme);
+      }
     } else if (result.properties?.actions[0].action === 'add_group') {
       const group = this.themeManager.findGroupByName(result.properties?.actions[0].data);
       if (!this.state.layers.layersList.includes(group)) {
-        this.state.layers.layersList.push(group);
+        this.state.layers.layersList.unshift(group);
       }
     } else if (result.properties?.actions[0].action === 'add_layer') {
       const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
       if (!this.state.layers.layersList.includes(layer)) {
-        this.state.layers.layersList.push(layer);
+        this.state.layers.layersList.unshift(layer);
       }
     } else {
       console.warn('Unsupported result type');

@@ -113,10 +113,6 @@ then
     echo "Preparing environment SIGIP..."
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/fr.json $APPDIR/fr.json
-    echo "Cannot create Mock objects for SIGIP, the following commands are blocked when executed from AWS or GitLab Pipeline"
-    #curl "https://www.sigip.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    #curl "https://www.sigip.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    #curl "https://www.sigip.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'sitn' ];
 then
@@ -124,9 +120,6 @@ then
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
     cp demo/fr.json $APPDIR/fr.json
-    curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://sitn.ne.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://sitn.ne.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'ticino' ];
 then

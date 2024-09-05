@@ -119,9 +119,6 @@ if "%1"=="sigip" (
     echo "Preparing environment SIGIP..."
     copy demo\config.sigip.json %APPDIR%\config.json /Y
     copy demo\fr.json %APPDIR%\fr.json /Y
-    curl "https://www.sigip.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
-    curl "https://www.sigip.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-    curl "https://www.sigip.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -130,9 +127,6 @@ if "%1"=="sitn" (
     copy demo\config.sitn.json %APPDIR%\config.json /Y
     copy demo\config.sitn.mobile.json %APPDIR%\config.mobile.json /Y
     copy demo\fr.json %APPDIR%\fr.json /Y
-    curl "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop" --output %OUTPUTDIR%\themes.json
-    curl "https://sitn.ne.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-    curl "https://sitn.ne.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 

@@ -350,6 +350,16 @@ class ThemesManager extends GirafeSingleton {
     }
   }
 
+  findThemeByName(themename: string): ThemeLayer {
+    for (const theme of Object.values(this.state.themes._allThemes)) {
+      if (theme.name === themename) {
+        return theme;
+      }
+    }
+
+    throw new Error(`Theme ${themename} was not found`);
+  }
+
   findGroupByName(groupname: string): GroupLayer {
     const group = this.#findBaseLayerByName(groupname);
     if (group instanceof GroupLayer) {
