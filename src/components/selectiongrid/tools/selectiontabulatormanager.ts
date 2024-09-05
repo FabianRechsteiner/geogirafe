@@ -150,7 +150,7 @@ export default class SelectionTabulatorManager {
     );
 
     columnDefinition.forEach((column) => {
-      if (column.title === 'geometry' || column.title === 'geom') {
+      if (column.field === 'the_geom' || column.field === 'geom' || column.field === 'geometry') {
         column.formatter = (cell) => {
           return this.formatGridGeomValue.getGeometryIcons(cell.getValue(), this.getLocale()) ?? cell.getValue();
         };
