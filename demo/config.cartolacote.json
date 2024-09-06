@@ -4,12 +4,12 @@
   },
   "languages": {
     "translations": {
-      "fr": ["fr.json", "Mock/fr.json"]
+      "fr": ["fr.json", "https://map.cartolacote.ch/static/dummy/fr.json"]
     },
     "defaultLanguage": "fr"
   },
   "themes": {
-    "url": "Mock/themes.json",
+    "url": "https://map.cartolacote.ch/themes?background=background&interface=desktop",
     "defaultTheme": "plan_ville"
   },
   "basemaps": {

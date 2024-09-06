@@ -26,9 +26,6 @@ then
     echo "Preparing environment CARTOLACOTE..."
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/fr.json $APPDIR/fr.json
-    curl "https://map.cartolacote.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://map.cartolacote.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://map.cartolacote.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'cartoriviera' ];
 then
@@ -37,9 +34,6 @@ then
     cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
     cp demo/fr.json $APPDIR/fr.json
     echo "Cannot create Mock objects for cartoriviera, the following commands are blocked when executed from AWS or GitLab Pipeline"
-    #curl "https://map.cartoriviera.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    #curl "https://map.cartoriviera.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    #curl "https://map.cartoriviera.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'cjl' ];
 then
