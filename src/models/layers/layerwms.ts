@@ -38,7 +38,6 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   // Base WMS attributes
   public ogcServer: ServerOgc;
 
-  public urlWfs: string | null;
   public minResolution?: number;
   public maxResolution?: number;
   public layers?: string;
@@ -65,7 +64,6 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     super(id, name, order, opts);
     this.ogcServer = ogcServer;
 
-    this.urlWfs = ogcServer.wfsSupport && ogcServer.urlWfs ? ogcServer.urlWfs : null;
     this.minResolution = opts?.minResolution;
     this.maxResolution = opts?.maxResolution;
     this.layers = opts?.layers;
@@ -81,12 +79,10 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     this.queryable = opts?.queryable || false;
     this.queryLayers = opts?.queryLayers;
 
-    if (this.queryable) {
-      if (!this.urlWfs || this.urlWfs.length == 0) {
-        this.hasError = true;
-        this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
-        this.queryable = false;
-      }
+    if (this.queryable && (!this.ogcServer.wfsSupport || this.ogcServer.urlWfs?.length === 0)) {
+      this.hasError = true;
+      this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
+      this.queryable = false;
     }
   }
 

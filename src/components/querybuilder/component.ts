@@ -29,38 +29,40 @@ class QueryBuilderComponent extends GirafeHTMLElement {
 
     super.render();
 
-    WfsManager.getServerWfs(this.layer).then((serverWfs) => {
-      const queryLayers = this.layer.queryLayers!.split(',');
+    WfsManager.getInstance()
+      .getServerWfs(this.layer)
+      .then((serverWfs) => {
+        const queryLayers = this.layer.queryLayers!.split(',');
 
-      const stackedLayerAttributes = queryLayers.map((l: string) => serverWfs.layers[l]);
-      const layerAttributesCount: Record<string, number> = {};
-      for (const la of stackedLayerAttributes.flat()) {
-        if (layerAttributesCount[la.name] === undefined) {
-          layerAttributesCount[la.name] = 0;
+        const stackedLayerAttributes = queryLayers.map((l: string) => serverWfs.layers[l]);
+        const layerAttributesCount: Record<string, number> = {};
+        for (const la of stackedLayerAttributes.flat()) {
+          if (layerAttributesCount[la.name] === undefined) {
+            layerAttributesCount[la.name] = 0;
+          }
+          layerAttributesCount[la.name]++;
         }
-        layerAttributesCount[la.name]++;
-      }
-      const commonAttributesNames = Object.keys(layerAttributesCount).filter(
-        (k) => layerAttributesCount[k] === queryLayers.length
-      );
-      const commonAttributes = stackedLayerAttributes[0]
-        ? stackedLayerAttributes[0].filter((la) => commonAttributesNames.includes(la.name))
-        : [];
-
-      this.deactivated = commonAttributes.length === 0;
-      if (this.deactivated) {
-        console.log(
-          'Filtering for layer group ' +
-            this.layer.name +
-            " is deactivated because the queryLayers don't have common attributes."
+        const commonAttributesNames = Object.keys(layerAttributesCount).filter(
+          (k) => layerAttributesCount[k] === queryLayers.length
         );
-      }
-      this.layerAttributes = commonAttributes;
-      this.loading = false;
-      super.render();
-      super.girafeTranslate();
-      this.activateTooltips(false, [800, 0], 'top-end');
-    });
+        const commonAttributes = stackedLayerAttributes[0]
+          ? stackedLayerAttributes[0].filter((la) => commonAttributesNames.includes(la.name))
+          : [];
+
+        this.deactivated = commonAttributes.length === 0;
+        if (this.deactivated) {
+          console.log(
+            'Filtering for layer group ' +
+              this.layer.name +
+              " is deactivated because the queryLayers don't have common attributes."
+          );
+        }
+        this.layerAttributes = commonAttributes;
+        this.loading = false;
+        super.render();
+        super.girafeTranslate();
+        this.activateTooltips(false, [800, 0], 'top-end');
+      });
   }
 
   get isString() {

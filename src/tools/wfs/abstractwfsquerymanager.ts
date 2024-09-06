@@ -11,6 +11,7 @@ import LayerWms from '../../models/layers/layerwms';
 import ServerWfs from '../../models/serverwfs';
 import WfsFilter from './wfsfilter';
 import { XmlTypes, xmlTypesStrList } from '../../models/xmlTypes';
+import ServerOgc from '../../models/serverogc';
 
 abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
   stateManager: StateManager;
@@ -248,11 +249,11 @@ abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
     }
     // should all have the same URL because we want to do one WFS query.
     const sameUrlForAll = queryableLayers.every((layer: LayerWms) => {
-      return layer.urlWfs === this.wfsUrl;
+      return layer.ogcServer.urlWfs === this.wfsUrl;
     });
     if (!sameUrlForAll) {
       const layersErrorFeedback = queryableLayers
-        .map((l) => '- layer name: ' + l.name + ': ' + ', layer WFS URL: ' + l.urlWfs)
+        .map((l) => '- layer name: ' + l.name + ': ' + ', layer WFS URL: ' + l.ogcServer.urlWfs)
         .join('\n');
       throw new Error(
         'Not all layers of this list have the same WFS URL:\n' + layersErrorFeedback + '\nWe cannot do que WFS query.\n'
@@ -274,7 +275,7 @@ abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
 
 // QueryableLayerWms: a LayerWms where (queryable=true and) urlWfs and are strings (and not null as is possible in LayerWms)
 export type QueryableLayerWms = Omit<LayerWms, 'urlWfs' | 'queryLayers'> & {
-  urlWfs: string;
+  ogcServer: ServerOgc;
   queryLayers: string;
 };
 
