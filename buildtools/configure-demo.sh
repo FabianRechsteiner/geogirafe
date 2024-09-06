@@ -1,3 +1,4 @@
+set -ex
 APPDIR="public"
 if [ -n "$2" ];
 then
