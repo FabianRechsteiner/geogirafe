@@ -45,6 +45,9 @@ describe('ThemesManager.prepareOgcServers', () => {
         imageType: 'image/png'
       }
     };
+
+    // Ignore WFS Preload
+    vi.spyOn(ThemesManager.getInstance(), 'preloadWfsServer').mockResolvedValue();
     const result = manager.prepareOgcServers(input);
 
     const server1 = result['WMS 1'];

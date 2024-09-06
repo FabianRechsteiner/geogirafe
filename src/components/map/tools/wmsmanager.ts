@@ -239,7 +239,7 @@ export default class WmsManager {
         olayer.setOpacity(layerWms.opacity);
       }
       if (layerWms.hasFilter) {
-        (olayer.getSource() as ImageWMS).updateParams({ FILTER: WfsManager.wmsGetMapFilter(layerWms) });
+        (olayer.getSource() as ImageWMS).updateParams({ FILTER: WfsManager.getInstance().wmsGetMapFilter(layerWms) });
       }
     } else if (layerWms.serverUniqueQueryId in this.layersByUniqueServerId) {
       this.makeLayerIndependent(layerWms);
@@ -259,7 +259,7 @@ export default class WmsManager {
         opacity: layerWms.opacity
       });
       if (layerWms.hasFilter) {
-        (olayer.getSource() as ImageWMS).updateParams({ FILTER: WfsManager.wmsGetMapFilter(layerWms) });
+        (olayer.getSource() as ImageWMS).updateParams({ FILTER: WfsManager.getInstance().wmsGetMapFilter(layerWms) });
       }
       this.independentLayers[layerWms.treeItemId] = { layerWms: layerWms, olayer: olayer };
       this.map.addLayer(olayer);

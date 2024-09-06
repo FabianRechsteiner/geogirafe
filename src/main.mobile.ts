@@ -101,7 +101,7 @@ try {
   register(proj4);
 
   // Tell configManager it should load the mobile configuration as well
-  ConfigManager.initMobile();
+  ConfigManager.getInstance().initMobile();
 
   // Initialize the managers
   ConfigManager.getInstance().loadConfig();

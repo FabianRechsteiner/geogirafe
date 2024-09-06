@@ -8,9 +8,9 @@ class ConfigManager extends GirafeSingleton {
   // TODO REG: With multiple interface (not only desktop and mobile)
   // We have to find another solution here.
   // Perhaps something more generic where we can pass a list of interfaces
-  private static isMobile: boolean = false;
-  public static initMobile() {
-    ConfigManager.isMobile = true;
+  private isMobile: boolean = false;
+  public initMobile() {
+    this.isMobile = true;
   }
 
   get Config() {
@@ -34,7 +34,7 @@ class ConfigManager extends GirafeSingleton {
     this.loadingPromise = (async () => {
       const response = await fetch('config.json');
       let jsonConfig = await response.json();
-      if (ConfigManager.isMobile) {
+      if (this.isMobile) {
         try {
           const responseMobile = await fetch('config.mobile.json');
           const jsonMobileConfig = await responseMobile.json();

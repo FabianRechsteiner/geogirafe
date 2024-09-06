@@ -18,6 +18,7 @@ import LayerCog from '../models/layers/layercog';
 import LayerXYZ from '../models/layers/layerxyz';
 import ServerOgc from '../models/serverogc';
 import ThemeLayer from '../models/layers/themelayer';
+import WfsManager from './wfs/wfsmanager';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -106,7 +107,23 @@ class ThemesManager extends GirafeSingleton {
       servers[serverName] = server;
     }
 
+    // Preload WFS FeatureInfos
+    this.preloadWfsServer(servers);
+
     return servers;
+  }
+
+  /**
+   * Preload all WFS DescribeFeatureType
+   * In order to limit the network overload, the servers calls are done sequetially
+   * and each call will wait the previous one to be done
+   */
+  async preloadWfsServer(ogcServers: { [key: string]: ServerOgc }) {
+    for (const server of Object.values(ogcServers)) {
+      if (server.wfsSupport) {
+        await WfsManager.getInstance().getServerWfs(server);
+      }
+    }
   }
 
   prepareBasemaps(basemapJson: GMFBackgroundLayer[]) {

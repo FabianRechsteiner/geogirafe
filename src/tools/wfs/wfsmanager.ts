@@ -7,6 +7,7 @@ import AbstractWfsQueryManager from './abstractwfsquerymanager';
 import WfsFilter from './wfsfilter';
 import WfsMapServerManager from './wfsquerymapservermanager';
 import WfsQGISManager from './wfsqueryqgismanager';
+import ServerOgc from '../../models/serverogc';
 
 export default class WfsManager extends GirafeSingleton {
   stateManager: StateManager;
@@ -14,19 +15,19 @@ export default class WfsManager extends GirafeSingleton {
     return this.stateManager.state;
   }
 
-  private static _queryManagerClasses: Map<string, new (baseUrl: string) => AbstractWfsQueryManager> = new Map();
-  private static _queryManagers: Map<string, AbstractWfsQueryManager> = new Map();
+  private _queryManagerClasses: Map<string, new (baseUrl: string) => AbstractWfsQueryManager> = new Map();
+  private _queryManagers: Map<string, AbstractWfsQueryManager> = new Map();
 
   // Register a queryManager with an identifier
-  static registerQueryManager(id: string, queryManagerClass: new (baseUrl: string) => AbstractWfsQueryManager) {
-    WfsManager._queryManagerClasses.set(id, queryManagerClass);
+  public registerQueryManager(id: string, queryManagerClass: new (baseUrl: string) => AbstractWfsQueryManager) {
+    this._queryManagerClasses.set(id, queryManagerClass);
   }
 
   // Get a queryManager based on the identifier
-  static getQueryManager(id: string, baseUrl: string): AbstractWfsQueryManager | null {
+  public getQueryManager(id: string, baseUrl: string): AbstractWfsQueryManager | null {
     let queryManager = this._queryManagers.get(baseUrl);
     if (!queryManager) {
-      const queryManagerClass = WfsManager._queryManagerClasses.get(id);
+      const queryManagerClass = this._queryManagerClasses.get(id);
       if (!queryManagerClass) {
         console.error(`queryManagerClass not found for baseUrl: ${baseUrl}, id: ${id}`);
         return null;
@@ -50,17 +51,17 @@ export default class WfsManager extends GirafeSingleton {
     });
 
     // Register the default queryManager
-    WfsManager.registerQueryManager('default', WfsMapServerManager);
-    WfsManager.registerQueryManager('mapserver', WfsMapServerManager);
-    WfsManager.registerQueryManager('qgisserver', WfsQGISManager);
+    this.registerQueryManager('default', WfsMapServerManager);
+    this.registerQueryManager('mapserver', WfsMapServerManager);
+    this.registerQueryManager('qgisserver', WfsQGISManager);
   }
 
-  static getQueryManagerByLayer(layer: LayerWms): AbstractWfsQueryManager {
+  public getQueryManagerByOgcServer(ogcServer: ServerOgc): AbstractWfsQueryManager {
     // Get the queryManager based on the servertype of the first layer
-    let queryManager = WfsManager.getQueryManager(layer.ogcServer.type, layer.urlWfs ?? '');
+    let queryManager = this.getQueryManager(ogcServer.type, ogcServer.urlWfs ?? '');
 
     if (!queryManager) {
-      queryManager = WfsManager.getQueryManager('default', layer.urlWfs ?? '');
+      queryManager = this.getQueryManager('default', ogcServer.urlWfs ?? '');
     }
 
     return queryManager as AbstractWfsQueryManager;
@@ -69,7 +70,7 @@ export default class WfsManager extends GirafeSingleton {
   async querySelection(selectionParams: SelectionParam[]) {
     const selectedFeaturesPerParam = await Promise.all(
       selectionParams.map((param) => {
-        const queryManager = WfsManager.getQueryManagerByLayer(param._layers[0]);
+        const queryManager = this.getQueryManagerByOgcServer(param._layers[0].ogcServer);
 
         if (!queryManager) {
           console.error('No queryManager found for this server type');
@@ -137,13 +138,15 @@ export default class WfsManager extends GirafeSingleton {
     this.state.loading = false;
   }
 
-  static async getServerWfs(layer: LayerWms): Promise<ServerWfs> {
-    const queryManager = WfsManager.getQueryManagerByLayer(layer);
-
+  async getServerWfs(ogcServer: ServerOgc): Promise<ServerWfs>;
+  async getServerWfs(layer: LayerWms): Promise<ServerWfs>;
+  async getServerWfs(object: ServerOgc | LayerWms): Promise<ServerWfs> {
+    const ogcServer = object instanceof LayerWms ? object.ogcServer : object;
+    const queryManager = this.getQueryManagerByOgcServer(ogcServer);
     return queryManager.getServerWfs();
   }
 
-  static wmsGetMapFilter(layerWms: LayerWms) {
-    return WfsManager.getQueryManagerByLayer(layerWms).wmsGetMapFilter(layerWms);
+  public wmsGetMapFilter(layerWms: LayerWms) {
+    return this.getQueryManagerByOgcServer(layerWms.ogcServer).wmsGetMapFilter(layerWms);
   }
 }

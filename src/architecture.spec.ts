@@ -9,7 +9,7 @@ function getAllTypescriptFiles(directoryPath: string, fileList: string[] = []) {
     const stats = fs.statSync(filePath);
     if (stats.isDirectory()) {
       getAllTypescriptFiles(filePath, fileList);
-    } else if (stats.isFile() && path.extname(file) === '.ts') {
+    } else if (stats.isFile() && path.extname(file) === '.ts' && !filePath.endsWith('.spec.ts')) {
       fileList.push(filePath);
     }
   });
@@ -48,7 +48,7 @@ describe('Components architecture', () => {
           if (!importPath.includes('../../tools/') && importPath.includes(`/${component}/`)) {
             // This import is using an import of another component
             // We allow it only if it is extended
-            const extendRegex = new RegExp(' *class *\\w+ *extends *' + importClass, 'gm');
+            const extendRegex = new RegExp('.*class +\\w+ +extends +' + importClass, 'gm');
             if (!code.match(extendRegex)) {
               errors.push(`Illegal dependency: the component ${tsFile} is referencing another component ${importPath}`);
             }
@@ -134,6 +134,30 @@ describe('Components architecture', () => {
           if (!isLegitim) {
             errors.push(`Illegal cross dependency: ${objA} is referencing ${objB} and vice-versa.`);
           }
+        }
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+
+  it('There should not be any static method in Singleton classes, because it can lead to inconsistancy and confusion.', async () => {
+    const tsFiles = getAllTypescriptFiles(__dirname);
+
+    const errors: string[] = [];
+    for (const tsFile of tsFiles) {
+      const code = fs.readFileSync(tsFile, 'utf8');
+      const regex = /.*class (\w+) +extends +GirafeSingleton/gm;
+      const matches = code.matchAll(regex);
+      for (const match of matches) {
+        const className = match[1].trim();
+        // Check if the word static is used
+        const staticRegex = / +static +/gm;
+        if (code.match(staticRegex)) {
+          errors.push(`The class ${className} is a singleton and should not have any static method.`);
         }
       }
     }
