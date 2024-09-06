@@ -1,5 +1,8 @@
 {
   "fr": {
-    "recenter_map": "Recentrer la carte"
+    "recenter_map": "Recentrer la carte",
+    "add_theme": "Ajouter un thème",
+    "add_group": "Ajouter un groupe",
+    "add_layer": "Ajouter une couche"
   }
 }
