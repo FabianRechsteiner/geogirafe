@@ -1,5 +1,4 @@
 import MapPosition from './mapposition';
-import type Layer from '../../models/layers/layer';
 import type Feature from 'ol/Feature';
 import type Basemap from '../../models/basemap';
 import type Theme from '../../models/theme';
@@ -47,10 +46,6 @@ type ThemesConfig = {
 
 type LayersConfig = {
   layersList: BaseLayer[];
-  swipedLayers: {
-    left: Layer[];
-    right: Layer[];
-  };
 };
 
 type TreeviewConfig = {
@@ -153,11 +148,7 @@ export default class State {
 
   // Current layers configuration
   layers: LayersConfig = {
-    layersList: [],
-    swipedLayers: {
-      left: [],
-      right: []
-    }
+    layersList: []
   };
 
   // Current Treeview state

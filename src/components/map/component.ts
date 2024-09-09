@@ -43,6 +43,7 @@ import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import { FocusFeature } from './tools/focusfeature';
 import XyzManager from './tools/xyzmanager';
+import ThemeLayer from '../../models/layers/themelayer';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -94,13 +95,27 @@ export default class MapComponent extends GirafeHTMLElement {
     this.focusFeature = new FocusFeature();
   }
 
+  resetAllSwipedLayers(layers: BaseLayer[]) {
+    for (const layer of layers) {
+      if (layer instanceof Layer) {
+        layer.swiped = 'no';
+      } else if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+        this.resetAllSwipedLayers(layer.children);
+      }
+    }
+
+    this.swipeManager.deactivateSwiper();
+  }
+
   registerEvents() {
     this.swiper.addEventListener('input', () => {
       this.olMap.render();
       this.updateCloseSwiperPosition();
     });
 
-    this.closeSwiperButton.onclick = () => (this.state.layers.swipedLayers = { left: [], right: [] });
+    this.closeSwiperButton.onclick = () => {
+      this.resetAllSwipedLayers(this.state.layers.layersList);
+    };
 
     this.stateManager.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) =>
       this.onChangeBasemap(newBasemap)
@@ -131,11 +146,6 @@ export default class MapComponent extends GirafeHTMLElement {
       'selection.focusedFeatures',
       (_oldFeature: Feature[] | null, newFeature: Feature[] | null) => this.focusFeature.setFocusedFeatures(newFeature)
     );
-    this.stateManager.subscribe(
-      'layers.swipedLayers',
-      (_oldLayers: { left: Layer[]; right: Layer[] }, newLayers: { left: Layer[]; right: Layer[] }) =>
-        this.onSwipedLayersChanged(newLayers)
-    );
 
     this.stateManager.subscribe('globe.display', () => this.onGlobeToggled());
 
@@ -148,8 +158,8 @@ export default class MapComponent extends GirafeHTMLElement {
       (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer)
     );
     this.stateManager.subscribe(
-      /layers\.swipedLayers\..*\.opacity/,
-      (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer)
+      /layers\.layersList\..*\.swiped/,
+      (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeSwiped(layer)
     );
     this.stateManager.subscribe(
       /layers\.layersList\..*\.filter/,
@@ -341,28 +351,9 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onSwipedLayersChanged(swipedLayers: { left: Layer[]; right: Layer[] }) {
-    if (swipedLayers.left.length === 0 && swipedLayers.right.length === 0) {
-      // TODO REG: Better manage WMS in order to combine swiped layers again in a unique olayer
-      // (to minimize the amount of WMS queries that are sent to the server)
-      this.swipeManager.deactivateSwipe();
-    } else {
-      this.swipeLayersOnSide(swipedLayers.left, 'left');
-      this.swipeLayersOnSide(swipedLayers.right, 'right');
-      this.updateCloseSwiperPosition();
-    }
-  }
-
-  swipeLayersOnSide(layers: Layer[], side: 'left' | 'right') {
-    for (const layer of layers) {
-      if (layer instanceof LayerWms) {
-        this.swipeManager.activateSwipeForWms(layer, side);
-      } else if (layer instanceof LayerWmts) {
-        this.swipeManager.activateSwipeForWmts(layer, side);
-      } else if (layer instanceof LayerLocalFile) {
-        this.swipeManager.activateSwipeForLocalFile(layer, side);
-      }
-    }
+  onChangeSwiped(layer: Layer) {
+    this.swipeManager.toggleSwipe(layer);
+    this.updateCloseSwiperPosition();
   }
 
   /**

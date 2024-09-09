@@ -149,7 +149,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.stateManager.subscribe(
-      /layers\.layersList\..*\.isLegendExpanded/,
+      /layers\..*\.isLegendExpanded/,
       (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
     );
     this.stateManager.subscribe(
@@ -214,27 +214,6 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     }
 
     MapManager.getInstance().zoomToExtent(this.layer.extent);
-  }
-
-  swipeLayer(side: 'left' | 'right') {
-    if (this.layer.activeState === 'off') {
-      this.toggle('on');
-    }
-
-    const otherSide = side === 'left' ? 'right' : 'left';
-    const newSwipedLayers: Record<'left' | 'right', Array<Layer>> = {
-      left: [],
-      right: []
-    };
-    // If the object is already present in the other side, we remove it
-    newSwipedLayers[otherSide] = this.state.layers.swipedLayers[otherSide].filter((l: Layer) => {
-      return l.treeItemId !== this.layer.treeItemId;
-    });
-    // Then, we add it to right side
-    newSwipedLayers[side] = [...this.state.layers.swipedLayers[side]];
-    newSwipedLayers[side].push(this.layer);
-    // Lastly, we update the state
-    this.state.layers.swipedLayers = newSwipedLayers;
   }
 
   showMetadata() {
