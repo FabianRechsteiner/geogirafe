@@ -1,5 +1,6 @@
 import { GMFTreeItem } from '../gmf';
 import ServerOgc from '../serverogc';
+import ILayerWithLegend from './ilayerwithlegend';
 import Layer from './layer';
 import TileLayer from 'ol/layer/Tile';
 import WMTS from 'ol/source/WMTS';
@@ -17,11 +18,14 @@ export type LayerWmtsOptions = {
   printLayers?: string;
   minResolution?: number;
   maxResolution?: number;
+  legend?: boolean;
   legendImage?: string;
+  isLegendExpanded?: boolean;
+  wasLegendExpanded?: boolean;
   hiDPILegendImages?: Record<string, string>;
 };
 
-class LayerWmts extends Layer {
+class LayerWmts extends Layer implements ILayerWithLegend {
   /**
    * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
    * This means that each modification made to its properties must come from outside,
@@ -37,7 +41,10 @@ class LayerWmts extends Layer {
   public style?: string;
   public minResolution?: number;
   public maxResolution?: number;
+  public legend: boolean;
   public legendImage?: string;
+  public isLegendExpanded: boolean;
+  public wasLegendExpanded: boolean;
 
   // A WMTS layer can have WMS informations to be able to query infos and print with a WMS layer.
   // TODO REG : Shouldn't we link here directly an object of type LayerWMS ?
@@ -73,7 +80,10 @@ class LayerWmts extends Layer {
     this.printLayers = opts.printLayers;
     this.minResolution = opts.minResolution;
     this.maxResolution = opts.maxResolution;
+    this.legend = opts.legend ?? false;
     this.legendImage = opts.legendImage;
+    this.isLegendExpanded = opts?.isLegendExpanded ?? false;
+    this.wasLegendExpanded = opts?.wasLegendExpanded ?? !this.isLegendExpanded;
     this.hiDPILegendImages = opts.hiDPILegendImages;
   }
 
@@ -92,7 +102,10 @@ class LayerWmts extends Layer {
       printLayers: this.printLayers,
       minResolution: this.minResolution,
       maxResolution: this.maxResolution,
+      legend: this.legend,
       legendImage: this.legendImage,
+      isLegendExpanded: this.isLegendExpanded,
+      wasLegendExpanded: this.wasLegendExpanded,
       hiDPILegendImages: this.hiDPILegendImages
     };
     const clonedObject = new LayerWmts(this.id, this.name, this.order, this.url, this.layer, options);
@@ -125,7 +138,10 @@ class LayerWmts extends Layer {
       printLayers: options.metadata?.printLayers,
       minResolution: options.minResolutionHint,
       maxResolution: options.maxResolutionHint,
+      legend: options.metadata?.legend,
       legendImage: options.metadata?.legendImage,
+      isLegendExpanded: options.metadata?.isLegendExpanded,
+      wasLegendExpanded: options.metadata?.wasLegendExpanded,
       hiDPILegendImages: options.metadata?.hiDPILegendImages
     };
   }

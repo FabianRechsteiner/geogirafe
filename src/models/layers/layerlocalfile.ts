@@ -16,6 +16,7 @@ class LayerLocalFile extends Layer implements ILayerWithLegend {
 
   public _features: Feature<Geometry>[];
   public lastModifiedDate: string;
+  public legend: boolean = true;
   public isLegendExpanded: boolean;
   public wasLegendExpanded: boolean;
   public extent: Extent;

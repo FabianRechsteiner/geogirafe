@@ -14,7 +14,7 @@ export type LayerWmsOptions = {
   maxResolution?: number;
   layers?: string;
   style?: string;
-  legend?: string;
+  legend?: boolean;
   iconUrl?: string;
   legendRule?: string;
   legendImage?: string;
@@ -44,7 +44,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   public style?: string;
 
   // Legend attributes
-  public legend?: string;
+  public legend: boolean;
   public iconUrl?: string;
   public legendRule?: string;
   public legendImage?: string;
@@ -68,15 +68,15 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     this.maxResolution = opts?.maxResolution;
     this.layers = opts?.layers;
     this.style = opts?.style;
-    this.legend = opts?.legend;
+    this.legend = opts?.legend ?? false;
     this.iconUrl = opts?.iconUrl;
     this.legendRule = opts?.legendRule;
     this.legendImage = opts?.legendImage;
-    this.isLegendExpanded = opts?.isLegendExpanded || false;
-    this.wasLegendExpanded = opts?.wasLegendExpanded || !this.isLegendExpanded;
+    this.isLegendExpanded = opts?.isLegendExpanded ?? false;
+    this.wasLegendExpanded = opts?.wasLegendExpanded ?? !this.isLegendExpanded;
     this.hiDPILegendImages = opts?.hiDPILegendImages;
     this.printNativeAngle = opts?.printNativeAngle;
-    this.queryable = opts?.queryable || false;
+    this.queryable = opts?.queryable ?? false;
     this.queryLayers = opts?.queryLayers;
 
     if (this.queryable && (!this.ogcServer.wfsSupport || this.ogcServer.urlWfs?.length === 0)) {

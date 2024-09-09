@@ -9,7 +9,7 @@ export interface GMFMetadata {
   isExpanded: boolean;
   isChecked: boolean;
   ogcServer?: string;
-  legend?: string;
+  legend?: boolean;
   iconUrl?: string;
   legendRule?: string;
   legendImage?: string;
