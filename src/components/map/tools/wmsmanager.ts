@@ -222,7 +222,7 @@ export default class WmsManager {
       throw new Error('Cannot change filter for this layer: it does not exist');
     }
 
-    if (!layerWms.hasFilter && !layerWms.isTransparent) {
+    if (!layerWms.hasFilter && !layerWms.isTransparent && layerWms.swiped === 'no') {
       // There is no more filter or opacity => Back to normal
       if (layerWms.treeItemId in this.independentLayers) {
         const olayer = this.independentLayers[layerWms.treeItemId].olayer;

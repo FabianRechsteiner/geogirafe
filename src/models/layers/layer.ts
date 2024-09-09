@@ -18,6 +18,7 @@ abstract class Layer extends BaseLayer {
 
   public activeState: 'on' | 'off' = 'off';
   public opacity: number;
+  public swiped: 'left' | 'right' | 'no' = 'no';
 
   constructor(id: number, name: string, order: number, options?: LayerOptions) {
     super(id, name, order, options);

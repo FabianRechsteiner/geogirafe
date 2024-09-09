@@ -61,11 +61,11 @@
   <i
     class="fa-solid fa-arrow-left tool selectable swipe-left advanced"
     tip="Swipe layer on the left"
-    onclick="${() => this.swipeLayer('left')}"></i>
+    onclick="${() => this.layer.swiped = 'left'}"></i>
   <i
     class="fa-solid fa-arrow-right tool selectable swipe-right advanced"
     tip="Swipe layer on the right"
-    onclick="${() => this.swipeLayer('right')}"></i>
+    onclick="${() => this.layer.swiped = 'right'}"></i>
 
   <!-- move icons -->
   <i class="fa-solid fa-caret-down advanced tool movedown selectable" tip="Move this layer down"></i>

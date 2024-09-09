@@ -11,6 +11,7 @@ import LayerWmts from '../../../models/layers/layerwmts';
 import LayerWms from '../../../models/layers/layerwms';
 import LayerLocalFile from '../../../models/layers/layerlocalfile';
 import LocalFileManager from './localfilemanager';
+import Layer from '../../../models/layers/layer';
 
 class SwipeManager {
   map: Map;
@@ -53,59 +54,76 @@ class SwipeManager {
     this.closeButton = closeButton;
   }
 
-  activateSwipeForWmts(layer: LayerWmts, side: 'left' | 'right') {
+  public toggleSwipe(layer: Layer) {
+    if (layer instanceof LayerWms) {
+      this.toggleSwipeForWms(layer);
+    } else if (layer instanceof LayerWmts) {
+      this.toggleSwipeForWmts(layer);
+    } else if (layer instanceof LayerLocalFile) {
+      this.toggleSwipeForLocalFile(layer);
+    }
+  }
+
+  private toggleSwipeForWmts(layer: LayerWmts) {
     if (this.wmtsManager.layerExists(layer)) {
-      const olayer = this.wmtsManager.getLayer(layer)!;
-      this.#activateSwipeForLayer(layer.layer, olayer, side);
-    } else {
-      throw new Error('Cannot swipe this layer: it does not exist.');
+      const olayer = this.wmtsManager.getLayer(layer);
+      if (olayer) {
+        if (layer.swiped === 'no') {
+          this.deactivateSwipeForLayer(layer.layer, olayer);
+        } else {
+          this.activateSwipeForLayer(layer.layer, olayer, layer.swiped);
+        }
+        return;
+      }
     }
+
+    throw new Error('Cannot swipe this layer: it does not exist.');
   }
 
-  activateSwipeForLocalFile(layer: LayerLocalFile, side: 'left' | 'right') {
+  private toggleSwipeForLocalFile(layer: LayerLocalFile) {
     if (this.localFileManager.layerExists(layer)) {
-      const olayer = this.localFileManager.getLayer(layer)!;
-      this.#activateSwipeForLayer(layer.name, olayer, side);
-    } else {
-      throw new Error('Cannot swipe this layer: it does not exist.');
+      const olayer = this.localFileManager.getLayer(layer);
+      if (olayer) {
+        if (layer.swiped === 'no') {
+          this.deactivateSwipeForLayer(layer.name, olayer);
+        } else {
+          this.activateSwipeForLayer(layer.name, olayer, layer.swiped);
+        }
+        return;
+      }
     }
+
+    throw new Error('Cannot swipe this layer: it does not exist.');
   }
 
-  activateSwipeForWms(layer: LayerWms, side: 'left' | 'right') {
+  private toggleSwipeForWms(layer: LayerWms) {
     if (this.wmsManager.layerExists(layer)) {
       this.wmsManager.makeLayerIndependent(layer);
-      const olayer = this.wmsManager.getOLayer(layer) as OLayer;
-      this.#activateSwipeForLayer(layer.name, olayer, side);
-    } else {
-      // Nothing to do
-      throw new Error('Layer does not exists. Cannot activate swiper.');
+      const olayer = this.wmsManager.getOLayer(layer);
+      if (olayer) {
+        if (layer.swiped === 'no') {
+          this.deactivateSwipeForLayer(layer.name, olayer);
+        } else {
+          this.activateSwipeForLayer(layer.name, olayer, layer.swiped);
+        }
+        return;
+      }
     }
+
+    throw new Error('Layer does not exists. Cannot activate swiper.');
   }
 
-  #setSwiperVisible() {
+  private showSwiper() {
     this.swiper.style.display = 'block';
     this.closeButton.style.display = 'block';
   }
 
-  #hideSwiper() {
+  private hideSwiper() {
     this.swiper.style.display = 'none';
     this.closeButton.style.display = 'none';
   }
 
-  /*deactivateSwipeForWms(layerInfos) {
-    if (layerInfos.name in this.swipedLayers) {
-      // Back to normal
-      const layerDef = this.swipedLayers[layerInfos.name];
-      // We delete the layer from the transparent layers
-      delete this.swipedLayers[layerInfos.name];
-      this.map.removeLayer(layerDef);
-      // And add it to the normal layer again
-      this.onAddWmsLayer(layerInfos);
-    
-    }
-  }*/
-
-  #activateSwipeForLayer(layername: string, olayer: OLayer, side: 'left' | 'right') {
+  private activateSwipeForLayer(layername: string, olayer: OLayer, side: 'left' | 'right') {
     // First, remove the old event listener
     if (layername in this.swiperEventListeners) {
       const eventListeners = this.swiperEventListeners[layername];
@@ -115,8 +133,8 @@ class SwipeManager {
     }
 
     // Then add the new listener
-    const prerenderHandler = (e: BaseEvent | Event) => this.#prerenderSwipe(e as RenderEvent, side);
-    const postrenderHandler = (e: BaseEvent | Event) => this.#postrenderSwipe(e as RenderEvent);
+    const prerenderHandler = (e: BaseEvent | Event) => this.prerenderSwipe(e as RenderEvent, side);
+    const postrenderHandler = (e: BaseEvent | Event) => this.postrenderSwipe(e as RenderEvent);
     this.swiperEventListeners[layername] = {
       olayer: olayer,
       prerender: prerenderHandler,
@@ -125,22 +143,33 @@ class SwipeManager {
     olayer.addEventListener('prerender', prerenderHandler);
     olayer.addEventListener('postrender', postrenderHandler);
 
-    this.#setSwiperVisible();
+    this.showSwiper();
     this.map.render();
   }
 
-  deactivateSwipe() {
+  private deactivateSwipeForLayer(layername: string, olayer: OLayer) {
+    if (layername in this.swiperEventListeners) {
+      const eventListeners = this.swiperEventListeners[layername];
+      olayer.removeEventListener('prerender', eventListeners.prerender);
+      olayer.removeEventListener('postrender', eventListeners.postrender);
+      delete this.swiperEventListeners[layername];
+    }
+
+    this.map.render();
+  }
+
+  public deactivateSwiper() {
     // Remove all events listeners
     for (const [_key, value] of Object.entries(this.swiperEventListeners)) {
       value.olayer.removeEventListener('prerender', value.prerender);
       value.olayer.removeEventListener('postrender', value.postrender);
     }
 
-    this.#hideSwiper();
+    this.hideSwiper();
     this.map.render();
   }
 
-  #prerenderSwipe(event: RenderEvent, side: 'left' | 'right') {
+  private prerenderSwipe(event: RenderEvent, side: 'left' | 'right') {
     // TODO REG : This method won't work with WegGL rendering
     const ctx: CanvasRenderingContext2D = event.context as CanvasRenderingContext2D;
     const size = this.map.getSize();
@@ -180,7 +209,7 @@ class SwipeManager {
     ctx.clip();
   }
 
-  #postrenderSwipe(event: RenderEvent) {
+  private postrenderSwipe(event: RenderEvent) {
     // TODO REG : This method won't work with WegGL rendering
     const ctx: CanvasRenderingContext2D = event.context as CanvasRenderingContext2D;
     ctx.restore();
