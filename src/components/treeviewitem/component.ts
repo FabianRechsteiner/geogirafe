@@ -7,6 +7,7 @@ import LayerWms from '../../models/layers/layerwms';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
 import QueryBuilderComponent from '../querybuilder/component';
 import MapManager from '../../tools/state/mapManager';
+import LayerWmts from '../../models/layers/layerwmts';
 
 class TreeViewItemComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -32,8 +33,11 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     if (layerId) {
       this.layer = this.layerManager.getTreeItem(layerId) as Layer;
       if (this.layer instanceof LayerWms) {
-        // Get Legend Url
+        // Manage Legend icons for WMS
         this.setWmsLegend();
+      }
+      if (this.layer instanceof LayerWmts) {
+        this.setWmtsLegend();
       }
     }
     super.render();
@@ -67,6 +71,21 @@ class TreeViewItemComponent extends GirafeHTMLElement {
         this.legendUrls[this.layer.layers!] = this.layer.legendImage;
       } else {
         this.legendUrls = this.getLegendImageUrlFromWms(false);
+      }
+    }
+  }
+
+  setWmtsLegend() {
+    if (!(this.layer instanceof LayerWmts)) {
+      // nothing to do if it's not a WMS
+      return;
+    }
+
+    if (this.layer.legend) {
+      if (this.layer.legendImage) {
+        this.legendUrls[this.layer.name] = this.layer.legendImage;
+      } else {
+        console.error(`The WMTS Layer ${this.layer.name} has no legendImage.`);
       }
     }
   }

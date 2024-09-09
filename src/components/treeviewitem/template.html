@@ -87,7 +87,7 @@
 
   <!-- Toggle legend icon -->
   <div
-    class="${this.layer instanceof LayerLocalFile || (this.layer instanceof LayerWms && this.layer.legend) ? 'legend selectable' : 'legend invisible'}">
+    class="${(this.layerManager.isLayerWithLegend(this.layer) && this.layer.legend) ? 'legend selectable' : 'legend invisible'}">
     <i
       tip="Toggle legend"
       class="${this.layerManager.isLayerWithLegend(this.layer) && this.layer.isLegendExpanded ? 'fa-solid fa-bars fa-rotate-270 tool selectable' : 'fa-solid fa-bars tool selectable'}"
@@ -96,7 +96,7 @@
 </div>
 
 ${Object.keys(this.legendUrls).map((l:string) => uHtml`<img
-  class="${this.layer instanceof LayerWms && this.layer.isLegendExpanded ? 'legend-image' : 'legend-image hidden'}"
+  class="${(this.layer instanceof LayerWms || this.layer instanceof LayerWmts) && this.layer.isLegendExpanded ? 'legend-image' : 'legend-image hidden'}"
   alt="${'Legend for ' + l}"
   src="${this.legendUrls[l]}" />` )}
 
