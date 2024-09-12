@@ -130,6 +130,9 @@ class GirafeConfig {
     downloadStartZoom: number;
     downloadEndZoom: number;
   };
+  query: {
+    legacy: boolean;
+  };
 
   public static readonly DEFAULT_LOCALE = 'en-US';
 
@@ -157,6 +160,7 @@ class GirafeConfig {
     this.csv = this.initConfigCsv(config);
     this.metadata = this.initConfigMetadata(config);
     this.offline = this.initConfigOffline(config);
+    this.query = this.initConfigQuery(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -230,6 +234,12 @@ class GirafeConfig {
       constrainScales: config.map?.constrainScales ?? true,
       constrainRotation: config.map?.constrainRotation ?? false,
       showScaleLine: config.map?.showScaleLine ?? true
+    };
+  }
+
+  private initConfigQuery(config: GirafeConfig) {
+    return {
+      legacy: config.query?.legacy ?? false
     };
   }
 
