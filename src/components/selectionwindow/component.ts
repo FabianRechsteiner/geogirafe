@@ -8,6 +8,7 @@ import FeatureToGridDataById from '../../tools/featuretogriddatabyid';
 import { getValidIndex } from '../../tools/utils/utils';
 import IconCenter from './images/center.svg';
 import ResizeWindow from '../../tools/resizewindow';
+import DOMPurify from 'dompurify';
 
 /**
  * Represents a Feature displayed in the SelectionWindowComponent.
@@ -94,6 +95,17 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     // Get content.
     this.displayedProperties = Object.entries(windowFeature.notOlProperties).filter((keyValue) => {
       return keyValue[1] !== undefined;
+    });
+    this.displayedProperties.forEach((keyValue) => {
+      let config = {};
+      if (this.configManager.Config.query.legacy) {
+        config = {
+          ADD_ATTR: ['onclick'],
+          ADD_URI_SAFE_ATTR: ['onclick']
+        };
+      }
+      keyValue[1] = DOMPurify.sanitize(keyValue[1] as string, config);
+      return keyValue[1];
     });
     // Render and translate data.
     this.render();

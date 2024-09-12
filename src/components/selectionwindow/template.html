@@ -25,7 +25,7 @@
         ${this.displayedProperties.map((keyValue) => uHtml`
         <tr>
           <td class="label" i18n="${keyValue[0]}"></td>
-          <td class="value">${keyValue[1]}</td>
+          <td class="value">${this.htmlUnsafe(keyValue[1] as string)}</td>
         </tr>
         `)}
       </table>

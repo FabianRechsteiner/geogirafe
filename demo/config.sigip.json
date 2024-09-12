@@ -54,5 +54,8 @@
     "service": "localStorage",
     "get": "",
     "post": ""
+  },
+  "query": {
+    "legacy": true
   }
 }
