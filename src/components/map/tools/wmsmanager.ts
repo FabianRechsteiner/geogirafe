@@ -351,4 +351,22 @@ export default class WmsManager {
       this.state.interface.selectionComponentVisible = true;
     }
   }
+
+  public refreshZIndexes() {
+    // Recalculate source for Layers
+    for (const obj of Object.values(this.layersByUniqueServerId)) {
+      for (const layerWms of obj.layersWms) {
+        const zindex = -layerWms.order;
+        obj.olayer.setZIndex(zindex);
+      }
+      const source = this.#createImageWMSSource(obj.layersWms);
+      obj.olayer.setSource(source);
+    }
+
+    // Manage independant layers
+    for (const obj of Object.values(this.independentLayers)) {
+      const zindex = -obj.layerWms.order;
+      obj.olayer.setZIndex(zindex);
+    }
+  }
 }

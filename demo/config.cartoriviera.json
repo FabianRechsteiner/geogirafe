@@ -18,7 +18,6 @@
     "SwissTopoVectorTiles": true
   },
   "treeview": {
-    "useCheckboxes": true,
     "useLegendIcons": true
   },
   "search": {

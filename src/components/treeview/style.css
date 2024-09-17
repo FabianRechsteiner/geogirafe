@@ -1,69 +1,47 @@
-::-webkit-scrollbar {
-  width: 5px;
+header {
+  border-top: solid 1px #ddd;
+  display: flex;
+  align-items: center;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #999;
+.tool {
+  display: none !important;
+  padding-left: 0rem !important;
+  padding-right: 0rem !important;
+  min-width: 0 !important;
+  max-width: 1.5rem !important;
 }
 
-.hidden {
-  display: none;
+header:hover .tool {
+  display: flex !important;
 }
 
-.panel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  background: var(--bkg-color);
+.tool.active {
+  display: flex !important;
+  opacity: 1 !important;
 }
 
-.menu {
-  border-top: solid 1px #bbb;
-  background-color: var(--bkg-color);
-  height: 2rem;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 6px;
-  z-index: 1;
-  font-size: 0;
+.label-container {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  overflow: auto;
+}
+
+.legend {
   display: flex;
 }
 
-.treeview-list {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 5px;
-  bottom: 2.3rem;
-  padding-left: 1rem;
-  padding-top: 1rem;
-  padding-bottom: 1.5rem;
-  padding-right: 0.7rem;
-  margin: 0;
-  margin-top: 0.5rem;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
+.children {
+  padding-left: 1.6rem;
+  flex-basis: 100%;
+  order: 10;
 }
 
-.rotate90 {
-  transform: rotate(90deg);
+.dragAfter {
+  border-bottom: dashed 1rem #ccc;
 }
 
-.selectable {
-  cursor: pointer;
-}
-
-.selectable:hover {
-  color: #000;
-}
-
-girafe-basemap {
-  position: absolute;
-  right: 0;
-  top: 0;
+.dragBefore {
+  border-top: dashed 1rem #ccc;
 }

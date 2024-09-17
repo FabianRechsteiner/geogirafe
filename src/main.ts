@@ -13,6 +13,7 @@ import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
 import ThemesManager from './tools/themesmanager';
 import WfsManager from './tools/wfs/wfsmanager';
+import OrderingManager from './tools/ordering/orderingmanager';
 
 import AboutComponent from './components/about/component';
 import BasemapComponent from './components/basemap/component';
@@ -41,10 +42,10 @@ import SelectionGridComponent from './components/selectiongrid/component';
 import SelectionWindowComponent from './components/selectionwindow/component';
 import ShareComponent from './components/share/component';
 import ThemeComponent from './components/themes/component';
-import TreeViewComponent from './components/treeview/component';
-import TreeViewItemComponent from './components/treeviewitem/component';
-import TreeViewGroupComponent from './components/treeviewgroup/component';
-import TreeViewThemeComponent from './components/treeviewtheme/component';
+import TreeViewRootComponent from './components/treeview/treeviewroot/component';
+import TreeViewItemComponent from './components/treeview/treeviewitem/component';
+import TreeViewGroupComponent from './components/treeview/treeviewgroup/component';
+import TreeViewThemeComponent from './components/treeview/treeviewtheme/component';
 import VideoRecordComponent from './components/videorecord/component';
 
 // Redirect to mobile interface if we are on mobile
@@ -98,6 +99,7 @@ try {
       I18nManager.getInstance();
       ThemesManager.getInstance();
       WfsManager.getInstance();
+      OrderingManager.getInstance();
 
       // Add the state to document, so that it will be accessible everywhere
       document.geogirafe = {
@@ -135,7 +137,7 @@ try {
       customElements.define('girafe-selection-window', SelectionWindowComponent);
       customElements.define('girafe-share', ShareComponent);
       customElements.define('girafe-theme-select', ThemeComponent);
-      customElements.define('girafe-tree-view', TreeViewComponent);
+      customElements.define('girafe-tree-view', TreeViewRootComponent);
       customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
       customElements.define('girafe-tree-view-item', TreeViewItemComponent);
       customElements.define('girafe-tree-view-theme', TreeViewThemeComponent);

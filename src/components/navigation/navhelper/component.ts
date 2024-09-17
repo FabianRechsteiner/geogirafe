@@ -13,7 +13,7 @@ type TippyType = typeof tippy;
 
 class NavHelperComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['./style.css', '../../../styles/common.css'];
   iconAdd: string = IconAdd;
   iconBookmark: string = IconBookmark;
   iconNext: string = IconNext;

@@ -3,6 +3,14 @@
   display: none;
 }
 
+.rotate90 {
+  transform: rotate(90deg);
+}
+
+.rotate180 {
+  transform: rotate(180deg);
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -12,7 +20,68 @@
   }
 }
 
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #999;
+}
+
 /* Common style (to all button of all sizes) */
+.gg-button {
+  border: none;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+}
+.gg-button:hover {
+  background-color: var(--bkg-color-grad1);
+  cursor: pointer;
+}
+.gg-small {
+  min-width: 2rem;
+  height: 2rem;
+  align-items: center;
+  padding: 0.5rem;
+}
+.gg-small img {
+  overflow: hidden;
+}
+.gg-small span {
+  width: 100%;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gg-check {
+  padding: 0.2rem;
+}
+.gg-label {
+  text-align: left;
+  padding-left: 0;
+  white-space: nowrap;
+}
+.gg-grab:hover {
+  cursor: grab;
+}
+.gg-spacer {
+  padding: 0;
+}
+.gg-opacity {
+  opacity: 0.5;
+}
+.gg-opacity:hover {
+  background-color: transparent;
+  opacity: 1;
+}
+.gg-selected {
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* TODO REG : Suppress all the following styles when the migration is done. */
 .girafe-button-big,
 .girafe-button-medium,
 .girafe-button-large,
@@ -89,13 +158,19 @@ img {
 
 /* Small button (icon only) */
 .girafe-button-small {
-  width: 2rem;
+  min-width: 2rem;
   height: 2rem;
   align-items: center;
   padding: 0.5rem;
 }
 .girafe-button-small img {
   overflow: hidden;
+}
+.girafe-button-small span {
+  width: 100%;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Tiny button (icon only with no padding) */

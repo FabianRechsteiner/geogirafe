@@ -155,6 +155,10 @@ class SwipeManager {
       delete this.swiperEventListeners[layername];
     }
 
+    if (Object.keys(this.swiperEventListeners).length <= 0) {
+      this.hideSwiper();
+    }
+
     this.map.render();
   }
 

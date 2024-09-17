@@ -14,6 +14,9 @@ class WmtsManager {
   map: Map;
 
   wmtsCapabilitiesByServer: Record<string, Record<string, unknown>> = {};
+  wmtsPromisesByServer: Record<string, Promise<Record<string, unknown>>> = {};
+  wmtsAbortsByLayer: Record<string, AbortController> = {};
+
   wmtsLayers: Record<
     string,
     {
@@ -46,69 +49,90 @@ class WmtsManager {
   }
 
   addLayer(layer: LayerWmts) {
-    this.#addLayerInternal(layer, false);
+    this.addLayerInternal(layer, false);
   }
 
   addBasemapLayer(basemap: LayerWmts) {
-    this.#addLayerInternal(basemap, true);
+    this.addLayerInternal(basemap, true);
   }
 
-  #addLayerInternal(layer: LayerWmts, isBasemap: boolean) {
-    this.#getWmtsCapabilities(layer.url, (capabilities) => {
-      const options = optionsFromCapabilities(capabilities, {
-        layer: layer.layer,
-        projection: this.state.projection
-      });
+  private async addLayerInternal(layer: LayerWmts, isBasemap: boolean) {
+    console.debug(`Adding WMTS Layer ${layer.name} : UniqueID=${layer.layerUniqueId}`);
+    const abortController = new AbortController();
+    this.wmtsAbortsByLayer[layer.layerUniqueId] = abortController;
+    const capabilities = await this.getWmtsCapabilities(layer.url);
 
-      if (options === null) {
-        console.warn('Cannot create WMTS layer for layer ' + layer.layer);
-        return;
-      }
+    if (abortController.signal.aborted) {
+      // The layer was removed during the async loading of Capabilities.
+      // => Do not add the layer
+      console.debug(`Aborting WMTS Layer ${layer.name} : UniqueID=${layer.layerUniqueId}`);
+      return;
+    }
 
-      // Set the right dimensions
-      for (const key in layer.dimensions) {
-        if (key in options.dimensions) {
-          // Update value
-          options.dimensions[key] = layer.dimensions[key];
-        } else {
-          console.warn(
-            'A dimension ' +
-              key +
-              ' was defined for the WMTS layer ' +
-              layer.layer +
-              ' but the server does not seem to accept it.'
-          );
-        }
-      }
+    // Remove the abort controller from the list.
+    delete this.wmtsAbortsByLayer[layer.layerUniqueId];
 
-      const olayer = new TileLayer({
-        opacity: layer.opacity,
-        source: new WMTS(options)
-      });
-
-      this.enrichWmtsLayerFromCapabilities(layer, olayer, capabilities);
-
-      let zindex;
-      if (isBasemap) {
-        this.basemapLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
-        zindex = -5000 - layer.order;
-      } else {
-        this.wmtsLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
-        zindex = -layer.order;
-      }
-
-      // Set zindex for this new layer
-      // (The bigger the order is, the deeper in the map it should be displayed.)
-      // (order is the inverse of z-index)
-      // For basemap, set a minimal number (arbitrary defined to less than -5000)
-      olayer.setZIndex(zindex);
-
-      // Add to map
-      this.map.addLayer(olayer);
-
-      // Add to state
-      layer._olayer = olayer;
+    console.debug(`Displaying WMTS Layer ${layer.name} : UniqueID=${layer.layerUniqueId}`);
+    const options = optionsFromCapabilities(capabilities, {
+      layer: layer.layer,
+      projection: this.state.projection
     });
+
+    if (options === null) {
+      console.warn('Cannot create WMTS layer for layer ' + layer.layer);
+      return;
+    }
+
+    // Set the right dimensions
+    for (const key in layer.dimensions) {
+      if (key in options.dimensions) {
+        // Update value
+        options.dimensions[key] = layer.dimensions[key];
+      } else {
+        console.warn(
+          'A dimension ' +
+            key +
+            ' was defined for the WMTS layer ' +
+            layer.layer +
+            ' but the server does not seem to accept it.'
+        );
+      }
+    }
+
+    const olayer = new TileLayer({
+      opacity: layer.opacity,
+      source: new WMTS(options)
+    });
+
+    this.enrichWmtsLayerFromCapabilities(layer, olayer, capabilities);
+
+    let zindex;
+    if (isBasemap) {
+      this.basemapLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
+      zindex = -5000 - layer.order;
+    } else {
+      this.wmtsLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
+      zindex = -layer.order;
+    }
+
+    // Set zindex for this new layer
+    // (The bigger the order is, the deeper in the map it should be displayed.)
+    // (order is the inverse of z-index)
+    // For basemap, set a minimal number (arbitrary defined to less than -5000)
+    olayer.setZIndex(zindex);
+
+    // Add to map
+    this.map.addLayer(olayer);
+
+    // Add to state
+    layer._olayer = olayer;
+  }
+
+  public refreshZIndexes() {
+    for (const obj of Object.values(this.wmtsLayers)) {
+      const zindex = -obj.layerWmts.order;
+      obj.olayer.setZIndex(zindex);
+    }
   }
 
   enrichWmtsLayerFromCapabilities(layer: LayerWmts, olayer: TileLayer<WMTS>, capabilities: Record<string, unknown>) {
@@ -122,7 +146,15 @@ class WmtsManager {
   }
 
   removeLayer(layer: LayerWmts) {
-    if (this.layerExists(layer)) {
+    console.debug(`Removal asked for WMTS Layer ${layer.name} : UniqueID=${layer.layerUniqueId}`);
+    if (layer.layerUniqueId in this.wmtsAbortsByLayer) {
+      // The Capabilities are curently loading.
+      // We cannot remove the layer yet, it has not been added, but we can abort the loading
+      console.debug(`Cancelling WMTS Layer ${layer.name} : UniqueID=${layer.layerUniqueId}`);
+      const abortController = this.wmtsAbortsByLayer[layer.layerUniqueId];
+      abortController.abort();
+    } else if (this.layerExists(layer)) {
+      console.debug(`Removing WMTS Layer ${layer.name} : UniqueID=${layer.layerUniqueId}`);
       const olayer = this.wmtsLayers[layer.layerUniqueId].olayer;
       delete this.wmtsLayers[layer.layerUniqueId];
       this.map.removeLayer(olayer);
@@ -184,23 +216,32 @@ class WmtsManager {
     StateManager.getInstance().state.selection.selectionParameters.push(...selectionParams);
   }
 
-  #getWmtsCapabilities(url: string, callback: (capabilities: Record<string, unknown>) => void) {
+  private async getWmtsCapabilities(url: string): Promise<Record<string, unknown>> {
+    if (url in this.wmtsPromisesByServer) {
+      // Capabilities are currently loading
+      const promise = this.wmtsPromisesByServer[url];
+      return promise;
+    }
+
     if (url in this.wmtsCapabilitiesByServer) {
       // Capabilities were already loaded
       const capabilities = this.wmtsCapabilitiesByServer[url];
-      callback(capabilities);
-    } else {
-      // Capabilities were not loaded yet.
-      fetch(url)
-        .then((response) => response.text())
-        .then((capabilities) => {
-          // Create new WMTS Layer from Capabilities
-          const parser = new WMTSCapabilities();
-          const result = parser.read(capabilities);
-          this.wmtsCapabilitiesByServer[url] = result;
-          callback(result);
-        });
+      return Promise.resolve(capabilities);
     }
+
+    this.wmtsPromisesByServer[url] = (async () => {
+      // Capabilities were not loaded yet.
+      const response = await fetch(url);
+      const result = await response.text();
+
+      // Create new WMTS Layer from Capabilities
+      const parser = new WMTSCapabilities();
+      const capabilities = parser.read(result) as Record<string, unknown>;
+      this.wmtsCapabilitiesByServer[url] = capabilities;
+      return capabilities;
+    })();
+
+    return this.wmtsPromisesByServer[url];
   }
 }
 

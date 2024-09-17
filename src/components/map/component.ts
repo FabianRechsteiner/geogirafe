@@ -44,6 +44,7 @@ import GroupLayer from '../../models/layers/grouplayer';
 import { FocusFeature } from './tools/focusfeature';
 import XyzManager from './tools/xyzmanager';
 import ThemeLayer from '../../models/layers/themelayer';
+import { debounce } from '../../tools/utils/debounce';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -165,7 +166,7 @@ export default class MapComponent extends GirafeHTMLElement {
       /layers\.layersList\..*\.filter/,
       (_oldFilter: string, _newFilter: string, layer: Layer) => this.onChangeFilter(layer)
     );
-    this.stateManager.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder([]));
+    this.stateManager.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder());
   }
 
   render() {
@@ -619,11 +620,11 @@ export default class MapComponent extends GirafeHTMLElement {
     layerInfos.forEach((l) => {
       if (l instanceof LayerWms) {
         this.wmsManager.removeLayer(l);
-        if (this.wmsManager3d != null) this.wmsManager3d.removeLayer(l);
-      } else if (l instanceof LayerWmts) {
-        if (this.wmtsManager.layerExists(l)) {
-          this.wmtsManager.removeLayer(l);
+        if (this.wmsManager3d != null) {
+          this.wmsManager3d.removeLayer(l);
         }
+      } else if (l instanceof LayerWmts) {
+        this.wmtsManager.removeLayer(l);
       } else if (l instanceof LayerLocalFile) {
         this.localFileManager.removeLayer(l);
       } else if (l instanceof LayerCog) {
@@ -634,27 +635,11 @@ export default class MapComponent extends GirafeHTMLElement {
     });
   }
 
-  onChangeOrder(_layers: Layer[]) {
-    alert('Not Implemented yet');
-    // TODO REG : Rewrite this while taking avery layer type in account.
-    /*this.wmsManager.changeOrder(layers);
-layers.forEach(layerInfos => {
-  if (layerInfos.serverUniqueQueryId in this.layersByServer) {
-    const layerDef = this.layersByServer[layerInfos.serverUniqueQueryId];
-    const source = this.createImageWMSSource(layerInfos.url, layerDef.layerList, layerInfos.imageType);
-    layerDef.layer.setSource(source);
-  }
-  else if (layerInfos.name in this.independantLayers) {
-    // TODO REG: Here we have to change to order of the layers around the transparent layer.
-    // This case can be a bit complicated, because the transparent layer can be between non transparent layers
-    // Perhaps we will have to split the non-transparent layers in 2 different lists ?
-    // Do we really want this ? It sound a bit too much... and can be complicated to implement.
-  }
-  // TODO REG : Manager swiped layers here
-  else if (layerInfos.name in this.swipedLayers) {
-    throw new Error(''This case is not supported yet');
-  }
-});*/
+  onChangeOrder = debounce(() => this.reorderLayers(), 0);
+  private reorderLayers() {
+    console.log('ORDER CHANGED FOR MAP');
+    this.wmtsManager.refreshZIndexes();
+    this.wmsManager.refreshZIndexes();
   }
 
   onChangeOpacity(layerInfos: Layer) {

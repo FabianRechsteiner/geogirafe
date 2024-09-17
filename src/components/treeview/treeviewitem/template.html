@@ -1,0 +1,113 @@
+<link rel="stylesheet" href="lib/tippy.js/tippy.css" />
+<link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
+<link rel="stylesheet" href="lib/tippy.js/border.css" />
+<link rel="stylesheet" href="lib/tippy.js/svg-arrow.css" />
+
+<div id="container">
+  <header>
+    <!-- Spacer -->
+    <div class="gg-spacer gg-small"></div>
+
+    <!-- Checkbox -->
+    <button
+      class="${this.layer.active ? 'gg-button gg-small gg-check gg-opacity gg-selected' : 'gg-button gg-small gg-check gg-opacity'}"
+      tip="Activate / Deactivate"
+      onclick="${() => this.toggle()}">
+      <img class="${this.layer.active ? '' : 'hidden'}" alt="Expand/Collapse button" src="icons/checked-full.svg" />
+      <img class="${!this.layer.active ? '' : 'hidden'}" alt="Expand/Collapse button" src="icons/checked-no.svg" />
+    </button>
+
+    <!-- Error icon -->
+    <button class="${this.layer.hasError ? 'gg-button gg-small gg-opacity' : 'hidden'}" tip="Error on layer">
+      <img alt="Error on layer" src="icons/error.svg" />
+    </button>
+
+    <!-- Label -->
+    <div class="label-container">
+      <button
+        class="${this.layer.active ? 'gg-button gg-small gg-opacity gg-label gg-selected' : 'gg-button gg-small gg-label gg-opacity'}"
+        onclick="${() => this.toggle()}">
+        <span i18n="${this.layer.name}"> ${this.layer.name} </span>
+      </button>
+      <img
+        class="${this.layer.active && this.iconUrl ? '' : 'hidden'}"
+        alt="${'Icon for ' + this.layer.name}"
+        src="${this.iconUrl}" />
+    </div>
+
+    <!-- zoom to resolution -->
+    <button
+      class="${this.layer.active && this.layer instanceof LayerWms && this.layer.hasRestrictedResolution() ? 'gg-button gg-small gg-opacity tool' : 'hidden'}"
+      tip="Zoom to visible resolution"
+      onclick="${() => this.zoomToVisibleResolution()}">
+      <img alt="Zoom to visible resolution" src="icons/zoom.svg" />
+    </button>
+
+    <!-- zoom to full extent -->
+    <button
+      class="${this.layer.active && this.layer instanceof LayerLocalFile ? 'gg-button gg-small gg-opacity tool' : 'hidden'}"
+      tip="Zoom to full extent"
+      onclick="${() => this.zoomToFullExtent()}">
+      <img alt="Zoom to full extent" src="icons/zoom.svg" />
+    </button>
+
+    <!-- swipe icons -->
+    <button
+      class="${this.getButtonClass('swipedLeft')}"
+      tip="Swipe layer to the left"
+      onclick="${() => this.layer.swiped = (this.layer.swiped === 'left') ? 'no' : 'left'}">
+      <img alt="Swipe layer to the left" src="icons/swipe-left.svg" />
+    </button>
+    <button
+      class="${this.getButtonClass('swipedRight')}"
+      tip="Swipe layer to the right"
+      onclick="${() => this.layer.swiped = (this.layer.swiped === 'right') ? 'no' : 'right'}">
+      <img alt="Swipe layer to the right" src="icons/swipe-right.svg" />
+    </button>
+
+    <!-- opacity icon -->
+    <button id="opacity" class="${this.getButtonClass('opacity')}" tip="Control opacity">
+      <img alt="Control opacity" src="icons/opacity.svg" />
+    </button>
+
+    <!-- Filter -->
+    <button id="filter" class="${this.getButtonClass('filter')}" tip="Filter layer">
+      <img alt="Filter layer" src="icons/filter.svg" />
+    </button>
+
+    <!-- Legend icon -->
+    <button
+      class="${this.hasLegend ? 'gg-button gg-small gg-opacity tool' : 'hidden'}"
+      tip="Toggle legend"
+      onclick="${() => this.toggleLegend()}">
+      <img alt="Toggle legend" src="icons/legend.svg" />
+    </button>
+
+    <!-- Metadata icon -->
+    <button class="gg-button gg-small gg-opacity tool" tip="Show metadata" onclick="${() => this.showMetadata()}">
+      <img alt="Remove theme" src="icons/info.svg" />
+    </button>
+
+    <!-- Drag -->
+    <button id="drag-button" class="gg-button gg-small gg-grab gg-opacity tool" tip="Move">
+      <img alt="Move layer" src="icons/drag.svg" />
+    </button>
+
+    <!-- Remove icon -->
+    <button class="remove gg-button gg-small gg-opacity tool" tip="Remove layer" onclick="${() => this.deleteLayer()}">
+      <img alt="Remove layer" src="icons/trash.svg" />
+    </button>
+  </header>
+
+  ${Object.keys(this.legendUrls).map((l:string) => uHtml`
+  <div class="${this.isLegendExpanded ? 'legend' : 'hidden'}">
+    <div class="gg-spacer gg-small"></div>
+    <img alt="${'Legend for ' + l}" src="${this.legendUrls[l]}" />
+  </div>
+  ` )}
+
+  <div class="${this.layer instanceof LayerLocalFile && this.isLegendExpanded ? 'legend-file' : 'legend-file hidden'}">
+    <span>File from </span><span>${(this.layer as LayerLocalFile).lastModifiedDate}</span><span> [</span
+    ><span>${(this.layer as LayerLocalFile)._features?.length} </span><span>features.]</span>
+  </div>
+</div>

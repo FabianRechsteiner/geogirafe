@@ -6,7 +6,7 @@ import IconGlobe from './images/globe.svg';
 
 class GlobeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+
   public icon2D: string = Icon2D;
   public icon3D: string = Icon3D;
   public iconSplit: string = IconSplit;

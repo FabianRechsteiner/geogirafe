@@ -301,11 +301,13 @@ class SearchComponent extends GirafeHTMLElement {
       }
     } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
-      if (!this.state.layers.layersList.includes(layer)) {
+      if (!this.state.layers.layersList.includes(layer.parent)) {
         // Preview layer
+        layer.parent.order = 0;
+        layer.parent.isExpanded = true;
         this.previewLayer = layer;
-        this.state.layers.layersList.unshift(this.previewLayer);
-        this.layerManager.toggleLayer(this.previewLayer, 'on');
+        this.state.layers.layersList.push(layer.parent);
+        this.layerManager.toggleLayer(layer, 'on');
       }
     }
   }
@@ -359,7 +361,7 @@ class SearchComponent extends GirafeHTMLElement {
 
     // Clear preview layer
     if (this.previewLayer) {
-      const treeItemId = this.previewLayer.treeItemId;
+      const treeItemId = this.previewLayer.parent.treeItemId;
       this.layerManager.toggleLayer(this.previewLayer, 'off');
       const index = this.state.layers.layersList.findIndex((l) => l.treeItemId === treeItemId);
       if (index >= 0) {
@@ -384,17 +386,20 @@ class SearchComponent extends GirafeHTMLElement {
     } else if (result.properties?.actions[0].action === 'add_theme') {
       const theme = this.themeManager.findThemeByName(result.properties?.actions[0].data);
       if (!this.state.layers.layersList.includes(theme)) {
-        this.state.layers.layersList.unshift(theme);
+        theme.order = 0;
+        this.state.layers.layersList.push(theme);
       }
     } else if (result.properties?.actions[0].action === 'add_group') {
       const group = this.themeManager.findGroupByName(result.properties?.actions[0].data);
       if (!this.state.layers.layersList.includes(group)) {
-        this.state.layers.layersList.unshift(group);
+        group.order = 0;
+        this.state.layers.layersList.push(group);
       }
     } else if (result.properties?.actions[0].action === 'add_layer') {
       const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
-      if (!this.state.layers.layersList.includes(layer)) {
-        this.state.layers.layersList.unshift(layer);
+      if (!this.state.layers.layersList.includes(layer.parent)) {
+        layer.parent.order = 0;
+        this.state.layers.layersList.push(layer);
       }
     } else {
       console.warn('Unsupported result type');

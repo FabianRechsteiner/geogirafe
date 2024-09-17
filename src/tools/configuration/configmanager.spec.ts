@@ -30,7 +30,6 @@ describe('ConfigManager.loadConfig', () => {
     // @ts-ignore
     manager.config = new GirafeConfig(MockHelper.mockConfig);
     manager.loadConfig().then((config) => {
-      expect(config.treeview.useCheckboxes).toEqual(false);
       expect(config.themes.imagesUrlPrefix).toEqual('');
       expect(config.general.locale).toEqual(GirafeConfig.DEFAULT_LOCALE);
       expect(config.selection.defaultFocusStrokeColor).toEqual('#ff0000');
