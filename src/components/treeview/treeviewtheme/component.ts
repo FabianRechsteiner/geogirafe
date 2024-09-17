@@ -2,17 +2,19 @@ import BaseLayer from '../../../models/layers/baselayer';
 import ThemeLayer from '../../../models/layers/themelayer';
 import TreeViewGroupElement from '../tools/treeviewgroupelement';
 // @ts-ignore This import is not used in the typescript file but needed in the HTML Template
-// Cannot use <ts-expect-error> here because after the build-lib, the error dissapear
+// Cannot use <ts-expect-error> here because after the build-lib, the error disappear
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import GroupLayer from '../../../models/layers/grouplayer';
 
 class TreeViewThemeComponent extends TreeViewGroupElement {
   templateUrl = './template.html';
   styleUrls = ['../style.css', '../../../styles/common.css'];
 
-  declare layer: ThemeLayer;
+  override layer: ThemeLayer;
 
   constructor(theme: ThemeLayer) {
     super(theme, 'treeviewtheme');
+    this.layer = theme;
   }
 
   render() {

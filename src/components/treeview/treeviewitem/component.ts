@@ -15,7 +15,7 @@ class TreeViewItemComponent extends TreeViewElement {
   iconUrl: string | null = null;
   legendUrls: Record<string, string> = {};
 
-  declare layer: Layer;
+  override layer: Layer;
 
   public get hasLegend() {
     return this.layerManager.isLayerWithLegend(this.layer) && this.layer.legend;
@@ -36,6 +36,7 @@ class TreeViewItemComponent extends TreeViewElement {
 
   constructor(layer: Layer) {
     super(layer, 'treeviewitem');
+    this.layer = layer;
   }
 
   render() {
@@ -268,8 +269,8 @@ class TreeViewItemComponent extends TreeViewElement {
   deleteLayer() {
     this.layerManager.toggleLayer(this.layer, 'off');
     setTimeout(() => {
-      const index = this.layer.parent.children.findIndex((l) => l === this.layer);
-      this.layer.parent.children.splice(index, 1);
+      const index = this.layer.parent!.children.findIndex((l) => l === this.layer);
+      this.layer.parent!.children.splice(index, 1);
     });
   }
 
