@@ -1,29 +1,41 @@
 import ImageWMS from 'ol/source/ImageWMS';
 import tippy from 'tippy.js';
-import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import Layer from '../../models/layers/layer';
-import LayerManager from '../../tools/layermanager';
-import LayerWms from '../../models/layers/layerwms';
-import LayerLocalFile from '../../models/layers/layerlocalfile';
-import QueryBuilderComponent from '../querybuilder/component';
-import MapManager from '../../tools/state/mapManager';
-import LayerWmts from '../../models/layers/layerwmts';
+import Layer from '../../../models/layers/layer';
+import LayerWms from '../../../models/layers/layerwms';
+import LayerLocalFile from '../../../models/layers/layerlocalfile';
+import QueryBuilderComponent from '../../querybuilder/component';
+import MapManager from '../../../tools/state/mapManager';
+import LayerWmts from '../../../models/layers/layerwmts';
+import TreeViewElement from '../tools/treeviewelement';
 
-class TreeViewItemComponent extends GirafeHTMLElement {
+class TreeViewItemComponent extends TreeViewElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../style.css', '../../../styles/common.css'];
 
-  layerManager: LayerManager;
-
-  layer: Layer;
   iconUrl: string | null = null;
   legendUrls: Record<string, string> = {};
 
-  constructor(layer: Layer) {
-    super('treeviewitem');
+  declare layer: Layer;
 
-    this.layerManager = LayerManager.getInstance();
-    this.layer = layer;
+  public get hasLegend() {
+    return this.layerManager.isLayerWithLegend(this.layer) && this.layer.legend;
+  }
+
+  public get isLegendExpanded() {
+    if (this.layerManager.isLayerWithLegend(this.layer)) {
+      return this.layer.isLegendExpanded;
+    }
+    return false;
+  }
+
+  public toggleLegend() {
+    if (this.layerManager.isLayerWithLegend(this.layer)) {
+      this.layer.isLegendExpanded = !this.layer.isLegendExpanded;
+    }
+  }
+
+  constructor(layer: Layer) {
+    super(layer, 'treeviewitem');
   }
 
   render() {
@@ -43,7 +55,6 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     super.render();
     this.createOpacityTooltip();
     this.createFilterTooltip();
-    this.createTooltips();
   }
 
   setWmsLegend() {
@@ -144,7 +155,7 @@ class TreeViewItemComponent extends GirafeHTMLElement {
         slider.min = '0';
         slider.max = '20';
         slider.value = (this.layer.opacity * 20).toString();
-        slider.oninput = (_e) => (this.layer.opacity = parseInt(slider.value) / 20);
+        slider.oninput = () => (this.layer.opacity = parseInt(slider.value) / 20);
         return slider;
       }
     });
@@ -167,50 +178,69 @@ class TreeViewItemComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe(
-      /layers\..*\.isLegendExpanded/,
-      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    this.subscribe(/layers\..*\.isLegendExpanded/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
+      this.refreshRender(layer)
     );
-    this.stateManager.subscribe(
-      /layers\.layersList\..*\.activeState/,
-      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    this.subscribe(/layers\.layersList\..*\.activeState/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
+      this.refreshRender(layer)
     );
-    this.stateManager.subscribe(
-      /layers\.layersList\..*\.hasError/,
-      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    this.subscribe(/layers\.layersList\..*\.hasError/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
+      this.refreshRender(layer)
     );
-    this.stateManager.subscribe(
-      /layers\.layersList\..*\.errorMessage/,
-      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    this.subscribe(/layers\.layersList\..*\.errorMessage/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
+      this.refreshRender(layer)
     );
-    this.stateManager.subscribe(
-      /layers\.layersList\..*\.filter/,
-      (_oldValue: boolean, _newValue: boolean, layer: Layer) => this.refreshRender(layer)
+    this.subscribe(/layers\.layersList\..*\.filter/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
+      this.refreshRender(layer)
     );
-    this.stateManager.subscribe('treeview.advanced', () => super.render());
-    this.stateManager.subscribe('position.resolution', () => this.refreshLegends());
+    this.subscribe(/layers\.layersList\..*\.opacity/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
+      this.refreshRender(layer)
+    );
+    this.subscribe(/layers\.layersList\..*\.swiped/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
+      this.refreshRender(layer)
+    );
+    this.subscribe('treeview.advanced', () => this.refreshRender(this.layer));
+    this.subscribe('position.resolution', () => this.refreshLegends());
   }
 
   refreshLegends() {
     if (this.layer instanceof LayerWms) {
       this.setWmsLegend();
     }
-    super.render();
-  }
-
-  refreshRender(layer: Layer) {
-    if (layer === this.layer) {
-      super.render();
-      this.createTooltips();
-    }
-  }
-
-  createTooltips() {
-    super.activateTooltips(false, [800, 0], 'right');
+    super.refreshRender();
   }
 
   toggle(state?: 'on' | 'off') {
     this.layerManager.toggleLayer(this.layer, state);
+  }
+
+  getButtonClass(button: string) {
+    const buttonClasses = 'gg-button gg-small gg-opacity tool';
+    const activeButtonClasses = buttonClasses + ' active';
+    switch (button) {
+      case 'swipedLeft':
+        if (this.layer.active) {
+          return this.layer.swiped === 'left' ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      case 'swipedRight':
+        if (this.layer.active) {
+          return this.layer.swiped === 'right' ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      case 'opacity':
+        if (this.layer.active) {
+          return this.layer.opacity < 1 ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      case 'filter':
+        if (this.layer.active && this.layer instanceof LayerWms && this.layer.queryable) {
+          return this.layer.hasFilter ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      default:
+        throw Error('Unsupported type: ' + button);
+    }
   }
 
   zoomToVisibleResolution() {
@@ -235,18 +265,17 @@ class TreeViewItemComponent extends GirafeHTMLElement {
     MapManager.getInstance().zoomToExtent(this.layer.extent);
   }
 
-  showMetadata() {
-    this.state.metadata = {
-      title: this.layer.name,
-      url: this.layer.metadataUrl ?? null
-    };
-    this.state.interface.metadataVisible = true;
+  deleteLayer() {
+    this.layerManager.toggleLayer(this.layer, 'off');
+    setTimeout(() => {
+      const index = this.layer.parent.children.findIndex((l) => l === this.layer);
+      this.layer.parent.children.splice(index, 1);
+    });
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.girafeTranslate();
       this.registerEvents();
     });
   }

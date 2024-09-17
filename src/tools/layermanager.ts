@@ -13,7 +13,7 @@ class LayerManager extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
 
-  hideLegendWhenLayerIsDeactivated: boolean = false;
+  private layerClones: BaseLayer[] = [];
 
   get state() {
     return this.stateManager.state;
@@ -25,38 +25,43 @@ class LayerManager extends GirafeSingleton {
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
 
-    this.configManager.loadConfig().then(() => {
-      this.hideLegendWhenLayerIsDeactivated =
-        this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated ?? false;
-    });
-
     this.stateManager.subscribe(
       /layers\.layersList\..*\.activeState/,
       (_oldActive: boolean, _newActive: boolean, layer: BaseLayer) => this.onLayerToggled(layer)
     );
+    this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) =>
+      this.onLayersListChanged(oldLayers, newLayers)
+    );
   }
 
-  getTreeItem(treeItemId: string): BaseLayer {
-    const treeItem = this.#getLayerRecursive(this.state.layers.layersList, treeItemId);
+  private onLayersListChanged(oldLayers: BaseLayer[], newLayers: BaseLayer[]) {
+    let addedLayers = newLayers;
+    if (oldLayers) {
+      addedLayers = newLayers.filter(
+        (newLayer) => !oldLayers.find((oldLayer) => oldLayer.treeItemId === newLayer.treeItemId)
+      );
+    }
+    this.layerClones.push(...addedLayers);
+  }
+
+  public getTreeItem(treeItemId: string): BaseLayer {
+    // The object is not in the list of active layers any more.
+    // We look in the list of clones
+    const treeItem = this.getLayerRecursive(this.layerClones, treeItemId);
     if (treeItem) {
       return treeItem;
     }
+
     throw new Error(`BaseLayer ${treeItemId} not found !`);
   }
 
-  #getLayerRecursive(layers: BaseLayer[], treeItemId: string): BaseLayer | null {
+  private getLayerRecursive(layers: BaseLayer[], treeItemId: string): BaseLayer | null {
     for (const layer of layers) {
       if (layer.treeItemId === treeItemId) {
         return layer;
       }
-      if (layer instanceof GroupLayer) {
-        const child = this.#getLayerRecursive(layer.children, treeItemId);
-        if (child) {
-          return child;
-        }
-      }
-      if (layer instanceof ThemeLayer) {
-        const child = this.#getLayerRecursive(layer.children, treeItemId);
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+        const child = this.getLayerRecursive(layer.children, treeItemId);
         if (child) {
           return child;
         }
@@ -73,7 +78,7 @@ class LayerManager extends GirafeSingleton {
   }
 
   initializeLegends(layer: LayerWms) {
-    if (layer.inactive && this.hideLegendWhenLayerIsDeactivated) {
+    if (layer.inactive && this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated) {
       layer.isLegendExpanded = false;
     }
   }
@@ -97,7 +102,7 @@ class LayerManager extends GirafeSingleton {
       }
     } else if (layer instanceof Layer) {
       // Hide the legend when the layer is deactivated (if configured so)
-      if (layer instanceof LayerWms && this.hideLegendWhenLayerIsDeactivated) {
+      if (this.isLayerWithLegend(layer) && this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated) {
         if (layer.active) {
           layer.isLegendExpanded = layer.wasLegendExpanded;
         } else {

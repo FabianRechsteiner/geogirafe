@@ -3,7 +3,7 @@ import LanguageIcon from './images/language.svg';
 
 class LanguageComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+
   public languageIcon: string = LanguageIcon;
 
   languages: string[] = [];

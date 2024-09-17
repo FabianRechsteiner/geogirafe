@@ -1,6 +1,7 @@
 import MagicString from 'magic-string';
 import fs from 'fs-extra';
 import path from 'path';
+import { minify } from 'minify';
 
 export function findFilesRecursive(sourceDir, allowedExtensions, fileList = []) {
   const childs = fs.readdirSync(sourceDir);
@@ -44,6 +45,20 @@ export function copy(filename, sourceDir, targetDir) {
   }
 }
 
+function getStyleCode(currentFilename, relativeCssPath) {
+  const styleFilePath = path.join(path.dirname(currentFilename), relativeCssPath.trim());
+  try {
+    const styleFileContent = fs.readFileSync(styleFilePath, 'utf8');
+    // Convert css notation (for ex \002a) to javascript notation (\u002a)
+    let styleCode = styleFileContent.replace(/\\([0-9a-fA-F]{4})/g, '\\u$1');
+    styleCode = minify.css(styleCode);
+    styleCode = `<style>\n${styleCode}\n</style>`;
+    return styleCode;
+  } catch (error) {
+    console.error(`Error reading style file for ${currentFilename}: ${error}`);
+  }
+}
+
 export function inlineTemplate(filename) {
   // Read the file
   const code = fs.readFileSync(filename, 'utf8');
@@ -58,16 +73,17 @@ export function inlineTemplate(filename) {
     if (styleRegex.test(code)) {
       // Read the CSS file
       const styleFound = code.match(styleRegex);
-      const styleFilePath = path.join(path.dirname(filename), styleFound[1]);
-      try {
-        const styleFileContent = fs.readFileSync(styleFilePath, 'utf8');
-        // Convert css notation (for ex \002a) to javascript notation (\u002a)
-        styleCode = styleFileContent.replace(/\\([0-9a-fA-F]{4})/g, '\\u$1');
-        styleCode = `<style>\n${styleCode}\n</style>`;
-        magicString.overwrite(styleFound.index, styleFound.index + styleFound[0].length, '');
-      } catch (error) {
-        console.error(`Error reading style file for ${filename}: ${error}`);
+      styleCode += getStyleCode(filename, styleFound[1]);
+      magicString.overwrite(styleFound.index, styleFound.index + styleFound[0].length, '');
+    }
+    // Verify if there are many CSS files
+    const stylesRegex = /styleUrls *= *\[(['"].*['"],? ?)+\] *;?/;
+    if (stylesRegex.test(code)) {
+      const stylesFound = code.match(stylesRegex);
+      for (const styleFound of stylesFound[1].replaceAll("'", '').split(',')) {
+        styleCode += getStyleCode(filename, styleFound);
       }
+      magicString.overwrite(stylesFound.index, stylesFound.index + stylesFound[0].length, '');
     }
 
     // Read HTML template

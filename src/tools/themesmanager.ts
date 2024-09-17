@@ -195,6 +195,7 @@ class ThemesManager extends GirafeSingleton {
       themeJson.children.forEach((layerJson: GMFTreeItem) => {
         const layer = this.prepareThemeLayer(layerJson, null, order);
         if (layer) {
+          layer.parent = theme;
           theme.children.push(layer);
         }
       });
@@ -301,6 +302,14 @@ class ThemesManager extends GirafeSingleton {
       return;
     }
 
+    // Create a clone of the theme object to use it in the treeview.
+    // This is essential, otherwise all changes done in the layers
+    // (For exemple when expanding legend, expanding a group, or activating the layer)
+    // Will also be done in the default layer configuration that has been loaded from themes.json
+    // And when a theme will be selected agin from the themes-selector
+    // The default configuration will have been overriden.
+    const clonedTheme = theme.clone();
+
     if (this.configManager.Config.themes.selectionMode === 'replace') {
       // Mode is <replace>
       // 1. Deactivate all active layers
@@ -308,62 +317,15 @@ class ThemesManager extends GirafeSingleton {
         element.activeState = 'off';
       }
       // 2. Add new layers
-      const clone = theme.clone();
-      this.state.layers.layersList = clone.children;
-    } else {
+      this.state.layers.layersList = clonedTheme.children;
+    } else if (!this.state.layers.layersList.find((l) => l.id == clonedTheme.id)) {
       // Mode is <add>
-      // 1. Add new theme to the list if is not in the list yet
-      if (!this.state.layers.layersList.find((l) => l.id == theme.id)) {
-        this.state.layers.layersList = this.getNewLayersListForAdd(theme);
-      } else {
-        console.info(`The theme ${theme.name} is already present in the treeview.`);
-      }
-    }
-  }
-
-  private getNewLayersListForAdd(theme: ThemeLayer): BaseLayer[] {
-    // TODO REG : There seems to be a new problem with on-change
-    // When using unshift to add an element at the beginning of a list, the path in on-change is not updated
-    // And the object is considered as detatched.
-    // As workaround, we can clone the object to force the recreation of a new object
-    // And we have to keep the existing treeviewitem ot be able to enable/disable the same layers.
-    const clone = theme.clone();
-    const existingList: BaseLayer[] = [clone];
-    for (const theme of this.state.layers.layersList) {
-      const clonedTheme = theme.clone();
-      this.workaroundResetInitialTreeViewItemId(theme, clonedTheme);
-      existingList.push(clonedTheme);
-    }
-    return existingList;
-  }
-
-  public getNewLayersListForRemove(theme: ThemeLayer): BaseLayer[] {
-    // TODO REG : There seems to be a new problem with on-change
-    // When using unshift to add an element at the beginning of a list, the path in on-change is not updated
-    // And the object is considered as detatched.
-    // As workaround, we can clone the object to force the recreation of a new object
-    // And we have to keep the existing treeviewitem ot be able to enable/disable the same layers.
-    const newList: BaseLayer[] = [];
-    for (const elem of this.state.layers.layersList) {
-      if (elem.treeItemId !== theme.treeItemId) {
-        // This item should be kept.
-        const clone = elem.clone();
-        this.workaroundResetInitialTreeViewItemId(elem, clone);
-        newList.push(clone);
-      }
-    }
-    return newList;
-  }
-
-  private workaroundResetInitialTreeViewItemId(initial: BaseLayer, clone: BaseLayer) {
-    clone.treeItemId = initial.treeItemId;
-    if (
-      (initial instanceof ThemeLayer || initial instanceof GroupLayer) &&
-      (clone instanceof ThemeLayer || clone instanceof GroupLayer)
-    ) {
-      for (let i = 0; i < initial.children.length; ++i) {
-        this.workaroundResetInitialTreeViewItemId(initial.children[i], clone.children[i]);
-      }
+      // Add new theme to the list if is not in the list yet
+      // Set order to 0, because the theme should be added at the top of the list
+      clonedTheme.order = 0;
+      this.state.layers.layersList.push(clonedTheme);
+    } else {
+      console.info(`The theme ${clonedTheme.name} is already present in the treeview.`);
     }
   }
 

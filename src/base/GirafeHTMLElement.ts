@@ -2,16 +2,20 @@ import { render as uRender, html as uHtml, Hole } from 'uhtml';
 import tippy from 'tippy.js';
 import I18nManager from '../tools/i18n/i18nmanager';
 import ConfigManager from '../tools/configuration/configmanager';
-import StateManager from '../tools/state/statemanager';
+import StateManager, { Callback } from '../tools/state/statemanager';
 import ComponentManager from '../tools/state/componentManager';
 
 class GirafeHTMLElement extends HTMLElement {
   templateUrl: string | null = null;
   styleUrl: string | null = null;
-  template?: Hole | (() => Hole);
+  template!: Hole | (() => Hole);
   name: string;
   shadow: ShadowRoot;
   displayStyle?: string;
+  timeoutId?: NodeJS.Timeout;
+  rendered: boolean = false;
+
+  callbacks: Callback[] = [];
 
   activeTooltips: (typeof tippy)[] = [];
 
@@ -118,13 +122,51 @@ class GirafeHTMLElement extends HTMLElement {
    * Render the component's template.
    */
   render() {
+    // TODO REG : Reactivate this check and fix all the code.
+    /*if (this.rendered) {
+      throw Error('Component already rendered. Please call refreshRender() instead.');
+    }*/
+
     if (this.template) {
       this.defineDisplayStyle();
       this.show();
       uRender(this.shadow, this.template);
+      this.rendered = true;
     } else {
       console.warn(`Cannot render: no template has been defined for component ${this.name}.`);
     }
+  }
+
+  /**
+   * Re-Render the component.
+   * The method should be called when the component
+   * has already been rendered and needs to be updated.
+   */
+  refreshRender() {
+    if (!this.rendered) {
+      throw Error('Component cannot be re-rendered. Please call render() first.');
+    }
+
+    // Use a debouncing to prevent multiple execution of this method
+    // If multiple refresh at the same time are called.
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
+
+    this.timeoutId = setTimeout(() => {
+      uRender(this.shadow, this.template);
+    });
+  }
+
+  /**
+   * Renders a hidden span with the name of the component.
+   * Useful to render a placeholder for not visible component.
+   */
+  renderEmpty() {
+    this.defineDisplayStyle();
+    this.hide();
+    uRender(this.shadow, uHtml`<span style="display: none">${this.name}</span>`);
+    this.rendered = false;
   }
 
   /**
@@ -150,16 +192,6 @@ class GirafeHTMLElement extends HTMLElement {
       this.unsafeCache.set(str, template);
     }
     return template;
-  }
-
-  /**
-   * Renders a hidden span with the name of the component.
-   * Useful to render a placeholder for not visible component.
-   */
-  renderEmpty() {
-    this.defineDisplayStyle();
-    this.hide();
-    uRender(this.shadow, uHtml`<span style="display: none">${this.name}</span>`);
   }
 
   /**
@@ -221,6 +253,30 @@ class GirafeHTMLElement extends HTMLElement {
    * @param _serializedElement The element serialization as returned by the serialize method
    */
   deserialize(_serializedElement: unknown) {}
+
+  /**
+   * Subscribes with <callback> to the state changes mad on <path>
+   */
+  subscribe(path: string, callback: Callback): Callback;
+  subscribe(path: RegExp, callback: Callback): Callback;
+  subscribe(path: string | RegExp, callback: Callback): Callback {
+    // @ts-expect-error The call would have succeeded against this implementation,
+    // but implementation signatures of overloads are not externally visible.
+    const subscription = this.stateManager.subscribe(path, callback);
+    this.callbacks.push(subscription);
+    return subscription;
+  }
+
+  /**
+   * When the component is disconnected from the DOM
+   * all the callbacks will be unregistered
+   */
+  disconnectedCallback() {
+    for (const callback of this.callbacks) {
+      this.stateManager.unsubscribe(callback);
+    }
+    this.callbacks.length = 0;
+  }
 }
 
 export default GirafeHTMLElement;

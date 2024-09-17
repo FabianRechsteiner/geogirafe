@@ -28,13 +28,16 @@ abstract class BaseLayer {
 
   public hasError: boolean = false;
   public errorMessage: string | null = null;
+  public get hasMetadata(): boolean {
+    return this.metadataUrl !== undefined;
+  }
 
   public abstract activeState: string;
   public abstract get active(): boolean;
   public abstract get inactive(): boolean;
   public abstract clone(): BaseLayer;
 
-  public parent: ThemeLayer | GroupLayer | null = null;
+  public parent?: ThemeLayer | GroupLayer;
 
   constructor(id: number, name: string, order: number, options?: BaseLayerOptions) {
     this.id = id;

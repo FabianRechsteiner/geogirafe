@@ -27,7 +27,6 @@ class GirafeConfig {
     emptyBasemap: boolean;
   };
   treeview: {
-    useCheckboxes: boolean;
     useLegendIcons: boolean;
     hideLegendWhenLayerIsDeactivated: boolean;
     defaultIconSize: {
@@ -311,7 +310,6 @@ class GirafeConfig {
 
   private initConfigTreeview(config: GirafeConfig) {
     return {
-      useCheckboxes: config.treeview?.useCheckboxes ?? false,
       useLegendIcons: config.treeview?.useLegendIcons ?? false,
       hideLegendWhenLayerIsDeactivated: config.treeview?.hideLegendWhenLayerIsDeactivated ?? true,
       defaultIconSize: {

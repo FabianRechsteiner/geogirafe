@@ -1,0 +1,46 @@
+<link rel="stylesheet" href="lib/tippy.js/tippy.css" />
+<link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
+<link rel="stylesheet" href="lib/tippy.js/border.css" />
+<link rel="stylesheet" href="lib/tippy.js/svg-arrow.css" />
+
+<div id="panel" class="panel">
+  <div class="menu">
+    <button
+      class="gg-button gg-small"
+      tip="Expand / Collapse all"
+      tip-placement="top"
+      onclick="${() => this.expandAll()}">
+      <img class="${this.isAllExpanded ? '' : 'hidden'}" alt="Collapse all icon" src="icons/expand.svg" />
+      <img class="${this.isAllExpanded ? 'hidden' : ''}" alt="Expand all icon" src="icons/expand-all.svg" />
+    </button>
+
+    <button
+      class="gg-button gg-small"
+      tip="Toggle all legends"
+      tip-placement="top"
+      onclick="${() => this.toggleAllLegends()}">
+      <img class="${this.areAllLegendExpanded ? '' : 'hidden'}" alt="Toggle all legends icon" src="icons/legend.svg" />
+      <img
+        class="${this.areAllLegendExpanded ? 'hidden' : 'rotate90'}"
+        alt="Toggle all legends icon"
+        src="icons/legend.svg" />
+    </button>
+
+    <button class="gg-button gg-small" tip="Remove all layers" tip-placement="top" onclick="${() => this.removeAll()}">
+      <img alt="Remove all layers icon" src="icons/trash.svg" />
+    </button>
+
+    <girafe-basemap tip="Select basemap"></girafe-basemap>
+  </div>
+
+  <div class="treeview-list">
+    <!-- prettier-ignore -->
+    ${this.sortedLayers().map(layer => (layer instanceof ThemeLayer) ? uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-theme themeid="${layer.treeItemId}"></girafe-tree-view-theme>
+    ` : (layer instanceof GroupLayer) ? uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>
+    ` : uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>
+    ` )}
+  </div>
+</div>

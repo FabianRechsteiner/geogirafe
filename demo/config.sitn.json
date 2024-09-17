@@ -22,7 +22,6 @@
     "SwissTopoVectorTiles": false
   },
   "treeview": {
-    "useCheckboxes": true,
     "useLegendIcons": true
   },
   "search": {
