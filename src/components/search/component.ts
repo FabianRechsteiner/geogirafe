@@ -301,7 +301,7 @@ class SearchComponent extends GirafeHTMLElement {
       }
     } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
-      if (!this.state.layers.layersList.includes(layer.parent)) {
+      if (layer.parent && !this.state.layers.layersList.includes(layer.parent)) {
         // Preview layer
         layer.parent.order = 0;
         layer.parent.isExpanded = true;
@@ -360,7 +360,7 @@ class SearchComponent extends GirafeHTMLElement {
     this.previewFeaturesCollection.clear();
 
     // Clear preview layer
-    if (this.previewLayer) {
+    if (this.previewLayer?.parent) {
       const treeItemId = this.previewLayer.parent.treeItemId;
       this.layerManager.toggleLayer(this.previewLayer, 'off');
       const index = this.state.layers.layersList.findIndex((l) => l.treeItemId === treeItemId);
@@ -397,7 +397,7 @@ class SearchComponent extends GirafeHTMLElement {
       }
     } else if (result.properties?.actions[0].action === 'add_layer') {
       const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
-      if (!this.state.layers.layersList.includes(layer.parent)) {
+      if (layer.parent && !this.state.layers.layersList.includes(layer.parent)) {
         layer.parent.order = 0;
         this.state.layers.layersList.push(layer);
       }

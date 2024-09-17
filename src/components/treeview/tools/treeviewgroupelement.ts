@@ -5,10 +5,11 @@ import GroupHelper from './grouphelper';
 import TreeViewElement from './treeviewelement';
 
 export default abstract class TreeViewGroupElement extends TreeViewElement {
-  declare layer: GroupLayer | ThemeLayer;
+  override layer: GroupLayer | ThemeLayer;
 
   constructor(layer: GroupLayer | ThemeLayer, name: string) {
     super(layer, name);
+    this.layer = layer;
   }
 
   public sortedChildren() {

@@ -278,7 +278,11 @@ girafe-metadata-window {
 }
 
 .tippy-box {
-  background-color: var(--bkg-color) !important;
+  background-color: var(--text-color) !important;
+}
+
+.tippy-content {
+  color: var(--bkg-color) !important;
 }
 
 .tippy-box[data-theme~='error'] {

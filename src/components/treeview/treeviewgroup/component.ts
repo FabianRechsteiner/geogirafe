@@ -7,10 +7,11 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
   templateUrl = './template.html';
   styleUrls = ['../style.css', '../../../styles/common.css'];
 
-  declare layer: GroupLayer;
+  override layer: GroupLayer;
 
   constructor(group: GroupLayer) {
     super(group, 'treeviewgroup');
+    this.layer = group;
   }
 
   render() {

@@ -8,34 +8,44 @@ class DragHelper {
     }
   }
 
-  static moveLayerAfter(dragged: BaseLayer, dropped: BaseLayer) {
+  static reorderLayers(
+    dragged: BaseLayer,
+    dropped: BaseLayer,
+    adjustOrder: (childOrder: number, draggedOrder: number) => boolean,
+    increment: number
+  ) {
     DragHelper.checkParents(dragged, dropped);
-    const minOrder = dragged.order;
     dragged.order = dropped.order;
 
     const layersToReorder = dragged.parent
       ? dragged.parent.children
       : StateManager.getInstance().state.layers.layersList;
+
     for (const child of layersToReorder) {
-      if (child.treeItemId != dragged.treeItemId && child.order <= dragged.order && child.order >= minOrder) {
-        child.order--;
+      if (child.treeItemId !== dragged.treeItemId && adjustOrder(child.order, dragged.order)) {
+        child.order += increment;
       }
     }
   }
 
-  static moveLayerBefore(dragged: BaseLayer, dropped: BaseLayer) {
-    DragHelper.checkParents(dragged, dropped);
-    const maxOrder = dragged.order;
-    dragged.order = dropped.order;
+  static moveLayerAfter(dragged: BaseLayer, dropped: BaseLayer) {
+    const minOrder = dragged.order;
+    DragHelper.reorderLayers(
+      dragged,
+      dropped,
+      (childOrder, draggedOrder) => childOrder <= draggedOrder && childOrder >= minOrder,
+      -1
+    );
+  }
 
-    const layersToReorder = dragged.parent
-      ? dragged.parent.children
-      : StateManager.getInstance().state.layers.layersList;
-    for (const child of layersToReorder) {
-      if (child.treeItemId != dragged.treeItemId && child.order >= dragged.order && child.order <= maxOrder) {
-        child.order++;
-      }
-    }
+  static moveLayerBefore(dragged: BaseLayer, dropped: BaseLayer) {
+    const maxOrder = dragged.order;
+    DragHelper.reorderLayers(
+      dragged,
+      dropped,
+      (childOrder, draggedOrder) => childOrder >= draggedOrder && childOrder <= maxOrder,
+      1
+    );
   }
 }
 
