@@ -42,8 +42,8 @@ export class OpenIdConnectManager extends GirafeSingleton {
   handlingIssuerRedirectPromise?: Promise<string>;
   #authorizationServer?: Promise<oauth.AuthorizationServer>;
 
-  constructor() {
-    super('OpenIdConnectManager');
+  constructor(type: string) {
+    super(type);
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
 

@@ -30,8 +30,8 @@ export default class KeycloakManager extends GirafeSingleton {
   anonymousUsername?: string;
   configurationPromise?: Promise<boolean>;
 
-  constructor() {
-    super('KeycloakManager');
+  constructor(type: string) {
+    super(type);
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
 

@@ -22,8 +22,8 @@ export class OauthManager extends AbstractOauthManager {
 
   resumePromise?: Promise<string>;
 
-  constructor() {
-    super('OauthManager');
+  constructor(type: string) {
+    super(type);
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
 

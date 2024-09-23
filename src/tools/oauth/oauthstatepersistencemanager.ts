@@ -20,8 +20,8 @@ export default class OauthStatePersistenceManager extends GirafeSingleton {
     'oauth.geomapfish.userInfo'
   ];
 
-  constructor() {
-    super('OauthStatePersistenceManager');
+  constructor(type: string) {
+    super(type);
     this.stateManager = StateManager.getInstance();
     this.state.oauth.status = (localStorage.getItem('oauth.status') ?? 'unknown') as BasicLoginStatus;
     this.state.oauth.issuer.status = (localStorage.getItem('oauth.issuer.status') ?? 'unknown') as OauthIssuerStatus;

@@ -1,6 +1,10 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 
 export abstract class AbstractOauthManager extends GirafeSingleton {
+  constructor(type: string) {
+    super(type);
+  }
+
   /** Whether Oauth has a configuration
    *
    * used to:
