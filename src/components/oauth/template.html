@@ -1,0 +1,22 @@
+<link rel="stylesheet" href="styles/common.css" />
+
+${this.configured? uHtml`<button class="girafe-button-big oauth-button" onclick="${() => this.toggleOauthMenu()}">
+  <img alt="help-icon" src="/icons/user.svg" />
+</button>
+
+<div class="${(this.menuOpen ? 'oauth-menu' : 'hidden')}">
+  <div class="${(this.state.oauth.status === 'loggedIn'? 'hidden': 'oauth-menu-item')}">
+    <button class="girafe-button-large" onmousedown="${() => this.onLoginClick()}" i18n="Login"></button>
+  </div>
+  <div class="${(this.state.oauth.status === 'loggedIn'? 'oauth-menu-item': 'hidden')}">
+    <div class="oauth-login-info">
+      <button class="girafe-button-large login-status">
+        Logged in as ${ this.state.oauth.geomapfish.userInfo?.username}
+      </button>
+    </div>
+  </div>
+  <div class="${(this.state.oauth.status === 'loggedIn'? 'oauth-menu-item': 'hidden')}">
+    <button class="girafe-button-large" onmousedown="${() => this.onLogoutClick()}" i18n="Logout"></button>
+  </div>
+</div>
+`: null}

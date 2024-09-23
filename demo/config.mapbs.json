@@ -14,7 +14,7 @@
     "defaultSelectionComponent": "grid"
   },
   "themes": {
-    "url": "Mock/themes.json",
+    "url": "https://map.geo.test.bs.ch/themes?background=background&interface=desktop",
     "defaultTheme": "",
     "selectionMode": "add"
   },
@@ -86,5 +86,19 @@
     "metadataUrlPrefix": "https://map.geo.bs.ch",
     "defaultWindowWidth": "500px",
     "defaultWindowHeight": "350px"
+  },
+  "oauth": {
+    "issuer": {
+      "url": "https://auth.geo.test.bs.ch/auth/realms/geobs",
+      "algorithm": "oidc",
+      "clientId": "MapBS-ui",
+      "checkSessionOnLoad": true
+    },
+    "geomapfish": {
+      "userInfoUrl": "https://map.geo.test.bs.ch/loginuser",
+      "loginUrl": "https://map.geo.test.bs.ch/KeycloakLogin",
+      "logoutUrl": "https://map.geo.test.bs.ch/KeycloakLogout",
+      "anonymousUsername": "service-account-service_mapbs_anonymous"
+    }
   }
 }

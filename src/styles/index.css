@@ -132,6 +132,12 @@ girafe-theme-select {
   z-index: 100;
 }
 
+girafe-oauth {
+  max-width: 4rem;
+  height: 4rem;
+  overflow-y: visible;
+}
+
 .logo {
   margin: 0.2rem 1rem;
 }
