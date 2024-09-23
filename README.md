@@ -67,6 +67,19 @@ npm install
 npm start
 ```
 
+## Working locally
+
+> ❗❗ IMPORTANT ❗❗  
+> When working locally with authentication, and more generally with cookies,
+> browsers treat single-label domains (domains without any dots) differently from multi-label domains (domains with at least one dot). Cookies set on single-label domains are often considered less secure because they can be more easily spoofed or misused. As a result, many browsers restrict or do not allow cookies to be set on single-label domains like `localhost`.  
+> 
+> Therefore, working against https://localhost **will not work**, because the cookies cannot be correctly set.  
+> You'll have to use https://app.localhost, which has been defined as the default domain when working locally with GeoGirafe.
+
+Further discussions about this: 
+- https://stackoverflow.com/questions/7346919/chrome-localhost-cookie-not-being-set
+- https://stackoverflow.com/questions/1134290/cookies-on-localhost-with-explicit-domain
+
 ## Debugging using VSCode
 
 If you are using VSCode, there is a preconfigured debugging configuration in the `.vscode` directory.  
@@ -116,7 +129,7 @@ You can try the built asset with (you need docker for this example!):
 docker run --rm -p 8088:80 -v $(pwd)/dist/app:/usr/share/nginx/html nginx:latest
 ```
 
-This will spin up an NGINX and you can access it on [localhost:8088](http://localhost:8088).
+This will spin up an NGINX and you can access it on [app.localhost:8088](http://app.localhost:8088).
 
 Press `CTRL+C` to stop the container.
 

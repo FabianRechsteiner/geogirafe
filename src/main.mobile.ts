@@ -17,6 +17,8 @@ import MapComponent from './components/map/component';
 import MobileSearchComponent from './components/search-mobile/component';
 import MobileThemeComponent from './components/themes-mobile/component';
 import OfflineComponent from './components/offline/component';
+import AbstractOauthManager from './tools/oauth/abstractoauthmanager.js';
+import OauthManager from './tools/oauth/oauthmanager.js';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
@@ -31,6 +33,8 @@ declare global {
       stateManager: StateManager;
       shareManager: ShareManager;
       offlineManager: OfflineManager;
+      oauthManager: AbstractOauthManager;
+      themesManager: ThemesManager;
     };
   }
   interface Window {
@@ -111,6 +115,7 @@ try {
       ErrorManager.getInstance();
       CsvManager.getInstance();
       I18nManager.getInstance();
+      OauthManager.getInstance();
       ThemesManager.getInstance();
       WfsManager.getInstance();
       LogManager.getInstance();
@@ -120,7 +125,9 @@ try {
         state: StateManager.getInstance().state,
         stateManager: StateManager.getInstance(),
         shareManager: ShareManager.getInstance(),
-        offlineManager: OfflineManager.getInstance()
+        offlineManager: OfflineManager.getInstance(),
+        oauthManager: OauthManager.getInstance(),
+        themesManager: ThemesManager.getInstance()
       };
 
       // Define components names

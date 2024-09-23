@@ -4,17 +4,41 @@ import { resolve } from 'path';
 import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
 import RestartPlugin from './buildtools/vite-restart-plugin';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import basicSsl from '@vitejs/plugin-basic-ssl';
+import dns from 'dns';
 
-const cesiumSource = 'node_modules/cesium/Build/Cesium';
+/**
+ * Custom name resolution for app.localhost:
+ * Vite try to do a DNS-Lookup when starting the dev server
+ * and app.localhost is not defined anywhere.
+ * We do not want to define on each client,
+ * so the default dns lookup method is overriden
+ * to resolve app.localhost to 127.0.0.1
+ */
+const originalDnsLookup = dns.lookup;
+function customDnsLookup(hostname, callback) {
+  if (hostname === 'app.localhost') {
+    callback(null, '127.0.0.1', 4);
+  } else {
+    originalDnsLookup(hostname, callback);
+  }
+}
+dns.lookup = customDnsLookup;
+
 // This is the base url for static files that CesiumJS needs to load.
 // Set to an empty string to place the files at the site's root path
-
+const cesiumSource = 'node_modules/cesium/Build/Cesium';
 // Default configuration for Cesium (see https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/)
 const cesiumBaseUrl = 'lib/cesium/';
 
 // https://v2.vitejs.dev/config/
 export default defineConfig({
   base: './',
+  server: {
+    host: 'app.localhost',
+    port: 8080,
+    strictPort: true
+  },
   build: {
     outDir: 'dist/app',
     sourcemap: true,
@@ -64,7 +88,8 @@ export default defineConfig({
       ]
     }),
     InlineTemplatesPlugin(),
-    RestartPlugin()
+    RestartPlugin(),
+    basicSsl()
   ],
   define: {
     // Define relative base path in cesium for loading assets

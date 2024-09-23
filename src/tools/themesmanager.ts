@@ -19,12 +19,15 @@ import LayerXYZ from '../models/layers/layerxyz';
 import ServerOgc from '../models/serverogc';
 import ThemeLayer from '../models/layers/themelayer';
 import WfsManager from './wfs/wfsmanager';
+import AbstractOauthManager from './oauth/abstractoauthmanager';
+import OauthManager from './oauth/oauthmanager';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
   layerManager: LayerManager;
   shareManager: ShareManager;
+  oauthManager: AbstractOauthManager;
 
   get state() {
     return this.stateManager.state;
@@ -37,6 +40,7 @@ class ThemesManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
     this.layerManager = LayerManager.getInstance();
     this.shareManager = ShareManager.getInstance();
+    this.oauthManager = OauthManager.getInstance();
 
     this.stateManager.subscribe(
       'themes.lastSelectedTheme',
@@ -64,7 +68,12 @@ class ThemesManager extends GirafeSingleton {
    * Load themes from backend and configures background layers if needed
    */
   async loadThemes() {
-    const response = await fetch(this.configManager.Config.themes.url);
+    await this.oauthManager.readyToLoadThemes();
+    const fetchOptions: RequestInit | undefined = (await this.oauthManager.configured())
+      ? { credentials: 'include' }
+      : undefined;
+    const response = await fetch(this.configManager.Config.themes.url, fetchOptions);
+
     const content = await response.json();
     this.state.ogcServers = this.prepareOgcServers(content['ogcServers']);
     if (this.configManager.Config.basemaps.show) {

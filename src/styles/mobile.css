@@ -34,6 +34,11 @@ girafe-theme-select {
   z-index: 9;
 }
 
+girafe-oauth {
+  width: 4rem;
+  height: 4rem;
+}
+
 .switch3d {
   position: fixed;
   bottom: 4rem;

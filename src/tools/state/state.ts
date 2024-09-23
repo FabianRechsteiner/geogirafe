@@ -9,6 +9,7 @@ import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
 import type OLayerImage from 'ol/layer/Image';
 import type OSourceImageWMS from 'ol/source/ImageWMS';
+import { OauthState } from '../oauth/oauthmanager';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -82,6 +83,7 @@ export type Metadata = {
   title: string | null;
   url: string | null;
 };
+export type Oauth = OauthState;
 
 export default class State {
   /**
@@ -193,6 +195,12 @@ export default class State {
 
   // Indicates is the application is currently used in offline mode
   isOffline: boolean = false;
+
+  oauth: Oauth = {
+    status: 'unlogged',
+    issuer: { status: 'unknown' },
+    geomapfish: { status: 'unlogged' }
+  };
 
   // The State object is defined as <not extensible> by the StateManager.
   // This property can be used by third-parts components or extensions

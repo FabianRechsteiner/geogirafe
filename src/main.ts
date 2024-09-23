@@ -35,6 +35,7 @@ import PrintComponent from './components/print/component';
 import ProjectionComponent from './components/projection/component';
 import PrototypeBannerComponent from './components/prototypebanner/component';
 import QueryBuilderComponent from './components/querybuilder/component';
+import OauthComponent from './components/oauth/component';
 import DrawingComponent from './components/drawing/component';
 import ScaleComponent from './components/scale/component';
 import SearchComponent from './components/search/component';
@@ -47,6 +48,8 @@ import TreeViewItemComponent from './components/treeview/treeviewitem/component'
 import TreeViewGroupComponent from './components/treeview/treeviewgroup/component';
 import TreeViewThemeComponent from './components/treeview/treeviewtheme/component';
 import VideoRecordComponent from './components/videorecord/component';
+import OauthManager from './tools/oauth/oauthmanager.js';
+import AbstractOauthManager from './tools/oauth/abstractoauthmanager.js';
 
 // Redirect to mobile interface if we are on mobile
 if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
@@ -61,6 +64,8 @@ declare global {
       stateManager: StateManager;
       shareManager: ShareManager;
       offlineManager: OfflineManager;
+      oauthManager: AbstractOauthManager;
+      themesManager: ThemesManager;
     };
   }
   interface Window {
@@ -97,6 +102,7 @@ try {
       ErrorManager.getInstance();
       CsvManager.getInstance();
       I18nManager.getInstance();
+      OauthManager.getInstance();
       ThemesManager.getInstance();
       WfsManager.getInstance();
       OrderingManager.getInstance();
@@ -106,7 +112,9 @@ try {
         state: StateManager.getInstance().state,
         stateManager: StateManager.getInstance(),
         shareManager: ShareManager.getInstance(),
-        offlineManager: OfflineManager.getInstance()
+        offlineManager: OfflineManager.getInstance(),
+        oauthManager: OauthManager.getInstance(),
+        themesManager: ThemesManager.getInstance()
       };
 
       // Define components names
@@ -130,6 +138,7 @@ try {
       customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
       customElements.define('girafe-proj-select', ProjectionComponent);
       customElements.define('girafe-query-builder', QueryBuilderComponent);
+      customElements.define('girafe-oauth', OauthComponent);
       customElements.define('girafe-drawing', DrawingComponent);
       customElements.define('girafe-scale', ScaleComponent);
       customElements.define('girafe-search', SearchComponent);

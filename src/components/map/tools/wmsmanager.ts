@@ -296,7 +296,7 @@ export default class WmsManager {
       const urlsAndLayerNames = this.getFeatureInfoUrl(param);
       Object.keys(urlsAndLayerNames).forEach((url) => {
         promises.push(
-          fetch(url)
+          fetch(url) //, {credentials: "include"})
             .then((r) => r.text())
             .then((response) => this.handleGetFeatureInfoResponse(response, url, urlsAndLayerNames))
         );

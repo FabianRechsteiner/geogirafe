@@ -132,6 +132,22 @@ class GirafeConfig {
   query: {
     legacy: boolean;
   };
+  oauth?: {
+    issuer: {
+      url: string;
+      algorithm?: 'oauth2' | 'oidc';
+      codeChallengeMethod?: string;
+      clientId: string;
+      scope?: string;
+      checkSessionOnLoad?: boolean;
+    };
+    geomapfish: {
+      userInfoUrl: string;
+      loginUrl: string;
+      logoutUrl: string;
+      anonymousUsername?: string;
+    };
+  };
 
   public static readonly DEFAULT_LOCALE = 'en-US';
 
@@ -160,6 +176,7 @@ class GirafeConfig {
     this.metadata = this.initConfigMetadata(config);
     this.offline = this.initConfigOffline(config);
     this.query = this.initConfigQuery(config);
+    this.oauth = this.initConfigOauth(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -423,6 +440,24 @@ class GirafeConfig {
       // Otherwise we will always have to manually activate it.
       logLevel: import.meta.env.DEV ? 'debug' : config.general.logLevel ?? 'warn'
     };
+  }
+
+  private initConfigOauth(config: GirafeConfig) {
+    if (config.oauth) {
+      const issuerConfig = {
+        ...{
+          algorithm: 'oidc' as 'oauth2' | 'oidc',
+          scope: 'openid',
+          codeChallengeMethod: 'S256'
+        },
+        ...config.oauth.issuer
+      };
+      return {
+        issuer: issuerConfig,
+        geomapfish: { ...config.oauth.geomapfish }
+      };
+    }
+    return undefined;
   }
 }
 
