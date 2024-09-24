@@ -4,34 +4,26 @@ import OauthManager from '../../tools/oauth/oauthmanager';
 
 export class OauthComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['./style.css', '../../styles/common.css'];
 
   oauthManager: AbstractOauthManager;
-  public configured?: boolean; // TODO REG: Move this to the state
-
   public menuOpen: boolean = false;
 
   constructor() {
     super('oauth');
     console.info('OauthComponent constructor');
     this.oauthManager = OauthManager.getInstance();
-
-    this.renderOnConfigured();
   }
 
-  renderOnConfigured() {
-    return this.oauthManager.configured().then((configured: boolean) => {
-      this.configured = configured;
-      super.render();
-    });
+  private registerEvents() {
+    this.subscribe('oauth.status', () => this.onStatusChanged());
   }
 
-  toggleOauthMenu() {
-    this.menuOpen = !this.menuOpen;
-    super.render();
+  private onStatusChanged() {
+    super.refreshRender();
   }
 
-  onLoginClick(debug = false) {
+  public onLoginClick(debug = false) {
     console.log('Login clicked');
     if (this.state.oauth.status !== 'loggedIn') {
       if (
@@ -51,7 +43,7 @@ export class OauthComponent extends GirafeHTMLElement {
     }
   }
 
-  onLogoutClick(debug = false) {
+  public onLogoutClick(debug = false) {
     console.log('Logout clicked');
     if (this.state.oauth.status === 'loggedIn') {
       if (
@@ -71,6 +63,14 @@ export class OauthComponent extends GirafeHTMLElement {
         this.oauthManager.logout();
       }
     }
+  }
+
+  connectedCallback() {
+    this.loadConfig().then(() => {
+      super.render();
+      this.registerEvents();
+      super.girafeTranslate();
+    });
   }
 }
 

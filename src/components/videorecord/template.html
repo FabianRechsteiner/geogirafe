@@ -1,15 +1,15 @@
 <button
   class="${this.status === 'downloaded' ? 'gg-button gg-medium' : 'hidden'}"
   onclick="${() => this.startRecording()}">
-  <img alt="help-icon" src="/icons/video-record.svg" />
+  <img alt="help-icon" src="icons/video-record.svg" />
 </button>
 <button
   class="${this.status === 'recording' ? 'gg-button gg-medium' : 'hidden'}"
   onclick="${() => this.stopRecording()}">
-  <img alt="help-icon" src="/icons/video-stop.svg" />
+  <img alt="help-icon" src="icons/video-stop.svg" />
 </button>
 <button
   class="${this.status === 'recorded' ? 'gg-button gg-medium' : 'hidden'}"
   onclick="${() => this.downloadRecord()}">
-  <img alt="help-icon" src="/icons/video-download.svg" />
+  <img alt="help-icon" src="icons/video-download.svg" />
 </button>

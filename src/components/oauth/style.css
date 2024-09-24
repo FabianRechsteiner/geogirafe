@@ -1,34 +1,6 @@
-.hidden {
-  display: none;
-}
-
-.oauth-menu {
+.container {
   display: flex;
-  flex-wrap: wrap;
-  width: fit-content;
-  margin-top: 0;
-  max-height: 70vh;
-  border: solid 1px #444;
-  border-radius: 3px;
-  padding: 1rem;
-  background-color: var(--bkg-color);
-}
-
-.oauth-menu-item {
-  display: block;
-  position: relative;
-  width: 100%;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-  margin: 0.5rem;
-  padding: 0;
-}
-
-.girafe-button-large.login-status {
-  background-color: transparent;
-  cursor: default;
-}
-.girafe-button-large.login-status:hover {
-  background-color: transparent;
+  flex-direction: row;
+  border-right: var(--app-standard-border);
+  align-items: center;
 }
