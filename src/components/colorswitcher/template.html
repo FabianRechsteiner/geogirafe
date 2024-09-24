@@ -1,21 +1,17 @@
-<div class="container">
-  <label class="${this.state.interface.darkFrontendMode ? 'switch checked' : 'switch'}">
-    Dark mode on interface
-    <input
-      type="checkbox"
-      onclick="${() => this.darkFrontendModeToggled()}"
-      onkeydown="${(e:KeyboardEvent) => this.simulateClick(e)}"
-      ?checked="${this.state.interface.darkFrontendMode}" />
+<button
+  class="${!this.state.interface.darkFrontendMode ? 'gg-button gg-medium' : 'hidden'}"
+  onclick="${() => this.state.interface.darkFrontendMode = true}">
+  <img alt="menu-icon" src="/icons/theme-dark.svg" />
+</button>
 
-    <span tip="Dark mode on interface" class="slider"></span>
-  </label>
-  <label class="${this.state.interface.darkMapMode ? 'switch checked' : 'switch'}">
-    Dark mode on map
-    <input
-      type="checkbox"
-      onclick="${() => this.state.interface.darkMapMode = !this.state.interface.darkMapMode}"
-      onkeydown="${(e:KeyboardEvent) => this.simulateClick(e)}"
-      ?checked="${this.state.interface.darkMapMode}" />
-    <span tip="Dark mode on map" class="slider"></span>
-  </label>
-</div>
+<button
+  class="${(this.state.interface.darkFrontendMode && !this.state.interface.darkMapMode) ? 'gg-button gg-medium' : 'hidden'}"
+  onclick="${() => this.state.interface.darkMapMode = true}">
+  <img alt="menu-icon" src="/icons/theme-dark-map.svg" />
+</button>
+
+<button
+  class="${(this.state.interface.darkFrontendMode && this.state.interface.darkMapMode) ? 'gg-button gg-medium' : 'hidden'}"
+  onclick="${() => this.state.interface.darkFrontendMode = this.state.interface.darkMapMode = false}">
+  <img alt="menu-icon" src="/icons/theme-light.svg" />
+</button>

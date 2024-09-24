@@ -1,10 +1,8 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import LanguageIcon from './images/language.svg';
 
 class LanguageComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-
-  public languageIcon: string = LanguageIcon;
+  styleUrl = '../../styles/common.css';
 
   languages: string[] = [];
 

@@ -1,14 +1,12 @@
-<link rel="stylesheet" href="styles/common.css" />
-
 <button
-  class="${(this.state.loading ? 'hidden' : 'girafe-button-big dark')}"
+  class="${(this.state.loading ? 'hidden' : 'gg-button gg-big')}"
   title="Theme Selection"
   onclick="${() => this.toggleThemesList()}"
   onblur="${() => this.onBlur()}">
   <img alt="menu-icon" src="icons/themes.svg" />
 </button>
 <button
-  class="${(this.state.loading ? 'girafe-button-big dark' : 'hidden')}"
+  class="${(this.state.loading ? 'gg-button gg-big' : 'hidden')}"
   title="Theme Selection"
   onclick="${() => this.toggleThemesList()}"
   onblur="${() => this.onBlur()}">

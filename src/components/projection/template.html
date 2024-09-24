@@ -1,14 +1,12 @@
-<link rel="stylesheet" href="styles/common.css" />
-
 <girafe-menu-button open="left">
-  <button slot="menu-button" class="girafe-button-medium">
-    <img alt="menu-icon" src="${this.projIcon}" />
-    <span>Proj</span>
+  <button slot="menu-button" class="gg-button gg-medium">
+    <img alt="menu-icon" src="/icons/proj.svg" />
   </button>
 
   ${Object.entries(this.projections).map(([code, text]) => uHtml`
-  <button slot="menu-content" class="girafe-button-medium" onclick="${() => this.changeProjection(code)}">
-    <img alt="help-icon" src="${this.projIcon}" />
-    <span>${text}</span></button
-  >` )}
+  <button slot="menu-content" class="gg-button gg-medium gg-withtext" onclick="${() => this.changeProjection(code)}">
+    <img alt="help-icon" src="/icons/proj.svg" />
+    <span>${text}</span>
+  </button>
+  ` )}
 </girafe-menu-button>

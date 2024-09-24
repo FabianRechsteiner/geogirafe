@@ -7,83 +7,44 @@ slot {
 #panel {
   position: relative;
   background: var(--bkg-color);
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  margin: 0.5rem;
+  display: flex;
+  align-items: center;
+  border-bottom: var(--app-standard-border);
+  padding-bottom: 0.5rem;
+}
+
+header span {
+  font-size: 1rem;
+  text-align: left;
+  flex-grow: 1;
 }
 
 #gutter {
-  z-index: 1;
-  width: 6px;
-  height: 100%;
-  background: var(--bkg-color);
   position: absolute;
-  top: 0;
+  z-index: 100;
+  width: 6px;
+  height: 4rem;
+  background: var(--bkg-color);
+  top: calc(50% - 2rem);
   cursor: col-resize;
+  border: var(--app-standard-border);
+  border-radius: 1rem;
 }
 
 #panel.left #gutter {
-  border-right: solid 1px #999;
-  right: 0;
+  right: -1rem;
 }
 
 #panel.right #gutter {
-  border-left: solid 1px #999;
-  left: 0;
-}
-
-#hide,
-#close {
-  z-index: 100;
-  border: solid 1px #999;
-  color: var(--text-color-grad2);
-  padding: 0.7rem 0.5rem;
-  width: 0.8rem;
-  height: 2rem;
-  line-height: 2rem;
-  position: absolute;
-  top: 1rem;
-  background-color: var(--bkg-color);
-  cursor: pointer;
+  left: -1rem;
 }
 
 #panel.left #hide {
-  right: -1.2rem;
-  border-left: none;
-  border-radius: 0 10px 10px 0;
-  padding-left: 0;
-}
-
-#panel.right #close {
-  left: -1.2rem;
-  border-right: none;
-  border-radius: 10px 0 0 10px;
-  padding-right: 0;
-}
-
-#hide i:before {
-  content: '\f104';
-}
-
-#close i:before {
-  content: '\f00d';
-}
-
-#hide.closed {
-  left: 5px !important;
-}
-
-#panel.left #hide.closed {
-  left: 5px !important;
-}
-
-#panel.right #close.closed {
-  right: 5px !important;
-}
-
-#hide.closed i:before {
-  content: '\f105';
-}
-
-#hide:hover,
-#close:hover {
-  border-color: #000;
-  color: var(--text-color);
+  display: none;
 }

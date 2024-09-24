@@ -155,6 +155,7 @@ class GirafeHTMLElement extends HTMLElement {
 
     this.timeoutId = setTimeout(() => {
       uRender(this.shadow, this.template);
+      this.girafeTranslate();
     });
   }
 

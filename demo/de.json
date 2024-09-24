@@ -4,6 +4,9 @@
     "recenter_map": "Die Karte zentrieren",
     "add_theme": "Thema hinzufügen",
     "add_group": "Karte hinzufügen",
-    "add_layer": "Kartenebene hinzufügen"
+    "add_layer": "Kartenebene hinzufügen",
+    "print-panel": "Karte drucken",
+    "drawing-panel": "Zeichnen & messen",
+    "lidar-panel": "LiDAR-Profil"
   }
 }

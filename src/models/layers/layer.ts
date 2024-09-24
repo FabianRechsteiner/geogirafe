@@ -1,4 +1,5 @@
 import BaseLayer from './baselayer';
+import GroupLayer from './grouplayer';
 
 type LayerOptions = {
   isDefaultChecked?: boolean;
@@ -19,6 +20,8 @@ abstract class Layer extends BaseLayer {
   public activeState: 'on' | 'off' = 'off';
   public opacity: number;
   public swiped: 'left' | 'right' | 'no' = 'no';
+
+  declare parent: GroupLayer;
 
   constructor(id: number, name: string, order: number, options?: LayerOptions) {
     super(id, name, order, options);

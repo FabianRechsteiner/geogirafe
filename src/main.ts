@@ -19,7 +19,7 @@ import AboutComponent from './components/about/component';
 import BasemapComponent from './components/basemap/component';
 import ColorSwitcherComponent from './components/colorswitcher/component';
 import CoordinateComponent from './components/coordinate/component';
-import GlobeComponent from './components/globe/component';
+import LayoutComponent from './components/layout/component';
 import HelpComponent from './components/help/component';
 import MetadataWindowComponent from './components/metadatawindow/component';
 import InfoboxComponent from './components/infobox/component';
@@ -122,7 +122,7 @@ try {
       customElements.define('girafe-basemap', BasemapComponent);
       customElements.define('girafe-colorswitcher', ColorSwitcherComponent);
       customElements.define('girafe-coordinate', CoordinateComponent);
-      customElements.define('girafe-globe-select', GlobeComponent);
+      customElements.define('girafe-layout', LayoutComponent);
       customElements.define('girafe-help', HelpComponent);
       customElements.define('girafe-metadata-window', MetadataWindowComponent);
       customElements.define('girafe-infobox', InfoboxComponent);
