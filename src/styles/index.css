@@ -133,12 +133,6 @@ girafe-theme-select {
   border-right: var(--app-standard-border);
 }
 
-girafe-oauth {
-  max-width: 4rem;
-  height: 4rem;
-  overflow-y: visible;
-}
-
 .logo {
   margin: 0.4rem 1rem;
   height: -webkit-fill-available;

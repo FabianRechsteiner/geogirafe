@@ -4,7 +4,7 @@ class LayoutComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = '../../styles/common.css';
 
-  public currentLayoutIcon: string = '/icons/layout-3d.svg';
+  public currentLayoutIcon: string = 'icons/layout-3d.svg';
 
   constructor() {
     super('layout');
@@ -17,13 +17,13 @@ class LayoutComponent extends GirafeHTMLElement {
   private onLayoutChanged() {
     switch (this.state.globe.display) {
       case 'none':
-        this.currentLayoutIcon = '/icons/layout-3d.svg';
+        this.currentLayoutIcon = 'icons/layout-3d.svg';
         break;
       case 'side':
-        this.currentLayoutIcon = '/icons/layout-3d.svg';
+        this.currentLayoutIcon = 'icons/layout-3d.svg';
         break;
       case 'full':
-        this.currentLayoutIcon = '/icons/layout-2d.svg';
+        this.currentLayoutIcon = 'icons/layout-2d.svg';
         break;
       default:
         throw Error('Invalid value for layout.');
