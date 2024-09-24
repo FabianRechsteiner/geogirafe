@@ -10,7 +10,6 @@ Example:
 
 <div id="panel" dock="left">
   <div id="gutter"></div>
-  <div id="hide"></div>
   <div id="close"></div>
 </div>
 
@@ -23,7 +22,6 @@ That's it.
 
 class GirafeResizableElement extends GirafeHTMLElement {
   gutter?: HTMLElement;
-  hideButton?: HTMLElement;
   closeButton?: HTMLElement;
   dock: 'left' | 'right' | 'bottom';
   prevX = 0;
@@ -62,10 +60,6 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.gutter.onmousedown = (e) => this.mousedown(e);
     this.gutter.ondblclick = () => this.togglePanelInternal();
 
-    this.hideButton = this.shadow.getElementById('hide') || undefined;
-    if (this.hideButton) {
-      this.hideButton.onclick = () => this.togglePanelInternal();
-    }
     this.closeButton = this.shadow.getElementById('close') || undefined;
     if (this.closeButton) {
       this.closeButton.onclick = () => this.closePanel();
@@ -157,17 +151,11 @@ class GirafeResizableElement extends GirafeHTMLElement {
       // => We reset it to the last width
       this.style.width = this.lastWidth + 'px';
       this.style.minWidth = this.minWidth + 'px';
-      if (this.hideButton) {
-        this.hideButton.classList.remove('closed');
-      }
     } else {
       // Hide the panel
       this.lastWidth = width;
       this.style.width = this.toggleSize + 'px';
       this.style.minWidth = '0';
-      if (this.hideButton) {
-        this.hideButton.classList.add('closed');
-      }
     }
   }
 
@@ -178,17 +166,11 @@ class GirafeResizableElement extends GirafeHTMLElement {
       // => We reset it to the last height
       this.style.height = this.lastHeight + 'px';
       this.style.minWidth = this.minHeight + 'px';
-      if (this.hideButton) {
-        this.hideButton.classList.remove('closed');
-      }
     } else {
       // Hide the panel
       this.lastHeight = height;
       this.style.height = this.toggleSize + 'px';
       this.style.minHeight = '0';
-      if (this.hideButton) {
-        this.hideButton.classList.add('closed');
-      }
     }
   }
 

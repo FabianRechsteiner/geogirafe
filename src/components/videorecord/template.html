@@ -1,13 +1,15 @@
-<link rel="stylesheet" href="styles/common.css" />
-
 <button
-  class="${this.status === 'downloaded' ? 'girafe-button-big' : 'hidden'}"
+  class="${this.status === 'downloaded' ? 'gg-button gg-medium' : 'hidden'}"
   onclick="${() => this.startRecording()}">
-  <img alt="help-icon" src="${this.videoIcon}" />
+  <img alt="help-icon" src="/icons/video-record.svg" />
 </button>
-<button class="${this.status === 'recording' ? 'girafe-button-big' : 'hidden'}" onclick="${() => this.stopRecording()}">
-  <img alt="help-icon" src="${this.stopIcon}" />
+<button
+  class="${this.status === 'recording' ? 'gg-button gg-medium' : 'hidden'}"
+  onclick="${() => this.stopRecording()}">
+  <img alt="help-icon" src="/icons/video-stop.svg" />
 </button>
-<button class="${this.status === 'recorded' ? 'girafe-button-big' : 'hidden'}" onclick="${() => this.downloadRecord()}">
-  <img alt="help-icon" src="${this.downloadIcon}" />
+<button
+  class="${this.status === 'recorded' ? 'gg-button gg-medium' : 'hidden'}"
+  onclick="${() => this.downloadRecord()}">
+  <img alt="help-icon" src="/icons/video-download.svg" />
 </button>

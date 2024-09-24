@@ -82,54 +82,11 @@
       <girafe-theme-select></girafe-theme-select>
       <img class="logo" alt="geogirafe-logo" src="images/logo_small.webp" />
       <girafe-search id="search"></girafe-search>
-      <div id="buttonbar">
-        <girafe-video-record></girafe-video-record>
-        <girafe-nav-history></girafe-nav-history>
-        <girafe-oauth></girafe-oauth>
-        <girafe-colorswitcher></girafe-colorswitcher>
-        <button class="girafe-button-big help" onclick="document.geogirafe.state.interface.helpVisible = true">
-          <img alt="help-icon" src="icons/help.svg" />
-        </button>
-        <button class="girafe-button-big share" onclick="document.geogirafe.state.interface.shareVisible = true">
-          <img alt="help-icon" src="icons/share.svg" />
-        </button>
-        <girafe-menu-button>
-          <button slot="menu-button" class="girafe-button-big">
-            <img alt="menu-icon" src="icons/menu.svg" />
-          </button>
-          <button
-            slot="menu-content"
-            class="girafe-button-medium"
-            onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
-            <img alt="help-icon" src="icons/draw.svg" />
-            <span>Draw</span>
-          </button>
-          <button
-            slot="menu-content"
-            class="girafe-button-medium"
-            onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
-            <img alt="help-icon" src="icons/print.svg" />
-            <span>Print</span>
-          </button>
-          <button
-            slot="menu-content"
-            class="girafe-button-medium"
-            onclick="document.geogirafe.state.interface.lidarPanelVisible = !document.geogirafe.state.interface.lidarPanelVisible">
-            <img alt="help-icon" src="icons/lidar.svg" />
-            <span>LiDAR</span>
-          </button>
-          <girafe-proj-select slot="menu-content"></girafe-proj-select>
-          <girafe-language-select slot="menu-content"></girafe-language-select>
-          <girafe-globe-select slot="menu-content"></girafe-globe-select>
-          <button
-            slot="menu-content"
-            class="girafe-button-medium"
-            onclick="document.geogirafe.state.interface.aboutVisible = true">
-            <img alt="help-icon" src="icons/info.svg" />
-            <span>About</span>
-          </button>
-        </girafe-menu-button>
-      </div>
+
+      <girafe-oauth></girafe-oauth>
+      <girafe-nav-history></girafe-nav-history>
+      <girafe-video-record></girafe-video-record>
+      <girafe-colorswitcher></girafe-colorswitcher>
     </header>
 
     <div id="content">
@@ -150,10 +107,59 @@
           <girafe-metadata-window></girafe-metadata-window>
         </div>
         <girafe-lr-panel class="panel-right" dock="right">
-          <girafe-drawing slot="main" data-toggle-path="interface.printPanelVisible"></girafe-drawing>
-          <girafe-print slot="main" data-toggle-path="interface.drawingPanelVisible"></girafe-print>
-          <girafe-lidar-panel slot="main" data-toggle-path="interface.lidarPanelVisible"></girafe-lidar-panel>
+          <girafe-drawing
+            slot="main"
+            data-toggle-path="interface.drawingPanelVisible"
+            data-title="drawing-panel"></girafe-drawing>
+          <girafe-print
+            slot="main"
+            data-toggle-path="interface.printPanelVisible"
+            data-title="print-panel"></girafe-print>
+          <girafe-lidar-panel
+            slot="main"
+            data-toggle-path="interface.lidarPanelVisible"
+            data-title="lidar-panel"></girafe-lidar-panel>
         </girafe-lr-panel>
+        <div id="buttonbar">
+          <button
+            slot="menu-content"
+            class="gg-button gg-medium"
+            onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
+            <img alt="help-icon" src="icons/draw.svg" />
+          </button>
+          <button
+            slot="menu-content"
+            class="gg-button gg-medium"
+            onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
+            <img alt="help-icon" src="icons/print.svg" />
+          </button>
+          <button
+            slot="menu-content"
+            class="gg-button gg-medium"
+            onclick="document.geogirafe.state.interface.lidarPanelVisible = !document.geogirafe.state.interface.lidarPanelVisible">
+            <img alt="help-icon" src="icons/lidar.svg" />
+          </button>
+          <button class="gg-button gg-medium" onclick="document.geogirafe.state.interface.shareVisible = true">
+            <img alt="help-icon" src="icons/share.svg" />
+          </button>
+          <girafe-language-select></girafe-language-select>
+          <girafe-layout></girafe-layout>
+          <girafe-proj-select></girafe-proj-select>
+
+          <div class="filler"></div>
+
+          <button class="gg-button gg-medium" onclick="document.geogirafe.state.interface.helpVisible = true">
+            <img alt="help-icon" src="icons/help.svg" />
+          </button>
+
+          <button class="gg-button gg-medium" onclick="document.geogirafe.state.interface.aboutVisible = true">
+            <img alt="help-icon" src="icons/info.svg" />
+          </button>
+
+          <button class="gg-button gg-medium" onclick="alert('not implemented')">
+            <img alt="help-icon" src="icons/config.svg" />
+          </button>
+        </div>
         <girafe-about></girafe-about>
         <girafe-share></girafe-share>
         <girafe-selection-window></girafe-selection-window>

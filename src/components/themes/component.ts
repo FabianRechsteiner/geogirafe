@@ -7,7 +7,7 @@ import CustomThemesManager from './tools/customthemesmanager';
 
 class ThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['./style.css', '../../styles/common.css'];
 
   newIcon: string = NewIcon;
 

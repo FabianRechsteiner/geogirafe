@@ -2,9 +2,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class ColorSwitcherComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
-
-  private currentTheme?: 'light' | 'dark';
+  styleUrl = '../../styles/common.css';
 
   constructor() {
     super('colorswitcher');
@@ -12,28 +10,23 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.stateManager.subscribe('interface.darkFrontendMode', () => this.onChangeDarkFrontendMode());
-    this.stateManager.subscribe('interface.darkMapMode', () => super.render());
+    this.stateManager.subscribe('interface.darkMapMode', () => super.refreshRender());
   }
 
   onChangeDarkFrontendMode() {
-    this.currentTheme = this.state.interface.darkFrontendMode ? 'dark' : 'light';
-    this.activateTheme(this.currentTheme);
-    super.render();
-  }
-
-  darkFrontendModeToggled() {
-    this.state.interface.darkFrontendMode = !this.state.interface.darkFrontendMode;
-    localStorage.setItem('theme', this.currentTheme!);
+    const currentTheme = this.state.interface.darkFrontendMode ? 'dark' : 'light';
+    this.activateTheme(currentTheme);
+    localStorage.setItem('theme', currentTheme);
+    super.refreshRender();
   }
 
   initValue() {
-    this.currentTheme = (localStorage.getItem('theme') as 'dark' | 'light') ?? undefined;
-    if (!this.currentTheme) {
+    let currentTheme = localStorage.getItem('theme');
+    if (!currentTheme) {
       const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-      this.currentTheme = prefersDarkScheme.matches ? 'dark' : 'light';
+      currentTheme = prefersDarkScheme.matches ? 'dark' : 'light';
     }
-
-    this.state.interface.darkFrontendMode = this.currentTheme === 'dark';
+    this.state.interface.darkFrontendMode = currentTheme === 'dark';
   }
 
   activateTheme(mode: 'dark' | 'light') {
@@ -47,7 +40,6 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
       super.render();
       this.girafeTranslate();
       this.registerEvents();
-      this.activateTooltips(false, [800, 0], 'top-end');
       this.initValue();
     });
   }

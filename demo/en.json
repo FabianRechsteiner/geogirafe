@@ -3,6 +3,9 @@
     "recenter_map": "Recenter the map",
     "add_theme": "Add a theme",
     "add_group": "Add a layergroup",
-    "add_layer": "Add a layer"
+    "add_layer": "Add a layer",
+    "print-panel": "Print map",
+    "drawing-panel": "Draw & measure",
+    "lidar-panel": "LiDAR profile"
   }
 }

@@ -1,10 +1,8 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import ProjIcon from './images/proj.svg';
 
 class ProjectionComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-
-  public projIcon: string = ProjIcon;
+  styleUrl = '../../styles/common.css';
 
   projections: Record<string, string> = {};
 

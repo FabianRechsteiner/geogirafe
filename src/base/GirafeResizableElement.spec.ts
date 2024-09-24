@@ -72,11 +72,6 @@ describe('GirafeResizableElement.makeResizable', () => {
     expect(resizableElement.gutter!.id).toBe('gutter');
   });
 
-  it('should initialize hideButton element', () => {
-    expect(resizableElement.hideButton).toBeDefined();
-    expect(resizableElement.hideButton!.id).toBe('hide');
-  });
-
   it('should initialize closeButton element', () => {
     expect(resizableElement.closeButton).toBeDefined();
     expect(resizableElement.closeButton!.id).toBe('close');
@@ -88,10 +83,6 @@ describe('GirafeResizableElement.makeResizable', () => {
 
   it('should set gutter ondblclick handler', () => {
     expect(typeof resizableElement.gutter!.ondblclick).toBe('function');
-  });
-
-  it('should set hideButton onclick handler if hideButton exists', () => {
-    expect(typeof resizableElement.hideButton!.onclick).toBe('function');
   });
 
   it('should set closeButton onclick handler if closeButton exists', () => {

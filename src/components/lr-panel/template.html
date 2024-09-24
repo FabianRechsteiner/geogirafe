@@ -1,15 +1,10 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
-
 <div id="panel">
+  <header>
+    <span i18n="${this.title}"></span>
+    <button id="close" class="gg-button gg-small">
+      <img alt="Close icon" src="icons/close.svg" />
+    </button>
+  </header>
   <div id="gutter"></div>
   <slot name="main"></slot>
-  ${ this.dock === 'left' ? uHtml`
-  <div id="hide" class="hide">
-    <i class="fa-solid"></i>
-  </div>
-  ` : uHtml`
-  <div id="close" class="close">
-    <i class="fa-solid"></i>
-  </div>
-  `}
 </div>

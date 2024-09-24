@@ -7,12 +7,16 @@ body {
 }
 
 body {
+  --app-color-grey: #cbd5e1;
+  --app-standard-height: 3.2rem;
+  --app-standard-border: 1px solid var(--app-color-grey);
+  --bkg-color: rgb(255, 255, 255);
+
   --bx-shdw: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.16);
   --t-bkg: #ffffffbb;
   --text-color: #222;
   --text-color-grad1: #444;
   --text-color-grad2: #666;
-  --bkg-color: rgb(255, 255, 255);
   --bkg-color-grad1: #ddd;
   --bkg-color-grad2: #bbb;
   --bkg-color-input: #fff;
@@ -112,14 +116,12 @@ header {
   right: 0;
   display: flex;
   flex-direction: row;
-  border-bottom: solid 1px var(--bkg-color-grad1);
+  align-items: center;
+  border-bottom: var(--app-standard-border);
   background: var(--bkg-color);
-  height: 4rem;
+  height: var(--app-standard-height);
   z-index: 100;
   justify-content: space-between;
-  box-shadow:
-    0 1px 2px rgba(60, 64, 67, 0.3),
-    0 1px 3px 1px rgba(60, 64, 67, 0.15);
 }
 
 img {
@@ -127,9 +129,8 @@ img {
 }
 
 girafe-theme-select {
-  width: 4rem;
-  height: 4rem;
   z-index: 100;
+  border-right: var(--app-standard-border);
 }
 
 girafe-oauth {
@@ -139,32 +140,32 @@ girafe-oauth {
 }
 
 .logo {
-  margin: 0.2rem 1rem;
+  margin: 0.4rem 1rem;
+  height: -webkit-fill-available;
 }
 
 girafe-search {
-  margin: 1rem auto auto 16rem;
   width: 36rem;
   margin-left: auto;
   margin-right: auto;
 }
 
 #buttonbar {
-  text-align: right;
-  color: var(--text-color);
-  background-color: transparent;
-  font-size: 0;
-  padding: 0;
+  background-color: var(--bkg-color);
   display: flex;
-  height: 4.6rem;
-  overflow: visible;
+  flex-direction: column;
+  border-left: var(--app-standard-border);
+}
+
+#buttonbar .filler {
+  flex-grow: 1;
 }
 
 #content {
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: 4rem;
+  top: var(--app-standard-height);
   bottom: 0;
   left: 0;
   right: 0;
@@ -172,6 +173,7 @@ girafe-search {
 
 #main {
   display: flex;
+  flex-direction: row;
   position: relative;
   width: 100%;
   height: 100%;
@@ -187,18 +189,14 @@ girafe-search {
   width: 25rem;
   min-width: 20rem;
   max-width: 50rem;
-  box-shadow:
-    0 1px 2px rgba(60, 64, 67, 0.3),
-    0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  border-right: var(--app-standard-border);
 }
 
 .panel-right {
   width: 20rem;
   min-width: 20rem;
   max-width: 40rem;
-  box-shadow:
-    0 -1px 2px rgba(60, 64, 67, 0.3),
-    0 -1px 3px 1px rgba(60, 64, 67, 0.15);
+  border-left: var(--app-standard-border);
 }
 
 #content-map {

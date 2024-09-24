@@ -17,8 +17,11 @@ import StateToggleManager from '../../tools/state/stateToggleManager';
  */
 class LRPanelComponent extends GirafeResizableElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['./style.css', '../../styles/common.css'];
+
   private stateToggleManager: StateToggleManager;
+  public title: string = 'Unknown panel';
+  private panelTitles: Record<string, string> = {};
 
   constructor() {
     super('lr-panel');
@@ -50,7 +53,9 @@ class LRPanelComponent extends GirafeResizableElement {
     const togglePaths: string[] = [];
     for (const element of elements) {
       const togglePath = (element as HTMLElement).dataset['togglePath'];
+      const panelTitle = (element as HTMLElement).dataset['title'] ?? 'Unknown panel';
       if (togglePath) {
+        this.panelTitles[togglePath] = panelTitle;
         togglePaths.push(togglePath);
       }
     }
@@ -66,7 +71,9 @@ class LRPanelComponent extends GirafeResizableElement {
       this.stateManager.subscribe(path, (oldValue, newValue) => {
         if (oldValue !== newValue) {
           if (newValue) {
+            this.title = this.panelTitles[path];
             this.show();
+            this.refreshRender();
           } else {
             this.hide();
           }

@@ -1,15 +1,9 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { v4 as uuidv4 } from 'uuid';
-import VideoIcon from './images/video.svg';
-import StopIcon from './images/stop.svg';
-import DownloadIcon from './images/download.svg';
 
 class VideoRecordComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-
-  public videoIcon: string = VideoIcon;
-  public stopIcon: string = StopIcon;
-  public downloadIcon: string = DownloadIcon;
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   status: 'downloaded' | 'recording' | 'recorded' = 'downloaded';
   mediaRecorder: MediaRecorder | null = null;
