@@ -54,12 +54,13 @@
       "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg"
     },
     "tilesetsUrls": [
+      "https://uzuflycesium.s3.amazonaws.com/Blonay/Cesium/Scene/BlonaymCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/Chardonne/BTI/Cesium/Scene/ChardonnemCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/Corseaux/BTI/Cesium/Scene/ChardonnemCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/CorsierSurVevey/BTI/Cesium/Scene/CorsiermCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/Jongny/BTI/Cesium/Scene/JongnymCesium.json",
-      "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_sans_lac/Scene/Vevey_cesium_sans_lac.json",
-      "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_lac_sans_lat/Scene/Vevey_cesium_lac_sans_lat.json"
+      "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_lac_sans_lat/Scene/Vevey_cesium_lac_sans_lat.json",
+      "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_sans_lac/Scene/Vevey_cesium_sans_lac.json"
     ]
   },
   "bookmarks": {
