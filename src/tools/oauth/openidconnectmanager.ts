@@ -36,6 +36,7 @@ export class OpenIdConnectManager extends GirafeSingleton {
   clientId: string;
   codeChallengeMethod: string;
   configurationPromise?: Promise<boolean>;
+  redirectUrl: string = `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`;
 
   tokensAutoRefreshTimer?: NodeJS.Timeout;
   tokensRefreshCallbacks: Array<() => any> = [];
@@ -279,8 +280,9 @@ export class OpenIdConnectManager extends GirafeSingleton {
 
     // redirect user to authorizationServer.authorization_endpoint
     const authorizationUrl = new URL(authorizationServer.authorization_endpoint);
+    this.redirectUrl = this.getRedirectUrl();
     authorizationUrl.searchParams.set('client_id', this.clientId);
-    authorizationUrl.searchParams.set('redirect_uri', this.getRedirectUrl());
+    authorizationUrl.searchParams.set('redirect_uri', this.redirectUrl);
     authorizationUrl.searchParams.set('response_type', 'code');
     authorizationUrl.searchParams.set('scope', this.scope);
     authorizationUrl.searchParams.set('code_challenge', code_challenge);
@@ -347,7 +349,11 @@ export class OpenIdConnectManager extends GirafeSingleton {
 
       if (currentUrl.searchParams.get('error') === 'login_required') {
         // removing oauth URL parameters
-        window.history.replaceState({ handleLoggedInToIssuer: 'done' }, '', window.location.pathname);
+        window.history.replaceState(
+          { handleLoggedInToIssuer: 'done' },
+          '',
+          `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`
+        );
         this.state.oauth.issuer.status = 'unlogged';
         return this.state.oauth.issuer.status;
       }
@@ -375,7 +381,7 @@ export class OpenIdConnectManager extends GirafeSingleton {
         authorizationServer,
         client,
         params,
-        this.getRedirectUrl(),
+        this.redirectUrl,
         this.codeVerifier
       );
       this.codeVerifier = undefined;
@@ -418,7 +424,11 @@ export class OpenIdConnectManager extends GirafeSingleton {
       }
 
       // removing oauth URL parameters
-      window.history.replaceState({ handleLoggedInToIssuer: 'done' }, '', window.location.pathname);
+      window.history.replaceState(
+        { handleLoggedInToIssuer: 'done' },
+        '',
+        `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`
+      );
 
       this.state.oauth.issuer.status = 'loggedIn';
       return this.state.oauth.issuer.status;
