@@ -14,6 +14,7 @@ class ThemeComponent extends GirafeHTMLElement {
   private readonly mapManager: MapManager;
   private readonly customThemesManager = new CustomThemesManager();
   public menuOpen: boolean = false;
+  public openedOnce: boolean = false;
 
   public get customThemes() {
     return this.customThemesManager?.customThemes ?? [];
@@ -41,6 +42,7 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   toggleThemesList() {
+    this.openedOnce = true;
     this.menuOpen = !this.menuOpen;
     super.render();
   }

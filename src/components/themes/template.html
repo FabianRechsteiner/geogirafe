@@ -1,16 +1,14 @@
 <button
-  class="${(this.state.loading ? 'hidden' : 'gg-button gg-big')}"
+  class="gg-button gg-big-withtext"
   title="Theme Selection"
   onclick="${() => this.toggleThemesList()}"
   onblur="${() => this.onBlur()}">
-  <img alt="menu-icon" src="icons/themes.svg" />
-</button>
-<button
-  class="${(this.state.loading ? 'gg-button gg-big' : 'hidden')}"
-  title="Theme Selection"
-  onclick="${() => this.toggleThemesList()}"
-  onblur="${() => this.onBlur()}">
-  <img alt="menu-icon" src="icons/loading.svg" class="spin" />
+  <img
+    alt="menu-icon"
+    src="icons/themes.svg"
+    class="${(!this.state.loading ? (this.openedOnce ? '' : 'gg-spin-wait') : 'hidden')}" />
+  <img alt="menu-icon" src="icons/loading.svg" class="${(this.state.loading ? 'gg-spin' : 'hidden')}" />
+  <span i18n="themes">Themes</span>
 </button>
 
 <div class="${(this.menuOpen ? 'themes' : 'hidden')}">
