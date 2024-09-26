@@ -59,10 +59,3 @@ button > span {
   text-align: left;
   color: var(--text-color);
 }
-
-.spin {
-  animation-name: spin;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
-}

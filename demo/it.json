@@ -3,6 +3,7 @@
     "recenter_map": "Ricentrare la mappa",
     "print-panel": "Stampare una carta",
     "drawing-panel": "Disegno e misurazione",
-    "lidar-panel": "Profilo lIDAR"
+    "lidar-panel": "Profilo lIDAR",
+    "themes": "temi"
   }
 }

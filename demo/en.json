@@ -6,6 +6,7 @@
     "add_layer": "Add a layer",
     "print-panel": "Print map",
     "drawing-panel": "Draw & measure",
-    "lidar-panel": "LiDAR profile"
+    "lidar-panel": "LiDAR profile",
+    "themes": "themes"
   }
 }

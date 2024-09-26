@@ -6,6 +6,7 @@
     "add_layer": "Ajouter une couche",
     "print-panel": "Imprimer une carte",
     "drawing-panel": "Dessin et mesure",
-    "lidar-panel": "Profil lIDAR"
+    "lidar-panel": "Profil lIDAR",
+    "themes": "thèmes"
   }
 }

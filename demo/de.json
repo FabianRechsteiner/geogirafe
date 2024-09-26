@@ -7,6 +7,7 @@
     "add_layer": "Kartenebene hinzufügen",
     "print-panel": "Karte drucken",
     "drawing-panel": "Zeichnen & messen",
-    "lidar-panel": "LiDAR-Profil"
+    "lidar-panel": "LiDAR-Profil",
+    "themes": "themen"
   }
 }
