@@ -4,42 +4,25 @@
   left: 0;
   right: 0;
   bottom: 0;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column-reverse;
   background: var(--bkg-color);
 }
 
 .menu {
   border-top: solid 1px #bbb;
-  background-color: var(--bkg-color);
-  height: 3rem;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 6px;
   z-index: 1;
-  font-size: 0;
   display: flex;
 }
 
 .treeview-list {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 5px;
-  bottom: 2.3rem;
-  padding-left: 0;
-  padding-top: 0.4rem;
-  padding-bottom: 1.5rem;
-  padding-right: 0.7rem;
-  margin: 0;
-  margin-top: 0.5rem;
+  padding-top: 0.5rem;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
+  flex-grow: 1;
 }
 
-girafe-basemap {
-  position: absolute;
-  right: 0;
-  top: 0;
+.spacer {
+  flex-grow: 1;
 }

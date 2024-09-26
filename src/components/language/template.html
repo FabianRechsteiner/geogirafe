@@ -1,10 +1,10 @@
 <girafe-menu-button open="left">
-  <button slot="menu-button" class="gg-button gg-medium">
+  <button slot="menu-button" class="gg-button gg-big">
     <img alt="menu-icon" src="icons/lang.svg" />
   </button>
 
   ${this.languages.map((language) => uHtml`
-  <button slot="menu-content" class="gg-button gg-medium gg-withtext" onclick="${() => this.changeLanguage(language)}">
+  <button slot="menu-content" class="gg-button gg-big-withtext" onclick="${() => this.changeLanguage(language)}">
     <img alt="help-icon" src="icons/lang.svg" />
     <span>${language.toUpperCase()}</span></button
   >` )}

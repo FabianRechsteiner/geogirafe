@@ -2,11 +2,17 @@
 .hidden {
   display: none;
 }
-.rotate90 {
+.gg-rotate90 {
   transform: rotate(90deg);
 }
-.rotate180 {
+.gg-rotate180 {
   transform: rotate(180deg);
+}
+.gg-rotate270 {
+  transform: rotate(270deg);
+}
+img {
+  filter: var(--svg-filter);
 }
 /* Animations */
 @keyframes spin {
@@ -55,6 +61,8 @@
   flex-direction: column;
   color: var(--text-color);
   padding: 0;
+  align-items: center;
+  justify-content: center;
 }
 .gg-button:hover {
   background-color: var(--bkg-color-grad1);
@@ -64,68 +72,90 @@
 .gg-big,
 .gg-big-withtext {
   min-width: var(--app-standard-height);
-  height: var(--app-standard-height);
-  align-items: center;
+  min-height: var(--app-standard-height);
+  max-height: var(--app-standard-height);
 }
-.gg-big img {
-  margin: calc(var(--app-standard-height) / 3.8);
-}
+.gg-big img,
 .gg-big-withtext img {
-  margin: calc(var(--app-standard-height) / 15);
-  margin-bottom: 0;
+  margin: 0;
+  width: calc(var(--app-standard-height) - 1.5rem);
 }
 .gg-big-withtext span {
+  font-size: 0.9rem;
   font-variant: small-caps;
-  text-align: center;
   padding: 0 1rem;
-  width: unset;
 }
 /* Medium button */
 .gg-medium,
 .gg-medium-withtext {
-  min-width: var(--app-standard-height) / 2;
-  height: var(--app-standard-height) / 2;
-  align-items: center;
+  flex-direction: row;
+  min-width: calc(var(--app-standard-height) / 1.2);
+  min-height: calc(var(--app-standard-height) / 1.2);
+  max-height: calc(var(--app-standard-height) / 1.2);
 }
 .gg-medium img {
-  margin: calc(var(--app-standard-height) / 4);
+  margin: 0;
+  width: calc(var(--app-standard-height) / 2.4);
+}
+.gg-medium-withtext img {
+  margin-left: 0.5rem;
+  width: calc(var(--app-standard-height) / 2.4);
+}
+.gg-medium-withtext span {
+  font-size: 0.9rem;
+  padding: 0 1rem;
+  padding-left: 0.5rem;
 }
 /* Small button */
-.gg-small {
-  min-width: 2rem;
-  height: 2rem;
-  align-items: center;
-  padding: 0.5rem;
+.gg-small,
+.gg-small-withtext {
+  flex-direction: row;
+  min-width: calc(var(--app-standard-height) / 2);
+  min-height: calc(var(--app-standard-height) / 2);
+  max-height: calc(var(--app-standard-height) / 2);
 }
 .gg-small img {
-  overflow: hidden;
+  margin: 0;
+  width: calc(var(--app-standard-height) / 3);
 }
-.gg-small span {
-  width: 100%;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.gg-small-withtext img {
+  margin-left: 0.5rem;
+  width: calc(var(--app-standard-height) / 3);
 }
-.gg-image-small {
+.gg-small-withtext span {
+  font-size: 0.9rem;
+  padding: 0 0.5rem;
+  padding-left: 0.3rem;
+}
+/* Treeview icons (checkbox, caret, spacer, label, grab, selected) */
+.gg-small > .gg-checkbox {
+  width: 1.2rem;
+}
+.gg-small > .gg-caret,
+.gg-spacer {
+  width: 1.5rem;
+  padding: 0;
+}
+.gg-small.gg-image {
   min-width: 1rem;
-  padding-left: 0.2rem;
-  width: 0.8rem;
-}
-.gg-check {
-  padding: 0.3rem;
+  width: 1rem;
+  padding: 0.25rem;
 }
 .gg-label {
   text-align: left;
   padding-left: 0;
   white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .gg-grab:hover {
   cursor: grab;
 }
-.gg-spacer {
-  padding: 0;
-  min-width: 1.2rem;
+.gg-selected {
+  font-weight: 700;
+  opacity: 1;
 }
+/* Opacity management */
 .gg-opacity {
   opacity: 0.5;
 }
@@ -133,29 +163,9 @@
   background-color: transparent;
   opacity: 1;
 }
-.gg-selected {
-  font-weight: 700;
-  opacity: 1;
-}
-.gg-withtext {
-  border-right: var(--app-standard-border);
-}
-.gg-withtext span {
-  font-size: 0.8rem;
-  text-align: center;
-  padding: 0.3rem;
-  color: var(--text-color);
-}
-.gg-caret {
-  padding: 0.2rem;
-  padding-left: 0.5rem;
-  min-width: 1.5rem;
-  width: 1.5rem;
-}
 
-/* TODO REG : Suppress all the following styles when the migration is done. */
+/* TODO REG : Suppress all the following styles. */
 .girafe-button-big,
-.girafe-button-medium,
 .girafe-button-large,
 .girafe-button-small,
 .girafe-button-tiny {
@@ -166,7 +176,6 @@
   color: var(--text-color);
 }
 .girafe-button-big:hover,
-.girafe-button-medium:hover,
 .girafe-button-large:hover,
 .girafe-button-small:hover,
 .girafe-button-tiny:hover {
@@ -175,16 +184,11 @@
 }
 
 .girafe-button-big.dark,
-.girafe-button-medium.dark,
 .girafe-button-large.dark,
 .girafe-button-small.dark,
 .girafe-button-tiny.dark {
   background-color: var(--bkg-color);
   filter: invert(1);
-}
-
-img {
-  filter: var(--svg-filter);
 }
 
 /* Big button (icon only) */
@@ -196,22 +200,6 @@ img {
 }
 .girafe-button-big img {
   overflow: hidden;
-}
-
-/* Medium button (icon or icon + text) */
-.girafe-button-medium {
-  flex-direction: column;
-  width: var(--app-standard-height);
-  align-items: center;
-}
-.girafe-button-medium img {
-  margin: 1rem;
-  width: 1.5rem;
-}
-.girafe-button-medium span {
-  display: block;
-  margin-top: -0.8rem;
-  margin-bottom: 0.8rem;
 }
 
 /* Large button (long text or icon + long text) */
