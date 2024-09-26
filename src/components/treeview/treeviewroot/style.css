@@ -11,7 +11,7 @@
 .menu {
   border-top: solid 1px #bbb;
   background-color: var(--bkg-color);
-  height: 2rem;
+  height: 3rem;
   position: absolute;
   bottom: 0;
   left: 0;
