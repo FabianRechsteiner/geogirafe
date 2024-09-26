@@ -19,6 +19,21 @@ if "%1"=="c2c" (
 )
 
 
+if "%1"=="experimental" (
+    echo "Preparing environment EXPERIMENTAL..."
+    copy demo\config.experimental.json %APPDIR%\config.json /Y
+    copy demo\de.json %APPDIR%\de.json /Y
+    copy demo\en.json %APPDIR%\en.json /Y
+    copy demo\fr.json %APPDIR%\fr.json /Y
+    curl "https://geomapfish-demo-2-9.camptocamp.com/themes?background=background&interface=experimental" --output %OUTPUTDIR%\themes.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/de.json" --output %OUTPUTDIR%\de.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/en.json" --output %OUTPUTDIR%\en.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
+    goto :end
+)
+
+
 if "%1"=="cartolacote" (
     echo "Preparing environment CARTOLACOTE..."
     copy demo\config.cartolacote.json %APPDIR%\config.json /Y
@@ -135,7 +150,7 @@ if "%1"=="ticino" (
 )
 
 echo "Usage: ./configure-demo-win <environment>"
-echo "Possible environments: ['c2c', 'cartolacote', 'cartoriviera', 'cjl', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
+echo "Possible environments: ['c2c', 'experimental', 'cartolacote', 'cartoriviera', 'cjl', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
 echo "Usage example: ./configure-demo-win mapbs"
 echo "Usage example with npm: npm run configure-demo-win mapbs"
 

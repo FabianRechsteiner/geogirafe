@@ -303,6 +303,8 @@ pages:
     # Prepare all demo environments
     - demo='c2c'
     - *prepare_demo
+    - demo='experimental'
+    - *prepare_demo
     - demo='cartolacote'
     - *prepare_demo
     - demo='cartoriviera'
