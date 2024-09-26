@@ -23,7 +23,7 @@ class GirafeHTMLElement extends HTMLElement {
   stateManager: StateManager;
   componentManager: ComponentManager;
 
-  private unsafeCache = new Map<string, TemplateStringsArray>();
+  private readonly unsafeCache = new Map<string, TemplateStringsArray>();
 
   constructor(name: string) {
     super();
@@ -36,7 +36,7 @@ class GirafeHTMLElement extends HTMLElement {
 
     this.shadow = this.attachShadow({ mode: 'open' });
 
-    this.stateManager.subscribe('language', (_oldLanguage: string, _newLanguage: string) => this.girafeTranslate());
+    this.subscribe('language', (_oldLanguage: string, _newLanguage: string) => this.girafeTranslate());
   }
 
   get state() {
@@ -256,7 +256,7 @@ class GirafeHTMLElement extends HTMLElement {
   deserialize(_serializedElement: unknown) {}
 
   /**
-   * Subscribes with <callback> to the state changes mad on <path>
+   * Subscribes with <callback> to the state changes made on <path>
    */
   subscribe(path: string, callback: Callback): Callback;
   subscribe(path: RegExp, callback: Callback): Callback;
@@ -266,6 +266,22 @@ class GirafeHTMLElement extends HTMLElement {
     const subscription = this.stateManager.subscribe(path, callback);
     this.callbacks.push(subscription);
     return subscription;
+  }
+
+  /**
+   *
+   * @param callback Unsubscribe all callbacks
+   */
+  unsubscribe(callback: Callback): void;
+  unsubscribe(callbacks: Callback[]): void;
+  unsubscribe(callbacks: Callback | Callback[]): void {
+    (Array.isArray(callbacks) ? callbacks : [callbacks]).forEach((callback) => {
+      const index = this.callbacks.findIndex((c) => c === callback);
+      if (index >= 0) {
+        this.stateManager.unsubscribe(callback);
+        this.callbacks.splice(index, 1);
+      }
+    });
   }
 
   /**

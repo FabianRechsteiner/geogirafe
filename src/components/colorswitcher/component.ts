@@ -9,8 +9,8 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('interface.darkFrontendMode', () => this.onChangeDarkFrontendMode());
-    this.stateManager.subscribe('interface.darkMapMode', () => super.refreshRender());
+    this.subscribe('interface.darkFrontendMode', () => this.onChangeDarkFrontendMode());
+    this.subscribe('interface.darkMapMode', () => super.refreshRender());
   }
 
   onChangeDarkFrontendMode() {

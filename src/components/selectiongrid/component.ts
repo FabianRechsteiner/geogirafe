@@ -17,7 +17,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   private readonly eventsCallbacks: Callback[] = [];
   private readonly selectionTabulatorManager = new SelectionTabulatorManager();
   private isVisibleComponentSetup = false;
-  private debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
+  private readonly debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
   visible = false;
 
   constructor() {
@@ -94,7 +94,7 @@ class SelectionGridComponent extends GirafeResizableElement {
    * @private
    */
   private renderComponentEmpty() {
-    this.stateManager.unsubscribe(this.eventsCallbacks);
+    this.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
     this.isVisibleComponentSetup = false;
     this.renderEmpty();
@@ -105,9 +105,7 @@ class SelectionGridComponent extends GirafeResizableElement {
    * @private
    */
   private registerVisibilityEvents() {
-    this.stateManager.subscribe('interface.selectionComponentVisible', (_oldValue, newValue) =>
-      this.togglePanel(newValue)
-    );
+    this.subscribe('interface.selectionComponentVisible', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
   /**
@@ -116,7 +114,7 @@ class SelectionGridComponent extends GirafeResizableElement {
    */
   private registerEvents() {
     this.eventsCallbacks.push(
-      this.stateManager.subscribe('selection.selectedFeatures', (_oldFeatures, newFeatures) => {
+      this.subscribe('selection.selectedFeatures', (_oldFeatures, newFeatures) => {
         // Use debounce to avoid quickly closing the grid on selection change.
         this.debounceOnFeaturesSelected(newFeatures);
       })

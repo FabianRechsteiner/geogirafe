@@ -11,7 +11,7 @@ class LayoutComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('globe.display', () => this.onLayoutChanged());
+    this.subscribe('globe.display', () => this.onLayoutChanged());
   }
 
   private onLayoutChanged() {

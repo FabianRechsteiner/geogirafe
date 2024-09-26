@@ -48,17 +48,17 @@ class PrintComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = './style.css';
 
-  private default_dpi = 96;
-  private default_scale = 10000;
-  private default_resolution = 100;
-  private default_format = 'pdf';
+  private readonly default_dpi = 96;
+  private readonly default_scale = 10000;
+  private readonly default_resolution = 100;
+  private readonly default_format = 'pdf';
 
   private readonly i18nManager: I18nManager;
   private readonly mapManager: MapManager;
   private readonly eventsCallbacks: Callback[] = [];
   private readonly eventKeys: EventsKey[] = [];
   private printManager?: PrintManager;
-  private printList: PrintElement[] = [];
+  private readonly printList: PrintElement[] = [];
   private printUrl?: string;
   private capabilities?: MFPCapabilities;
   private configAttributeNames: string[] = [];
@@ -345,7 +345,7 @@ class PrintComponent extends GirafeHTMLElement {
     this.printMaskManager?.destroy();
     unByKeyAll(this.eventKeys);
     this.eventKeys.length = 0;
-    this.stateManager.unsubscribe(this.eventsCallbacks);
+    this.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
     this.renderEmpty();
   }
@@ -365,7 +365,7 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private registerVisibilityEvents() {
-    this.stateManager.subscribe('interface.printPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
+    this.subscribe('interface.printPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
   /**
@@ -380,7 +380,7 @@ class PrintComponent extends GirafeHTMLElement {
       })
     );
     this.eventsCallbacks.push(
-      this.stateManager.subscribe('print.scale', (_oldVal, newVal) => {
+      this.subscribe('print.scale', (_oldVal, newVal) => {
         const scaleElement = this.shadow.querySelector('#scale') as HTMLInputElement;
         scaleElement.value = newVal;
       })

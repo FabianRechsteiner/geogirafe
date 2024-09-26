@@ -17,6 +17,21 @@ function getAllTypescriptFiles(directoryPath: string, fileList: string[] = []) {
   return fileList;
 }
 
+function getAllHtmlFiles(directoryPath: string, fileList: string[] = []) {
+  const files = fs.readdirSync(directoryPath);
+  files.forEach((file) => {
+    const filePath = path.join(directoryPath, file);
+    const stats = fs.statSync(filePath);
+    if (stats.isDirectory()) {
+      getAllHtmlFiles(filePath, fileList);
+    } else if (stats.isFile() && path.extname(file) === '.html') {
+      fileList.push(filePath);
+    }
+  });
+
+  return fileList;
+}
+
 function getSubDirectories(directoryPath: string) {
   const files = fs.readdirSync(directoryPath);
   return files.filter((f) => fs.statSync(path.join(directoryPath, f)).isDirectory());
@@ -159,6 +174,93 @@ describe('Components architecture', () => {
         if (code.match(staticRegex)) {
           errors.push(`The class ${className} is a singleton and should not have any static method.`);
         }
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+
+  it('Components should use this.subscribe() method instead of stateManager.subscribe(), because they will be automaticaly unsubscribed when the component disconnects from DOM', async () => {
+    const componentsPath = path.join(__dirname, 'components');
+    const tsFiles = getAllTypescriptFiles(componentsPath);
+
+    const errors: string[] = [];
+    for (const tsFile of tsFiles) {
+      const code = fs.readFileSync(tsFile, 'utf8');
+      const regex = /.*class (\w+) +extends +GirafeHTMLElement/gm;
+      const matches = code.matchAll(regex);
+      for (const match of matches) {
+        const className = match[1].trim();
+        // Check if this.stateManager.subscribe() is used
+        let subscribeRegex = /.*this\.stateManager\.subscribe.*/gm;
+        if (code.match(subscribeRegex)) {
+          errors.push(
+            `The component ${className} should use this.subscribe() instead of this.stateManager.subscribe().`
+          );
+        }
+        // Check if StateManager.getInstance().subscribe() is used
+        subscribeRegex = /.*StateManager\.getInstance\(\)\.subscribe.*/gm;
+        if (code.match(subscribeRegex)) {
+          errors.push(
+            `The component ${className} should use this.subscribe() instead of StateManager.getInstance().subscribe().`
+          );
+        }
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+
+  it('Components should use this.unsubscribe() method instead of stateManager.unsubscribe(), because the list of subscription should be keep up to date for automatic unsubscribtion if disconnected from the DOM', async () => {
+    const componentsPath = path.join(__dirname, 'components');
+    const tsFiles = getAllTypescriptFiles(componentsPath);
+
+    const errors: string[] = [];
+    for (const tsFile of tsFiles) {
+      const code = fs.readFileSync(tsFile, 'utf8');
+      const regex = /.*class (\w+) +extends +GirafeHTMLElement/gm;
+      const matches = code.matchAll(regex);
+      for (const match of matches) {
+        const className = match[1].trim();
+        // Check if this.stateManager.unsubscribe() is used
+        let subscribeRegex = /.*this\.stateManager\.unsubscribe.*/gm;
+        if (code.match(subscribeRegex)) {
+          errors.push(
+            `The component ${className} should use this.unsubscribe() instead of this.stateManager.unsubscribe().`
+          );
+        }
+        // Check if StateManager.getInstance().unsubscribe() is used
+        subscribeRegex = /.*StateManager\.getInstance\(\)\.unsubscribe.*/gm;
+        if (code.match(subscribeRegex)) {
+          errors.push(
+            `The component ${className} should use this.unsubscribe() instead of StateManager.getInstance().unsubscribe().`
+          );
+        }
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+
+  it('HTML templates should use relative path for icons, not absolute ones.', async () => {
+    const parentPath = path.join(__dirname, '..'); // include parent path for index and mobile tempaltes
+    const htmlFiles = getAllHtmlFiles(parentPath);
+
+    const errors: string[] = [];
+    for (const htmlFile of htmlFiles) {
+      const code = fs.readFileSync(htmlFile, 'utf8');
+      const regex = /.*<img.*src="\/icons\//gm;
+      if (code.match(regex)) {
+        errors.push(`The template ${htmlFile} should use relative path for icons.`);
       }
     }
 

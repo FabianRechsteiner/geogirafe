@@ -214,7 +214,7 @@ export default class LidarPanelComponent extends GirafeHTMLElement {
     this.state.selection.enabled = true;
     this.isVisibleComponentSetup = false;
     this.drawLine.setActive(false);
-    this.stateManager.unsubscribe(this.eventsCallbacks);
+    this.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
     this.lidarInterface?.clearProfile();
     this.renderEmpty();
@@ -236,7 +236,7 @@ export default class LidarPanelComponent extends GirafeHTMLElement {
   }
 
   private registerVisibilityEvents() {
-    this.stateManager.subscribe('interface.lidarPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
+    this.subscribe('interface.lidarPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
   private async togglePanel(visible: boolean): Promise<void> {
@@ -250,7 +250,7 @@ export default class LidarPanelComponent extends GirafeHTMLElement {
    */
   private registerEvents() {
     this.eventsCallbacks.push(
-      this.stateManager.subscribe('lidar.line', (oldVal, newVal) => {
+      this.subscribe('lidar.line', (oldVal, newVal) => {
         if (oldVal === newVal) {
           return;
         }
@@ -261,7 +261,7 @@ export default class LidarPanelComponent extends GirafeHTMLElement {
       })
     );
     this.eventsCallbacks.push(
-      this.stateManager.subscribe('lidar.drawActive', (oldVal, newVal) => {
+      this.subscribe('lidar.drawActive', (oldVal, newVal) => {
         if (oldVal === null || oldVal === newVal) {
           return;
         }

@@ -33,9 +33,7 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('interface.aboutVisible', (_oldValue: boolean, newValue: boolean) =>
-      this.toggleAbout(newValue)
-    );
+    this.subscribe('interface.aboutVisible', (_oldValue: boolean, newValue: boolean) => this.toggleAbout(newValue));
   }
 
   toggleAbout(visible: boolean) {

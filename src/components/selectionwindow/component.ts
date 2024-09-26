@@ -30,9 +30,9 @@ class SelectionWindowComponent extends GirafeDraggableElement {
 
   private readonly eventsCallbacks: Callback[] = [];
   private isVisibleComponentSetup = false;
-  private debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
+  private readonly debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
   private resizeWindow: ResizeWindow | null = null;
-  private featureToGridData = new FeatureToGridDataById({ removeEmptyColumns: false });
+  private readonly featureToGridData = new FeatureToGridDataById({ removeEmptyColumns: false });
   private windowFeatures: WindowFeature[] = [];
   visible = false;
   focusedIndex = 0;
@@ -145,7 +145,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   private renderComponentEmpty() {
     this.resizeWindow?.destroy();
     this.resizeWindow = null;
-    this.stateManager.unsubscribe(this.eventsCallbacks);
+    this.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
     this.isVisibleComponentSetup = false;
     this.renderEmpty();
@@ -156,9 +156,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * @private
    */
   private registerVisibilityEvents() {
-    this.stateManager.subscribe('interface.selectionComponentVisible', (_oldValue, newValue) =>
-      this.togglePanel(newValue)
-    );
+    this.subscribe('interface.selectionComponentVisible', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
   /**
@@ -167,7 +165,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    */
   private registerEvents() {
     this.eventsCallbacks.push(
-      this.stateManager.subscribe('selection.selectedFeatures', (_oldFeatures, newFeatures) => {
+      this.subscribe('selection.selectedFeatures', (_oldFeatures, newFeatures) => {
         // Use debounce to avoid quicly closing the grid on selection change.
         this.debounceOnFeaturesSelected(newFeatures);
       })

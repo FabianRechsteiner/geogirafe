@@ -12,7 +12,7 @@ class InfoboxComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('infobox.elements', () => super.render());
+    this.subscribe('infobox.elements', () => super.render());
   }
 
   closeMessage(info: InfoBoxContent) {
