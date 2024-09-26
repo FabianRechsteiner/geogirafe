@@ -16,6 +16,7 @@ export type LayerWmtsOptions = {
   style?: string;
   wmsLayers?: string;
   queryLayers?: string;
+  ogcServer?: string;
   printLayers?: string;
   minResolution?: number;
   maxResolution?: number;
@@ -98,7 +99,6 @@ class LayerWmts extends Layer implements ILayerWithLegend {
       dimensions: this.dimensions,
       imageType: this.imageType,
       style: this.style,
-      ogcServer: this.ogcServer,
       queryLayers: this.queryLayers,
       wmsLayers: this.wmsLayers,
       printLayers: this.printLayers,
@@ -110,7 +110,7 @@ class LayerWmts extends Layer implements ILayerWithLegend {
       wasLegendExpanded: this.wasLegendExpanded,
       hiDPILegendImages: this.hiDPILegendImages
     };
-    const clonedObject = new LayerWmts(this.id, this.name, this.order, this.url, this.layer, options);
+    const clonedObject = new LayerWmts(this.id, this.name, this.order, this.url, this.layer, options, this.ogcServer);
     clonedObject.activeState = this.activeState;
     return clonedObject;
   }
@@ -137,6 +137,7 @@ class LayerWmts extends Layer implements ILayerWithLegend {
       imageType: options.imageType,
       style: options.style,
       wmsLayers: options.metadata?.wmsLayers,
+      ogcServer: options.metadata?.ogcServer,
       queryLayers: options.metadata?.queryLayers,
       printLayers: options.metadata?.printLayers,
       minResolution: options.minResolutionHint,
