@@ -6,7 +6,11 @@
 <div id="container">
   <header>
     <!-- Spacer -->
-    <div class="gg-spacer gg-small"></div>
+    <img
+      class="${this.layer.protected ? 'gg-image-small gg-opacity' : 'hidden'}"
+      alt="Protected layer"
+      src="icons/protected.svg" />
+    <div class="${this.layer.protected ? 'hidden' : 'gg-spacer gg-small'}"></div>
 
     <!-- Checkbox -->
     <button

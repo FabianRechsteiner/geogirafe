@@ -6,6 +6,7 @@ type LayerVectorTilesOptions = {
   disclaimer?: string;
   metadataUrl?: string;
   opacity?: number;
+  protected?: boolean;
 };
 
 class LayerVectorTiles extends Layer {
@@ -41,7 +42,8 @@ class LayerVectorTiles extends Layer {
       isDefaultChecked: this.isDefaultChecked,
       metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
-      opacity: this.opacity
+      opacity: this.opacity,
+      protected: this.protected
     };
     const clonedObject = new LayerVectorTiles(this.id, this.name, this.order, this.style, this.source, options);
     clonedObject.activeState = this.activeState;

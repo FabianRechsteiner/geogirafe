@@ -6,6 +6,7 @@ type LayerOptions = {
   disclaimer?: string;
   metadataUrl?: string;
   opacity?: number;
+  protected?: boolean;
 };
 
 abstract class Layer extends BaseLayer {
@@ -19,6 +20,7 @@ abstract class Layer extends BaseLayer {
 
   public activeState: 'on' | 'off' = 'off';
   public opacity: number;
+  public protected: boolean;
   public swiped: 'left' | 'right' | 'no' = 'no';
 
   declare parent: GroupLayer;
@@ -26,6 +28,7 @@ abstract class Layer extends BaseLayer {
   constructor(id: number, name: string, order: number, options?: LayerOptions) {
     super(id, name, order, options);
     this.opacity = options?.opacity ?? 1;
+    this.protected = options?.protected ?? false;
   }
 
   get isTransparent() {
