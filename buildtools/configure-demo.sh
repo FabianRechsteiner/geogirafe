@@ -20,7 +20,18 @@ then
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/en.json" --silent --output $MOCKDIR/en.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
-
+elif [ "$1" = 'experimental' ];
+then
+    echo "Preparing environment EXPERIMENTAL..."
+    cp demo/config.$1.json $APPDIR/config.json
+    cp demo/de.json $APPDIR/de.json
+    cp demo/fr.json $APPDIR/fr.json
+    cp demo/en.json $APPDIR/en.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/themes?background=background&interface=experimental" --silent --output $MOCKDIR/themes.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/de.json" --silent --output $MOCKDIR/de.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/en.json" --silent --output $MOCKDIR/en.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
+    curl "https://geomapfish-demo-2-9.camptocamp.com/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 elif [ "$1" = 'cartolacote' ];
 then
     echo "Preparing environment CARTOLACOTE..."
@@ -127,7 +138,7 @@ then
 
 else
     echo "Usage: ./configure-demo <environment>"
-    echo "Possible environments: ['c2c', 'cartolacote', 'cartoriviera', 'cjl', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
+    echo "Possible environments: ['c2c', 'experimental', 'cartolacote', 'cartoriviera', 'cjl', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
     echo "Usage example: ./configure-demo mapbs"
     echo "Usage example with npm: npm run configure-demo mapbs"
 
