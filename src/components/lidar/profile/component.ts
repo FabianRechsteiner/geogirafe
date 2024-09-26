@@ -34,7 +34,7 @@ export default class LidarProfileComponent extends GirafeResizableElement {
   }
 
   private registerVisibilityEvents() {
-    this.stateManager.subscribe('lidar.line', (_oldValue, newValue) => this.togglePanel(newValue));
+    this.subscribe('lidar.line', (_oldValue, newValue) => this.togglePanel(newValue));
   }
 
   private async togglePanel(line: OlGeomLineString): Promise<void> {

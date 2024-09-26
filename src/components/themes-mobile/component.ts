@@ -86,11 +86,11 @@ class MobileThemeComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('themes', () => {
+    this.subscribe('themes', () => {
       super.render();
       super.girafeTranslate();
     });
-    this.stateManager.subscribe('layers.layersList', () => {
+    this.subscribe('layers.layersList', () => {
       for (const layer of this.state.layers.layersList) {
         LayerManager.getInstance().activateIfDefaultChecked(layer);
       }
@@ -98,10 +98,8 @@ class MobileThemeComponent extends GirafeHTMLElement {
       super.girafeTranslate();
     });
 
-    this.stateManager.subscribe(
-      'basemaps',
-      (_oldBasemaps: { [key: number]: Basemap }, newBasemaps: { [key: number]: Basemap }) =>
-        this.onBasemapsLoaded(newBasemaps)
+    this.subscribe('basemaps', (_oldBasemaps: { [key: number]: Basemap }, newBasemaps: { [key: number]: Basemap }) =>
+      this.onBasemapsLoaded(newBasemaps)
     );
   }
 

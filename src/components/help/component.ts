@@ -39,10 +39,8 @@ class HelpComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('interface.helpVisible', (_oldValue: boolean, newValue: boolean) =>
-      this.toggleHelp(newValue)
-    );
-    this.stateManager.subscribe('interface.darkFrontendMode', (_oldValue: boolean, newValue: boolean) => {
+    this.subscribe('interface.helpVisible', (_oldValue: boolean, newValue: boolean) => this.toggleHelp(newValue));
+    this.subscribe('interface.darkFrontendMode', (_oldValue: boolean, newValue: boolean) => {
       this.darkFrontendMode = newValue;
     });
     this.content.addEventListener('click', () => {

@@ -12,7 +12,7 @@ class ThemeComponent extends GirafeHTMLElement {
   newIcon: string = NewIcon;
 
   private readonly mapManager: MapManager;
-  private customThemesManager = new CustomThemesManager();
+  private readonly customThemesManager = new CustomThemesManager();
   public menuOpen: boolean = false;
 
   public get customThemes() {
@@ -25,8 +25,8 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('loading', () => super.render());
-    this.stateManager.subscribe('themes.isLoaded', () => {
+    this.subscribe('loading', () => super.render());
+    this.subscribe('themes.isLoaded', () => {
       if (this.state.themes.isLoaded) {
         this.customThemesManager.loadCustomThemes();
         super.render();

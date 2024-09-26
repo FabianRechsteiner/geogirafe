@@ -32,9 +32,7 @@ class ShareComponent extends GirafeDraggableElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('interface.shareVisible', (_oldValue: boolean, newValue: boolean) =>
-      this.togglePopup(newValue)
-    );
+    this.subscribe('interface.shareVisible', (_oldValue: boolean, newValue: boolean) => this.togglePopup(newValue));
   }
 
   initializeShortenerService() {

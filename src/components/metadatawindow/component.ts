@@ -11,11 +11,11 @@ class MetadataWindowComponent extends GirafeDraggableElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('interface.metadataVisible', (_oldValue: boolean, newValue: boolean) =>
+    this.subscribe('interface.metadataVisible', (_oldValue: boolean, newValue: boolean) =>
       this.toggleMetadata(newValue)
     );
 
-    this.stateManager.subscribe(/metadata.*/, () => this.render());
+    this.subscribe(/metadata.*/, () => this.render());
   }
 
   render() {

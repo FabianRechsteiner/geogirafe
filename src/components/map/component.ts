@@ -118,55 +118,44 @@ export default class MapComponent extends GirafeHTMLElement {
       this.resetAllSwipedLayers(this.state.layers.layersList);
     };
 
-    this.stateManager.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) =>
-      this.onChangeBasemap(newBasemap)
-    );
-    this.stateManager.subscribe('projection', (oldProjection: string, newProjection: string) =>
+    this.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) => this.onChangeBasemap(newBasemap));
+    this.subscribe('projection', (oldProjection: string, newProjection: string) =>
       this.onChangeProjection(oldProjection, newProjection)
     );
-    this.stateManager.subscribe('interface.darkMapMode', (_oldValue: boolean, _newValue: boolean) =>
-      this.onChangeDarkMode()
-    );
-    this.stateManager.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
+    this.subscribe('interface.darkMapMode', (_oldValue: boolean, _newValue: boolean) => this.onChangeDarkMode());
+    this.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
       this.onPositionChanged(newPosition)
     );
-    this.stateManager.subscribe('position.scale', (_oldScale: number, newScale: number) =>
-      this.onChangeScale(newScale)
-    );
-    this.stateManager.subscribe('position.resolution', (_oldResolution: number, newResolution: number) =>
+    this.subscribe('position.scale', (_oldScale: number, newScale: number) => this.onChangeScale(newScale));
+    this.subscribe('position.resolution', (_oldResolution: number, newResolution: number) =>
       this.zoomToResolution(newResolution)
     );
-    this.stateManager.subscribe('position.zoom', (_oldZoom: number, newZoom: number) => this.zoomToZoom(newZoom));
-    this.stateManager.subscribe('position.center', (_oldCenter: Coordinate, newCenter: Coordinate) =>
+    this.subscribe('position.zoom', (_oldZoom: number, newZoom: number) => this.zoomToZoom(newZoom));
+    this.subscribe('position.center', (_oldCenter: Coordinate, newCenter: Coordinate) =>
       this.panToCoordinate(newCenter)
     );
-    this.stateManager.subscribe('selection.selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) =>
+    this.subscribe('selection.selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) =>
       this.onFeaturesSelected(newFeatures)
     );
-    this.stateManager.subscribe(
-      'selection.focusedFeatures',
-      (_oldFeature: Feature[] | null, newFeature: Feature[] | null) => this.focusFeature.setFocusedFeatures(newFeature)
+    this.subscribe('selection.focusedFeatures', (_oldFeature: Feature[] | null, newFeature: Feature[] | null) =>
+      this.focusFeature.setFocusedFeatures(newFeature)
     );
 
-    this.stateManager.subscribe('globe.display', () => this.onGlobeToggled());
+    this.subscribe('globe.display', () => this.onGlobeToggled());
 
-    this.stateManager.subscribe(
-      /layers\.layersList\..*\.activeState/,
-      (_oldActive: boolean, _newActive: boolean, layer: Layer) => this.onLayerToggled(layer)
+    this.subscribe(/layers\.layersList\..*\.activeState/, (_oldActive: boolean, _newActive: boolean, layer: Layer) =>
+      this.onLayerToggled(layer)
     );
-    this.stateManager.subscribe(
-      /layers\.layersList\..*\.opacity/,
-      (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeOpacity(layer)
+    this.subscribe(/layers\.layersList\..*\.opacity/, (_oldOpacity: number, _newOpacity: number, layer: Layer) =>
+      this.onChangeOpacity(layer)
     );
-    this.stateManager.subscribe(
-      /layers\.layersList\..*\.swiped/,
-      (_oldOpacity: number, _newOpacity: number, layer: Layer) => this.onChangeSwiped(layer)
+    this.subscribe(/layers\.layersList\..*\.swiped/, (_oldOpacity: number, _newOpacity: number, layer: Layer) =>
+      this.onChangeSwiped(layer)
     );
-    this.stateManager.subscribe(
-      /layers\.layersList\..*\.filter/,
-      (_oldFilter: string, _newFilter: string, layer: Layer) => this.onChangeFilter(layer)
+    this.subscribe(/layers\.layersList\..*\.filter/, (_oldFilter: string, _newFilter: string, layer: Layer) =>
+      this.onChangeFilter(layer)
     );
-    this.stateManager.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder());
+    this.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder());
   }
 
   render() {

@@ -21,7 +21,7 @@ class NavHelperComponent extends GirafeHTMLElement {
   iconTrash: string = IconTrash;
 
   #tooltip: TippyType;
-  #positionHistory: MapPosition[] = [];
+  readonly #positionHistory: MapPosition[] = [];
   #currentPositionIndex: number = -1;
 
   bookmarks: Bookmark[] = [];
@@ -124,7 +124,7 @@ class NavHelperComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
+    this.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
       this.onPositionChanged(newPosition)
     );
   }

@@ -13,7 +13,7 @@ class LayerManager extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
 
-  private layerClones: BaseLayer[] = [];
+  private readonly layerClones: BaseLayer[] = [];
 
   get state() {
     return this.stateManager.state;
@@ -84,7 +84,7 @@ class LayerManager extends GirafeSingleton {
   }
 
   toggle(layer: BaseLayer, state: 'on' | 'off') {
-    if (layer instanceof GroupLayer) {
+    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       this.toggleGroupOrTheme(layer, state);
     } else if (layer instanceof Layer) {
       this.toggleLayer(layer, state);

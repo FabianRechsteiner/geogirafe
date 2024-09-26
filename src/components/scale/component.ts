@@ -15,7 +15,7 @@ class ScaleComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('position', () => this.onScaleChanged());
+    this.subscribe('position', () => this.onScaleChanged());
   }
 
   onScaleChanged() {

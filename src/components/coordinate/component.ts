@@ -26,7 +26,7 @@ class CoordinateComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe('mouseCoordinates', (_oldCoordinates: number[], newCoordinates: number[]) =>
+    this.subscribe('mouseCoordinates', (_oldCoordinates: number[], newCoordinates: number[]) =>
       this.onChangeCoordinates(newCoordinates)
     );
   }

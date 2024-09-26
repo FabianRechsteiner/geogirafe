@@ -46,10 +46,8 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.stateManager.subscribe(
-      'basemaps',
-      (_oldBasemaps: { [key: number]: Basemap }, newBasemaps: { [key: number]: Basemap }) =>
-        this.onBasemapsLoaded(newBasemaps)
+    this.subscribe('basemaps', (_oldBasemaps: { [key: number]: Basemap }, newBasemaps: { [key: number]: Basemap }) =>
+      this.onBasemapsLoaded(newBasemaps)
     );
   }
 
