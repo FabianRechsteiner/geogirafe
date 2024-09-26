@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z"/></svg>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <mask id="mask0_136_6952" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+  <rect width="24" height="24" fill="#D9D9D9"/>
+  </mask>
+  <g mask="url(#mask0_136_6952)">
+  <path d="M10.5 16.3C10.3667 16.3 10.25 16.2542 10.15 16.1625C10.05 16.0708 10 15.95 10 15.8V8.20001C10 8.05001 10.05 7.92918 10.15 7.83751C10.25 7.74585 10.3667 7.70001 10.5 7.70001C10.5333 7.70001 10.65 7.75001 10.85 7.85001L14.475 11.475C14.5583 11.5583 14.6167 11.6417 14.65 11.725C14.6833 11.8083 14.7 11.9 14.7 12C14.7 12.1 14.6833 12.1917 14.65 12.275C14.6167 12.3583 14.5583 12.4417 14.475 12.525L10.85 16.15C10.8 16.2 10.7458 16.2375 10.6875 16.2625C10.6292 16.2875 10.5667 16.3 10.5 16.3Z" fill="#1C1B1F"/>
+  </g>
+</svg>
+  

@@ -6,6 +6,7 @@ type LayerCogTilesOptions = {
   disclaimer?: string;
   metadataUrl?: string;
   opacity?: number;
+  protected?: boolean;
 };
 
 class LayerCog extends Layer {
@@ -31,7 +32,8 @@ class LayerCog extends Layer {
       isDefaultChecked: this.isDefaultChecked,
       metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
-      opacity: this.opacity
+      opacity: this.opacity,
+      protected: this.protected
     };
     const clonedObject = new LayerCog(this.id, this.name, this.order, this.source, options);
     clonedObject.activeState = this.activeState;
@@ -47,7 +49,8 @@ class LayerCog extends Layer {
       isDefaultChecked: options.metadata?.isChecked,
       metadataUrl: options.metadata?.metadataUrl,
       disclaimer: options.metadata?.disclaimer,
-      opacity: 1 // TODO REG : Set default opacity
+      opacity: 1, // TODO REG : Set default opacity
+      protected: options.metadata?.protected
     };
   }
 }

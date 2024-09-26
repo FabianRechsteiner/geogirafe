@@ -20,6 +20,7 @@ export interface GMFMetadata {
   queryLayers?: string;
   wmsLayers?: string;
   printNativeAngle?: boolean;
+  protected?: boolean;
 }
 
 export interface GMFChildLayer {

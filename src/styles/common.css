@@ -72,8 +72,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.gg-image-small {
+  min-width: 1rem;
+  padding-left: 0.2rem;
+  width: 0.8rem;
+}
 .gg-check {
-  padding: 0.2rem;
+  padding: 0.3rem;
 }
 .gg-label {
   text-align: left;
@@ -85,6 +90,7 @@
 }
 .gg-spacer {
   padding: 0;
+  min-width: 1.2rem;
 }
 .gg-opacity {
   opacity: 0.5;
@@ -105,6 +111,12 @@
   text-align: center;
   padding: 0.3rem;
   color: var(--text-color);
+}
+.gg-caret {
+  padding: 0.2rem;
+  padding-left: 0.5rem;
+  min-width: 1.5rem;
+  width: 1.5rem;
 }
 
 /* TODO REG : Suppress all the following styles when the migration is done. */
