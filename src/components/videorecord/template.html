@@ -1,15 +1,11 @@
 <button
-  class="${this.status === 'downloaded' ? 'gg-button gg-medium' : 'hidden'}"
+  class="${this.status === 'downloaded' ? 'gg-button gg-big' : 'hidden'}"
   onclick="${() => this.startRecording()}">
   <img alt="help-icon" src="icons/video-record.svg" />
 </button>
-<button
-  class="${this.status === 'recording' ? 'gg-button gg-medium' : 'hidden'}"
-  onclick="${() => this.stopRecording()}">
+<button class="${this.status === 'recording' ? 'gg-button gg-big' : 'hidden'}" onclick="${() => this.stopRecording()}">
   <img alt="help-icon" src="icons/video-stop.svg" />
 </button>
-<button
-  class="${this.status === 'recorded' ? 'gg-button gg-medium' : 'hidden'}"
-  onclick="${() => this.downloadRecord()}">
+<button class="${this.status === 'recorded' ? 'gg-button gg-big' : 'hidden'}" onclick="${() => this.downloadRecord()}">
   <img alt="help-icon" src="icons/video-download.svg" />
 </button>

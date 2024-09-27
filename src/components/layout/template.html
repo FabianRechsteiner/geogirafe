@@ -1,26 +1,17 @@
 <girafe-menu-button open="left">
-  <button slot="menu-button" class="gg-button gg-medium">
+  <button slot="menu-button" class="gg-button gg-big">
     <img alt="menu-icon" src="${this.currentLayoutIcon}" />
   </button>
 
-  <button
-    slot="menu-content"
-    class="gg-button gg-medium gg-withtext"
-    onclick="${() => this.state.globe.display='none'}">
+  <button slot="menu-content" class="gg-button gg-big-withtext" onclick="${() => this.state.globe.display='none'}">
     <img alt="help-icon" src="icons/layout-2d.svg" />
     <span>2D</span>
   </button>
-  <button
-    slot="menu-content"
-    class="gg-button gg-medium gg-withtext"
-    onclick="${() => this.state.globe.display='side'}">
+  <button slot="menu-content" class="gg-button gg-big-withtext" onclick="${() => this.state.globe.display='side'}">
     <img alt="help-icon" src="icons/layout-mix.svg" />
     <span>Mix</span>
   </button>
-  <button
-    slot="menu-content"
-    class="gg-button gg-medium gg-withtext"
-    onclick="${() => this.state.globe.display='full'}">
+  <button slot="menu-content" class="gg-button gg-big-withtext" onclick="${() => this.state.globe.display='full'}">
     <img alt="help-icon" src="icons/layout-3d.svg" />
     <span>3D</span>
   </button>

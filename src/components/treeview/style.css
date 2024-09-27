@@ -2,14 +2,11 @@ header {
   border-top: solid 1px #ddd;
   display: flex;
   align-items: center;
+  height: 2rem;
 }
 
 .tool {
   display: none !important;
-  padding-left: 0rem !important;
-  padding-right: 0rem !important;
-  min-width: 0 !important;
-  max-width: 1.5rem !important;
 }
 
 header:hover .tool {
@@ -33,7 +30,7 @@ header:hover .tool {
 }
 
 .children {
-  padding-left: 1.6rem;
+  padding-left: 1.3rem;
   flex-basis: 100%;
   order: 10;
 }

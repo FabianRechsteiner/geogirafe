@@ -50,7 +50,7 @@ button.delete {
   right: 0;
 }
 
-button > span {
+.themes > button > span {
   display: inline-block;
   width: 9rem;
   overflow: hidden;

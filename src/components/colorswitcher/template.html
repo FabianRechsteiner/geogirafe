@@ -1,17 +1,17 @@
 <button
-  class="${!this.state.interface.darkFrontendMode ? 'gg-button gg-medium' : 'hidden'}"
+  class="${!this.state.interface.darkFrontendMode ? 'gg-button gg-big' : 'hidden'}"
   onclick="${() => this.state.interface.darkFrontendMode = true}">
   <img alt="menu-icon" src="icons/theme-dark.svg" />
 </button>
 
 <button
-  class="${(this.state.interface.darkFrontendMode && !this.state.interface.darkMapMode) ? 'gg-button gg-medium' : 'hidden'}"
+  class="${(this.state.interface.darkFrontendMode && !this.state.interface.darkMapMode) ? 'gg-button gg-big' : 'hidden'}"
   onclick="${() => this.state.interface.darkMapMode = true}">
   <img alt="menu-icon" src="icons/theme-dark-map.svg" />
 </button>
 
 <button
-  class="${(this.state.interface.darkFrontendMode && this.state.interface.darkMapMode) ? 'gg-button gg-medium' : 'hidden'}"
+  class="${(this.state.interface.darkFrontendMode && this.state.interface.darkMapMode) ? 'gg-button gg-big' : 'hidden'}"
   onclick="${() => this.state.interface.darkFrontendMode = this.state.interface.darkMapMode = false}">
   <img alt="menu-icon" src="icons/theme-light.svg" />
 </button>
