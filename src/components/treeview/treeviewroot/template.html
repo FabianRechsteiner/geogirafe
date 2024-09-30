@@ -10,7 +10,7 @@
       tip="Expand / Collapse all"
       tip-placement="top"
       onclick="${() => this.expandAll()}">
-      <img class="${this.isAllExpanded ? '' : 'hidden'}" alt="Collapse all icon" src="icons/expand.svg" />
+      <img class="${this.isAllExpanded ? '' : 'hidden'}" alt="Collapse all icon" src="icons/collapse-all.svg" />
       <img class="${this.isAllExpanded ? 'hidden' : ''}" alt="Expand all icon" src="icons/expand-all.svg" />
     </button>
 
@@ -19,11 +19,7 @@
       tip="Toggle all legends"
       tip-placement="top"
       onclick="${() => this.toggleAllLegends()}">
-      <img class="${this.areAllLegendExpanded ? '' : 'hidden'}" alt="Toggle all legends icon" src="icons/legend.svg" />
-      <img
-        class="${this.areAllLegendExpanded ? 'hidden' : 'rotate90'}"
-        alt="Toggle all legends icon"
-        src="icons/legend.svg" />
+      <img alt="Toggle all legends icon" src="icons/legend.svg" />
     </button>
 
     <button class="gg-button gg-medium" tip="Remove all layers" tip-placement="top" onclick="${() => this.removeAll()}">

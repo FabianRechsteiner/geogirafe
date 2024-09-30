@@ -7,7 +7,7 @@ import { xmlNumberTypesStrList, xmlStringTypesStrList } from '../../models/xmlTy
 
 class QueryBuilderComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['./style.css', '../../styles/common.css'];
 
   loading: boolean = true;
   deactivated: boolean = false;

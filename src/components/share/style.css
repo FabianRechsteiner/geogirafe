@@ -18,10 +18,6 @@
   text-align: center;
 }
 
-.hidden {
-  display: none;
-}
-
 #close {
   cursor: pointer;
   float: right;
@@ -34,20 +30,6 @@
 .link {
   display: flex;
   height: 2.3rem;
-}
-
-.link button {
-  border: none;
-  border-right: solid 1px var(--bkg-color);
-  width: 2.3rem;
-  height: 2.3rem;
-  line-height: 2.3rem;
-  background-color: var(--bkg-color-grad2);
-  color: var(--text-color);
-  padding: 0;
-  cursor: pointer;
-  margin: 0;
-  display: inline-block;
 }
 
 .qrcode {

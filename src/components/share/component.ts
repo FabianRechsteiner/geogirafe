@@ -10,7 +10,7 @@ import GmfManager from './tools/gmfmanager';
 
 class ShareComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['./style.css', '../../styles/common.css'];
 
   loading = true;
 

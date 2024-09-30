@@ -90,11 +90,11 @@ export default class SelectionTabulatorManager {
       headerSortElement: function (_, dir) {
         switch (dir) {
           case 'asc':
-            return "<i class='fas fa-sort-up'>";
+            return '<img alt="sort-up-icon" src="icons/sort-up.svg" />';
           case 'desc':
-            return "<i class='fas fa-sort-down'>";
+            return '<img alt="sort-down-icon" src="icons/sort-down.svg" />';
           default:
-            return "<i class='fas fa-sort'>";
+            return '<img alt="sort-icon" src="icons/sort.svg" />';
         }
       }
     });

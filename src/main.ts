@@ -66,6 +66,7 @@ declare global {
       offlineManager: OfflineManager;
       oauthManager: AbstractOauthManager;
       themesManager: ThemesManager;
+      configManager: ConfigManager;
     };
   }
   interface Window {
@@ -114,7 +115,8 @@ try {
         shareManager: ShareManager.getInstance(),
         offlineManager: OfflineManager.getInstance(),
         oauthManager: OauthManager.getInstance(),
-        themesManager: ThemesManager.getInstance()
+        themesManager: ThemesManager.getInstance(),
+        configManager: ConfigManager.getInstance()
       };
 
       // Define components names

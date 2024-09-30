@@ -1,29 +1,23 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
-
 <div id="draggable">
   <div id="header">
     Share this map with a link
-    <div id="close">
-      <i class="fa-solid fa-xmark"></i>
-    </div>
+    <img id="close" alt="close-icon" src="icons/close.svg" />
   </div>
 
   <div id="content">
-    <div class="${(this.loading ? '' : 'hidden')}">
-      <i class="fa-4x fa-solid fa-circle-notch fa-spin loading"></i>
-    </div>
+    <img alt="loading-icon" src="icons/loading.svg" class="${(this.loading ? 'gg-spin' : 'hidden')}" />
 
     <div class="${(this.loading ? 'hidden' : '')}">
       <div class="link">
         <input id="link" type="text" value="${this.shareLink}" />
-        <button tip="Add bookmark" onclick="${() => this.copyToClipboard()}">
-          <i class="fa-sm fa-regular fa-copy"></i>
+        <button class="gg-button gg-medium" tip="Copy ShortUrl" onclick="${() => this.copyToClipboard()}">
+          <img alt="copy-icon" src="icons/copy.svg" />
         </button>
       </div>
 
       <img alt="share-qrcode" class="${(this.qrCode ? 'qrcode' : 'hidden')}" src="${this.qrCode}" />
       <div class="${(this.success ? 'hidden' : 'qrcode error')}">
-        <i class="fa-solid fa-circle-exclamation tool error"></i>
+        <img alt="error-icon" src="icons/error.svg" />
         Error, can not fetch the shortener service. Please try again later.
       </div>
 

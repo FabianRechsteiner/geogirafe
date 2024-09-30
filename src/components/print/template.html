@@ -1,11 +1,9 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
-
 <div id="panel">
   <div id="content">
     <div class="${this.getRenderState() === 'loading' ? '' : 'hidden'}">
       <div class="message">
         <div i18n="Connecting to the print server, please wait."></div>
-        <i class="fa-solid fa-3x fa-circle-notch fa-spin"></i>
+        <img alt="loading-icon" src="icons/loading.svg" class="gg-spin" />
       </div>
     </div>
 
@@ -130,10 +128,21 @@
         ${this.printList.map((printItem) => uHtml`
         <div id="${printItem.id}" class="print-item" title="${printItem.elementTitle}">
           <button class="cancel" tabindex="0" onclick="${() => this.onCancelPrintElementClicked(printItem.id)}">
-            <i class="fa-solid"></i>
+            <img alt="close-icon" src="icons/close.svg" />
           </button>
           <button class="container" tabindex="0" onclick="${() => this.onPrintElementClicked(printItem.id)}">
-            <i class="${this.getStatusClasses(printItem.status)}"></i>
+            <img
+              alt="loading-icon"
+              src="icons/loading.svg"
+              class="${printItem.status === PrintStatus.Started ? 'gg-spin' : 'hidden'}" />
+            <img
+              alt="loading-icon"
+              src="icons/download.svg"
+              class="${printItem.status === PrintStatus.Success ? '' : 'hidden'}" />
+            <img
+              alt="loading-icon"
+              src="icons/error.svg"
+              class="${printItem.status === PrintStatus.Errored ? '' : 'hidden'}" />
             <p>
               <span i18n="${printItem.selectedLayoutName}">${printItem.selectedLayoutName}</span>
               <span>(${printItem.selectedFormat.toUpperCase()})</span>
