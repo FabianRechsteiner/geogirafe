@@ -6,14 +6,26 @@
 <div id="panel">
   <div id="content">
     <div id="header">
-      ${this.getTabHeaders().map((th) => uHtml`
-      <button
-        id="${th.id}"
-        i18n="${th.text}"
-        class="${th.active ? 'tab active' : 'tab'}"
-        .active="${th.active}"
-        onclick="${() => this.displayGrid(th.id, true)}"></button>
-      `)}
+      <div class="tab-panel">
+        ${this.getTabHeaders().map((th) => uHtml`
+        <button
+          id="${th.id}"
+          i18n="${th.text}"
+          class="${th.active ? 'tab active' : 'tab'}"
+          .active="${th.active}"
+          onclick="${() => this.displayGrid(th.id, true)}"></button>
+        `)}
+      </div>
+      <div class="selection-panel">
+        <button class="selection-btn" onclick="${() => this.invertSelection()}" i18n="Invert selection"></button>
+        <button class="selection-btn" onclick="${() => this.selectNone()}" i18n="Select none"></button>
+        <button class="selection-btn" onclick="${() => this.selectAll()}" i18n="Select all"></button>
+        <button
+          ?hidden="${!this.showCsvButton}"
+          class="selection-btn"
+          onclick="${() => this.generateCSV()}"
+          i18n="Generate CSV"></button>
+      </div>
     </div>
     <div id="tabulator"></div>
   </div>

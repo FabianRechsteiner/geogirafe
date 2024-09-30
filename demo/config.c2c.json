@@ -75,6 +75,7 @@
     "url": "https://sitn.ne.ch/pytree"
   },
   "csv": {
-    "separator": ";"
+    "separator": ";",
+    "quote": "\""
   }
 }

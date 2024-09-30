@@ -9,6 +9,7 @@ import { getValidIndex } from '../../tools/utils/utils';
 import IconCenter from './images/center.svg';
 import ResizeWindow from '../../tools/resizewindow';
 import DOMPurify from 'dompurify';
+import CsvManager from '../../tools/export/csvmanager';
 
 /**
  * Represents a Feature displayed in the SelectionWindowComponent.
@@ -17,6 +18,11 @@ interface WindowFeature {
   id: string;
   feature: OlFeature;
   notOlProperties: Record<string, unknown>;
+}
+
+interface Layer {
+  id: string;
+  label: string;
 }
 
 /**
@@ -38,7 +44,9 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   focusedIndex = 0;
   maxIndex = 0;
   iconCenter = IconCenter;
+  csvManager = CsvManager.getInstance();
   displayedProperties: [string, unknown][] = [];
+  showDropdown = false;
 
   constructor() {
     super('selectionwindow');
@@ -74,6 +82,67 @@ class SelectionWindowComponent extends GirafeDraggableElement {
       return;
     }
     this.state.position.center = getCenter(extent);
+  }
+
+  /**
+   * Toggles the visibility of the layers dropdown.
+   */
+  openDropdown() {
+    this.showDropdown = !this.showDropdown;
+    this.render();
+  }
+
+  /**
+   * Gets the list of layers to export.
+   * @returns The list of layers to export.
+   */
+  getLayersList() {
+    const layers: Layer[] = [];
+    this.windowFeatures.forEach((feature) => {
+      if (!layers.some((layer) => layer.id === feature.id)) {
+        const label = `Export ${feature.id}`;
+        layers.push({ id: feature.id, label });
+      }
+    });
+    return layers;
+  }
+
+  /**
+   * Generates a CSV file with the properties of the currently focused feature.
+   * @param layer The layer to export.
+   */
+  generateCSV(layer: string) {
+    // Only data from the selected layer
+    const data: Record<string, unknown>[] = [];
+    this.windowFeatures.forEach((feature) => {
+      if (feature.id === layer) {
+        data.push(feature.notOlProperties);
+      }
+    });
+
+    // Ignore undefined values
+    data.forEach((entry) => this.ignoreUndefinedValues(entry));
+
+    // Get the columns
+    const columns = Object.keys(data[0]).map((column) => {
+      return { name: column };
+    });
+
+    this.csvManager.startDownload(data, columns, 'query-results.csv');
+
+    this.showDropdown = false;
+    this.render();
+  }
+
+  /**
+   * Ignores undefined values in the data.
+   */
+  ignoreUndefinedValues(data: Record<string, unknown>) {
+    Object.keys(data).forEach((key) => {
+      if (data[key] === undefined) {
+        delete data[key];
+      }
+    });
   }
 
   /**
