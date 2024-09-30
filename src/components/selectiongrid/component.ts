@@ -3,6 +3,7 @@ import type { Callback } from '../../tools/state/statemanager';
 import type OlFeature from 'ol/Feature';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionTabulatorManager, { type TabHeader } from './tools/selectiontabulatormanager';
+import CsvManager from '../../tools/export/csvmanager';
 
 /**
  * Represents a selection grid component based on GridJs.
@@ -16,12 +17,21 @@ class SelectionGridComponent extends GirafeResizableElement {
 
   private readonly eventsCallbacks: Callback[] = [];
   private readonly selectionTabulatorManager = new SelectionTabulatorManager();
+  private readonly csvManager: CsvManager;
   private isVisibleComponentSetup = false;
   private readonly debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
   visible = false;
+  currentTabId: string = '';
+  showCsvButton = false;
 
   constructor() {
     super('selectiongrid');
+    this.csvManager = CsvManager.getInstance();
+
+    this.subscribe('selection.gridSelected', (_oldValue: boolean, newValue: boolean) => {
+      this.showCsvButton = newValue;
+      this.render();
+    });
   }
 
   connectedCallback() {
@@ -54,6 +64,7 @@ class SelectionGridComponent extends GirafeResizableElement {
     this.selectionTabulatorManager.activateTab(id);
     this.render();
     this.selectionTabulatorManager.displayGrid(id);
+    this.currentTabId = id;
   }
 
   /**
@@ -63,6 +74,41 @@ class SelectionGridComponent extends GirafeResizableElement {
     this.state.interface.selectionComponentVisible = false;
     this.state.selection.selectedFeatures = [];
     super.clean();
+  }
+
+  /**
+   * Selects all rows in the grid.
+   */
+  selectAll() {
+    this.selectionTabulatorManager.table?.selectRow();
+  }
+
+  /**
+   * Deselects all rows in the grid.
+   */
+  selectNone() {
+    this.selectionTabulatorManager.table?.deselectRow();
+  }
+
+  /**
+   * Inverts the selection of all rows in the grid.
+   */
+  invertSelection() {
+    console.log('TODO: invertSelection');
+  }
+
+  generateCSV() {
+    const columns = this.selectionTabulatorManager.data[this.currentTabId].columns.map((column) => {
+      return { name: column };
+    });
+    const excludedColumns = ['geom', 'the_geom', 'geometry'];
+    const filteredColumns = columns.filter((column) => !excludedColumns.includes(column.name));
+
+    this.csvManager.startDownload(
+      this.selectionTabulatorManager.table?.getSelectedData() ?? [],
+      filteredColumns,
+      'query-results.csv'
+    );
   }
 
   /**

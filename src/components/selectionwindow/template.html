@@ -49,6 +49,20 @@
       <button onclick="${() => this.recenter()}">
         <img alt="recenter-icon" src="${this.iconCenter}" />
       </button>
+      <button onclick="${() => this.openDropdown()}"><img alt="csv-icon" src="icons/csv.svg" /></button>
+      <div ?hidden="${!this.showDropdown}">
+        <div id="layers-dropdown">
+          ${this.getLayersList().map( (layer) => uHtml`
+          <option
+            class="layers-dropdown-item"
+            value="${layer.id}"
+            onclick="${() => this.generateCSV(layer.id)}"
+            onkeydown="${() => this.generateCSV(layer.id)}"
+            tabindex="0"
+            i18n="${layer.label}"></option>
+          `)}
+        </div>
+      </div>
     </div>
     <button
       id="next"

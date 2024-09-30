@@ -37,6 +37,7 @@ type Selection = {
   selectedFeatures: Feature[];
   focusedFeatures: Feature[] | null;
   enabled: boolean;
+  gridSelected: boolean;
 };
 
 type ThemesConfig = {
@@ -179,7 +180,8 @@ export default class State {
     selectionParameters: [],
     selectedFeatures: [],
     focusedFeatures: null,
-    enabled: true
+    enabled: true,
+    gridSelected: false
   };
 
   theme: Theme | null = null;

@@ -5,6 +5,7 @@ import FeatureToGridDataById, { GridData, GridDataById } from '../../../tools/fe
 import I18nManager from '../../../tools/i18n/i18nmanager';
 import FormatGridGeomValue from './formatgridgeomvalue';
 import { ColumnDefinition, TabulatorFull as Tabulator } from 'tabulator-tables';
+import StateManager from '../../../tools/state/statemanager';
 
 /**
  * Represents the header text and state of a tab.
@@ -36,6 +37,7 @@ export default class SelectionTabulatorManager {
   private readonly formatGridGeomValue = new FormatGridGeomValue();
   private configManager: ConfigManager;
   private readonly featureToGridData = new FeatureToGridDataById({ keepGeomProperty: true });
+  private readonly stateManager: StateManager;
   idTab: Record<string, TabContent> = {};
   tabHeaders: TabHeader[] = [];
   table: Tabulator | null = null;
@@ -44,6 +46,7 @@ export default class SelectionTabulatorManager {
 
   constructor() {
     this.configManager = ConfigManager.getInstance();
+    this.stateManager = StateManager.getInstance();
   }
 
   /**
@@ -97,6 +100,11 @@ export default class SelectionTabulatorManager {
             return "<i class='fas fa-sort'>";
         }
       }
+    });
+
+    this.table?.on('rowSelectionChanged', (selection) => {
+      // True if at least one row is selected.
+      this.stateManager.state.selection.gridSelected = selection.length > 0;
     });
   }
 
