@@ -1,12 +1,10 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
-
-<div id="wfs-filter-querybuilder">
+<div class="container">
   <div class="${this.loading ? 'loading' : 'loading hidden'}">
-    <i class="fa-xl fa-solid fa-circle-notch fa-spin"></i>
+    <img alt="loading-icon" src="icons/loading.svg" class="gg-spin" />
     Loading server configuration...
   </div>
   <div class="${this.deactivated ? 'deactivated' : 'deactivated hidden'}">
-    <i class="fa-xl fa-solid fa-xmark"></i>
+    <img alt="info-icon" src="icons/info.svg" />
     Filtering deactivated: layers in layergroup don't have identical attributes.
   </div>
   <div class="${this.loading || this.deactivated ? 'content hidden' : 'content'}">
@@ -44,12 +42,12 @@
       placeholder="Enter value..."
       onkeypress="${(e:KeyboardEvent)=>this.onValueKeyPress(e)}" />
 
-    <button tip="Apply filter" onclick="${() => this.filter()}">
-      <i class="fa-sm fa-solid fa-filter"></i>
+    <button class="gg-button gg-medium" tip="Apply filter" onclick="${() => this.filter()}">
+      <img alt="filter-icon" src="icons/filter.svg" />
     </button>
 
-    <button tip="Remove filter" onclick="${() => this.removeFilter()}">
-      <i class="fa-sm fa-solid fa-trash"></i>
+    <button class="gg-button gg-medium" tip="Remove filter" onclick="${() => this.removeFilter()}">
+      <img alt="delete-icon" src="icons/trash.svg" />
     </button>
   </div>
 </div>

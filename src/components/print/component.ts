@@ -46,7 +46,7 @@ interface PrintElement {
  */
 class PrintComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['./style.css', '../../styles/common.css'];
 
   private readonly default_dpi = 96;
   private readonly default_scale = 10000;
@@ -210,20 +210,6 @@ class PrintComponent extends GirafeHTMLElement {
   attrNameForI18n(attrName: string): string {
     if (attrName === 'legend') return 'Legend';
     return attrName;
-  }
-
-  /**
-   * @returns html classes regarding the print status.
-   */
-  getStatusClasses(status: PrintStatus): string {
-    const baseClasses = 'status fa-solid fa-3x ';
-    if (status === PrintStatus.Errored) {
-      return baseClasses + 'error fa-triangle-exclamation';
-    }
-    if (status === PrintStatus.Success) {
-      return baseClasses + 'success fa-file-arrow-down';
-    }
-    return baseClasses + 'pending fa-circle-notch fa-spin';
   }
 
   /**

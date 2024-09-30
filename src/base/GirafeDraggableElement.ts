@@ -11,9 +11,7 @@ Example:
 <div id="draggable">
   <div id="header">
     Click here to move
-    <div id="close">
-      <i class="fa-solid"></i>
-    </div>
+    <img id="close" alt="close-icon" src="icons/close.svg" />
   </div>
   <!-- PLACE CONTENT HERE -->
 </div>

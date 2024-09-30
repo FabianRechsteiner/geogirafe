@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
-
 <div id="draggable" class="${this.visible ? 'ctx' : 'hidden'}">
   <button tabindex="-1" class="resizer tl corner"></button>
   <button tabindex="-1" class="resizer t top-bottom"></button>
@@ -12,7 +10,7 @@
   <div id="header">
     <p i18n="${this.getWindowFeature()?.id}"></p>
     <button id="close" onclick="${() => this.closeWindow()}">
-      <i class="fa-solid"></i>
+      <img alt="close-icon" src="icons/close.svg" />
     </button>
   </div>
   <div id="content">
@@ -36,7 +34,7 @@
       id="previous"
       class="${this.maxIndex > 0 ? '' : 'hidden'}"
       onclick="${() => this.onFocusWindowFeature(this.focusedIndex - 1)}">
-      <i class="fa-solid fa-xl fa-circle-arrow-left"></i>
+      <img alt="previous-icon" src="icons/previous.svg" />
     </button>
     <div id="counter" class="${this.maxIndex > 0 ? '' : 'hidden'}">
       <span class="${this.maxIndex > 0 ? '' : 'hidden'}">
@@ -54,7 +52,7 @@
       id="next"
       class="${this.maxIndex > 0 ? '' : 'hidden'}"
       onclick="${() => this.onFocusWindowFeature(this.focusedIndex + 1)}">
-      <i class="fa-solid fa-xl fa-circle-arrow-right"></i>
+      <img alt="next-icon" src="icons/next.svg" />
     </button>
   </div>
 </div>
