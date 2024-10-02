@@ -94,7 +94,9 @@ class SelectionGridComponent extends GirafeResizableElement {
    * Inverts the selection of all rows in the grid.
    */
   invertSelection() {
-    console.log('TODO: invertSelection');
+    this.selectionTabulatorManager.table?.getRows().forEach((row) => {
+      row.toggleSelect();
+    });
   }
 
   generateCSV() {
