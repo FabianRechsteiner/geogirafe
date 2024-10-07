@@ -453,7 +453,11 @@ class PrintComponent extends GirafeHTMLElement {
     }
     let capabilities: MFPCapabilities | undefined = undefined;
     try {
-      const response = await fetch(this.getCapabilitiesUrl(), { referrer: '' });
+      const fetchOptions = { referrer: '' } as RequestInit;
+      if (this.configManager.Config.oauth) {
+        fetchOptions.credentials = 'include';
+      }
+      const response = await fetch(this.getCapabilitiesUrl(), fetchOptions);
       capabilities = await response.json();
     } catch (error) {
       console.error(error);
