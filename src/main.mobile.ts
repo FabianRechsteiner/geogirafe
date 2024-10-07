@@ -17,7 +17,6 @@ import MapComponent from './components/map/component';
 import MobileSearchComponent from './components/search-mobile/component';
 import MobileThemeComponent from './components/themes-mobile/component';
 import OfflineComponent from './components/offline/component';
-import AbstractOauthManager from './tools/oauth/abstractoauthmanager.js';
 import OauthManager from './tools/oauth/oauthmanager.js';
 
 // Redirect to desktop interface if we are NOT on mobile
@@ -33,7 +32,6 @@ declare global {
       stateManager: StateManager;
       shareManager: ShareManager;
       offlineManager: OfflineManager;
-      oauthManager: AbstractOauthManager;
       themesManager: ThemesManager;
       configManager: ConfigManager;
     };
@@ -113,13 +111,12 @@ try {
   LogManager.getInstance()
     .initLogging()
     .then(() => {
+      OauthManager.getInstance().initialize();
       ErrorManager.getInstance();
       CsvManager.getInstance();
       I18nManager.getInstance();
-      OauthManager.getInstance();
-      ThemesManager.getInstance();
       WfsManager.getInstance();
-      LogManager.getInstance();
+      ThemesManager.getInstance().initialize();
 
       // Add the state to document, so that it will be accessible everywhere
       document.geogirafe = {
@@ -127,7 +124,6 @@ try {
         stateManager: StateManager.getInstance(),
         shareManager: ShareManager.getInstance(),
         offlineManager: OfflineManager.getInstance(),
-        oauthManager: OauthManager.getInstance(),
         themesManager: ThemesManager.getInstance(),
         configManager: ConfigManager.getInstance()
       };

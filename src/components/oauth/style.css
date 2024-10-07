@@ -4,3 +4,9 @@
   border-right: var(--app-standard-border);
   align-items: center;
 }
+
+.name {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}

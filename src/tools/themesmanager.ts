@@ -19,15 +19,12 @@ import LayerXYZ from '../models/layers/layerxyz';
 import ServerOgc from '../models/serverogc';
 import ThemeLayer from '../models/layers/themelayer';
 import WfsManager from './wfs/wfsmanager';
-import AbstractOauthManager from './oauth/abstractoauthmanager';
-import OauthManager from './oauth/oauthmanager';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
   layerManager: LayerManager;
   shareManager: ShareManager;
-  oauthManager: AbstractOauthManager;
 
   get state() {
     return this.stateManager.state;
@@ -40,17 +37,16 @@ class ThemesManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
     this.layerManager = LayerManager.getInstance();
     this.shareManager = ShareManager.getInstance();
-    this.oauthManager = OauthManager.getInstance();
 
     this.stateManager.subscribe(
       'themes.lastSelectedTheme',
       (_oldTheme: ThemeLayer | null, newTheme: ThemeLayer | null) => this.onChangeTheme(newTheme)
     );
 
-    this.initialize();
+    this.stateManager.subscribe('oauth.userInfo', () => this.loadThemes());
   }
 
-  private async initialize() {
+  public async initialize() {
     await this.configManager.loadConfig();
     await this.loadThemes();
 
@@ -68,10 +64,7 @@ class ThemesManager extends GirafeSingleton {
    * Load themes from backend and configures background layers if needed
    */
   async loadThemes() {
-    await this.oauthManager.readyToLoadThemes();
-    const fetchOptions: RequestInit | undefined = (await this.oauthManager.configured())
-      ? { credentials: 'include' }
-      : undefined;
+    const fetchOptions = this.configManager.Config.oauth ? ({ credentials: 'include' } as RequestInit) : undefined;
     const response = await fetch(this.configManager.Config.themes.url, fetchOptions);
 
     const content = await response.json();

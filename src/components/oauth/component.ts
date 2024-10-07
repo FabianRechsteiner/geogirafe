@@ -1,12 +1,13 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import AbstractOauthManager from '../../tools/oauth/abstractoauthmanager';
 import OauthManager from '../../tools/oauth/oauthmanager';
 
 export class OauthComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['./style.css', '../../styles/common.css'];
 
-  oauthManager: AbstractOauthManager;
+  public userIconUrl?: string;
+
+  oauthManager: OauthManager;
   public menuOpen: boolean = false;
 
   constructor() {
@@ -16,53 +17,48 @@ export class OauthComponent extends GirafeHTMLElement {
   }
 
   private registerEvents() {
-    this.subscribe('oauth.status', () => this.onStatusChanged());
+    this.subscribe('oauth.status', () => this.refreshRender());
+    this.subscribe(/oauth\.userInfo.*/, () => this.refreshRender());
   }
 
-  private onStatusChanged() {
+  async refreshRender() {
+    this.userIconUrl = await this.getUserIconUrl();
     super.refreshRender();
   }
 
-  public onLoginClick(debug = false) {
-    console.log('Login clicked');
-    if (this.state.oauth.status !== 'loggedIn') {
-      if (
-        !debug ||
-        window.confirm(
-          'current oauth status: ' +
-            this.state.oauth.status +
-            '\nissuer status: ' +
-            this.state.oauth.issuer.status +
-            '\ngeomapfish status: ' +
-            this.state.oauth.geomapfish.status +
-            '\nReset oauth status and login?'
-        )
-      ) {
-        this.oauthManager.login();
-      }
+  public onLoginClick() {
+    if (!this.configManager.Config.oauth) {
+      throw new Error('Authentication is not configured on this instance. Login cannot be done.');
+    } else {
+      this.oauthManager.login();
     }
   }
 
-  public onLogoutClick(debug = false) {
-    console.log('Logout clicked');
-    if (this.state.oauth.status === 'loggedIn') {
-      if (
-        !debug ||
-        window.confirm(
-          'current oauth status: ' +
-            this.state.oauth.status +
-            '\nissuer status: ' +
-            this.state.oauth.issuer.status +
-            (this.state.oauth.issuer.userInfo ? ' (' + this.state.oauth.issuer.userInfo?.email + ')' : '') +
-            '\ngeomapfish status: ' +
-            this.state.oauth.geomapfish.status +
-            (this.state.oauth.geomapfish.userInfo ? ' (' + this.state.oauth.geomapfish.userInfo?.username + ')' : '') +
-            '\nLogout?'
-        )
-      ) {
-        this.oauthManager.logout();
-      }
+  public onLogoutClick() {
+    if (window.confirm('Do you want to logout ?')) {
+      this.oauthManager.logout();
     }
+  }
+
+  public async getUserIconUrl() {
+    if (this.state.oauth.userInfo?.email) {
+      const hashedEmail = await this.sha256(this.state.oauth.userInfo.email);
+      const gravatarUrl = `https://www.gravatar.com/avatar/${hashedEmail}?d=mp`;
+      return gravatarUrl;
+    }
+    return undefined;
+  }
+
+  private async sha256(message: string) {
+    // encode as UTF-8
+    const msgBuffer = new TextEncoder().encode(message);
+    // hash the message
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    // convert ArrayBuffer to Array
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    // convert bytes to hex string
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
   }
 
   connectedCallback() {

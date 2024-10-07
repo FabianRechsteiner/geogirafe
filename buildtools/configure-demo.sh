@@ -19,7 +19,6 @@ then
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/de.json" --silent --output $MOCKDIR/de.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/en.json" --silent --output $MOCKDIR/en.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 elif [ "$1" = 'experimental' ];
 then
     echo "Preparing environment EXPERIMENTAL..."
@@ -31,7 +30,6 @@ then
     curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/de.json" --silent --output $MOCKDIR/de.json
     curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/en.json" --silent --output $MOCKDIR/en.json
     curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 elif [ "$1" = 'cartolacote' ];
 then
     echo "Preparing environment CARTOLACOTE..."
@@ -53,7 +51,6 @@ then
     cp demo/fr.json $APPDIR/fr.json
     curl "https://map.cjl.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.cjl.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://map.cjl.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'geogr' ];
 then
@@ -62,7 +59,6 @@ then
     cp demo/de.json $APPDIR/de.json
     curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --silent --output $MOCKDIR/de.json
-    curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'lausanne' ];
 then
@@ -71,7 +67,6 @@ then
     cp demo/fr.json $APPDIR/fr.json
     curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.lausanne.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://map.lausanne.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'lie' ];
 then
@@ -80,7 +75,6 @@ then
     cp demo/de.json $APPDIR/de.json
     curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.llv.li/static/dummy/de.json" --silent --output $MOCKDIR/de.json
-    curl "https://map.geo.llv.li/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'mapbs' ];
 then
@@ -90,11 +84,9 @@ then
     cp demo/de.json $APPDIR/de.json
     cp demo/fr.json $APPDIR/fr.json
     cp demo/en.json $APPDIR/en.json
-    curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.bs.ch/static/dummy/de.json" --silent --output $MOCKDIR/de.json
     curl "https://map.geo.bs.ch/static/dummy/en.json" --silent --output $MOCKDIR/en.json
     curl "https://map.geo.bs.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://map.geo.bs.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'mapnv' ];
 then
@@ -103,7 +95,6 @@ then
     cp demo/fr.json $APPDIR/fr.json
     curl "https://mapnv.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://mapnv.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-    curl "https://mapnv.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'schwyz' ];
 then
@@ -112,7 +103,6 @@ then
     cp demo/de.json $APPDIR/de.json
     curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.sz.ch/static-ngeo/build/de.json" --silent --output $MOCKDIR/de.json
-    curl "https://map.geo.sz.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 elif [ "$1" = 'sigip' ];
 then
@@ -134,7 +124,6 @@ then
     cp demo/it.json $APPDIR/it.json
     curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.ti.ch/static/dummy/it.json" --silent --output $MOCKDIR/it.json
-    curl "https://map.geo.ti.ch/printproxy/capabilities.json" --silent --output $MOCKDIR/capabilities.json
 
 else
     echo "Usage: ./configure-demo <environment>"

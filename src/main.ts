@@ -49,7 +49,6 @@ import TreeViewGroupComponent from './components/treeview/treeviewgroup/componen
 import TreeViewThemeComponent from './components/treeview/treeviewtheme/component';
 import VideoRecordComponent from './components/videorecord/component';
 import OauthManager from './tools/oauth/oauthmanager.js';
-import AbstractOauthManager from './tools/oauth/abstractoauthmanager.js';
 
 // Redirect to mobile interface if we are on mobile
 if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
@@ -64,7 +63,6 @@ declare global {
       stateManager: StateManager;
       shareManager: ShareManager;
       offlineManager: OfflineManager;
-      oauthManager: AbstractOauthManager;
       themesManager: ThemesManager;
       configManager: ConfigManager;
     };
@@ -100,13 +98,13 @@ try {
   LogManager.getInstance()
     .initLogging()
     .then(() => {
+      OauthManager.getInstance().initialize();
       ErrorManager.getInstance();
       CsvManager.getInstance();
       I18nManager.getInstance();
-      OauthManager.getInstance();
-      ThemesManager.getInstance();
       WfsManager.getInstance();
       OrderingManager.getInstance();
+      ThemesManager.getInstance().initialize();
 
       // Add the state to document, so that it will be accessible everywhere
       document.geogirafe = {
@@ -114,7 +112,6 @@ try {
         stateManager: StateManager.getInstance(),
         shareManager: ShareManager.getInstance(),
         offlineManager: OfflineManager.getInstance(),
-        oauthManager: OauthManager.getInstance(),
         themesManager: ThemesManager.getInstance(),
         configManager: ConfigManager.getInstance()
       };

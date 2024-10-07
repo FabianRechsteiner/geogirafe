@@ -135,17 +135,18 @@ class GirafeConfig {
   oauth?: {
     issuer: {
       url: string;
-      algorithm?: 'oauth2' | 'oidc';
-      codeChallengeMethod?: string;
+      algorithm: 'oauth2' | 'oidc';
+      codeChallengeMethod: string;
       clientId: string;
-      scope?: string;
-      checkSessionOnLoad?: boolean;
+      scope: string;
+      loginRequired: boolean;
+      checkSessionOnLoad: boolean;
     };
     geomapfish: {
       userInfoUrl: string;
       loginUrl: string;
       logoutUrl: string;
-      anonymousUsername?: string;
+      anonymousUsername: string;
     };
   };
 
@@ -443,21 +444,36 @@ class GirafeConfig {
   }
 
   private initConfigOauth(config: GirafeConfig) {
-    if (config.oauth) {
-      const issuerConfig = {
-        ...{
-          algorithm: 'oidc' as 'oauth2' | 'oidc',
-          scope: 'openid',
-          codeChallengeMethod: 'S256'
-        },
-        ...config.oauth.issuer
-      };
-      return {
-        issuer: issuerConfig,
-        geomapfish: { ...config.oauth.geomapfish }
-      };
+    if (!config.oauth) {
+      // No oAuth configuration
+      return undefined;
     }
-    return undefined;
+
+    if (!config.oauth.issuer.url) {
+      throw new Error(
+        `Configuration for oauth.issuer.url is required. See https://doc.geomapfish.dev/docs/configuration.`
+      );
+    }
+    if (!config.oauth.issuer.clientId) {
+      throw new Error(
+        `Configuration for oauth.issuer.clientId is required. See https://doc.geomapfish.dev/docs/configuration.`
+      );
+    }
+
+    const issuerConfig = {
+      url: config.oauth.issuer.url,
+      algorithm: config.oauth.issuer.algorithm ?? 'oidc',
+      codeChallengeMethod: config.oauth.issuer.codeChallengeMethod ?? 'S256',
+      clientId: config.oauth.issuer.clientId,
+      scope: config.oauth.issuer.scope ?? 'openid',
+      loginRequired: config.oauth.issuer.loginRequired ?? false,
+      checkSessionOnLoad: config.oauth.issuer.checkSessionOnLoad ?? false
+    };
+
+    return {
+      issuer: issuerConfig,
+      geomapfish: config.oauth.geomapfish
+    };
   }
 }
 

@@ -14,7 +14,6 @@ if "%1"=="c2c" (
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/de.json" --output %OUTPUTDIR%\de.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/en.json" --output %OUTPUTDIR%\en.json
     curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -29,7 +28,6 @@ if "%1"=="experimental" (
     curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/de.json" --output %OUTPUTDIR%\de.json
     curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/en.json" --output %OUTPUTDIR%\en.json
     curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -55,7 +53,6 @@ if "%1"=="cjl" (
     copy demo\fr.json %APPDIR%\fr.json /Y
     curl "https://map.cjl.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.cjl.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-    curl "https://map.cjl.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -65,7 +62,6 @@ if "%1"=="geogr" (
     copy demo\de.json %APPDIR%\de.json /Y
     curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --output %OUTPUTDIR%\de.json
-    curl "https://edit.geo.gr.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -75,7 +71,6 @@ if "%1"=="lausanne" (
     copy demo\fr.json %APPDIR%\fr.json /Y
     curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.lausanne.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-    curl "https://map.lausanne.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -85,7 +80,6 @@ if "%1"=="lie" (
     copy demo\de.json %APPDIR%\de.json /Y
     curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.geo.llv.li/static/dummy/de.json" --output %OUTPUTDIR%\de.json
-    curl "https://map.geo.llv.li/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -96,11 +90,9 @@ if "%1"=="mapbs" (
     copy demo\de.json %APPDIR%\de.json /Y
     copy demo\fr.json %APPDIR%\fr.json /Y
     copy demo\en.json %APPDIR%\en.json /Y
-    curl "https://map.geo.bs.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.geo.bs.ch/static/dummy/de.json" --output %OUTPUTDIR%\de.json
     curl "https://map.geo.bs.ch/static/dummy/en.json" --output %OUTPUTDIR%\en.json
     curl "https://map.geo.bs.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-    curl "https://map.geo.bs.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -110,7 +102,6 @@ if "%1"=="mapnv" (
     copy demo\fr.json %APPDIR%\fr.json /Y
     curl "https://mapnv.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://mapnv.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-    curl "https://mapnv.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -120,7 +111,6 @@ if "%1"=="schwyz" (
     copy demo\de.json %APPDIR%\de.json /Y
     curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.geo.sz.ch/static-ngeo/build/de.json" --output %OUTPUTDIR%\de.json
-    curl "https://map.geo.sz.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
@@ -145,7 +135,6 @@ if "%1"=="ticino" (
     copy demo\it.json %APPDIR%\it.json /Y
     curl "https://map.geo.ti.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.geo.ti.ch/static/dummy/it.json" --output %OUTPUTDIR%\it.json
-    curl "https://map.geo.ti.ch/printproxy/capabilities.json" --output %OUTPUTDIR%\capabilities.json
     goto :end
 )
 
