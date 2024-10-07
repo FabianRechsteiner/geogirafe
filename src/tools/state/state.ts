@@ -9,7 +9,7 @@ import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
 import type OLayerImage from 'ol/layer/Image';
 import type OSourceImageWMS from 'ol/source/ImageWMS';
-import { OauthState } from '../oauth/oauthmanager';
+import { OpenIDTokenEndpointResponse, UserInfoResponse } from 'oauth4webapi';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -80,11 +80,25 @@ export type Lidar = {
   drawActive: boolean;
 };
 
+/**
+ * Login states :
+ * 1. issuer.loggedIn   : Logged in to identity provider
+ * 2. loggedIn          : Fully logged in (to both identity provider and backend)
+ * 3. loginFailed       : Login failed
+ * 4. backend.loggedOut : Logout from backend
+ * 5. loggedOut         : Fully Logged out (from both identity provider and backend)
+ * 5. logoutFailed      : Logout failed
+ */
+type LoginState = {
+  status: 'issuer.loggedIn' | 'loggedIn' | 'loginFailed' | 'backend.loggedOut' | 'loggedOut' | 'logoutFailed';
+  tokens?: OpenIDTokenEndpointResponse;
+  userInfo?: UserInfoResponse;
+};
+
 export type Metadata = {
   title: string | null;
   url: string | null;
 };
-export type Oauth = OauthState;
 
 export default class State {
   /**
@@ -198,10 +212,8 @@ export default class State {
   // Indicates is the application is currently used in offline mode
   isOffline: boolean = false;
 
-  oauth: Oauth = {
-    status: 'unlogged',
-    issuer: { status: 'unknown' },
-    geomapfish: { status: 'unlogged' }
+  oauth: LoginState = {
+    status: 'loggedOut'
   };
 
   // The State object is defined as <not extensible> by the StateManager.

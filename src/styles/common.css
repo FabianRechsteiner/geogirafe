@@ -27,11 +27,11 @@ img {
   0% {
     transform: rotate(0deg);
   }
-  5% {
-    transform: rotate(90deg);
+  7% {
+    transform: rotate(360deg);
   }
   100% {
-    transform: rotate(90deg);
+    transform: rotate(360deg);
   }
 }
 .gg-spin {
@@ -42,7 +42,7 @@ img {
 }
 .gg-spin-wait {
   animation-name: spin-wait;
-  animation-duration: 5s;
+  animation-duration: 10s;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }

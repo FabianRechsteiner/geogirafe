@@ -90,8 +90,8 @@
   "oauth": {
     "issuer": {
       "url": "https://auth.geo.test.bs.ch/auth/realms/geobs",
-      "algorithm": "oidc",
       "clientId": "MapBS-ui",
+      "loginRequired": false,
       "checkSessionOnLoad": true
     },
     "geomapfish": {
