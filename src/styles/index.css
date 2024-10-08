@@ -63,9 +63,14 @@ girafe-search {
 }
 
 #buttonbar {
-  background-color: var(--bkg-color);
   display: flex;
   flex-direction: column;
+  position: fixed;
+  top: var(--app-standard-height);
+  right: 0;
+  height: calc(100% - var(--app-standard-height));
+  width: var(--app-standard-height);
+  background-color: var(--bkg-color);
   border-left: var(--app-standard-border);
 }
 
@@ -80,7 +85,7 @@ girafe-search {
   top: var(--app-standard-height);
   bottom: 0;
   left: 0;
-  right: 0;
+  right: var(--app-standard-height);
 }
 
 #main {

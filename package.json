@@ -42,7 +42,7 @@
     "oauth4webapi": "^2.17.0",
     "on-change": "5.0.1",
     "source-map-js": "1.2.1",
-    "tabulator-tables": "6.2.5",
+    "tabulator-tables": "6.3.0",
     "tippy.js": "6.3.7",
     "uhtml": "4.5.11",
     "uuid": "10.0.0",
