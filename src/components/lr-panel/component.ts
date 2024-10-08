@@ -22,6 +22,9 @@ class LRPanelComponent extends GirafeResizableElement {
   private readonly stateToggleManager: StateToggleManager;
   public title: string = 'Unknown panel';
   private panelTitles: Record<string, string> = {};
+  public get hasMultipleChilds() {
+    return Object.keys(this.panelTitles).length > 1;
+  }
 
   constructor() {
     super('lr-panel');

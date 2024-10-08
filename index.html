@@ -101,48 +101,7 @@
             data-toggle-path="interface.lidarPanelVisible"
             data-title="lidar-panel"></girafe-lidar-panel>
         </girafe-lr-panel>
-        <div id="buttonbar">
-          <button
-            slot="menu-content"
-            class="gg-button gg-big"
-            onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
-            <img alt="help-icon" src="icons/draw.svg" />
-          </button>
-          <button
-            slot="menu-content"
-            class="gg-button gg-big"
-            onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
-            <img alt="help-icon" src="icons/print.svg" />
-          </button>
-          <button
-            slot="menu-content"
-            class="gg-button gg-big"
-            onclick="document.geogirafe.state.interface.lidarPanelVisible = !document.geogirafe.state.interface.lidarPanelVisible">
-            <img alt="help-icon" src="icons/lidar.svg" />
-          </button>
-          <button class="gg-button gg-big" onclick="document.geogirafe.state.interface.shareVisible = true">
-            <img alt="help-icon" src="icons/share.svg" />
-          </button>
-          <girafe-language-select></girafe-language-select>
-          <girafe-layout></girafe-layout>
-          <girafe-proj-select></girafe-proj-select>
 
-          <div class="filler"></div>
-
-          <button class="gg-button gg-big" onclick="document.geogirafe.state.interface.helpVisible = true">
-            <img alt="help-icon" src="icons/help.svg" />
-          </button>
-
-          <button
-            class="gg-button gg-big"
-            onclick="document.geogirafe.state.interface.aboutVisible = !document.geogirafe.state.interface.aboutVisible">
-            <img alt="help-icon" src="icons/info.svg" />
-          </button>
-
-          <button class="gg-button gg-big" onclick="alert('not implemented')">
-            <img alt="help-icon" src="icons/config.svg" />
-          </button>
-        </div>
         <girafe-about></girafe-about>
         <girafe-share></girafe-share>
         <girafe-selection-window></girafe-selection-window>
@@ -152,6 +111,49 @@
         <girafe-selection-grid dock="bottom"></girafe-selection-grid>
         <girafe-lidar-profile id="lidar-footer" dock="bottom"></girafe-lidar-profile>
       </div>
+    </div>
+
+    <div id="buttonbar">
+      <button
+        slot="menu-content"
+        class="gg-button gg-big"
+        onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
+        <img alt="help-icon" src="icons/draw.svg" />
+      </button>
+      <button
+        slot="menu-content"
+        class="gg-button gg-big"
+        onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
+        <img alt="help-icon" src="icons/print.svg" />
+      </button>
+      <button
+        slot="menu-content"
+        class="gg-button gg-big"
+        onclick="document.geogirafe.state.interface.lidarPanelVisible = !document.geogirafe.state.interface.lidarPanelVisible">
+        <img alt="help-icon" src="icons/lidar.svg" />
+      </button>
+      <button class="gg-button gg-big" onclick="document.geogirafe.state.interface.shareVisible = true">
+        <img alt="help-icon" src="icons/share.svg" />
+      </button>
+      <girafe-language-select></girafe-language-select>
+      <girafe-layout></girafe-layout>
+      <girafe-proj-select></girafe-proj-select>
+
+      <div class="filler"></div>
+
+      <button class="gg-button gg-big" onclick="document.geogirafe.state.interface.helpVisible = true">
+        <img alt="help-icon" src="icons/help.svg" />
+      </button>
+
+      <button
+        class="gg-button gg-big"
+        onclick="document.geogirafe.state.interface.aboutVisible = !document.geogirafe.state.interface.aboutVisible">
+        <img alt="help-icon" src="icons/info.svg" />
+      </button>
+
+      <button class="gg-button gg-big" onclick="alert('not implemented')">
+        <img alt="help-icon" src="icons/config.svg" />
+      </button>
     </div>
   </body>
 </html>

@@ -46,12 +46,22 @@ class MenuButtonComponent extends GirafeHTMLElement {
   private openMenu() {
     this.listenChildButtons();
     this.open = true;
-    super.render();
+    setTimeout(() => document.addEventListener('click', this.outsideClickHandler), 0);
+    this.refreshRender();
   }
 
-  private closeMenuHandler = () => this.closeMenu(true);
+  private readonly outsideClickHandler = (event: MouseEvent) => this.outsideClick(event);
+  private outsideClick(event: MouseEvent) {
+    const target = event.target as Node;
+    if (!this.shadow.contains(target)) {
+      this.closeMenu();
+    }
+  }
+
+  private readonly closeMenuHandler = () => this.closeMenu(true);
   private closeMenu(closeParent: boolean = false) {
     this.open = false;
+    document.removeEventListener('click', this.outsideClickHandler);
     if (closeParent) {
       // If this menu itself is contained in another menu
       // We close the parent menu too
@@ -63,7 +73,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
         parentMenuButton.toggleMenu();
       }
     }
-    super.render();
+    this.refreshRender();
   }
 
   findAllAssignedButtons(nodes: Node[]): HTMLButtonElement[] {
