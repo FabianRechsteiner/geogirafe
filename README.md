@@ -71,12 +71,13 @@ npm start
 
 > ❗❗ IMPORTANT ❗❗  
 > When working locally with authentication, and more generally with cookies,
-> browsers treat single-label domains (domains without any dots) differently from multi-label domains (domains with at least one dot). Cookies set on single-label domains are often considered less secure because they can be more easily spoofed or misused. As a result, many browsers restrict or do not allow cookies to be set on single-label domains like `localhost`.  
-> 
+> browsers treat single-label domains (domains without any dots) differently from multi-label domains (domains with at least one dot). Cookies set on single-label domains are often considered less secure because they can be more easily spoofed or misused. As a result, many browsers restrict or do not allow cookies to be set on single-label domains like `localhost`.
+>
 > Therefore, working against https://localhost **will not work**, because the cookies cannot be correctly set.  
 > You'll have to use https://app.localhost, which has been defined as the default domain when working locally with GeoGirafe.
 
-Further discussions about this: 
+Further discussions about this:
+
 - https://stackoverflow.com/questions/7346919/chrome-localhost-cookie-not-being-set
 - https://stackoverflow.com/questions/1134290/cookies-on-localhost-with-explicit-domain
 
