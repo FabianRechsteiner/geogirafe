@@ -1,9 +1,11 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import type { Callback } from '../../tools/state/statemanager';
+import * as olExtent from 'ol/extent';
 import type OlFeature from 'ol/Feature';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionTabulatorManager, { type TabHeader } from './tools/selectiontabulatormanager';
 import CsvManager from '../../tools/export/csvmanager';
+import MapManager from '../../tools/state/mapManager';
 
 /**
  * Represents a selection grid component based on GridJs.
@@ -18,6 +20,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   private readonly eventsCallbacks: Callback[] = [];
   private readonly selectionTabulatorManager = new SelectionTabulatorManager();
   private readonly csvManager: CsvManager;
+  private readonly mapManager: MapManager;
   private isVisibleComponentSetup = false;
   private readonly debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
   visible = false;
@@ -27,6 +30,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   constructor() {
     super('selectiongrid');
     this.csvManager = CsvManager.getInstance();
+    this.mapManager = MapManager.getInstance();
 
     this.subscribe('selection.gridSelected', (_oldValue: boolean, newValue: boolean) => {
       this.showCsvButton = newValue;
@@ -73,6 +77,8 @@ class SelectionGridComponent extends GirafeResizableElement {
   closePanel() {
     this.state.interface.selectionComponentVisible = false;
     this.state.selection.selectedFeatures = [];
+    this.showCsvButton = false;
+    this.state.selection.gridSelected = false;
     super.clean();
   }
 
@@ -97,6 +103,21 @@ class SelectionGridComponent extends GirafeResizableElement {
     this.selectionTabulatorManager.table?.getRows().forEach((row) => {
       row.toggleSelect();
     });
+  }
+
+  /**
+   * Zooms to the extent of the selected rows in the grid.
+   */
+  zoomToSelection() {
+    const extent = olExtent.createEmpty();
+    this.selectionTabulatorManager.table?.getRows().forEach((row) => {
+      if (row.isSelected()) {
+        const data = row.getData();
+        const geometry = data.geom ?? data.the_geom ?? data.geometry;
+        olExtent.extend(extent, geometry.getExtent());
+      }
+    });
+    this.mapManager.getMap().getView().fit(extent, { duration: 300 });
   }
 
   generateCSV() {
@@ -132,6 +153,9 @@ class SelectionGridComponent extends GirafeResizableElement {
    * @private
    */
   private setupVisibleComponent() {
+    this.showCsvButton = false;
+    this.state.selection.gridSelected = false;
+
     this.isVisibleComponentSetup = true;
     this.registerEvents();
   }

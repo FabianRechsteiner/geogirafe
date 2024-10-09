@@ -78,7 +78,7 @@ export default class SelectionTabulatorManager {
   }
 
   /**
-   * Creates (replace) the GridJS grid based on the provided tab id and related data and features.
+   * Creates (replace) the Tabulator grid based on the provided tab id and related data and features.
    */
   displayGrid(id: string): void {
     if (!this.element) {
