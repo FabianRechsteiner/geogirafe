@@ -68,6 +68,8 @@ class GirafeConfig {
     defaultFocusFillColor: string;
     defaultFocusStrokeColor: string;
     defaultFocusStrokeWidth: number;
+    highlightFillColor: string;
+    highlightStrokeColor: string;
   };
   drawing: {
     defaultFillColor: string;
@@ -290,7 +292,9 @@ class GirafeConfig {
       defaultStrokeWidth: config.selection?.defaultStrokeWidth ?? 4,
       defaultFocusFillColor: config.selection?.defaultFocusFillColor ?? '#ff33337f',
       defaultFocusStrokeColor: config.selection?.defaultFocusStrokeColor ?? '#ff0000',
-      defaultFocusStrokeWidth: config.selection?.defaultFocusStrokeWidth ?? 4
+      defaultFocusStrokeWidth: config.selection?.defaultFocusStrokeWidth ?? 4,
+      highlightFillColor: config.selection?.highlightFillColor ?? '#00ff227f',
+      highlightStrokeColor: config.selection?.highlightStrokeColor ?? '#00ff22'
     };
   }
 

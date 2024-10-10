@@ -36,6 +36,7 @@ type Selection = {
   selectionParameters: SelectionParam[];
   selectedFeatures: Feature[];
   focusedFeatures: Feature[] | null;
+  highlightedFeatures?: Feature[] | null;
   enabled: boolean;
   gridSelected: boolean;
 };

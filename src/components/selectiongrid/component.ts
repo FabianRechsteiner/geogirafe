@@ -120,6 +120,9 @@ class SelectionGridComponent extends GirafeResizableElement {
     this.mapManager.getMap().getView().fit(extent, { duration: 300 });
   }
 
+  /**
+   * Generates a CSV file from the selected rows in the grid.
+   */
   generateCSV() {
     const columns = this.selectionTabulatorManager.data[this.currentTabId].columns.map((column) => {
       return { name: column };

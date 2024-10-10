@@ -50,7 +50,7 @@ export class FocusFeature {
     });
     this.setFocusLayerStyle();
     this.olMap.addLayer(this.focusLayer);
-    this.focusLayer.setZIndex(1003);
+    this.focusLayer.setZIndex(1004);
     this.focusLayer.set('altitudeMode', 'clampToGround');
   }
 
