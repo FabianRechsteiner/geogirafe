@@ -113,7 +113,8 @@ export default class DrawingComponent extends GirafeHTMLElement {
       };
       this.getById('fixedLengthEnabled').onchange = (e) => {
         const elements = Array.from(this.shadowRoot?.querySelectorAll('.fixedLengthElement')!);
-        if ((e.target as HTMLInputElement).checked) {
+        const option = e.target as HTMLInputElement;
+        if (!option.disabled && option.checked) {
           elements.forEach((e) => e.classList.remove('disabled'));
           this.getById<HTMLInputElement>('fixedLengthValue').dispatchEvent(new Event('input'));
         } else {
@@ -151,6 +152,25 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.toolSelected = this.getById(this.buttons.find((x) => x.tool == tool)!.id)!;
     this.toolSelected.className = 'selected';
     this.drawingState.activeTool = tool;
+
+    this.updateOptionFixedLength(tool);
+  }
+
+  updateOptionFixedLength(tool: DrawingShape | null) {
+    // Enable / disable fix length checkbox based on current tool
+    if (!this.renderedOnce) {
+      return;
+    }
+    const option = this.getById<HTMLInputElement>('fixedLengthEnabled');
+    option.disabled = [
+      null,
+      DrawingShape.Point,
+      DrawingShape.Rectangle,
+      DrawingShape.FreehandPolyline,
+      DrawingShape.FreehandPolygon
+    ].includes(tool);
+    // Trigger event to enable/disable children elements
+    option.dispatchEvent(new Event('change'));
   }
 
   connectedCallback() {
