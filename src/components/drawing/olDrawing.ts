@@ -13,6 +13,8 @@ import VectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Projection } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
+import ConfigManager from '../../tools/configuration/configmanager';
+import MapManager from '../../tools/state/mapManager';
 
 function getLength(coordinates: Coordinate[]) {
   return new LineString(coordinates).getLength();
@@ -239,8 +241,10 @@ export default class OlDrawing {
 
   centerViewOnFeature(feature: DrawingFeature) {
     const olFeature = this.featuresMap.get(feature.id)?.feature;
-    if (olFeature != undefined) {
-      this.map.olMap.getView().fit(olFeature.getGeometry()! as SimpleGeometry);
+    const extent = olFeature?.getGeometry()?.getExtent();
+    if (extent) {
+      const minResolution = ConfigManager.getInstance().Config.search.minResolution;
+      MapManager.getInstance().zoomToExtent(extent, minResolution);
     }
   }
 
