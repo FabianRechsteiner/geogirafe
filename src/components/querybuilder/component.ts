@@ -2,8 +2,8 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import LayerWms from '../../models/layers/layerwms';
 import WfsManager from '../../tools/wfs/wfsmanager';
 import { LayerAttribute } from '../../models/serverwfs';
-import { WfsFilter, WfsOperator } from '../../tools/wfs/wfsfilter';
-import { xmlNumberTypesStrList, xmlStringTypesStrList } from '../../models/xmlTypes';
+import { mapAttributeTypeToFilterOperators, WfsFilter, WfsOperator } from '../../tools/wfs/wfsfilter';
+import { isString, isNumber, isDate } from '../../models/xmlTypes';
 
 class QueryBuilderComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -16,6 +16,23 @@ class QueryBuilderComponent extends GirafeHTMLElement {
   currentLayerAttribute?: LayerAttribute = undefined;
 
   showVal: boolean = false;
+  showVal2: boolean = false;
+  allOperatorOptions: { operator: WfsOperator; displayName: string }[] = [
+    { operator: 'eq', displayName: 'equals' },
+    { operator: 'neq', displayName: 'does not equal' },
+    { operator: 'like', displayName: 'contains' },
+    { operator: 'nlike', displayName: 'does not contain' },
+    { operator: 'gt', displayName: 'greater than' },
+    { operator: 'gte', displayName: 'greater than or equal to' },
+    { operator: 'lt', displayName: 'less than' },
+    { operator: 'lte', displayName: 'less than or equal to' },
+    { operator: 'before', displayName: 'before' },
+    { operator: 'after', displayName: 'after' },
+    { operator: 'between', displayName: 'between' },
+    { operator: 'nul', displayName: 'is blank' },
+    { operator: 'nnul', displayName: 'is not blank' }
+  ];
+  operatorOptions: { operator: WfsOperator; displayName: string }[] = [];
 
   constructor(layer: LayerWms) {
     super('querybuilder');
@@ -65,13 +82,38 @@ class QueryBuilderComponent extends GirafeHTMLElement {
       });
   }
 
-  get isString() {
-    // TODO REG: Manage the type date as a separate type
-    return xmlStringTypesStrList.includes(this.currentLayerAttribute?.type ?? '');
+  get inputTypeForFilterValue(): string {
+    if (isDate(this.currentLayerAttribute?.type || '')) {
+      if (this.currentLayerAttribute?.type === 'datetime') {
+        return 'datetime-local';
+      }
+      return 'date';
+    }
+    return 'string';
   }
 
-  get isNumber() {
-    return xmlNumberTypesStrList.includes(this.currentLayerAttribute?.type ?? '');
+  updateOperatorOptions() {
+    this.operatorOptions = [];
+
+    let xmlTypeGroup: 'string' | 'number' | 'date';
+    if (isString(this.currentLayerAttribute?.type || '')) {
+      xmlTypeGroup = 'string';
+    } else if (isNumber(this.currentLayerAttribute?.type || '')) {
+      xmlTypeGroup = 'number';
+    } else if (isDate(this.currentLayerAttribute?.type || '')) {
+      xmlTypeGroup = 'date';
+    }
+    this.operatorOptions = this.allOperatorOptions.filter((option) =>
+      xmlTypeGroup ? mapAttributeTypeToFilterOperators[xmlTypeGroup].includes(option.operator) : false
+    );
+
+    const operatorSelect = this.shadow.getElementById('operator') as HTMLSelectElement;
+    const currentOperator: WfsOperator = <WfsOperator>operatorSelect?.value;
+
+    if (!this.operatorOptions.map((op) => op.operator).includes(currentOperator)) {
+      operatorSelect.value = '';
+      this.operatorChanged();
+    }
   }
 
   attributeChanged() {
@@ -82,12 +124,14 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     }
 
     this.currentLayerAttribute = layerAttribute;
+    this.updateOperatorOptions();
     super.render();
   }
 
   operatorChanged() {
     const operatorSelect = this.shadow.getElementById('operator') as HTMLSelectElement;
-    this.showVal = operatorSelect.value !== 'nul' && operatorSelect.value !== 'nnul';
+    this.showVal = !!operatorSelect?.value && operatorSelect?.value !== 'nul' && operatorSelect?.value !== 'nnul';
+    this.showVal2 = operatorSelect?.value === 'between';
     super.render();
   }
 
@@ -101,17 +145,31 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     const attributeSelect = this.shadow.getElementById('attribute') as HTMLSelectElement;
     const operatorSelect = this.shadow.getElementById('operator') as HTMLSelectElement;
     const valueInput = this.shadow.getElementById('val') as HTMLInputElement;
-    return [attributeSelect, operatorSelect, valueInput];
+    const value2Input = this.shadow.getElementById('val2') as HTMLInputElement;
+    return [attributeSelect, operatorSelect, valueInput, value2Input];
+  }
+
+  validateInput(val: string): string {
+    if (val && isDate(this.currentLayerAttribute?.type || '')) {
+      const date = new Date(val);
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date value entered !');
+      }
+    }
+    return val;
   }
 
   getFilter() {
-    const [attributeSelect, operatorSelect, val] = this.getFilterElements();
+    const [attributeSelect, operatorSelect, val, val2] = this.getFilterElements();
 
     const property = attributeSelect.value;
     const operator = operatorSelect.value as WfsOperator;
-    const value = val.value;
-    const filter = new WfsFilter(property, operator, value, this.currentLayerAttribute?.type);
-    return filter;
+    const value = this.validateInput(val.value);
+    const value2 = this.validateInput(val2.value);
+    if (this.showVal2 && (!value || !value2)) {
+      return;
+    }
+    return new WfsFilter(property, operator, value, value2, this.currentLayerAttribute?.type);
   }
 
   filter() {
@@ -119,14 +177,16 @@ class QueryBuilderComponent extends GirafeHTMLElement {
   }
 
   removeFilter() {
-    const [attributeSelect, operatorSelect, val] = this.getFilterElements();
+    const [attributeSelect, operatorSelect, val, val2] = this.getFilterElements();
 
     this.layer.filter = undefined;
     attributeSelect.value = '';
     operatorSelect.value = '';
     val.value = '';
+    val2.value = '';
     this.currentLayerAttribute = undefined;
     this.showVal = false;
+    this.showVal2 = false;
     super.render();
   }
 

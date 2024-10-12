@@ -7,26 +7,56 @@ import {
   lessThanOrEqualTo,
   like,
   not,
-  notEqualTo
+  notEqualTo,
+  between,
+  during
 } from 'ol/format/filter';
 import Filter from 'ol/format/filter/Filter';
+import { XmlTypes, isStringNumeric, isString, isDate } from '../../models/xmlTypes';
 
-import { XmlTypes, isStringNumeric } from '../../models/xmlTypes';
-
-export const wfsOperatorsStrList = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'like', 'nlike', 'nul', 'nnul'] as const;
+export const wfsOperatorsStrList = [
+  'eq',
+  'neq',
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'like',
+  'nlike',
+  'before',
+  'after',
+  'between',
+  'nul',
+  'nnul'
+] as const;
 export type WfsOperator = (typeof wfsOperatorsStrList)[number];
 
-export class WfsFilter<WfsXmlTypes = XmlTypes> {
+export const mapAttributeTypeToFilterOperators: Record<'string' | 'number' | 'date', WfsOperator[]> = {
+  string: ['eq', 'neq', 'like', 'nlike', 'nul', 'nnul'],
+  number: ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'between', 'nul', 'nnul'],
+  date: ['eq', 'neq', 'before', 'after', 'between', 'nnul']
+};
+
+export class WfsFilter<WfsXmlTypes extends XmlTypes = XmlTypes> {
   property: string;
   propertyType?: WfsXmlTypes;
   operator: WfsOperator;
   value: string;
+  value2: string;
 
-  constructor(property: string, operator: WfsOperator, value: string, propertyType?: WfsXmlTypes) {
+  beginOfTime = '0001-01-01';
+  endOfTime = '9999-12-31';
+
+  constructor(property: string, operator: WfsOperator, value: string, value2: string = '', propertyType?: WfsXmlTypes) {
     this.property = property;
     this.operator = operator;
     this.value = value;
+    this.value2 = value2;
     this.propertyType = propertyType;
+
+    if (this.operator === 'between' && !this.value2) {
+      throw new Error('Between operator needs two filter values !');
+    }
   }
 
   public toOpenLayersFilter(): Filter {
@@ -37,16 +67,19 @@ export class WfsFilter<WfsXmlTypes = XmlTypes> {
     //(this.property, this.value, propertyType)
     switch (this.operator) {
       case 'eq':
-        if (this.propertyType === 'string' && isStringNumeric(this.value)) {
+        if (isString(this.propertyType) && isStringNumeric(this.value)) {
           // See https://mapserver-users.osgeo.narkive.com/P0EVA6Qr/wfs-filter-creates-a-query-using-a-number-instead-of-text
           return like(this.property, '*' + this.value + '*');
         } else {
           return equalTo(this.property, this.value as string | number);
         }
       case 'neq':
-        if (this.propertyType === 'string' && isStringNumeric(this.value)) {
+        if (isString(this.propertyType) && isStringNumeric(this.value)) {
           // See https://mapserver-users.osgeo.narkive.com/P0EVA6Qr/wfs-filter-creates-a-query-using-a-number-instead-of-text
           return not(like(this.property, '*' + this.value + '*'));
+        } else if (isDate(this.propertyType)) {
+          // mapserver does not support notEqualTo for date values, see notes in https://www.mapserver.org/ogc/filter_encoding.html#tests
+          return not(equalTo(this.property, this.value));
         } else {
           return notEqualTo(this.property, this.value as string | number);
         }
@@ -62,9 +95,21 @@ export class WfsFilter<WfsXmlTypes = XmlTypes> {
         return like(this.property, '*' + this.value + '*');
       case 'nlike':
         return not(like(this.property, '*' + this.value + '*'));
+      case 'before':
+        return during(this.property, this.beginOfTime, this.value);
+      case 'after':
+        return during(this.property, this.value, this.endOfTime);
+      case 'between':
+        if (isDate(this.propertyType)) {
+          return during(this.property, this.value, this.value2);
+        }
+        return between(this.property, Number(this.value), Number(this.value2));
       case 'nul':
         return isNull(this.property);
       case 'nnul':
+        if (isDate(this.propertyType)) {
+          return notEqualTo(this.property, '');
+        }
         return not(isNull(this.property));
       default:
         throw new Error('Unknown filter operator');
@@ -108,6 +153,12 @@ export class WfsFilter<WfsXmlTypes = XmlTypes> {
         return WfsFilter.simpleLikeFilter(this.property, wildCard + this.value + wildCard, wildCard);
       case 'nlike':
         return WfsFilter.simpleNlikeFilter(this.property, wildCard + this.value + wildCard, wildCard);
+      case 'before':
+        return WfsFilter.simpleLteFilter(this.property, this.value);
+      case 'after':
+        return WfsFilter.simpleGteFilter(this.property, this.value);
+      case 'between':
+        return WfsFilter.simpleBetweenFilter(this.property, this.value, this.value2);
       case 'nul':
         return WfsFilter.simpleEqFilter(this.property, '');
       case 'nnul':
@@ -139,6 +190,10 @@ export class WfsFilter<WfsXmlTypes = XmlTypes> {
 
   protected static simpleGteFilter(name: string, value: string) {
     return `<Filter><PropertyIsGreaterThanOrEqualTo><PropertyName>${name}</PropertyName><Literal>${value}</Literal></PropertyIsGreaterThanOrEqualTo></Filter>`;
+  }
+
+  protected static simpleBetweenFilter(name: string, value: string, value2: string) {
+    return `<Filter><And><PropertyIsGreaterThanOrEqualTo><PropertyName>${name}</PropertyName><Literal>${value}</Literal></PropertyIsGreaterThanOrEqualTo><PropertyIsLessThanOrEqualTo><PropertyName>${name}</PropertyName><Literal>${value2}</Literal></PropertyIsLessThanOrEqualTo></And></Filter>`;
   }
 
   protected static simpleInnerLikeFilter(name: string, value: string, wildCard?: string) {
