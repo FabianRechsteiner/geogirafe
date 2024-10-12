@@ -28,3 +28,15 @@ export type XmlTypes = (typeof xmlTypesStrList)[number];
 export function isStringNumeric(str: string) {
   return str.trim().length > 0 && !isNaN(Number(str)); // ensure strings of whitespace fail or mixed chars and numbers like '2n'
 }
+
+export function isString(attributeType: XmlTypes): boolean {
+  return xmlStringTypesStrList.includes(attributeType);
+}
+
+export function isNumber(attributeType: XmlTypes): boolean {
+  return xmlNumberTypesStrList.includes(attributeType);
+}
+
+export function isDate(attributeType: XmlTypes): boolean {
+  return xmlDatetimeTypesStrList.includes(attributeType);
+}

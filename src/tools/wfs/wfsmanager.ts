@@ -127,14 +127,8 @@ export default class WfsManager extends GirafeSingleton {
     });
     // add the newly filtered selected features
     selectedFeatures.push(...filteredSelectedFeatures);
-
-    if (selectedFeatures.length === 0) {
-      // No feature selected
-      this.state.interface.selectionComponentVisible = false;
-    } else {
-      this.state.selection.selectedFeatures = selectedFeatures;
-      this.state.interface.selectionComponentVisible = true;
-    }
+    this.state.selection.selectedFeatures = selectedFeatures;
+    this.state.interface.selectionComponentVisible = selectedFeatures.length !== 0;
     this.state.loading = false;
   }
 

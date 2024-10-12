@@ -22,25 +22,25 @@
     <div class="custom-select">
       <select id="operator" name="operator" onchange="${() => this.operatorChanged()}">
         <option value="" disabled selected>Select operator...</option>
-        <option value="eq" class="${this.isNumber || this.isString ? '' : 'hidden'}">equals</option>
-        <option value="neq" class="${this.isNumber || this.isString ? '' : 'hidden'}">does not equal</option>
-        <option value="like" class="${!this.isString ? 'hidden' : ''}">contains</option>
-        <option value="nlike" class="${!this.isString ? 'hidden' : ''}">does not contain</option>
-        <option value="gt" class="${!this.isNumber ? 'hidden' : ''}">greater than</option>
-        <option value="gte" class="${!this.isNumber ? 'hidden' : ''}">greater than or equal to</option>
-        <option value="lt" class="${!this.isNumber ? 'hidden' : ''}">less than</option>
-        <option value="lte" class="${!this.isNumber ? 'hidden' : ''}">less than or equal to</option>
-        <option value="nul" class="${this.isNumber || this.isString ? '' : 'hidden'}">is blank</option>
-        <option value="nnul" class="${this.isNumber || this.isString ? '' : 'hidden'}">is not blank</option>
+        ${this.operatorOptions.map(option => uHtmlFor(option, option.operator)`
+          <option value="${option.operator}">${option.displayName}</option>
+        `)}
       </select>
     </div>
 
     <input
       id="val"
-      type="text"
+      type="${this.inputTypeForFilterValue}"
       class="${this.showVal ? '' : 'hidden'}"
-      placeholder="Enter value..."
-      onkeypress="${(e:KeyboardEvent)=>this.onValueKeyPress(e)}" />
+      placeholder="${this.showVal2 ? 'Enter lower boundary...' : 'Enter value...'}"
+      onkeydown="${(e:KeyboardEvent)=>this.onValueKeyPress(e)}" />
+
+    <input
+      id="val2"
+      type="${this.inputTypeForFilterValue}"
+      class="${this.showVal2 ? '' : 'hidden'}"
+      placeholder="Enter upper boundary..."
+      onkeydown="${(e:KeyboardEvent)=>this.onValueKeyPress(e)}" />
 
     <button class="gg-button gg-medium" tip="Apply filter" onclick="${() => this.filter()}">
       <img alt="filter-icon" src="icons/filter.svg" />
