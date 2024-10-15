@@ -85,7 +85,9 @@ export default class MapComponent extends GirafeHTMLElement {
 
   // For object selection
   selectedFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
+  highlightedFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   selectionLayer!: VectorLayer<VectorSource>;
+  highlightLayer!: VectorLayer<VectorSource>;
   pixelTolerance = 10;
   dragbox!: DragBox;
   focusFeature: FocusFeature;
@@ -136,6 +138,9 @@ export default class MapComponent extends GirafeHTMLElement {
     );
     this.subscribe('selection.selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) =>
       this.onFeaturesSelected(newFeatures)
+    );
+    this.subscribe('selection.highlightedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) =>
+      this.onFeatureHighlighted(newFeatures)
     );
     this.subscribe('selection.focusedFeatures', (_oldFeature: Feature[] | null, newFeature: Feature[] | null) =>
       this.focusFeature.setFocusedFeatures(newFeature)
@@ -193,6 +198,11 @@ export default class MapComponent extends GirafeHTMLElement {
     const view = this.viewManager.getView();
     this.olMap.setView(view);
 
+    // Create layer for highlighted features
+    const highlightSource = new VectorSource({
+      features: this.highlightedFeaturesCollection
+    });
+
     // Create layer for selection
     const selectionSource = new VectorSource({
       features: this.selectedFeaturesCollection
@@ -221,8 +231,28 @@ export default class MapComponent extends GirafeHTMLElement {
           })
         })
       });
+      this.highlightLayer = new VectorLayer({
+        source: highlightSource,
+        style: new Style({
+          stroke: new Stroke({
+            color: this.configManager.Config.selection.highlightStrokeColor,
+            width: this.configManager.Config.selection.defaultStrokeWidth
+          }),
+          fill: new Fill({ color: this.configManager.Config.selection.highlightFillColor }),
+          image: new Circle({
+            radius: 7,
+            fill: new Fill({ color: this.configManager.Config.selection.highlightFillColor }),
+            stroke: new Stroke({
+              color: this.configManager.Config.selection.highlightStrokeColor,
+              width: this.configManager.Config.selection.defaultStrokeWidth
+            })
+          })
+        })
+      });
       this.olMap.addLayer(this.selectionLayer);
+      this.olMap.addLayer(this.highlightLayer);
       this.selectionLayer.setZIndex(1002);
+      this.highlightLayer.setZIndex(1003);
       this.selectionLayer.set('altitudeMode', 'clampToGround');
 
       if (this.configManager.Config.map.showScaleLine) {
@@ -317,6 +347,7 @@ export default class MapComponent extends GirafeHTMLElement {
     // Reset current selection
     this.state.selection.selectedFeatures = [];
     this.state.selection.selectionParameters = [];
+    this.state.selection.highlightedFeatures = [];
     // Layers selectable today are WMS, WMTS (with wms layer) and Local files
     this.wmsManager.selectFeatures(extent);
     this.wmtsManager.selectFeatures(extent);
@@ -535,6 +566,13 @@ export default class MapComponent extends GirafeHTMLElement {
       for (const feature of features) {
         this.selectedFeaturesCollection.push(feature);
       }
+    }
+  }
+
+  onFeatureHighlighted(features: Feature[]) {
+    this.highlightedFeaturesCollection.clear();
+    for (const feature of features) {
+      this.highlightedFeaturesCollection.push(feature);
     }
   }
 

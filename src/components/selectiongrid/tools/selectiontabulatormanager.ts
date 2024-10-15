@@ -6,6 +6,7 @@ import I18nManager from '../../../tools/i18n/i18nmanager';
 import FormatGridGeomValue from './formatgridgeomvalue';
 import { ColumnDefinition, TabulatorFull as Tabulator } from 'tabulator-tables';
 import StateManager from '../../../tools/state/statemanager';
+import { getUid } from 'ol/util';
 
 /**
  * Represents the header text and state of a tab.
@@ -105,6 +106,22 @@ export default class SelectionTabulatorManager {
     this.table?.on('rowSelectionChanged', (selection) => {
       // True if at least one row is selected.
       this.stateManager.state.selection.gridSelected = selection.length > 0;
+
+      // Highlight selected features on the map.
+      const highlightedGeometries: OlFeature[] = [];
+      selection.forEach((row) => {
+        // the grid cell containing the olFeature
+        const rowOlFeature = row.geom ?? row.the_geom ?? row.geometry;
+
+        const selectedGeometry = this.data[id].features.find((feature) => {
+          const geometryName = feature.getGeometryName();
+          return getUid(feature.get(geometryName)) === getUid(rowOlFeature);
+        });
+        if (selectedGeometry) {
+          highlightedGeometries.push(selectedGeometry);
+        }
+      });
+      this.stateManager.state.selection.highlightedFeatures = highlightedGeometries;
     });
   }
 
