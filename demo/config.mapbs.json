@@ -14,7 +14,7 @@
     "defaultSelectionComponent": "grid"
   },
   "themes": {
-    "url": "https://map.geo.test.bs.ch/themes?background=background&interface=desktop",
+    "url": "https://map.geo.bs.ch/themes?background=background&interface=desktop",
     "defaultTheme": "",
     "selectionMode": "add"
   },
@@ -32,12 +32,12 @@
     }
   },
   "search": {
-    "url": "https://map.geo.test.bs.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###&lang=###SEARCHLANG###",
+    "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###&lang=###SEARCHLANG###",
     "objectPreview": true,
     "layerPreview": true
   },
   "print": {
-    "url": "https://map.geo.test.bs.ch/printproxy/",
+    "url": "https://map.geo.bs.ch/printproxy/",
     "defaultLayout": "print_A4_hochformat"
   },
   "share": {
@@ -83,21 +83,21 @@
     "post": ""
   },
   "metadata": {
-    "metadataUrlPrefix": "https://map.geo.test.bs.ch",
+    "metadataUrlPrefix": "https://map.geo.bs.ch",
     "defaultWindowWidth": "500px",
     "defaultWindowHeight": "350px"
   },
   "oauth": {
     "issuer": {
-      "url": "https://auth.geo.test.bs.ch/auth/realms/geobs",
+      "url": "https://auth.geo.bs.ch/auth/realms/geobs",
       "clientId": "MapBS-ui",
       "loginRequired": false,
       "checkSessionOnLoad": true
     },
     "geomapfish": {
-      "userInfoUrl": "https://map.geo.test.bs.ch/loginuser",
-      "loginUrl": "https://map.geo.test.bs.ch/KeycloakLogin",
-      "logoutUrl": "https://map.geo.test.bs.ch/KeycloakLogout",
+      "userInfoUrl": "https://map.geo.bs.ch/loginuser",
+      "loginUrl": "https://map.geo.bs.ch/KeycloakLogin",
+      "logoutUrl": "https://map.geo.bs.ch/KeycloakLogout",
       "anonymousUsername": "service-account-service_mapbs_anonymous"
     }
   }

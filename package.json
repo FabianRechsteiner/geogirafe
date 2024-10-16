@@ -39,7 +39,7 @@
     "error-stack-parser": "2.1.4",
     "file-saver": "2.0.5",
     "lz-string": "1.5.0",
-    "oauth4webapi": "^2.17.0",
+    "oauth4webapi": "3.0.1",
     "on-change": "5.0.1",
     "source-map-js": "1.2.1",
     "tabulator-tables": "6.3.0",

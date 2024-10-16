@@ -9,7 +9,7 @@ import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
 import type OLayerImage from 'ol/layer/Image';
 import type OSourceImageWMS from 'ol/source/ImageWMS';
-import { OpenIDTokenEndpointResponse, UserInfoResponse } from 'oauth4webapi';
+import { TokenEndpointResponse, UserInfoResponse } from 'oauth4webapi';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -92,7 +92,7 @@ export type Lidar = {
  */
 type LoginState = {
   status: 'issuer.loggedIn' | 'loggedIn' | 'loginFailed' | 'backend.loggedOut' | 'loggedOut' | 'logoutFailed';
-  tokens?: OpenIDTokenEndpointResponse;
+  tokens?: TokenEndpointResponse;
   userInfo?: UserInfoResponse;
 };
 
