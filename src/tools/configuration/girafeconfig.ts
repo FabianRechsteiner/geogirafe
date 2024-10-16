@@ -134,6 +134,11 @@ class GirafeConfig {
   query: {
     legacy: boolean;
   };
+  gmfauth?: {
+    url: string;
+    loginRequired: boolean;
+    checkSessionOnLoad: boolean;
+  };
   oauth?: {
     issuer: {
       url: string;
@@ -180,6 +185,7 @@ class GirafeConfig {
     this.offline = this.initConfigOffline(config);
     this.query = this.initConfigQuery(config);
     this.oauth = this.initConfigOauth(config);
+    this.gmfauth = this.initGmfOauth(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -444,6 +450,23 @@ class GirafeConfig {
       // NOTE REG: Small hack specific to Vite: When running in debug mode, we force the logLevel to debug.
       // Otherwise we will always have to manually activate it.
       logLevel: import.meta.env.DEV ? 'debug' : config.general.logLevel ?? 'warn'
+    };
+  }
+
+  private initGmfOauth(config: GirafeConfig) {
+    if (!config.gmfauth) {
+      // No GMF-Auth configuration
+      return undefined;
+    }
+
+    if (!config.gmfauth.url) {
+      throw new Error(`Configuration for gmfauth.url is required. See https://doc.geomapfish.dev/docs/configuration.`);
+    }
+
+    return {
+      url: config.gmfauth.url,
+      loginRequired: config.gmfauth.loginRequired ?? false,
+      checkSessionOnLoad: config.gmfauth.checkSessionOnLoad ?? true
     };
   }
 

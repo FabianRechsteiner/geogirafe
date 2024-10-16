@@ -1,4 +1,4 @@
-<div class="${this.configManager.Config.oauth ? '' : 'hidden'}">
+<div class="${this.configManager.Config.oauth || this.configManager.Config.gmfauth ? '' : 'hidden'}">
   <div class="${this.state.oauth.status === 'loggedIn' ? 'hidden' : 'container'}">
     <button class="gg-button gg-medium-withtext" onclick="${() => this.onLoginClick()}">
       <img alt="menu-icon" src="icons/user.svg" />
@@ -9,7 +9,9 @@
     <button class="gg-button gg-medium-withtext" onclick="${() => this.onLogoutClick()}">
       <img alt="menu-icon" src="${this.userIconUrl ?? 'icons/user.svg'}" />
       <div class="name">
-        <span>${this.state.oauth.userInfo?.given_name + ' ' + this.state.oauth.userInfo?.family_name}</span>
+        <span class="${this.state.oauth.userInfo?.given_name ? '' : 'hidden'}"
+          >${this.state.oauth.userInfo?.given_name + ' ' + this.state.oauth.userInfo?.family_name}</span
+        >
         <span>${this.state.oauth.userInfo?.username}</span>
       </div>
     </button>

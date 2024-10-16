@@ -35,7 +35,7 @@ import PrintComponent from './components/print/component';
 import ProjectionComponent from './components/projection/component';
 import PrototypeBannerComponent from './components/prototypebanner/component';
 import QueryBuilderComponent from './components/querybuilder/component';
-import OauthComponent from './components/oauth/component';
+import OauthComponent from './components/auth/component';
 import DrawingComponent from './components/drawing/component';
 import ScaleComponent from './components/scale/component';
 import SearchComponent from './components/search/component';
@@ -48,7 +48,7 @@ import TreeViewItemComponent from './components/treeview/treeviewitem/component'
 import TreeViewGroupComponent from './components/treeview/treeviewgroup/component';
 import TreeViewThemeComponent from './components/treeview/treeviewtheme/component';
 import VideoRecordComponent from './components/videorecord/component';
-import OauthManager from './tools/oauth/oauthmanager.js';
+import AuthManager from './tools/auth/authmanager.js';
 
 // Redirect to mobile interface if we are on mobile
 if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
@@ -98,7 +98,7 @@ try {
   LogManager.getInstance()
     .initLogging()
     .then(() => {
-      OauthManager.getInstance().initialize();
+      AuthManager.getInstance().initialize();
       ErrorManager.getInstance();
       CsvManager.getInstance();
       I18nManager.getInstance();

@@ -1,6 +1,4 @@
-import ConfigManager from '../configuration/configmanager';
-import StateManager from '../state/statemanager';
-import GirafeSingleton from '../../base/GirafeSingleton';
+import AbstractConnectManager from './abstractconnectmanager';
 import ShareManager from '../share/sharemanager';
 import {
   authorizationCodeGrantRequest,
@@ -9,26 +7,19 @@ import {
   Client,
   discoveryRequest,
   generateRandomCodeVerifier,
-  isOAuth2Error,
-  OpenIDTokenEndpointResponse,
-  processAuthorizationCodeOpenIDResponse,
+  processAuthorizationCodeResponse,
   processDiscoveryResponse,
   processRefreshTokenResponse,
   refreshTokenGrantRequest,
+  TlsClientAuth,
+  TokenEndpointResponse,
   validateAuthResponse
 } from 'oauth4webapi';
 
-export default class OpenIdConnectManager extends GirafeSingleton {
-  private readonly configManager: ConfigManager;
-  private readonly stateManager: StateManager;
-
+export default class OpenIdConnectManager extends AbstractConnectManager {
   private authorizationServer?: AuthorizationServer;
 
-  get state() {
-    return this.stateManager.state;
-  }
-
-  get issuerConfig() {
+  private get issuerConfig() {
     return this.configManager.Config.oauth!.issuer;
   }
 
@@ -44,13 +35,7 @@ export default class OpenIdConnectManager extends GirafeSingleton {
     return new URL(window.location.href).searchParams.has('error');
   }
 
-  constructor(type: string) {
-    super(type);
-    this.configManager = ConfigManager.getInstance();
-    this.stateManager = StateManager.getInstance();
-  }
-
-  public initialize() {
+  public override initialize() {
     if (this.isAuthentified()) {
       if (!this.hasAuthError()) {
         // We are back from issuer authentication.
@@ -106,18 +91,19 @@ export default class OpenIdConnectManager extends GirafeSingleton {
     };
   }
 
-  public async login() {
+  public override async login() {
     /**
      * If autologin configuration is activated, we force a loggin at the start of the app
      * But if we are coming back from the issuer, we are already in a loggin process.
      * In this case we do not do anything
      */
     if (!this.isAuthentified() || this.hasAuthError()) {
+      console.debug('Auth: 1. Issuer login');
       await this.redirectToIssuerLogin(false);
     }
   }
 
-  public async silentLogin() {
+  public override async silentLogin() {
     /**
      * If autologin configuration is activated, we force a loggin at the start of the app
      * But if we are coming back from the issuer, we are already in a loggin process.
@@ -128,7 +114,8 @@ export default class OpenIdConnectManager extends GirafeSingleton {
     }
   }
 
-  public async logout() {
+  public override async logout() {
+    console.debug('Auth: 5. Issuer logout');
     await this.logoutFromIssuer();
   }
 
@@ -179,39 +166,48 @@ export default class OpenIdConnectManager extends GirafeSingleton {
   }
 
   private async handleLoggedInToIssuer() {
+    console.debug('Auth: 2. Issuer login handle');
     const authorizationServer = await this.getAuthorizationServer();
     const client = this.getClient();
     const currentUrl = new URL(document.URL);
-    const params = validateAuthResponse(authorizationServer, client, currentUrl);
 
-    if (isOAuth2Error(params)) {
-      this.manageError();
+    let params;
+    try {
+      params = validateAuthResponse(authorizationServer, client, currentUrl);
+    } catch (error) {
+      this.manageError(error as Error);
     }
 
-    const codeGrantResponse = await authorizationCodeGrantRequest(
+    const response = await authorizationCodeGrantRequest(
       authorizationServer,
       client,
+      TlsClientAuth(),
       params as URLSearchParams,
       this.redirectUrl,
       this.codeVerifier
     );
 
-    const openIdTokens = await processAuthorizationCodeOpenIDResponse(authorizationServer, client, codeGrantResponse);
-
-    if (isOAuth2Error(openIdTokens)) {
-      this.manageError();
+    let openIdTokens;
+    try {
+      openIdTokens = await processAuthorizationCodeResponse(authorizationServer, client, response);
+    } catch (error) {
+      this.manageError(error as Error);
     }
 
-    this.state.oauth.tokens = openIdTokens as OpenIDTokenEndpointResponse;
-
-    if (this.state.oauth.tokens.expires_in) {
-      const expiresInMs = this.state.oauth.tokens.expires_in * 1000;
-      setTimeout(() => this.refreshToken(), expiresInMs);
-    }
+    this.setToken(openIdTokens as TokenEndpointResponse);
 
     // Removing oauth URL parameters
     this.resetUrlHistory(true);
     this.state.oauth.status = 'issuer.loggedIn';
+  }
+
+  setToken(tokens: TokenEndpointResponse) {
+    this.state.oauth.tokens = tokens;
+    // Prepare refresh token
+    if (this.state.oauth.tokens.expires_in) {
+      const expiresInMs = this.state.oauth.tokens.expires_in * 1000;
+      setTimeout(() => this.refreshToken(), expiresInMs);
+    }
   }
 
   private handleErrorFromIssuer() {
@@ -240,25 +236,33 @@ export default class OpenIdConnectManager extends GirafeSingleton {
     const authorizationServer = await this.getAuthorizationServer();
     const client = this.getClient();
 
-    const response = await refreshTokenGrantRequest(authorizationServer, client, this.state.oauth.tokens.refresh_token);
-    const newOpenIdTokens = await processRefreshTokenResponse(authorizationServer, client, response);
-    if (isOAuth2Error(newOpenIdTokens)) {
-      this.manageError();
+    const response = await refreshTokenGrantRequest(
+      authorizationServer,
+      client,
+      TlsClientAuth(),
+      this.state.oauth.tokens.refresh_token
+    );
+
+    let openIdTokens;
+    try {
+      openIdTokens = await processRefreshTokenResponse(authorizationServer, client, response);
+    } catch (error) {
+      this.manageError(error as Error);
     }
 
-    this.state.oauth.tokens = newOpenIdTokens as OpenIDTokenEndpointResponse;
+    this.setToken(openIdTokens as TokenEndpointResponse);
   }
 
-  private manageError() {
+  private manageError(error: Error) {
     this.state.oauth.status = 'loginFailed';
-    // TODO REG : Get the right error message here
-    const errorMsg = 'OAuth: Issuer login failed';
-    throw new Error(errorMsg);
+    const errorMsg = `OAuth: Issuer login failed: ${error.message}`;
+    console.error(errorMsg);
+    throw error;
   }
 
   async logoutFromIssuer() {
     const authorizationServer = await this.getAuthorizationServer();
-    const issuerLogoutUrl = new URL(authorizationServer.end_session_endpoint!);
+    const issuerLogoutUrl = new URL(authorizationServer.end_session_endpoint as string);
     const logoutRedirectUrl = this.getLogoutRedirectUrl();
     issuerLogoutUrl.searchParams.set('client_id', this.issuerConfig.clientId);
     issuerLogoutUrl.searchParams.set('post_logout_redirect_uri', logoutRedirectUrl);

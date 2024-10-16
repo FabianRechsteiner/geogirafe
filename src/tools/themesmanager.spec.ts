@@ -12,11 +12,12 @@ const emptyTheme = {
   themes: []
 };
 
-beforeAll(() => {
+beforeAll(async () => {
   MockHelper.startMocking();
   global.fetch = fetchMock;
   fetchMock.mockResolvedValueOnce({ json: vi.fn().mockResolvedValue(emptyTheme) });
   manager = ThemesManager.getInstance();
+  await manager.initialize();
 });
 
 afterAll(() => {

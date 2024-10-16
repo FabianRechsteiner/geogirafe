@@ -1,5 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import OauthManager from '../../tools/oauth/oauthmanager';
+import AuthManager from '../../tools/auth/authmanager';
 
 export class OauthComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -7,13 +7,13 @@ export class OauthComponent extends GirafeHTMLElement {
 
   public userIconUrl?: string;
 
-  oauthManager: OauthManager;
+  oauthManager: AuthManager;
   public menuOpen: boolean = false;
 
   constructor() {
     super('oauth');
     console.info('OauthComponent constructor');
-    this.oauthManager = OauthManager.getInstance();
+    this.oauthManager = AuthManager.getInstance();
   }
 
   private registerEvents() {
@@ -27,7 +27,7 @@ export class OauthComponent extends GirafeHTMLElement {
   }
 
   public onLoginClick() {
-    if (!this.configManager.Config.oauth) {
+    if (!this.configManager.Config.oauth && !this.configManager.Config.gmfauth) {
       throw new Error('Authentication is not configured on this instance. Login cannot be done.');
     } else {
       this.oauthManager.login();

@@ -3,11 +3,13 @@ import GMFManager from './gmfmanager';
 import OpenIdConnectManager from './openidconnectmanager';
 import GirafeSingleton from '../../base/GirafeSingleton';
 import ConfigManager from '../configuration/configmanager';
+import AbstractConnectManager from './abstractconnectmanager';
+import GMFConnectManager from './gmfconnectmanager';
 
-export default class OauthManager extends GirafeSingleton {
+export default class AuthManager extends GirafeSingleton {
   private readonly stateManager: StateManager;
 
-  private readonly issuerManager: OpenIdConnectManager;
+  private issuerManager!: AbstractConnectManager;
   private readonly gmfManager: GMFManager;
 
   private get state() {
@@ -17,19 +19,46 @@ export default class OauthManager extends GirafeSingleton {
   constructor(type: string) {
     super(type);
     this.stateManager = StateManager.getInstance();
-    this.issuerManager = OpenIdConnectManager.getInstance();
-    this.issuerManager.initialize();
     this.gmfManager = GMFManager.getInstance();
-
     this.stateManager.subscribe('oauth.status', () => this.loginStateChanged());
   }
 
   public initialize() {
-    const issuerConfig = ConfigManager.getInstance().Config.oauth?.issuer;
-    if (issuerConfig?.loginRequired) {
-      this.login();
-    } else if (issuerConfig?.checkSessionOnLoad) {
+    const oauthIssuerConfig = ConfigManager.getInstance().Config.oauth?.issuer;
+    if (oauthIssuerConfig) {
+      // Standard oAuth workflow
+      this.initializeOAuth(oauthIssuerConfig);
+    }
+
+    const gmfauthConfig = ConfigManager.getInstance().Config.gmfauth;
+    if (gmfauthConfig) {
+      this.initializeGmfAuth(gmfauthConfig);
+    }
+
+    // Else: oo auth configured
+    // Nothing to do
+  }
+
+  private initializeOAuth(config: any) {
+    this.issuerManager = OpenIdConnectManager.getInstance();
+    this.issuerManager.initialize();
+    if (config.checkSessionOnLoad) {
       this.silentLogin();
+    }
+    if (config.loginRequired && this.state.oauth.status === 'loggedOut') {
+      this.login();
+    }
+  }
+
+  private async initializeGmfAuth(config: any) {
+    this.issuerManager = GMFConnectManager.getInstance();
+    this.issuerManager.initialize();
+    // For GMF, the silent login is actually the same as checkin if the userinfos are already defined
+    if (config.checkSessionOnLoad) {
+      await this.gmfManager.getUserInfo();
+    }
+    if (config.loginRequired && this.state.oauth.status === 'loggedOut') {
+      this.login();
     }
   }
 
@@ -38,8 +67,11 @@ export default class OauthManager extends GirafeSingleton {
       if (this.state.oauth.status === 'issuer.loggedIn') {
         // We are logged in to the identity provider
         // We must now login to GMF
-        await this.gmfManager.login();
-        // And get UserInfos
+        // If we got a token from the issuer, we first call the GMF login route with Token
+        if (this.state.oauth.tokens) {
+          await this.gmfManager.loginWithToken();
+        }
+        // And then we get the UserInfos
         await this.gmfManager.getUserInfo();
       }
     } catch (e) {
@@ -65,7 +97,7 @@ export default class OauthManager extends GirafeSingleton {
       await this.issuerManager.silentLogin();
     } catch (e) {
       this.state.oauth.status = 'loggedOut';
-      // TODO REG : Use anonymous mode
+      // TODO REG : Test anonymous username ?
     }
   }
 
