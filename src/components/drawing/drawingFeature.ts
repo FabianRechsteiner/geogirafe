@@ -32,6 +32,7 @@ export type SerializedFeature = {
   dm: boolean;
   nc: string;
   mc: string;
+  s: boolean;
   t: DrawingShape;
 };
 
@@ -48,6 +49,7 @@ export default class DrawingFeature {
   private _font: string;
   private _displayName: boolean = true;
   private _displayMeasure: boolean = true;
+  private _selected: boolean = true;
 
   geojson: object;
   id: string = uuidv4();
@@ -160,6 +162,15 @@ export default class DrawingFeature {
     return this._tool;
   }
 
+  get selected() {
+    return this._selected;
+  }
+
+  set selected(v) {
+    this._selected = v;
+    this.onChange(this);
+  }
+
   addToState() {
     (StateManager.getInstance().state.extendedState.drawing as DrawingState).features.push(this);
   }
@@ -178,7 +189,8 @@ export default class DrawingFeature {
       dn: this._displayName,
       dm: this._displayMeasure,
       nc: this._nameColor,
-      mc: this._measureColor
+      mc: this._measureColor,
+      s: this._selected
     };
   }
 
@@ -229,6 +241,7 @@ export default class DrawingFeature {
     newFeature.displayMeasure = serializedFeature.dm;
     newFeature.nameColor = serializedFeature.nc;
     newFeature.measureColor = serializedFeature.mc;
+    newFeature.selected = serializedFeature.s;
     newFeature.addToState();
     return newFeature;
   }

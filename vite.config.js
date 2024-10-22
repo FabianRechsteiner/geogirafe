@@ -79,6 +79,7 @@ export default defineConfig({
         { src: `${cesiumSource}/Widgets`, dest: cesiumBaseUrl },
         { src: 'service-worker.js', dest: '' },
         { src: 'src/styles/*.css', dest: 'styles/' },
+        { src: 'src/assets/icons/*', dest: 'icons/' },
         { src: 'node_modules/ol/ol.css', dest: 'lib/ol/' },
         { src: 'node_modules/tabulator-tables/dist/css/tabulator.min.css', dest: 'lib/tabulator-tables/' },
         { src: 'node_modules/font-gis/css/*.css', dest: 'lib/font-gis/' },
