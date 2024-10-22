@@ -19,31 +19,67 @@
     </div>
   </div>
   <div id="drawingListContainer">
-    <div id="drawingList"></div>
+    <div id="drawingList">
+
+      ${this.drawingState.features.map(feature => uHtmlFor(feature, feature.id)`
+
+      <div id="${'f-' + feature.id}" class="girafe">
+
+        <button id="${'f-select-' + feature.id}"
+                class="gg-button icon" tip="Select to change appearance"
+                onclick="${() => this.onToggleFeatureSelection(feature)}">
+          ${this.htmlUnsafe(feature.selected ? this.checkedIcon : this.noCheckedIcon)}
+        </button>
+
+        <button class="gg-button icon" tip="Center on shape"
+                onclick="${() => this.olDrawing.centerViewOnFeature(feature)}">
+          ${this.htmlUnsafe(this.locateIcon)}
+        </button>
+
+        <span id="${'f-name-' + feature.id}">${feature.name}</span>
+
+        <button class="gg-button icon" tip="Delete shape"
+                onclick="${() => this.deleteFeature(feature)}">
+          ${this.htmlUnsafe(this.trashIcon)}
+        </button>
+
+      </div>
+      `)}
+      
+    </div>
   </div>
-  <div id="options" class="disabled">
-    <input id="optionsTitle" type="text" value="${this.curFeature?.name}" />
+  <div id="options" class="${this.selectedFeatures.length > 0 ? '' : 'disabled'}">
+    <input id="optionsTitle" type="text" value="${this.getOptionsTitle()}"
+           class="${this.selectedFeatures.length > 1 ? 'disabled' : ''}" />
     <div id="optionsText">
       <div id="optionsTextLines">
         <span>Name</span>
-        <button class="icon" id="visibleIconName" onclick="${()=>this.toggleNameVisibility()}"></button>
+        <button class="gg-button icon" id="visibleIconName"
+                tip="Show or hide shape name"
+                onclick="${()=>this.toggleNameVisibility()}">
+          ${this.htmlUnsafe(this.isDisplayNameEnabled() ? this.visibleIcon: this.notVisibleIcon)}
+        </button>
         <span>Font</span>
         <input
           id="optionsNameFontSize"
           type="number"
           min="1"
-          value="${this.curFeature?.nameFontSize}"
+          value="${this.selectedFeatures[0]?.nameFontSize}"
           oninput="${()=>this.onOptionsChange()}" />
         <span>pt</span>
         <div class="icon colorPicker" id="nameColorPicker"></div>
         <span>Measures</span>
-        <button class="icon" id="visibleIconMeasure" onclick="${()=>this.toggleMeasureVisibility()}"></button>
+        <button class="gg-button icon" id="visibleIconMeasure"
+                tip="Show or hide measure information"
+                onclick="${()=>this.toggleMeasureVisibility()}">
+          ${this.htmlUnsafe(this.isDisplayMeasureEnabled() ? this.visibleIcon: this.notVisibleIcon)}
+        </button>
         <span>Font</span>
         <input
           id="optionsMeasuresFontSize"
           type="number"
           min="1"
-          value="${this.curFeature?.measureFontSize}"
+          value="${this.selectedFeatures[0]?.measureFontSize}"
           oninput="${()=>this.onOptionsChange()}" />
         <span>pt</span>
         <div class="icon colorPicker" id="measureColorPicker"></div>
@@ -54,8 +90,8 @@
       <div id="optionsColorLine">
         <span>Stroke color</span>
         <div class="icon colorPicker" id="strokePicker"></div>
-        <span id="fillPickerSpan">Fill color</span>
-        <div class="icon colorPicker" id="fillPicker"></div>
+        <span id="fillPickerSpan" class="${this.isFillColorEnabled() ? '' : 'disabled'}">Fill color</span>
+        <div class="${'icon colorPicker ' + (this.isFillColorEnabled() ? '' : 'disabled')}" id="fillPicker"></div>
       </div>
     </div>
     <hr />
@@ -66,7 +102,7 @@
           id="optionsStrokeWidth"
           type="number"
           min="1"
-          value="${this.curFeature?.strokeWidth}"
+          value="${this.selectedFeatures[0]?.strokeWidth}"
           oninput="${()=>this.onOptionsChange()}" />
         <span>px</span>
       </div>
@@ -75,9 +111,9 @@
     <div id="optionsExport">
       <div id="optionsExportLine">
         <span>Export</span>
-        <button onclick='${() =>this.exportFeature(this.curFeature!, "geojson")}'>GeoJson</button>
-        <button onclick='${() =>this.exportFeature(this.curFeature!, "kml")}'>KML</button>
-        <button onclick='${() =>this.exportFeature(this.curFeature!, "gpx")}'>GPX</button>
+        <button onclick='${() =>this.exportSelectedFeatures("geojson")}'>GeoJson</button>
+        <button onclick='${() =>this.exportSelectedFeatures("kml")}'>KML</button>
+        <button onclick='${() =>this.exportSelectedFeatures("gpx")}'>GPX</button>
       </div>
     </div>
   </div>

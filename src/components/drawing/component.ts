@@ -12,23 +12,23 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { download } from '../../tools/export/download';
 import MapComponent from '../map/component';
 
-import trashIcon from './assets/trash.svg?raw';
+import checkedIcon from '../../assets/icons/checked-full.svg?raw';
+import noCheckedIcon from '../../assets/icons/checked-no.svg?raw';
+import trashIcon from '../../assets/icons/trash.svg?raw';
 import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
 
-function createDiv(id = '', className = '', content = '', onclick = () => {}) {
-  const element = document.createElement('div');
-  element.id = id;
-  element.className = className;
-  element.innerHTML = content;
-  element.onclick = onclick;
-  return element;
-}
-
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['./style.css', '../../styles/common.css'];
+
+  checkedIcon: string = checkedIcon;
+  noCheckedIcon: string = noCheckedIcon;
+  trashIcon: string = trashIcon;
+  locateIcon: string = locateIcon;
+  visibleIcon: string = visibleIcon;
+  notVisibleIcon: string = notVisibleIcon;
 
   visible = false;
   renderedOnce = false;
@@ -47,7 +47,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
     { id: 'freepolygon', tool: DrawingShape.FreehandPolygon }
   ];
   toolSelected: Element | null = null;
-  curFeature: DrawingFeature | null = null;
 
   olDrawing: OlDrawing;
   cesiumDrawing: CesiumDrawing;
@@ -69,7 +68,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.activateTooltips(false, [800, 0], 'top-end');
     this.visible ? this.renderComponent() : this.hide();
     this.state.selection.enabled = !this.visible;
-    this.setTool();
   }
 
   renderComponent() {
@@ -79,31 +77,28 @@ export default class DrawingComponent extends GirafeHTMLElement {
       this.buttons.forEach((b) => {
         this.getById(b.id).addEventListener('click', () => this.setTool(b.tool));
       });
-      this.getById('visibleIconName').innerHTML = visibleIcon;
-      this.getById('visibleIconMeasure').innerHTML = visibleIcon;
       this.addColorPicker(
         'nameColorPicker',
-        (c) => (this.curFeature!.nameColor = c.hex),
-        () => this.curFeature!.nameColor
+        (c) => this.selectedFeatures.forEach((f) => (f.nameColor = c.hex)),
+        () => this.selectedFeatures[0].nameColor
       );
       this.addColorPicker(
         'measureColorPicker',
-        (c) => (this.curFeature!.measureColor = c.hex),
-        () => this.curFeature!.measureColor
+        (c) => this.selectedFeatures.forEach((f) => (f.measureColor = c.hex)),
+        () => this.selectedFeatures[0].measureColor
       );
       this.addColorPicker(
         'fillPicker',
-        (c) => (this.curFeature!.fillColor = c.hex),
-        () => this.curFeature!.fillColor
+        (c) => this.selectedFeatures.forEach((f) => (f.fillColor = c.hex)),
+        () => this.selectedFeatures[0].fillColor
       );
       this.addColorPicker(
         'strokePicker',
-        (c) => (this.curFeature!.strokeColor = c.hex),
-        () => this.curFeature!.strokeColor
+        (c) => this.selectedFeatures.forEach((f) => (f.strokeColor = c.hex)),
+        () => this.selectedFeatures[0].strokeColor
       );
       this.getById('optionsTitle').oninput = (e) => {
-        this.curFeature!.name = (e.target as HTMLInputElement).value;
-        this.getById('name-f-' + this.curFeature!.id).innerHTML = this.curFeature!.name;
+        this.selectedFeatures[0].name = (e.target as HTMLInputElement).value;
         this.render();
       };
       this.getById('fixedLengthValue').oninput = (e) => {
@@ -123,6 +118,14 @@ export default class DrawingComponent extends GirafeHTMLElement {
           this.cesiumDrawing.setFixedLength(0);
         }
       };
+
+      this.setTool();
+    }
+    // Set the color picker color to the properties of the first selected feature. Necessary, so subsequently
+    // selected features do not change color immediately upon selecting them, but only after manually setting
+    // the color via color picker.
+    if (this.selectedFeatures.length === 1) {
+      this.colorPickers.forEach((val) => val[0].setColor(val[1]()));
     }
   }
 
@@ -185,19 +188,29 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.render();
   }
 
+  get selectedFeatures(): DrawingFeature[] {
+    return this.drawingState.features.filter((f) => f.selected);
+  }
+
   onFeaturesChanged(oldFeatures: DrawingFeature[], newFeatures: DrawingFeature[]) {
     oldFeatures = oldFeatures ?? [];
     const newIds = newFeatures.map((f) => f.id);
     const oldIds = oldFeatures.map((f) => f.id);
     const deleted = oldFeatures.filter((f) => !newIds.includes(f.id));
     const added = newFeatures.filter((f) => !oldIds.includes(f.id));
-    deleted.forEach((f) => this.getById('f-' + f.id).remove());
-    added.forEach((f) => this.addFeatureToList(f));
+    if (added.length > 0) {
+      // Update the current selection to only include the newly created feature(s)
+      this.selectedFeatures.forEach(
+        (feature: DrawingFeature) => (feature.selected = added.map((f) => f.id).includes(feature.id))
+      );
+    }
+    // Update drawing source
     this.olDrawing.deleteFeatures(deleted);
     this.olDrawing.addFeatures(added);
     // OlCesium is currently managing features in Cesium
     //this.cesiumDrawing.addFeatures(added)
     //this.cesiumDrawing.deleteFeatures(deleted)
+    this.render();
   }
 
   onProjectionChanged(oldProj: string, newProj: string) {
@@ -216,74 +229,64 @@ export default class DrawingComponent extends GirafeHTMLElement {
     }
   }
 
-  addFeatureToList(feature: DrawingFeature) {
-    const container = createDiv('f-' + feature.id, 'girafe');
-    container.onclick = () => {
-      if (this.drawingState.features.map((f) => f.id).includes(feature.id)) {
-        Array.from(this.getById('drawingList').children).forEach((e) => e.classList.remove('selected'));
-        container.classList.add('selected');
-        this.curFeature = feature;
-        this.updateOptionPanel();
-      }
-    };
-    container.appendChild(createDiv('', 'icon', locateIcon, () => this.olDrawing.centerViewOnFeature(feature)));
-    const name = document.createElement('span');
-    name.id = 'name-f-' + feature.id;
-    name.innerHTML = feature.name;
-    container.appendChild(name);
-    container.appendChild(createDiv('', 'icon', trashIcon, () => this.deleteFeature(feature)));
-    this.getById('drawingList').appendChild(container);
+  onToggleFeatureSelection(feature: DrawingFeature) {
+    feature.selected = !feature.selected;
+    this.render();
   }
 
-  updateOptionPanel() {
-    if (this.curFeature != null) {
-      this.getById('options').classList.remove('disabled');
-      this.colorPickers.forEach((val) => val[0].setColor(val[1]()));
-      this.getById('visibleIconName').innerHTML = this.curFeature.displayName ? visibleIcon : notVisibleIcon;
-      this.getById('visibleIconMeasure').innerHTML = this.curFeature.displayMeasure ? visibleIcon : notVisibleIcon;
-      if (this.curFeature.isPointOrPolyline()) {
-        this.getById('fillPickerSpan').classList.add('disabled');
-        this.getById('fillPicker').classList.add('disabled');
-      } else {
-        this.getById('fillPickerSpan').classList.remove('disabled');
-        this.getById('fillPicker').classList.remove('disabled');
-      }
-      this.render();
+  getOptionsTitle(): string {
+    if (this.selectedFeatures.length < 2) {
+      return this.selectedFeatures[0]?.name || '';
+    } else {
+      return `${this.selectedFeatures.length} Shapes selected`;
     }
+  }
+
+  isDisplayNameEnabled(): boolean {
+    return this.selectedFeatures.some((f) => f.displayName);
+  }
+
+  isDisplayMeasureEnabled(): boolean {
+    return this.selectedFeatures.some((f) => f.displayMeasure);
+  }
+
+  isFillColorEnabled(): boolean {
+    return !this.selectedFeatures.every((f) => f.isPointOrPolyline());
   }
 
   deleteFeature(feature: DrawingFeature) {
     if (confirm(`Do you want to remove "${feature.name}" ?`)) {
       this.drawingState.features = this.drawingState.features.filter((f) => f.id != feature.id);
-      this.curFeature = null;
-      this.getById('options').classList.add('disabled');
+      this.render();
     }
   }
 
   onOptionsChange() {
-    if (this.curFeature != null) {
-      this.curFeature.nameFontSize = parseInt(this.getById<HTMLInputElement>('optionsNameFontSize').value);
-      this.curFeature.measureFontSize = parseInt(this.getById<HTMLInputElement>('optionsMeasuresFontSize').value);
-      this.curFeature.strokeWidth = parseInt(this.getById<HTMLInputElement>('optionsStrokeWidth').value);
-    }
+    const nameFontSize = parseInt(this.getById<HTMLInputElement>('optionsNameFontSize').value);
+    const measureFontSize = parseInt(this.getById<HTMLInputElement>('optionsMeasuresFontSize').value);
+    const strokeWidth = parseInt(this.getById<HTMLInputElement>('optionsStrokeWidth').value);
+    this.selectedFeatures.forEach((f) => (f.nameFontSize = nameFontSize));
+    this.selectedFeatures.forEach((f) => (f.measureFontSize = measureFontSize));
+    this.selectedFeatures.forEach((f) => (f.strokeWidth = strokeWidth));
   }
 
   toggleNameVisibility() {
-    if (this.curFeature != null) {
-      this.curFeature.displayName = !this.curFeature.displayName;
-      this.getById('visibleIconName').innerHTML = this.curFeature.displayName ? visibleIcon : notVisibleIcon;
-    }
+    const currentVisibility = this.selectedFeatures.some((f) => f.displayName);
+    this.selectedFeatures.forEach((f) => (f.displayName = !currentVisibility));
+    this.render();
   }
 
   toggleMeasureVisibility() {
-    if (this.curFeature != null) {
-      this.curFeature.displayMeasure = !this.curFeature.displayMeasure;
-      this.getById('visibleIconMeasure').innerHTML = this.curFeature.displayMeasure ? visibleIcon : notVisibleIcon;
-    }
+    const currentVisibility = this.selectedFeatures.some((f) => f.displayMeasure);
+    this.selectedFeatures.forEach((f) => (f.displayMeasure = !currentVisibility));
+    this.render();
   }
 
-  exportFeature(feature: DrawingFeature, format: 'geojson' | 'kml' | 'gpx') {
-    if (feature != null) {
+  exportSelectedFeatures(format: 'geojson' | 'kml' | 'gpx') {
+    const olFeatures: Feature[] = [];
+    const fileName = this.selectedFeatures.length === 1 ? this.selectedFeatures[0].name : 'drawing_export';
+
+    this.selectedFeatures.forEach((feature: DrawingFeature) => {
       let olFeature = this.olDrawing.createOlFeature(feature);
       if (feature.type == DrawingShape.Disk) {
         const geojson = feature.geojson as any;
@@ -293,33 +296,35 @@ export default class DrawingComponent extends GirafeHTMLElement {
         );
         olFeature.setStyle(style);
       }
-      switch (format) {
-        case 'geojson':
-          return download(
-            JSON.stringify(new GeoJSON().writeFeatureObject(olFeature, { featureProjection: this.state.projection })),
-            feature.name + '.geojson',
-            '.geojson'
-          );
-        case 'kml':
-          return download(
-            new KML().writeFeatures([olFeature], { featureProjection: this.state.projection }),
-            feature.name + '.kml',
-            '.kml'
-          );
-        case 'gpx':
-          if (!feature.isPointOrPolyline()) {
-            return this.state.infobox.elements.push({
-              id: uuidv4(),
-              text: 'Warning : The GPX format only supports points and polylines',
-              type: 'warning'
-            });
-          }
-          return download(
-            new GPX().writeFeatures([olFeature], { featureProjection: this.state.projection }),
-            feature.name + '.gpx',
-            '.gpx'
-          );
-      }
+      olFeatures.push(olFeature);
+    });
+
+    switch (format) {
+      case 'geojson':
+        return download(
+          JSON.stringify(new GeoJSON().writeFeaturesObject(olFeatures, { featureProjection: this.state.projection })),
+          fileName + '.geojson',
+          '.geojson'
+        );
+      case 'kml':
+        return download(
+          new KML().writeFeatures(olFeatures, { featureProjection: this.state.projection }),
+          fileName + '.kml',
+          '.kml'
+        );
+      case 'gpx':
+        if (this.selectedFeatures.some((f) => !f.isPointOrPolyline())) {
+          return this.state.infobox.elements.push({
+            id: uuidv4(),
+            text: 'Warning : The GPX format only supports points and polylines',
+            type: 'warning'
+          });
+        }
+        return download(
+          new GPX().writeFeatures(olFeatures, { featureProjection: this.state.projection }),
+          fileName + '.gpx',
+          '.gpx'
+        );
     }
   }
 }
