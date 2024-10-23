@@ -4,11 +4,12 @@ import TileLayer from 'ol/layer/Tile';
 import type { Map } from 'ol';
 import type { Layer as OLayer } from 'ol/layer';
 import type LayerWmts from '../../../models/layers/layerwmts';
-import type { SelectionParam } from '../../../tools/state/state';
+import SelectionParam from '../../../models/selectionparam';
 import StateManager from '../../../tools/state/statemanager';
 import LayerWms from '../../../models/layers/layerwms';
 import OLayerImage from 'ol/layer/Image';
 import OSourceImageWMS from 'ol/source/ImageWMS';
+import ServerOgc from '../../../models/serverogc';
 
 class WmtsManager {
   map: Map;
@@ -186,13 +187,14 @@ class WmtsManager {
   selectFeatures(extent: number[]) {
     const selectionParams: SelectionParam[] = [];
     const allWmtsLayers = [...Object.values(this.basemapLayers), ...Object.values(this.wmtsLayers)];
+    // TODO: Pushing 1 selectionParam per WMTS layer: efficient/meaningful? smells bad
     allWmtsLayers.forEach((wmtsItem) => {
       const wmtsLayer = wmtsItem.layerWmts;
       const queryLayers = wmtsLayer.wmsLayers ?? wmtsLayer.queryLayers;
       if (!queryLayers || !wmtsLayer.ogcServer) {
         return;
       }
-      const ogcServer = { ...wmtsLayer.ogcServer };
+      const ogcServer = new ServerOgc(wmtsLayer.ogcServer.name, wmtsLayer.ogcServer);
       const layers = queryLayers.split(',').map((wmsLayer) => {
         return new LayerWms(0, wmsLayer, 0, ogcServer, {
           queryLayers,
@@ -202,16 +204,11 @@ class WmtsManager {
       });
       const oLayer = new OLayerImage({
         source: new OSourceImageWMS({
-          url: layers[0].ogcServer.url,
+          url: ogcServer.url,
           params: { LAYERS: queryLayers }
         })
       });
-      selectionParams.push({
-        _layers: layers,
-        _oLayer: oLayer,
-        selectionBox: extent,
-        srid: this.state.projection
-      });
+      selectionParams.push(new SelectionParam(ogcServer, layers, extent, this.state.projection, oLayer));
     });
     StateManager.getInstance().state.selection.selectionParameters.push(...selectionParams);
   }

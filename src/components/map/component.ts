@@ -15,7 +15,7 @@ import { ScreenSpaceEventHandler, Cartesian2, Cesium3DTileset } from 'cesium';
 import proj4 from 'proj4';
 
 import SwipeManager from './tools/swipemanager';
-import WmsManager from './tools/wmsmanager';
+import WmsManager from '../../tools/wms/wmsmanager';
 import WmsManager3d from './tools/wmsmanager3d';
 import OsmManager from './tools/osmmanager';
 import VectorTilesManager from './tools/vectortilesmanager';
@@ -45,6 +45,8 @@ import { FocusFeature } from './tools/focusfeature';
 import XyzManager from './tools/xyzmanager';
 import ThemeLayer from '../../models/layers/themelayer';
 import { debounce } from '../../tools/utils/debounce';
+import SelectionParam from '../../models/selectionparam';
+import WfsManager from '../../tools/wfs/wfsmanager';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -136,6 +138,9 @@ export default class MapComponent extends GirafeHTMLElement {
     this.subscribe('position.center', (_oldCenter: Coordinate, newCenter: Coordinate) =>
       this.panToCoordinate(newCenter)
     );
+    this.subscribe('selection.selectionParameters', (_oldParams: SelectionParam[], newParams: SelectionParam[]) =>
+      this.onSelectFeatures(newParams)
+    );
     this.subscribe('selection.selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) =>
       this.onFeaturesSelected(newFeatures)
     );
@@ -175,7 +180,8 @@ export default class MapComponent extends GirafeHTMLElement {
     this.olMap.setTarget(this.mapTarget);
 
     // Initialize managers
-    this.wmsManager = new WmsManager(this.olMap);
+    this.wmsManager = WmsManager.getInstance();
+    this.wmsManager.map = this.olMap;
     this.osmManager = new OsmManager(this.olMap);
     this.cogManager = new CogManager(this.olMap);
     this.xyzManager = new XyzManager(this.olMap);
@@ -352,6 +358,38 @@ export default class MapComponent extends GirafeHTMLElement {
     this.wmsManager.selectFeatures(extent);
     this.wmtsManager.selectFeatures(extent);
     this.localFileManager.selectFeatures(extent);
+  }
+
+  async onSelectFeatures(selectionParams: SelectionParam[]) {
+    this.state.loading = true;
+
+    // WMS GetFeatureInfo
+    const wmsPromises = selectionParams.map((param) => {
+      const wmsGetFeatureInfoSelectionParam = param.clone((l) => l.queryable && !l.wfsQueryable);
+      const client = this.wmsManager.getClient(wmsGetFeatureInfoSelectionParam._ogcServer);
+      return client.getFeatureInfo(wmsGetFeatureInfoSelectionParam);
+    });
+
+    // WFS GetFeature
+    const wfsPromises = selectionParams.map((param) => {
+      const wfsGetFeatureInfoSelectionParam = param.clone((l) => l.wfsQueryable);
+      const client = WfsManager.getInstance().getClient(wfsGetFeatureInfoSelectionParam._ogcServer);
+      const features = client.getFeature(wfsGetFeatureInfoSelectionParam);
+      return features;
+    });
+
+    const wmsGmlFeatures = (await Promise.all(wmsPromises)).flat();
+    const wfsGmlFeatures = (await Promise.all(wfsPromises)).flat();
+
+    const gmlFeatures = [...wmsGmlFeatures, ...wfsGmlFeatures];
+
+    if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length == 0) {
+      this.state.interface.selectionComponentVisible = false;
+    } else {
+      this.state.selection.selectedFeatures.push(...gmlFeatures);
+      this.state.interface.selectionComponentVisible = true;
+    }
+    this.state.loading = false;
   }
 
   connectedCallback() {
@@ -629,7 +667,7 @@ export default class MapComponent extends GirafeHTMLElement {
   onAddLayers(layerInfos: Layer[]) {
     layerInfos.forEach((l) => {
       if (l instanceof LayerWms) {
-        this.wmsManager.addLayer(l);
+        this.wmsManager.getClient(l).addLayer(l);
         if (this.wmsManager3d != null) this.wmsManager3d.addLayer(l);
       } else if (l instanceof LayerWmts) {
         this.wmtsManager.addLayer(l);
@@ -646,7 +684,7 @@ export default class MapComponent extends GirafeHTMLElement {
   onRemoveLayers(layerInfos: Layer[]) {
     layerInfos.forEach((l) => {
       if (l instanceof LayerWms) {
-        this.wmsManager.removeLayer(l);
+        this.wmsManager.getClient(l).removeLayer(l);
         if (this.wmsManager3d != null) {
           this.wmsManager3d.removeLayer(l);
         }
@@ -671,7 +709,7 @@ export default class MapComponent extends GirafeHTMLElement {
 
   onChangeOpacity(layerInfos: Layer) {
     if (layerInfos instanceof LayerWms) {
-      this.wmsManager.changeOpacity(layerInfos);
+      this.wmsManager.getClient(layerInfos).changeOpacity(layerInfos);
       if (this.wmsManager3d != null) this.wmsManager3d.changeOpacity(layerInfos);
     } else if (layerInfos instanceof LayerWmts) {
       if (this.wmtsManager.layerExists(layerInfos)) {
@@ -682,7 +720,7 @@ export default class MapComponent extends GirafeHTMLElement {
 
   onChangeFilter(layerInfos: Layer) {
     if (layerInfos instanceof LayerWms) {
-      this.wmsManager.changeFilter(layerInfos);
+      this.wmsManager.getClient(layerInfos).changeFilter(layerInfos);
       if (this.wmsManager3d != null) this.wmsManager3d.changeFilter(layerInfos);
     }
   }
@@ -710,7 +748,7 @@ export default class MapComponent extends GirafeHTMLElement {
       } else if (layer instanceof LayerWmts) {
         this.wmtsManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerWms) {
-        this.wmsManager.addBasemapLayer(layer);
+        this.wmsManager.getClient(layer).addBasemapLayer(layer);
         if (this.wmsManager3d != null) this.wmsManager3d.addBasemapLayer(layer);
       } else {
         throw new Error('Unknown basemap type');

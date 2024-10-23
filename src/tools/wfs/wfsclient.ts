@@ -6,20 +6,28 @@ import { WriteGetFeatureOptions } from 'ol/format/WFS';
 
 import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
-import { SelectionParam } from '../state/state';
+import SelectionParam from '../../models/selectionparam';
 import LayerWms from '../../models/layers/layerwms';
 import ServerWfs from '../../models/serverwfs';
-import WfsFilter from './wfsfilter';
 import { XmlTypes, xmlTypesStrList } from '../../models/xmlTypes';
 import ServerOgc from '../../models/serverogc';
 
-abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
+export type WfsClientOptions = {
+  featurePrefix: string;
+  featureNS: string;
+};
+export type WfsClientOptionalOptions = {
+  featurePrefix?: string;
+  featureNS?: string;
+};
+
+export class WfsClient<WfsXmlTypes = XmlTypes> {
   stateManager: StateManager;
   get state() {
     return this.stateManager.state;
   }
 
-  wfsUrl: string;
+  ogcServer: ServerOgc;
 
   //TODO: make this configurable
   maxFeatures: number = 300;
@@ -28,17 +36,25 @@ abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
 
   serverWfs: Promise<ServerWfs<WfsXmlTypes>> | undefined;
 
-  constructor(wfsUrl: string, featurePrefix: string, featureNS: string) {
-    this.wfsUrl = wfsUrl;
-    this.featureNS = featureNS;
-    this.featurePrefix = featurePrefix;
+  constructor(ogcServer: ServerOgc, options: WfsClientOptions) {
+    this.ogcServer = ogcServer;
+    this.featureNS = options.featureNS;
+    this.featurePrefix = options.featurePrefix;
 
+    this.configMaxFeatures();
+    this.stateManager = StateManager.getInstance();
+  }
+
+  get wfsUrl(): string {
+    return this.ogcServer.urlWfs ?? '';
+  }
+
+  configMaxFeatures() {
     ConfigManager.getInstance()
       .loadConfig()
       .then((config) => {
         this.maxFeatures = config.selection.maxFeature ?? this.maxFeatures;
       });
-    this.stateManager = StateManager.getInstance();
   }
 
   getServerWfs(): Promise<ServerWfs<WfsXmlTypes>> {
@@ -177,10 +193,10 @@ abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
     return url.href;
   }
 
-  async wfsQuery(selectionParam: SelectionParam): Promise<Feature<Geometry>[]> {
+  async getFeature(selectionParam: SelectionParam): Promise<Feature<Geometry>[]> {
     // First, keep only queryable layers
     // And verify that all layers have the same WFS URL
-    const queryableLayers = this.getQueryableLayers(selectionParam);
+    const queryableLayers = selectionParam._layers.filter((l) => l.wfsQueryable) as QueryableLayerWms[];
     if (queryableLayers.length <= 0) {
       return [];
     }
@@ -202,7 +218,7 @@ abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
       filter: olFilter
     };
     const getFeatureRequests = Object.entries(geometryColumnNameToFeatureType).map(async ([columnName, featureTypes]) =>
-      this.getFeature(featureTypes, { geometryName: columnName, ...getFeatureOptions })
+      this.getFeatureRaw(featureTypes, { geometryName: columnName, ...getFeatureOptions })
     );
 
     const getFeatureResponses = await Promise.all(getFeatureRequests);
@@ -219,7 +235,10 @@ abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
     } as WriteGetFeatureOptions;
   }
 
-  async getFeature(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions): Promise<Feature<Geometry>[]> {
+  async getFeatureRaw(
+    featureTypes: string[],
+    getFeatureOptions: GetFeatureOptionalOptions
+  ): Promise<Feature<Geometry>[]> {
     if (getFeatureOptions.bbox && !getFeatureOptions.geometryName) {
       throw new Error(
         `WFS GetFeature: not possible to query bbox ${getFeatureOptions.bbox} without a geometryName.\nFeatureTypes: ${featureTypes}\nWFS: ${this.wfsUrl}`
@@ -241,41 +260,10 @@ abstract class AbstractWfsQueryManager<WfsXmlTypes = XmlTypes> {
     const features = new GML3().readFeatures(gml);
     return features;
   }
-
-  getQueryableLayers(selectionParam: SelectionParam): QueryableLayerWms[] {
-    const queryableLayers = selectionParam._layers.filter((l) => l.queryable);
-    if (queryableLayers.length === 0) {
-      return [];
-    }
-    // should all have the same URL because we want to do one WFS query.
-    const sameUrlForAll = queryableLayers.every((layer: LayerWms) => {
-      return layer.ogcServer.urlWfs === this.wfsUrl;
-    });
-    if (!sameUrlForAll) {
-      const layersErrorFeedback = queryableLayers
-        .map((l) => '- layer name: ' + l.name + ': ' + ', layer WFS URL: ' + l.ogcServer.urlWfs)
-        .join('\n');
-      throw new Error(
-        'Not all layers of this list have the same WFS URL:\n' + layersErrorFeedback + '\nWe cannot do que WFS query.\n'
-      );
-    }
-    return queryableLayers.map((l) => l as QueryableLayerWms);
-  }
-
-  public wmsGetMapFilter(layer: LayerWms): string {
-    if (!layer.hasFilter) {
-      return '';
-    }
-    const filter = layer.filter as WfsFilter;
-    const nbQuerylayers = layer.queryLayers!.split(',').length;
-
-    return '(' + filter.toSimpleXmlFilter().repeat(nbQuerylayers) + ')';
-  }
 }
 
 // QueryableLayerWms: a LayerWms where (queryable=true and) urlWfs and are strings (and not null as is possible in LayerWms)
-export type QueryableLayerWms = Omit<LayerWms, 'urlWfs' | 'queryLayers'> & {
-  ogcServer: ServerOgc;
+export type QueryableLayerWms = Omit<LayerWms, 'queryLayers'> & {
   queryLayers: string;
 };
 
@@ -285,4 +273,16 @@ export type GetFeatureOptionalOptions = Omit<WriteGetFeatureOptions, 'featureNS'
   featureTypes?: string[];
 };
 
-export default AbstractWfsQueryManager;
+export class WfsClientMapServer extends WfsClient {
+  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
+    super(ogcServer, { featurePrefix: 'feature', featureNS: 'https://mapserver.gis.umn.edu/mapserver', ...options });
+  }
+}
+
+export class WfsClientQgis extends WfsClient {
+  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
+    super(ogcServer, { featurePrefix: 'feature', featureNS: 'https://www.qgis.org/gml', ...options });
+  }
+}
+
+export default WfsClient;

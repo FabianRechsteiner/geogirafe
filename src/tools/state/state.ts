@@ -4,12 +4,10 @@ import type Basemap from '../../models/basemap';
 import type Theme from '../../models/theme';
 import type BaseLayer from '../../models/layers/baselayer';
 import type ThemeLayer from '../../models/layers/themelayer';
-import type LayerWms from '../../models/layers/layerwms';
 import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
-import type OLayerImage from 'ol/layer/Image';
-import type OSourceImageWMS from 'ol/source/ImageWMS';
 import { TokenEndpointResponse, UserInfoResponse } from 'oauth4webapi';
+import SelectionParam from '../../models/selectionparam';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -23,13 +21,6 @@ type GraphicalInterface = {
   shareVisible: boolean;
   darkMapMode: boolean;
   darkFrontendMode: boolean;
-};
-
-export type SelectionParam = {
-  _layers: LayerWms[];
-  _oLayer?: OLayerImage<OSourceImageWMS>;
-  selectionBox: number[];
-  srid: string;
 };
 
 type Selection = {

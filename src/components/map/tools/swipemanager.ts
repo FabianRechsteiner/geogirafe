@@ -1,7 +1,7 @@
 import { Map } from 'ol';
 import { getRenderPixel } from 'ol/render';
 import WmtsManager from './wmtsmanager';
-import WmsManager from './wmsmanager';
+import WmsManager from '../../../tools/wms/wmsmanager';
 import { Layer as OLayer } from 'ol/layer';
 import { Listener } from 'ol/events';
 import RenderEvent from 'ol/render/Event';
@@ -97,9 +97,9 @@ class SwipeManager {
   }
 
   private toggleSwipeForWms(layer: LayerWms) {
-    if (this.wmsManager.layerExists(layer)) {
-      this.wmsManager.makeLayerIndependent(layer);
-      const olayer = this.wmsManager.getOLayer(layer);
+    if (this.wmsManager.getClient(layer).layerExists(layer)) {
+      this.wmsManager.getClient(layer).makeLayerIndependent(layer);
+      const olayer = this.wmsManager.getClient(layer).getOLayer(layer);
       if (olayer) {
         if (layer.swiped === 'no') {
           this.deactivateSwipeForLayer(layer.name, olayer);

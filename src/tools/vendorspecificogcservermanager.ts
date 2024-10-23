@@ -1,0 +1,52 @@
+import GirafeSingleton from '../base/GirafeSingleton';
+import LayerWms from '../models/layers/layerwms';
+import ServerOgc from '../models/serverogc';
+
+export default abstract class VendorSpecificOgcServerManager<
+  OgcServerClient,
+  OgcClientOptions
+> extends GirafeSingleton {
+  protected readonly _clientClasses: Map<
+    string,
+    new (ogcServer: ServerOgc, options: OgcClientOptions) => OgcServerClient
+  > = new Map();
+  protected readonly _clients: Map<string, OgcServerClient> = new Map();
+
+  public abstract getClientId(ogcServer: ServerOgc): string;
+  public createClient(
+    clientClass: new (os: ServerOgc, opt: OgcClientOptions) => OgcServerClient,
+    ogcServer: ServerOgc
+  ): OgcServerClient {
+    return new clientClass(ogcServer, {} as OgcClientOptions);
+  }
+
+  // Register a client with an identifier
+  public registerClientClass(
+    type: string,
+    clientClass: new (ogcServer: ServerOgc, opt: OgcClientOptions) => OgcServerClient
+  ) {
+    this._clientClasses.set(type, clientClass);
+  }
+
+  // Get a client based on the identifier
+  public getClient(ogcServer: ServerOgc): OgcServerClient;
+  public getClient(layerWms: LayerWms): OgcServerClient;
+  public getClient(object: ServerOgc | LayerWms): OgcServerClient {
+    const ogcServer = object instanceof LayerWms ? object.ogcServer : object;
+    const type = ogcServer.type;
+    const clientId = this.getClientId(ogcServer);
+    let client = this._clients.get(clientId);
+    if (!client) {
+      let clientClass = this._clientClasses.get(type);
+      if (!clientClass) {
+        console.error(
+          `clientClass not found for ogcServer with id: ${clientId}, type: ${type}, ogcServer: ${ogcServer}`
+        );
+        clientClass = this._clientClasses.get('default')!;
+      }
+      client = this.createClient(clientClass, ogcServer);
+      this._clients.set(clientId, client);
+    }
+    return client;
+  }
+}

@@ -16,4 +16,8 @@ export default class ServerOgc {
     this.type = elem.type;
     this.imageType = elem.imageType;
   }
+
+  get uniqueWmsQueryId(): string {
+    return this.name + this.imageType;
+  }
 }
