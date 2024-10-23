@@ -51,8 +51,6 @@ if "%1"=="cjl" (
     echo "Preparing environment CARTOJURALEMAN..."
     copy demo\config.cjl.json %APPDIR%\config.json /Y
     copy demo\fr.json %APPDIR%\fr.json /Y
-    curl "https://map.cjl.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
-    curl "https://map.cjl.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
     goto :end
 )
 

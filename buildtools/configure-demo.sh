@@ -49,8 +49,6 @@ then
     echo "Preparing environment CARTOJURALEMAN..."
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/fr.json $APPDIR/fr.json
-    curl "https://map.cjl.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://map.cjl.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
 
 elif [ "$1" = 'geogr' ];
 then
