@@ -1,6 +1,6 @@
 import LayerWms from '../../../models/layers/layerwms';
 import StateManager from '../../../tools/state/statemanager';
-import type { SelectionParam } from '../../../tools/state/state';
+import SelectionParam from '../../../models/selectionparam';
 import LayerManager from '../../../tools/layermanager';
 import { Scene as CesiumScene, WebMapServiceImageryProvider, ImageryLayer } from 'cesium';
 import ConfigManager from '../../../tools/configuration/configmanager';
@@ -96,13 +96,16 @@ export default class WmsManager3d {
 
     for (const key in this.layersRecord) {
       const layerDef = this.layersRecord[key];
-      selectionParams.push({
-        _layers: layerDef.map((l) => l.layers),
-        selectionBox: extent,
-        srid: state.projection
-      });
+      selectionParams.push(
+        new SelectionParam(
+          layerDef[0].layers.ogcServer,
+          layerDef.map((l) => l.layers),
+          extent,
+          state.projection
+        )
+      );
     }
 
-    state.selection.selectionParameters = selectionParams;
+    state.selection.selectionParameters.push(...selectionParams);
   }
 }

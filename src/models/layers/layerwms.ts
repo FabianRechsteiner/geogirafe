@@ -125,7 +125,11 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   }
 
   get serverUniqueQueryId() {
-    return this.ogcServer.name + this.ogcServer.imageType;
+    return this.ogcServer.uniqueWmsQueryId;
+  }
+
+  get wfsQueryable() {
+    return this.queryable && Boolean(this.ogcServer?.urlWfs && this.queryLayers);
   }
 
   private static isGMFTreeItem(options: GMFTreeItem | LayerWmsOptions): options is GMFTreeItem {

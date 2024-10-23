@@ -120,7 +120,7 @@ export class WfsFilter<WfsXmlTypes extends XmlTypes = XmlTypes> {
    *
    * @returns a simple filter string that can be used in a WMS GetMap request, does not provide any XML namespace (xmlns attributes)
    */
-  toSimpleXmlFilter(): string {
+  toWmsGetMapFilter(): string {
     if (!this.propertyType) {
       throw new Error('The type of the property should never be null !');
     }
