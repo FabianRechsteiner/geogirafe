@@ -29,6 +29,10 @@ header:hover .tool {
   display: flex;
 }
 
+.legend img {
+  height: fit-content;
+}
+
 .children {
   padding-left: 1.3rem;
   flex-basis: 100%;
