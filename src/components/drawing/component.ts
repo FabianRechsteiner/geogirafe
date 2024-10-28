@@ -304,13 +304,13 @@ export default class DrawingComponent extends GirafeHTMLElement {
         return download(
           JSON.stringify(new GeoJSON().writeFeaturesObject(olFeatures, { featureProjection: this.state.projection })),
           fileName + '.geojson',
-          '.geojson'
+          'application/geo+json'
         );
       case 'kml':
         return download(
           new KML().writeFeatures(olFeatures, { featureProjection: this.state.projection }),
           fileName + '.kml',
-          '.kml'
+          'application/vnd.google-earth.kml+xml'
         );
       case 'gpx':
         if (this.selectedFeatures.some((f) => !f.isPointOrPolyline())) {
@@ -323,7 +323,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
         return download(
           new GPX().writeFeatures(olFeatures, { featureProjection: this.state.projection }),
           fileName + '.gpx',
-          '.gpx'
+          'application/gpx+xml'
         );
     }
   }
