@@ -26,6 +26,8 @@ import InfoboxComponent from './components/infobox/component';
 import LanguageComponent from './components/language/component';
 import LidarPanelComponent from './components/lidar/panel/component';
 import LidarProfileComponent from './components/lidar/profile/component';
+import CrossSectionSettingsComponent from './components/cross-section/cross-section-settings/component';
+import CrossSectionViewComponent from './components/cross-section/cross-section-viewer/component';
 import LRPanelComponent from './components/lr-panel/component';
 import MapComponent from './components/map/component';
 import MenuButtonComponent from './components/menubutton/component';
@@ -128,6 +130,8 @@ try {
       customElements.define('girafe-language-select', LanguageComponent);
       customElements.define('girafe-lidar-panel', LidarPanelComponent);
       customElements.define('girafe-lidar-profile', LidarProfileComponent);
+      customElements.define('girafe-cross-section-settings', CrossSectionSettingsComponent);
+      customElements.define('girafe-cross-section-view', CrossSectionViewComponent);
       customElements.define('girafe-lr-panel', LRPanelComponent);
       customElements.define('girafe-map', MapComponent);
       customElements.define('girafe-menu-button', MenuButtonComponent);

@@ -14,6 +14,7 @@ type GraphicalInterface = {
   drawingPanelVisible: boolean;
   printPanelVisible: boolean;
   lidarPanelVisible: boolean;
+  crossSectionPanelVisible: boolean;
   selectionComponentVisible: boolean;
   selectionComponent: string;
   aboutVisible: boolean;
@@ -132,6 +133,7 @@ export default class State {
     drawingPanelVisible: false,
     printPanelVisible: false,
     lidarPanelVisible: false,
+    crossSectionPanelVisible: false,
     selectionComponentVisible: false,
     selectionComponent: '',
     aboutVisible: false,
@@ -144,6 +146,7 @@ export default class State {
   // Current language
   language: string | null = null;
 
+  // LIDAR
   lidar: Lidar = {
     line: null,
     drawActive: false

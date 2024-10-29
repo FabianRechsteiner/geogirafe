@@ -100,6 +100,10 @@
             slot="main"
             data-toggle-path="interface.lidarPanelVisible"
             data-title="lidar-panel"></girafe-lidar-panel>
+          <girafe-cross-section-settings
+            slot="main"
+            data-toggle-path="interface.crossSectionPanelVisible"
+            data-title="cross-section-panel"></girafe-cross-section-settings>
         </girafe-lr-panel>
 
         <girafe-about></girafe-about>
@@ -110,6 +114,7 @@
       <div id="content-bottom">
         <girafe-selection-grid dock="bottom"></girafe-selection-grid>
         <girafe-lidar-profile id="lidar-footer" dock="bottom"></girafe-lidar-profile>
+        <girafe-cross-section-view id="cross-section-footer" dock="bottom"></girafe-cross-section-view>
       </div>
     </div>
 
@@ -131,6 +136,12 @@
         class="gg-button gg-big"
         onclick="document.geogirafe.state.interface.lidarPanelVisible = !document.geogirafe.state.interface.lidarPanelVisible">
         <img alt="help-icon" src="icons/lidar.svg" />
+      </button>
+      <button
+        slot="menu-content"
+        class="gg-button gg-big"
+        onclick="document.geogirafe.state.interface.crossSectionPanelVisible = !document.geogirafe.state.interface.crossSectionPanelVisible">
+        <img alt="cross-section-icon" src="icons/cross-section.svg" />
       </button>
       <button class="gg-button gg-big" onclick="document.geogirafe.state.interface.shareVisible = true">
         <img alt="help-icon" src="icons/share.svg" />

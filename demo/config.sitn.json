@@ -4,7 +4,7 @@
   },
   "languages": {
     "translations": {
-      "fr": ["fr.json", "https://sitn.ne.ch/static/dummy/fr.json"]
+      "fr": ["fr.json", "fr.crosssection.json", "https://sitn.ne.ch/static/dummy/fr.json"]
     },
     "defaultLanguage": "fr"
   },

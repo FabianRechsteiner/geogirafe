@@ -1,0 +1,345 @@
+<link rel="stylesheet" href="lib/tabulator-tables/tabulator.min.css" />
+<div id="panel">
+  <div id="content">
+    <!-- DRAW/DELETE CROSS SECTION BUTTONS -->
+    <div class="btn-group-flex">
+      <button
+        id="draw-profile-btn"
+        class="${this.crossSectionState.drawProfile ? 'custom-btn active' : 'custom-btn'}"
+        title="${this.i18nManager.getTranslation('draw_profile_help')}"
+        onclick="${() => this.toggleLineDraw()}"
+        i18n="draw_profile">
+        Draw
+      </button>
+      <button
+        id="delete-profile-btn"
+        class="custom-btn"
+        title="${this.i18nManager.getTranslation('delete_help')}"
+        onclick="${() => this.deleteProfile()}"
+        i18n="delete">
+        Delete
+      </button>
+    </div>
+
+    <!-- CROSS SECTION WIDTH BUTTON -->
+    <div class="btn-group-flex">
+      <label for="section-width-btn" i18n="profile_width">Width [m]</label>
+      <input
+        id="section-width-btn"
+        class="settings-btn"
+        type="number"
+        value="${this.crossSectionState.sectionWidth}"
+        min="0.0"
+        max="50"
+        step="0.1"
+        oninput="${(e: Event) => this.setSectionWidth(parseFloat((e.target! as HTMLInputElement).value))}" />
+    </div>
+
+    <!-- MAP/CROSS SECTION VIEW SYNC BUTTONS -->
+    <div class="btn-group-flex">
+      <button
+        id="reset-zoom-btn"
+        class="custom-btn"
+        title="${this.i18nManager.getTranslation('profile_reset_view_help')}"
+        onclick="${() => this.resetZoom()}"
+        i18n="profile_reset_view">
+        Reset view
+      </button>
+      <button
+        id="sync-views-btn"
+        class="${this.crossSectionState.syncViews ? 'custom-btn active' : 'custom-btn'}"
+        title="${this.i18nManager.getTranslation('profile_sync_view_help')}"
+        onclick="${() => this.setViewSync(!this.crossSectionState.syncViews)}"
+        i18n="profile_sync_view">
+        Sync. views
+      </button>
+    </div>
+
+    <!-- TRANSLATE PROFILE BUTTONS -->
+    <div class="btn-group-flex">
+      <button
+        class="gg-button gg-big"
+        title="${this.i18nManager.getTranslation('profile_shift_up_help')}"
+        onclick="${() => this.shiftLinestring([0.0, this.crossSectionState.linestringShift])}"
+        i18n="">
+        <img src="icons/arrow_up.svg" alt="${this.i18nManager.getTranslation('profile_shift_up_help')}" />
+      </button>
+      <button
+        class="gg-button gg-big"
+        title="${this.i18nManager.getTranslation('profile_shift_down_help')}"
+        onclick="${() => this.shiftLinestring([0.0, -this.crossSectionState.linestringShift])}"
+        i18n="">
+        <img src="icons/arrow_down.svg" alt="${this.i18nManager.getTranslation('profile_shift_down_help')}" />
+      </button>
+      <button
+        class="gg-button gg-big"
+        title="${this.i18nManager.getTranslation('profile_shift_left_help')}"
+        onclick="${() => this.shiftLinestring([-this.crossSectionState.linestringShift, 0.0])}"
+        i18n="">
+        <img src="icons/arrow_left.svg" alt="${this.i18nManager.getTranslation('profile_shift_left_help')}" />
+      </button>
+      <button
+        class="gg-button gg-big"
+        title="${this.i18nManager.getTranslation('profile_shift_right_help')}"
+        onclick="${() => this.shiftLinestring([this.crossSectionState.linestringShift, 0.0])}"
+        i18n="">
+        <img src="icons/arrow_right.svg" alt="${this.i18nManager.getTranslation('profile_shift_right_help')}" />
+      </button>
+    </div>
+
+    <div class="btn-group-flex">
+      <div class="cell">
+        <label for="z-ratio-btn">
+          ${this.i18nManager.getTranslation('profile_exaggeration')}
+          (${this.crossSectionState.verticalExaggeration})</label
+        >
+        <div style="display: flex; align-items: center">
+          <input
+            id="z-ratio-btn"
+            class="settings-btn"
+            type="range"
+            min="0.1"
+            max="10"
+            step="0.1"
+            value="${this.crossSectionState.verticalExaggeration}"
+            oninput="${(e: Event) => this.setVerticalExaggeration(parseFloat((e.target! as HTMLInputElement).value))}"
+            style="flex: 1; min-width: 0; box-sizing: border-box" />
+          <button
+            id="z-ratio-reset-btn"
+            class="reset-btn"
+            title="${this.i18nManager.getTranslation('profile_exaggeration_reset_help')}"
+            onclick="${() => this.setVerticalExaggeration(1.0)}">
+            <img
+              src="icons/restart_alt.svg"
+              alt="${this.i18nManager.getTranslation('profile_exaggeration_reset_help')}" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group-flex">
+      <div class="cell">
+        <label for="point-size-label">
+          ${this.i18nManager.getTranslation('profile_point_size')} (${this.crossSectionState.pointSize})</label
+        >
+        <div style="display: flex; align-items: center">
+          <input
+            id="point-size-btn"
+            class="settings-btn"
+            type="range"
+            min="0.1"
+            max="10"
+            value="${this.crossSectionState.pointSize}"
+            oninput="${(e: Event) => this.setPointSize(parseFloat((e.target! as HTMLInputElement).value))}"
+            step="0.1"
+            style="flex: 1; min-width: 0; box-sizing: border-box" />
+          <button
+            id="point-size-reset-btn"
+            class="reset-btn"
+            title="${this.i18nManager.getTranslation('profile_point_size_reset_help')}"
+            onclick="${() => this.setPointSize(3.0)}">
+            <img
+              src="icons/restart_alt.svg"
+              alt="${this.i18nManager.getTranslation('profile_point_size_reset_help')}" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <h3 i18n="profile_colors">Colors</h3>
+
+    <div class="btn-group-flex">
+      <div class="cell">
+        <!-- SELECT VARIABLE USED FOR COLORING -->
+        <label for="color-variable-btn" i18n="profile_color_by">Color by</label>
+        <select
+          id="color-variable-btn"
+          class="settings-btn"
+          oninput="${(e: Event) => this.setColorVariable((e.target! as HTMLInputElement).value as colorVariable)}">
+          <option value="uniform" i18n="color_option_uniform">Single color</option>
+          <option value="natural" i18n="color_option_natural">Natural</option>
+          <option value="intensity" i18n="color_option_intensity">Intensity</option>
+          <option value="classification" i18n="color_option_classification">Classification</option>
+        </select>
+      </div>
+
+      <!-- SELECT PALETTE  -->
+      <div class="cell" hidden="${this.crossSectionState.colorVariable !== 'intensity'}">
+        <label for="sequential-color-btn" i18n="profile_colormap">Colorscale</label>
+        <select
+          id="sequential-color-btn"
+          class="settings-btn"
+          oninput="${(e: Event) => this.setColorPalette((e.target! as HTMLSelectElement).value as colorPalette)}">
+          <option value="spectral">Spectral</option>
+          <option value="greys">Greys</option>
+          <option value="blues">Blues</option>
+          <option value="viridis">Viridis</option>
+          <option value="magma">Magma</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-group-flex">
+      <!-- SELECT UNIFORM COLOR -->
+      <div class="cell" hidden="${this.crossSectionState.colorVariable !== 'uniform'}">
+        <label for="uniform-color-btn" i18n="color_option_uniform">Uniform color</label>
+        <input
+          id="uniform-color-btn"
+          class="settings-btn"
+          type="color"
+          value="${this.crossSectionState.colorUniform}"
+          oninput="${(e: Event) => this.setUniformColor((e.target! as HTMLInputElement).value)}" />
+      </div>
+
+      <!-- SELECT BACKGROUND COLOR -->
+      <div class="cell">
+        <label for="background-color-btn" i18n="profile_background_color">Background color</label>
+        <input
+          id="background-color-btn"
+          class="settings-btn"
+          type="color"
+          value="${this.crossSectionState.backgroundColor}"
+          oninput="${(e: Event) => this.setBackgroundColor((e.target! as HTMLInputElement).value)}" />
+      </div>
+    </div>
+
+    <!-- MEASUREMENTS BUTTONS -->
+    <div class="btn-group-flex">
+      <button
+        id="draw-measurements-btn"
+        class="${this.crossSectionState.drawMeasurement ? 'custom-btn active' : 'custom-btn'}"
+        title="${this.i18nManager.getTranslation('profile_measurement_help')}"
+        onclick="${() => this.toggleMeasureDraw()}"
+        i18n="profile_measurement"
+        ?disabled="${!this.crossSectionState.enableMeasurement}">
+        Measure
+      </button>
+      <button
+        id="delete-measurements-btn"
+        class="custom-btn"
+        title="${this.i18nManager.getTranslation('profile_delete_measurements_help')}"
+        onclick="${() => this.deleteAllMeasurements()}"
+        i18n="profile_delete_measurements">
+        Delete all
+      </button>
+    </div>
+
+    <!-- MEASUREMENTS TABLE -->
+    <div class="scrollable-table-container">
+      <table id="measurements-table" class="scrollable-table">
+        <thead>
+          <tr>
+            <th class="table-cell sticky-header" style="text-align: center"></th>
+            <th class="table-cell sticky-header" style="text-align: right" i18n="profile_table_dist">DIST.</th>
+            <th class="table-cell sticky-header" style="text-align: right" i18n="profile_table_slope">SLOPE.</th>
+            <th class="table-cell sticky-header" style="text-align: center"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- DRAW/DELETE MARKERS SECTION -->
+    <div class="btn-group-flex">
+      <button
+        id="draw-markers-btn"
+        class="${this.crossSectionState.drawMarker ? 'custom-btn active' : 'custom-btn'}"
+        title="${this.i18nManager.getTranslation('profile_draw_markers_help')}"
+        onclick="${() => this.toggleMarkerDraw()}"
+        i18n="profile_draw_markers"
+        ?disabled="${!this.crossSectionState.enableAnnotation}">
+        Annotate
+      </button>
+      <button
+        id="delete-markers-btn"
+        class="custom-btn"
+        title="${this.i18nManager.getTranslation('profile_delete_markers_help')}"
+        onclick="${() => this.deleteAllMarkers()}"
+        i18n="profile_delete_markers">
+        Delete all
+      </button>
+    </div>
+
+    <!-- ANNOTATIONS TABLE -->
+    <div class="scrollable-table-container">
+      <table id="markers-table" class="scrollable-table">
+        <thead>
+          <tr>
+            <th class="sticky-header" style="text-align: center" i18n="profile_table_id">ID</th>
+            <th class="sticky-header" style="text-align: right" i18n="profile_table_coord">COORD.</th>
+            <th class="sticky-header" style="text-align: center"></th>
+            <th class="sticky-header" style="text-align: center"></th>
+            <th class="sticky-header" style="text-align: center"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h3 i18n="profile_print_title">Print</h3>
+
+    <!-- PRINT BUTTON -->
+    <div class="btn-group-flex">
+      <select
+        id="print-profile-format-btn"
+        class="custom-btn"
+        oninput="${(e: Event) => this.setPrintFileFormat((e.target! as HTMLSelectElement).value as printFileFormat)}">
+        <option value="svg" i18n="">SVG</option>
+      </select>
+      <button
+        id="print-profile-btn"
+        class="custom-btn"
+        title="${this.i18nManager.getTranslation('profile_print_help')}"
+        onclick="${() => this.printPlot(this.crossSectionState.printFileFormat)}"
+        i18n="profile_print">
+        Print
+      </button>
+    </div>
+
+    <h3 i18n="profile_download_title">Downloads</h3>
+
+    <!-- MARKERS DOWNLOAD BUTTON -->
+    <div i18n="profile_markers_download">Markers</div>
+    <div class="btn-group-flex">
+      <select
+        id="download-markers-format-btn"
+        class="custom-btn"
+        oninput="${(e: Event) => this.setAnnotationsFileFormat((e.target! as HTMLSelectElement).value as vectorFeatureFileFormat)}">
+        <option value="kml" i18n="">KML</option>
+        <option value="geojson" i18n="">GeoJSON</option>
+        <option value="gpx" i18n="">GPX</option>
+      </select>
+      <button
+        id="download-markers-btn"
+        class="custom-btn"
+        title="${this.i18nManager.getTranslation('download_help')}"
+        onclick="${() => this.exportFeature(this.points, 'markers', this.crossSectionState.downloadAnnotationsFormat)}"
+        i18n="download"
+        ?disabled="${!this.crossSectionState.enableAnnotationsDownload}">
+        Download
+      </button>
+    </div>
+
+    <!-- LINESTRING DOWNLOAD BUTTON -->
+    <div i18n="profile_linestring_download">Profile line</div>
+    <div class="btn-group-flex">
+      <select
+        id="download-linestring-format-btn"
+        class="custom-btn"
+        oninput="${(e: Event) => this.setLineFileFormat((e.target! as HTMLSelectElement).value as vectorFeatureFileFormat)}">
+        <option value="kml" i18n="">KML</option>
+        <option value="geojson" i18n="">GeoJSON</option>
+        <option value="gpx" i18n="">GPX</option>
+      </select>
+      <button
+        id="download-linestring-btn"
+        class="custom-btn"
+        title="${this.i18nManager.getTranslation('download_help')}"
+        onclick="${() => this.exportFeature([this.linestring], 'linestring', this.crossSectionState.downloadLinestringFormat)}"
+        i18n="download"
+        ?disabled="${!this.crossSectionState.enableLinestringDownload}">
+        Download
+      </button>
+    </div>
+  </div>
+</div>
