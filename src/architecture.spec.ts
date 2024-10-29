@@ -270,7 +270,15 @@ describe('Components architecture', () => {
   it('There should not be any unused icon.', async () => {
     const iconsPath = path.join(__dirname, 'assets/icons');
     const allIcons = getAllSvgFiles(iconsPath);
-    const usedIcons = allIcons.reduce((acc, el:string) => { acc[el.split('/assets/')[1]] = false; return acc;}, {} as { [key: string]: boolean });
+
+    const usedIcons = allIcons.reduce(
+      (acc, el: string) => {
+        el = el.replace(/\\/g, '/');
+        acc[el.split('/assets/')[1]] = false;
+        return acc;
+      },
+      {} as { [key: string]: boolean }
+    );
 
     const parentPath = path.join(__dirname, '..'); // include parent path for index and mobile templates
     const htmlFiles = getAllHtmlFiles(parentPath);
@@ -278,7 +286,7 @@ describe('Components architecture', () => {
 
     for (const htmlFile of [...htmlFiles, ...tsFiles]) {
       const code = fs.readFileSync(htmlFile, 'utf8');
-      const regex = /src="(icons\/[^"]+.svg)"/gm;
+      const regex = /(icons\/[^'"]+\.svg)/gm;
       const matches = code.matchAll(regex);
       for (const match of matches) {
         const iconPath = match[1].trim();
@@ -286,7 +294,9 @@ describe('Components architecture', () => {
       }
     }
 
-    const errors = Object.keys(usedIcons).filter(key => !usedIcons[key]).map(key => `The icon ${key} is never used. It should be removed.`);
+    const errors = Object.keys(usedIcons)
+      .filter((key) => !usedIcons[key])
+      .map((key) => `The icon ${key} is never used. It should be removed.`);
     // Raise exception if any error was found
     if (errors.length > 0) {
       throw new Error(errors.join('\n'));

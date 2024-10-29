@@ -154,7 +154,8 @@ footer {
 }
 
 girafe-selection-grid,
-girafe-lidar-profile {
+girafe-lidar-profile,
+girafe-cross-section-view {
   position: relative;
   display: block;
 }
