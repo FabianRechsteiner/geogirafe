@@ -9,7 +9,7 @@
 </button>
 
 <div class="${(this.menuOpen ? 'themes' : 'hidden')}">
-  <h2 class="${(this.showBasemaps) ? '' : 'hidden'}">Basemaps</h2>
+  <h2 class="${(this.showBasemaps) ? '' : 'hidden'}" i18n="Basemaps">Basemaps</h2>
   <div class="${(this.showBasemaps) ? 'category' : 'hidden'}">
     ${Object.values(this.state.basemaps).map(basemap => uHtmlFor(basemap, basemap.id)`
     <button
@@ -23,7 +23,7 @@
     `)}
   </div>
 
-  <h2>Themes</h2>
+  <h2 i18n="Themes">Themes</h2>
   <div class="category row2">
     ${Object.values(this.state.themes._allThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
     <button
@@ -37,7 +37,7 @@
     `)}
   </div>
 
-  <h2 class="${this.state.layers.layersList.length > 0 ? '' : 'hidden'}">Layers</h2>
+  <h2 class="${this.state.layers.layersList.length > 0 ? '' : 'hidden'}" i18n="Layers">Layers</h2>
   <div class="${this.state.layers.layersList.length > 0 ? 'category row22' : 'hidden'}">
     ${this.availableLayers().map(([layer, iconSrc]) => uHtmlFor(layer, layer.treeItemId)`
     <button

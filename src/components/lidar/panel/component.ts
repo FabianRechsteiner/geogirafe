@@ -169,9 +169,9 @@ export default class LidarPanelComponent extends GirafeHTMLElement {
    */
   private renderComponent() {
     super.render();
-    super.girafeTranslate();
-    this.activateTooltips(false, [800, 0], 'top-end');
     this.renderComponentConfigPart();
+    this.activateTooltips(false, [800, 0], 'top-end');
+    super.girafeTranslate();
   }
 
   /**

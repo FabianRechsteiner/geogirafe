@@ -467,24 +467,24 @@ export default class {
     const intensity = point.intensity;
 
     if (distance !== undefined) {
-      const distanceTxt = this.i18nManager.getTranslation('Distance: ');
+      const distanceTxt = this.i18nManager.getTranslation('Distance');
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      html.push(`${distanceTxt + this.formatDecimals(distance, distDecimal)}`);
+      html.push(`${distanceTxt}: ${this.formatDecimals(distance, distDecimal)}`);
     }
     if (altitude !== undefined) {
-      const altitudeTxt = this.i18nManager.getTranslation('Altitude: ');
+      const altitudeTxt = this.i18nManager.getTranslation('Altitude');
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      html.push(`${altitudeTxt + this.formatDecimals(altitude, distDecimal)}`);
+      html.push(`${altitudeTxt}: ${this.formatDecimals(altitude, distDecimal)}`);
     }
     if (classification.length > 0) {
-      const classificationTxt = this.i18nManager.getTranslation('Classification: ');
+      const classificationTxt = this.i18nManager.getTranslation('Classification');
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      html.push(`${classificationTxt + classification}`);
+      html.push(`${classificationTxt}: ${classification}`);
     }
     if (intensity !== undefined) {
-      const intensityTxt = this.i18nManager.getTranslation('Intensity: ');
+      const intensityTxt = this.i18nManager.getTranslation('Intensity');
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      html.push(`${intensityTxt + this.formatDecimals(intensity, 0)}`);
+      html.push(`${intensityTxt}: ${this.formatDecimals(intensity, 0)}`);
     }
 
     return html.join('</br>');

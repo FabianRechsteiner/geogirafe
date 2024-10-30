@@ -56,7 +56,7 @@
 
       ${ this.dpis.length < 2 ? null : uHtml`
       <div class="option">
-        <label for="dpi" i18n="DPI">DPI</label>
+        <label for="dpi">DPI</label>
         <div class="select" onchange="${(evt:Event) => this.onDpiChanged(evt)}">
           <select id="dpi">
             ${this.dpis.map((dpi) => uHtml`
@@ -145,7 +145,7 @@
               class="${printItem.status === PrintStatus.Errored ? '' : 'hidden'}" />
             <p>
               <span i18n="${printItem.selectedLayoutName}">${printItem.selectedLayoutName}</span>
-              <span>(${printItem.selectedFormat.toUpperCase()})</span>
+              <span>(</span><span>${printItem.selectedFormat.toUpperCase()}</span><span>)</span>
             </p>
             <p class="time">${printItem.time}</p>
           </button>

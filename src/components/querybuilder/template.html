@@ -1,16 +1,20 @@
 <div class="container">
   <div class="${this.loading ? 'loading' : 'loading hidden'}">
     <img alt="loading-icon" src="icons/loading.svg" class="gg-spin" />
-    Loading server configuration...
+    <span i18n="Loading server configuration...">Loading server configuration...</span>
   </div>
   <div class="${this.deactivated ? 'deactivated' : 'deactivated hidden'}">
     <img alt="info-icon" src="icons/info.svg" />
-    Filtering deactivated: layers in layergroup don't have identical attributes.
+    <span i18n="Filtering deactivated: layers in layergroup don't have identical attributes."
+      >Filtering deactivated: layers in layergroup don't have identical attributes.</span
+    >
   </div>
   <div class="${this.loading || this.deactivated ? 'content hidden' : 'content'}">
     <div class="custom-select">
       <select id="attribute" name="attribute" onchange="${() => this.attributeChanged()}">
-        <option value="" disabled ?selected="${!this.currentLayerAttribute}">Select attribute...</option>
+        <option value="" disabled ?selected="${!this.currentLayerAttribute}" i18n="Select attribute...">
+          Select attribute...
+        </option>
         ${this.layerAttributes.map(attr => uHtmlFor(attr, attr.name)`
         <option i18n="${attr.name}" value="${attr.name}" ?selected="${this.currentLayerAttribute?.name==attr.name}">
           ${attr.name}
@@ -21,9 +25,9 @@
 
     <div class="custom-select">
       <select id="operator" name="operator" onchange="${() => this.operatorChanged()}">
-        <option value="" disabled selected>Select operator...</option>
+        <option value="" disabled selected i18n="Select operator...">Select operator...</option>
         ${this.operatorOptions.map(option => uHtmlFor(option, option.operator)`
-          <option value="${option.operator}">${option.displayName}</option>
+        <option value="${option.operator}">${option.displayName}</option>
         `)}
       </select>
     </div>

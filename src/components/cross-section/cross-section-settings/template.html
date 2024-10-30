@@ -190,11 +190,36 @@
           id="sequential-color-btn"
           class="settings-btn"
           oninput="${(e: Event) => this.setColorPalette((e.target! as HTMLSelectElement).value as ColorPalette)}">
-          <option value="spectral" ?selected="${this.crossSectionState.colorPalette === 'spectral'}">Spectral</option>
-          <option value="greys" ?selected="${this.crossSectionState.colorPalette === 'greys'}">Greys</option>
-          <option value="blues" ?selected="${this.crossSectionState.colorPalette === 'blues'}">Blues</option>
-          <option value="viridis" ?selected="${this.crossSectionState.colorPalette === 'viridis'}">Viridis</option>
-          <option value="magma" ?selected="${this.crossSectionState.colorPalette === 'magma'}">Magma</option>
+          <option
+            value="spectral"
+            ?selected="${this.crossSectionState.colorPalette === 'spectral'}"
+            i18n="palette_option_spectral">
+            Spectral
+          </option>
+          <option
+            value="greys"
+            ?selected="${this.crossSectionState.colorPalette === 'greys'}"
+            i18n="palette_option_greys">
+            Greys
+          </option>
+          <option
+            value="blues"
+            ?selected="${this.crossSectionState.colorPalette === 'blues'}"
+            i18n="palette_option_blues">
+            Blues
+          </option>
+          <option
+            value="viridis"
+            ?selected="${this.crossSectionState.colorPalette === 'viridis'}"
+            i18n="palette_option_viridis">
+            Viridis
+          </option>
+          <option
+            value="magma"
+            ?selected="${this.crossSectionState.colorPalette === 'magma'}"
+            i18n="palette_option_magma">
+            Magma
+          </option>
         </select>
       </div>
     </div>
