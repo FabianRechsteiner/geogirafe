@@ -6,6 +6,7 @@ import MapManager from '../../tools/state/mapManager';
 import ThemeLayer from '../../models/layers/themelayer';
 import LayerManager from '../../tools/layermanager';
 import BaseLayer from '../../models/layers/baselayer';
+import GroupLayer from '../../models/layers/grouplayer';
 
 class MobileThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -51,6 +52,33 @@ class MobileThemeComponent extends GirafeHTMLElement {
         duration: 1000
       });
     }
+  }
+
+  isThemeActive(theme: ThemeLayer) {
+    return (
+      theme.id === this.state.themes.lastSelectedTheme?.id ||
+      this.state.layers.layersList.find((l) => l.id === theme.id)
+    );
+  }
+
+  availableLayers() {
+    const flattenLayerGroupsRecursive = (
+      layers: BaseLayer[],
+      parentThemeIcon = this.state.themes.lastSelectedTheme?.icon
+    ): [Layer, string][] => {
+      return layers
+        .map((l) => {
+          if (l instanceof ThemeLayer) {
+            return flattenLayerGroupsRecursive(l.children, l.icon);
+          }
+          if (l instanceof GroupLayer) {
+            return flattenLayerGroupsRecursive(l.children, parentThemeIcon);
+          }
+          return [[l as Layer, parentThemeIcon]];
+        })
+        .flat() as [Layer, string][];
+    };
+    return flattenLayerGroupsRecursive(this.state.layers.layersList);
   }
 
   onLayerSelected(layer: BaseLayer) {

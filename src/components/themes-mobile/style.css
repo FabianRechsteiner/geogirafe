@@ -65,8 +65,12 @@ h2 {
   width: 100%;
 }
 
-.theme > img.unselected {
+.theme.unselected > img {
   filter: grayscale(1);
+}
+.theme.selected > img {
+  background-color: lightgray;
+  border-radius: 0.5rem;
 }
 
 button.select {
