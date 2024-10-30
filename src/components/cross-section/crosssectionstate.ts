@@ -1,4 +1,4 @@
-import type { printFileFormat, vectorFeatureFileFormat, colorVariable, colorPalette } from './crosssectiontypes';
+import type { PrintFileFormat, VectorFeatureFileFormat, ColorVariable, ColorPalette } from './crosssectiontypes';
 import type { Marker, Measurement } from './scatterplot';
 
 // Cross-section
@@ -10,9 +10,9 @@ export class CrossSectionState {
   enableMeasurement: boolean = false; // this controls the measurement button's disable property
   drawMeasurement: boolean = false;
   backgroundColor: string = '#ffffff';
-  colorVariable: colorVariable = 'intensity';
+  colorVariable: ColorVariable = 'intensity';
   colorUniform: string = '#000000';
-  colorPalette: colorPalette = 'viridis';
+  colorPalette: ColorPalette = 'viridis';
   cursorDomainCoordinates: [number, number] = [0.0, 0.0];
   domain: { xmin: number; xmax: number; ymin: number; ymax: number } = {
     xmin: 0.0,
@@ -36,9 +36,9 @@ export class CrossSectionState {
   zoom: { k: number; tx: number; ty: number } = { k: 1.0, tx: 0.0, ty: 0.0 };
   zoomUpdate: boolean = false;
   printProfile: boolean = false;
-  printFileFormat: printFileFormat = 'svg';
+  printFileFormat: PrintFileFormat = 'svg';
   enableLinestringDownload: boolean = false; // this controls the linstring download button's disable property
-  downloadLinestringFormat: vectorFeatureFileFormat = 'kml';
+  downloadLinestringFormat: VectorFeatureFileFormat = 'kml';
   enableAnnotationsDownload: boolean = false; // this controls the annotation download button's disable property
-  downloadAnnotationsFormat: vectorFeatureFileFormat = 'kml';
+  downloadAnnotationsFormat: VectorFeatureFileFormat = 'kml';
 }

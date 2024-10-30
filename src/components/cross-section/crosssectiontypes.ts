@@ -1,4 +1,4 @@
-export type vectorFeatureFileFormat = 'kml' | 'geojson' | 'gpx';
-export type printFileFormat = 'svg' | 'pdf' | 'png';
-export type colorVariable = 'intensity' | 'natural' | 'classification' | 'uniform';
-export type colorPalette = 'spectral' | 'greys' | 'blues' | 'viridis' | 'magma';
+export type VectorFeatureFileFormat = 'kml' | 'geojson' | 'gpx';
+export type PrintFileFormat = 'svg' | 'pdf' | 'png';
+export type ColorVariable = 'intensity' | 'natural' | 'classification' | 'uniform';
+export type ColorPalette = 'spectral' | 'greys' | 'blues' | 'viridis' | 'magma';

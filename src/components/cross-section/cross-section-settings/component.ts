@@ -1,4 +1,4 @@
-import type { vectorFeatureFileFormat, colorPalette, colorVariable, printFileFormat } from './../crosssectiontypes';
+import type { VectorFeatureFileFormat, ColorPalette, ColorVariable, PrintFileFormat } from './../crosssectiontypes';
 import type { Marker, Measurement } from './../scatterplot';
 import type { Callback } from '../../../tools/state/statemanager';
 
@@ -546,16 +546,16 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.crossSectionState.colorUniform = val;
   }
 
-  setColorPalette(val: colorPalette): void {
+  setColorPalette(val: ColorPalette): void {
     this.crossSectionState.colorPalette = val;
   }
 
-  setColorVariable(val: colorVariable): void {
+  setColorVariable(val: ColorVariable): void {
     this.crossSectionState.colorVariable = val;
     super.render();
   }
 
-  exportFeature(features: Feature[], filename: string, format: vectorFeatureFileFormat): void {
+  exportFeature(features: Feature[], filename: string, format: VectorFeatureFileFormat): void {
     switch (format) {
       case 'geojson': {
         const geoJsonString = new GeoJSON().writeFeatures(features, {
@@ -768,7 +768,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.crossSectionState.syncViews = val;
   }
 
-  printPlot(printFileFormat: printFileFormat): void {
+  printPlot(printFileFormat: PrintFileFormat): void {
     const event: CustomEvent = new CustomEvent('print-canvas', {
       detail: { format: printFileFormat },
       bubbles: true,
@@ -777,15 +777,15 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.dispatchEvent(event);
   }
 
-  setPrintFileFormat(val: printFileFormat): void {
+  setPrintFileFormat(val: PrintFileFormat): void {
     this.crossSectionState.printFileFormat = val;
   }
 
-  setAnnotationsFileFormat(val: vectorFeatureFileFormat): void {
+  setAnnotationsFileFormat(val: VectorFeatureFileFormat): void {
     this.crossSectionState.downloadAnnotationsFormat = val;
   }
 
-  setLineFileFormat(val: vectorFeatureFileFormat): void {
+  setLineFileFormat(val: VectorFeatureFileFormat): void {
     this.crossSectionState.downloadLinestringFormat = val;
   }
 
@@ -1061,6 +1061,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
   private async togglePanel(visible: boolean): Promise<void> {
     this.visible = visible;
+    this.state.selection.enabled = !this.visible;
     this.render();
   }
 
