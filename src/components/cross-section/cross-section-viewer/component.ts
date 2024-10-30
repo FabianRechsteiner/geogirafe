@@ -1,12 +1,14 @@
 import type { Callback } from '../../../tools/state/statemanager';
-import type { colorVariable, colorPalette } from './../crosssectiontypes';
+import type { ColorVariable, ColorPalette } from './../crosssectiontypes';
 import type { Marker } from './../scatterplot';
 import { CursorMoveEvent, ChangeDomainEvent, ChangeMarkersEvent, ChangeMeasurementsEvent } from './../scatterplot';
 
 import GirafeResizableElement from '../../../base/GirafeResizableElement';
 import { CrossSectionState } from './../crosssectionstate';
+import ConfigManager from '../../../tools/configuration/configmanager';
 import { Scatterplot } from '../scatterplot';
-import { getProfileData, computeColors } from '../utils';
+import { PytreeManager } from '../pytreemanager';
+import { computeColors } from '../utils';
 import { download } from '../../../tools/export/download';
 
 class CrossSectionViewComponent extends GirafeResizableElement {
@@ -25,6 +27,7 @@ class CrossSectionViewComponent extends GirafeResizableElement {
   classification: Uint8Array;
   currentRefreshId: symbol | undefined;
   panel: HTMLDivElement | null = null;
+  pytreeManager: PytreeManager | null = null;
 
   constructor() {
     super('cross-section-view');
@@ -39,7 +42,23 @@ class CrossSectionViewComponent extends GirafeResizableElement {
     this.classification = new Uint8Array(this.crossSectionState.maxNumberOfPoints); // 1 bytes * 1 value
   }
 
+  async initPytreeManager() {
+    const baseURL = ConfigManager.getInstance().Config.lidar.url.replace(/\/?$/, '/');
+    this.pytreeManager = new PytreeManager(baseURL);
+
+    await this.pytreeManager.getConfig();
+  }
+
   async refreshData(lineWidth: number, lineCoordinates: [number, number][]) {
+    if (!this.pytreeManager) {
+      try {
+        await this.initPytreeManager();
+      } catch (error) {
+        console.error('Cross-section-viewer: Unavble to initialize Pytree manager', error);
+        throw error;
+      }
+    }
+
     this.scatterplot!.clearGLPoints();
 
     this.validateRequestArgs(lineWidth, lineCoordinates);
@@ -76,7 +95,14 @@ class CrossSectionViewComponent extends GirafeResizableElement {
         this.state.loading = true;
 
         // Asynchronous request to retrieve cross-section data at given level of detail (LOD)
-        const response = await getProfileData(LOD, LOD, lineWidth, coordinateString, this.abortController.signal);
+        const response = await this.pytreeManager!.getData(
+          this.pytreeManager!.config!.default_point_cloud,
+          LOD,
+          LOD,
+          lineWidth,
+          coordinateString,
+          this.abortController.signal
+        );
 
         if (!response || signal.aborted || this.currentRefreshId !== refreshId) {
           break;
@@ -86,21 +112,35 @@ class CrossSectionViewComponent extends GirafeResizableElement {
 
         // Update data arrays
         if (response.metadata.points > 0 && remainder > 0 && !signal.aborted) {
-          this.uv.set(
-            // @ts-expect-error: D3 typing issue
-            response.data['POSITION_PROJECTED_PROFILE'].slice(0, remainder * 2),
-            this.crossSectionState.numberOfPoints * 2
-          );
-          // @ts-expect-error: D3 typing issue
-          this.rgb.set(response.data['RGB'].slice(0, remainder * 3), this.crossSectionState.numberOfPoints * 3);
-          // @ts-expect-error: D3 typing issue
-          this.intensity.set(response.data['INTENSITY'].slice(0, remainder), this.crossSectionState.numberOfPoints);
-
-          this.classification.set(
-            // @ts-expect-error: D3 typing issue
-            response.data['CLASSIFICATION'].slice(0, remainder),
-            this.crossSectionState.numberOfPoints
-          );
+          for (const key in response.data) {
+            switch (key) {
+              case 'POSITION_PROJECTED_PROFILE':
+                this.uv.set(
+                  // @ts-expect-error: D3 typing issue
+                  response.data['POSITION_PROJECTED_PROFILE'].slice(0, remainder * 2),
+                  this.crossSectionState.numberOfPoints * 2
+                );
+                break;
+              case 'RGB':
+                // @ts-expect-error: D3 typing issue
+                this.rgb.set(response.data['RGB'].slice(0, remainder * 3), this.crossSectionState.numberOfPoints * 3);
+                break;
+              case 'INTENSITY':
+                this.intensity.set(
+                  // @ts-expect-error: D3 typing issue
+                  response.data['INTENSITY'].slice(0, remainder),
+                  this.crossSectionState.numberOfPoints
+                );
+                break;
+              case 'CLASSIFICATION':
+                this.classification.set(
+                  // @ts-expect-error: D3 typing issue
+                  response.data['CLASSIFICATION'].slice(0, remainder),
+                  this.crossSectionState.numberOfPoints
+                );
+                break;
+            }
+          }
 
           this.crossSectionState.numberOfPoints = Math.min(
             this.crossSectionState.maxNumberOfPoints,
@@ -155,7 +195,7 @@ class CrossSectionViewComponent extends GirafeResizableElement {
     }
   }
 
-  changeColormap(variable: colorVariable, colormap: colorPalette = 'spectral') {
+  changeColormap(variable: ColorVariable, colormap: ColorPalette = 'spectral') {
     let colors;
     switch (variable) {
       case 'intensity':
@@ -169,7 +209,12 @@ class CrossSectionViewComponent extends GirafeResizableElement {
         colors = this.rgb.slice(0, this.crossSectionState.numberOfPoints * 3);
         break;
       case 'classification':
-        colors = computeColors(this.classification.slice(0, this.crossSectionState.numberOfPoints), 'custom', [1, 41]);
+        // colors = computeColors(this.classification.slice(0, this.crossSectionState.numberOfPoints), 'custom', [1, 41]);
+        colors = this.pytreeManager!.getClassificationColor(
+          this.classification.slice(0, this.crossSectionState.numberOfPoints),
+          this.pytreeManager!.config!.classification_colors
+        );
+
         break;
       case 'uniform':
         colors = computeColors(

@@ -155,11 +155,31 @@
         <select
           id="color-variable-btn"
           class="settings-btn"
-          oninput="${(e: Event) => this.setColorVariable((e.target! as HTMLInputElement).value as colorVariable)}">
-          <option value="uniform" i18n="color_option_uniform">Single color</option>
-          <option value="natural" i18n="color_option_natural">Natural</option>
-          <option value="intensity" i18n="color_option_intensity">Intensity</option>
-          <option value="classification" i18n="color_option_classification">Classification</option>
+          oninput="${(e: Event) => this.setColorVariable((e.target! as HTMLInputElement).value as ColorVariable)}">
+          <option
+            value="uniform"
+            i18n="color_option_uniform"
+            ?selected="${this.crossSectionState.colorVariable === 'uniform'}">
+            Single color
+          </option>
+          <option
+            value="natural"
+            i18n="color_option_natural"
+            ?selected="${this.crossSectionState.colorVariable === 'natural'}">
+            Natural
+          </option>
+          <option
+            value="intensity"
+            i18n="color_option_intensity"
+            ?selected="${this.crossSectionState.colorVariable === 'intensity'}">
+            Intensity
+          </option>
+          <option
+            value="classification"
+            i18n="color_option_classification"
+            ?selected="${this.crossSectionState.colorVariable === 'classification'}">
+            Classification
+          </option>
         </select>
       </div>
 
@@ -169,12 +189,12 @@
         <select
           id="sequential-color-btn"
           class="settings-btn"
-          oninput="${(e: Event) => this.setColorPalette((e.target! as HTMLSelectElement).value as colorPalette)}">
-          <option value="spectral">Spectral</option>
-          <option value="greys">Greys</option>
-          <option value="blues">Blues</option>
-          <option value="viridis">Viridis</option>
-          <option value="magma">Magma</option>
+          oninput="${(e: Event) => this.setColorPalette((e.target! as HTMLSelectElement).value as ColorPalette)}">
+          <option value="spectral" ?selected="${this.crossSectionState.colorPalette === 'spectral'}">Spectral</option>
+          <option value="greys" ?selected="${this.crossSectionState.colorPalette === 'greys'}">Greys</option>
+          <option value="blues" ?selected="${this.crossSectionState.colorPalette === 'blues'}">Blues</option>
+          <option value="viridis" ?selected="${this.crossSectionState.colorPalette === 'viridis'}">Viridis</option>
+          <option value="magma" ?selected="${this.crossSectionState.colorPalette === 'magma'}">Magma</option>
         </select>
       </div>
     </div>
@@ -283,7 +303,7 @@
       <select
         id="print-profile-format-btn"
         class="custom-btn"
-        oninput="${(e: Event) => this.setPrintFileFormat((e.target! as HTMLSelectElement).value as printFileFormat)}">
+        oninput="${(e: Event) => this.setPrintFileFormat((e.target! as HTMLSelectElement).value as PrintFileFormat)}">
         <option value="svg" i18n="">SVG</option>
       </select>
       <button
@@ -304,7 +324,7 @@
       <select
         id="download-markers-format-btn"
         class="custom-btn"
-        oninput="${(e: Event) => this.setAnnotationsFileFormat((e.target! as HTMLSelectElement).value as vectorFeatureFileFormat)}">
+        oninput="${(e: Event) => this.setAnnotationsFileFormat((e.target! as HTMLSelectElement).value as VectorFeatureFileFormat)}">
         <option value="kml" i18n="">KML</option>
         <option value="geojson" i18n="">GeoJSON</option>
         <option value="gpx" i18n="">GPX</option>
@@ -326,7 +346,7 @@
       <select
         id="download-linestring-format-btn"
         class="custom-btn"
-        oninput="${(e: Event) => this.setLineFileFormat((e.target! as HTMLSelectElement).value as vectorFeatureFileFormat)}">
+        oninput="${(e: Event) => this.setLineFileFormat((e.target! as HTMLSelectElement).value as VectorFeatureFileFormat)}">
         <option value="kml" i18n="">KML</option>
         <option value="geojson" i18n="">GeoJSON</option>
         <option value="gpx" i18n="">GPX</option>
