@@ -226,8 +226,8 @@ export class LidarProfileManager {
     this.config.clientConfig.pointSum = 0;
     const profileWidth = this.config.clientConfig.autoWidth ? maxLODWith.width : this.config.serverConfig.width ?? 0;
 
-    const profileWidthTxt = this.i18nManager?.getTranslation('Profile width: ');
-    d3select(getLidarProfileWidthInfo() as BaseType).html(`${profileWidthTxt} ${profileWidth}m`);
+    const profileWidthTxt = this.i18nManager?.getTranslation('Profile width');
+    d3select(getLidarProfileWidthInfo() as BaseType).html(`${profileWidthTxt}: ${profileWidth}m`);
     const initialLOD = this.config.serverConfig.initialLOD ?? 0;
 
     for (let i = 0; i < maxLODWith.maxLOD; i++) {
@@ -273,8 +273,8 @@ export class LidarProfileManager {
     const lodInfo = d3select(getLidarProfileLodInfo() as BaseType);
     if (this.config.serverConfig.debug) {
       let html = lodInfo.html();
-      const loadingLodTxt = this.i18nManager?.getTranslation('Loading LOD: ');
-      html += `${loadingLodTxt} ${minLOD}-${maxLOD}..<br>`;
+      const loadingLodTxt = this.i18nManager?.getTranslation('Loading LOD');
+      html += `${loadingLodTxt}: ${minLOD}-${maxLOD}..<br>`;
       lodInfo.html(html);
     }
 
@@ -298,9 +298,9 @@ export class LidarProfileManager {
         }
         if (this.config.serverConfig.debug) {
           let html = lodInfo.html();
-          const lodTxt = this.i18nManager?.getTranslation('LOD: ');
+          const lodTxt = this.i18nManager?.getTranslation('LOD');
           const loadedTxt = this.i18nManager?.getTranslation('loaded');
-          html += `${lodTxt} ${minLOD}-${maxLOD} ${loadedTxt}<br>`;
+          html += `${lodTxt}: ${minLOD}-${maxLOD} ${loadedTxt}<br>`;
           lodInfo.html(html);
         }
         this.processBuffer(data, iter, distanceOffset, resetPlot);

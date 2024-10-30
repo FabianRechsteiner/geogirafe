@@ -253,11 +253,11 @@ describe('Components architecture', () => {
     const tsFiles = getAllTypescriptFiles(__dirname);
 
     const errors: string[] = [];
-    for (const htmlFile of [...htmlFiles, ...tsFiles]) {
-      const code = fs.readFileSync(htmlFile, 'utf8');
+    for (const file of [...htmlFiles, ...tsFiles]) {
+      const code = fs.readFileSync(file, 'utf8');
       const regex = /src="\/icons\//gm;
       if (code.match(regex)) {
-        errors.push(`The template ${htmlFile} should use relative path for icons.`);
+        errors.push(`The template ${file} should use relative path for icons.`);
       }
     }
 
@@ -284,8 +284,8 @@ describe('Components architecture', () => {
     const htmlFiles = getAllHtmlFiles(parentPath);
     const tsFiles = getAllTypescriptFiles(__dirname);
 
-    for (const htmlFile of [...htmlFiles, ...tsFiles]) {
-      const code = fs.readFileSync(htmlFile, 'utf8');
+    for (const file of [...htmlFiles, ...tsFiles]) {
+      const code = fs.readFileSync(file, 'utf8');
       const regex = /(icons\/[^'"]+\.svg)/gm;
       const matches = code.matchAll(regex);
       for (const match of matches) {
@@ -297,6 +297,225 @@ describe('Components architecture', () => {
     const errors = Object.keys(usedIcons)
       .filter((key) => !usedIcons[key])
       .map((key) => `The icon ${key} is never used. It should be removed.`);
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+});
+
+describe('Components translations', () => {
+  const noNeedForTranslation = [
+    ':&nbsp;',
+    'pt',
+    'DPI',
+    ':',
+    'KML',
+    'px',
+    'GeoJson',
+    'GPX',
+    'x',
+    '×',
+    '2D',
+    '3D',
+    '1&nbsp;:&nbsp;',
+    'LOD',
+    ')',
+    '(',
+    '/',
+    '[',
+    ']',
+    '.'
+  ];
+
+  function getSupportedLanguages() {
+    const i18nPath = path.join(__dirname, '..', 'public', 'i18n');
+    const files = fs.readdirSync(i18nPath);
+    const languages: string[] = [];
+    files.forEach((file) => {
+      languages.push(file.split('.')[0]);
+    });
+
+    return languages;
+  }
+
+  it('There should not be any hardcoded text in html files without i18n attribute', async () => {
+    const parentPath = path.join(__dirname, 'components'); // include parent path for index and mobile templates
+    const htmlFiles = getAllHtmlFiles(parentPath);
+
+    const errors: string[] = [];
+    for (const htmlFile of htmlFiles) {
+      let code = fs.readFileSync(htmlFile, 'utf8');
+      // Replace characters < and > that are used in attributes (for example for compareason tests of function with =>)
+      code = code.replace(/(="[^"]*)>([^"]*")/g, '$1&gt;$2');
+      code = code.replace(/(="[^"]*)<([^"]*")/g, '$1&lt;$2');
+
+      const regex = /([^>]+>)([^<]+)</gms;
+      const matches = code.matchAll(regex);
+      for (const match of matches) {
+        const tag = match[1]
+          .trim()
+          .replace(/(="[^"]*)&gt;([^"]*")/g, '$1>$2')
+          .replace(/(="[^"]*)&lt;([^"]*")/g, '$1<$2');
+        const text = match[2]
+          .trim()
+          .replace(/(="[^"]*)&gt;([^"]*")/g, '$1>$2')
+          .replace(/(="[^"]*)&lt;([^"]*")/g, '$1<$2');
+        if (text.length === 0) {
+          // Only spaces or line breaks
+          continue;
+        }
+        if (text.startsWith('https://')) {
+          // Is just a link, nothing to translate
+          continue;
+        }
+        if (text.startsWith('${') || text.endsWith('}')) {
+          // If the content is a uHtml variable, we ignore it
+          continue;
+        }
+        if (text.startsWith('`') && text.endsWith('`')) {
+          // If the content is a uHtml template, we ignore it
+          continue;
+        }
+        if (tag.includes('i18n=')) {
+          // If there already is a i18n tag, everything is ok, and we ignore it
+          continue;
+        }
+        if (noNeedForTranslation.includes(text)) {
+          // Special strings do not need any translation
+          continue;
+        }
+
+        errors.push(`The template ${htmlFile} contains untranslated text: """${text}""" in tag <${tag}.`);
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+
+  it('Every i18n attribute should have a corresponding translation', async () => {
+    // First, read all translations files
+    const i18nPath = path.join(__dirname, '..', 'public', 'i18n');
+    const translations: Record<string, any> = {};
+    for (const lang of getSupportedLanguages()) {
+      const file = fs.readFileSync(path.join(i18nPath, `${lang}.json`), 'utf-8');
+      translations[lang] = JSON.parse(file)[lang];
+    }
+
+    const parentPath = path.join(__dirname, 'components'); // include parent path for index and mobile templates
+    const htmlFiles = getAllHtmlFiles(parentPath);
+
+    const errors: string[] = [];
+    for (const htmlFile of htmlFiles) {
+      let code = fs.readFileSync(htmlFile, 'utf8');
+      const regex = /i18n="([^"]+)"/gms;
+      const matches = code.matchAll(regex);
+      for (const match of matches) {
+        const i18nId = match[1];
+
+        if (i18nId.startsWith('${') || i18nId.endsWith('}')) {
+          // If the content is a uHtml variable, we ignore it
+          continue;
+        }
+
+        for (const lang of getSupportedLanguages()) {
+          if (!(i18nId in translations[lang])) {
+            // Translation is missing
+            errors.push(`The translation in ${lang.toUpperCase()} is missing for key "${i18nId}".`);
+          }
+        }
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+
+  it('Every tooltip should have a corresponding translation', async () => {
+    // First, read all translations files
+    const i18nPath = path.join(__dirname, '..', 'public', 'i18n');
+    const translations: Record<string, any> = {};
+    for (const lang of getSupportedLanguages()) {
+      const file = fs.readFileSync(path.join(i18nPath, `${lang}.json`), 'utf-8');
+      translations[lang] = JSON.parse(file)[lang];
+    }
+
+    const parentPath = path.join(__dirname, 'components'); // include parent path for index and mobile templates
+    const htmlFiles = getAllHtmlFiles(parentPath);
+
+    const errors: string[] = [];
+    for (const htmlFile of htmlFiles) {
+      let code = fs.readFileSync(htmlFile, 'utf8');
+      const regex = /tip="([^"]+)"/gms;
+      const matches = code.matchAll(regex);
+      for (const match of matches) {
+        const i18nId = match[1];
+
+        if (i18nId.startsWith('${') || i18nId.endsWith('}')) {
+          // If the content is a uHtml variable, we ignore it
+          continue;
+        }
+
+        if (noNeedForTranslation.includes(i18nId)) {
+          // Special strings do not need any translation
+          continue;
+        }
+
+        for (const lang of getSupportedLanguages()) {
+          if (!(i18nId in translations[lang])) {
+            // Translation is missing
+            errors.push(`The translation in ${lang.toUpperCase()} is missing for key "${i18nId}".`);
+          }
+        }
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+
+  it('Every geTranslation call should have a corresponding translation', async () => {
+    // First, read all translations files
+    const i18nPath = path.join(__dirname, '..', 'public', 'i18n');
+    const translations: Record<string, any> = {};
+    for (const lang of getSupportedLanguages()) {
+      const file = fs.readFileSync(path.join(i18nPath, `${lang}.json`), 'utf-8');
+      translations[lang] = JSON.parse(file)[lang];
+    }
+
+    const parentPath = path.join(__dirname, 'components'); // include parent path for index and mobile templates
+    const htmlFiles = getAllHtmlFiles(parentPath);
+    const tsFiles = getAllTypescriptFiles(parentPath);
+
+    const errors: string[] = [];
+    for (const file of [...htmlFiles, ...tsFiles]) {
+      let code = fs.readFileSync(file, 'utf8');
+      const regex = /getTranslation\('([^']+)'\)/gm;
+      const matches = code.matchAll(regex);
+      for (const match of matches) {
+        const i18nId = match[1];
+
+        if (noNeedForTranslation.includes(i18nId)) {
+          // Special strings do not need any translation
+          continue;
+        }
+
+        for (const lang of getSupportedLanguages()) {
+          if (!(i18nId in translations[lang])) {
+            // Translation is missing
+            errors.push(`The translation in ${lang.toUpperCase()} is missing for key "${i18nId}".`);
+          }
+        }
+      }
+    }
+
     // Raise exception if any error was found
     if (errors.length > 0) {
       throw new Error(errors.join('\n'));

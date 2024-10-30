@@ -64,10 +64,10 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    super.girafeTranslate();
-    this.activateTooltips(false, [800, 0], 'top-end');
     this.visible ? this.renderComponent() : this.hide();
     this.state.selection.enabled = !this.visible;
+    this.activateTooltips(false, [800, 0], 'top-end');
+    super.girafeTranslate();
   }
 
   renderComponent() {

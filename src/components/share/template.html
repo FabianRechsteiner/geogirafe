@@ -1,6 +1,6 @@
 <div id="draggable">
   <div id="header">
-    Share this map with a link
+    <span i18n="Share this map with a link">Share this map with a link</span>
     <img id="close" alt="close-icon" src="icons/close.svg" />
   </div>
 
@@ -18,7 +18,9 @@
       <img alt="share-qrcode" class="${(this.qrCode ? 'qrcode' : 'hidden')}" src="${this.qrCode}" />
       <div class="${(this.success ? 'hidden' : 'qrcode error')}">
         <img alt="error-icon" src="icons/error.svg" />
-        Error, can not fetch the shortener service. Please try again later.
+        <span i18n="Error, can not fetch the shortener service. Please try again later."
+          >Error, can not fetch the shortener service. Please try again later.</span
+        >
       </div>
 
       <div class="social">

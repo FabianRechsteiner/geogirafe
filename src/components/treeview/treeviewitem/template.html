@@ -117,7 +117,12 @@
   ` )}
 
   <div class="${this.layer instanceof LayerLocalFile && this.isLegendExpanded ? 'legend-file' : 'legend-file hidden'}">
-    <span>File from </span><span>${(this.layer as LayerLocalFile).lastModifiedDate}</span><span> [</span
-    ><span>${(this.layer as LayerLocalFile)._features?.length} </span><span>features.]</span>
+    <span i18n="File from">File from</span>
+    <span>${(this.layer as LayerLocalFile).lastModifiedDate}</span>
+    <span>[</span>
+    <span>${(this.layer as LayerLocalFile)._features?.length}</span>
+    <span i18n="features">features</span>
+    <span>.</span>
+    <span>]</span>
   </div>
 </div>

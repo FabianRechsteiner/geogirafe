@@ -27,6 +27,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   public render() {
     super.render();
     this.activateTooltips(false, [800, 0], 'right');
+    this.girafeTranslate();
   }
 
   private registerEvents() {
@@ -51,7 +52,6 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   protected connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.girafeTranslate();
       this.registerEvents();
     });
   }

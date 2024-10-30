@@ -52,7 +52,14 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   girafeTranslate() {
-    I18nManager.getInstance().translate(this.shadow);
+    I18nManager.getInstance()
+      .translate(this.shadow)
+      .then(() => {
+        // Translate tooltips
+        for (const tooltip of this.activeTooltips) {
+          tooltip.setContent(I18nManager.getInstance().getTranslation(tooltip.props.content));
+        }
+      });
   }
 
   /**
@@ -101,7 +108,7 @@ class GirafeHTMLElement extends HTMLElement {
     const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
     elementsWithTooltip.forEach((el) => {
       const tooltipText = el.getAttribute('tip');
-      if (tooltipText !== '') {
+      if (tooltipText && tooltipText !== '') {
         const placement = el.getAttribute('tip-placement') ?? defaultPlacement;
         const theme = el.getAttribute('tip-theme') ?? '';
         const tooltip = tippy(el, {
@@ -111,7 +118,7 @@ class GirafeHTMLElement extends HTMLElement {
           theme: theme,
           //animateFill: false,
           //animation: 'scale-with-inertia',
-          content: el.getAttribute('tip')
+          content: tooltipText
         });
         this.activeTooltips.push(tooltip);
       }
