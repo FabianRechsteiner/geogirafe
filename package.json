@@ -50,13 +50,13 @@
     "vanilla-picker": "2.12.3"
   },
   "peerDependencies": {
-    "@geoblocks/mapfishprint": "^0.2.13",
-    "@geoblocks/print": "^0.7.5",
-    "cesium": "^1.113.0",
-    "ol": "^8.1.0",
-    "ol-mapbox-style": "^12.1.0",
-    "olcs": "^2.16.0",
-    "proj4": "^2.9.2"
+    "@geoblocks/mapfishprint": "0.2",
+    "@types/geojson": "7946",
+    "cesium": ">1.113",
+    "ol": "8 || 9",
+    "ol-mapbox-style": "12",
+    "olcs": "2",
+    "proj4": "2"
   },
   "devDependencies": {
     "@geoblocks/mapfishprint": "0.2.16",
