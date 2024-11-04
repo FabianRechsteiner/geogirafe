@@ -17,121 +17,100 @@ afterAll(() => {
   MockHelper.stopMocking();
 });
 
-describe('StateManager.getCircularReplacer', () => {
-  it('should replace circular references with [Circular]', () => {
-    const circularObject: any = {};
-    circularObject.circularReference = circularObject;
-    const jsonString = JSON.stringify(circularObject, manager.getCircularReplacer());
-
-    const expectedString = '{"circularReference":"[Circular]"}';
-    expect(jsonString).toEqual(expectedString);
-  });
-
-  it('should not replace non-circular references', () => {
-    const nonCircularObject = { key: 'value' };
-    const jsonString = JSON.stringify(nonCircularObject, manager.getCircularReplacer());
-
-    const expectedString = '{"key":"value"}';
-    expect(jsonString).toEqual(expectedString);
-  });
-
-  it('should handle arrays with circular references', () => {
-    const circularArray: any[] = [];
-    circularArray.push(circularArray);
-    const jsonString = JSON.stringify(circularArray, manager.getCircularReplacer());
-
-    const expectedString = '["[Circular]"]';
-    expect(jsonString).toEqual(expectedString);
-  });
-
-  it('should handle arrays without circular references', () => {
-    const nonCircularArray = [1, 2, 3];
-    const jsonString = JSON.stringify(nonCircularArray, manager.getCircularReplacer());
-
-    const expectedString = '[1,2,3]';
-    expect(jsonString).toEqual(expectedString);
-  });
-
-  it('should not replace non-object values', () => {
-    const primitiveValue = 42;
-    const jsonString = JSON.stringify(primitiveValue, manager.getCircularReplacer());
-
-    expect(jsonString).toEqual('42');
-  });
-});
-
 describe('StateManager.areEqual', () => {
   it('areEqual should compare equal numbers', () => {
+    // @ts-ignore
     expect(manager.areEqual(42, 42)).toBe(true);
   });
 
   it('areEqual should compare different numbers', () => {
+    // @ts-ignore
     expect(manager.areEqual(42, 43)).toBe(false);
   });
 
   it('areEqual should compare NaN numbers', () => {
+    // @ts-ignore
     expect(manager.areEqual(NaN, NaN)).toBe(true);
   });
 
   it('areEqual should compare equal strings', () => {
+    // @ts-ignore
     expect(manager.areEqual('abc', 'abc')).toBe(true);
   });
 
   it('areEqual should compare different strings', () => {
+    // @ts-ignore
     expect(manager.areEqual('abc', 'def')).toBe(false);
   });
 
   it('areEqual should compare equal booleans', () => {
+    // @ts-ignore
     expect(manager.areEqual(true, true)).toBe(true);
   });
 
   it('areEqual should compare different booleans', () => {
+    // @ts-ignore
     expect(manager.areEqual(true, false)).toBe(false);
   });
 
   it('areEqual should compare null values', () => {
+    // @ts-ignore
     expect(manager.areEqual(null, null)).toBe(true);
   });
 
   it('areEqual should compare undefined values', () => {
+    // @ts-ignore
     expect(manager.areEqual(undefined, undefined)).toBe(true);
   });
 
   it('areEqual should compare null and undefined values', () => {
+    // @ts-ignore
     expect(manager.areEqual(null, undefined)).toBe(false);
   });
 
   it('areEqual should compare equal arrays', () => {
     const arr1 = [1, 2, 3];
     const arr2 = [1, 2, 3];
+    // @ts-ignore
     expect(manager.areEqual(arr1, arr2)).toBe(true);
   });
 
   it('areEqual should compare different arrays', () => {
     const arr1 = [1, 2, 3];
     const arr2 = [3, 2, 1];
+    // @ts-ignore
     expect(manager.areEqual(arr1, arr2)).toBe(false);
   });
 
   it('areEqual should compare equal objects', () => {
     const obj1 = { key: 'value' };
     const obj2 = { key: 'value' };
+    // @ts-ignore
     expect(manager.areEqual(obj1, obj2)).toBe(true);
   });
 
   it('areEqual should compare different objects', () => {
     const obj1 = { key: 'value' };
     const obj2 = { key: 'differentValue' };
+    // @ts-ignore
     expect(manager.areEqual(obj1, obj2)).toBe(false);
   });
 
-  it('2 empty state should be the equal', () => {
+  it('areEqual should compare objects with different properties', () => {
+    const obj1 = { key: 'value' };
+    const obj2 = { otherkey: 'value' };
+    // @ts-ignore
+    expect(manager.areEqual(obj1, obj2)).toBe(false);
+  });
+
+  it('2 empty state should be equal', () => {
     const obj1 = new State();
     const obj2 = new State();
+    // @ts-ignore
     expect(manager.areEqual(obj1, obj2)).toBe(true);
   });
 
-  it('areEqual should handle circular references', () => {
+  it('areEqual should handle circular references for different objects', () => {
     const layer1: any = { group: null, val: 1 };
     const layer2: any = { group: null, val: 2 };
     const group = {
@@ -141,9 +120,49 @@ describe('StateManager.areEqual', () => {
     layer1.group = group;
     layer2.group = group;
 
+    // @ts-ignore
     expect(manager.areEqual(group, group)).toBe(true);
+    // @ts-ignore
     expect(manager.areEqual(layer1, layer1)).toBe(true);
+    // @ts-ignore
     expect(manager.areEqual(layer2, layer2)).toBe(true);
+    // @ts-ignore
+    expect(manager.areEqual(layer1, layer2)).toBe(false);
+  });
+
+  it('areEqual should handle circular references for equal objects', () => {
+    const layer1: any = { group: null, val: 1 };
+    const layer2: any = { group: null, val: 1 };
+    const group = {
+      layers: [layer1, layer2],
+      val: 0
+    };
+    layer1.group = group;
+    layer2.group = group;
+
+    // @ts-ignore
+    expect(manager.areEqual(group, group)).toBe(true);
+    // @ts-ignore
+    expect(manager.areEqual(layer1, layer1)).toBe(true);
+    // @ts-ignore
+    expect(manager.areEqual(layer2, layer2)).toBe(true);
+    // @ts-ignore
+    expect(manager.areEqual(layer1, layer2)).toBe(true);
+  });
+
+  it('should ignore properties starting with an underscore for equal objects', () => {
+    const layer1: any = { group: null, val: 1, _id: 'toto' };
+    const layer2: any = { group: null, val: 1, _id: 'tutu' };
+
+    // @ts-ignore
+    expect(manager.areEqual(layer1, layer2)).toBe(true);
+  });
+
+  it('should ignore properties starting with an underscore for different objects', () => {
+    const layer1: any = { group: null, val: 1, _id: 'toto' };
+    const layer2: any = { group: null, val: 2, _id: 'tutu' };
+
+    // @ts-ignore
     expect(manager.areEqual(layer1, layer2)).toBe(false);
   });
 });

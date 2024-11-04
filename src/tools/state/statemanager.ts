@@ -35,6 +35,7 @@ class StateManager extends GirafeSingleton {
       {
         // Adding object in the state with a name starting by a symbol will avoid to Proxy this object
         // (The Proxy API changes the class!) and prevent to listen changes on this object.
+        // NOTE: the method areEqual() will also ignore underscores when deeply comparing objects
         ignoreUnderscores: true,
         ignoreSymbols: true,
         ignoreDetached: true
@@ -47,7 +48,7 @@ class StateManager extends GirafeSingleton {
     this.setDefaultValues();
   }
 
-  setDefaultValues() {
+  private setDefaultValues() {
     // Set default values
     this.configManager?.loadConfig().then(() => {
       const config = this.configManager?.Config;
@@ -59,7 +60,7 @@ class StateManager extends GirafeSingleton {
     });
   }
 
-  onChange(property: string, oldValue: unknown, value: unknown) {
+  private onChange(property: string, oldValue: unknown, value: unknown) {
     const path = property.trim();
     for (const key in this.#callbacks) {
       const regex = new RegExp('^' + key + '$');
@@ -86,9 +87,9 @@ class StateManager extends GirafeSingleton {
     }
   }
 
-  subscribe(path: string, callback: Callback): Callback;
-  subscribe(path: RegExp, callback: Callback): Callback;
-  subscribe(path: string | RegExp, callback: Callback): Callback {
+  public subscribe(path: string, callback: Callback): Callback;
+  public subscribe(path: RegExp, callback: Callback): Callback;
+  public subscribe(path: string | RegExp, callback: Callback): Callback {
     const pathAsString = typeof path === 'string' ? path : path.source;
     if (!(pathAsString in this.#callbacks)) {
       this.#callbacks[pathAsString] = [];
@@ -121,9 +122,9 @@ class StateManager extends GirafeSingleton {
   }
 
   /** Unsubscribe one or multiple trackers by their callbacks.  */
-  unsubscribe(callback: Callback): void;
-  unsubscribe(callbacks: Callback[]): void;
-  unsubscribe(callbacks: Callback | Callback[]): void {
+  public unsubscribe(callback: Callback): void;
+  public unsubscribe(callbacks: Callback[]): void;
+  public unsubscribe(callbacks: Callback | Callback[]): void {
     (Array.isArray(callbacks) ? callbacks : [callbacks]).forEach((callback) => {
       let found = false;
       for (const path in this.#callbacks) {
@@ -145,7 +146,7 @@ class StateManager extends GirafeSingleton {
    * @returns the property or object, following the given path, and the
    * parent and last key to the parent object to be able to set it (see also setPropertyByPath).
    */
-  getPropertyByPath(obj: any, path: string) {
+  public getPropertyByPath(obj: any, path: string) {
     let currentObj = obj;
     let parentObject = null;
     let lastKey = null;
@@ -170,7 +171,7 @@ class StateManager extends GirafeSingleton {
    * Sets the value of a property specified by a given path in an object.
    * @returns true if the property was set successfully, false otherwise.
    */
-  setPropertyByPath(obj: any, path: string, value: any): boolean {
+  public setPropertyByPath(obj: any, path: string, value: any): boolean {
     const result = this.getPropertyByPath(obj, path);
     if (result.parentObject && result.lastKey) {
       result.parentObject[result.lastKey] = value;
@@ -180,34 +181,51 @@ class StateManager extends GirafeSingleton {
   }
 
   /**
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value
-   * @returns a replacer for a cyclic value
+   * Returns true if to object are deeply equal, false otherwise
+   * Circular references are ignored
    */
-  getCircularReplacer() {
-    const visitedObjects = new WeakSet();
+  private areEqual(obj1: any, obj2: any, visitedObjects = new WeakSet()) {
+    let areEqual: boolean | undefined;
 
-    return function (_key: string, value: any) {
-      if (typeof value !== 'object' || value === null) {
-        // The value is not an object
-        // => We just return it
-        return value;
-      }
+    areEqual = this.areNumbersEqual(obj1, obj2);
+    if (areEqual !== undefined) {
+      return areEqual;
+    }
 
-      if (visitedObjects.has(value)) {
-        // We have found a circular reference.
-        // => We replace it with a dummy string.
-        return '[Circular]';
-      }
+    areEqual = this.areNullOrUndefinedEqual(obj1, obj2);
+    if (areEqual !== undefined) {
+      return areEqual;
+    }
 
-      // Add the object to the list of visited objects
-      visitedObjects.add(value);
+    areEqual = this.areSimpleValuesEqual(obj1, obj2);
+    if (areEqual !== undefined) {
+      return areEqual;
+    }
 
-      // Return the value
-      return value;
-    };
+    areEqual = this.areCircularReferencesEqual(obj1, obj2, visitedObjects);
+    if (areEqual !== undefined) {
+      return areEqual;
+    }
+
+    // Mark the objects as visited
+    visitedObjects.add(obj1);
+    visitedObjects.add(obj2);
+
+    areEqual = this.areArraysEqual(obj1, obj2, visitedObjects);
+    if (areEqual !== undefined) {
+      return areEqual;
+    }
+
+    areEqual = this.areObjectsEqual(obj1, obj2, visitedObjects);
+    if (areEqual !== undefined) {
+      return areEqual;
+    }
+
+    // Unmanaged case
+    throw Error('Unmanaged case for equality check');
   }
 
-  areEqual(obj1: any, obj2: any) {
+  private areNumbersEqual(obj1: any, obj2: any): boolean | undefined {
     if (typeof obj1 === 'number' && typeof obj2 === 'number') {
       // Special case for numbers : check NaN
       if (Number.isNaN(obj1) && Number.isNaN(obj2)) {
@@ -216,32 +234,90 @@ class StateManager extends GirafeSingleton {
       return obj1 === obj2;
     }
 
-    if (
-      typeof obj1 !== 'object' ||
-      typeof obj2 !== 'object' ||
-      obj1 === null ||
-      obj2 === null ||
-      obj1 === undefined ||
-      obj2 === undefined
-    ) {
-      // Compare simple values
+    // Not numbers
+    return undefined;
+  }
+
+  private areNullOrUndefinedEqual(obj1: any, obj2: any): boolean | undefined {
+    if (obj1 === null || obj2 === null || obj1 === undefined || obj2 === undefined) {
       return obj1 === obj2;
     }
 
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
+    // Not null or undefined
+    return undefined;
+  }
 
-    if (keys1.length !== keys2.length) {
-      // Not the same number of properties
-      return false;
+  private areSimpleValuesEqual(obj1: any, obj2: any): boolean | undefined {
+    if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+      return obj1 === obj2;
     }
 
-    if (JSON.stringify(obj1, this.getCircularReplacer()) !== JSON.stringify(obj2, this.getCircularReplacer())) {
-      return false;
+    // Not a simple object
+    return undefined;
+  }
+
+  private areCircularReferencesEqual(obj1: any, obj2: any, visitedObjects: WeakSet<any>): boolean | undefined {
+    if (visitedObjects.has(obj1) || visitedObjects.has(obj2)) {
+      // This object was already checked. It should be the same object
+      return obj1 === obj2;
     }
 
-    // Everything is equal
-    return true;
+    // Not a circular reference
+    return undefined;
+  }
+
+  private areArraysEqual(obj1: any, obj2: any, visitedObjects: WeakSet<any>): boolean | undefined {
+    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+      if (obj1.length !== obj2.length) {
+        // Different length for both arrays
+        return false;
+      }
+      for (let i = 0; i < obj1.length; i++) {
+        if (!this.areEqual(obj1[i], obj2[i], visitedObjects)) {
+          // Not equal
+          return false;
+        }
+      }
+
+      // Arrays are equal
+      return true;
+    }
+
+    // Not arrays
+    return undefined;
+  }
+
+  private areObjectsEqual(obj1: any, obj2: any, visitedObjects: WeakSet<any>): boolean | undefined {
+    if (typeof obj1 === 'object' && typeof obj2 === 'object') {
+      // Ignore properties that begins with underscore
+      // This is coherent with the configuration of on-change
+      // Otherwise, all objects will be compared (including openlayers ones), and we do not want this
+      const keys1 = Object.keys(obj1).filter((key) => !key.startsWith('_'));
+      const keys2 = Object.keys(obj2).filter((key) => !key.startsWith('_'));
+
+      if (keys1.length !== keys2.length) {
+        // Not the same number of properties
+        return false;
+      }
+
+      for (const key of keys1) {
+        if (!obj2.hasOwnProperty(key)) {
+          // Key is not present in the second object
+          return false;
+        }
+
+        if (!this.areEqual(obj1[key], obj2[key], visitedObjects)) {
+          // Properties have different values
+          return false;
+        }
+      }
+
+      // Everything is equal
+      return true;
+    }
+
+    // Not an object
+    return undefined;
   }
 }
 
