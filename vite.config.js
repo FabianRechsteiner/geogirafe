@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
-import RestartPlugin from './buildtools/vite-restart-plugin';
+import HtmlRebuildPlugin from './buildtools/vite-restart-plugin';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import dns from 'dns';
@@ -30,6 +30,10 @@ dns.lookup = customDnsLookup;
 const cesiumSource = 'node_modules/cesium/Build/Cesium';
 // Default configuration for Cesium (see https://cesium.com/learn/cesiumjs-learn/cesiumjs-quickstart/)
 const cesiumBaseUrl = 'lib/cesium/';
+
+// Default prefix. Must be 'src' when working locally on the gg-viewer project
+// Will be automatically set to the library path when working with the library @geogirafe/lib-geoportal
+const geogirafeSource = 'src';
 
 // https://v2.vitejs.dev/config/
 export default defineConfig({
@@ -77,9 +81,9 @@ export default defineConfig({
         { src: `${cesiumSource}/Workers`, dest: cesiumBaseUrl },
         { src: `${cesiumSource}/Assets`, dest: cesiumBaseUrl },
         { src: `${cesiumSource}/Widgets`, dest: cesiumBaseUrl },
-        { src: 'service-worker.js', dest: '' },
-        { src: 'src/styles/*.css', dest: 'styles/' },
-        { src: 'src/assets/icons/*', dest: 'icons/' },
+        { src: `${geogirafeSource}/service-worker.js`, dest: '' },
+        { src: `${geogirafeSource}/styles/*.css`, dest: 'styles/' },
+        { src: `${geogirafeSource}/assets/*`, dest: '' },
         { src: 'node_modules/ol/ol.css', dest: 'lib/ol/' },
         { src: 'node_modules/tabulator-tables/dist/css/tabulator.min.css', dest: 'lib/tabulator-tables/' },
         { src: 'node_modules/font-gis/css/*.css', dest: 'lib/font-gis/' },
@@ -89,7 +93,7 @@ export default defineConfig({
       ]
     }),
     InlineTemplatesPlugin(),
-    RestartPlugin(),
+    HtmlRebuildPlugin(),
     basicSsl()
   ],
   define: {

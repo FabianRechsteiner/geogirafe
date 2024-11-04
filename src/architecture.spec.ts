@@ -329,7 +329,7 @@ describe('Components translations', () => {
   ];
 
   function getSupportedLanguages() {
-    const i18nPath = path.join(__dirname, '..', 'public', 'i18n');
+    const i18nPath = path.join(__dirname, 'assets', 'i18n');
     const files = fs.readdirSync(i18nPath);
     const languages: string[] = [];
     files.forEach((file) => {
@@ -398,7 +398,7 @@ describe('Components translations', () => {
 
   it('Every i18n attribute should have a corresponding translation', async () => {
     // First, read all translations files
-    const i18nPath = path.join(__dirname, '..', 'public', 'i18n');
+    const i18nPath = path.join(__dirname, 'assets', 'i18n');
     const translations: Record<string, any> = {};
     for (const lang of getSupportedLanguages()) {
       const file = fs.readFileSync(path.join(i18nPath, `${lang}.json`), 'utf-8');
@@ -438,7 +438,7 @@ describe('Components translations', () => {
 
   it('Every tooltip should have a corresponding translation', async () => {
     // First, read all translations files
-    const i18nPath = path.join(__dirname, '..', 'public', 'i18n');
+    const i18nPath = path.join(__dirname, 'assets', 'i18n');
     const translations: Record<string, any> = {};
     for (const lang of getSupportedLanguages()) {
       const file = fs.readFileSync(path.join(i18nPath, `${lang}.json`), 'utf-8');
@@ -483,7 +483,7 @@ describe('Components translations', () => {
 
   it('Every geTranslation call should have a corresponding translation', async () => {
     // First, read all translations files
-    const i18nPath = path.join(__dirname, '..', 'public', 'i18n');
+    const i18nPath = path.join(__dirname, 'assets', 'i18n');
     const translations: Record<string, any> = {};
     for (const lang of getSupportedLanguages()) {
       const file = fs.readFileSync(path.join(i18nPath, `${lang}.json`), 'utf-8');

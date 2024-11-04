@@ -98,6 +98,9 @@
     ".": {
       "import": "./main.js"
     },
+    "./mobile": {
+      "import": "./main.mobile.js"
+    },
     "./base": {
       "import": "./base/main.js"
     },
@@ -126,7 +129,7 @@
     "start-rebundle-deps": "tsc && vite serve --force",
     "build": "node buildtools/app-clean.js && tsc && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "preview": "vite preview",
-    "build-lib": "node buildtools/lib-clean.js && node buildtools/lib-inline.js && node buildtools/lib-collect.js && node buildtools/lib-main-file.js && tsc --project tsconfig.lib.json && node buildtools/lib-finalize.js",
+    "build-lib": "node buildtools/lib-clean.js && node buildtools/lib-inline.js && node buildtools/lib-collect.js && node buildtools/lib-main-file.js && tsc --project tsconfig.lib.json && node buildtools/lib-templates.js && node buildtools/lib-finalize.js",
     "publish-lib": "cd dist/lib && npm publish",
     "build-docker": "docker build -t geogirafe/viewer -f buildtools/Dockerfile dist",
     "build-apk": "docker run -v ./dist:/geogirafe/dist -v ./buildtools:/geogirafe/buildtools geogirafe/cordova-builder bash -c \"cp /geogirafe/buildtools/cordova/apk-build.sh . && chmod u+x apk-build.sh && ./apk-build.sh\"",

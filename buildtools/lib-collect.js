@@ -10,3 +10,4 @@ copy('tools', sourceDir, targetDir);
 copy('typings', sourceDir, targetDir);
 copy('decs.d.ts', sourceDir, targetDir);
 copy('main.ts', sourceDir, targetDir);
+copy('main.mobile.ts', sourceDir, targetDir);

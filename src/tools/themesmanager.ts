@@ -104,14 +104,15 @@ class ThemesManager extends GirafeSingleton {
 
   prepareOgcServers(ogcServerJson: Record<string, GMFServerOgc>) {
     const servers: { [key: string]: ServerOgc } = {};
-    for (const serverName of Object.keys(ogcServerJson)) {
-      const server = new ServerOgc(serverName, ogcServerJson[serverName]);
-      servers[serverName] = server;
+    if (ogcServerJson) {
+      for (const serverName of Object.keys(ogcServerJson)) {
+        const server = new ServerOgc(serverName, ogcServerJson[serverName]);
+        servers[serverName] = server;
+      }
+
+      // Preload WFS FeatureInfos
+      this.preloadWfsServer(servers);
     }
-
-    // Preload WFS FeatureInfos
-    this.preloadWfsServer(servers);
-
     return servers;
   }
 

@@ -1,5 +1,3 @@
-import path from 'path';
-
 const HtmlRebuildPlugin = function () {
   return {
     name: 'girafe-html-rebuild',

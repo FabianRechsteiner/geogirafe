@@ -17,8 +17,13 @@ fs.writeFileSync(filepath, newContent);
 
 // Copy common styles of the application
 let sourceDir = 'src';
-let targetDir = path.join('dist', 'lib', '');
+let targetDir = path.join('dist', 'lib');
+console.info(`Copying styles...`);
 copy('styles', sourceDir, targetDir);
+console.info(`Copying icons and translation files...`);
+copy('assets', sourceDir, targetDir);
+console.info(`Copying service worker...`);
+copy('service-worker.js', sourceDir, targetDir);
 
 // Copy buildtools that should be added to package
 console.info(`Copying the BuildTools...`);
@@ -47,6 +52,7 @@ copy('README.md', sourceDir, targetDir);
 copy('CONTRIBUTING.md', sourceDir, targetDir);
 copy('LICENSE', sourceDir, targetDir);
 copy('public', sourceDir, targetDir);
+deleteDirectory(path.join(targetDir, 'public', 'Mock'));
 
 const fileList = findFilesRecursive(path.resolve('src', 'components'), ['.png', '.webp', '.jpg', '.jpeg', '.svg']);
 for (const filepath of fileList) {

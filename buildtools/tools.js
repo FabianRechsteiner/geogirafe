@@ -45,6 +45,16 @@ export function copy(filename, sourceDir, targetDir) {
   }
 }
 
+export function replaceInFile(filename, searchPattern, replacement) {
+  try {
+    const content = fs.readFileSync(filename, 'utf8');
+    const newContent = content.replace(searchPattern, replacement);
+    fs.writeFileSync(filename, newContent, 'utf8');
+  } catch (error) {
+    console.error(`Error replacing content in ${filename}: ${error}`);
+  }
+}
+
 function getStyleCode(currentFilename, relativeCssPath) {
   const styleFilePath = path.join(path.dirname(currentFilename), relativeCssPath.trim());
   try {
