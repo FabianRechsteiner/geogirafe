@@ -17,7 +17,6 @@ import MapComponent from './components/map/component';
 import MobileSearchComponent from './components/search-mobile/component';
 import MobileThemeComponent from './components/themes-mobile/component';
 import OfflineComponent from './components/offline/component';
-import AuthManager from './tools/auth/authmanager.js';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
@@ -111,7 +110,6 @@ try {
   LogManager.getInstance()
     .initLogging()
     .then(() => {
-      AuthManager.getInstance().initialize();
       ErrorManager.getInstance();
       CsvManager.getInstance();
       I18nManager.getInstance();
