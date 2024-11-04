@@ -57,5 +57,9 @@
   },
   "query": {
     "legacy": true
+  },
+  "gmfauth": {
+    "url": "https://www.sigip.ch",
+    "loginRequired": false
   }
 }
