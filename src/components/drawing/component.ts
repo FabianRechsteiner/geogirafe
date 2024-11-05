@@ -7,10 +7,12 @@ import CesiumDrawing from './cesiumDrawing';
 import { KML, GeoJSON, GPX } from 'ol/format';
 import { Polygon } from 'ol/geom';
 import Feature from 'ol/Feature';
+import { Coordinate } from 'ol/coordinate';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { download } from '../../tools/export/download';
 import MapComponent from '../map/component';
+import { alternateMouseClick, ContextMenu, MenuEntry } from '../map/tools/contextmenu';
 
 import checkedIcon from '../../assets/icons/checked-full.svg?raw';
 import noCheckedIcon from '../../assets/icons/checked-no.svg?raw';
@@ -18,6 +20,7 @@ import trashIcon from '../../assets/icons/trash.svg?raw';
 import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
+import { formatCoordinates } from '../../tools/geometrytools';
 
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -50,6 +53,11 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   olDrawing: OlDrawing;
   cesiumDrawing: CesiumDrawing;
+  mapContextMenu: ContextMenu | undefined = undefined;
+  fixedLengthEnabled: boolean = false;
+  // Batch Create mode is currently not used. Batch mode allows the user to create multiple shapes without re-selecting
+  //  the drawing tool. It possibly will be part of advanced drawing/editing tools.
+  batchCreateMode: boolean = false;
 
   constructor() {
     super('drawing');
@@ -75,7 +83,13 @@ export default class DrawingComponent extends GirafeHTMLElement {
     if (!this.renderedOnce) {
       this.renderedOnce = true;
       this.buttons.forEach((b) => {
-        this.getById(b.id).addEventListener('click', () => this.setTool(b.tool));
+        this.getById(b.id).addEventListener('click', () => {
+          this.setTool(b.tool);
+          if (b.tool) {
+            this.deselectAllFeatures();
+            this.refreshRender();
+          }
+        });
       });
       this.addColorPicker(
         'nameColorPicker',
@@ -99,7 +113,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
       );
       this.getById('optionsTitle').oninput = (e) => {
         this.selectedFeatures[0].name = (e.target as HTMLInputElement).value;
-        this.render();
+        this.refreshRender();
       };
       this.getById('fixedLengthValue').oninput = (e) => {
         const val = parseFloat((e.target as HTMLInputElement).value);
@@ -119,14 +133,19 @@ export default class DrawingComponent extends GirafeHTMLElement {
         }
       };
 
+      this.createMapContextMenu();
       this.setTool();
     }
+  }
+
+  refreshRender() {
     // Set the color picker color to the properties of the first selected feature. Necessary, so subsequently
     // selected features do not change color immediately upon selecting them, but only after manually setting
     // the color via color picker.
     if (this.selectedFeatures.length === 1) {
       this.colorPickers.forEach((val) => val[0].setColor(val[1]()));
     }
+    super.refreshRender();
   }
 
   addColorPicker(id: string, set: (c: typeof Color) => any, get: () => string) {
@@ -155,25 +174,17 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.toolSelected = this.getById(this.buttons.find((x) => x.tool == tool)!.id)!;
     this.toolSelected.className = 'selected';
     this.drawingState.activeTool = tool;
-
-    this.updateOptionFixedLength(tool);
   }
 
-  updateOptionFixedLength(tool: DrawingShape | null) {
+  fixedLengthOptionAllowed(): boolean {
     // Enable / disable fix length checkbox based on current tool
-    if (!this.renderedOnce) {
-      return;
-    }
-    const option = this.getById<HTMLInputElement>('fixedLengthEnabled');
-    option.disabled = [
+    return ![
       null,
       DrawingShape.Point,
       DrawingShape.Rectangle,
       DrawingShape.FreehandPolyline,
       DrawingShape.FreehandPolygon
-    ].includes(tool);
-    // Trigger event to enable/disable children elements
-    option.dispatchEvent(new Event('change'));
+    ].includes(this.drawingState.activeTool);
   }
 
   connectedCallback() {
@@ -185,11 +196,29 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   togglePanel(visible: boolean) {
     this.visible = visible;
-    this.render();
+    if (this.renderedOnce) {
+      if (this.visible) {
+        this.olDrawing.enableAllInteractions();
+        this.mapContextMenu?.enable();
+      } else {
+        this.olDrawing.disableAllInteractions();
+        // Deselect features so the vertex symbology disappears, also disable context menu
+        this.deselectAllFeatures();
+        this.mapContextMenu?.disable();
+      }
+      this.refreshRender();
+    } else {
+      this.render();
+    }
   }
 
   get selectedFeatures(): DrawingFeature[] {
     return this.drawingState.features.filter((f) => f.selected);
+  }
+
+  deselectAllFeatures() {
+    this.drawingState.features.forEach((f) => (f.selected = false));
+    this.olDrawing.updateModifiableFeatures([]);
   }
 
   onFeaturesChanged(oldFeatures: DrawingFeature[], newFeatures: DrawingFeature[]) {
@@ -198,19 +227,27 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const oldIds = oldFeatures.map((f) => f.id);
     const deleted = oldFeatures.filter((f) => !newIds.includes(f.id));
     const added = newFeatures.filter((f) => !oldIds.includes(f.id));
+
     if (added.length > 0) {
-      // Update the current selection to only include the newly created feature(s)
-      this.selectedFeatures.forEach(
-        (feature: DrawingFeature) => (feature.selected = added.map((f) => f.id).includes(feature.id))
+      // Update the current selection: no selection if in batch mode, otherwise only include the newly created feature(s)
+      this.drawingState.features.forEach(
+        (feature: DrawingFeature) =>
+          (feature.selected = this.batchCreateMode ? false : added.map((f) => f.id).includes(feature.id))
       );
     }
     // Update drawing source
     this.olDrawing.deleteFeatures(deleted);
     this.olDrawing.addFeatures(added);
+    this.olDrawing.updateModifiableFeatures(this.selectedFeatures);
     // OlCesium is currently managing features in Cesium
     //this.cesiumDrawing.addFeatures(added)
     //this.cesiumDrawing.deleteFeatures(deleted)
-    this.render();
+
+    // Deactivate the drawing tool after finishing the shape
+    if (!this.batchCreateMode) {
+      this.setTool(null);
+    }
+    this.refreshRender();
   }
 
   onProjectionChanged(oldProj: string, newProj: string) {
@@ -229,9 +266,27 @@ export default class DrawingComponent extends GirafeHTMLElement {
     }
   }
 
+  onToggleBatchMode() {
+    // Currently not used, will possibly be part of advanced editing/drawing tools
+    this.batchCreateMode = !this.batchCreateMode;
+    if (this.batchCreateMode) {
+      this.deselectAllFeatures();
+    }
+    this.refreshRender();
+  }
+
+  onToggleFixedLength() {
+    this.fixedLengthEnabled = !this.fixedLengthEnabled;
+    const val = this.fixedLengthEnabled ? parseFloat(this.getById<HTMLInputElement>('fixedLengthValue').value) : 0;
+    this.olDrawing.setFixedLength(val);
+    this.cesiumDrawing.setFixedLength(val);
+    this.refreshRender();
+  }
+
   onToggleFeatureSelection(feature: DrawingFeature) {
     feature.selected = !feature.selected;
-    this.render();
+    this.olDrawing.updateModifiableFeatures(this.selectedFeatures);
+    this.refreshRender();
   }
 
   getOptionsTitle(): string {
@@ -257,7 +312,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
   deleteFeature(feature: DrawingFeature) {
     if (confirm(`Do you want to remove "${feature.name}" ?`)) {
       this.drawingState.features = this.drawingState.features.filter((f) => f.id != feature.id);
-      this.render();
+      this.refreshRender();
     }
   }
 
@@ -273,13 +328,46 @@ export default class DrawingComponent extends GirafeHTMLElement {
   toggleNameVisibility() {
     const currentVisibility = this.selectedFeatures.some((f) => f.displayName);
     this.selectedFeatures.forEach((f) => (f.displayName = !currentVisibility));
-    this.render();
+    this.refreshRender();
   }
 
   toggleMeasureVisibility() {
     const currentVisibility = this.selectedFeatures.some((f) => f.displayMeasure);
     this.selectedFeatures.forEach((f) => (f.displayMeasure = !currentVisibility));
-    this.render();
+    this.refreshRender();
+  }
+
+  createMapContextMenu() {
+    const menuEntries: MenuEntry[] = [
+      {
+        entry: 'Remove vertex',
+        callback: (_evt: MouseEvent, mapCoordinate: Coordinate) => {
+          const successful = this.olDrawing.removeLastInteractedVertex();
+          if (!successful) {
+            const errorMessage = `It's not possible to remove vertex at ${formatCoordinates(mapCoordinate, this.configManager.Config.general.locale)}`;
+            this.stateManager.state.infobox.elements.push({
+              id: uuidv4(),
+              text: errorMessage,
+              type: 'warning'
+            });
+          }
+        }
+      }
+    ];
+    const conditionToOpen = (_evt: MouseEvent, mapCoordinate: Coordinate) => {
+      if (!this.visible || this.selectedFeatures.length === 0) {
+        return false;
+      }
+      // Only proceed if there is an editable vertex under the mouse pointer
+      return this.olDrawing.hasEditableVertexAtCoordinate(mapCoordinate);
+    };
+
+    this.mapContextMenu = new ContextMenu(
+      this.componentManager.getComponents(MapComponent)[0],
+      menuEntries,
+      alternateMouseClick,
+      conditionToOpen
+    );
   }
 
   exportSelectedFeatures(format: 'geojson' | 'kml' | 'gpx') {

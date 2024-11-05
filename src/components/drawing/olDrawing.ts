@@ -3,16 +3,29 @@ import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
 import State from '../../tools/state/state';
 import { Collection, Feature } from 'ol';
-import { Geometry, LineString, Point, Polygon, Circle as CircleGeom, SimpleGeometry } from 'ol/geom';
+import {
+  Geometry,
+  LineString,
+  Point,
+  Polygon,
+  Circle as CircleGeom,
+  SimpleGeometry,
+  MultiPoint,
+  MultiLineString,
+  LinearRing,
+  MultiPolygon
+} from 'ol/geom';
 import { createBox, createRegularPolygon, SketchCoordType } from 'ol/interaction/Draw';
 import { Type } from 'ol/geom/Geometry';
-import { Style, Stroke, Text, Fill, Circle, RegularShape } from 'ol/style';
+import { Style, Stroke, Text, Fill, RegularShape, Circle } from 'ol/style';
 import { Modify, Snap, Draw } from 'ol/interaction';
 import VectorSource, { VectorSourceEvent } from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Projection } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
+import { mouseOnly, never, primaryAction } from 'ol/events/condition';
+import { Pixel } from 'ol/pixel';
 import ConfigManager from '../../tools/configuration/configmanager';
 import MapManager from '../../tools/state/mapManager';
 
@@ -36,12 +49,33 @@ function fixLastLength(length: number, coordinates: SketchCoordType, scale: numb
   }
 }
 
+function extractVerticesFromGeometry(geometry: Geometry): MultiPoint {
+  let vertices: Coordinate[] = [];
+
+  // Extract coordinates depending on coordinate array depth
+  if (geometry instanceof Point) {
+    vertices = [geometry.getCoordinates()];
+  } else if (geometry instanceof MultiPoint || geometry instanceof LineString || geometry instanceof LinearRing) {
+    vertices = geometry.getCoordinates();
+  } else if (geometry instanceof Polygon || geometry instanceof MultiLineString) {
+    vertices = geometry.getCoordinates().flat();
+  } else if (geometry instanceof MultiPolygon) {
+    vertices = geometry
+      .getCoordinates()
+      .flat()
+      .map((coordinateList) => coordinateList.flat());
+  }
+  return new MultiPoint(vertices);
+}
+
 export default class OlDrawing {
   map: MapComponent;
   state: State;
   drawingSource!: VectorSource;
+  modifiableFeatures: Collection<Feature> = new Collection([]);
   draw: Draw | null = null;
-  snap!: Snap;
+  modify: Modify | null = null;
+  snap: Snap | null = null;
   currentShape: DrawingShape | null = null;
   featuresMap: Map<string, { feature: Feature<Geometry>; shape: DrawingShape }> = new Map();
   fixedLength: number = 0;
@@ -62,7 +96,7 @@ export default class OlDrawing {
       })
     );
     this.map.stateManager.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
-      newTool === null ? this.deactivateTool() : this.activateTool(newTool)
+      newTool === null ? this.deactivateDrawTool() : this.activateDrawTool(newTool)
     );
 
     // OlCesium duplicates drawn shapes when 3D view is open if its eventListener is not removed
@@ -74,6 +108,79 @@ export default class OlDrawing {
         this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
       }
     });
+
+    this.addSnapInteraction();
+
+    this.modify = new Modify({
+      features: this.modifiableFeatures,
+      // 'condition' needs to be set to mouseOnly instead of primaryAction so that primary and alternate clicks are registered.
+      condition: mouseOnly,
+      deleteCondition: never,
+      insertVertexCondition: primaryAction,
+      style: new DrawingFeature(1, {}, '').getVertexStyle(true),
+      snapToPointer: true,
+      pixelTolerance: this.map.pixelTolerance
+    });
+    this.map.olMap.addInteraction(this.modify);
+  }
+
+  enableAllInteractions() {
+    this.draw?.setActive(true);
+    this.modify?.setActive(true);
+    this.snap?.setActive(true);
+  }
+
+  disableAllInteractions() {
+    this.draw?.setActive(false);
+    this.modify?.setActive(false);
+    this.snap?.setActive(false);
+  }
+
+  hasEditableVertexAtCoordinate(coordinate: Coordinate): boolean {
+    /*
+    Check if there is a vertex of a selected (=editable) feature within the pixel tolerance of the clicked coordinates.
+     */
+    const filter = (f: Feature) =>
+      this.modifiableFeatures.getArray().some((editFeature: Feature<Geometry>) => f == editFeature);
+    // Use filter to only query currently selected features
+    const closestElements = this.getClosestVertexAndFeature(coordinate, filter);
+    if (closestElements) {
+      const closestVertex: Coordinate = closestElements[0];
+      const vertexAsPixel: Pixel = this.map.olMap.getPixelFromCoordinate(closestVertex);
+      const clickAsPixel: Pixel = this.map.olMap.getPixelFromCoordinate(coordinate);
+      const dx = vertexAsPixel[0] - clickAsPixel[0];
+      const dy = vertexAsPixel[1] - clickAsPixel[1];
+      const distanceToVertex: number = Math.sqrt(dx * dx + dy * dy);
+      if (distanceToVertex < this.map.pixelTolerance) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getClosestVertexAndFeature(
+    coordinate: Coordinate,
+    filter: (f: Feature) => boolean = () => true
+  ): [Coordinate, Feature<Geometry>] | undefined {
+    /*
+    Returns the closest vertex and feature from the drawing source. Feature source can be pre-filtered via filter function.
+     */
+    const feature = this.drawingSource.getClosestFeatureToCoordinate(coordinate, filter);
+    const geometry = feature?.getGeometry();
+    if (geometry) {
+      const vertices: MultiPoint = extractVerticesFromGeometry(geometry);
+      const closestVertex: Coordinate = vertices.getClosestPoint(coordinate);
+      return [closestVertex, feature];
+    }
+    return undefined;
+  }
+
+  removeLastInteractedVertex(): boolean | undefined {
+    /* 
+    Deletes the vertex that the user interacted with last via the modify interaction. Handled events are defined by the
+     modify option properties 'condition' and 'insertVertexCondition'.
+    */
+    return this.modify?.removePoint();
   }
 
   addFeatures(features: DrawingFeature[]) {
@@ -95,6 +202,18 @@ export default class OlDrawing {
       if (toRemove != undefined) {
         this.drawingSource.removeFeature(toRemove);
         this.featuresMap.delete(f.id);
+      }
+    });
+  }
+
+  updateModifiableFeatures(features: DrawingFeature[]) {
+    // Restricts the modify interaction to the currently selected drawing features
+    this.modifiableFeatures.clear();
+
+    features.forEach((df: DrawingFeature) => {
+      const olFeature = this.featuresMap.get(df.id)?.feature;
+      if (olFeature) {
+        this.modifiableFeatures.push(olFeature);
       }
     });
   }
@@ -173,8 +292,8 @@ export default class OlDrawing {
     return geom;
   }
 
-  activateTool(tool: DrawingShape) {
-    this.deactivateTool();
+  activateDrawTool(tool: DrawingShape) {
+    this.deactivateDrawTool();
     this.state.selection.enabled = false;
     this.currentShape = tool;
     let geomFunction = undefined;
@@ -216,27 +335,33 @@ export default class OlDrawing {
       source: this.drawingSource,
       type: olTool as Type,
       freehand: tool == DrawingShape.FreehandPolyline || tool == DrawingShape.FreehandPolygon,
+      stopClick: true,
       geometryFunction: geomFunction,
+      condition: (e) => primaryAction(e),
       style: (f) => this.getStyle(new DrawingFeature(tool, {}, ''), f as Feature<Geometry>)
     });
-    this.map.olMap.on('dblclick', () => {
+    this.draw.on('drawend', () => {
       this.draw?.removeLastPoint();
       this.draw?.finishDrawing();
     });
     this.map.olMap.addInteraction(this.draw);
-    this.map.olMap.addInteraction(new Modify({ source: this.drawingSource }));
-    this.snap = new Snap({ source: this.drawingSource });
-    this.map.olMap.addInteraction(this.snap);
+
+    this.addSnapInteraction();
   }
 
-  deactivateTool() {
+  deactivateDrawTool() {
     this.state.selection.enabled = true;
     if (this.draw) {
       this.map.olMap.removeInteraction(this.draw);
     }
+  }
+
+  addSnapInteraction() {
     if (this.snap) {
       this.map.olMap.removeInteraction(this.snap);
     }
+    this.snap = new Snap({ source: this.drawingSource, pixelTolerance: this.map.pixelTolerance });
+    this.map.olMap.addInteraction(this.snap);
   }
 
   centerViewOnFeature(feature: DrawingFeature) {
@@ -355,6 +480,19 @@ export default class OlDrawing {
       addLabel(getHalfPoint(segment), feature.getLengthText(getLength(segment)));
       addLabel(square.getInteriorPoint(), feature.getAreaText(getArea(square)));
     }
+
+    if (feature.selected) {
+      const vertexStyle = feature.getVertexStyle();
+      // Add a node style to every vertex of the geometry
+      vertexStyle.setGeometry(function (f) {
+        const geom = f?.getGeometry();
+        if (geom && geom instanceof Geometry) {
+          return extractVerticesFromGeometry(geom);
+        }
+      });
+      styles.push(vertexStyle);
+    }
+
     return styles;
   }
 

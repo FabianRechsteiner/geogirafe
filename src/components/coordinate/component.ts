@@ -1,5 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import { niceCoordinates } from '../../tools/geometrytools';
+import { formatCoordinates } from '../../tools/geometrytools';
 
 class CoordinateComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -32,7 +32,7 @@ class CoordinateComponent extends GirafeHTMLElement {
   }
 
   onChangeCoordinates(coord: number[]) {
-    [this.east, this.north] = niceCoordinates(coord, this.locale);
+    [this.east, this.north] = formatCoordinates(coord, this.locale);
     this.render();
   }
 

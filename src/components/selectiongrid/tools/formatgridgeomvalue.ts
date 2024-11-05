@@ -2,7 +2,7 @@ import type OlGeomGeometry from 'ol/geom/Geometry';
 import { Circle, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
 import { getCenter } from 'ol/extent';
 import { polygonFromCircle } from '../../../tools/utils/olutils';
-import { niceCoordinates } from '../../../tools/geometrytools';
+import { formatCoordinates } from '../../../tools/geometrytools';
 import IconCenter from '../images/center.svg';
 
 /**
@@ -67,7 +67,7 @@ export default class FormatGridGeomValue {
   private getGeometryIconsInfoPoint(geometry: Point): [string, number[]] {
     let icons = '<i class="geo-type fg-point fg-lg"></i>';
     const coords = geometry.getFlatCoordinates();
-    const niceCoords = niceCoordinates(coords, this.locale);
+    const niceCoords = formatCoordinates(coords, this.locale);
     icons += `<span>E ${niceCoords[0]} / N ${niceCoords[1]}</span>`;
     return [icons, coords];
   }
@@ -80,7 +80,7 @@ export default class FormatGridGeomValue {
     let icons = '<i class="geo-type fg-multipoint fg-lg"></i>';
     if (geometry.getPoints.length === 1) {
       const coords = geometry.getPoint(0).getFlatCoordinates();
-      const niceCoords = niceCoordinates(coords, this.locale);
+      const niceCoords = formatCoordinates(coords, this.locale);
       icons += `<span>E ${niceCoords[0]} / N ${niceCoords[1]}</span>`;
       return [icons, coords];
     }

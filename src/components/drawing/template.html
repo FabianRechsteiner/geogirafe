@@ -1,21 +1,30 @@
 <link rel="stylesheet" href="lib/font-gis/font-gis.css" />
 <link rel="stylesheet" href="lib/vanilla-picker/vanilla-picker.csp.css" />
 <div id="panel">
-  <div id="toolbar">
-    <button id="disable" tip="Disable drawing" class="selected"><i class="fg-arrow-o fg-lg"></i></button>
-    <button id="point" tip="Point"><i class="fg-point fg-lg"></i></button>
-    <button id="line" tip="Line"><i class="fg-polyline-pt fg-lg"></i></button>
-    <button id="polygon" tip="Polygon"><i class="fg-polygon-pt fg-lg"></i></button>
-    <button id="square" tip="Square"><i class="fg-square-pt fg-lg"></i></button>
-    <button id="rectangle" tip="Rectangle"><i class="fg-rectangle-pt fg-lg"></i></button>
-    <button id="circle" tip="Circle"><i class="fg-circle-o fg-lg"></i></button>
-    <button id="freeline" tip="Freehand line"><i class="fg-polyline fg-lg"></i></button>
-    <button id="freepolygon" tip="Freehand polygon"><i class="fg-polygon-o fg-lg"></i></button>
-    <div id="toolParameters">
-      <input type="checkbox" id="fixedLengthEnabled" />
-      <label class="fixedLengthElement disabled" for="fixedLengthValue" i18n="Fix length to">Fix length to</label>
-      <input class="fixedLengthElement disabled" type="number" id="fixedLengthValue" />
-      <label class="fixedLengthElement disabled" for="fixedLengthValue" i18n="meters">meters</label>
+  <div>
+    <div id="toolbar">
+      <button id="disable" tip="Disable drawing" class="selected"><i class="fg-arrow-o fg-lg"></i></button>
+      <button id="point" tip="Point"><i class="fg-point fg-lg"></i></button>
+      <button id="line" tip="Line"><i class="fg-polyline-pt fg-lg"></i></button>
+      <button id="polygon" tip="Polygon"><i class="fg-polygon-pt fg-lg"></i></button>
+      <button id="square" tip="Square"><i class="fg-square-pt fg-lg"></i></button>
+      <button id="rectangle" tip="Rectangle"><i class="fg-rectangle-pt fg-lg"></i></button>
+      <button id="circle" tip="Circle"><i class="fg-circle-o fg-lg"></i></button>
+      <button id="freeline" tip="Freehand line"><i class="fg-polyline fg-lg"></i></button>
+      <button id="freepolygon" tip="Freehand polygon"><i class="fg-polygon-o fg-lg"></i></button>
+    </div>
+
+    <div class="toolParameters">
+      <button id="fixedLengthEnabled" class="${this.fixedLengthOptionAllowed() ? 'gg-button icon' : 'gg-button icon disabled'}"
+              onclick="${() => this.onToggleFixedLength()}">
+        ${this.htmlUnsafe(this.fixedLengthEnabled ? this.checkedIcon : this.noCheckedIcon)}
+      </button>
+      <label class="${this.fixedLengthEnabled && this.fixedLengthOptionAllowed() ? '' : 'disabled'}" 
+             for="fixedLengthValue" i18n="Fix length to">Fix length to </label>
+      <input class="${this.fixedLengthEnabled && this.fixedLengthOptionAllowed() ? '' : 'disabled'}" 
+             type="number" id="fixedLengthValue" />
+      <label class="${this.fixedLengthEnabled && this.fixedLengthOptionAllowed() ? '' : 'disabled'}" 
+             for="fixedLengthValue" i18n="meters">meters</label>
     </div>
   </div>
   <div id="drawingListContainer">
