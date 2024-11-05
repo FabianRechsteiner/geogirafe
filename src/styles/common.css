@@ -14,6 +14,9 @@
 img {
   filter: var(--svg-filter);
 }
+div {
+  scrollbar-width: thin;
+}
 /* Animations */
 @keyframes spin {
   from {

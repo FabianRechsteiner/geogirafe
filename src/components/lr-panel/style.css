@@ -1,6 +1,5 @@
 #panel {
   height: 100%;
-  overflow: hidden;
 }
 #gutter {
   height: 100%;
@@ -9,7 +8,6 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: thin;
 }
 
 #panel {

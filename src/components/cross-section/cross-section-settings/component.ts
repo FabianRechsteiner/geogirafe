@@ -142,10 +142,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       this.handleAddFeature(e);
     });
 
-    this.linestringSource.on('clear', (_e: VectorSourceEvent) => {
-      this.handleLinestringClear();
-    });
-
     this.linesLayer = new VectorLayer({
       source: this.linestringSource,
       style: {
@@ -164,7 +160,8 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       geometry: new LineString([])
     });
 
-    this.domainLinestringSource = new VectorSource({ features: [this.domainLinestring] });
+    this.domainLinestringSource = new VectorSource({ features: [] });
+
     this.domainLineStringLayer = new VectorLayer({
       source: this.domainLinestringSource,
       style: {
@@ -182,7 +179,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       geometry: new Polygon([])
     });
 
-    this.polygonSource = new VectorSource({ features: [this.polygon] });
+    this.polygonSource = new VectorSource({ features: [] });
 
     this.polygonLayer = new VectorLayer({
       source: this.polygonSource,
@@ -203,7 +200,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     });
 
     this.pointerSource = new VectorSource({
-      features: [this.pointer],
+      features: [],
       wrapX: false
     });
 
@@ -242,19 +239,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.crossSectionState.linestringCoordinates = geometry.getCoordinates() as [number, number][];
   }
 
-  private handleLinestringClear(): void {
-    this.crossSectionState.linestringCoordinates = [];
-
-    // Clear linestring coordinates (but keep the feature)
-    this.linestring.getGeometry()!.setCoordinates([]);
-
-    // Clear domain linestring coordinates (but keep the feature)
-    this.domainLinestring.getGeometry()!.setCoordinates([]);
-
-    // Clear polygon (buffer) on the map
-    this.polygonSource.clear();
-  }
-
   private initializeDrawInteraction(): void {
     this.drawInteraction = new Draw({
       source: this.linestringSource,
@@ -277,11 +261,13 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
     this.modifyInteraction.on('modifystart', (_e: ModifyEvent) => {
       this.polygonSource.clear();
-      this.domainLinestring.setGeometry(new LineString([]));
-      this.pointer.setGeometry(new Point([]));
+      this.domainLinestringSource.clear();
+      this.pointerSource.clear();
     });
 
     this.modifyInteraction.on('modifyend', (_e: ModifyEvent) => {
+      // The linestring coordinates are only updated when the modify interaction has ended, to
+      // avoid redrawing the buffer and domain linestring during modification
       this.crossSectionState.linestringCoordinates = this.linestring.getGeometry()!.getCoordinates() as [
         number,
         number
@@ -324,7 +310,11 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     });
   }
 
-  updateLinestringBuffer(): void {
+  drawLinestringBuffer(): void {
+    if (this.crossSectionState.linestringCoordinates.length < 2) {
+      return;
+    }
+
     if (!this.linestring) {
       console.warn('updateLinestringBuffer: Linestring is undefined, unable to update buffer');
       return;
@@ -343,7 +333,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     const bo = new BufferOp(jstsGeom, bufferParams);
     const buffered = bo.getResultGeometry(this.crossSectionState.sectionWidth);
     const mypoly = this.parser.write(buffered) as Polygon;
-
     this.polygon.setGeometry(mypoly);
     this.polygonSource.addFeature(this.polygon);
 
@@ -351,22 +340,33 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   updateLinestringCoordinates() {
-    // Update pointer coordinates
-    this.pointer.setGeometry(new Point([]));
-    this.linestring!.getGeometry()!.setCoordinates(this.crossSectionState.linestringCoordinates);
+    this.pointerSource.clear();
+    this.domainLinestringSource.clear();
+    this.polygonSource.clear();
 
-    this.linestringLength = this.linestring!.getGeometry()!.getLength();
-
-    this.domainLinestring.setGeometry(new LineString([]));
-    this.updateDomainLinestring();
-    this.updateLinestringBuffer();
+    if (this.crossSectionState.linestringCoordinates.length >= 2) {
+      this.linestring!.getGeometry()!.setCoordinates(this.crossSectionState.linestringCoordinates);
+      this.linestringLength = this.linestring!.getGeometry()!.getLength();
+      this.drawDomainLinestring();
+      this.drawLinestringBuffer();
+    } else {
+      this.linestringSource.clear();
+    }
   }
 
-  updateDomainLinestring(): void {
+  drawDomainLinestring(): void {
+    if (this.crossSectionState.linestringCoordinates.length < 2) {
+      return;
+    }
+
     const geometry = this.linestring.getGeometry();
 
     if (!geometry) {
-      console.warn('updateDomainLinestring: Linestring geometry is undefined, unable to clip');
+      console.warn('drawDomainLinestring: Linestring geometry is undefined, unable to clip');
+      return;
+    }
+
+    if (geometry.getCoordinates().length < 2) {
       return;
     }
 
@@ -376,34 +376,33 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     const fStart = Math.max(0.0, this.crossSectionState.domain.xmin / linestringLength);
     const fEnd = Math.min(1.0, this.crossSectionState.domain.xmax / linestringLength);
 
-    if (fStart > 1.0 || fEnd < 0.0) {
-      this.domainLinestring.getGeometry()!.setCoordinates([]);
-      return;
-    }
+    if (fStart >= 0.0 && fStart <= 1.0 && fEnd >= 0.0 && fEnd <= 1.0) {
+      const coordStart = geometry.getCoordinateAt(fStart);
+      const coordEnd = geometry.getCoordinateAt(fEnd);
+      const lineStringCoords = geometry.getCoordinates() as [number, number][];
 
-    const coordStart = geometry.getCoordinateAt(fStart);
-    const coordEnd = geometry.getCoordinateAt(fEnd);
-    const lineStringCoords = geometry.getCoordinates() as [number, number][];
+      const coords = [];
+      coords.push(coordStart);
 
-    const coords = [];
-    coords.push(coordStart);
-
-    for (const coord of lineStringCoords) {
-      const distance = this.getDistanceAtCoord(geometry, coord);
-      if (distance >= this.crossSectionState.domain.xmin && distance <= this.crossSectionState.domain.xmax) {
-        coords.push(coord);
+      for (const coord of lineStringCoords) {
+        const distance = this.getDistanceAtCoord(geometry, coord);
+        if (distance >= this.crossSectionState.domain.xmin && distance <= this.crossSectionState.domain.xmax) {
+          coords.push(coord);
+        }
       }
-    }
 
-    coords.push(coordEnd);
+      coords.push(coordEnd);
 
-    // Update domain linestring geometry
-    this.domainLinestring.getGeometry()!.setCoordinates(coords);
+      this.domainLinestring.getGeometry()!.setCoordinates(coords);
+      if (this.domainLinestringSource.getFeatures().length === 0) {
+        this.domainLinestringSource.addFeature(this.domainLinestring);
+      }
 
-    // Zoom to extent
-    if (this.crossSectionState.syncViews) {
-      const view = this.map.getView();
-      view.setCenter(this.domainLinestring.getGeometry()!.getCoordinateAt(0.5));
+      // Zoom to extent
+      if (this.crossSectionState.syncViews) {
+        const view = this.map.getView();
+        view.setCenter(this.domainLinestring.getGeometry()!.getCoordinateAt(0.5));
+      }
     }
   }
 
@@ -438,10 +437,16 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   drawPointer(coords: [number, number]): void {
-    const geometry = this.pointer?.getGeometry();
-    if (geometry) {
-      this.pointer.getGeometry()!.setCoordinates(coords);
-      this.pointerLayer.changed();
+    const geometry = this.pointer.getGeometry();
+
+    if (!geometry) {
+      return;
+    }
+
+    geometry.setCoordinates(coords);
+
+    if (this.pointerSource.getFeatures().length === 0) {
+      this.pointerSource.addFeature(this.pointer);
     }
   }
 
@@ -709,8 +714,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   deleteProfile(): void {
-    this.linestringSource.clear();
-    this.polygonSource.clear();
+    this.crossSectionState.linestringCoordinates = [];
   }
 
   deleteMarker(id: string): void {
@@ -790,19 +794,37 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   handleCursorDomainCoordinatesChange(cursorDomainCoordinates: [number, number]) {
-    if (this.linestring) {
-      const geometry = this.linestring.getGeometry();
-      if (geometry) {
-        const f = cursorDomainCoordinates[0] / this.linestringLength;
-        let coords;
-        if (f < 0.0 || f > 1.0) {
-          coords = [NaN, NaN] as [number, number];
-        } else {
-          coords = geometry.getCoordinateAt(f) as [number, number];
-        }
+    if (this.crossSectionState.linestringCoordinates.length < 2) {
+      console.warn(
+        'handleCursorDomainCoordinatesChange: Linestring coordinates are undefined, unable to update pointer coordinates'
+      );
+      return;
+    }
 
-        this.drawPointer(coords);
-      }
+    if (!this.linestring) {
+      console.warn(
+        'handleCursorDomainCoordinatesChange: Linestring is undefined, unable to update pointer coordinates'
+      );
+      return;
+    }
+
+    const geometry = this.linestring.getGeometry();
+
+    if (!geometry) {
+      console.warn(
+        'handleCursorDomainCoordinatesChange: Linestring geometry is undefined, unable to update pointer coordinates'
+      );
+      return;
+    }
+
+    const f = cursorDomainCoordinates[0] / this.linestringLength;
+
+    if (f >= 0.0 && f <= 1.0) {
+      const coords = geometry.getCoordinateAt(f) as [number, number];
+      this.drawPointer(coords);
+    } else {
+      // If the pointer is not located within the extent of the linestring, then clear the pointer from the map
+      this.pointerSource.clear();
     }
   }
 
@@ -902,7 +924,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
         (_oldVal: Marker[], _newVal: Marker[], _parent: CrossSectionState) => {
           console.debug(`Settings |crossSection.markers (array length) changed from: ${_oldVal} to: ${_newVal}`);
 
-          if (!this.crossSectionState.linestringCoordinates) {
+          if (this.crossSectionState.linestringCoordinates.length < 2) {
             return;
           }
 
@@ -931,7 +953,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
         (_oldVal: Marker[], _newVal: Marker[], _parent: CrossSectionState) => {
           console.debug(`Settings | crossSection.markers (properties) changed from: ${_oldVal} to: ${_newVal}`);
 
-          if (!this.crossSectionState.linestringCoordinates) {
+          if (this.crossSectionState.linestringCoordinates.length < 2) {
             return;
           }
 
@@ -988,9 +1010,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
         'extendedState.crossSection.sectionWidth',
         (_oldVal: number, _newVal: number, _parent: CrossSectionState) => {
           console.debug(`crossSection.sectionWidth changed from: ${_oldVal} to: ${_newVal}`);
-          if (this.linestring) {
-            this.updateLinestringBuffer();
-          }
+          this.drawLinestringBuffer();
           super.render();
         }
       ),
@@ -1020,10 +1040,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
           _parent: CrossSectionState
         ) => {
           console.debug(`crossSection.domain changed from: ${_oldVal} to: ${_newVal}`);
-
-          if (this.linestring) {
-            this.updateDomainLinestring();
-          }
+          this.drawDomainLinestring();
         }
       )
     );
