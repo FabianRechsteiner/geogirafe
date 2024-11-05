@@ -77,6 +77,9 @@ class GirafeConfig {
     defaultStrokeWidth: number;
     defaultTextSize: number;
     defaultFont: string;
+    defaultVertexRadius: number;
+    defaultVertexFillColor: string;
+    defaultVertexStrokeWidth: number;
   };
   share: {
     service: 'lstu' | 'gmf' | null;
@@ -274,7 +277,10 @@ class GirafeConfig {
       defaultStrokeColor: config.drawing?.defaultStrokeColor ?? '#0000ff',
       defaultStrokeWidth: config.drawing?.defaultStrokeWidth ?? 2,
       defaultTextSize: config.drawing?.defaultTextSize ?? 12,
-      defaultFont: config.drawing?.defaultFont ?? 'Arial'
+      defaultFont: config.drawing?.defaultFont ?? 'Arial',
+      defaultVertexRadius: config.drawing?.defaultVertexRadius ?? 8,
+      defaultVertexFillColor: config.drawing?.defaultVertexFillColor ?? '#ffffffbf',
+      defaultVertexStrokeWidth: config.drawing?.defaultVertexStrokeWidth ?? 2
     };
   }
 

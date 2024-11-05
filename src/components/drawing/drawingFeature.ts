@@ -2,6 +2,8 @@ import ConfigManager from '../../tools/configuration/configmanager';
 import StateManager from '../../tools/state/statemanager';
 import ShapeNamer from './shapeNamer';
 import { v4 as uuidv4 } from 'uuid';
+import { Fill, RegularShape, Stroke, Style } from 'ol/style';
+import { toRadians } from 'ol/math';
 
 export enum DrawingShape {
   Point,
@@ -49,7 +51,7 @@ export default class DrawingFeature {
   private _font: string;
   private _displayName: boolean = true;
   private _displayMeasure: boolean = true;
-  private _selected: boolean = true;
+  private _selected: boolean = false;
 
   geojson: object;
   id: string = uuidv4();
@@ -226,6 +228,26 @@ export default class DrawingFeature {
       this.type == DrawingShape.Polyline ||
       this.type == DrawingShape.FreehandPolyline
     );
+  }
+
+  getVertexStyle(activeNode: boolean = false): Style {
+    const defaultConfig = ConfigManager.getInstance().Config.drawing;
+    return new Style({
+      zIndex: 1002,
+      image: new RegularShape({
+        points: 4,
+        radius: activeNode ? defaultConfig.defaultVertexRadius + 2 : defaultConfig.defaultVertexRadius,
+        angle: toRadians(45),
+        rotateWithView: false,
+        fill: new Fill({
+          color: defaultConfig.defaultVertexFillColor
+        }),
+        stroke: new Stroke({
+          color: this.strokeColor,
+          width: activeNode ? defaultConfig.defaultVertexStrokeWidth + 2 : defaultConfig.defaultVertexStrokeWidth
+        })
+      })
+    });
   }
 
   static deserialize(serializedFeature: SerializedFeature) {

@@ -164,3 +164,22 @@ input[type='range']::-moz-range-thumb {
     right: 0.5rem !important;
   }
 }
+
+
+/* Styles for map context menu in contextmenu.ts */
+
+.contextmenu {
+  background-color: var(--bkg-color);
+  color: var(--text-color);
+  box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  border: 1px solid #cccccc;
+
+  .hidden {
+    display: none;
+  }
+
+  .menu-entry {
+    cursor: pointer;
+  }
+}
