@@ -206,10 +206,8 @@ export default class DrawingComponent extends GirafeHTMLElement {
         this.deselectAllFeatures();
         this.mapContextMenu?.disable();
       }
-      this.refreshRender();
-    } else {
-      this.render();
     }
+    this.render();
   }
 
   get selectedFeatures(): DrawingFeature[] {
