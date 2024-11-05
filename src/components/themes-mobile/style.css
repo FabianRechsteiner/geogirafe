@@ -14,7 +14,6 @@ button.main {
   margin-top: 0;
   overflow-x: hidden;
   overflow-y: scroll;
-  scrollbar-width: thin;
   border: none;
   border-top: solid 1px #444;
   border-radius: 0;
