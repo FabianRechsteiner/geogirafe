@@ -169,10 +169,10 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   setTool(tool: DrawingShape | null = null) {
     if (this.toolSelected !== null) {
-      this.toolSelected.className = '';
+      this.toolSelected.classList.remove('selected');
     }
     this.toolSelected = this.getById(this.buttons.find((x) => x.tool == tool)!.id)!;
-    this.toolSelected.className = 'selected';
+    this.toolSelected.classList.add('selected');
     this.drawingState.activeTool = tool;
   }
 

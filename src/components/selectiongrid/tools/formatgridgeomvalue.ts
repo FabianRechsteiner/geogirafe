@@ -3,13 +3,11 @@ import { Circle, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, P
 import { getCenter } from 'ol/extent';
 import { polygonFromCircle } from '../../../tools/utils/olutils';
 import { formatCoordinates } from '../../../tools/geometrytools';
-import IconCenter from '../images/center.svg';
 
 /**
  * Generates HTML string containing icons based on the provided geometry.
  */
 export default class FormatGridGeomValue {
-  private readonly iconCenter = IconCenter;
   private locale: string = '';
 
   /**
@@ -21,16 +19,7 @@ export default class FormatGridGeomValue {
     if (!info[0]) {
       return;
     }
-    let icons = info[0];
-    const coords = info[1];
-
-    icons += `<button class="girafe-button-tiny tiny-margin"
-                      tip="Pan to geometry"
-                      tip-placement="right"
-                      onclick="document.geogirafe.state.position.center = [${coords[0]},${coords[1]}]">
-                <img alt="recenter-icon" src="${this.iconCenter}" />
-              </button>`;
-
+    const icons = info[0];
     return icons;
   }
 
@@ -65,7 +54,7 @@ export default class FormatGridGeomValue {
    * @private
    */
   private getGeometryIconsInfoPoint(geometry: Point): [string, number[]] {
-    let icons = '<i class="geo-type fg-point fg-lg"></i>';
+    let icons = '<img alt="point icon" src="icons/point.svg" />';
     const coords = geometry.getFlatCoordinates();
     const niceCoords = formatCoordinates(coords, this.locale);
     icons += `<span>E ${niceCoords[0]} / N ${niceCoords[1]}</span>`;
@@ -77,7 +66,7 @@ export default class FormatGridGeomValue {
    * @private
    */
   private getGeometryIconsInfoMultiPoint(geometry: MultiPoint): [string, number[]] {
-    let icons = '<i class="geo-type fg-multipoint fg-lg"></i>';
+    let icons = '<img alt="multipoint icon" src="icons/multipoint.svg" />';
     if (geometry.getPoints.length === 1) {
       const coords = geometry.getPoint(0).getFlatCoordinates();
       const niceCoords = formatCoordinates(coords, this.locale);
@@ -94,7 +83,7 @@ export default class FormatGridGeomValue {
    * @private
    */
   private getGeometryIconsInfoLine(geometry: LineString | MultiLineString): [string, number[]] {
-    let icons = '<i class="geo-type fg-polyline-pt fg-lg"></i>';
+    let icons = '<img alt="polyline icon" src="icons/polyline.svg" />';
     let geoLength;
     if (geometry instanceof MultiLineString) {
       geoLength = geometry.getLineStrings().reduce((length, line) => length + line.getLength(), 0);
@@ -114,7 +103,7 @@ export default class FormatGridGeomValue {
    * @private
    */
   private getGeometryIconsInfoPolygon(geometry: Polygon | MultiPolygon): [string, number[]] {
-    let icons = '<i class="geo-type fg-polygon-pt fg-lg"></i>';
+    let icons = '<img alt="polygon icon" src="icons/polygon.svg" />';
     const area = (Math.round(geometry.getArea() * 100) / 100).toLocaleString(this.locale, {
       minimumFractionDigits: 2
     });

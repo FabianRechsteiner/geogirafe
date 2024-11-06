@@ -20,12 +20,12 @@ button:hover {
 }
 button.selected {
   border: solid 1px var(--text-color-grad2);
-  background-color: var(--text-color-grad2);
+  background-color: var(--bkg-color-grad1);
   color: var(--bkg-color);
 }
-#toolbar button {
-  height: 2.4rem;
-  width: 2.4rem;
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .icon {
