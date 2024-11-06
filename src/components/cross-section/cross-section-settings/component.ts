@@ -148,6 +148,10 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
         'fill-color': 'rgba(255, 255, 255, 0.2)',
         'stroke-color': '#ff0000',
         'stroke-width': 2
+      },
+      properties: {
+        addToPrintedLayers: true,
+        altitudeMode: 'clampToGround'
       }
     });
 
@@ -167,6 +171,10 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       style: {
         'stroke-color': '#0000ff',
         'stroke-width': 2
+      },
+      properties: {
+        addToPrintedLayers: true,
+        altitudeMode: 'clampToGround'
       }
     });
 
@@ -187,6 +195,10 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
         'fill-color': 'rgba(255, 255, 255, 0.2)',
         'stroke-color': '#ff0000',
         'stroke-width': 2
+      },
+      properties: {
+        addToPrintedLayers: true,
+        altitudeMode: 'clampToGround'
       }
     });
 
@@ -206,7 +218,11 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
     this.pointerLayer = new VectorLayer({
       source: this.pointerSource,
-      style: this.iconStyle
+      style: this.iconStyle,
+      properties: {
+        addToPrintedLayers: true,
+        altitudeMode: 'clampToGround'
+      }
     });
 
     this.map.addLayer(this.pointerLayer);
@@ -222,7 +238,11 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
     this.pointsLayer = new VectorLayer({
       source: this.pointsSource,
-      style: this.pointStyleFunction as StyleLike
+      style: this.pointStyleFunction as StyleLike,
+      properties: {
+        addToPrintedLayers: true,
+        altitudeMode: 'clampToGround'
+      }
     });
 
     this.map.addLayer(this.pointsLayer);
