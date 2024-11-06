@@ -181,6 +181,24 @@ button {
   background-color: #9abcea;
 }
 
+/*Size of span and images in table*/
+.tabulator-cell img {
+  height: 1.5rem;
+  float: left;
+  margin-right: 0.5rem;
+}
+.tabulator-cell span {
+  line-height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+.tabulator-cell span sup {
+  position: absolute;
+  right: -0.5rem;
+  top: -0.3rem;
+}
+
 /*Hover effect for rows*/
 @media (hover: hover) and (pointer: fine) {
   #tabulator .tabulator-tableholder .tabulator-table .tabulator-row:hover {

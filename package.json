@@ -77,7 +77,6 @@
     "cesium": "1.119.0",
     "cross-env": "7.0.3",
     "eslint": "8.56.0",
-    "font-gis": "1.0.5",
     "fs-extra": "11.2.0",
     "jsdom": "24.1.0",
     "lint-staged": "15.2.7",
