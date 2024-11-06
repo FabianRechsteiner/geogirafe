@@ -191,7 +191,7 @@ export default class OlDrawing {
         this.featuresMap.set(feature.id, { feature: olFeature, shape: feature.type });
         this.drawingSource.addFeature(olFeature);
       }
-      feature.onChange = (f: DrawingFeature) => olFeature.setStyle(this.getStyle(f, olFeature));
+      feature.onChange = (df: DrawingFeature) => olFeature.setStyle((f) => this.getStyle(df, f as Feature<Geometry>));
       feature.onChange(feature);
     });
   }
@@ -256,7 +256,7 @@ export default class OlDrawing {
     } else {
       olFeature = new Feature(new GeoJSON().readFeatures(feature.geojson)[0].getGeometry());
     }
-    olFeature.setStyle(this.getStyle(feature, olFeature));
+    olFeature.setStyle((f) => this.getStyle(feature, f as Feature<Geometry>));
     return olFeature;
   }
 
@@ -383,6 +383,7 @@ export default class OlDrawing {
     const geometry = olFeature.getGeometry() as Geometry;
     const measureFont = 'Bold ' + feature.measureFontSize + 'px/1 ' + feature.font;
     const nameFont = 'Bold ' + feature.nameFontSize + 'px/1 ' + feature.font;
+    const measureColor = 'rgba(0, 0, 0, 0.4)';
     const defaultStyle = new Style({
       stroke: new Stroke({ color: feature.strokeColor, width: feature.strokeWidth }),
       fill: new Fill({ color: feature.fillColor }),
@@ -393,6 +394,8 @@ export default class OlDrawing {
       text: new Text({
         text: feature.displayName ? feature.name : '',
         font: nameFont,
+        textBaseline: 'bottom',
+        offsetY: feature.type == DrawingShape.Point ? 2 * feature.nameFontSize : 1.2 * feature.nameFontSize,
         fill: new Fill({ color: feature.nameColor })
       })
     });
@@ -402,7 +405,7 @@ export default class OlDrawing {
         font: measureFont,
         padding: [2, 2, 2, 2],
         textBaseline: 'bottom',
-        offsetY: -12,
+        offsetY: -1 * feature.nameFontSize,
         fill: new Fill({ color: feature.measureColor })
       }),
       image: new RegularShape({
@@ -410,7 +413,7 @@ export default class OlDrawing {
         points: 3,
         angle: Math.PI,
         displacement: [0, 8],
-        fill: new Fill({ color: 'rgba(0, 0, 0, 0.4)' })
+        fill: new Fill({ color: measureColor })
       })
     });
 
@@ -452,8 +455,9 @@ export default class OlDrawing {
       const center = (geometry as CircleGeom).getCenter();
       const radiusLine = [center, [center[0] + radius, center[1]]];
       const radiusLineStyle = defaultStyle.clone();
+      radiusLineStyle.setStroke(new Stroke({ color: measureColor, width: feature.strokeWidth }));
       radiusLineStyle.getText()!.setText('');
-      radiusLineStyle.setGeometry(new LineString(radiusLine));
+      radiusLineStyle.setGeometry(feature.displayMeasure ? new LineString(radiusLine) : new LineString([]));
       styles.push(radiusLineStyle);
       addLabel(getHalfPoint(radiusLine), feature.getLengthText(radius));
     } else if (feature.type == DrawingShape.FreehandPolygon) {
