@@ -351,7 +351,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     );
 
     const bo = new BufferOp(jstsGeom, bufferParams);
-    const buffered = bo.getResultGeometry(this.crossSectionState.sectionWidth);
+    const buffered = bo.getResultGeometry(this.crossSectionState.sectionWidthSettings.value);
     const mypoly = this.parser.write(buffered) as Polygon;
     this.polygon.setGeometry(mypoly);
     this.polygonSource.addFeature(this.polygon);
@@ -541,25 +541,46 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   setSectionWidth(val: number): void {
-    if (val <= 0) {
-      throw new Error('setSectionWidth: Width must be a positive number');
+    if (
+      val <= 0 ||
+      val < this.crossSectionState.sectionWidthSettings.min ||
+      val > this.crossSectionState.sectionWidthSettings.max
+    ) {
+      val = this.crossSectionState.sectionWidthSettings.default;
+      console.warn(
+        `setSectionWidth: Width is not within accepted range [${this.crossSectionState.sectionWidthSettings.min}, ${this.crossSectionState.sectionWidthSettings.max}]. Resetting to default value`
+      );
     }
-    this.crossSectionState.sectionWidth = val;
+    this.crossSectionState.sectionWidthSettings.value = val;
   }
 
   setVerticalExaggeration(val: number): void {
-    if (val <= 0) {
-      throw new Error('setVerticalExaggeration: vertical exaggeration must be a positive number');
+    if (
+      val <= 0 ||
+      val < this.crossSectionState.verticalExaggerationSettings.min ||
+      val > this.crossSectionState.verticalExaggerationSettings.max
+    ) {
+      val = this.crossSectionState.verticalExaggerationSettings.default;
+      console.warn(
+        `setVerticalExaggeration: vertical exaggeration is not within accepted range [${this.crossSectionState.verticalExaggerationSettings.min}, ${this.crossSectionState.verticalExaggerationSettings.max}]. Resetting to default value`
+      );
     }
-    this.crossSectionState.verticalExaggeration = val;
+    this.crossSectionState.verticalExaggerationSettings.value = val;
     super.render();
   }
 
   setPointSize(val: number): void {
-    if (val <= 0) {
-      throw new Error('setPointSize: point size must be a positive number');
+    if (
+      val <= 0 ||
+      val < this.crossSectionState.pointSizeSettings.min ||
+      val > this.crossSectionState.pointSizeSettings.max
+    ) {
+      val = this.crossSectionState.pointSizeSettings.default;
+      console.warn(
+        `setPointSize: point size is not within accepted range [${this.crossSectionState.pointSizeSettings.min}, ${this.crossSectionState.pointSizeSettings.max}]. Resetting to default value`
+      );
     }
-    this.crossSectionState.pointSize = val;
+    this.crossSectionState.pointSizeSettings.value = val;
     super.render();
   }
 
@@ -1026,14 +1047,11 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       ),
 
       // Profile width
-      this.subscribe(
-        'extendedState.crossSection.sectionWidth',
-        (_oldVal: number, _newVal: number, _parent: CrossSectionState) => {
-          console.debug(`crossSection.sectionWidth changed from: ${_oldVal} to: ${_newVal}`);
-          this.drawLinestringBuffer();
-          super.render();
-        }
-      ),
+      this.subscribe('extendedState.crossSection.sectionWidthSettings.value', (_oldVal: number, _newVal: number) => {
+        console.debug(`crossSection.sectionWidthSettings.value changed from: ${_oldVal} to: ${_newVal}`);
+        this.drawLinestringBuffer();
+        super.render();
+      }),
 
       // Linestring coordinates
       this.subscribe(

@@ -284,13 +284,13 @@ class CrossSectionViewComponent extends GirafeResizableElement {
         this.darkFrontendMode = _newValue;
       }),
       this.subscribe(
-        'extendedState.crossSection.verticalExaggeration',
-        (_oldVal: number, _newVal: number, _parent: CrossSectionState) => {
+        'extendedState.crossSection.verticalExaggerationSettings.value',
+        (_oldVal: number, _newVal: number) => {
           this.scatterplot?.updateVerticalExaggeration(_newVal);
         }
       ),
       this.subscribe(
-        'extendedState.crossSection.pointSize',
+        'extendedState.crossSection.pointSizeSettings.value',
         (_oldVal: number, _newVal: number, _parent: CrossSectionState) => {
           this.scatterplot?.updatePointSize(_newVal);
         }
@@ -333,14 +333,11 @@ class CrossSectionViewComponent extends GirafeResizableElement {
           }
         }
       ),
-      this.subscribe(
-        'extendedState.crossSection.sectionWidth',
-        (_oldVal: number, _newVal: number, _parent: CrossSectionState) => {
-          if (_parent.sectionWidth > 0 && _parent.linestringCoordinates.length >= 2) {
-            this.refreshData(_parent.sectionWidth, _parent.linestringCoordinates);
-          }
+      this.subscribe('extendedState.crossSection.sectionWidthSettings.value', (_oldVal: number, _newVal: number) => {
+        if (_newVal > 0 && this.crossSectionState.linestringCoordinates.length >= 2) {
+          this.refreshData(_newVal, this.crossSectionState.linestringCoordinates);
         }
-      ),
+      }),
       this.subscribe(
         'extendedState.crossSection.linestringCoordinates',
         (_oldVal: [number, number][], _newVal: [number, number][], _parent: CrossSectionState) => {
@@ -352,8 +349,14 @@ class CrossSectionViewComponent extends GirafeResizableElement {
             return;
           }
 
-          if (_parent.sectionWidth > 0 && _parent.linestringCoordinates.length >= 2) {
-            this.refreshData(_parent.sectionWidth, _parent.linestringCoordinates);
+          if (
+            this.crossSectionState.sectionWidthSettings.value > 0 &&
+            this.crossSectionState.linestringCoordinates.length >= 2
+          ) {
+            this.refreshData(
+              this.crossSectionState.sectionWidthSettings.value,
+              this.crossSectionState.linestringCoordinates
+            );
           }
         }
       ),

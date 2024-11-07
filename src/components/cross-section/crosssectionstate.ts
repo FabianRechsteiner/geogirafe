@@ -20,11 +20,29 @@ export class CrossSectionState {
     ymin: 0.0,
     ymax: 50.0
   };
-  pointSize: number = 3.0;
-  verticalExaggeration: number = 1.0;
+  pointSizeSettings: { default: number; min: number; max: number; step: number; value: number } = {
+    default: 3.0,
+    min: 0.1,
+    max: 10.0,
+    step: 0.1,
+    value: 3.0
+  };
+  verticalExaggerationSettings: { default: number; min: number; max: number; step: number; value: number } = {
+    default: 1.0,
+    min: 0.1,
+    max: 10.0,
+    step: 0.1,
+    value: 1.0
+  };
   syncViews: boolean = false;
   margins: { left: number; right: number; top: number; bottom: number } = { left: 45, right: 5, top: 10, bottom: 25 };
-  sectionWidth: number = 1.5;
+  sectionWidthSettings: { default: number; min: number; max: number; step: number; value: number } = {
+    default: 1.5,
+    min: 0.1,
+    max: 50.0,
+    step: 0.1,
+    value: 1.5
+  };
   minLOD: number = 1;
   maxLOD: number = 14;
   markers: Marker[] = [];
