@@ -33,25 +33,24 @@
     </button>
 
     <!-- Label -->
-    <div class="label-container">
+    <div class="${this.isVisibleInCurrentResolution() ? 'label-container' : 'label-container label-out-resolution'}">
       <button
         class="${this.layer.active ? 'gg-button gg-small gg-selected' : 'gg-button gg-small gg-opacity'}"
         onclick="${() => this.toggle()}">
         <span i18n="${this.layer.name}" class="gg-label"> ${this.layer.name} </span>
+      </button>
+      <!-- zoom to resolution -->
+      <button
+        class="${this.layer.active && this.layer instanceof LayerWms && !this.isVisibleInCurrentResolution() ? 'gg-button gg-small resolution-tool' : 'hidden'}"
+        tip="Zoom to visible resolution"
+        onclick="${() => this.zoomToVisibleResolution()}">
+        <img alt="Zoom to visible resolution" src="icons/zoom.svg" />
       </button>
       <img
         class="${this.layer.active && this.iconUrl ? '' : 'hidden'}"
         alt="${'Icon for ' + this.layer.name}"
         src="${this.iconUrl}" />
     </div>
-
-    <!-- zoom to resolution -->
-    <button
-      class="${this.layer.active && this.layer instanceof LayerWms && this.layer.hasRestrictedResolution() ? 'gg-button gg-small gg-opacity tool' : 'hidden'}"
-      tip="Zoom to visible resolution"
-      onclick="${() => this.zoomToVisibleResolution()}">
-      <img alt="Zoom to visible resolution" src="icons/zoom.svg" />
-    </button>
 
     <!-- zoom to full extent -->
     <button
