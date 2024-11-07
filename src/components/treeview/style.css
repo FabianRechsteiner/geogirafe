@@ -25,6 +25,14 @@ header:hover .tool {
   overflow: auto;
 }
 
+.label-out-resolution span {
+  font-style: italic;
+}
+
+.resolution-tool {
+  margin-left: 0.5rem;
+}
+
 .legend {
   display: flex;
 }

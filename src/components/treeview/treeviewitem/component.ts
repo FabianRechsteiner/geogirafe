@@ -179,12 +179,14 @@ class TreeViewItemComponent extends TreeViewElement {
   }
 
   registerEvents() {
-    this.subscribe(/layers\..*\.isLegendExpanded/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
-      this.refreshRender(layer)
-    );
-    this.subscribe(/layers\.layersList\..*\.activeState/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
-      this.refreshRender(layer)
-    );
+    this.subscribe(/layers\..*\.isLegendExpanded/, (_oldValue: boolean, _newValue: boolean, layer: Layer) => {
+      this.refreshLegends();
+      this.refreshRender(layer);
+    });
+    this.subscribe(/layers\.layersList\..*\.activeState/, (_oldValue: boolean, _newValue: boolean, layer: Layer) => {
+      this.refreshLegends();
+      this.refreshRender(layer);
+    });
     this.subscribe(/layers\.layersList\..*\.hasError/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
       this.refreshRender(layer)
     );
@@ -201,14 +203,14 @@ class TreeViewItemComponent extends TreeViewElement {
       this.refreshRender(layer)
     );
     this.subscribe('treeview.advanced', () => this.refreshRender(this.layer));
-    this.subscribe('position.resolution', () => this.refreshLegends());
+    this.subscribe('position', () => this.refreshLegends());
   }
 
   refreshLegends() {
-    if (this.layer instanceof LayerWms) {
+    if (this.layer instanceof LayerWms && this.layer.hasRestrictedResolution() && this.layer.isLegendExpanded) {
       this.setWmsLegend();
+      super.refreshRender();
     }
-    super.refreshRender();
   }
 
   toggle(state?: 'on' | 'off') {
@@ -249,13 +251,42 @@ class TreeViewItemComponent extends TreeViewElement {
       throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called here.`);
     }
 
-    // Because of rounding errors (for example 1.59 becomes 1.589999999999998),
-    // we zoom a bit more than just the max resolution.
-    // For the moment we try with 10% more
     if (this.layer.maxResolution) {
-      const resolution = this.layer.maxResolution - (10 / 100) * this.layer.maxResolution;
-      this.state.position.resolution = resolution;
+      if (this.configManager.Config.map.constrainScales) {
+        // We have to find the right resolution
+        const allowedResolutions = MapManager.getInstance().getMap().getView().getResolutions()!;
+        const maxResolution = this.layer.maxResolution;
+        const newResolution = allowedResolutions.find((r) => r < maxResolution)!;
+        this.state.position.resolution = newResolution;
+      } else {
+        // We can just zoom to the correct resolution.
+        // But because of rounding errors (for example 1.59 becomes 1.589999999999998),
+        // we zoom a bit more than just the max resolution (5% more)
+
+        const resolution = this.layer.maxResolution * 0.95;
+        this.state.position.resolution = resolution;
+      }
     }
+  }
+
+  isVisibleInCurrentResolution() {
+    if (!(this.layer instanceof LayerWms)) {
+      // Always true for not WMS layers
+      return true;
+    } else if (!this.layer.hasRestrictedResolution()) {
+      // No restricted Resolution
+      return true;
+    }
+
+    const currentResolution = this.state.position.resolution;
+    if (this.layer.maxResolution && this.layer.maxResolution < currentResolution) {
+      return false;
+    }
+    if (this.layer.minResolution && this.layer.minResolution > currentResolution) {
+      return false;
+    }
+
+    return true;
   }
 
   zoomToFullExtent() {

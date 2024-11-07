@@ -155,7 +155,6 @@ div {
   cursor: grab;
 }
 .gg-selected {
-  font-weight: 700;
   opacity: 1;
 }
 /* Opacity management */
