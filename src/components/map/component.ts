@@ -47,6 +47,7 @@ import ThemeLayer from '../../models/layers/themelayer';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionParam from '../../models/selectionparam';
 import WfsManager from '../../tools/wfs/wfsmanager';
+import I18nManager from '../../tools/i18n/i18nmanager';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -395,7 +396,6 @@ export default class MapComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      super.girafeTranslate();
       // this.changeCanvasColor();
       this.listenOpenLayersEvents();
       this.registerEvents();
@@ -504,7 +504,8 @@ export default class MapComponent extends GirafeHTMLElement {
         timeDatePicker.style.display = shadowCheckbox.checked ? 'block' : 'none';
       };
       const shadowLabel = document.createElement('label');
-      shadowLabel.innerText = 'Enable shadows';
+      shadowLabel.innerText = I18nManager.getInstance().getTranslation('Enable shadows');
+      shadowLabel.setAttribute('i18n', 'Enable shadows');
       const shadowEnabledContainer = document.createElement('div');
       shadowEnabledContainer.classList.add('ui-input');
       shadowEnabledContainer.appendChild(shadowCheckbox);

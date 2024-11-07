@@ -50,6 +50,7 @@ class ShareComponent extends GirafeDraggableElement {
   render() {
     super.render();
     super.makeDraggable();
+    this.girafeTranslate();
   }
 
   async togglePopup(visible: boolean) {
@@ -100,7 +101,6 @@ class ShareComponent extends GirafeDraggableElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      this.girafeTranslate();
       this.initializeShortenerService();
       this.registerEvents();
     });
