@@ -2,6 +2,9 @@
   "general": {
     "locale": "fr-CH"
   },
+  "gmfauth": {
+    "url": "https://sitn.ne.ch"
+  },
   "languages": {
     "translations": {
       "fr": ["i18n/fr.json", "https://sitn.ne.ch/static/dummy/fr.json"]
