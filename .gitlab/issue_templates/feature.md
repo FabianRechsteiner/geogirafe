@@ -10,5 +10,5 @@
 
 (Any other information about this feature request, or any point to watch out for or open question)
 
-/label ~gg::draft
-/label ~new
+/label ~gg::new
+/label ~feature
