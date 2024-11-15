@@ -11,6 +11,8 @@ class BasemapComponent extends GirafeHTMLElement {
 
   shareManager: ShareManager;
 
+  activeBasemap: string = '';
+
   constructor() {
     super('basemap');
 
@@ -31,6 +33,8 @@ class BasemapComponent extends GirafeHTMLElement {
       for (const basemap of Object.values(basemaps)) {
         if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
           this.state.activeBasemap = basemap;
+          this.activeBasemap = basemap.name;
+          this.render();
           break;
         }
       }
@@ -43,6 +47,8 @@ class BasemapComponent extends GirafeHTMLElement {
       this.state.projection = basemap.projection;
     }
     this.state.activeBasemap = basemap;
+    this.activeBasemap = basemap.name;
+    this.render();
   }
 
   registerEvents() {
