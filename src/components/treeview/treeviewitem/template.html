@@ -93,7 +93,9 @@
     </button>
 
     <!-- Metadata icon -->
-    <button class="gg-button gg-small gg-opacity tool" tip="Show metadata" onclick="${() => this.showMetadata()}">
+    <button
+      class="${this.layer.hasMetadata ? 'metadata gg-button gg-small gg-opacity tool' : 'hidden'}"
+      onclick="${() => this.showMetadata()}">
       <img alt="Remove theme" src="icons/info.svg" />
     </button>
 
