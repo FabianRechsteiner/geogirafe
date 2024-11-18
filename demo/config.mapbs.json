@@ -25,7 +25,6 @@
     "SwissTopoVectorTiles": true
   },
   "treeview": {
-    "useLegendIcons": true,
     "hideLegendWhenLayerIsDeactivated": false,
     "defaultIconSize": {
       "width": "21",

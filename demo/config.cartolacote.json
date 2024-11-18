@@ -17,9 +17,6 @@
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
-  "treeview": {
-    "useLegendIcons": true
-  },
   "search": {
     "url": "https://map.cartolacote.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###",
     "objectPreview": true,
