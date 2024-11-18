@@ -3,7 +3,7 @@ import { InfoBoxContent } from '../../tools/state/state';
 
 class InfoboxComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   infos = [] as InfoBoxContent[];
 

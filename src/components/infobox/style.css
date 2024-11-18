@@ -29,21 +29,14 @@
   color: #fff;
 }
 
-.close-icon {
-  border: none;
-  color: var(--text-color-grad2);
-  padding: 0;
-  margin: 0.5rem;
+button {
   position: absolute;
   top: 0;
   right: 0;
-  width: 0.8rem;
-  background-color: transparent;
-  cursor: pointer;
 }
 
-.content div.warning .close-icon,
-.content div.error .close-icon {
+.content div.warning button,
+.content div.error button {
   filter: invert(1);
 }
 
