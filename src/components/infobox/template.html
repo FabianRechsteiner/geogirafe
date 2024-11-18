@@ -2,7 +2,7 @@
   ${(this.state.infobox.elements ?? []).map(info => uHtml`
   <div class="${info.type}">
     <span>${this.htmlUnsafe(info.text)}</span>
-    <button class="close-icon" onclick="${() => this.closeMessage(info)}" tip="Close message">
+    <button class="gg-button gg-small" onclick="${() => this.closeMessage(info)}" tip="Close message">
       <img alt="close-icon" src="icons/close.svg" />
     </button>
   </div>
