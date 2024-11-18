@@ -24,9 +24,6 @@
     "OSM": false,
     "SwissTopoVectorTiles": false
   },
-  "treeview": {
-    "useLegendIcons": true
-  },
   "search": {
     "url": "https://sitn.ne.ch/search?limit=100&partitionlimit=40&interface=desktop&query=###SEARCHTERM###&lang=fr",
     "objectPreview": true,

@@ -27,9 +27,6 @@
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
-  "treeview": {
-    "useLegendIcons": true
-  },
   "search": {
     "url": "https://geomapfish-demo-2-9.camptocamp.com/search?limit=30&partitionlimit=5&interface=experimental&query=###SEARCHTERM###&lang=###SEARCHLANG###",
     "objectPreview": true,

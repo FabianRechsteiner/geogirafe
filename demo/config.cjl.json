@@ -18,9 +18,6 @@
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
-  "treeview": {
-    "useLegendIcons": true
-  },
   "search": {
     "url": "https://map.cjl.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###",
     "objectPreview": true,
