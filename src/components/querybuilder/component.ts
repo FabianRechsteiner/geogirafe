@@ -126,6 +126,7 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     this.currentLayerAttribute = layerAttribute;
     this.updateOperatorOptions();
     super.render();
+    super.girafeTranslate();
   }
 
   operatorChanged() {
