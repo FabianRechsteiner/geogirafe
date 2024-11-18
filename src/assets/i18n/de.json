@@ -178,6 +178,19 @@
     "No graph to export in PNG!": "Kein Diagramm zum Exportieren als PNG!",
     "Activate batch creation mode to draw multiple features without needing to reselect the tool": "Aktiviere den Batch-Modus um mehrere Formen zu zeichnen ohne das Werkzeug neu auszuwählen",
     "Batch creation mode": "Batch-Modus",
-    "Enable shadows": "Schatten aktivieren"
+    "Enable shadows": "Schatten aktivieren",
+    "equals": "gleich",
+    "does not equal": "ungleich",
+    "contains": "enthält",
+    "does not contain": "enthält nicht",
+    "greater than": "grösser als",
+    "greater than or equal to": "grösser oder gleich",
+    "less than": "kleiner als",
+    "less than or equal to": "kleiner oder gleich",
+    "before": "vor",
+    "after": "nach",
+    "between": "zwischen",
+    "is blank": "ist leer",
+    "is not blank": "ist nicht leer"
   }
 }

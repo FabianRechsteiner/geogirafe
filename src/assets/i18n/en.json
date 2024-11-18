@@ -178,6 +178,19 @@
     "No graph to export in PNG!": "No graph to export in PNG!",
     "Activate batch creation mode to draw multiple features without needing to reselect the tool": "Activate batch creation mode to draw multiple features without the needing to reselect the tool",
     "Batch creation mode": "Batch creation mode",
-    "Enable shadows": "Enable shadows"
+    "Enable shadows": "Enable shadows",
+    "equals": "equals",
+    "does not equal": "does not equal",
+    "contains": "contains",
+    "does not contain": "does not contain",
+    "greater than": "greater than",
+    "greater than or equal to": "greater than or equal to",
+    "less than": "less than",
+    "less than or equal to": "less than or equal to",
+    "before": "before",
+    "after": "after",
+    "between": "between",
+    "is blank": "is blank",
+    "is not blank": "is not blank"
   }
 }

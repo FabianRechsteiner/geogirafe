@@ -27,7 +27,7 @@
       <select id="operator" name="operator" onchange="${() => this.operatorChanged()}">
         <option value="" disabled selected i18n="Select operator...">Select operator...</option>
         ${this.operatorOptions.map(option => uHtmlFor(option, option.operator)`
-        <option value="${option.operator}">${option.displayName}</option>
+        <option i18n="${option.displayName}" value="${option.operator}">${option.displayName}</option>
         `)}
       </select>
     </div>
