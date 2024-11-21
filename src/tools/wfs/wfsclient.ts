@@ -194,9 +194,11 @@ export class WfsClient<WfsXmlTypes = XmlTypes> {
   }
 
   async getFeature(selectionParam: SelectionParam): Promise<Feature<Geometry>[]> {
-    // First, keep only queryable layers
+    // First, keep only queryable and visible layers
     // And verify that all layers have the same WFS URL
-    const queryableLayers = selectionParam._layers.filter((l) => l.wfsQueryable) as QueryableLayerWms[];
+    const queryableLayers = selectionParam._layers.filter(
+      (l) => l.wfsQueryable && l.isVisibleAtResolution(this.state.position.resolution)
+    ) as QueryableLayerWms[];
     if (queryableLayers.length <= 0) {
       return [];
     }

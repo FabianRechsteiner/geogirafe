@@ -120,6 +120,13 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     return (this.minResolution && this.minResolution !== 0) || (this.maxResolution && this.maxResolution !== 999999999);
   }
 
+  isVisibleAtResolution(resolution: number) {
+    if (resolution === undefined || resolution === null || !this.hasRestrictedResolution()) {
+      return true;
+    }
+    return resolution >= (this.minResolution ?? -1) && resolution <= (this.maxResolution ?? Infinity);
+  }
+
   get hasFilter() {
     return this.filter !== null && this.filter !== undefined;
   }

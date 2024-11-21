@@ -264,7 +264,7 @@ export default abstract class WmsClient {
     const urlsAndLayerNames: Record<string, string> = {};
     param._layers.forEach((layer) => {
       const olLayer = param._oLayer ?? this.getOLayer(layer);
-      if (!layer.queryable || !olLayer) {
+      if (!layer.queryable || !olLayer || !layer.isVisibleAtResolution(this.state.position.resolution)) {
         return;
       }
       // Layer is queryable through WMS and has an OL layer.
