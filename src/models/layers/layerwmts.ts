@@ -122,6 +122,17 @@ class LayerWmts extends Layer implements ILayerWithLegend {
     return this.name;
   }
 
+  hasRestrictedResolution() {
+    return (this.minResolution && this.minResolution !== 0) || (this.maxResolution && this.maxResolution !== 999999999);
+  }
+
+  isVisibleAtResolution(resolution: number) {
+    if (resolution === undefined || resolution === null || !this.hasRestrictedResolution()) {
+      return true;
+    }
+    return resolution >= (this.minResolution ?? -1) && resolution <= (this.maxResolution ?? Infinity);
+  }
+
   private static isGMFTreeItem(options: GMFTreeItem | LayerWmtsOptions): options is GMFTreeItem {
     return 'id' in options;
   }

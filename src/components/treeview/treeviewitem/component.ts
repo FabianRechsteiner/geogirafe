@@ -270,23 +270,11 @@ class TreeViewItemComponent extends TreeViewElement {
   }
 
   isVisibleInCurrentResolution() {
-    if (!(this.layer instanceof LayerWms)) {
-      // Always true for not WMS layers
-      return true;
-    } else if (!this.layer.hasRestrictedResolution()) {
-      // No restricted Resolution
+    if (!(this.layer instanceof LayerWms) && !(this.layer instanceof LayerWmts)) {
+      // Always true for not WMS/WMTS layers
       return true;
     }
-
-    const currentResolution = this.state.position.resolution;
-    if (this.layer.maxResolution && this.layer.maxResolution < currentResolution) {
-      return false;
-    }
-    if (this.layer.minResolution && this.layer.minResolution > currentResolution) {
-      return false;
-    }
-
-    return true;
+    return this.layer.isVisibleAtResolution(this.state.position.resolution);
   }
 
   zoomToFullExtent() {
