@@ -4,6 +4,7 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import State from './state';
 import ConfigManager from '../configuration/configmanager';
 import onChange from 'on-change';
+import { getPropertyByPath } from '../utils/pathUtils';
 
 export type Callback = (oldValue: any, value: any, parent?: any) => void | Promise<void>;
 
@@ -69,7 +70,7 @@ class StateManager extends GirafeSingleton {
         const indexOfLastPoint = path.lastIndexOf('.');
         const parentPath = path.substring(0, indexOfLastPoint);
         const childPathFromParent = path.substring(indexOfLastPoint + 1);
-        const parentObject = this.getPropertyByPath(this.state, parentPath);
+        const parentObject = getPropertyByPath(this.state, parentPath);
         if (!parentObject.found) {
           console.warn('Parent object could not be found in the state');
         } else {
@@ -102,7 +103,7 @@ class StateManager extends GirafeSingleton {
     // At the application start, perhaps the value in state was initialized before the subscribe method was called
     // Therefore, if the subscribed value os not null, undefined or an empty object or array
     // We immediately call the callback.
-    const obj = this.getPropertyByPath(this.state, pathAsString);
+    const obj = getPropertyByPath(this.state, pathAsString);
     if (obj.found) {
       if (
         obj.object === null ||
@@ -114,7 +115,7 @@ class StateManager extends GirafeSingleton {
       } else {
         // Object is not null during the subscribe. => we call the callback
         const parentPath = pathAsString.substring(0, pathAsString.lastIndexOf('.'));
-        const parentObject = this.getPropertyByPath(this.state, parentPath);
+        const parentObject = getPropertyByPath(this.state, parentPath);
         callback(null, obj.object, parentObject.object);
       }
     }
@@ -140,44 +141,6 @@ class StateManager extends GirafeSingleton {
         throw Error(`Cannot unsubscribe this callback : it does not exist`);
       }
     });
-  }
-
-  /**
-   * @returns the property or object, following the given path, and the
-   * parent and last key to the parent object to be able to set it (see also setPropertyByPath).
-   */
-  public getPropertyByPath(obj: any, path: string) {
-    let currentObj = obj;
-    let parentObject = null;
-    let lastKey = null;
-    if (path.trim() !== '') {
-      const keys = path.split('.');
-
-      for (const key of keys) {
-        if (key in currentObj) {
-          parentObject = currentObj;
-          lastKey = key;
-          currentObj = currentObj[key];
-        } else {
-          return { found: false, object: null, parentObject, lastKey };
-        }
-      }
-    }
-
-    return { found: true, object: currentObj, parentObject, lastKey };
-  }
-
-  /**
-   * Sets the value of a property specified by a given path in an object.
-   * @returns true if the property was set successfully, false otherwise.
-   */
-  public setPropertyByPath(obj: any, path: string, value: any): boolean {
-    const result = this.getPropertyByPath(obj, path);
-    if (result.parentObject && result.lastKey) {
-      result.parentObject[result.lastKey] = value;
-      return true;
-    }
-    return false;
   }
 
   /**

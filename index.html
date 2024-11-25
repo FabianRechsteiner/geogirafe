@@ -93,6 +93,10 @@
             slot="main"
             data-toggle-path="interface.crossSectionPanelVisible"
             data-title="cross-section-settings"></girafe-cross-section-settings>
+          <girafe-user-preferences
+            slot="main"
+            data-toggle-path="interface.userPreferencesPanelVisible"
+            data-title="user-preferences-panel"></girafe-user-preferences>
         </girafe-lr-panel>
 
         <girafe-about></girafe-about>
@@ -135,7 +139,6 @@
       <button class="gg-button gg-big" onclick="document.geogirafe.state.interface.shareVisible = true">
         <img alt="help-icon" src="icons/share.svg" />
       </button>
-      <girafe-language-select></girafe-language-select>
       <girafe-layout></girafe-layout>
       <girafe-proj-select></girafe-proj-select>
 
@@ -151,8 +154,9 @@
         <img alt="help-icon" src="icons/info.svg" />
       </button>
 
-      <button class="gg-button gg-big" onclick="alert('not implemented')">
-        <img alt="help-icon" src="icons/config.svg" />
+      <button class="gg-button gg-big"
+              onclick="document.geogirafe.state.interface.userPreferencesPanelVisible = !document.geogirafe.state.interface.userPreferencesPanelVisible">
+        <img alt="user-preferences-icon" src="icons/config.svg" />
       </button>
     </div>
   </body>

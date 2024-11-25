@@ -16,15 +16,17 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
   onChangeDarkFrontendMode() {
     const currentTheme = this.state.interface.darkFrontendMode ? 'dark' : 'light';
     this.activateTheme(currentTheme);
-    localStorage.setItem('theme', currentTheme);
     super.refreshRender();
   }
 
   initValue() {
-    let currentTheme = localStorage.getItem('theme');
-    if (!currentTheme) {
+    let currentTheme: string;
+    const config = this.configManager.Config.interface.darkFrontendMode;
+    if (config === undefined) {
       const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
       currentTheme = prefersDarkScheme.matches ? 'dark' : 'light';
+    } else {
+      currentTheme = config ? 'dark' : 'light';
     }
     this.state.interface.darkFrontendMode = currentTheme === 'dark';
   }

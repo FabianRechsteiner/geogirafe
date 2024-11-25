@@ -23,7 +23,6 @@ import LayoutComponent from './components/layout/component';
 import HelpComponent from './components/help/component';
 import MetadataWindowComponent from './components/metadatawindow/component';
 import InfoboxComponent from './components/infobox/component';
-import LanguageComponent from './components/language/component';
 import LidarPanelComponent from './components/lidar/panel/component';
 import LidarProfileComponent from './components/lidar/profile/component';
 import CrossSectionSettingsComponent from './components/cross-section/cross-section-settings/component';
@@ -49,6 +48,7 @@ import TreeViewRootComponent from './components/treeview/treeviewroot/component'
 import TreeViewItemComponent from './components/treeview/treeviewitem/component';
 import TreeViewGroupComponent from './components/treeview/treeviewgroup/component';
 import TreeViewThemeComponent from './components/treeview/treeviewtheme/component';
+import UserPreferencesComponent from './components/userpreferences/component';
 import VideoRecordComponent from './components/videorecord/component';
 import AuthManager from './tools/auth/authmanager.js';
 
@@ -127,7 +127,6 @@ try {
       customElements.define('girafe-help', HelpComponent);
       customElements.define('girafe-metadata-window', MetadataWindowComponent);
       customElements.define('girafe-infobox', InfoboxComponent);
-      customElements.define('girafe-language-select', LanguageComponent);
       customElements.define('girafe-lidar-panel', LidarPanelComponent);
       customElements.define('girafe-lidar-profile', LidarProfileComponent);
       customElements.define('girafe-cross-section-settings', CrossSectionSettingsComponent);
@@ -153,6 +152,7 @@ try {
       customElements.define('girafe-tree-view-group', TreeViewGroupComponent);
       customElements.define('girafe-tree-view-item', TreeViewItemComponent);
       customElements.define('girafe-tree-view-theme', TreeViewThemeComponent);
+      customElements.define('girafe-user-preferences', UserPreferencesComponent);
       customElements.define('girafe-video-record', VideoRecordComponent);
     });
 } finally {

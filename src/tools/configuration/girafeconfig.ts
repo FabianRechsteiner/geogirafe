@@ -11,6 +11,7 @@ class GirafeConfig {
   };
   interface: {
     defaultSelectionComponent: string;
+    darkFrontendMode: boolean | undefined;
   };
   themes: {
     url: string;
@@ -440,10 +441,12 @@ class GirafeConfig {
   }
 
   private initConfigInterface(config: GirafeConfig) {
+    const defaultConfig = {
+      defaultSelectionComponent: 'window',
+      darkFrontendMode: undefined
+    };
     return {
-      ...{
-        defaultSelectionComponent: 'window'
-      },
+      ...defaultConfig,
       ...config.interface
     };
   }

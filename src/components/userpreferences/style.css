@@ -1,0 +1,38 @@
+#content {
+    padding: 0 1rem;
+    color: var(--text-color);
+}
+
+.preference-row {
+    display: flex;
+    padding: 5px;
+}
+
+.preference-row label {
+    padding-right: 1rem;
+    width: 40%;
+}
+
+.preference-row > input,
+.preference-row > select {
+    min-width: 5rem;
+}
+
+.checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    fill: var(--text-color);
+    flex-shrink: 0;
+}
+
+#reset-all {
+    padding: 5px;
+    border-radius: 3px;
+    outline: 0;
+    border: solid 1px var(--text-color);
+    margin-left: auto;
+}
+
+#footer {
+    margin-top: 2rem;
+}

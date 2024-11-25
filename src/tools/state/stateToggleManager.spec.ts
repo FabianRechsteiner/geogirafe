@@ -21,7 +21,8 @@ describe('StateToggleManager class', () => {
     'interface.helpVisible',
     'interface.drawingPanelVisible',
     'interface.printPanelVisible',
-    'state.language'
+    'state.language',
+    'interface.userPreferencesPanelVisible'
   ];
 
   beforeAll(() => {
@@ -29,6 +30,7 @@ describe('StateToggleManager class', () => {
     state.interface.helpVisible = true;
     state.interface.drawingPanelVisible = false;
     state.interface.printPanelVisible = true;
+    state.interface.userPreferencesPanelVisible = false;
     state.language = 'fr';
     stateToggleManager = new StateToggleManager(paths, stateManager);
   });
@@ -37,6 +39,7 @@ describe('StateToggleManager class', () => {
     expect(state.interface.helpVisible).toBeTruthy();
     expect(state.interface.drawingPanelVisible).toBeFalsy();
     expect(state.interface.printPanelVisible).toBeFalsy();
+    expect(state.interface.userPreferencesPanelVisible).toBeFalsy();
     expect(state.language).toEqual('fr');
   });
 
@@ -45,6 +48,7 @@ describe('StateToggleManager class', () => {
     expect(state.interface.helpVisible).toBeFalsy();
     expect(state.interface.drawingPanelVisible).toBeTruthy();
     expect(state.interface.printPanelVisible).toBeFalsy();
+    expect(state.interface.userPreferencesPanelVisible).toBeFalsy();
   });
 
   it('deactivateAll', () => {
@@ -52,11 +56,12 @@ describe('StateToggleManager class', () => {
     expect(state.interface.helpVisible).toBeFalsy();
     expect(state.interface.drawingPanelVisible).toBeFalsy();
     expect(state.interface.printPanelVisible).toBeFalsy();
+    expect(state.interface.userPreferencesPanelVisible).toBeFalsy();
   });
 
   it('filterValidTogglePaths', () => {
     const filteredPaths = StateToggleManager.filterValidTogglePaths(stateManager, paths);
     expect(filteredPaths).not.toContain(paths[3]);
-    expect(filteredPaths.length).toEqual(3);
+    expect(filteredPaths.length).toEqual(4);
   });
 });

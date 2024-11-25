@@ -46,14 +46,18 @@ class MockHelper {
   };
 
   public static startMocking() {
+    const configManager = ConfigManager.getInstance();
     // @ts-ignore
-    ConfigManager.getInstance().config = new GirafeConfig(MockHelper.mockConfig);
+    configManager['config'] = new GirafeConfig(MockHelper.mockConfig);
+    configManager.clearUserPreferences();
     I18nManager.getInstance().translations = { fr: { a: 'translated_a', b: 'translated_b' } };
   }
 
   public static stopMocking() {
+    const configManager = ConfigManager.getInstance();
     // @ts-ignore
-    ConfigManager.getInstance().config = null;
+    configManager.config = null;
+    configManager.clearUserPreferences();
   }
 }
 

@@ -1,0 +1,54 @@
+<div id="panel">
+  <div id="content">
+    <div>
+      <div class="preference-row" hidden="${!this.preferences.language.visible}">
+        <label for="language" i18n="Language">Language</label>
+        <select id="language"
+                onchange="${(evt: Event) => this.onChangePreferenceFromEvent('language', evt)}">
+          ${this.preferences.language.options.map((option) => uHtml`
+          <option
+            i18n="${option.label}"
+            ?selected="${this.preferences.language.currentValue === option.value}"
+            value="${option.value}">
+            ${option.label}
+          </option>
+          `)}
+        </select>
+      </div>
+      
+      <div class="preference-row" hidden="${!this.preferences.projection.visible}">
+        <label for="projection" i18n="Projection">Projection</label>
+        <select id="projection"
+                onchange="${(evt: Event) => this.onChangePreferenceFromEvent('projection', evt)}">
+          ${this.preferences.projection.options.map((option) => uHtml`
+          <option
+            i18n="${option.label}"
+            ?selected="${this.preferences.projection.currentValue === option.value}"
+            value="${option.value}">
+            ${option.label}
+          </option>
+          `)}
+        </select>
+      </div>
+
+      <div class="preference-row" hidden="${!this.preferences.darkFrontendMode.visible}">
+        <label for="darkFrontendMode" i18n="Dark mode">Dark mode</label>
+        <button
+          class="gg-button checkbox" id="darkFrontendMode"
+          onclick="${() => this.changePreference('darkFrontendMode', !this.preferences.darkFrontendMode.currentValue)}">
+          ${this.htmlUnsafe(this.preferences.darkFrontendMode.currentValue ? this.checkedIcon : this.noCheckedIcon)}
+        </button>
+      </div>
+    
+
+    </div>
+    
+    <div id="footer">
+      <button id="reset-all"
+              class="gg-button gg-medium-withtext"
+              tip="Reset all preferences back to the default value"
+              i18n="Reset All"
+              onclick="${() => this.onResetAll()}">Reset All</button>
+    </div>
+  </div>
+</div>

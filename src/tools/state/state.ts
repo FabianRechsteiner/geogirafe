@@ -18,6 +18,7 @@ type GraphicalInterface = {
   selectionComponentVisible: boolean;
   selectionComponent: string;
   aboutVisible: boolean;
+  userPreferencesPanelVisible: boolean;
   metadataVisible: boolean;
   shareVisible: boolean;
   darkMapMode: boolean;
@@ -137,6 +138,7 @@ export default class State {
     selectionComponentVisible: false,
     selectionComponent: '',
     aboutVisible: false,
+    userPreferencesPanelVisible: false,
     metadataVisible: false,
     shareVisible: false,
     darkMapMode: false,
