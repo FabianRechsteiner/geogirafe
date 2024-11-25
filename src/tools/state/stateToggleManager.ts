@@ -1,6 +1,7 @@
-import type { Callback } from '../state/statemanager';
+import type { Callback } from './statemanager';
 import State from '../state/state';
 import StateManager from '../state/statemanager';
+import { getPropertyByPath, setPropertyByPath } from '../utils/pathUtils';
 
 /**
  * Manages the toggling of state properties based on specified paths.
@@ -39,9 +40,9 @@ export default class StateToggleManager {
     this.togglePaths
       .filter((path) => path !== setPath)
       .forEach((path) => {
-        this.stateManager.setPropertyByPath(this.state, path, false);
+        setPropertyByPath(this.state, path, false);
       });
-    this.stateManager.setPropertyByPath(this.state, setPath, newValue);
+    setPropertyByPath(this.state, setPath, newValue);
   }
 
   /**
@@ -59,9 +60,9 @@ export default class StateToggleManager {
   private initToggle() {
     let oneActive = false;
     this.togglePaths.forEach((path) => {
-      const result = this.stateManager.getPropertyByPath(this.state, path);
+      const result = getPropertyByPath(this.state, path);
       if (oneActive) {
-        this.stateManager.setPropertyByPath(this.state, path, false);
+        setPropertyByPath(this.state, path, false);
       }
       if (result.object === true) {
         oneActive = true;
@@ -96,7 +97,7 @@ export default class StateToggleManager {
    */
   static filterValidTogglePaths(stateManager: StateManager, paths: string[]): string[] {
     return paths.filter((path) => {
-      const result = stateManager.getPropertyByPath(stateManager.state, path);
+      const result = getPropertyByPath(stateManager.state, path);
       if (result.found && (result.object === true || result.object === false)) {
         return true;
       }

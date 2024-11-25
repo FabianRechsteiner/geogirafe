@@ -1,14 +1,19 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 import GirafeConfig from './girafeconfig';
+import { getPropertyByPath, setPropertyByPath, createObjectFromPath } from '../utils/pathUtils';
 
 class ConfigManager extends GirafeSingleton {
   private config: GirafeConfig | null = null;
+  // Config before applying user preferences
+  private defaultConfig: GirafeConfig | null = null;
   private loadingPromise: Promise<GirafeConfig> | null = null;
+  private readonly userPreferencesStorageKey: string = 'userPreferences';
 
   // TODO REG: With multiple interface (not only desktop and mobile)
   // We have to find another solution here.
   // Perhaps something more generic where we can pass a list of interfaces
   private isMobile: boolean = false;
+
   public initMobile() {
     this.isMobile = true;
   }
@@ -43,6 +48,11 @@ class ConfigManager extends GirafeSingleton {
           console.warn('No configuration found for mobile. Defaulting to desktop configuration.');
         }
       }
+      // Create a backup of the default config before applying custom user preferences
+      this.defaultConfig = new GirafeConfig(structuredClone(jsonConfig));
+
+      const userPreferences = this.loadUserPreferences();
+      jsonConfig = this.mergeConfigs(jsonConfig, userPreferences);
 
       this.config = new GirafeConfig(jsonConfig);
       console.log('Application Configuration loaded.');
@@ -66,6 +76,44 @@ class ConfigManager extends GirafeSingleton {
       }
     }
     return obj1;
+  }
+
+  /**
+   * Get the original config value from the config files(s) before any custom user preferences were applied
+   */
+  public getDefaultConfigValue(path: string): unknown {
+    const result = getPropertyByPath(this.defaultConfig, path);
+    if (result.found && result.parentObject && result.lastKey) {
+      return result.parentObject[result.lastKey];
+    }
+  }
+
+  /**
+   * Load user preferences from the local browser storage.
+   * @returns the user preference object containing all custom settings.
+   */
+  private loadUserPreferences(): Record<string, unknown> {
+    const userPreferences = localStorage.getItem(this.userPreferencesStorageKey);
+    return userPreferences ? JSON.parse(userPreferences) : {};
+  }
+
+  /**
+   * Saves user preferences to the local storage.
+   */
+  public saveUserPreference(path: string, newValue: unknown): void {
+    const updatedPreference: Record<string, unknown> = createObjectFromPath(path);
+    if (setPropertyByPath(updatedPreference, path, newValue)) {
+      const currentUserPreferences = this.loadUserPreferences() ?? {};
+      const updatedUserPreferences = this.mergeConfigs(currentUserPreferences, updatedPreference);
+      localStorage.setItem(this.userPreferencesStorageKey, JSON.stringify(updatedUserPreferences));
+    }
+  }
+
+  /**
+   * Delete all custom user preferences in the local storage
+   */
+  public clearUserPreferences(): void {
+    localStorage.removeItem(this.userPreferencesStorageKey);
   }
 }
 

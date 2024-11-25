@@ -191,6 +191,13 @@
     "after": "after",
     "between": "between",
     "is blank": "is blank",
-    "is not blank": "is not blank"
+    "is not blank": "is not blank",
+    "user-preferences-panel": "User preferences",
+    "Language": "Language",
+    "Projection": "Projection",
+    "Reset All": "Reset All",
+    "Dark mode": "Dark mode",
+    "Reset all preferences back to the default value": "Reset all preferences back to the default value",
+    "Reset user preferences back to default values?": "Reset user preferences back to default values?"
   }
 }

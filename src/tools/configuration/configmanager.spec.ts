@@ -1,11 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import ConfigManager from './configmanager';
 import GirafeConfig from './girafeconfig';
 import MockHelper from '../tests/mockhelper';
 import TestHelper from '../tests/testhelper';
 
+afterAll(() => {
+  ConfigManager.getInstance().clearUserPreferences();
+});
+
 describe('ConfigManager.loadConfig', () => {
   const manager = ConfigManager.getInstance();
+  manager.clearUserPreferences();
+
 
   it('should return config if config is already loaded', async () => {
     // @ts-ignore
@@ -39,7 +45,7 @@ describe('ConfigManager.loadConfig', () => {
     });
   });
 
-  it('the overriden configuration entries should be present in the final configuration', async () => {
+  it('the overridden configuration entries should be present in the final configuration', async () => {
     const myConfig = { ...MockHelper.mockConfig };
     myConfig.themes.url = 'https://www.my-custom-themes-url.reg';
     myConfig.map.srid = 'EPSG:2222';
@@ -60,6 +66,15 @@ describe('ConfigManager.loadConfig', () => {
     manager.config = new GirafeConfig(myConfig);
     manager.loadConfig().then((config) => {
       expect(TestHelper.obj2ContainsObj1PropertiesValues(myConfig, config)).toBeTruthy();
+    });
+  });
+
+  it('should ignore invalid keys in user preferences when loading the config', () => {
+    const invalidKey = 'thisIsAnInvalidKey';
+    const invalidPath = 'basemaps.' + invalidKey;
+    manager.saveUserPreference(invalidPath, 'someValue');
+    manager.loadConfig().then((config) => {
+      expect(Object.keys(config.basemaps)).not.include(invalidKey);
     });
   });
 });
@@ -105,5 +120,23 @@ describe('ConfigManager.mergeConfigs', () => {
     // @ts-ignore
     const result = manager.mergeConfigs(obj1, obj2);
     expect(result).toEqual({ a: { b: { c: 1 }, d: 2 } });
+  });
+});
+
+describe('ConfigManager.saveUserPreference', () => {
+  const manager = ConfigManager.getInstance();
+
+  beforeEach(() => {
+    manager.clearUserPreferences();
+  });
+
+  it('should save user preferences by providing a path and value', () => {
+    const path = 'basemaps.defaultBasemap';
+    const newValue = Math.random().toFixed(4).toString();
+    manager.saveUserPreference(path, newValue);
+    const savedPreferences = manager['loadUserPreferences']();
+    expect(savedPreferences).not.toBeNull();
+    // @ts-ignore
+    expect(savedPreferences.basemaps.defaultBasemap).toBe(newValue);
   });
 });

@@ -191,6 +191,13 @@
     "after": "après",
     "between": "entre",
     "is blank": "est vide",
-    "is not blank": "n'est pas vide"
+    "is not blank": "n'est pas vide",
+    "user-preferences-panel": "Paramètres utilisateur",
+    "Language": "Langue",
+    "Projection": "Projection",
+    "Reset All": "Réinitialiser tout",
+    "Dark mode": "Mode sombre",
+    "Reset all preferences back to the default value": "Réinitialiser tous les paramètres à la valeur par défaut",
+    "Reset user preferences back to default values?": "Réinitialiser tous les paramètres à la valeur par défaut?"
   }
 }
