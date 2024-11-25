@@ -51,7 +51,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   domainLinestringSource!: VectorSource<Feature<Geometry>>;
   domainLineStringLayer!: VectorLayer<VectorSource<Feature<Geometry>>>;
   polygon!: Feature<Polygon>;
-  polygonSource!: VectorSource<Feature<Polygon>>;
+  polygonSource!: VectorSource<Feature<Geometry>>;
   polygonLayer!: VectorLayer<VectorSource<Feature<Geometry>>>;
   pointer!: Feature<Point>;
   pointerSource!: VectorSource<Feature<Geometry>>;
@@ -164,7 +164,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       geometry: new LineString([])
     });
 
-    this.domainLinestringSource = new VectorSource({ features: [] });
+    this.domainLinestringSource = new VectorSource<Feature<Geometry>>({ features: [] });
 
     this.domainLineStringLayer = new VectorLayer({
       source: this.domainLinestringSource,
@@ -187,7 +187,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       geometry: new Polygon([])
     });
 
-    this.polygonSource = new VectorSource({ features: [] });
+    this.polygonSource = new VectorSource<Feature<Geometry>>({ features: [] });
 
     this.polygonLayer = new VectorLayer({
       source: this.polygonSource,
@@ -211,7 +211,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       style: this.iconStyle
     });
 
-    this.pointerSource = new VectorSource({
+    this.pointerSource = new VectorSource<Feature<Geometry>>({
       features: [],
       wrapX: false
     });
@@ -231,7 +231,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   private initializePointsLayer(): void {
     this.points = [];
 
-    this.pointsSource = new VectorSource({
+    this.pointsSource = new VectorSource<Feature<Geometry>>({
       features: this.points,
       wrapX: false
     });
