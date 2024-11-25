@@ -6710,9 +6710,6 @@ ul.u-text li:last-child {
   text-align: center;
   padding: 1em;
 }
-.u-backlink a:first-letter {
-  text-transform: capitalize;
-}
 .u-backlink a,
 .u-backlink p {
   display: inline-block;
