@@ -5,7 +5,7 @@ import WMTSTileGrid from 'ol/tilegrid/WMTS';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
-import { Point } from 'ol/geom';
+import { Geometry, Point } from 'ol/geom';
 import { Fill, Stroke, Style, Text, Circle } from 'ol/style';
 import { StyleLike } from 'ol/style/Style';
 
@@ -45,7 +45,7 @@ export const createOlVectorLayer = (): VectorLayer<VectorSource> => {
     properties: {
       name: 'Test Vector layer'
     },
-    source: new VectorSource({
+    source: new VectorSource<Feature<Geometry>>({
       features
     })
   });
