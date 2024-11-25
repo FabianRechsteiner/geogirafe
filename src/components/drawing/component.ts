@@ -5,7 +5,7 @@ import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
 
 import { KML, GeoJSON, GPX } from 'ol/format';
-import { Polygon } from 'ol/geom';
+import { Polygon, Geometry } from 'ol/geom';
 import Feature from 'ol/Feature';
 import { Coordinate } from 'ol/coordinate';
 
@@ -283,7 +283,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
       features.forEach((f) => {
         // TODO Handle the case of disks
         f.geojson = geoJson.writeFeatureObject(
-          geoJson.readFeature(f.geojson, { dataProjection: oldProj, featureProjection: newProj })
+          geoJson.readFeature(f.geojson, { dataProjection: oldProj, featureProjection: newProj }) as Feature<Geometry>
         );
       });
       // Refresh all the listeners

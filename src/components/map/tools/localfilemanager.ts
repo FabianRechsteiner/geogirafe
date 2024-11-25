@@ -36,6 +36,7 @@ class LocalFileManager {
 
   createInteraction() {
     const dragAndDropInteraction = new DragAndDrop({
+      // @ts-expect-error ol Format types
       formatConstructors: [GPX, GeoJSON, IGC, new KML({ extractStyles: true }), TopoJSON]
     });
     dragAndDropInteraction.on('addfeatures', (e) => {
@@ -49,7 +50,7 @@ class LocalFileManager {
       if (e.features && e.features.length > acceptableFeatures.features.length) {
         // Some features are outer extent
         layer.hasError = true;
-        layer.errorMessage = `Only ${acceptableFeatures.features.length} features among ${e.features.length} could be loaded. 
+        layer.errorMessage = `Only ${acceptableFeatures.features.length} features among ${e.features.length} could be loaded.
         Verify that those features can be displayed within the maximal extent configured in your application.`;
       }
 
