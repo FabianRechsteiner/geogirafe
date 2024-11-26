@@ -192,7 +192,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   deserialize(serializedFeatures: SerializedFeature[]) {
-    serializedFeatures.forEach((f) => this.drawingState.features.push(DrawingFeature.deserialize(f)));
+    const df: DrawingFeature[] = [];
+    serializedFeatures.forEach((f) => df.push(DrawingFeature.deserialize(f)));
+    this.drawingState.features = df;
   }
 
   setTool(tool: DrawingShape | null = null) {
@@ -255,10 +257,12 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const added = newFeatures.filter((f) => !oldIds.includes(f.id));
 
     if (added.length > 0) {
-      // Update the current selection: no selection if in batch mode, otherwise only include the newly created feature(s)
+      // Update the current selection: no selection if in batch mode or if component isn't visible (e.g. if features
+      // are added via share link), otherwise only include the newly created feature(s)
       this.drawingState.features.forEach(
         (feature: DrawingFeature) =>
-          (feature.selected = this.batchCreateMode ? false : added.map((f) => f.id).includes(feature.id))
+          (feature.selected =
+            this.batchCreateMode || !this.visible ? false : added.map((f) => f.id).includes(feature.id))
       );
     }
     // Update drawing source
