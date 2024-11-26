@@ -194,6 +194,9 @@ export default class OlDrawing {
       feature.onChange = (df: DrawingFeature) => olFeature.setStyle((f) => this.getStyle(df, f as Feature<Geometry>));
       feature.onChange(feature);
     });
+
+    // Refresh the snap interaction
+    this.addSnapInteraction();
   }
 
   deleteFeatures(features: DrawingFeature[]) {
