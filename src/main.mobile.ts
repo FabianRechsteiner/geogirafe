@@ -10,7 +10,7 @@ import LogManager from './tools/logging/logmanager.js';
 import OfflineManager from './tools/offline/offlinemanager';
 import ShareManager from './tools/share/sharemanager';
 import StateManager from './tools/state/statemanager';
-import ThemesManager from './tools/themesmanager';
+import ThemesManager from './tools/themes/themesmanager';
 import WfsManager from './tools/wfs/wfsmanager.js';
 
 import MapComponent from './components/map/component';

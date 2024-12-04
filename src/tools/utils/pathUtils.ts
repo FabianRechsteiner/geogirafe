@@ -51,3 +51,26 @@ export const createObjectFromPath = (path: string) => {
 
   return resultObject;
 };
+
+/**
+ * Deletes a property in an object and all its predecessors, if they otherwise would be empty objects.
+ */
+export const deletePropertyByPath = (obj: any, path: string) => {
+  const result = getPropertyByPath(obj, path);
+  if (result.found && result.parentObject && result.lastKey) {
+    // Property exists, delete it
+    delete result.parentObject[result.lastKey];
+  } else if (!result.found && result.parentObject && result.lastKey) {
+    // Predecessor exits, delete it if it does not contain any other properties
+    if (Object.keys(result.parentObject[result.lastKey]).length === 0) {
+      delete result.parentObject[result.lastKey];
+    } else {
+      // This predecessor contains additional properties, no more predecessor cna be removed
+      return;
+    }
+  } else {
+    // Function arrived at root level of object
+    return;
+  }
+  deletePropertyByPath(obj, path);
+};

@@ -34,6 +34,7 @@ export class FocusFeature {
   }
 
   setFocusedFeatures(features: Feature[] | null) {
+    this.setFocusLayerStyle();
     this.flash(features);
   }
 

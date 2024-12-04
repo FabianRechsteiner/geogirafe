@@ -1,31 +1,33 @@
 import { v4 as uuidv4 } from 'uuid';
-import GirafeSingleton from '../base/GirafeSingleton';
-import Basemap from '../models/basemap';
-import Layer from '../models/layers/layer';
-import { GMFBackgroundLayer, GMFServerOgc, GMFTheme, GMFTreeItem } from '../models/gmf';
-import ConfigManager from './configuration/configmanager';
-import StateManager from './state/statemanager';
-import GroupLayer from '../models/layers/grouplayer';
-import BaseLayer from '../models/layers/baselayer';
-import LayerOsm from '../models/layers/layerosm';
-import LayerVectorTiles from '../models/layers/layervectortiles';
-import LayerWmts from '../models/layers/layerwmts';
-import LayerWms from '../models/layers/layerwms';
-import LayerManager from './layermanager';
-import ShareManager from './share/sharemanager';
-import LayerConsts from '../models/layers/layerconsts';
-import LayerCog from '../models/layers/layercog';
-import LayerXYZ from '../models/layers/layerxyz';
-import ServerOgc from '../models/serverogc';
-import ThemeLayer from '../models/layers/themelayer';
-import WfsManager from './wfs/wfsmanager';
-import AuthHelper from './auth/authhelper';
+import GirafeSingleton from '../../base/GirafeSingleton';
+import Basemap from '../../models/basemap';
+import Layer from '../../models/layers/layer';
+import { GMFBackgroundLayer, GMFServerOgc, GMFTheme, GMFTreeItem } from '../../models/gmf';
+import ConfigManager from '../configuration/configmanager';
+import StateManager from '../state/statemanager';
+import GroupLayer from '../../models/layers/grouplayer';
+import BaseLayer from '../../models/layers/baselayer';
+import LayerOsm from '../../models/layers/layerosm';
+import LayerVectorTiles from '../../models/layers/layervectortiles';
+import LayerWmts from '../../models/layers/layerwmts';
+import LayerWms from '../../models/layers/layerwms';
+import LayerManager from '../layermanager';
+import ShareManager from '../share/sharemanager';
+import LayerConsts from '../../models/layers/layerconsts';
+import LayerCog from '../../models/layers/layercog';
+import LayerXYZ from '../../models/layers/layerxyz';
+import ServerOgc from '../../models/serverogc';
+import ThemeLayer from '../../models/layers/themelayer';
+import WfsManager from '../wfs/wfsmanager';
+import AuthHelper from '../auth/authhelper';
+import CustomThemesManager from './customthemesmanager';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
   layerManager: LayerManager;
   shareManager: ShareManager;
+  customThemesManager: CustomThemesManager;
 
   get state() {
     return this.stateManager.state;
@@ -38,6 +40,7 @@ class ThemesManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
     this.layerManager = LayerManager.getInstance();
     this.shareManager = ShareManager.getInstance();
+    this.customThemesManager = CustomThemesManager.getInstance();
 
     this.stateManager.subscribe(
       'themes.lastSelectedTheme',
@@ -73,6 +76,7 @@ class ThemesManager extends GirafeSingleton {
       this.state.basemaps = this.prepareBasemaps(content['background_layers']);
     }
     this.state.themes._allThemes = this.prepareThemes(content['themes']);
+    this.customThemesManager.loadCustomThemes();
     this.state.themes.isLoaded = true;
 
     if (this.configManager.Config.themes.showErrorsOnStart) {
@@ -91,7 +95,10 @@ class ThemesManager extends GirafeSingleton {
   setDefaultTheme() {
     // Set default theme if any
     if (!this.isNullOrUndefinedOrBlank(this.configManager.Config.themes.defaultTheme)) {
-      const themes = Object.values(this.state.themes._allThemes);
+      const themes = [
+        ...Object.values(this.state.themes._allThemes),
+        ...Object.values(this.customThemesManager.customThemes.map((ct) => ct.getThemeLayer()))
+      ];
       const defaultTheme = themes.find((t) => t.name === this.configManager.Config.themes.defaultTheme);
       if (defaultTheme) {
         this.state.themes.lastSelectedTheme = defaultTheme;
@@ -307,10 +314,10 @@ class ThemesManager extends GirafeSingleton {
 
     // Create a clone of the theme object to use it in the treeview.
     // This is essential, otherwise all changes done in the layers
-    // (For exemple when expanding legend, expanding a group, or activating the layer)
+    // (For example when expanding legend, expanding a group, or activating the layer)
     // Will also be done in the default layer configuration that has been loaded from themes.json
-    // And when a theme will be selected agin from the themes-selector
-    // The default configuration will have been overriden.
+    // And when a theme will be selected aging from the themes-selector
+    // The default configuration will have been overwritten.
     const clonedTheme = theme.clone();
 
     if (this.configManager.Config.themes.selectionMode === 'replace') {

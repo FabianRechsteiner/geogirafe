@@ -9,26 +9,25 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
   }
 
   registerEvents() {
-    this.subscribe('interface.darkFrontendMode', () => this.onChangeDarkFrontendMode());
+    this.subscribe('interface.darkFrontendMode', (_, newValue) => this.onChangeDarkFrontendMode(newValue));
     this.subscribe('interface.darkMapMode', () => super.refreshRender());
   }
 
-  onChangeDarkFrontendMode() {
-    const currentTheme = this.state.interface.darkFrontendMode ? 'dark' : 'light';
+  onChangeDarkFrontendMode(newValue: boolean | undefined) {
+    const themeIsDark = newValue ?? this.systemIsInDarkMode();
+    const currentTheme = themeIsDark ? 'dark' : 'light';
     this.activateTheme(currentTheme);
     super.refreshRender();
   }
 
   initValue() {
-    let currentTheme: string;
     const config = this.configManager.Config.interface.darkFrontendMode;
-    if (config === undefined) {
-      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-      currentTheme = prefersDarkScheme.matches ? 'dark' : 'light';
-    } else {
-      currentTheme = config ? 'dark' : 'light';
-    }
-    this.state.interface.darkFrontendMode = currentTheme === 'dark';
+    this.state.interface.darkFrontendMode = config ?? this.systemIsInDarkMode();
+    this.state.interface.darkMapMode = this.configManager.Config.interface.darkMapMode;
+  }
+
+  systemIsInDarkMode(): boolean {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
   activateTheme(mode: 'dark' | 'light') {

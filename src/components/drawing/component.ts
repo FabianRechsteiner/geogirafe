@@ -1,4 +1,4 @@
-import Picker, { Color } from 'vanilla-picker';
+import { Color } from 'vanilla-picker';
 import { v4 as uuidv4 } from 'uuid';
 import DrawingFeature, { DrawingState, SerializedFeature, DrawingShape } from './drawingFeature';
 import OlDrawing from './olDrawing';
@@ -13,6 +13,8 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { download } from '../../tools/export/download';
 import MapComponent from '../map/component';
 import { alternateMouseClick, ContextMenu, MenuEntry } from '../map/tools/contextmenu';
+import { formatCoordinates } from '../../tools/geometrytools';
+import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
 import checkedIcon from '../../assets/icons/checked-full.svg?raw';
 import noCheckedIcon from '../../assets/icons/checked-no.svg?raw';
@@ -20,7 +22,6 @@ import trashIcon from '../../assets/icons/trash.svg?raw';
 import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
-import { formatCoordinates } from '../../tools/geometrytools';
 
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -36,7 +37,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
   visible = false;
   renderedOnce = false;
   drawingState: DrawingState;
-  colorPickers: [any, () => string][] = [];
+  colorPickers: [GirafeColorPicker, () => string][] = [];
 
   buttons: { id: string; tool: DrawingShape | null }[] = [
     { id: 'disable', tool: null },
@@ -121,7 +122,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
         this.cesiumDrawing.setFixedLength(val);
       };
       this.getById('fixedLengthEnabled').onchange = (e) => {
-        const elements = Array.from(this.shadowRoot?.querySelectorAll('.fixedLengthElement')!);
+        const elements = Array.from(this.shadowRoot!.querySelectorAll('.fixedLengthElement'));
         const option = e.target as HTMLInputElement;
         if (!option.disabled && option.checked) {
           elements.forEach((e) => e.classList.remove('disabled'));
@@ -143,48 +144,21 @@ export default class DrawingComponent extends GirafeHTMLElement {
     // selected features do not change color immediately upon selecting them, but only after manually setting
     // the color via color picker.
     if (this.selectedFeatures.length === 1) {
-      this.colorPickers.forEach((val) => val[0].setColor(val[1]()));
+      this.colorPickers.forEach((val) => val[0].setColor(val[1](), false));
     }
     super.refreshRender();
   }
 
-  addColorPicker(id: string, set: (c: typeof Color) => any, get: () => string) {
+  addColorPicker(id: string, set: (c: Color) => unknown, get: () => string) {
     const parent = this.getById(id);
-    const picker = new Picker({ parent: parent, popup: 'top' });
-    picker.originalOpenHandler = picker.openHandler;
-    picker.openHandler = (e: PointerEvent) => this.customColorPickerOpenHandler(picker, parent, e);
-    const update = (c: typeof Color) => {
+    const picker = new GirafeColorPicker({ parent: parent, popup: 'top' }, true);
+    const update = (c: Color) => {
       set(c);
       parent.style.backgroundColor = c.hex;
     };
     picker.onChange = update;
     picker.onDone = update;
     this.colorPickers.push([picker, get]);
-  }
-
-  customColorPickerOpenHandler(picker: any, parent: HTMLElement, e: PointerEvent) {
-    /**
-     * There is a CSS limitation when using overflow :
-     * we cannot have an overflow-y scrollable and at the same time an overflow-x visible.
-     * It just doesn't work as explain here for example:
-     * https://www.reddit.com/r/css/comments/1b9jyvx/overflowy_scroll_overflowx_visible_at_same_time/
-     * But we need this in our case, because the panel must be scrollable,
-     * and the picker must stay visible when opened.
-     * To solve this, we have to display the color-picker as 'fixed' to escape
-     * the encapsulation of the parent component.
-     * This can at the moment only be done by overriding the openHandler() method
-     * of the vanilla-picker component:
-     * https://github.com/Sphinxxxx/vanilla-picker/issues/24.
-     */
-    picker.originalOpenHandler(e);
-    if (e.target === parent) {
-      picker.domElement.style.position = 'fixed';
-      const left = parent.getBoundingClientRect().left + parent.getBoundingClientRect().width;
-      const bottom =
-        window.innerHeight - (parent.getBoundingClientRect().bottom - parent.getBoundingClientRect().height);
-      picker.domElement.style.left = `${left}px`;
-      picker.domElement.style.bottom = `${bottom}px`;
-    }
   }
 
   serialize() {

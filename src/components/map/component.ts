@@ -220,42 +220,13 @@ export default class MapComponent extends GirafeHTMLElement {
         properties: {
           addToPrintedLayers: true
         },
-        source: selectionSource,
-        // TODO REG: Change default selection color
-        style: new Style({
-          stroke: new Stroke({
-            color: this.configManager.Config.selection.defaultStrokeColor,
-            width: this.configManager.Config.selection.defaultStrokeWidth
-          }),
-          fill: new Fill({ color: this.configManager.Config.selection.defaultFillColor }),
-          image: new Circle({
-            radius: 7,
-            fill: new Fill({ color: this.configManager.Config.selection.defaultFillColor }),
-            stroke: new Stroke({
-              color: this.configManager.Config.selection.defaultStrokeColor,
-              width: this.configManager.Config.selection.defaultStrokeWidth
-            })
-          })
-        })
+        source: selectionSource
       });
       this.highlightLayer = new VectorLayer({
-        source: highlightSource,
-        style: new Style({
-          stroke: new Stroke({
-            color: this.configManager.Config.selection.highlightStrokeColor,
-            width: this.configManager.Config.selection.defaultStrokeWidth
-          }),
-          fill: new Fill({ color: this.configManager.Config.selection.highlightFillColor }),
-          image: new Circle({
-            radius: 7,
-            fill: new Fill({ color: this.configManager.Config.selection.highlightFillColor }),
-            stroke: new Stroke({
-              color: this.configManager.Config.selection.highlightStrokeColor,
-              width: this.configManager.Config.selection.defaultStrokeWidth
-            })
-          })
-        })
+        source: highlightSource
       });
+      this.setSelectLayerStyle();
+      this.setHighlightLayerStyle();
       this.olMap.addLayer(this.selectionLayer);
       this.olMap.addLayer(this.highlightLayer);
       this.selectionLayer.setZIndex(1002);
@@ -396,7 +367,6 @@ export default class MapComponent extends GirafeHTMLElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      // this.changeCanvasColor();
       this.listenOpenLayersEvents();
       this.registerEvents();
     });
@@ -405,8 +375,6 @@ export default class MapComponent extends GirafeHTMLElement {
   onCustomGirafeEvent(details: { action: string; layer: Layer; extent: Extent }) {
     if (details.action === GeoEvents.zoomToExtent) {
       this.zoomToExtent(details.extent);
-    } else if (details.action === GeoEvents.undoDraw) {
-      //this.redliningManager.removeLastPoint();
     }
   }
 
@@ -425,6 +393,46 @@ export default class MapComponent extends GirafeHTMLElement {
     const percent = (sliderValue - min) / (max - min);
     const offset = percent * this.swiper.offsetWidth;
     this.closeSwiperButton.style.left = `${offset}px`;
+  }
+
+  private setSelectLayerStyle() {
+    this.selectionLayer.setStyle(
+      new Style({
+        stroke: new Stroke({
+          color: this.configManager.Config.selection.defaultStrokeColor,
+          width: this.configManager.Config.selection.defaultStrokeWidth
+        }),
+        fill: new Fill({ color: this.configManager.Config.selection.defaultFillColor }),
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({ color: this.configManager.Config.selection.defaultFillColor }),
+          stroke: new Stroke({
+            color: this.configManager.Config.selection.defaultStrokeColor,
+            width: this.configManager.Config.selection.defaultStrokeWidth
+          })
+        })
+      })
+    );
+  }
+
+  private setHighlightLayerStyle() {
+    this.highlightLayer.setStyle(
+      new Style({
+        stroke: new Stroke({
+          color: this.configManager.Config.selection.highlightStrokeColor,
+          width: this.configManager.Config.selection.defaultStrokeWidth
+        }),
+        fill: new Fill({ color: this.configManager.Config.selection.highlightFillColor }),
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({ color: this.configManager.Config.selection.highlightFillColor }),
+          stroke: new Stroke({
+            color: this.configManager.Config.selection.highlightStrokeColor,
+            width: this.configManager.Config.selection.defaultStrokeWidth
+          })
+        })
+      })
+    );
   }
 
   async create3dMap() {
@@ -605,6 +613,8 @@ export default class MapComponent extends GirafeHTMLElement {
       for (const feature of features) {
         this.selectedFeaturesCollection.push(feature);
       }
+      // Recreate the style in case user preferences have changed in the meantime
+      this.setSelectLayerStyle();
     }
   }
 
@@ -613,6 +623,8 @@ export default class MapComponent extends GirafeHTMLElement {
     for (const feature of features) {
       this.highlightedFeaturesCollection.push(feature);
     }
+    // Recreate the style in case user preferences have changed in the meantime
+    this.setHighlightLayerStyle();
   }
 
   onPositionChanged(position: MapPosition) {

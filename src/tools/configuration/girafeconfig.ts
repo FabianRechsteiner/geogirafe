@@ -1,3 +1,5 @@
+import { SharedLayer } from '../share/sharedstate';
+
 class GirafeConfig {
   general: {
     locale: string;
@@ -12,6 +14,7 @@ class GirafeConfig {
   interface: {
     defaultSelectionComponent: string;
     darkFrontendMode: boolean | undefined;
+    darkMapMode: boolean;
   };
   themes: {
     url: string;
@@ -20,6 +23,7 @@ class GirafeConfig {
     showErrorsOnStart: boolean;
     selectionMode: 'add' | 'replace';
   };
+  customthemes: Record<string, SharedLayer[]>[];
   basemaps: {
     show: boolean;
     defaultBasemap: string;
@@ -175,6 +179,7 @@ class GirafeConfig {
     this.languages = this.initConfigLanguages(config);
     this.interface = this.initConfigInterface(config);
     this.themes = this.initConfigThemes(config);
+    this.customthemes = this.initConfigCustomThemes(config);
     this.basemaps = this.initConfigBasemaps(config);
     this.treeview = this.initConfigTreeview(config);
     this.selection = this.initConfigSelection(config);
@@ -433,6 +438,10 @@ class GirafeConfig {
     };
   }
 
+  private initConfigCustomThemes(config: GirafeConfig) {
+    return config.customthemes ?? [];
+  }
+
   private initConfigLanguages(config: GirafeConfig) {
     if (!config.languages) {
       throw new Error(`Configuration for languages is required. See https://doc.geomapfish.dev/docs/configuration.`);
@@ -443,7 +452,8 @@ class GirafeConfig {
   private initConfigInterface(config: GirafeConfig) {
     const defaultConfig = {
       defaultSelectionComponent: 'window',
-      darkFrontendMode: undefined
+      darkFrontendMode: undefined,
+      darkMapMode: false
     };
     return {
       ...defaultConfig,

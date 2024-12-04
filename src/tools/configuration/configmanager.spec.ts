@@ -5,12 +5,12 @@ import MockHelper from '../tests/mockhelper';
 import TestHelper from '../tests/testhelper';
 
 afterAll(() => {
-  ConfigManager.getInstance().clearUserPreferences();
+  ConfigManager.getInstance().deleteAllUserPreferences();
 });
 
 describe('ConfigManager.loadConfig', () => {
   const manager = ConfigManager.getInstance();
-  manager.clearUserPreferences();
+  manager.deleteAllUserPreferences();
 
 
   it('should return config if config is already loaded', async () => {
@@ -127,10 +127,10 @@ describe('ConfigManager.saveUserPreference', () => {
   const manager = ConfigManager.getInstance();
 
   beforeEach(() => {
-    manager.clearUserPreferences();
+    manager.deleteAllUserPreferences();
   });
 
-  it('should save user preferences by providing a path and value', () => {
+  it('should save user preferences in storage by providing a path and simple value', () => {
     const path = 'basemaps.defaultBasemap';
     const newValue = Math.random().toFixed(4).toString();
     manager.saveUserPreference(path, newValue);
@@ -138,5 +138,42 @@ describe('ConfigManager.saveUserPreference', () => {
     expect(savedPreferences).not.toBeNull();
     // @ts-ignore
     expect(savedPreferences.basemaps.defaultBasemap).toBe(newValue);
+  });
+
+  it('should overwrite user preferences in storage by providing a path and simple value', () => {
+    const path = 'basemaps.defaultBasemap';
+    const newValue = 22;
+    manager.saveUserPreference(path, newValue);
+    const savedPreferences = manager['loadUserPreferences']();
+    // @ts-ignore
+    expect(savedPreferences.basemaps.defaultBasemap).toBe(newValue);
+
+    const updatedValue = 33;
+    manager.saveUserPreference(path, updatedValue);
+    const updatedPreferences = manager['loadUserPreferences']();
+    // @ts-ignore
+    expect(updatedPreferences.basemaps.defaultBasemap).toBe(updatedValue);
+  });
+
+  it('should overwrite user preferences in storage by providing a path and object', () => {
+    const path = 'customthemes';
+    const customThemes = { theme1: [], theme2: [{ c: 1, e: 0, i: 2345, o: 3456 }] };
+    manager.saveUserPreference(path, customThemes);
+
+    const savedPreferences = manager['loadUserPreferences']();
+    // @ts-ignore
+    expect(savedPreferences.customthemes.theme2.length).toEqual(1);
+
+    // Now update the custom themes
+    const updatedCustomThemes = { ...customThemes, theme3: [] };
+    // @ts-ignore
+    delete updatedCustomThemes['theme2'];
+    manager.saveUserPreference(path, updatedCustomThemes);
+
+    const updatedPreferences = manager['loadUserPreferences']();
+    // @ts-ignore
+    expect(updatedPreferences.customthemes.theme3.length).toEqual(0);
+    // @ts-ignore
+    expect(Object.keys(updatedPreferences.customthemes)).toEqual(['theme1', 'theme3']);
   });
 });

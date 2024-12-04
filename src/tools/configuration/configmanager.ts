@@ -1,6 +1,6 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 import GirafeConfig from './girafeconfig';
-import { getPropertyByPath, setPropertyByPath, createObjectFromPath } from '../utils/pathUtils';
+import { getPropertyByPath, setPropertyByPath, createObjectFromPath, deletePropertyByPath } from '../utils/pathUtils';
 
 class ConfigManager extends GirafeSingleton {
   private config: GirafeConfig | null = null;
@@ -101,18 +101,31 @@ class ConfigManager extends GirafeSingleton {
    * Saves user preferences to the local storage.
    */
   public saveUserPreference(path: string, newValue: unknown): void {
-    const updatedPreference: Record<string, unknown> = createObjectFromPath(path);
-    if (setPropertyByPath(updatedPreference, path, newValue)) {
-      const currentUserPreferences = this.loadUserPreferences() ?? {};
-      const updatedUserPreferences = this.mergeConfigs(currentUserPreferences, updatedPreference);
-      localStorage.setItem(this.userPreferencesStorageKey, JSON.stringify(updatedUserPreferences));
+    let userPreferences = this.loadUserPreferences() ?? {};
+    const result = getPropertyByPath(userPreferences, path);
+    if (!result.found) {
+      // User preference does not exist yet, create it
+      const newPreference: Record<string, unknown> = createObjectFromPath(path);
+      userPreferences = this.mergeConfigs(userPreferences, newPreference);
+    }
+    if (setPropertyByPath(userPreferences, path, newValue)) {
+      localStorage.setItem(this.userPreferencesStorageKey, JSON.stringify(userPreferences));
     }
   }
 
   /**
-   * Delete all custom user preferences in the local storage
+   * Delete a part of the user preferences in the local storage
    */
-  public clearUserPreferences(): void {
+  public deleteUserPreference(path: string): void {
+    const currentUserPreferences = this.loadUserPreferences() ?? {};
+    deletePropertyByPath(currentUserPreferences, path);
+    localStorage.setItem(this.userPreferencesStorageKey, JSON.stringify(currentUserPreferences));
+  }
+
+  /**
+   * DANGER: Delete all custom user preferences including custom themes in the local storage
+   */
+  public deleteAllUserPreferences(): void {
     localStorage.removeItem(this.userPreferencesStorageKey);
   }
 }

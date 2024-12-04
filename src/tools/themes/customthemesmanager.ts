@@ -1,13 +1,22 @@
-import BaseLayer from '../../../models/layers/baselayer';
-import GroupLayer from '../../../models/layers/grouplayer';
-import Layer from '../../../models/layers/layer';
-import ThemeLayer from '../../../models/layers/themelayer';
-import { SharedLayer } from '../../../tools/share/sharedstate';
-import StateDeserializer from '../../../tools/share/statedeserializer';
-import CustomTheme from './customtheme';
+import GirafeSingleton from '../../base/GirafeSingleton';
+import ConfigManager from '../configuration/configmanager';
+import BaseLayer from '../../models/layers/baselayer';
+import GroupLayer from '../../models/layers/grouplayer';
+import Layer from '../../models/layers/layer';
+import ThemeLayer from '../../models/layers/themelayer';
+import { SharedLayer } from '../share/sharedstate';
+import StateDeserializer from '../share/statedeserializer';
+import CustomTheme from '../../models/customtheme';
 
-class CustomThemesManager {
-  public customThemes: CustomTheme[] = [];
+class CustomThemesManager extends GirafeSingleton {
+  configManager: ConfigManager;
+  customThemes: CustomTheme[] = [];
+  private readonly configPath: string = 'customthemes';
+
+  constructor(type: string) {
+    super(type);
+    this.configManager = ConfigManager.getInstance();
+  }
 
   public addTheme(themeName: string, layersList: BaseLayer[]) {
     const theme = new CustomTheme(themeName);
@@ -47,30 +56,30 @@ class CustomThemesManager {
     }
   }
 
-  saveCustomThemes() {
-    const serializedobject: Record<string, SharedLayer[]> = {};
+  private saveCustomThemes() {
+    const serializedObject: Record<string, SharedLayer[]> = {};
     for (const customTheme of this.customThemes) {
-      serializedobject[customTheme.name] = customTheme.getSerialized();
+      serializedObject[customTheme.name] = customTheme.getSerialized();
     }
-    localStorage.setItem('custom-themes', JSON.stringify(serializedobject));
+    this.configManager.saveUserPreference(this.configPath, serializedObject);
   }
 
   public loadCustomThemes() {
-    try {
-      const localThemes = localStorage.getItem('custom-themes');
-      if (localThemes) {
-        const serializedCustomThemes = JSON.parse(localThemes);
-        for (const customThemeName in serializedCustomThemes) {
+    const config = this.configManager?.Config;
+    if (config) {
+      try {
+        for (const customThemeName in config.customthemes) {
           const customTheme = new CustomTheme(customThemeName);
-          const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedCustomThemes[customThemeName]);
+          const serializedLayerTree = config.customthemes[customThemeName] as unknown as SharedLayer[];
+          const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedLayerTree);
           customTheme.layers.push(...layerTree);
           this.customThemes.push(customTheme);
         }
+      } catch (error) {
+        console.warn('Cannot deserialize custom themes from local storage');
+        console.warn(error);
+        // Do not throw the error, the themes selector can still be used
       }
-    } catch (error) {
-      console.warn('Cannot deserialize custom themes from local storage');
-      console.warn(error);
-      // Do not throw the error, the themes selector can still be used
     }
   }
 }

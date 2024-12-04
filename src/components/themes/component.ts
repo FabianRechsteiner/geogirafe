@@ -2,8 +2,8 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ThemeLayer from '../../models/layers/themelayer';
 import MapManager from '../../tools/state/mapManager';
 import NewIcon from './images/new.svg';
-import CustomTheme from './tools/customtheme';
-import CustomThemesManager from './tools/customthemesmanager';
+import CustomTheme from '../../models/customtheme';
+import CustomThemesManager from '../../tools/themes/customthemesmanager';
 
 class ThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -12,24 +12,24 @@ class ThemeComponent extends GirafeHTMLElement {
   newIcon: string = NewIcon;
 
   private readonly mapManager: MapManager;
-  private readonly customThemesManager = new CustomThemesManager();
+  private readonly customThemesManager: CustomThemesManager;
   public menuOpen: boolean = false;
   public openedOnce: boolean = false;
 
   public get customThemes() {
-    return this.customThemesManager?.customThemes ?? [];
+    return this.customThemesManager.customThemes;
   }
 
   constructor() {
     super('themes');
     this.mapManager = MapManager.getInstance();
+    this.customThemesManager = CustomThemesManager.getInstance();
   }
 
   registerEvents() {
     this.subscribe('loading', () => super.render());
     this.subscribe('themes.isLoaded', () => {
       if (this.state.themes.isLoaded) {
-        this.customThemesManager.loadCustomThemes();
         super.render();
         super.girafeTranslate();
       }
