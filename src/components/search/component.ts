@@ -7,7 +7,8 @@ import { Geometry, LineString, MultiLineString, MultiPolygon, Point, MultiPoint,
 import { Style, Icon, Stroke, Fill } from 'ol/style';
 import { buffer, getWidth, getHeight, getCenter, containsExtent, Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate';
-import Picker from 'vanilla-picker';
+import { Color } from 'vanilla-picker';
+import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
 import PinIcon from './images/pin.svg';
 import LayerIcon from './images/layer.svg';
@@ -17,7 +18,7 @@ import PaintbrushIcon from './images/paintbrush.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SearchResult, { type GeometryResult, GeometryCollectionResult } from '../../models/searchresult';
-import ThemesManager from '../../tools/themesmanager';
+import ThemesManager from '../../tools/themes/themesmanager';
 import MapManager from '../../tools/state/mapManager';
 import Layer from '../../models/layers/layer';
 import LayerManager from '../../tools/layermanager';
@@ -54,7 +55,8 @@ class SearchComponent extends GirafeHTMLElement {
   private searchBox?: HTMLInputElement;
 
   public paintSearchResults?: boolean;
-  public defaultSearchStrokeColor?: string;
+  public defaultSearchStrokeColor: string;
+  public defaultSearchFillColor: string;
 
   private abortController = new AbortController();
 
@@ -63,41 +65,30 @@ class SearchComponent extends GirafeHTMLElement {
     this.themeManager = ThemesManager.getInstance();
     this.layerManager = LayerManager.getInstance();
     this.map = MapManager.getInstance().getMap();
+
+    this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor as string;
+    this.defaultSearchFillColor = this.configManager.Config.search.defaultFillColor as string;
     this.createPreviewLayer();
   }
 
   private createPreviewLayer() {
     this.configManager.loadConfig().then(() => {
       this.paintSearchResults = this.configManager.Config.search.paintSearchResults;
-      this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor;
       this.maxExtent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
 
-      this.initColorPicker();
-      const previewStyle = new Style({
-        stroke: new Stroke({
-          color: this.configManager.Config.search.defaultStrokeColor,
-          width: this.configManager.Config.search.defaultStrokeWidth
-        }),
-        fill: new Fill({ color: this.configManager.Config.search.defaultFillColor }),
-        image: new Icon({
-          anchor: [0.5, 1],
-          anchorXUnits: 'fraction',
-          anchorYUnits: 'fraction',
-          src: this.getColoredPinIcon(this.configManager.Config.search.defaultStrokeColor as string),
-          scale: 0.3
-        })
-      });
       this.previewGeoLayer = new VectorLayer({
         properties: {
           addToPrintedLayers: true
         },
         source: new VectorSource({
           features: this.previewFeaturesCollection
-        }),
-        style: previewStyle
+        })
       });
+      this.updatePreviewLayerStyle(this.defaultSearchFillColor, this.defaultSearchStrokeColor);
       this.map.addLayer(this.previewGeoLayer);
       this.previewGeoLayer.setZIndex(1010);
+
+      this.initColorPicker();
     });
   }
 
@@ -298,6 +289,7 @@ class SearchComponent extends GirafeHTMLElement {
       // Result with geometry
       if (result.geometry) {
         this.addFeatureToPreview(result.geometry);
+        this.updatePreviewLayerStyle();
       }
     } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
@@ -493,32 +485,51 @@ class SearchComponent extends GirafeHTMLElement {
     super.render();
     const colorPicker = this.shadowRoot?.getElementById('colorPickerBtn');
     if (colorPicker) {
-      const fillPicker = new Picker({
+      const fillPicker = new GirafeColorPicker({
         parent: colorPicker,
         color: this.configManager.Config.search.defaultStrokeColor,
         popup: 'right'
       });
-      fillPicker.onChange = (color: Picker.Color) => {
+      fillPicker.onChange = (color: Color) => {
         // The fill color should be the selected color with a bit more transparency
         const fillColor = [color.rgba[0], color.rgba[1], color.rgba[2], color.rgba[3] / 2];
-        this.previewGeoLayer?.setStyle(
-          new Style({
-            stroke: new Stroke({
-              color: color.hex,
-              width: this.configManager.Config.search.defaultStrokeWidth
-            }),
-            fill: new Fill({ color: fillColor }),
-            image: new Icon({
-              anchor: [0.5, 1],
-              anchorXUnits: 'fraction',
-              anchorYUnits: 'fraction',
-              src: this.getColoredPinIcon(color.hex),
-              scale: 0.3
-            })
-          })
-        );
+        this.updatePreviewLayerStyle(fillColor, color.hex);
       };
     }
+  }
+
+  private updatePreviewLayerStyle(fillColor?: string | number[], strokeColor?: string) {
+    // Only update style if new colors were provided via color picker or default colors have changed
+    if (this.defaultColorHasChanged()) {
+      this.defaultSearchFillColor = this.configManager.Config.search.defaultFillColor as string;
+      this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor as string;
+    }
+    fillColor ??= this.defaultSearchFillColor;
+    strokeColor ??= this.defaultSearchStrokeColor;
+
+    this.previewGeoLayer!.setStyle(
+      new Style({
+        stroke: new Stroke({
+          color: strokeColor,
+          width: this.configManager.Config.search.defaultStrokeWidth
+        }),
+        fill: new Fill({ color: fillColor }),
+        image: new Icon({
+          anchor: [0.5, 1],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'fraction',
+          src: this.getColoredPinIcon(strokeColor),
+          scale: 0.3
+        })
+      })
+    );
+  }
+
+  private defaultColorHasChanged(): boolean {
+    return (
+      this.defaultSearchFillColor !== this.configManager.Config.search.defaultFillColor ||
+      this.defaultSearchStrokeColor !== this.configManager.Config.search.defaultStrokeColor
+    );
   }
 
   private getColoredPinIcon(hexColor: string) {

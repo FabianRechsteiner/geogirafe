@@ -103,6 +103,7 @@ A big thank to all the contributors of GeoGirafe, in alphabetical order:
 - Matthew Parkan @matthew.parkan (SITN Neuchâtel)
 - Michael Müller @michmuel (Geoinformation Basel-Landschaft)
 - Olivier Monod @monodo (Yverdon-les-bains)
+- Patricia Moll @piMoll (OpenGIS)
 - Pauline Fanguin @pfanguin (Cartolacote)
 - Rémi Bovard @rbovard (Cartoriviera)
 - Ruth Albrecht (Geoinformation Basel-Landschaft)

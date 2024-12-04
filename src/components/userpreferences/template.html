@@ -1,47 +1,61 @@
+<link rel="stylesheet" href="lib/vanilla-picker/vanilla-picker.csp.css" />
+<link rel="stylesheet" href="src/styles/girafecolorpicker.css" />
+
 <div id="panel">
   <div id="content">
-    <div>
-      <div class="preference-row" hidden="${!this.preferences.language.visible}">
-        <label for="language" i18n="Language">Language</label>
-        <select id="language"
-                onchange="${(evt: Event) => this.onChangePreferenceFromEvent('language', evt)}">
-          ${this.preferences.language.options.map((option) => uHtml`
-          <option
-            i18n="${option.label}"
-            ?selected="${this.preferences.language.currentValue === option.value}"
-            value="${option.value}">
-            ${option.label}
-          </option>
-          `)}
-        </select>
-      </div>
-      
-      <div class="preference-row" hidden="${!this.preferences.projection.visible}">
-        <label for="projection" i18n="Projection">Projection</label>
-        <select id="projection"
-                onchange="${(evt: Event) => this.onChangePreferenceFromEvent('projection', evt)}">
-          ${this.preferences.projection.options.map((option) => uHtml`
-          <option
-            i18n="${option.label}"
-            ?selected="${this.preferences.projection.currentValue === option.value}"
-            value="${option.value}">
-            ${option.label}
-          </option>
-          `)}
-        </select>
-      </div>
 
-      <div class="preference-row" hidden="${!this.preferences.darkFrontendMode.visible}">
-        <label for="darkFrontendMode" i18n="Dark mode">Dark mode</label>
+    ${this.preferenceGroups.map(group => uHtml`
+    
+    <div class="preference-group">
+      <div class="preference-group-title" i18n="${group}">${group}</div>
+
+      ${this.getPreferencesByGroup(group).map(([preference, key]) => uHtmlFor(preference, key)`
+      
+        ${preference.uiElement === 'select' ? uHtml`
+      
+        <div class="preference-row" hidden="${!preference.visible}">
+          
+          <label for="${key}" i18n="${key}">${key}</label>
+          <select id="${key}"
+                  onchange="${(evt: Event) => this.onSelectOption(key, evt)}"
+                  onmousedown="${() => this.onOpenSelectOption(key)}">
+            ${preference.options.map(option => uHtml`
+            <option
+              i18n="${option.label}"
+              ?selected="${preference.currentValue === option.value}"
+              value="${option.label}">
+              ${option.label}
+            </option>
+            `)}
+          </select>
+        </div>
+      ` : uHtml``}
+      
+      ${preference.uiElement === 'checkbox' ? uHtml`
+
+      <div class="preference-row with-checkbox" hidden="${!preference.visible}">
+        <label for="${key}" i18n="${key}">${key}</label>
         <button
-          class="gg-button checkbox" id="darkFrontendMode"
-          onclick="${() => this.changePreference('darkFrontendMode', !this.preferences.darkFrontendMode.currentValue)}">
-          ${this.htmlUnsafe(this.preferences.darkFrontendMode.currentValue ? this.checkedIcon : this.noCheckedIcon)}
+          class="gg-button checkbox" id="${key}"
+          onclick="${() => this.changePreference(key, !preference.currentValue)}">
+          ${this.htmlUnsafe(preference.currentValue ? this.checkedIcon : this.noCheckedIcon)}
         </button>
       </div>
-    
+      ` : uHtml``}
 
+      ${preference.uiElement === 'color' ? uHtml`
+
+      <div class="preference-row with-colorpicker" hidden="${!preference.visible}">
+        <label for="${key}" i18n="${key}">${key}</label>
+        <button class="colorpicker" id="${key}">
+        </button>
+      </div>
+      ` : uHtml``}
+      
+      `)}
     </div>
+    `)}
+
     
     <div id="footer">
       <button id="reset-all"

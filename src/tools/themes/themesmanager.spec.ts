@@ -1,7 +1,7 @@
 import { it, expect, describe, beforeAll, afterAll, vi } from 'vitest';
 import ThemesManager from './themesmanager';
-import MockHelper from './tests/mockhelper';
-import { GMFServerOgc } from '../models/gmf';
+import MockHelper from '../tests/mockhelper';
+import { GMFServerOgc } from '../../models/gmf';
 
 let manager: ThemesManager;
 

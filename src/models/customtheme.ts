@@ -1,8 +1,8 @@
-import BaseLayer from '../../../models/layers/baselayer';
-import ThemeLayer from '../../../models/layers/themelayer';
-import { SharedLayer } from '../../../tools/share/sharedstate';
-import StateSerializer from '../../../tools/share/stateserializer';
-import CustomIcon from '../images/custom.svg';
+import BaseLayer from './layers/baselayer';
+import ThemeLayer from './layers/themelayer';
+import { SharedLayer } from '../tools/share/sharedstate';
+import StateSerializer from '../tools/share/stateserializer';
+import CustomIcon from '../components/themes/images/custom.svg';
 import { v4 as uuidv4 } from 'uuid';
 
 export default class CustomTheme {

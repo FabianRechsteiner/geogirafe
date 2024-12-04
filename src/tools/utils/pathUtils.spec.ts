@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createObjectFromPath, getPropertyByPath, setPropertyByPath } from './pathUtils';
+import { createObjectFromPath, deletePropertyByPath, getPropertyByPath, setPropertyByPath } from './pathUtils';
 
 describe('pathUtils.getPropertyPath', () => {
   it('getPropertyByPath should get property by path', () => {
@@ -134,5 +134,40 @@ describe('pathUtils.objectFromPath', () => {
 
     result = createObjectFromPath('questionable./.path');
     expect(result).toEqual({ questionable: { ['/']: { path: {} } } });
+  });
+});
+
+
+describe('pathUtils.objectFromPath', () => {
+  it('should delete a deeply nested object and all its predecessors', () => {
+    const obj = { level1: { level2: { level3: { level4: { level5: 42 } } } } };
+    deletePropertyByPath(obj, 'level1.level2.level3.level4.level5');
+    expect(Object.keys(obj).length).toBe(0);
+  });
+
+  it('should not delete a deeply nested object until a predecessors has additional properties', () => {
+    const obj = { level1: { level2: { level3: { level4: { level5: 42 } } }, siblingOnLevel2: 43 } };
+    deletePropertyByPath(obj, 'level1.level2.level3.level4.level5');
+    expect(Object.keys(obj.level1).length).toBe(1);
+    expect(obj.level1.siblingOnLevel2).toBe(43);
+    expect(Object.keys(obj.level1)).toEqual(['siblingOnLevel2']);
+  });
+
+  it('should ignore incorrect paths', () => {
+    const obj = { level1: { level2: { level3: { level4: { level5: 42 } } } } };
+    deletePropertyByPath(obj, 'level1.level2.level999.level4.level5');
+    expect(obj['level1']['level2']['level3']['level4']['level5']).toBe(42);
+  });
+
+  it('should handle emtpy objects', () => {
+    const obj = {};
+    deletePropertyByPath(obj, 'level1.level2.level3.level4.level5');
+    expect(Object.keys(obj).length).toBe(0);
+  });
+
+  it('should handle an incorrect property', () => {
+    const obj = { level1: { level2: { level3: { level4: { level5: 42 } } } } };
+    deletePropertyByPath(obj, 'level1.level2.level3.level4.level999');
+    expect(obj['level1']['level2']['level3']['level4']['level5']).toBe(42);
   });
 });

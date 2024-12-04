@@ -1,10 +1,14 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import { UserPreference } from './userPreference';
+import { PreferenceGroup, PreferenceGroups, PreferenceOption, UserPreference } from './userPreference';
 import I18nManager from '../../tools/i18n/i18nmanager';
+import CustomThemesManager from '../../tools/themes/customthemesmanager';
+import CustomTheme from '../../models/customtheme';
+import { getPropertyByPath, setPropertyByPath } from '../../tools/utils/pathUtils';
+import { Color } from 'vanilla-picker';
+import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
 import checkedIcon from '../../assets/icons/checked-full.svg?raw';
 import noCheckedIcon from '../../assets/icons/checked-no.svg?raw';
-import { getPropertyByPath, setPropertyByPath } from '../../tools/utils/pathUtils';
 
 /**
  Lets users change (default) configuration values, updates the state accordingly and saves the changes in the local
@@ -18,17 +22,66 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   noCheckedIcon: string = noCheckedIcon;
 
   visible = false;
-
+  ready: boolean = false;
   preferences: Record<string, UserPreference>;
+  preferenceGroups: PreferenceGroup[] = PreferenceGroups;
+  colorPickers: Record<string, GirafeColorPicker> = {};
+
+  customThemesManager: CustomThemesManager;
 
   constructor() {
     super('user-preferences');
 
+    this.customThemesManager = CustomThemesManager.getInstance();
+
     this.preferences = {
-      language: new UserPreference('language', 'languages.defaultLanguage'),
-      projection: new UserPreference('projection', 'map.srid'),
-      darkFrontendMode: new UserPreference('interface.darkFrontendMode', 'interface.darkFrontendMode')
+      language: new UserPreference('languages.defaultLanguage', 'language', 'system', 'select'),
+      logLevel: new UserPreference('general.logLevel', null, 'system', 'select'),
+      theme: new UserPreference('themes.defaultTheme', 'theme', 'map', 'select', (themeName: string) => {
+        const themeId = Object.keys(this.state.themes._allThemes).find(
+          (themeKey) => this.state.themes._allThemes[Number(themeKey)].name === themeName
+        );
+        return this.state.themes._allThemes[Number(themeId)];
+      }),
+      basemap: new UserPreference('basemaps.defaultBasemap', 'activeBasemap', 'map', 'select', (bsName: string) => {
+        const bsId = Object.keys(this.state.basemaps).find(
+          (bsKey) => this.state.basemaps[Number(bsKey)].name === bsName
+        );
+        return this.state.basemaps[Number(bsId)];
+      }),
+      projection: new UserPreference('map.srid', 'projection', 'map', 'select'),
+      darkFrontendMode: new UserPreference(
+        'interface.darkFrontendMode',
+        'interface.darkFrontendMode',
+        'visual',
+        'select'
+      ),
+      darkMapMode: new UserPreference('interface.darkMapMode', 'interface.darkMapMode', 'visual', 'checkbox'),
+      selectionComponent: new UserPreference(
+        'interface.defaultSelectionComponent',
+        'interface.selectionComponent',
+        'visual',
+        'select'
+      ),
+      selectFillColor: new UserPreference('selection.defaultFillColor', null, 'visual', 'color'),
+      selectStrokeColor: new UserPreference('selection.defaultStrokeColor', null, 'visual', 'color'),
+      selectHighlightFillColor: new UserPreference('selection.highlightFillColor', null, 'visual', 'color'),
+      selectHighlightStrokeColor: new UserPreference('selection.highlightStrokeColor', null, 'visual', 'color'),
+      searchFillColor: new UserPreference('search.defaultFillColor', null, 'visual', 'color'),
+      searchStrokeColor: new UserPreference('search.defaultStrokeColor', null, 'visual', 'color'),
+      drawingFillColor: new UserPreference('drawing.defaultFillColor', null, 'visual', 'color'),
+      drawingStrokeColor: new UserPreference('drawing.defaultStrokeColor', null, 'visual', 'color')
     };
+
+    this.subscribe('themes.isLoaded', (_, isLoaded) => {
+      if (isLoaded) {
+        this.initPreferenceOptions();
+        this.initCurrentPreferenceValues();
+        this.initColorPicker();
+        this.ready = true;
+        this.render();
+      }
+    });
   }
 
   connectedCallback(): void {
@@ -43,9 +96,8 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   }
 
   private renderComponent(): void {
-    if (!this.rendered) {
-      this.initPreferenceOptions();
-      this.initCurrentPreferenceValues();
+    if (!this.ready) {
+      return;
     }
     super.render();
     this.activateTooltips(false, [800, 0], 'top-end');
@@ -65,23 +117,60 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
       return { label: key, value: key };
     });
 
+    this.preferences.logLevel.options = [
+      { label: 'debug', value: 'debug' },
+      { label: 'info', value: 'info' },
+      { label: 'warn', value: 'warn' },
+      { label: 'error', value: 'error' }
+    ];
+
     this.preferences.projection.options = Object.keys(this.configManager.Config.projections).map((key) => {
       return { label: this.configManager.Config.projections[key], value: key };
     });
+
+    this.refreshThemeOptions();
+
+    this.preferences.basemap.options = Object.keys(this.state.basemaps).map((key: string) => {
+      const baseMapName = this.state.basemaps[Number(key)].name;
+      return { label: baseMapName, value: baseMapName };
+    });
+
+    this.preferences.selectionComponent.options = [
+      { label: 'window', value: 'window' },
+      { label: 'grid', value: 'grid' }
+    ];
+
+    this.preferences.darkFrontendMode.options = [
+      { label: 'same as system', value: undefined },
+      { label: 'dark', value: true },
+      { label: 'light', value: false }
+    ];
   }
 
   /**
-   Readout the current value from the state or the config to show in the template
+   * Collect all possible options for the default theme preference. This has to be repeatable, since the user
+   * can create new custom themes at any time.
+   */
+  private refreshThemeOptions() {
+    let defaultThemes: PreferenceOption[] = [{ label: '-', value: '' }];
+    Object.keys(this.state.themes._allThemes).forEach((key: string) => {
+      const themeName = this.state.themes._allThemes[Number(key)].name;
+      defaultThemes.push({ label: themeName, value: themeName });
+    });
+    defaultThemes = defaultThemes.sort((a, b) => a.label.toUpperCase().localeCompare(b.label.toUpperCase()));
+    const customThemes: PreferenceOption[] = this.customThemesManager.customThemes.map((ct: CustomTheme) => {
+      return { label: ct.name, value: ct.name };
+    });
+    this.preferences.theme.options = [...defaultThemes, ...customThemes];
+  }
+
+  /**
+   Readout the default value from the config to show in the component
    */
   private initCurrentPreferenceValues(): void {
     let result;
     for (const key in this.preferences) {
-      if (this.preferences[key].statePath) {
-        result = getPropertyByPath(this.state, this.preferences[key].statePath);
-      }
-      if (!result?.found && this.preferences[key].configPath) {
-        result = getPropertyByPath(this.configManager.Config, this.preferences[key].configPath);
-      }
+      result = getPropertyByPath(this.configManager.Config, this.preferences[key].configPath);
       if (result?.found && result.parentObject && result.lastKey) {
         this.preferences[key].currentValue = result.parentObject[result.lastKey];
       }
@@ -89,42 +178,96 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   }
 
   /**
+   * Create color picker object and set the initial color value
+   */
+  private initColorPicker(): void {
+    super.render();
+    for (const preferenceKey in this.preferences) {
+      if (this.preferences[preferenceKey].uiElement === 'color') {
+        const parent = this.shadowRoot?.getElementById(preferenceKey);
+        if (parent) {
+          const colorPicker = new GirafeColorPicker(
+            {
+              parent: parent,
+              color: this.preferences[preferenceKey].currentValue as string,
+              popup: 'top'
+            },
+            true
+          );
+          colorPicker.onChange = (color: Color) => (parent.style.backgroundColor = color.hex);
+          colorPicker.onClose = (color: Color) => this.changePreference(preferenceKey, color.hex);
+          colorPicker.setColor(this.preferences[preferenceKey].currentValue as string, false);
+          this.colorPickers[preferenceKey] = colorPicker;
+        }
+      }
+    }
+  }
+
+  /**
+   * If necessary, change/update options of select elements right before they're shown.
+   */
+  onOpenSelectOption(preferenceKey: string): void {
+    if (preferenceKey === 'theme') {
+      this.refreshThemeOptions();
+      this.refreshRender();
+    }
+  }
+
+  /**
    Called when user changes a preference in the panel
    */
-  onChangePreferenceFromEvent(preferenceKey: string, evt: Event): void {
-    const newValue = (evt.target as HTMLInputElement)?.value;
-    this.changePreference(preferenceKey, newValue);
+  onSelectOption(preferenceKey: string, evt: Event): void {
+    const optionLabel = (evt.target as HTMLInputElement)?.value;
+    const selectedOption = this.preferences[preferenceKey].options.find((o) => o.label === optionLabel);
+    if (selectedOption) {
+      this.changePreference(preferenceKey, selectedOption.value);
+    }
   }
 
   /**
    Update state and local storage with new value
    */
   changePreference(preferenceKey: string, newValue: unknown): void {
-    if (!Object.keys(this.preferences).includes(preferenceKey)) {
-      return;
+    if (this.preferences[preferenceKey]) {
+      this.preferences[preferenceKey].currentValue = newValue;
+      this.updatePreferenceInConfig(preferenceKey);
+      this.updatePreferenceInState(preferenceKey);
+      this.updatePreferenceInStorage(preferenceKey);
+      this.refreshRender();
     }
-    this.preferences[preferenceKey].currentValue = newValue;
-    this.updatePreferenceInState(this.preferences[preferenceKey].statePath, newValue);
-    this.updatePreferenceInStorage(this.preferences[preferenceKey].configPath, newValue);
-    this.refreshRender();
+  }
+
+  /**
+   Update the config object with the new value
+   */
+  private updatePreferenceInConfig(preferenceKey: string): void {
+    const preference = this.preferences[preferenceKey];
+    setPropertyByPath(this.configManager.Config, preference.configPath, preference.currentValue);
   }
 
   /**
    Update the state with the new value
    */
-  private updatePreferenceInState(path: string, newValue: unknown): void {
-    if (path) {
-      setPropertyByPath(this.state, path, newValue);
+  private updatePreferenceInState(preferenceKey: string): void {
+    const preference = this.preferences[preferenceKey];
+    if (preference?.statePath) {
+      setPropertyByPath(this.state, preference.statePath, preference.getCurrentValueForState());
     }
   }
 
   /**
    Save the user preference as a partial config object in the local browser storage
    */
-  private updatePreferenceInStorage(path: string, newValue: unknown): void {
-    if (path) {
-      this.configManager.saveUserPreference(path, newValue);
-    }
+  private updatePreferenceInStorage(preferenceKey: string): void {
+    const preference = this.preferences[preferenceKey];
+    this.configManager.saveUserPreference(preference.configPath, preference.currentValue);
+  }
+
+  /**
+   Delete user preference in the local browser storage
+   */
+  private deletePreferenceInStorage(preferenceKey: string): void {
+    this.configManager.deleteUserPreference(this.preferences[preferenceKey].configPath);
   }
 
   /**
@@ -134,13 +277,24 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   public onResetAll(): void {
     const confirmMsg = I18nManager.getInstance().getTranslation('Reset user preferences back to default values?');
     if (confirm(confirmMsg)) {
-      this.configManager.clearUserPreferences();
       for (const preferenceKey in this.preferences) {
-        const defaultValue = this.configManager.getDefaultConfigValue(this.preferences[preferenceKey].configPath);
-        this.preferences[preferenceKey].currentValue = defaultValue;
-        this.updatePreferenceInState(this.preferences[preferenceKey].statePath, defaultValue);
+        this.deletePreferenceInStorage(preferenceKey);
+        this.preferences[preferenceKey].currentValue = this.configManager.getDefaultConfigValue(
+          this.preferences[preferenceKey].configPath
+        );
+        this.updatePreferenceInState(preferenceKey);
+        this.updatePreferenceInConfig(preferenceKey);
+        this.colorPickers[preferenceKey]?.setColor(this.preferences[preferenceKey].currentValue as string, false);
       }
       this.render();
     }
+  }
+
+  public getPreferencesByGroup(group: string): [UserPreference, string][] {
+    return Object.keys(this.preferences)
+      .map((key) => {
+        return <[UserPreference, string]>[this.preferences[key], key];
+      })
+      .filter((p) => p[0].group === group);
   }
 }

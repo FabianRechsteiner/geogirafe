@@ -17,6 +17,11 @@ class MockHelper {
     themes: {
       url: 'Mock/themes.json'
     },
+    basemaps: {
+      defaultBasemap: 'Grundkarte farbig',
+      OSM: false,
+      SwissTopoVectorTiles: true
+    },
     projections: {
       'EPSG:3857': 'W-M'
     },
@@ -49,7 +54,7 @@ class MockHelper {
     const configManager = ConfigManager.getInstance();
     // @ts-ignore
     configManager['config'] = new GirafeConfig(MockHelper.mockConfig);
-    configManager.clearUserPreferences();
+    configManager.deleteAllUserPreferences();
     I18nManager.getInstance().translations = { fr: { a: 'translated_a', b: 'translated_b' } };
   }
 
@@ -57,7 +62,7 @@ class MockHelper {
     const configManager = ConfigManager.getInstance();
     // @ts-ignore
     configManager.config = null;
-    configManager.clearUserPreferences();
+    configManager.deleteAllUserPreferences();
   }
 }
 
