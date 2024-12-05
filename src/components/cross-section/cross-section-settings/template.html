@@ -4,7 +4,7 @@
     <div class="btn-group-flex">
       <button
         id="draw-profile-btn"
-        class="${this.crossSectionState.drawProfile ? 'custom-btn active' : 'custom-btn'}"
+        class="${this.crossSectionState.drawProfile ? 'gg-button active' : 'gg-button'}"
         title="${this.i18nManager.getTranslation('draw_profile_help')}"
         onclick="${() => this.toggleLineDraw()}"
         i18n="draw_profile">
@@ -12,7 +12,7 @@
       </button>
       <button
         id="delete-profile-btn"
-        class="custom-btn"
+        class="gg-button"
         title="${this.i18nManager.getTranslation('delete_help')}"
         onclick="${() => this.deleteProfile()}"
         i18n="delete">
@@ -22,10 +22,10 @@
 
     <!-- CROSS SECTION WIDTH BUTTON -->
     <div class="btn-group-flex">
-      <label for="section-width-btn" i18n="profile_width">Width [m]</label>
+      <label for="section-width-btn" i18n="profile_width" class="gg-label">Width [m]</label>
       <input
         id="section-width-btn"
-        class="settings-btn"
+        class="gg-input"
         type="number"
         value="${this.crossSectionState.sectionWidthSettings.value}"
         min="${this.crossSectionState.sectionWidthSettings.min}"
@@ -38,7 +38,7 @@
     <div class="btn-group-flex">
       <button
         id="reset-zoom-btn"
-        class="custom-btn"
+        class="gg-button"
         title="${this.i18nManager.getTranslation('profile_reset_view_help')}"
         onclick="${() => this.resetZoom()}"
         i18n="profile_reset_view">
@@ -46,7 +46,7 @@
       </button>
       <button
         id="sync-views-btn"
-        class="${this.crossSectionState.syncViews ? 'custom-btn active' : 'custom-btn'}"
+        class="${this.crossSectionState.syncViews ? 'gg-button active' : 'gg-button'}"
         title="${this.i18nManager.getTranslation('profile_sync_view_help')}"
         onclick="${() => this.setViewSync(!this.crossSectionState.syncViews)}"
         i18n="profile_sync_view">
@@ -57,28 +57,28 @@
     <!-- TRANSLATE PROFILE BUTTONS -->
     <div class="btn-group-flex">
       <button
-        class="gg-button gg-big"
+        class="gg-icon-button gg-big"
         title="${this.i18nManager.getTranslation('profile_shift_up_help')}"
         onclick="${() => this.shiftLinestring([0.0, this.crossSectionState.linestringShift])}"
         i18n="">
         <img src="icons/arrow_up.svg" alt="${this.i18nManager.getTranslation('profile_shift_up_help')}" />
       </button>
       <button
-        class="gg-button gg-big"
+        class="gg-icon-button gg-big"
         title="${this.i18nManager.getTranslation('profile_shift_down_help')}"
         onclick="${() => this.shiftLinestring([0.0, -this.crossSectionState.linestringShift])}"
         i18n="">
         <img src="icons/arrow_down.svg" alt="${this.i18nManager.getTranslation('profile_shift_down_help')}" />
       </button>
       <button
-        class="gg-button gg-big"
+        class="gg-icon-button gg-big"
         title="${this.i18nManager.getTranslation('profile_shift_left_help')}"
         onclick="${() => this.shiftLinestring([-this.crossSectionState.linestringShift, 0.0])}"
         i18n="">
         <img src="icons/arrow_left.svg" alt="${this.i18nManager.getTranslation('profile_shift_left_help')}" />
       </button>
       <button
-        class="gg-button gg-big"
+        class="gg-icon-button gg-big"
         title="${this.i18nManager.getTranslation('profile_shift_right_help')}"
         onclick="${() => this.shiftLinestring([this.crossSectionState.linestringShift, 0.0])}"
         i18n="">
@@ -88,15 +88,15 @@
 
     <div class="btn-group-flex">
       <div class="cell">
-        <label for="z-ratio-btn">
+        <label for="z-ratio-btn" class="gg-label">
           ${this.i18nManager.getTranslation('profile_exaggeration')}
           (${this.crossSectionState.verticalExaggerationSettings.value})</label
         >
         <div style="display: flex; align-items: center">
           <input
             id="z-ratio-btn"
-            class="settings-btn"
             type="range"
+            class="gg-range"
             min="${this.crossSectionState.verticalExaggerationSettings.min}"
             max="${this.crossSectionState.verticalExaggerationSettings.max}"
             step="${this.crossSectionState.verticalExaggerationSettings.step}"
@@ -118,15 +118,15 @@
 
     <div class="btn-group-flex">
       <div class="cell">
-        <label for="point-size-label">
+        <label for="point-size-label" class="gg-label">
           ${this.i18nManager.getTranslation('profile_point_size')}
           (${this.crossSectionState.pointSizeSettings.value})</label
         >
         <div style="display: flex; align-items: center">
           <input
             id="point-size-btn"
-            class="settings-btn"
             type="range"
+            class="gg-range"
             min="${this.crossSectionState.pointSizeSettings.min}"
             max="${this.crossSectionState.pointSizeSettings.max}"
             step="${this.crossSectionState.pointSizeSettings.step}"
@@ -149,110 +149,106 @@
     <h3 i18n="profile_colors">Colors</h3>
 
     <div class="btn-group-flex">
-      <div class="cell">
-        <!-- SELECT VARIABLE USED FOR COLORING -->
-        <label for="color-variable-btn" i18n="profile_color_by">Color by</label>
-        <select
-          id="color-variable-btn"
-          class="settings-btn"
-          oninput="${(e: Event) => this.setColorVariable((e.target! as HTMLInputElement).value as ColorVariable)}">
-          <option
-            value="uniform"
-            i18n="color_option_uniform"
-            ?selected="${this.crossSectionState.colorVariable === 'uniform'}">
-            Single color
-          </option>
-          <option
-            value="natural"
-            i18n="color_option_natural"
-            ?selected="${this.crossSectionState.colorVariable === 'natural'}">
-            Natural
-          </option>
-          <option
-            value="intensity"
-            i18n="color_option_intensity"
-            ?selected="${this.crossSectionState.colorVariable === 'intensity'}">
-            Intensity
-          </option>
-          <option
-            value="classification"
-            i18n="color_option_classification"
-            ?selected="${this.crossSectionState.colorVariable === 'classification'}">
-            Classification
-          </option>
-        </select>
-      </div>
-
-      <!-- SELECT PALETTE  -->
-      <div class="cell" hidden="${this.crossSectionState.colorVariable !== 'intensity'}">
-        <label for="sequential-color-btn" i18n="profile_colormap">Colorscale</label>
-        <select
-          id="sequential-color-btn"
-          class="settings-btn"
-          oninput="${(e: Event) => this.setColorPalette((e.target! as HTMLSelectElement).value as ColorPalette)}">
-          <option
-            value="spectral"
-            ?selected="${this.crossSectionState.colorPalette === 'spectral'}"
-            i18n="palette_option_spectral">
-            Spectral
-          </option>
-          <option
-            value="greys"
-            ?selected="${this.crossSectionState.colorPalette === 'greys'}"
-            i18n="palette_option_greys">
-            Greys
-          </option>
-          <option
-            value="blues"
-            ?selected="${this.crossSectionState.colorPalette === 'blues'}"
-            i18n="palette_option_blues">
-            Blues
-          </option>
-          <option
-            value="viridis"
-            ?selected="${this.crossSectionState.colorPalette === 'viridis'}"
-            i18n="palette_option_viridis">
-            Viridis
-          </option>
-          <option
-            value="magma"
-            ?selected="${this.crossSectionState.colorPalette === 'magma'}"
-            i18n="palette_option_magma">
-            Magma
-          </option>
-        </select>
-      </div>
+      <!-- SELECT VARIABLE USED FOR COLORING -->
+      <label for="color-variable-btn" i18n="profile_color_by" class="gg-label">Color by</label>
+      <select
+        id="color-variable-btn"
+        class="gg-select"
+        oninput="${(e: Event) => this.setColorVariable((e.target! as HTMLInputElement).value as ColorVariable)}">
+        <option
+          value="uniform"
+          i18n="color_option_uniform"
+          ?selected="${this.crossSectionState.colorVariable === 'uniform'}">
+          Single color
+        </option>
+        <option
+          value="natural"
+          i18n="color_option_natural"
+          ?selected="${this.crossSectionState.colorVariable === 'natural'}">
+          Natural
+        </option>
+        <option
+          value="intensity"
+          i18n="color_option_intensity"
+          ?selected="${this.crossSectionState.colorVariable === 'intensity'}">
+          Intensity
+        </option>
+        <option
+          value="classification"
+          i18n="color_option_classification"
+          ?selected="${this.crossSectionState.colorVariable === 'classification'}">
+          Classification
+        </option>
+      </select>
     </div>
 
-    <div class="btn-group-flex">
-      <!-- SELECT UNIFORM COLOR -->
-      <div class="cell" hidden="${this.crossSectionState.colorVariable !== 'uniform'}">
-        <label for="uniform-color-btn" i18n="color_option_uniform">Uniform color</label>
-        <input
-          id="uniform-color-btn"
-          class="settings-btn"
-          type="color"
-          value="${this.crossSectionState.colorUniform}"
-          oninput="${(e: Event) => this.setUniformColor((e.target! as HTMLInputElement).value)}" />
-      </div>
+    <div class="btn-group-flex" hidden="${this.crossSectionState.colorVariable !== 'intensity'}">
+      <!-- SELECT PALETTE  -->
+      <label for="sequential-color-btn" i18n="profile_colormap" class="gg-label">Colorscale</label>
+      <select
+        id="sequential-color-btn"
+        class="gg-select"
+        oninput="${(e: Event) => this.setColorPalette((e.target! as HTMLSelectElement).value as ColorPalette)}">
+        <option
+          value="spectral"
+          ?selected="${this.crossSectionState.colorPalette === 'spectral'}"
+          i18n="palette_option_spectral">
+          Spectral
+        </option>
+        <option
+          value="greys"
+          ?selected="${this.crossSectionState.colorPalette === 'greys'}"
+          i18n="palette_option_greys">
+          Greys
+        </option>
+        <option
+          value="blues"
+          ?selected="${this.crossSectionState.colorPalette === 'blues'}"
+          i18n="palette_option_blues">
+          Blues
+        </option>
+        <option
+          value="viridis"
+          ?selected="${this.crossSectionState.colorPalette === 'viridis'}"
+          i18n="palette_option_viridis">
+          Viridis
+        </option>
+        <option
+          value="magma"
+          ?selected="${this.crossSectionState.colorPalette === 'magma'}"
+          i18n="palette_option_magma">
+          Magma
+        </option>
+      </select>
+    </div>
 
-      <!-- SELECT BACKGROUND COLOR -->
-      <div class="cell">
-        <label for="background-color-btn" i18n="profile_background_color">Background color</label>
-        <input
-          id="background-color-btn"
-          class="settings-btn"
-          type="color"
-          value="${this.crossSectionState.backgroundColor}"
-          oninput="${(e: Event) => this.setBackgroundColor((e.target! as HTMLInputElement).value)}" />
-      </div>
+    <div class="btn-group-flex" hidden="${this.crossSectionState.colorVariable !== 'uniform'}">
+      <!-- SELECT UNIFORM COLOR -->
+      <label for="uniform-color-btn" i18n="color_option_uniform" class="gg-label">Uniform color</label>
+      <input
+        id="uniform-color-btn"
+        class="gg-input"
+        type="color"
+        value="${this.crossSectionState.colorUniform}"
+        oninput="${(e: Event) => this.setUniformColor((e.target! as HTMLInputElement).value)}" />
+    </div>
+
+    <!-- SELECT BACKGROUND COLOR -->
+    <div class="btn-group-flex">
+      <label for="background-color-btn" i18n="profile_background_color" class="gg-label">Background color</label>
+      <input
+        id="background-color-btn"
+        class="gg-input"
+        type="color"
+        value="${this.crossSectionState.backgroundColor}"
+        oninput="${(e: Event) => this.setBackgroundColor((e.target! as HTMLInputElement).value)}" />
     </div>
 
     <!-- MEASUREMENTS BUTTONS -->
     <div class="btn-group-flex">
       <button
         id="draw-measurements-btn"
-        class="${this.crossSectionState.drawMeasurement ? 'custom-btn active' : 'custom-btn'}"
+        class="${this.crossSectionState.drawMeasurement ? 'gg-button active' : 'gg-button'}"
         title="${this.i18nManager.getTranslation('profile_measurement_help')}"
         onclick="${() => this.toggleMeasureDraw()}"
         i18n="profile_measurement"
@@ -261,7 +257,7 @@
       </button>
       <button
         id="delete-measurements-btn"
-        class="custom-btn"
+        class="gg-button"
         title="${this.i18nManager.getTranslation('profile_delete_measurements_help')}"
         onclick="${() => this.deleteAllMeasurements()}"
         i18n="profile_delete_measurements">
@@ -288,7 +284,7 @@
     <div class="btn-group-flex">
       <button
         id="draw-markers-btn"
-        class="${this.crossSectionState.drawMarker ? 'custom-btn active' : 'custom-btn'}"
+        class="${this.crossSectionState.drawMarker ? 'gg-button active' : 'gg-button'}"
         title="${this.i18nManager.getTranslation('profile_draw_markers_help')}"
         onclick="${() => this.toggleMarkerDraw()}"
         i18n="profile_draw_markers"
@@ -297,7 +293,7 @@
       </button>
       <button
         id="delete-markers-btn"
-        class="custom-btn"
+        class="gg-button"
         title="${this.i18nManager.getTranslation('profile_delete_markers_help')}"
         onclick="${() => this.deleteAllMarkers()}"
         i18n="profile_delete_markers">
@@ -327,13 +323,13 @@
     <div class="btn-group-flex">
       <select
         id="print-profile-format-btn"
-        class="custom-btn"
+        class="gg-select"
         oninput="${(e: Event) => this.setPrintFileFormat((e.target! as HTMLSelectElement).value as PrintFileFormat)}">
         <option value="svg" i18n="">SVG</option>
       </select>
       <button
         id="print-profile-btn"
-        class="custom-btn"
+        class="gg-button"
         title="${this.i18nManager.getTranslation('profile_print_help')}"
         onclick="${() => this.printPlot(this.crossSectionState.printFileFormat)}"
         i18n="profile_print">
@@ -348,7 +344,7 @@
     <div class="btn-group-flex">
       <select
         id="download-markers-format-btn"
-        class="custom-btn"
+        class="gg-select"
         oninput="${(e: Event) => this.setAnnotationsFileFormat((e.target! as HTMLSelectElement).value as VectorFeatureFileFormat)}">
         <option value="kml" i18n="">KML</option>
         <option value="geojson" i18n="">GeoJSON</option>
@@ -356,7 +352,7 @@
       </select>
       <button
         id="download-markers-btn"
-        class="custom-btn"
+        class="gg-button"
         title="${this.i18nManager.getTranslation('download_help')}"
         onclick="${() => this.exportFeature(this.points, 'markers', this.crossSectionState.downloadAnnotationsFormat)}"
         i18n="download"
@@ -370,7 +366,7 @@
     <div class="btn-group-flex">
       <select
         id="download-linestring-format-btn"
-        class="custom-btn"
+        class="gg-select"
         oninput="${(e: Event) => this.setLineFileFormat((e.target! as HTMLSelectElement).value as VectorFeatureFileFormat)}">
         <option value="kml" i18n="">KML</option>
         <option value="geojson" i18n="">GeoJSON</option>
@@ -378,7 +374,7 @@
       </select>
       <button
         id="download-linestring-btn"
-        class="custom-btn"
+        class="gg-button"
         title="${this.i18nManager.getTranslation('download_help')}"
         onclick="${() => this.exportFeature([this.linestring], 'linestring', this.crossSectionState.downloadLinestringFormat)}"
         i18n="download"

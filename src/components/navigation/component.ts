@@ -1,80 +1,54 @@
-import tippy from 'tippy.js';
-import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
-import MapPosition from '../../../tools/state/mapposition';
-import NavBookmarksComponent from '../navbookmarks/component';
-import { Bookmark } from '../Bookmark';
-import IconAdd from './images/add.svg';
-import IconBookmark from './images/bookmark.svg';
-import IconNext from './images/next.svg';
-import IconPrevious from './images/previous.svg';
-import IconTrash from './images/trash.svg';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import MapPosition from '../../tools/state/mapposition';
+import { Bookmark } from './Bookmark';
 
-type TippyType = typeof tippy;
-
-class NavHelperComponent extends GirafeHTMLElement {
+class NavigationComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../../styles/common.css'];
-  iconAdd: string = IconAdd;
-  iconBookmark: string = IconBookmark;
-  iconNext: string = IconNext;
-  iconPrevious: string = IconPrevious;
-  iconTrash: string = IconTrash;
+  styleUrls = ['../../styles/common.css', './style.css'];
 
-  #tooltip: TippyType;
-  readonly #positionHistory: MapPosition[] = [];
-  #currentPositionIndex: number = -1;
+  private readonly positionHistory: MapPosition[] = [];
+  private currentPositionIndex: number = -1;
 
-  bookmarks: Bookmark[] = [];
+  public bookmarks: Bookmark[] = [];
 
-  bookmarkStorage: string = 'localStorage';
+  private bookmarkStorage: string = 'localStorage';
 
-  get hasBookmark() {
+  public get hasBookmark() {
     return this.bookmarks.length > 0;
   }
 
-  #selfNavigation: boolean = false;
+  private selfNavigation: boolean = false;
 
   constructor() {
-    super('navhelper');
+    super('navigation');
   }
 
   render() {
     super.render();
-    this.createBookmarkTooltip();
   }
 
-  createBookmarkTooltip() {
-    const el = this.shadow.getElementById('add-bookmark');
-    this.#tooltip = tippy(el, {
-      trigger: 'click',
-      arrow: true,
-      interactive: true,
-      theme: 'light',
-      placement: 'bottom',
-      appendTo: document.body,
-      content: (_reference: object) => {
-        const bookmarkbox = new NavBookmarksComponent(this);
-        return bookmarkbox;
-      }
-    });
-  }
-
-  addBookmark(bookmark: Bookmark) {
-    this.bookmarks.push(bookmark);
-    this.saveBookmarks();
-    super.render();
-    super.girafeTranslate();
-    this.#tooltip.hide();
-  }
-
-  removeBookmark(bookmark: Bookmark) {
-    const index = this.bookmarks.indexOf(bookmark);
-    if (index >= 0) {
-      this.bookmarks.splice(index, 1);
+  public async addBookmark() {
+    const name = await window.gPrompt('Give a name to your bookmark', 'Add bookmark', 'Enter a name...');
+    if (name) {
+      const bookmark = new Bookmark(name, this.state.position);
+      this.bookmarks.push(bookmark);
+      this.saveBookmarks();
+      super.render();
+      super.girafeTranslate();
     }
-    this.saveBookmarks();
-    super.render();
-    super.girafeTranslate();
+  }
+
+  public async removeBookmark(bookmark: Bookmark) {
+    const remove = await window.gConfirm('Do you want to delete this bookmark?', 'Delete bookmark');
+    if (remove) {
+      const index = this.bookmarks.indexOf(bookmark);
+      if (index >= 0) {
+        this.bookmarks.splice(index, 1);
+      }
+      this.saveBookmarks();
+      super.render();
+      super.girafeTranslate();
+    }
   }
 
   async saveBookmarks() {
@@ -130,26 +104,26 @@ class NavHelperComponent extends GirafeHTMLElement {
   }
 
   onPositionChanged(position: MapPosition) {
-    if (!this.#selfNavigation) {
+    if (!this.selfNavigation) {
       // When the application is initializing, the position is perhaps not correct
       if (!position.isValid) {
         return;
       }
 
-      if (this.#currentPositionIndex !== this.#positionHistory.length - 1) {
+      if (this.currentPositionIndex !== this.positionHistory.length - 1) {
         // Remove history from this index to create a new one
-        this.#positionHistory.splice(this.#currentPositionIndex + 1);
+        this.positionHistory.splice(this.currentPositionIndex + 1);
       }
-      this.#positionHistory.push(position);
-      this.#currentPositionIndex = this.#positionHistory.length - 1;
+      this.positionHistory.push(position);
+      this.currentPositionIndex = this.positionHistory.length - 1;
     }
   }
 
   navigateBack() {
-    let position = this.#positionHistory[this.#currentPositionIndex];
-    if (this.#currentPositionIndex > 0) {
-      this.#currentPositionIndex--;
-      position = this.#positionHistory[this.#currentPositionIndex];
+    let position = this.positionHistory[this.currentPositionIndex];
+    if (this.currentPositionIndex > 0) {
+      this.currentPositionIndex--;
+      position = this.positionHistory[this.currentPositionIndex];
       console.log('Navigating back to:', position);
     }
 
@@ -157,21 +131,21 @@ class NavHelperComponent extends GirafeHTMLElement {
   }
 
   navigateForward() {
-    let position = this.#positionHistory[this.#currentPositionIndex];
-    if (this.#currentPositionIndex < this.#positionHistory.length - 1) {
-      this.#currentPositionIndex++;
-      position = this.#positionHistory[this.#currentPositionIndex];
+    let position = this.positionHistory[this.currentPositionIndex];
+    if (this.currentPositionIndex < this.positionHistory.length - 1) {
+      this.currentPositionIndex++;
+      position = this.positionHistory[this.currentPositionIndex];
       console.log('Navigating forward to:', position);
     }
     this.navigateToPosition(position);
   }
 
   navigateToPosition(position: MapPosition) {
-    this.#selfNavigation = true;
+    this.selfNavigation = true;
     try {
       this.state.position = position;
     } finally {
-      this.#selfNavigation = false;
+      this.selfNavigation = false;
     }
   }
 
@@ -188,4 +162,4 @@ class NavHelperComponent extends GirafeHTMLElement {
   }
 }
 
-export default NavHelperComponent;
+export default NavigationComponent;

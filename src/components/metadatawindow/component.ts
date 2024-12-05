@@ -2,7 +2,7 @@ import GirafeDraggableElement from '../../base/GirafeDraggableElement';
 
 class MetadataWindowComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   private initialized = false;
 

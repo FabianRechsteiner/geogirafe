@@ -10,7 +10,7 @@ import GroupLayer from '../../models/layers/grouplayer';
 
 class MobileThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   public showBasemaps: boolean = true;
   public menuOpen: boolean = false;

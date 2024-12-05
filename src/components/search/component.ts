@@ -26,7 +26,7 @@ import { parseCoordinates } from '../../tools/geometrytools';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   public searchIcon: string = SearchIcon;
   public paintbrushIcon: string = PaintbrushIcon;

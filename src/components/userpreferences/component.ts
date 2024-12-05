@@ -1,6 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { PreferenceGroup, PreferenceGroups, PreferenceOption, UserPreference } from './userPreference';
-import I18nManager from '../../tools/i18n/i18nmanager';
 import CustomThemesManager from '../../tools/themes/customthemesmanager';
 import CustomTheme from '../../models/customtheme';
 import { getPropertyByPath, setPropertyByPath } from '../../tools/utils/pathUtils';
@@ -16,7 +15,7 @@ import noCheckedIcon from '../../assets/icons/checked-no.svg?raw';
  */
 export default class UserPreferencesComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   checkedIcon: string = checkedIcon;
   noCheckedIcon: string = noCheckedIcon;
@@ -274,20 +273,24 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
    * Reset user preferences back to defaults. This will delete the data in the local storage and set the current state
    * back to the defaults from config.json
    */
-  public onResetAll(): void {
-    const confirmMsg = I18nManager.getInstance().getTranslation('Reset user preferences back to default values?');
-    if (confirm(confirmMsg)) {
-      for (const preferenceKey in this.preferences) {
-        this.deletePreferenceInStorage(preferenceKey);
-        this.preferences[preferenceKey].currentValue = this.configManager.getDefaultConfigValue(
-          this.preferences[preferenceKey].configPath
-        );
-        this.updatePreferenceInState(preferenceKey);
-        this.updatePreferenceInConfig(preferenceKey);
-        this.colorPickers[preferenceKey]?.setColor(this.preferences[preferenceKey].currentValue as string, false);
-      }
-      this.render();
+  public async onResetAll() {
+    const confirm = await window.gConfirm('Reset user preferences back to default values?', 'Reset preferences');
+    if (confirm) {
+      this.resetAll();
     }
+  }
+
+  private resetAll() {
+    for (const preferenceKey in this.preferences) {
+      this.deletePreferenceInStorage(preferenceKey);
+      this.preferences[preferenceKey].currentValue = this.configManager.getDefaultConfigValue(
+        this.preferences[preferenceKey].configPath
+      );
+      this.updatePreferenceInState(preferenceKey);
+      this.updatePreferenceInConfig(preferenceKey);
+      this.colorPickers[preferenceKey]?.setColor(this.preferences[preferenceKey].currentValue as string, false);
+    }
+    this.render();
   }
 
   public getPreferencesByGroup(group: string): [UserPreference, string][] {

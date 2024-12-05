@@ -218,7 +218,7 @@ class TreeViewItemComponent extends TreeViewElement {
   }
 
   getButtonClass(button: string) {
-    const buttonClasses = 'gg-button gg-small gg-opacity tool';
+    const buttonClasses = 'gg-icon-button gg-small gg-opacity tool';
     const activeButtonClasses = buttonClasses + ' active';
     switch (button) {
       case 'swipedLeft':

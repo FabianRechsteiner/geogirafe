@@ -23,15 +23,13 @@ import LayoutComponent from './components/layout/component';
 import HelpComponent from './components/help/component';
 import MetadataWindowComponent from './components/metadatawindow/component';
 import InfoboxComponent from './components/infobox/component';
-import LidarPanelComponent from './components/lidar/panel/component';
-import LidarProfileComponent from './components/lidar/profile/component';
 import CrossSectionSettingsComponent from './components/cross-section/cross-section-settings/component';
 import CrossSectionViewComponent from './components/cross-section/cross-section-viewer/component';
 import LRPanelComponent from './components/lr-panel/component';
 import MapComponent from './components/map/component';
 import MenuButtonComponent from './components/menubutton/component';
-import NavBookmarksComponent from './components/navigation/navbookmarks/component';
-import NavHelperComponent from './components/navigation/navhelper/component';
+import ModalsComponent from './components/modals/component';
+import NavigationComponent from './components/navigation/component';
 import PrintComponent from './components/print/component';
 import ProjectionComponent from './components/projection/component';
 import PrototypeBannerComponent from './components/prototypebanner/component';
@@ -72,6 +70,9 @@ declare global {
   interface Window {
     CESIUM_BASE_URL: string;
     Cesium: unknown;
+    gConfirm(message: string, title?: string): Promise<boolean>;
+    gAlert(message: string, title?: string): Promise<boolean>;
+    gPrompt(message: string, title?: string, placeholder?: string): Promise<string | false>;
   }
 }
 
@@ -127,15 +128,13 @@ try {
       customElements.define('girafe-help', HelpComponent);
       customElements.define('girafe-metadata-window', MetadataWindowComponent);
       customElements.define('girafe-infobox', InfoboxComponent);
-      customElements.define('girafe-lidar-panel', LidarPanelComponent);
-      customElements.define('girafe-lidar-profile', LidarProfileComponent);
       customElements.define('girafe-cross-section-settings', CrossSectionSettingsComponent);
       customElements.define('girafe-cross-section-view', CrossSectionViewComponent);
       customElements.define('girafe-lr-panel', LRPanelComponent);
       customElements.define('girafe-map', MapComponent);
       customElements.define('girafe-menu-button', MenuButtonComponent);
-      customElements.define('girafe-nav-bookmarks', NavBookmarksComponent);
-      customElements.define('girafe-nav-history', NavHelperComponent);
+      customElements.define('girafe-modals', ModalsComponent);
+      customElements.define('girafe-nav-history', NavigationComponent);
       customElements.define('girafe-print', PrintComponent);
       customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
       customElements.define('girafe-proj-select', ProjectionComponent);

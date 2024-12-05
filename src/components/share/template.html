@@ -9,8 +9,8 @@
 
     <div class="${(this.loading ? 'hidden' : '')}">
       <div class="link">
-        <input id="link" type="text" value="${this.shareLink}" />
-        <button class="gg-button gg-medium" tip="Copy ShortUrl" onclick="${() => this.copyToClipboard()}">
+        <input id="link" type="text" value="${this.shareLink}" class="gg-input gg-medium" />
+        <button class="gg-icon-button gg-medium" tip="Copy ShortUrl" onclick="${() => this.copyToClipboard()}">
           <img alt="copy-icon" src="icons/copy.svg" />
         </button>
       </div>

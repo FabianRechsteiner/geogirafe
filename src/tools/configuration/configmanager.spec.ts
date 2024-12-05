@@ -12,7 +12,6 @@ describe('ConfigManager.loadConfig', () => {
   const manager = ConfigManager.getInstance();
   manager.deleteAllUserPreferences();
 
-
   it('should return config if config is already loaded', async () => {
     // @ts-ignore
     manager.config = new GirafeConfig(MockHelper.mockConfig);

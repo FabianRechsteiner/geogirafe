@@ -54,3 +54,36 @@ header:hover .tool {
 .dragBefore {
   border-top: dashed 1rem #ccc;
 }
+
+.gg-checkbox {
+  width: 1.2rem;
+}
+.gg-caret,
+.gg-spacer {
+  width: 1.5rem;
+  padding: 0;
+}
+.gg-caret {
+  transform: scale(130%);
+}
+.gg-caret.gg-rotate90 {
+  transform: scale(130%) rotate(90deg);
+}
+.gg-small.gg-image {
+  min-width: 1rem;
+  width: 1rem;
+  padding: 0.25rem;
+}
+.gg-tree-label {
+  text-align: left;
+  padding-left: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.gg-grab:hover {
+  cursor: grab;
+}
+.gg-selected {
+  opacity: 1;
+}

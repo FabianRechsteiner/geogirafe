@@ -46,7 +46,7 @@ interface PrintElement {
  */
 class PrintComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   private readonly default_dpi = 96;
   private readonly default_scale = 10000;

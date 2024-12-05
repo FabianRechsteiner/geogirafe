@@ -1,0 +1,103 @@
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import I18nManager from '../../tools/i18n/i18nmanager';
+
+type ModalType = 'alert' | 'confirm' | 'prompt';
+
+class ModalsComponent extends GirafeHTMLElement {
+  templateUrl = './template.html';
+  styleUrls = ['../../styles/common.css', './style.css'];
+
+  visible: boolean = false;
+  boxType?: ModalType;
+  boxTitle?: string;
+  boxMessage?: string;
+  boxPlaceholder?: string;
+  resolveAlertConfirm!: (value: boolean) => void;
+  resolvePrompt!: (value: string | false) => void;
+
+  i18nManager: I18nManager = I18nManager.getInstance();
+
+  constructor() {
+    super('native-modals');
+
+    window.gConfirm = (message: string, title?: string): Promise<boolean> =>
+      this.alertConfirmBox('confirm', message, title);
+    window.gAlert = (message: string, title?: string): Promise<boolean> =>
+      this.alertConfirmBox('alert', message, title);
+    window.gPrompt = (message: string, title?: string, placeholder?: string): Promise<string | false> =>
+      this.promptBox(message, title, placeholder);
+  }
+
+  private initBox(type: ModalType, message: string, title?: string, placeholder?: string) {
+    this.boxType = type;
+    this.boxMessage = this.i18nManager.getTranslation(message);
+    if (title) {
+      this.boxTitle = this.i18nManager.getTranslation(title);
+    }
+    if (placeholder) {
+      this.boxPlaceholder = this.i18nManager.getTranslation(placeholder);
+    }
+
+    this.visible = true;
+    this.refreshRender();
+  }
+
+  private resetBox() {
+    this.visible = false;
+    this.boxType = undefined;
+    this.boxTitle = undefined;
+    this.boxMessage = undefined;
+    this.boxPlaceholder = undefined;
+    this.refreshRender();
+  }
+
+  private async promptBox(message: string, title?: string, placeholder?: string): Promise<string | false> {
+    this.initBox('prompt', message, title, placeholder);
+
+    return new Promise((resolve) => {
+      this.resolvePrompt = resolve;
+    });
+  }
+
+  private async alertConfirmBox(type: ModalType, message: string, title?: string): Promise<boolean> {
+    this.initBox(type, message, title);
+
+    return new Promise((resolve) => {
+      this.resolveAlertConfirm = resolve;
+    });
+  }
+
+  public ok() {
+    this.resetBox();
+    this.resolveAlertConfirm(true);
+  }
+
+  public nok() {
+    this.resetBox();
+    this.resolveAlertConfirm(false);
+  }
+
+  public promptOk() {
+    const text = (this.shadow.getElementById('input-text') as HTMLInputElement).value;
+    this.resetBox();
+    this.resolvePrompt(text);
+  }
+
+  public promptNok() {
+    this.resetBox();
+    this.resolvePrompt(false);
+  }
+
+  render() {
+    super.render();
+  }
+
+  connectedCallback() {
+    this.loadConfig().then(() => {
+      this.render();
+      super.girafeTranslate();
+    });
+  }
+}
+
+export default ModalsComponent;

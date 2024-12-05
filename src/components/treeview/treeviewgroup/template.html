@@ -7,7 +7,7 @@
   <header>
     <!-- Caret -->
     <button
-      class="gg-button gg-small gg-opacity"
+      class="gg-icon-button gg-small gg-opacity"
       tip="Expand / Collapse"
       onclick="${() => (this.layer as GroupLayer).isExpanded = !(this.layer as GroupLayer).isExpanded}">
       <img
@@ -18,7 +18,7 @@
 
     <!-- Checkbox -->
     <button
-      class="${this.layer.activeState === 'on' ? 'gg-button gg-small gg-selected' : 'gg-button gg-small gg-opacity'}"
+      class="${this.layer.activeState === 'on' ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
       tip="Activate / Deactivate"
       onclick="${() => this.toggle()}">
       <img
@@ -36,34 +36,37 @@
     </button>
 
     <!-- Error icon -->
-    <button class="${this.layer.hasError ? 'gg-button gg-small gg-opacity' : 'hidden'}" tip="Error on layer">
+    <button class="${this.layer.hasError ? 'gg-icon-button gg-small gg-opacity' : 'hidden'}" tip="Error on layer">
       <img alt="Error on layer" src="icons/error.svg" />
     </button>
 
     <!-- Label -->
     <div class="label-container">
       <button
-        class="${this.layer.activeState === 'on' ? 'gg-button gg-small gg-selected' : 'gg-button gg-small gg-opacity'}"
+        class="${this.layer.activeState === 'on' ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
         onclick="${() => this.toggle()}">
-        <span i18n="${this.layer.name}" class="gg-label"> ${this.layer.name} </span>
+        <span i18n="${this.layer.name}" class="gg-tree-label"> ${this.layer.name} </span>
       </button>
     </div>
 
     <!-- Metadata icon -->
     <button
-      class="${this.layer.hasMetadata ? 'metadata gg-button gg-small gg-opacity tool' : 'hidden'}"
+      class="${this.layer.hasMetadata ? 'metadata gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
       tip="Show metadata"
       onclick="${() => this.showMetadata()}">
       <img alt="Remove theme" src="icons/info.svg" />
     </button>
 
     <!-- Drag -->
-    <button id="drag-button" class="gg-button gg-small gg-grab gg-opacity tool" tip="Move">
+    <button id="drag-button" class="gg-icon-button gg-small gg-grab gg-opacity tool" tip="Move">
       <img alt="Move layer" src="icons/drag.svg" />
     </button>
 
     <!-- Remove icon -->
-    <button class="remove gg-button gg-small gg-opacity tool" tip="Remove theme" onclick="${() => this.deleteGroup()}">
+    <button
+      class="remove gg-icon-button gg-small gg-opacity tool"
+      tip="Remove theme"
+      onclick="${() => this.deleteGroup()}">
       <img alt="Remove theme" src="icons/trash.svg" />
     </button>
   </header>

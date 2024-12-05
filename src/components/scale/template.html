@@ -1,17 +1,9 @@
-<link rel="stylesheet" href="styles/common.css" />
-
-<div id="content">
-  <label for="scale" i18n="scale">Scale</label>
-  <span id="scale">${this.getFormatedScale()}</span>
-
-  <girafe-menu-button open="up">
-    <button slot="menu-button" class="girafe-button-small">
-      <img alt="menu-icon" src="icons/caret-up.svg" />
-    </button>
-
-    ${this.configManager.Config.map.scales.map((scale) => uHtml`
-    <button slot="menu-content" class="girafe-button-large" onclick="${() => this.state.position.scale = scale}">
-      <span>${this.getFormatedScale(scale)}</span></button
-    >` )}
-  </girafe-menu-button>
-</div>
+<select
+  class="gg-select"
+  onchange="${(e:Event) => { this.state.position.scale = parseInt((e.target as HTMLSelectElement).value)}}">
+  ${this.configManager.Config.map.scales.map((scale) => uHtml`
+  <option ?selected="${this.getFormatedScale() === this.getFormatedScale(scale)}" value="${scale}">
+    ${this.getFormatedScale(scale)}
+  </option>
+  `)}
+</select>

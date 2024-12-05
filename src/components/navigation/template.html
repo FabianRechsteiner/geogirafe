@@ -1,18 +1,18 @@
 <div class="content">
   <div class="content-horizontal">
     <div class="content-vertical">
-      <button id="add-bookmark" class="girafe-button-small">
-        <img alt="add-icon" src="${this.iconAdd}" />
+      <button class="gg-icon-button gg-small" onclick="${() => this.addBookmark()}">
+        <img alt="add-icon" src="icons/bookmark-add.svg" />
       </button>
-
-      <button class="girafe-button-small" onclick="${() => this.navigateBack()}">
-        <img alt="previous-icon" src="${this.iconPrevious}" />
+      <button class="gg-icon-button gg-small" onclick="${() => this.navigateBack()}">
+        <img alt="previous-icon" src="icons/previous.svg" />
       </button>
     </div>
+
     <div class="content-vertical">
       <girafe-menu-button open="bottom-left">
-        <button slot="menu-button" class="girafe-button-small">
-          <img alt="menu-icon" src="${this.iconBookmark}" />
+        <button slot="menu-button" class="gg-icon-button gg-small">
+          <img alt="menu-icon" src="icons/bookmark-black.svg" />
         </button>
 
         <div slot="menu-content" class="${this.hasBookmark ? 'menu-content' : 'hidden'}">
@@ -20,12 +20,13 @@
           <div class="content-horizontal">
             <button
               slot="menu-button"
-              class="girafe-button-large grow"
+              class="gg-icon-button gg-small-withtext"
               onclick="${() => this.navigateToPosition(bookmark.position)}">
+              <img alt="bookmark-icon" src="icons/bookmark.svg" />
               <span>${bookmark.name}</span>
             </button>
-            <button slot="menu-button" class="girafe-button-small" onclick="${() => this.removeBookmark(bookmark)}">
-              <img alt="menu-icon" src="${this.iconTrash}" />
+            <button slot="menu-button" class="gg-icon-button gg-small" onclick="${() => this.removeBookmark(bookmark)}">
+              <img alt="menu-icon" src="icons/trash.svg" />
             </button>
           </div>
           ` )}
@@ -35,8 +36,8 @@
         </div>
       </girafe-menu-button>
 
-      <button slot="menu-button" class="girafe-button-small" onclick="${() => this.navigateForward()}">
-        <img alt="menu-icon" src="${this.iconNext}" />
+      <button slot="menu-button" class="gg-icon-button gg-small" onclick="${() => this.navigateForward()}">
+        <img alt="menu-icon" src="icons/next.svg" />
       </button>
     </div>
   </div>

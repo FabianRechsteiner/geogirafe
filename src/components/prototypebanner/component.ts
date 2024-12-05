@@ -2,7 +2,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class PrototypeBannerComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   constructor() {
     super('prototype');

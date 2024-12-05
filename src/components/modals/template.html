@@ -1,0 +1,34 @@
+<div id="content" class="${this.visible ? '' : 'hidden'}">
+  <div class="modal">
+    <header>
+      <img alt="help-icon" src="icons/help.svg" />
+    </header>
+    <section>
+      <h2>${this.boxTitle}</h2>
+      <span>${this.boxMessage}</span>
+
+      <input
+        id="input-text"
+        type="text"
+        class="${this.boxType === 'prompt' ? 'gg-input' : 'hidden'}"
+        placeholder="${this.boxPlaceholder}" />
+
+      <!-- Alert box -->
+      <div class="${this.boxType === 'alert' ? 'confirm-buttons' : 'hidden'}">
+        <button class="gg-button" onclick="${()=> this.ok()}" i18n="Ok">Ok</button>
+      </div>
+
+      <!-- Confirm box -->
+      <div class="${this.boxType === 'confirm' ? 'confirm-buttons' : 'hidden'}">
+        <button class="gg-button" onclick="${()=> this.ok()}" i18n="Yes">Yes</button>
+        <button class="gg-button" onclick="${()=> this.nok()}" i18n="No">No</button>
+      </div>
+
+      <!-- Prompt box -->
+      <div class="${this.boxType === 'prompt' ? 'confirm-buttons' : 'hidden'}">
+        <button class="gg-button" onclick="${()=> this.promptOk()}" i18n="Ok">Ok</button>
+        <button class="gg-button" onclick="${()=> this.promptNok()}" i18n="Cancel">Cancel</button>
+      </div>
+    </section>
+  </div>
+</div>

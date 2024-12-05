@@ -54,6 +54,8 @@ class MockHelper {
     const configManager = ConfigManager.getInstance();
     // @ts-ignore
     configManager['config'] = new GirafeConfig(MockHelper.mockConfig);
+    // @ts-ignore
+    configManager['defaultConfig'] = new GirafeConfig(MockHelper.mockConfig);
     configManager.deleteAllUserPreferences();
     I18nManager.getInstance().translations = { fr: { a: 'translated_a', b: 'translated_b' } };
   }

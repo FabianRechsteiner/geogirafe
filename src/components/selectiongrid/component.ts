@@ -15,7 +15,7 @@ import MapManager from '../../tools/state/mapManager';
  */
 class SelectionGridComponent extends GirafeResizableElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   private readonly eventsCallbacks: Callback[] = [];
   private readonly selectionTabulatorManager = new SelectionTabulatorManager();

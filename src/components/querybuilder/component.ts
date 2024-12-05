@@ -7,7 +7,7 @@ import { isString, isNumber, isDate } from '../../models/xmlTypes';
 
 class QueryBuilderComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   loading: boolean = true;
   deactivated: boolean = false;

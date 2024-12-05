@@ -88,7 +88,8 @@ describe('UserPreferencesComponent', () => {
     for (const key in component.preferences) {
       component['updatePreferenceInStorage'](key);
     }
-    component.onResetAll();
+    // @ts-ignore
+    component.resetAll();
 
     const localStorage = configManager['loadUserPreferences']();
     const allUserPreferencesKeys = Object.keys(component.preferences);
@@ -106,12 +107,12 @@ describe('UserPreferencesComponent', () => {
     configManager.saveUserPreference(customThemesManager['configPath'], { thisIsACustomTheme: [] });
 
     // Now reset user preferences
-    component.onResetAll();
+    // @ts-ignore
+    component.resetAll();
 
     const localStorage = configManager['loadUserPreferences']();
     const allUserPreferencesKeys = Object.keys(component.preferences);
     expect(Object.keys(localStorage)).not.toContain(allUserPreferencesKeys);
     expect(Object.keys(localStorage)).toContain(customThemesManager['configPath']);
   });
-  
 });

@@ -4,7 +4,7 @@ import ArrowWhite from './images/arrow_white.webp';
 
 class HelpComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   content!: HTMLElement;
   themes!: HTMLElement;

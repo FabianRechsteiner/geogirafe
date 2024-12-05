@@ -4,7 +4,7 @@ import ShareManager from '../../tools/share/sharemanager';
 
 class BasemapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   servers = {};
   basemapJson = {};
