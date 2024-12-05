@@ -13,65 +13,53 @@
 
     <div class="${this.getRenderState() === 'setup' ? '' : 'hidden'}">
       <div class="option">
-        <label for="layout" i18n="Layout">Layout</label>
-        <div class="select" onchange="${(evt:Event) => this.onLayoutChanged(evt)}">
-          <select id="layout">
-            ${this.layouts.map((layout) => uHtml`
-            <option
-              i18n="${layout.name}"
-              ?selected="${this.selectedLayout?.name === layout.name}"
-              value="${layout.name}">
-              ${layout.name}
-            </option>
-            `)}
-          </select>
-        </div>
+        <label for="layout" i18n="Layout" class="gg-label">Layout</label>
+        <select id="layout" class="gg-select" onchange="${(evt:Event) => this.onLayoutChanged(evt)}">
+          ${this.layouts.map((layout) => uHtml`
+          <option i18n="${layout.name}" ?selected="${this.selectedLayout?.name === layout.name}" value="${layout.name}">
+            ${layout.name}
+          </option>
+          `)}
+        </select>
       </div>
 
       <div class="option">
-        <label for="scale" i18n="Scale">Scale</label>
-        <div class="select" onchange="${(evt:Event) => this.onScaleChanged(evt)}">
-          <select id="scale">
-            ${this.scales.map((scale) => uHtml`
-            <option ?selected="${this.getSelectedScale() === scale}" value="${scale}">
-              <span>1&nbsp;:&nbsp;</span><span i18n="${scale}" i18nFn="formatNumber">${scale}</span>
-            </option>
-            `)}
-          </select>
-        </div>
+        <label for="scale" i18n="Scale" class="gg-label">Scale</label>
+        <select id="scale" class="gg-select" onchange="${(evt:Event) => this.onScaleChanged(evt)}">
+          ${this.scales.map((scale) => uHtml`
+          <option ?selected="${this.getSelectedScale() === scale}" value="${scale}">
+            <span>1&nbsp;:&nbsp;</span><span i18n="${scale}" i18nFn="formatNumber">${scale}</span>
+          </option>
+          `)}
+        </select>
       </div>
 
       <div class="option">
-        <label for="format" i18n="Format">Format</label>
-        <div class="select" onchange="${(evt:Event) => this.onFormatChanged(evt)}">
-          <select id="format">
-            ${this.printFormats.map((format) => uHtml`
-            <option ?selected="${this.getSelectedFormat() === format}" value="${format}">
-              ${format.toUpperCase()}
-            </option>
-            `)}
-          </select>
-        </div>
+        <label for="format" i18n="Format" class="gg-label">Format</label>
+        <select id="format" class="gg-select" onchange="${(evt:Event) => this.onFormatChanged(evt)}">
+          ${this.printFormats.map((format) => uHtml`
+          <option ?selected="${this.getSelectedFormat() === format}" value="${format}">${format.toUpperCase()}</option>
+          `)}
+        </select>
       </div>
 
       ${ this.dpis.length < 2 ? null : uHtml`
       <div class="option">
-        <label for="dpi">DPI</label>
-        <div class="select" onchange="${(evt:Event) => this.onDpiChanged(evt)}">
-          <select id="dpi">
-            ${this.dpis.map((dpi) => uHtml`
-            <option ?selected="${this.getSelectedDpi() === dpi}" value="${dpi}">${dpi}</option>
-            `)}
-          </select>
-        </div>
+        <label for="dpi" class="gg-label">DPI</label>
+        <select id="dpi" class="gg-select" onchange="${(evt:Event) => this.onDpiChanged(evt)}">
+          ${this.dpis.map((dpi) => uHtml`
+          <option ?selected="${this.getSelectedDpi() === dpi}" value="${dpi}">${dpi}</option>
+          `)}
+        </select>
       </div>
       `}
 
       <div class="option">
-        <label for="rotationSlider" i18n="Rotation">Rotation</label>
+        <label for="rotationSlider" i18n="Rotation" class="gg-label">Rotation</label>
         <div class="rotation">
           <input
             id="rotationSlider"
+            class="gg-range"
             type="range"
             min="-180"
             max="180"
@@ -80,6 +68,7 @@
             oninput="${(evt:Event) => this.onInputRotationChanged(evt)}" />
           <input
             id="rotationNumber"
+            class="gg-input"
             type="number"
             min="-180"
             max="180"
@@ -93,20 +82,28 @@
       <!-- prettier-ignore -->
       ${this.attributeNames.map( (attrName) => { if (this.getAttributeInputType(attrName) === 'number') { return uHtml`
       <div class="option">
-        <label for="${attrName}" i18n="${this.attrNameForI18n(attrName)}">${attrName}</label>
-        <input id="${attrName}" type="number" value="${this.getCapabilitiesAttribute(attrName)?.default}" />
+        <label for="${attrName}" i18n="${this.attrNameForI18n(attrName)}" class="gg-label">${attrName}</label>
+        <input
+          id="${attrName}"
+          type="number"
+          class="gg-input"
+          value="${this.getCapabilitiesAttribute(attrName)?.default}" />
       </div>
       `} if (this.getAttributeInputType(attrName) === 'checkbox') { return uHtml`
       <div class="option">
-        <label for="${attrName}" i18n="${this.attrNameForI18n(attrName)}">${attrName}</label>
-        <input id="${attrName}" type="checkbox" ?checked="${this.getCapabilitiesAttribute(attrName)?.default}" />
+        <label for="${attrName}" i18n="${this.attrNameForI18n(attrName)}" class="gg-label">${attrName}</label>
+        <input
+          id="${attrName}"
+          type="checkbox"
+          class="gg-checkbox"
+          ?checked="${this.getCapabilitiesAttribute(attrName)?.default}" />
       </div>
       `} if (this.getAttributeInputType(attrName) === 'textarea') { return uHtml`
-      <div class="option w-full">
+      <div class="option">
         <!-- prettier-ignore -->
         <textarea
           id="${attrName}"
-          class="w-full"
+          class="gg-textarea"
           i18n="${this.attrNameForI18n(attrName)}"
           placeholder="${attrName}">${this.getCapabilitiesAttribute(attrName)?.default}</textarea>
       </div>
@@ -114,7 +111,7 @@
       <div class="option">
         <input
           id="${this.attrNameForI18n(attrName)}"
-          class="w-full"
+          class="gg-input"
           i18n="${attrName}"
           placeholder="${attrName}"
           type="text"
@@ -122,7 +119,7 @@
       </div>
       `})}
 
-      <button id="export-pdf" onclick="${() => this.print()}" i18n="Print">Print</button>
+      <button id="export-pdf" class="gg-button" onclick="${() => this.print()}" i18n="Print">Print</button>
 
       <div id="print-list">
         ${this.printList.map((printItem) => uHtml`

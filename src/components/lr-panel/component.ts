@@ -17,7 +17,7 @@ import StateToggleManager from '../../tools/state/stateToggleManager';
  */
 class LRPanelComponent extends GirafeResizableElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   private readonly stateToggleManager: StateToggleManager;
   public title: string = 'Unknown panel';

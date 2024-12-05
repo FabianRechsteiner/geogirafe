@@ -82,10 +82,6 @@ describe('Components architecture', () => {
     // This will ensure that the cross-dependency not created unintentionally
     const legitimCrossDependencies = [
       {
-        oa: path.join(__dirname, path.normalize('components/navigation/navbookmarks/component.ts')),
-        ob: path.join(__dirname, path.normalize('components/navigation/navhelper/component.ts'))
-      },
-      {
         oa: path.join(__dirname, path.normalize('components/lidar/tools/manager.ts')),
         ob: path.join(__dirname, path.normalize('components/lidar/tools/plot.ts'))
       },
@@ -511,6 +507,57 @@ describe('Components translations', () => {
           if (!(i18nId in translations[lang])) {
             // Translation is missing
             errors.push(`The translation in ${lang.toUpperCase()} is missing for key "${i18nId}".`);
+          }
+        }
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+
+  it('Every gAlert, gPrompt, gConfirm call should have a corresponding translation', async () => {
+    // First, read all translations files
+    const i18nPath = path.join(__dirname, 'assets', 'i18n');
+    const translations: Record<string, any> = {};
+    for (const lang of getSupportedLanguages()) {
+      const file = fs.readFileSync(path.join(i18nPath, `${lang}.json`), 'utf-8');
+      translations[lang] = JSON.parse(file)[lang];
+    }
+
+    const parentPath = path.join(__dirname, 'components'); // include parent path for index and mobile templates
+    const htmlFiles = getAllHtmlFiles(parentPath);
+    const tsFiles = getAllTypescriptFiles(parentPath);
+
+    const errors: string[] = [];
+    for (const file of [...htmlFiles, ...tsFiles]) {
+      let code = fs.readFileSync(file, 'utf8');
+      const regex = /(gPrompt|gAlert|gConfirm)\(([^)]+)\)/gm;
+      const matches = code.matchAll(regex);
+      for (const match of matches) {
+        const params = match[2].split(',');
+        for (const param of params) {
+          // trim before because the space can be part of the translation
+          let i18nId = param.trim();
+          if (i18nId.startsWith('`')) {
+            // Ignore templated string
+            continue;
+          }
+
+          // Remove string separators (' or ")
+          i18nId = i18nId.slice(1, -1);
+          if (noNeedForTranslation.includes(i18nId)) {
+            // Special strings do not need any translation
+            continue;
+          }
+
+          for (const lang of getSupportedLanguages()) {
+            if (!(i18nId in translations[lang])) {
+              // Translation is missing
+              errors.push(`The translation in ${lang.toUpperCase()} is missing for key "${i18nId}".`);
+            }
           }
         }
       }

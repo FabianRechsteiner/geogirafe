@@ -4,19 +4,19 @@
 .picker_wrapper,
 .picker_arrow::after,
 .picker_arrow::before {
-    background-color: var(--bkg-color) !important;
+  background-color: var(--bkg-color) !important;
 }
 
 .picker_wrapper,
 .picker_arrow::before {
-    box-shadow: 0 0 10px 1px var(--text-color-grad1) !important;
+  box-shadow: 0 0 10px 1px var(--text-color-grad1) !important;
 }
 
 /* Move color picker over to the left side of the parent, away from the window edge */
 .picker_wrapper.fixedPosition {
-    transform: translateX(-260px);
+  transform: translateX(-260px);
 }
 
 .picker_arrow.fixedPosition {
-    transform: translateX(200px) rotate(90deg) scaleX(-1) !important;
+  transform: translateX(200px) rotate(90deg) scaleX(-1) !important;
 }

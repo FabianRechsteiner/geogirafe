@@ -3,7 +3,7 @@ import GirafeLogo from './images/logo.png';
 
 class AboutComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   loaded = false;
   version!: string;

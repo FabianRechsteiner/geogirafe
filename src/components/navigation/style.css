@@ -14,15 +14,3 @@
   width: max-content;
   background-color: var(--bkg-color);
 }
-
-.border-top {
-  border-top: solid 1px var(--bkg-color);
-}
-
-.hidden {
-  display: none;
-}
-
-.grow {
-  flex-grow: 1;
-}

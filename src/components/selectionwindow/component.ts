@@ -32,7 +32,7 @@ interface Layer {
  */
 class SelectionWindowComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   private readonly eventsCallbacks: Callback[] = [];
   private isVisibleComponentSetup = false;

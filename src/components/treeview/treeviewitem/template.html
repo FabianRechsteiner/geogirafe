@@ -14,7 +14,7 @@
 
     <!-- Checkbox -->
     <button
-      class="${this.layer.active ? 'gg-button gg-small gg-selected' : 'gg-button gg-small gg-opacity'}"
+      class="${this.layer.active ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
       tip="Activate / Deactivate"
       onclick="${() => this.toggle()}">
       <img
@@ -28,20 +28,20 @@
     </button>
 
     <!-- Error icon -->
-    <button class="${this.layer.hasError ? 'gg-button gg-small gg-opacity' : 'hidden'}" tip="Error on layer">
+    <button class="${this.layer.hasError ? 'gg-icon-button gg-small gg-opacity' : 'hidden'}" tip="Error on layer">
       <img alt="Error on layer" src="icons/error.svg" />
     </button>
 
     <!-- Label -->
     <div class="${this.isVisibleInCurrentResolution() ? 'label-container' : 'label-container label-out-resolution'}">
       <button
-        class="${this.layer.active ? 'gg-button gg-small gg-selected' : 'gg-button gg-small gg-opacity'}"
+        class="${this.layer.active ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
         onclick="${() => this.toggle()}">
-        <span i18n="${this.layer.name}" class="gg-label"> ${this.layer.name} </span>
+        <span i18n="${this.layer.name}" class="gg-tree-label"> ${this.layer.name} </span>
       </button>
       <!-- zoom to resolution -->
       <button
-        class="${this.layer.active && this.layer instanceof LayerWms && !this.isVisibleInCurrentResolution() ? 'gg-button gg-small resolution-tool' : 'hidden'}"
+        class="${this.layer.active && this.layer instanceof LayerWms && !this.isVisibleInCurrentResolution() ? 'gg-icon-button gg-small resolution-tool' : 'hidden'}"
         tip="Zoom to visible resolution"
         onclick="${() => this.zoomToVisibleResolution()}">
         <img alt="Zoom to visible resolution" src="icons/zoom.svg" />
@@ -54,7 +54,7 @@
 
     <!-- zoom to full extent -->
     <button
-      class="${this.layer.active && this.layer instanceof LayerLocalFile ? 'gg-button gg-small gg-opacity tool' : 'hidden'}"
+      class="${this.layer.active && this.layer instanceof LayerLocalFile ? 'gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
       tip="Zoom to full extent"
       onclick="${() => this.zoomToFullExtent()}">
       <img alt="Zoom to full extent" src="icons/zoom.svg" />
@@ -86,7 +86,7 @@
 
     <!-- Legend icon -->
     <button
-      class="${this.hasLegend ? 'gg-button gg-small gg-opacity tool' : 'hidden'}"
+      class="${this.hasLegend ? 'gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
       tip="Toggle legend"
       onclick="${() => this.toggleLegend()}">
       <img alt="Toggle legend" src="icons/legend.svg" />
@@ -94,18 +94,21 @@
 
     <!-- Metadata icon -->
     <button
-      class="${this.layer.hasMetadata ? 'metadata gg-button gg-small gg-opacity tool' : 'hidden'}"
+      class="${this.layer.hasMetadata ? 'metadata gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
       onclick="${() => this.showMetadata()}">
       <img alt="Remove theme" src="icons/info.svg" />
     </button>
 
     <!-- Drag -->
-    <button id="drag-button" class="gg-button gg-small gg-grab gg-opacity tool" tip="Move">
+    <button id="drag-button" class="gg-icon-button gg-small gg-grab gg-opacity tool" tip="Move">
       <img alt="Move layer" src="icons/drag.svg" />
     </button>
 
     <!-- Remove icon -->
-    <button class="remove gg-button gg-small gg-opacity tool" tip="Remove layer" onclick="${() => this.deleteLayer()}">
+    <button
+      class="remove gg-icon-button gg-small gg-opacity tool"
+      tip="Remove layer"
+      onclick="${() => this.deleteLayer()}">
       <img alt="Remove layer" src="icons/trash.svg" />
     </button>
   </header>

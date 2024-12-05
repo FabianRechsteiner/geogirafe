@@ -3,7 +3,7 @@ import { formatCoordinates } from '../../tools/geometrytools';
 
 class CoordinateComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = './style.css';
+  styleUrl = '../../styles/common.css';
 
   #locale?: string;
   east: string | null = null;

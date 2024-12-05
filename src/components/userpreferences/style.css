@@ -1,68 +1,44 @@
 #content {
-    padding: 0 1rem;
-    color: var(--text-color);
+  background: var(--bkg-color);
+  padding: 1rem;
+  margin: 0;
 }
 
 .preference-group {
-    padding-bottom: 1rem;
+  padding-bottom: 1rem;
 }
 
 .preference-group-title {
-    font-weight: bold;
-    padding-bottom: 10px;
+  font-weight: bold;
+  padding-bottom: 10px;
 }
 
 .preference-row {
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 8px;
-}
-
-.preference-row > input,
-.preference-row > select {
-    margin: 5px 0;
-    color: var(--text-color);
-    background-color: var(--bkg-color);
-    border: solid 1px var(--text-color);
-    border-radius: 3px;
-    display: inline-block;
-    box-sizing: border-box;
-    padding: 0 0.5rem;
-    height: 2rem;
-    width: 100%;
-    cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
 }
 
 .with-checkbox,
 .with-colorpicker {
-    flex-direction: row;
-    justify-content: space-between;
-    height: 2rem;
-    align-items: center;
-}
-.checkbox {
-    width: 1.2rem;
-    height: 1.2rem;
-    fill: var(--text-color);
-    flex-shrink: 0;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 2rem;
+  align-items: center;
 }
 
 .colorpicker {
-    width: 1.5rem;
-    height: 1.5rem;
-    border: solid 1px var(--text-color);
-    border-radius: 3px;
-    cursor: pointer;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: solid 1px var(--text-color);
+  border-radius: 3px;
+  cursor: pointer;
 }
 
 #reset-all {
-    padding: 5px;
-    border-radius: 3px;
-    outline: 0;
-    border: solid 1px var(--text-color);
-    margin-left: auto;
+  justify-self: end;
 }
 
 #footer {
-    margin-top: 2rem;
+  margin-top: 2rem;
 }

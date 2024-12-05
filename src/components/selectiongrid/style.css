@@ -89,23 +89,6 @@
   background-color: var(--bkg-color);
 }
 
-.selection-btn {
-  border: solid 1px #ccc;
-  height: 2rem;
-  line-height: 2rem;
-  padding: 0 1rem;
-  margin-right: 0.2rem;
-  margin-bottom: 0.2rem;
-  cursor: pointer;
-  color: var(--text-color);
-  background-color: var(--bkg-color);
-}
-
-.selection-btn:hover {
-  color: var(--text-color);
-  background-color: var(--bkg-color-grad2);
-}
-
 #grid {
   overflow: hidden;
   flex: 1;

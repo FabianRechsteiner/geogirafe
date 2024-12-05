@@ -137,7 +137,6 @@ describe('pathUtils.objectFromPath', () => {
   });
 });
 
-
 describe('pathUtils.objectFromPath', () => {
   it('should delete a deeply nested object and all its predecessors', () => {
     const obj = { level1: { level2: { level3: { level4: { level5: 42 } } } } };

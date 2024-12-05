@@ -59,6 +59,9 @@
       <girafe-colorswitcher></girafe-colorswitcher>
     </header>
 
+    <girafe-help></girafe-help>
+    <girafe-modals></girafe-modals>
+
     <div id="content">
       <div id="main">
         <girafe-lr-panel class="panel-left" dock="left">
@@ -68,13 +71,22 @@
           <girafe-map></girafe-map>
           <div class="info-area">
             <girafe-infobox></girafe-infobox>
-            <footer>
-              <girafe-scale></girafe-scale>
-              <girafe-coordinate></girafe-coordinate>
-            </footer>
           </div>
           <girafe-prototype-banner></girafe-prototype-banner>
           <girafe-metadata-window></girafe-metadata-window>
+          <footer>
+            <girafe-scale></girafe-scale>
+            <girafe-coordinate></girafe-coordinate>
+            <span class="copyright">
+              <span>Information without public faith</span>
+              <span>
+                ©
+                <a href="https://doc.geomapfish.dev" target="_blank">GeoGirafe</a>,
+                <a href="https://www.swisstopo.admin.ch/fr/bases-legales" target="_blank">swisstopo</a>,
+                <a href="http://www.openstreetmap.org/copyright" target="_blank">OSM</a>
+              </span>
+            </span>
+          </footer>
         </div>
         <girafe-lr-panel class="panel-right" dock="right">
           <girafe-drawing
@@ -85,10 +97,6 @@
             slot="main"
             data-toggle-path="interface.printPanelVisible"
             data-title="print-panel"></girafe-print>
-          <girafe-lidar-panel
-            slot="main"
-            data-toggle-path="interface.lidarPanelVisible"
-            data-title="lidar-panel"></girafe-lidar-panel>
           <girafe-cross-section-settings
             slot="main"
             data-toggle-path="interface.crossSectionPanelVisible"
@@ -102,11 +110,9 @@
         <girafe-about></girafe-about>
         <girafe-share></girafe-share>
         <girafe-selection-window></girafe-selection-window>
-        <girafe-help></girafe-help>
       </div>
       <div id="content-bottom">
         <girafe-selection-grid dock="bottom"></girafe-selection-grid>
-        <girafe-lidar-profile id="lidar-footer" dock="bottom"></girafe-lidar-profile>
         <girafe-cross-section-view id="cross-section-footer" dock="bottom"></girafe-cross-section-view>
       </div>
     </div>
@@ -114,29 +120,23 @@
     <div id="buttonbar">
       <button
         slot="menu-content"
-        class="gg-button gg-big"
+        class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
         <img alt="help-icon" src="icons/draw.svg" />
       </button>
       <button
         slot="menu-content"
-        class="gg-button gg-big"
+        class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
         <img alt="help-icon" src="icons/print.svg" />
       </button>
       <button
         slot="menu-content"
-        class="gg-button gg-big"
-        onclick="document.geogirafe.state.interface.lidarPanelVisible = !document.geogirafe.state.interface.lidarPanelVisible">
-        <img alt="help-icon" src="icons/lidar.svg" />
-      </button>
-      <button
-        slot="menu-content"
-        class="gg-button gg-big"
+        class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.crossSectionPanelVisible = !document.geogirafe.state.interface.crossSectionPanelVisible">
         <img alt="cross-section-icon" src="icons/cross-section.svg" />
       </button>
-      <button class="gg-button gg-big" onclick="document.geogirafe.state.interface.shareVisible = true">
+      <button class="gg-icon-button gg-big" onclick="document.geogirafe.state.interface.shareVisible = true">
         <img alt="help-icon" src="icons/share.svg" />
       </button>
       <girafe-layout></girafe-layout>
@@ -144,18 +144,19 @@
 
       <div class="filler"></div>
 
-      <button class="gg-button gg-big" onclick="document.geogirafe.state.interface.helpVisible = true">
+      <button class="gg-icon-button gg-big" onclick="document.geogirafe.state.interface.helpVisible = true">
         <img alt="help-icon" src="icons/help.svg" />
       </button>
 
       <button
-        class="gg-button gg-big"
+        class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.aboutVisible = !document.geogirafe.state.interface.aboutVisible">
         <img alt="help-icon" src="icons/info.svg" />
       </button>
 
-      <button class="gg-button gg-big"
-              onclick="document.geogirafe.state.interface.userPreferencesPanelVisible = !document.geogirafe.state.interface.userPreferencesPanelVisible">
+      <button
+        class="gg-icon-button gg-big"
+        onclick="document.geogirafe.state.interface.userPreferencesPanelVisible = !document.geogirafe.state.interface.userPreferencesPanelVisible">
         <img alt="user-preferences-icon" src="icons/config.svg" />
       </button>
     </div>

@@ -4,7 +4,7 @@ type OpenDirection = 'bottom' | 'bottom-left' | 'up' | 'left';
 
 class MenuButtonComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   open = false;
   openDirection: OpenDirection = 'bottom';

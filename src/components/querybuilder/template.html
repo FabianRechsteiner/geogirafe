@@ -10,47 +10,43 @@
     >
   </div>
   <div class="${this.loading || this.deactivated ? 'content hidden' : 'content'}">
-    <div class="custom-select">
-      <select id="attribute" name="attribute" onchange="${() => this.attributeChanged()}">
-        <option value="" disabled ?selected="${!this.currentLayerAttribute}" i18n="Select attribute...">
-          Select attribute...
-        </option>
-        ${this.layerAttributes.map(attr => uHtmlFor(attr, attr.name)`
-        <option i18n="${attr.name}" value="${attr.name}" ?selected="${this.currentLayerAttribute?.name==attr.name}">
-          ${attr.name}
-        </option>
-        `)}
-      </select>
-    </div>
+    <select id="attribute" name="attribute" class="gg-select gg-medium" onchange="${() => this.attributeChanged()}">
+      <option value="" disabled ?selected="${!this.currentLayerAttribute}" i18n="Select attribute...">
+        Select attribute...
+      </option>
+      ${this.layerAttributes.map(attr => uHtmlFor(attr, attr.name)`
+      <option i18n="${attr.name}" value="${attr.name}" ?selected="${this.currentLayerAttribute?.name==attr.name}">
+        ${attr.name}
+      </option>
+      `)}
+    </select>
 
-    <div class="custom-select">
-      <select id="operator" name="operator" onchange="${() => this.operatorChanged()}">
-        <option value="" disabled selected i18n="Select operator...">Select operator...</option>
-        ${this.operatorOptions.map(option => uHtmlFor(option, option.operator)`
-        <option i18n="${option.displayName}" value="${option.operator}">${option.displayName}</option>
-        `)}
-      </select>
-    </div>
+    <select id="operator" name="operator" class="gg-select gg-medium" onchange="${() => this.operatorChanged()}">
+      <option value="" disabled selected i18n="Select operator...">Select operator...</option>
+      ${this.operatorOptions.map(option => uHtmlFor(option, option.operator)`
+      <option i18n="${option.displayName}" value="${option.operator}">${option.displayName}</option>
+      `)}
+    </select>
 
     <input
       id="val"
       type="${this.inputTypeForFilterValue}"
-      class="${this.showVal ? '' : 'hidden'}"
+      class="${this.showVal ? 'gg-input gg-medium' : 'hidden'}"
       placeholder="${this.showVal2 ? 'Enter lower boundary...' : 'Enter value...'}"
       onkeydown="${(e:KeyboardEvent)=>this.onValueKeyPress(e)}" />
 
     <input
       id="val2"
       type="${this.inputTypeForFilterValue}"
-      class="${this.showVal2 ? '' : 'hidden'}"
+      class="${this.showVal2 ? 'gg-input gg-medium' : 'hidden'}"
       placeholder="Enter upper boundary..."
       onkeydown="${(e:KeyboardEvent)=>this.onValueKeyPress(e)}" />
 
-    <button class="gg-button gg-medium" tip="Apply filter" onclick="${() => this.filter()}">
+    <button class="gg-icon-button gg-medium" tip="Apply filter" onclick="${() => this.filter()}">
       <img alt="filter-icon" src="icons/filter.svg" />
     </button>
 
-    <button class="gg-button gg-medium" tip="Remove filter" onclick="${() => this.removeFilter()}">
+    <button class="gg-icon-button gg-medium" tip="Remove filter" onclick="${() => this.removeFilter()}">
       <img alt="delete-icon" src="icons/trash.svg" />
     </button>
   </div>

@@ -3,7 +3,7 @@ import AuthManager from '../../tools/auth/authmanager';
 
 export class OauthComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   public userIconUrl?: string;
 
@@ -34,8 +34,9 @@ export class OauthComponent extends GirafeHTMLElement {
     }
   }
 
-  public onLogoutClick() {
-    if (window.confirm('Do you want to logout ?')) {
+  public async onLogoutClick() {
+    const logout = await window.gConfirm('Do you want to logout ?', 'Logout');
+    if (logout) {
       this.oauthManager.logout();
     }
   }

@@ -4,10 +4,6 @@
   min-width: 20rem; /* For and from parent panel */
 }
 
-.hidden {
-  display: none;
-}
-
 #content {
   background: var(--bkg-color);
   padding: 1.5rem;
@@ -23,17 +19,49 @@
   margin: 0.25rem;
 }
 
-#content div.option {
+/* Print options */
+.option {
   margin-top: 0.5rem;
   display: flex;
-  justify-content: space-between;
 }
 
+.option label {
+  width: 40%;
+}
+
+.option label:after {
+  content: ' :';
+}
+
+.option input,
+.option select,
+.option textarea {
+  flex-grow: 1;
+}
+
+.option input.gg-checkbox {
+  flex-grow: 0;
+}
+
+.rotation {
+  flex-grow: 1;
+  display: flex;
+  gap: 0.5rem;
+}
+
+#rotationSlider {
+  width: 0;
+}
+
+#rotationNumber {
+  width: 4rem;
+  flex-grow: 0;
+}
+
+/* List of reports */
 #content #export-pdf {
   float: right;
   margin-top: 1rem;
-  height: 3rem;
-  width: 8rem;
 }
 
 #content button {
@@ -113,97 +141,4 @@
   bottom: 0;
   right: 0;
   margin-right: 0.5rem;
-}
-
-label {
-  color: var(--text-color);
-  width: 8rem;
-  line-height: 2.5rem;
-  margin-right: 0.5rem;
-  flex-grow: 1;
-}
-
-label ~ * {
-  flex-grow: 1;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-label:after {
-  content: ' :';
-}
-
-select,
-textarea,
-input {
-  font-family: Arial, sans-serif;
-  appearance: none;
-  outline: 0;
-  box-shadow: none;
-  padding: 0.5rem;
-  color: var(--text-color);
-  background-color: var(--bkg-color);
-  border: solid 1px var(--text-color);
-  background-image: none;
-  cursor: pointer;
-}
-
-textarea {
-  height: 6rem;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.rotation {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.rotation input {
-  appearance: auto;
-  flex-grow: 1;
-  overflow: hidden;
-  max-width: 50%;
-}
-
-.rotation input[type='range'] {
-  padding-left: 0;
-  padding-right: 0;
-  flex-grow: 2;
-}
-
-input[type='checkbox'] {
-  appearance: auto;
-  flex-grow: 0;
-  max-width: 6rem;
-  overflow: visible;
-}
-
-/* Custom Select wrapper */
-.select {
-  position: relative;
-  display: flex;
-  width: 13rem;
-  height: 2.5rem;
-  border-radius: 3px;
-  overflow: hidden;
-  flex-grow: 1;
-}
-
-.select select {
-  flex-grow: 1;
-}
-
-.select::after {
-  content: '\25bc';
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 0.7rem;
-  border: solid 1px var(--text-color);
-  border-left-width: 0;
-  color: var(--text-color);
-  pointer-events: none;
 }

@@ -7,7 +7,7 @@ import CustomThemesManager from '../../tools/themes/customthemesmanager';
 
 class ThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   newIcon: string = NewIcon;
 
@@ -76,17 +76,22 @@ class ThemeComponent extends GirafeHTMLElement {
     }
   }
 
-  onAddCustomTheme() {
-    const themeName = prompt('Please give a name to you new custom theme:');
-    if (themeName !== null && themeName.trim().length > 0) {
+  async onAddCustomTheme() {
+    const themeName = await window.gPrompt(
+      'Please enter a name for the new custom theme',
+      'Create cutsom theme',
+      'my theme'
+    );
+    if (themeName !== false && themeName.trim().length > 0) {
       this.customThemesManager.addTheme(themeName, this.state.layers.layersList);
       super.render();
     }
   }
 
-  onDeleteCustomTheme(themelayer: CustomTheme, e: Event) {
+  async onDeleteCustomTheme(themelayer: CustomTheme, e: Event) {
     e.stopPropagation();
-    if (confirm('Do you want to delete this theme?')) {
+    const confirm = await window.gConfirm('Do you want to delete this theme?', 'Delete Theme');
+    if (confirm) {
       this.customThemesManager.deleteTheme(themelayer);
       super.render();
     }

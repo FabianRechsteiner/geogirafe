@@ -58,7 +58,7 @@ declare global {
 
 export default class MapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   olMap: Map;
   mapTarget!: HTMLDivElement;

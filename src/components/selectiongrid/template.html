@@ -17,16 +17,14 @@
       </div>
       <div class="selection-panel">
         <button
-          ?hidden="${!this.showCsvButton}"
-          class="selection-btn"
+          class="${this.showCsvButton ? 'gg-button' : 'hidden'}"
           onclick="${() => this.zoomToSelection()}"
           i18n="Zoom to"></button>
-        <button class="selection-btn" onclick="${() => this.invertSelection()}" i18n="Invert selection"></button>
-        <button class="selection-btn" onclick="${() => this.selectNone()}" i18n="Select none"></button>
-        <button class="selection-btn" onclick="${() => this.selectAll()}" i18n="Select all"></button>
+        <button class="gg-button" onclick="${() => this.invertSelection()}" i18n="Invert selection"></button>
+        <button class="gg-button" onclick="${() => this.selectNone()}" i18n="Select none"></button>
+        <button class="gg-button" onclick="${() => this.selectAll()}" i18n="Select all"></button>
         <button
-          ?hidden="${!this.showCsvButton}"
-          class="selection-btn"
+          class="${this.showCsvButton ? 'gg-button' : 'hidden'}"
           onclick="${() => this.generateCSV()}"
           i18n="Generate CSV"></button>
       </div>

@@ -33,6 +33,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   private registerEvents() {
     this.subscribe('layers.layersList', (oldLayers, newLayers) => this.onLayersListChanged(oldLayers, newLayers));
     this.subscribe('treeview.advanced', () => this.refreshRender());
+    this.subscribe('basemaps', () => this.refreshRender());
     this.subscribe(/layers\.layersList\..*\.order/, () => this.refreshRender());
   }
 

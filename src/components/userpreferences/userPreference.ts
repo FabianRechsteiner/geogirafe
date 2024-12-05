@@ -6,7 +6,6 @@ export type PreferenceOption = {
 export const PreferenceGroups = ['system', 'map', 'visual'];
 export type PreferenceGroup = (typeof PreferenceGroups)[number];
 
-
 /**
  Contains info/config about preference items the user can change in the UserPreferenceComponent.
  */
@@ -51,4 +50,3 @@ export class UserPreference {
     return this._configToStateMapper(this.currentValue);
   }
 }
-

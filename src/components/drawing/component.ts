@@ -25,7 +25,7 @@ import notVisibleIcon from './assets/notVisible.svg?raw';
 
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../styles/common.css'];
+  styleUrls = ['../../styles/common.css', './style.css'];
 
   checkedIcon: string = checkedIcon;
   noCheckedIcon: string = noCheckedIcon;
@@ -313,8 +313,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
     return !this.selectedFeatures.every((f) => f.isPointOrPolyline());
   }
 
-  deleteFeature(feature: DrawingFeature) {
-    if (confirm(`Do you want to remove "${feature.name}" ?`)) {
+  async deleteFeature(feature: DrawingFeature) {
+    const confirm = await window.gConfirm(`Do you want to remove "${feature.name}" ?`, 'Delete Feature');
+    if (confirm) {
       this.drawingState.features = this.drawingState.features.filter((f) => f.id != feature.id);
       this.refreshRender();
     }
