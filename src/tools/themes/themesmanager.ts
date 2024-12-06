@@ -52,15 +52,24 @@ class ThemesManager extends GirafeSingleton {
 
   public async initialize() {
     await this.configManager.loadConfig();
-    await this.loadThemes();
 
-    console.log('Themes were loaded');
+    try {
+      await this.loadThemes();
+      console.log('Themes were loaded');
 
-    // We shouldn't set the default theme is there is any configured hash
-    if (this.shareManager.hasSharedState()) {
-      this.shareManager.setStateFromUrl();
-    } else {
-      this.setDefaultTheme();
+      // We shouldn't set the default theme is there is any configured hash
+      if (this.shareManager.hasSharedState()) {
+        this.shareManager.setStateFromUrl();
+      } else {
+        this.setDefaultTheme();
+      }
+    } catch {
+      // Themes could not be loaded
+      await window.gAlert(
+        'An error occurred while loading the themes. This has nothing to do with GeoGirafe and is very probably a backend-configuration error (wrong content in themes.json, or CORS error). Please check the backend configuration.',
+        'Backend error'
+      );
+      await window.gAlert('This instance of GeoGirafe cannot be used at the moment.', 'Backend error');
     }
   }
 

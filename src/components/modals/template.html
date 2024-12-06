@@ -1,7 +1,8 @@
 <div id="content" class="${this.visible ? '' : 'hidden'}">
   <div class="modal">
     <header>
-      <img alt="help-icon" src="icons/help.svg" />
+      <img alt="question-icon" src="icons/help.svg" class="${this.boxType === 'alert' ? 'hidden' : ''}" />
+      <img alt="error-icon" src="icons/error.svg" class="${this.boxType === 'alert' ? '' : 'hidden'}" />
     </header>
     <section>
       <h2>${this.boxTitle}</h2>

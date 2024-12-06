@@ -48,8 +48,6 @@ if "%1"=="cjl" (
 if "%1"=="geogr" (
     echo "Preparing environment GEOGR..."
     copy demo\config.geogr.json %APPDIR%\config.json /Y
-    curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
-    curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --output %OUTPUTDIR%\de.json
     goto :end
 )
 
@@ -90,8 +88,6 @@ if "%1"=="mapnv" (
 if "%1"=="schwyz" (
     echo "Preparing environment SCHWYZ..."
     copy demo\config.schwyz.json %APPDIR%\config.json /Y
-    curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
-    curl "https://map.geo.sz.ch/static-ngeo/build/de.json" --output %OUTPUTDIR%\de.json
     goto :end
 )
 

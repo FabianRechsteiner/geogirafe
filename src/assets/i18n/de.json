@@ -237,6 +237,9 @@
     "searchFillColor": "Suchresultat Füllfarbe",
     "searchStrokeColor": "Suchresultat Strichfarbe",
     "drawingFillColor": "Zeichnen Füllfarbe",
-    "drawingStrokeColor": "Zeichnen Strichfarbe"
+    "drawingStrokeColor": "Zeichnen Strichfarbe",
+    "An error occurred while loading the themes. This has nothing to do with GeoGirafe and is very probably a backend-configuration error (wrong content in themes.json, or CORS error). Please check the backend configuration.": "Ein Fehler ist beim Laden der Themen aufgetreten. Dies hat nichts mit GeoGirafe zu tun und ist höchstwahrscheinlich ein Backend-Konfigurationsfehler (falscher Inhalt in themes.json oder CORS-Fehler). Bitte überprüfen Sie die Backend-Konfiguration.",
+    "This instance of GeoGirafe cannot be used at the moment.": "Diese Instanz von GeoGirafe kann momentan nicht verwendet werden.",
+    "Backend error": "Backend-Fehler"
   }
 }

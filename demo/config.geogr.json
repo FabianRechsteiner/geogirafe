@@ -4,12 +4,12 @@
   },
   "languages": {
     "translations": {
-      "de": ["i18n/de.json", "Mock/de.json"]
+      "de": ["i18n/de.json", "https://edit.geo.gr.ch/static/X/en.json"]
     },
     "defaultLanguage": "de"
   },
   "themes": {
-    "url": "Mock/themes.json",
+    "url": "https://edit.geo.gr.ch/themes?background=background&interface=desktop",
     "defaultTheme": "Basisinfo"
   },
   "basemaps": {
