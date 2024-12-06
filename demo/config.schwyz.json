@@ -4,16 +4,16 @@
   },
   "languages": {
     "translations": {
-      "de": ["i18n/de.json", "Mock/de.json"]
+      "de": ["i18n/de.json", "https://map.geo.sz.ch/static/dummy/de.json"]
     },
     "defaultLanguage": "de"
   },
   "themes": {
-    "url": "Mock/themes.json",
+    "url": "https://map.geo.sz.ch/themes?background=background&interface=desktop",
     "defaultTheme": ""
   },
   "basemaps": {
-    "defaultBasemap": "Landeskarte farbig (aktuell)",
+    "defaultBasemap": "Landeskarte (farbig)",
     "OSM": true,
     "SwissTopoVectorTiles": true
   },

@@ -45,8 +45,6 @@ elif [ "$1" = 'geogr' ];
 then
     echo "Preparing environment GEOGR..."
     cp demo/config.$1.json $APPDIR/config.json
-    curl "https://edit.geo.gr.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://edit.geo.gr.ch/static-ngeo/build/de.json" --silent --output $MOCKDIR/de.json
 
 elif [ "$1" = 'lausanne' ];
 then
@@ -82,8 +80,6 @@ elif [ "$1" = 'schwyz' ];
 then
     echo "Preparing environment SCHWYZ..."
     cp demo/config.$1.json $APPDIR/config.json
-    curl "https://map.geo.sz.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://map.geo.sz.ch/static-ngeo/build/de.json" --silent --output $MOCKDIR/de.json
 
 elif [ "$1" = 'sigip' ];
 then
