@@ -91,6 +91,8 @@ export default class SelectionTabulatorManager {
       columns: this.columnsToGridColumns(this.data[id].columns),
       selectableRows: true,
       layout: 'fitColumns',
+      locale: true,
+      maxHeight: '750',
       headerSortElement: function (_, dir) {
         switch (dir) {
           case 'asc':
@@ -228,5 +230,13 @@ export default class SelectionTabulatorManager {
    */
   private getLocale(): string {
     return this.configManager.Config.general.locale;
+  }
+
+  blockRedraw(): void {
+    this.table?.blockRedraw();
+  }
+
+  restoreRedraw(): void {
+    this.table?.restoreRedraw();
   }
 }

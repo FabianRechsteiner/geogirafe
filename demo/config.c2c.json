@@ -19,7 +19,7 @@
     "defaultTheme": "Demo"
   },
   "selection": {
-    "maxFeature": 100
+    "maxFeature": 200
   },
   "basemaps": {
     "show": true,
