@@ -37,7 +37,7 @@ describe('ConfigManager.loadConfig', () => {
     manager.loadConfig().then((config) => {
       expect(config.themes.imagesUrlPrefix).toEqual('');
       expect(config.general.locale).toEqual(GirafeConfig.DEFAULT_LOCALE);
-      expect(config.selection.defaultFocusStrokeColor).toEqual('#ff0000');
+      expect(config.selection.highlightStrokeColor).toEqual('#00ff22');
       expect(config.drawing.defaultTextSize).toEqual(12);
       expect(config.basemaps.OSM).toEqual(false);
       expect(config.map.showScaleLine).toEqual(true);

@@ -7,10 +7,12 @@ import type { FrameState } from 'ol/Map';
 import VectorLayer from 'ol/layer/Vector';
 import { Circle, Fill, Stroke, Style } from 'ol/style';
 import { unByKey } from 'ol/Observable';
+import { asString } from 'ol/color';
 import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
 import MapManager from '../../../tools/state/mapManager';
 import ConfigManager from '../../../tools/configuration/configmanager';
+import { colorToRgbaArray } from '../../../tools/utils/utils';
 
 /**
  * Helps to highlight features on the map by adding an animated
@@ -23,7 +25,9 @@ export class FocusFeature {
   private readonly configManager: ConfigManager;
   private readonly flashStyleCache: Record<string, Style> = {};
   private focusLayer?: VectorLayer<VectorSource>;
+  private focusSource?: VectorSource;
   private focusAnimation: EventsKey | null = null;
+  private strokeColor!: number[] | null;
 
   constructor() {
     this.olMap = MapManager.getInstance().getMap();
@@ -34,7 +38,6 @@ export class FocusFeature {
   }
 
   setFocusedFeatures(features: Feature[] | null) {
-    this.setFocusLayerStyle();
     this.flash(features);
   }
 
@@ -43,11 +46,12 @@ export class FocusFeature {
    * @private
    */
   private createFocusLayer() {
+    this.focusSource = new VectorSource();
     this.focusLayer = new VectorLayer({
       properties: {
         addToPrintedLayers: true
       },
-      source: new VectorSource()
+      source: this.focusSource
     });
     this.setFocusLayerStyle();
     this.olMap.addLayer(this.focusLayer);
@@ -60,22 +64,18 @@ export class FocusFeature {
    * @private
    */
   private setFocusLayerStyle() {
-    const config = this.configManager.Config.selection;
-    const strokeColor = config.defaultFocusStrokeColor;
-    const strokeWidth = config.defaultFocusStrokeWidth;
-    const fillColor = config.defaultFocusFillColor;
     const style = new Style({
       stroke: new Stroke({
-        color: strokeColor,
-        width: strokeWidth
+        color: this.configManager.Config.selection.highlightStrokeColor,
+        width: this.configManager.Config.selection.defaultStrokeWidth
       }),
-      fill: new Fill({ color: fillColor }),
+      fill: new Fill({ color: this.configManager.Config.selection.highlightFillColor }),
       image: new Circle({
         radius: 7,
-        fill: new Fill({ color: fillColor }),
+        fill: new Fill({ color: this.configManager.Config.selection.highlightFillColor }),
         stroke: new Stroke({
-          color: strokeColor,
-          width: strokeWidth
+          color: this.configManager.Config.selection.highlightStrokeColor,
+          width: this.configManager.Config.selection.defaultStrokeWidth
         })
       })
     });
@@ -88,6 +88,8 @@ export class FocusFeature {
    * @private
    */
   private flash(features: Feature[] | null) {
+    // Remove earlier focus features from map
+    this.focusSource?.clear();
     // First deactivate the current animation
     // (We only want one animated object)
     if (this.focusAnimation !== null) {
@@ -102,6 +104,11 @@ export class FocusFeature {
     if (!geometries.length) {
       return;
     }
+    // Update features in map and their style
+    this.focusSource?.addFeatures(features);
+    this.setFocusLayerStyle();
+    this.strokeColor = colorToRgbaArray(this.configManager.Config.selection.highlightStrokeColor) || [255, 0, 0, 1];
+
     this.focusAnimation = this.focusLayer.on('postrender', (renderEvent) => {
       geometries.forEach((geometry) => {
         const flashGeom = geometry.clone();
@@ -135,28 +142,29 @@ export class FocusFeature {
     if (cached) {
       return cached;
     }
-    const style = FocusFeature.createFlashStyle(values);
+    const style = FocusFeature.createFlashStyle(values, this.strokeColor!);
     this.flashStyleCache[cacheKeyName] = style;
     return style;
   }
 
   /**
    * @param values - With [radius, opacity, offset] expected.
+   * @param color - stroke color of flash animation
    * @returns A new "flash" style object based on the given values.
    * @static
    */
-  static createFlashStyle(values: number[]): Style {
+  static createFlashStyle(values: number[], color: number[]): Style {
     const [radius, opacity, offset] = values;
     return new Style({
       image: new Circle({
         radius: radius,
         stroke: new Stroke({
-          color: 'rgba(255, 0, 0, ' + opacity + ')',
-          width: 0.25 + opacity
+          color: asString([...color.slice(0, 3), opacity]),
+          width: 4 * opacity
         })
       }),
       stroke: new Stroke({
-        color: [255, 0, 0, 1],
+        color: asString(color),
         width: 12,
         lineDash: [16, 32],
         lineDashOffset: offset
