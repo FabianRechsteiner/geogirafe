@@ -34,8 +34,9 @@ girafe-theme-select {
 }
 
 .logo {
-  margin: 0.4rem 1rem;
+  margin: 0.2rem 1rem;
   height: -webkit-fill-available;
+  opacity: 0.8;
 }
 
 girafe-search {

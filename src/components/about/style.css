@@ -26,9 +26,11 @@
 }
 
 img.logo {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
   filter: var(--svg-filter);
+  height: 4rem;
+  opacity: 0.8;
 }
 
 h3 {

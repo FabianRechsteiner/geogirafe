@@ -1,5 +1,4 @@
 import GirafeDraggableElement from '../../base/GirafeDraggableElement';
-import GirafeLogo from './images/logo.png';
 
 class AboutComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
@@ -9,7 +8,6 @@ class AboutComponent extends GirafeDraggableElement {
   version!: string;
   build!: string;
   date!: string;
-  public logo: string = GirafeLogo;
 
   constructor() {
     super('about');
