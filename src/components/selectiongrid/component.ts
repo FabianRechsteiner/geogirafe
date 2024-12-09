@@ -36,6 +36,14 @@ class SelectionGridComponent extends GirafeResizableElement {
       this.showCsvButton = newValue;
       this.render();
     });
+
+    this.addEventListener('resize-start', () => {
+      this.selectionTabulatorManager.blockRedraw();
+    });
+
+    this.addEventListener('resize-end', () => {
+      this.selectionTabulatorManager.restoreRedraw();
+    });
   }
 
   connectedCallback() {

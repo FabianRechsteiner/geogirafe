@@ -88,6 +88,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
 
   private mousedown(e: MouseEvent) {
     e.preventDefault();
+    this.dispatchEvent(new CustomEvent('resize-start'));
     document.onmousemove = (e) => this.mousemove(e);
     document.onmouseup = () => this.mouseup();
 
@@ -116,6 +117,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
     // stop moving when mouse button is released
     document.onmouseup = null;
     document.onmousemove = null;
+    this.dispatchEvent(new CustomEvent('resize-end'));
   }
 
   protected closePanel() {
