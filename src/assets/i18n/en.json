@@ -240,6 +240,7 @@
     "drawingStrokeColor": "Drawing stroke color",
     "An error occurred while loading the themes. This has nothing to do with GeoGirafe and is very probably a backend-configuration error (wrong content in themes.json, or CORS error). Please check the backend configuration.": "An error occurred while loading the themes. This has nothing to do with GeoGirafe and is very probably a backend-configuration error (wrong content in themes.json, or CORS error). Please check the backend configuration.",
     "This instance of GeoGirafe cannot be used at the moment.": "This instance of GeoGirafe cannot be used at the moment.",
-    "Backend error": "Backend error"
+    "Backend error": "Backend error",
+    "Web Mercator projection distorts distances and areas": "Web Mercator projection distorts distances and areas"
   }
 }

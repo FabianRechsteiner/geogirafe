@@ -1,7 +1,7 @@
 import type OlGeomGeometry from 'ol/geom/Geometry';
 import { Circle, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
 import { getCenter } from 'ol/extent';
-import { polygonFromCircle } from '../../../tools/utils/olutils';
+import { getArea, getDistance, polygonFromCircle } from '../../../tools/utils/olutils';
 import { formatCoordinates } from '../../../tools/geometrytools';
 
 /**
@@ -86,9 +86,9 @@ export default class FormatGridGeomValue {
     let icons = '<img alt="polyline icon" src="icons/polyline.svg" />';
     let geoLength;
     if (geometry instanceof MultiLineString) {
-      geoLength = geometry.getLineStrings().reduce((length, line) => length + line.getLength(), 0);
+      geoLength = geometry.getLineStrings().reduce((length, line) => length + getDistance(line.getCoordinates()), 0);
     } else {
-      geoLength = geometry.getLength();
+      geoLength = getDistance(geometry.getCoordinates());
     }
     const length = (Math.round(geoLength * 100) / 100).toLocaleString(this.locale, {
       minimumFractionDigits: 2
@@ -104,9 +104,13 @@ export default class FormatGridGeomValue {
    */
   private getGeometryIconsInfoPolygon(geometry: Polygon | MultiPolygon): [string, number[]] {
     let icons = '<img alt="polygon icon" src="icons/polygon.svg" />';
-    const area = (Math.round(geometry.getArea() * 100) / 100).toLocaleString(this.locale, {
-      minimumFractionDigits: 2
-    });
+    let geoArea = 0;
+    if (geometry instanceof MultiPolygon) {
+      geometry.getPolygons().forEach((polygon) => (geoArea += getArea(polygon)));
+    } else {
+      geoArea = getArea(geometry);
+    }
+    const area = (Math.round(geoArea * 100) / 100).toLocaleString(this.locale, { minimumFractionDigits: 2 });
     icons += `<span>${area}&nbsp;m<sup>2</sup></span>`;
     const coords = getCenter(geometry.getExtent());
     return [icons, coords];

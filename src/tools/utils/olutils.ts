@@ -3,10 +3,13 @@ import type { Map } from 'ol';
 import type BaseLayer from 'ol/layer/Base';
 import type Feature from 'ol/Feature';
 import { fromCircle } from 'ol/geom/Polygon.js';
-
+import { Coordinate } from 'ol/coordinate';
+import { Projection, get as getProjection } from 'ol/proj';
+import { getDistance as getSphericalDistance, getArea as getSphericalArea } from 'ol/sphere';
 import { unByKey } from 'ol/Observable';
-import { Circle } from 'ol/geom';
+import { Circle, LineString, Polygon } from 'ol/geom';
 import GeoConsts from '../geoconsts';
+import StateManager from '../state/statemanager';
 
 /**
  * Unsubscribe to all OpenLayer listeners.
@@ -51,4 +54,28 @@ export const removeUnwantedOlParams = (feature: Feature, keepGeom = false): Reco
  */
 export const polygonFromCircle = (geometry: Circle) => {
   return fromCircle(geometry, GeoConsts.CIRCLE_TO_POLYGON_SIDES);
+};
+
+/**
+ * @param coordinates ol Coordinate list
+ * @returns the length between two coordinates considering the current map projection (projected or geographic)
+ */
+export const getDistance = (coordinates: Coordinate[]) => {
+  const projection: Projection | null = getProjection(StateManager.getInstance().state.projection);
+  if (projection?.getUnits() === 'degrees') {
+    return getSphericalDistance(coordinates[0], coordinates[1]);
+  }
+  return new LineString(coordinates).getLength();
+};
+
+/**
+ * @param polygon ol Polygon
+ * @returns the area of a polygon considering the current map projection (projected or geographic)
+ */
+export const getArea = (polygon: Polygon) => {
+  const projection: Projection | null = getProjection(StateManager.getInstance().state.projection);
+  if (projection?.getUnits() === 'degrees') {
+    return getSphericalArea(polygon, { projection: projection! });
+  }
+  return polygon.getArea();
 };

@@ -1,7 +1,8 @@
-import { test, describe, expect } from 'vitest';
+import { test, describe, expect, beforeAll, afterAll } from 'vitest';
 import FormatGridGeomValue from './formatgridgeomvalue';
 import { Point, LineString, Polygon, MultiPoint, Circle } from 'ol/geom';
 import type OlGeomGeometry from 'ol/geom/Geometry';
+import MockHelper from '../../../tools/tests/mockhelper';
 
 const getGeometryIconsInfo = (geometry: OlGeomGeometry | null): [string, number[]] | [null, null] => {
   const fg = new FormatGridGeomValue() as any;
@@ -10,6 +11,15 @@ const getGeometryIconsInfo = (geometry: OlGeomGeometry | null): [string, number[
 };
 
 describe('FormatGridGeomValue', () => {
+
+  beforeAll(() => {
+    MockHelper.startMocking();
+  });
+
+  afterAll(() => {
+    MockHelper.stopMocking();
+  });
+  
   test('Testing Point type null geometry', () => {
     const [icon, coords] = getGeometryIconsInfo(null);
     expect(icon).toBeNull();
