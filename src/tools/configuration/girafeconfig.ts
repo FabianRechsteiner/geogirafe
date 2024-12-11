@@ -1,5 +1,3 @@
-import { SharedLayer } from '../share/sharedstate';
-
 class GirafeConfig {
   general: {
     locale: string;
@@ -23,7 +21,6 @@ class GirafeConfig {
     showErrorsOnStart: boolean;
     selectionMode: 'add' | 'replace';
   };
-  customthemes: Record<string, SharedLayer[]>[];
   basemaps: {
     show: boolean;
     defaultBasemap: string;
@@ -176,7 +173,6 @@ class GirafeConfig {
     this.languages = this.initConfigLanguages(config);
     this.interface = this.initConfigInterface(config);
     this.themes = this.initConfigThemes(config);
-    this.customthemes = this.initConfigCustomThemes(config);
     this.basemaps = this.initConfigBasemaps(config);
     this.treeview = this.initConfigTreeview(config);
     this.selection = this.initConfigSelection(config);
@@ -430,10 +426,6 @@ class GirafeConfig {
       showErrorsOnStart: config.themes.showErrorsOnStart ?? false,
       selectionMode: config.themes.selectionMode ?? 'replace'
     };
-  }
-
-  private initConfigCustomThemes(config: GirafeConfig) {
-    return config.customthemes ?? [];
   }
 
   private initConfigLanguages(config: GirafeConfig) {
