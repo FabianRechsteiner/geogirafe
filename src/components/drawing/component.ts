@@ -22,6 +22,7 @@ import trashIcon from '../../assets/icons/trash.svg?raw';
 import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
+import I18nManager from '../../tools/i18n/i18nmanager';
 
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -137,6 +138,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
       this.createMapContextMenu();
       this.setTool();
     }
+    this.warnWhenInWebMercator();
   }
 
   refreshRender() {
@@ -195,6 +197,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.loadConfig().then(() => {
       this.render();
       this.subscribe('interface.drawingPanelVisible', (_, newValue) => this.togglePanel(newValue));
+      this.subscribe('projection', (_, newProjection) => this.warnWhenInWebMercator(newProjection));
     });
   }
 
@@ -267,6 +270,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
       // Refresh all the listeners
       this.drawingState.features = [];
       this.drawingState.features = features;
+      this.olDrawing.updateModifiableFeatures(this.selectedFeatures);
     }
   }
 
@@ -373,6 +377,17 @@ export default class DrawingComponent extends GirafeHTMLElement {
       alternateMouseClick,
       conditionToOpen
     );
+  }
+
+  private warnWhenInWebMercator(projection: string = this.state.projection) {
+    if (this.visible && projection === 'EPSG:3857') {
+      const errorMessage = 'Web Mercator projection distorts distances and areas';
+      this.stateManager.state.infobox.elements.push({
+        id: uuidv4(),
+        text: I18nManager.getInstance().getTranslation(errorMessage),
+        type: 'warning'
+      });
+    }
   }
 
   exportSelectedFeatures(format: 'geojson' | 'kml' | 'gpx') {

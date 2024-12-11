@@ -28,14 +28,7 @@ import { mouseOnly, never, primaryAction } from 'ol/events/condition';
 import { Pixel } from 'ol/pixel';
 import ConfigManager from '../../tools/configuration/configmanager';
 import MapManager from '../../tools/state/mapManager';
-
-function getLength(coordinates: Coordinate[]) {
-  return new LineString(coordinates).getLength();
-}
-
-function getArea(polygon: Polygon) {
-  return polygon.getArea();
-}
+import { getDistance, getArea } from '../../tools/utils/olutils';
 
 function getHalfPoint(coordinates: Coordinate[]) {
   return new Point(new LineString(coordinates).getCoordinateAt(0.5));
@@ -45,7 +38,7 @@ function fixLastLength(length: number, coordinates: SketchCoordType, scale: numb
   const coord = coordinates as Coordinate[];
   if (coord.length > 1 && length > 0) {
     const lastLine = [coord[coord.length - 2], coord[coord.length - 1]];
-    coord[coord.length - 1] = new LineString(lastLine).getCoordinateAt(length / (getLength(lastLine) * scale));
+    coord[coord.length - 1] = new LineString(lastLine).getCoordinateAt(length / (getDistance(lastLine) * scale));
   }
 }
 
@@ -290,8 +283,8 @@ export default class OlDrawing {
   createDiskFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
     const coord = coordinates as Coordinate[];
     fixLastLength(this.fixedLength, coord);
-    geom = geom ?? new CircleGeom(coord[0], getLength(coord));
-    (geom as CircleGeom).setCenterAndRadius(coord[0], getLength(coord));
+    geom = geom ?? new CircleGeom(coord[0], getDistance(coord));
+    (geom as CircleGeom).setCenterAndRadius(coord[0], getDistance(coord));
     return geom;
   }
 
@@ -444,13 +437,13 @@ export default class OlDrawing {
       addLabel(geometry as Point, feature.getCoordText((geometry as Point).getCoordinates()));
     } else if (feature.type == DrawingShape.Polyline) {
       (geometry as LineString).forEachSegment((a, b) =>
-        addLabel(getHalfPoint([a, b]), feature.getLengthText(getLength([a, b])))
+        addLabel(getHalfPoint([a, b]), feature.getLengthText(getDistance([a, b])))
       );
     } else if (feature.type == DrawingShape.Polygon) {
       const polygon = geometry as Polygon;
       const segments = this.ensurePolygonIsProperlyClosed(polygon);
       new LineString(segments).forEachSegment((a, b) =>
-        addLabel(getHalfPoint([a, b]), feature.getLengthText(getLength([a, b])))
+        addLabel(getHalfPoint([a, b]), feature.getLengthText(getDistance([a, b])))
       );
       addLabel(polygon.getInteriorPoint(), feature.getAreaText(getArea(polygon)));
     } else if (feature.type == DrawingShape.Disk) {
@@ -469,22 +462,22 @@ export default class OlDrawing {
       addLabel(polygon.getInteriorPoint(), feature.getAreaText(getArea(polygon)));
       addLabel(
         new Point(polygon.getCoordinates()[0][0]),
-        feature.getLengthText(getLength(polygon.getCoordinates()[0]))
+        feature.getLengthText(getDistance(polygon.getCoordinates()[0]))
       );
     } else if (feature.type == DrawingShape.FreehandPolyline) {
       const line = geometry as LineString;
-      addLabel(new Point(line.getCoordinates()[0]), feature.getLengthText(getLength(line.getCoordinates())));
+      addLabel(new Point(line.getCoordinates()[0]), feature.getLengthText(getDistance(line.getCoordinates())));
     } else if (feature.type == DrawingShape.Rectangle) {
       const rect = geometry as Polygon;
       const segment1 = [rect.getCoordinates()[0][0], rect.getCoordinates()[0][1]];
       const segment2 = [rect.getCoordinates()[0][1], rect.getCoordinates()[0][2]];
-      addLabel(getHalfPoint(segment1), feature.getLengthText(getLength(segment1)));
-      addLabel(getHalfPoint(segment2), feature.getLengthText(getLength(segment2)));
+      addLabel(getHalfPoint(segment1), feature.getLengthText(getDistance(segment1)));
+      addLabel(getHalfPoint(segment2), feature.getLengthText(getDistance(segment2)));
       addLabel(rect.getInteriorPoint(), feature.getAreaText(getArea(rect)));
     } else if (feature.type == DrawingShape.Square) {
       const square = geometry as Polygon;
       const segment = [square.getCoordinates()[0][0], square.getCoordinates()[0][1]];
-      addLabel(getHalfPoint(segment), feature.getLengthText(getLength(segment)));
+      addLabel(getHalfPoint(segment), feature.getLengthText(getDistance(segment)));
       addLabel(square.getInteriorPoint(), feature.getAreaText(getArea(square)));
     }
 

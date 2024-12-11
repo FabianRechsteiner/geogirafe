@@ -1,9 +1,9 @@
-import type { VectorFeatureFileFormat, ColorPalette, ColorVariable, PrintFileFormat } from './../crosssectiontypes';
-import type { Marker, Measurement } from './../scatterplot';
+import type { VectorFeatureFileFormat, ColorPalette, ColorVariable, PrintFileFormat } from '../crosssectiontypes';
+import type { Marker, Measurement } from '../scatterplot';
 import type { Callback } from '../../../tools/state/statemanager';
 
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
-import { CrossSectionState } from './../crosssectionstate';
+import { CrossSectionState } from '../crosssectionstate';
 import { download } from '../../../tools/export/download';
 import MapManager from '../../../tools/state/mapManager';
 import I18nManager from '../../../tools/i18n/i18nmanager';
@@ -33,6 +33,7 @@ import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser.js';
 // @ts-expect-error: JSTS typing issue
 import { BufferOp, BufferParameters } from 'jsts/org/locationtech/jts/operation/buffer.js';
 import { StyleLike } from 'ol/style/Style';
+import { getDistance } from '../../../tools/utils/olutils';
 
 class CrossSectionSettingsComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -366,7 +367,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
     if (this.crossSectionState.linestringCoordinates.length >= 2) {
       this.linestring!.getGeometry()!.setCoordinates(this.crossSectionState.linestringCoordinates);
-      this.linestringLength = this.linestring!.getGeometry()!.getLength();
+      this.linestringLength = getDistance(this.linestring!.getGeometry()!.getCoordinates());
       this.drawDomainLinestring();
       this.drawLinestringBuffer();
     } else {
@@ -390,7 +391,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       return;
     }
 
-    const linestringLength = geometry.getLength();
+    const linestringLength = getDistance(geometry.getCoordinates());
 
     // Get map coordinates of profile domain extent
     const fStart = Math.max(0.0, this.crossSectionState.domain.xmin / linestringLength);
@@ -436,15 +437,14 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       const p1 = lineStringCoords[i];
       const p2 = lineStringCoords[i + 1];
 
-      let segment = new LineString([p1, p2]);
+      const segment = new LineString([p1, p2]);
       const intersects = segment.intersectsCoordinate(coord);
 
       if (intersects) {
-        segment = new LineString([p1, coord]);
-        distance += segment.getLength();
+        distance += getDistance([p1, coord]);
         break;
       }
-      distance += segment.getLength();
+      distance += getDistance([p1, p2]);
     }
 
     return distance;
