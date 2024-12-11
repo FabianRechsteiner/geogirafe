@@ -92,7 +92,7 @@ class ConfigManager extends GirafeSingleton {
    * Load user preferences from the local browser storage.
    * @returns the user preference object containing all custom settings.
    */
-  private loadUserPreferences(): Record<string, unknown> {
+  public loadUserPreferences(): Record<string, unknown> {
     const userPreferences = localStorage.getItem(this.userPreferencesStorageKey);
     return userPreferences ? JSON.parse(userPreferences) : {};
   }

@@ -11,7 +11,7 @@ import CustomTheme from '../../models/customtheme';
 class CustomThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
   customThemes: CustomTheme[] = [];
-  private readonly configPath: string = 'customthemes';
+  private readonly storagePath: string = 'customthemes';
 
   constructor(type: string) {
     super(type);
@@ -61,25 +61,27 @@ class CustomThemesManager extends GirafeSingleton {
     for (const customTheme of this.customThemes) {
       serializedObject[customTheme.name] = customTheme.getSerialized();
     }
-    this.configManager.saveUserPreference(this.configPath, serializedObject);
+    this.configManager.saveUserPreference(this.storagePath, serializedObject);
   }
 
   public loadCustomThemes() {
-    const config = this.configManager?.Config;
-    if (config) {
-      try {
-        for (const customThemeName in config.customthemes) {
-          const customTheme = new CustomTheme(customThemeName);
-          const serializedLayerTree = config.customthemes[customThemeName] as unknown as SharedLayer[];
-          const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedLayerTree);
-          customTheme.layers.push(...layerTree);
-          this.customThemes.push(customTheme);
-        }
-      } catch (error) {
-        console.warn('Cannot deserialize custom themes from local storage');
-        console.warn(error);
-        // Do not throw the error, the themes selector can still be used
+    const userPreferences = this.configManager.loadUserPreferences();
+    const customThemes = userPreferences[this.storagePath] as Record<string, SharedLayer[]>;
+    if (!customThemes) {
+      return;
+    }
+    try {
+      for (const customThemeName in customThemes) {
+        const customTheme = new CustomTheme(customThemeName);
+        const serializedLayerTree = customThemes[customThemeName];
+        const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedLayerTree);
+        customTheme.layers.push(...layerTree);
+        this.customThemes.push(customTheme);
       }
+    } catch (error) {
+      console.warn('Cannot deserialize custom themes from local storage');
+      console.warn(error);
+      // Do not throw the error, the themes selector can still be used
     }
   }
 }
