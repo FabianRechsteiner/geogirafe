@@ -109,20 +109,18 @@ export default class SelectionTabulatorManager {
       // True if at least one row is selected.
       this.stateManager.state.selection.gridSelected = selection.length > 0;
 
-      // Highlight selected features on the map.
-      const highlightedGeometries: OlFeature[] = [];
-      selection.forEach((row) => {
-        // the grid cell containing the olFeature
-        const rowOlFeature = row.geom ?? row.the_geom ?? row.geometry;
-
-        const selectedGeometry = this.data[id].features.find((feature) => {
-          const geometryName = feature.getGeometryName();
-          return getUid(feature.get(geometryName)) === getUid(rowOlFeature);
-        });
-        if (selectedGeometry) {
-          highlightedGeometries.push(selectedGeometry);
-        }
+      // Create a Map of features by their UIDs
+      const featureMap = new Map<string, OlFeature<OlGeomGeometry>>();
+      this.data[id].features.forEach((feature) => {
+        const uid = getUid(feature.getGeometry());
+        featureMap.set(uid, feature);
       });
+
+      // Highlight selected features on the map.
+      const highlightedGeometries = selection
+        .map((row) => featureMap.get(getUid(row.geom ?? row.the_geom ?? row.geometry)))
+        .filter((feature): feature is OlFeature => feature !== undefined);
+
       this.stateManager.state.selection.highlightedFeatures = highlightedGeometries;
     });
   }
