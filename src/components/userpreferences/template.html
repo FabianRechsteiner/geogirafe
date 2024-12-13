@@ -8,8 +8,8 @@
     <div class="preference-group">
       <div class="preference-group-title" i18n="${group}">${group}</div>
 
-      ${this.getPreferencesByGroup(group).map(([preference, key]) => uHtmlFor(preference, key)` ${preference.uiElement
-      === 'select' ? uHtml`
+      ${this.getPreferencesByGroup(group).map(([preference, key]) => 
+        uHtmlFor(preference, key)` ${preference.uiElement === 'select' ? uHtml`
 
       <div class="preference-row" hidden="${!preference.visible}">
         <label for="${key}" class="gg-label" i18n="${key}">${key}</label>
@@ -36,7 +36,7 @@
           id="${key}"
           type="checkbox"
           class="gg-checkbox"
-          ?checked="${this.preferences.darkFrontendMode.currentValue}"
+          ?checked="${preference.currentValue}"
           onchange="${() => this.changePreference(key, !preference.currentValue)}" />
       </div>
       ` : uHtml``} ${preference.uiElement === 'color' ? uHtml`
