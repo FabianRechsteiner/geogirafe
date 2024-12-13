@@ -56,11 +56,6 @@
       "https://uzuflycesium.s3.amazonaws.com/Pully/3Dtiles/Pully-Nord_3Dtiles/Scene/PullymNord_3Dtiles.json"
     ]
   },
-  "bookmarks": {
-    "service": "localStorage",
-    "get": "",
-    "post": ""
-  },
   "query": {
     "legacy": true
   },
