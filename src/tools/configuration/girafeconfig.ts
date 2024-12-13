@@ -108,11 +108,6 @@ class GirafeConfig {
     terrainUrl: string;
     tilesetsUrls: string[];
   };
-  bookmarks?: {
-    service: 'localStorage' | 'server';
-    get: string | undefined;
-    post: string | undefined;
-  };
   lidar: {
     url: string;
   };
@@ -179,7 +174,6 @@ class GirafeConfig {
     this.drawing = this.initConfigDrawing(config);
     this.projections = this.initConfigProjections(config);
     this.map = this.initConfigMap(config);
-    this.bookmarks = this.initConfigBookmarks(config);
     this.lidar = this.initConfigLidar(config);
     this.csv = this.initConfigCsv(config);
     this.metadata = this.initConfigMetadata(config);
@@ -395,24 +389,6 @@ class GirafeConfig {
   private initConfigOffline(config: GirafeConfig) {
     // This can be null, that's not a problem. No default value either.
     return config.offline;
-  }
-
-  private initConfigBookmarks(config: GirafeConfig) {
-    if (config.bookmarks?.service) {
-      if (config.bookmarks.service === 'server') {
-        if (!config.bookmarks.get) {
-          throw new Error(
-            `Configuration for bookmarks.get is required. See https://doc.geomapfish.dev/docs/configuration`
-          );
-        }
-        if (!config.bookmarks.post) {
-          throw new Error(
-            `Configuration for bookmarks.post is required. See https://doc.geomapfish.dev/docs/configuration`
-          );
-        }
-      }
-      return config.bookmarks;
-    }
   }
 
   private initConfigThemes(config: GirafeConfig) {

@@ -10,8 +10,7 @@ class NavigationComponent extends GirafeHTMLElement {
   private currentPositionIndex: number = -1;
 
   public bookmarks: Bookmark[] = [];
-
-  private bookmarkStorage: string = 'localStorage';
+  private readonly storagePath: string = 'bookmarks';
 
   public get hasBookmark() {
     return this.bookmarks.length > 0;
@@ -51,48 +50,28 @@ class NavigationComponent extends GirafeHTMLElement {
     }
   }
 
-  async saveBookmarks() {
-    if (this.bookmarkStorage === 'localStorage') {
-      localStorage.setItem('bookmarks', JSON.stringify(this.bookmarks));
-    } else if (this.bookmarkStorage === 'server') {
-      // TODO: Define a workflow and finalize it
-      const url = this.configManager.Config.bookmarks!.post;
-      const response = await fetch(url!, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(this.bookmarks)
-      });
-      const data = await response.json();
-      console.log(data);
-    }
+  saveBookmarks() {
+    this.configManager.saveUserPreference(this.storagePath, this.bookmarks);
   }
 
-  async loadBookmarks() {
+  loadBookmarks() {
     this.bookmarks = [];
-    let storedBookmarks: string | null = '';
-
-    if (this.bookmarkStorage === 'localStorage') {
-      storedBookmarks = localStorage.getItem('bookmarks');
-    } else if (this.bookmarkStorage === 'server') {
-      // TODO: Define a workflow and finalize it
-      const url = this.configManager.Config.bookmarks!.get;
-      const response = await fetch(url!);
-      const data = await response.json();
-      storedBookmarks = data;
-    }
+    const userPreferences = this.configManager.loadUserPreferences();
+    const storedBookmarks: Bookmark[] = userPreferences[this.storagePath] as Bookmark[];
 
     if (storedBookmarks) {
-      const jsonBookmarks = JSON.parse(storedBookmarks);
-
-      for (const bookmark of jsonBookmarks) {
-        const position = new MapPosition();
-        position.center = bookmark.position.center;
-        position.zoom = bookmark.position.zoom;
-        position.resolution = bookmark.position.resolution;
-        position.scale = bookmark.position.scale;
-        this.bookmarks.push(new Bookmark(bookmark.name, position));
+      for (const bookmark of storedBookmarks) {
+        try {
+          const position = new MapPosition();
+          position.center = bookmark.position.center;
+          position.zoom = bookmark.position.zoom;
+          position.resolution = bookmark.position.resolution;
+          position.scale = bookmark.position.scale;
+          this.bookmarks.push(new Bookmark(bookmark.name, position));
+        } catch (error) {
+          console.warn('Cannot read stored bookmarks');
+          console.warn(error);
+        }
       }
     }
   }
@@ -151,9 +130,6 @@ class NavigationComponent extends GirafeHTMLElement {
 
   connectedCallback() {
     this.loadConfig().then(() => {
-      this.bookmarkStorage = this.configManager.Config.bookmarks
-        ? this.configManager.Config.bookmarks.service
-        : 'localStorage';
       this.loadBookmarks();
       this.render();
       super.girafeTranslate();

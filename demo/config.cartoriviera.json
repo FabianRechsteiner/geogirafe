@@ -63,11 +63,6 @@
       "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_sans_lac/Scene/Vevey_cesium_sans_lac.json"
     ]
   },
-  "bookmarks": {
-    "service": "localStorage",
-    "get": "",
-    "post": ""
-  },
   "gmfauth": {
     "url": "https://map.cartoriviera.ch",
     "loginRequired": false

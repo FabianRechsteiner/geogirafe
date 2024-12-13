@@ -77,11 +77,6 @@
       "https://3d.geo.bs.ch/cesium/tiles/fr-gebaeude-2023/tileset.json"
     ]
   },
-  "bookmarks": {
-    "service": "localStorage",
-    "get": "",
-    "post": ""
-  },
   "metadata": {
     "metadataUrlPrefix": "https://map.geo.bs.ch",
     "defaultWindowWidth": "500px",
