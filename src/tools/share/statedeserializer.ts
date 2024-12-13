@@ -8,6 +8,7 @@ import StateManager from '../state/statemanager';
 
 import ComponentManager from '../state/componentManager';
 import ThemeLayer from '../../models/layers/themelayer';
+import ErrorManager from '../error/errormanager';
 
 class StateDeserializer {
   stateManager: StateManager;
@@ -25,6 +26,12 @@ class StateDeserializer {
   }
 
   public deserializeAndSetState(compressedState: string) {
+    // First: clear the current layers list
+    for (const layer of this.stateManager.state.layers.layersList) {
+      this.layerManager.toggle(layer, 'off');
+    }
+    this.state.layers.layersList = [];
+
     const stringState = LZString.decompressFromBase64(compressedState);
     const sharedState: SharedState = JSON.parse(stringState);
 
@@ -70,33 +77,74 @@ class StateDeserializer {
         this.deserializeLayer(layer, sharedLayer);
         layersList.push(layer);
       } else {
-        // TODO REG : Add infobox ?
         console.warn(`Cannot find layer with id ${sharedLayer.i} in the available layers`);
       }
     }
     return layersList;
   }
 
-  private deserializeLayer(layer: BaseLayer, sharedLayer: SharedLayer) {
-    layer.order = sharedLayer.o;
-    layer.isDefaultChecked = Boolean(sharedLayer.c);
-    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
-      layer.isExpanded = Boolean(sharedLayer.e);
+  private deserializeLayer(originalLayer: BaseLayer, sharedLayer: SharedLayer) {
+    originalLayer.order = sharedLayer.o;
+    originalLayer.isDefaultChecked = Boolean(sharedLayer.c);
+    if (originalLayer instanceof GroupLayer || originalLayer instanceof ThemeLayer) {
+      originalLayer.isExpanded = Boolean(sharedLayer.e);
       // Manage children
-      // Ad remove unnecessary childs
-      for (let i = layer.children.length - 1; i >= 0; i--) {
-        const child = layer.children[i];
-        const serializedChild = sharedLayer.z.find((l) => l.i == child.id);
-        if (serializedChild) {
-          this.deserializeLayer(child, serializedChild);
+      this.removeUnnecessaryChilds(originalLayer, sharedLayer);
+      this.checkUnknownLayers(sharedLayer, originalLayer);
+    } else if (originalLayer instanceof Layer && this.layerManager.isLayerWithLegend(originalLayer)) {
+      originalLayer.isLegendExpanded = Boolean(sharedLayer.e);
+    }
+  }
+
+  private checkUnknownLayers(sharedLayer: SharedLayer, originalLayer: GroupLayer | ThemeLayer) {
+    // If some layers are present in the shared state but cannot be found in the current list of available layers
+    // It probably means that the layers are private ones or that the layer has been delete.
+    // Add an infobox for this.
+    for (const sharedChild of sharedLayer.z) {
+      const originalChild = originalLayer.children.find((c) => c.id == sharedChild.i);
+      if (!originalChild) {
+        ErrorManager.getInstance().pushMessage(
+          'unknown-layers-cannot-be-added',
+          'Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.',
+          'warning'
+        );
+      }
+    }
+  }
+
+  private removeUnnecessaryChilds(originalLayer: GroupLayer | ThemeLayer, sharedLayer: SharedLayer) {
+    let reorder = false;
+    for (let i = originalLayer.children.length - 1; i >= 0; i--) {
+      const child = originalLayer.children[i];
+      const serializedChild = sharedLayer.z.find((l) => l.i == child.id);
+      if (serializedChild) {
+        this.deserializeLayer(child, serializedChild);
+      } else {
+        // This child exists in the original layer, but not in the shared state.
+        // => If it is present in the x list, it was explicitely removed
+        // And we can remove it from the current object
+        const explicitlyRemoved = sharedLayer.x.find((id) => id == child.id);
+        if (explicitlyRemoved) {
+          originalLayer.children.splice(i, 1);
+          console.debug(`Layer ${originalLayer.children[i].name} was removed from initial state`);
         } else {
-          // This child exists in the original layer, but not in the shared state.
-          // => We have to remove it from the current object
-          layer.children.splice(i, 1);
+          // Otherwise it is a new layer. We do not remove it
+          // But we have to set the right order for it.
+          // In this case we have to reorder all the layers at this level
+          // In order to keep the order defined in the initial group
+          console.debug(`Layer ${originalLayer.children[i].name} will be added to the treeview because it is new`);
+          console.debug(`Layer ${originalLayer.name} needs a reorering of its children`);
+          reorder = true;
         }
       }
-    } else if (layer instanceof Layer && this.layerManager.isLayerWithLegend(layer)) {
-      layer.isLegendExpanded = Boolean(sharedLayer.e);
+    }
+
+    if (reorder) {
+      console.debug(`Reordering childs for layer ${originalLayer.name}`);
+      let order = 1;
+      for (const child of originalLayer.children) {
+        child.order = order++;
+      }
     }
   }
 

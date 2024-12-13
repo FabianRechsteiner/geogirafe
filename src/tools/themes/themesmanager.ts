@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import GirafeSingleton from '../../base/GirafeSingleton';
 import Basemap from '../../models/basemap';
-import Layer from '../../models/layers/layer';
 import { GMFBackgroundLayer, GMFServerOgc, GMFTheme, GMFTreeItem } from '../../models/gmf';
 import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
@@ -21,6 +20,7 @@ import ThemeLayer from '../../models/layers/themelayer';
 import WfsManager from '../wfs/wfsmanager';
 import AuthHelper from '../auth/authhelper';
 import CustomThemesManager from './customthemesmanager';
+import ErrorManager from '../error/errormanager';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -42,12 +42,7 @@ class ThemesManager extends GirafeSingleton {
     this.shareManager = ShareManager.getInstance();
     this.customThemesManager = CustomThemesManager.getInstance();
 
-    this.stateManager.subscribe(
-      'themes.lastSelectedTheme',
-      (_oldTheme: ThemeLayer | null, newTheme: ThemeLayer | null) => this.onChangeTheme(newTheme)
-    );
-
-    this.stateManager.subscribe('oauth.userInfo', () => this.loadThemes());
+    this.stateManager.subscribe('oauth.userInfo', () => this.initialize());
   }
 
   public async initialize() {
@@ -77,6 +72,7 @@ class ThemesManager extends GirafeSingleton {
    * Load themes from backend and configures background layers if needed
    */
   async loadThemes() {
+    this.state.themes.isLoaded = false;
     const response = await fetch(this.configManager.Config.themes.url, AuthHelper.getFetchOptions());
 
     const content = await response.json();
@@ -92,11 +88,7 @@ class ThemesManager extends GirafeSingleton {
       // Display themes errors only if configured so.
       // Parse errors if any
       for (const error of content['errors']) {
-        this.state.infobox.elements.push({
-          id: uuidv4(),
-          text: error,
-          type: 'error'
-        });
+        ErrorManager.getInstance().pushMessage(uuidv4(), error, 'error');
       }
     }
   }
@@ -267,11 +259,11 @@ class ThemesManager extends GirafeSingleton {
           layer = new LayerWms(elem.id, elem.name, order.value, ogcServer, elem);
         } else {
           // Layer is invalid : it does not have any OGC-Server
-          this.state.infobox.elements.push({
-            id: uuidv4(),
-            text: `Layer ${elem.name} (id=${elem.id}) is invalid and cannot be created: missing OGC-Server.`,
-            type: 'error'
-          });
+          ErrorManager.getInstance().pushMessage(
+            uuidv4(),
+            `Layer ${elem.name} (id=${elem.id}) is invalid and cannot be created: missing OGC-Server.`,
+            'error'
+          );
         }
         break;
       }
@@ -313,93 +305,6 @@ class ThemesManager extends GirafeSingleton {
 
     order.value = order.value + 1;
     return layer;
-  }
-
-  onChangeTheme(theme: ThemeLayer | null) {
-    if (!theme) {
-      // Theme is null, nothing to do here
-      return;
-    }
-
-    // Create a clone of the theme object to use it in the treeview.
-    // This is essential, otherwise all changes done in the layers
-    // (For example when expanding legend, expanding a group, or activating the layer)
-    // Will also be done in the default layer configuration that has been loaded from themes.json
-    // And when a theme will be selected aging from the themes-selector
-    // The default configuration will have been overwritten.
-    const clonedTheme = theme.clone();
-
-    if (this.configManager.Config.themes.selectionMode === 'replace') {
-      // Mode is <replace>
-      // 1. Deactivate all active layers
-      for (const element of this.state.layers.layersList) {
-        element.activeState = 'off';
-      }
-      // 2. Add new layers
-      this.state.layers.layersList = clonedTheme.children;
-    } else if (!this.state.layers.layersList.find((l) => l.id == clonedTheme.id)) {
-      // Mode is <add>
-      // Add new theme to the list if is not in the list yet
-      // Set order to 0, because the theme should be added at the top of the list
-      clonedTheme.order = 0;
-      this.state.layers.layersList.push(clonedTheme);
-    } else {
-      console.info(`The theme ${clonedTheme.name} is already present in the treeview.`);
-    }
-  }
-
-  findThemeByName(themename: string): ThemeLayer {
-    for (const theme of Object.values(this.state.themes._allThemes)) {
-      if (theme.name === themename) {
-        return theme;
-      }
-    }
-
-    throw new Error(`Theme ${themename} was not found`);
-  }
-
-  findGroupByName(groupname: string): GroupLayer {
-    const group = this.#findBaseLayerByName(groupname);
-    if (group instanceof GroupLayer) {
-      return group;
-    }
-
-    throw new Error(`Layer ${group.name} was found, but is not a group`);
-  }
-
-  findLayerByName(layername: string): Layer {
-    const layer = this.#findBaseLayerByName(layername);
-    if (layer instanceof Layer) {
-      return layer;
-    }
-
-    throw new Error(`Layer ${layer.name} was found, but is not a layer`);
-  }
-
-  #findBaseLayerByName(layername: string): BaseLayer {
-    for (const theme of Object.values(this.state.themes._allThemes)) {
-      const layer = this.#findLayerRecursive(theme.children, layername);
-      if (layer) {
-        return layer;
-      }
-    }
-    throw new Error(`Layer ${layername} not found !`);
-  }
-
-  #findLayerRecursive(layers: BaseLayer[], layername: string): BaseLayer | null {
-    for (const layer of layers) {
-      if (layer.name === layername) {
-        return layer;
-      }
-      if (layer instanceof GroupLayer) {
-        const child = this.#findLayerRecursive(layer.children, layername);
-        if (child) {
-          return child;
-        }
-      }
-    }
-
-    return null;
   }
 }
 
