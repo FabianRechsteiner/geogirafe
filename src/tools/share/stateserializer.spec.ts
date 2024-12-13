@@ -7,6 +7,8 @@ import State from '../state/state';
 import LZString from 'lz-string';
 import { SharedState } from './sharedstate';
 import Basemap from '../../models/basemap';
+import ThemeLayer from '../../models/layers/themelayer';
+import StateManager from '../state/statemanager';
 
 let serializer: StateSerializer;
 
@@ -21,7 +23,11 @@ afterAll(() => {
 
 describe('StateSerializer.getSerializedLayer', () => {
   it('should return serialized data for a GroupLayer (id, order)', () => {
+    const theme = new ThemeLayer(1, 'test-theme', 0);
     const groupLayer = new GroupLayer(11, 'Group 1', 10);
+    theme.children.push(groupLayer);
+    StateManager.getInstance().state.themes._allThemes[theme.id] = theme;
+
     // @ts-ignore
     const sharedLayer = serializer.getSerializedLayer(groupLayer);
 
@@ -30,12 +36,17 @@ describe('StateSerializer.getSerializedLayer', () => {
       o: 10,
       c: 0,
       e: 0,
-      z: []
+      z: [],
+      x: []
     });
   });
 
   it('should return serialized data for a GroupLayer (isExpanded)', () => {
+    const theme = new ThemeLayer(1, 'test-theme', 0);
     const groupLayer = new GroupLayer(11, 'Group 1', 10, { isDefaultExpanded: true });
+    theme.children.push(groupLayer);
+    StateManager.getInstance().state.themes._allThemes[theme.id] = theme;
+
     // @ts-ignore
     const sharedLayer = serializer.getSerializedLayer(groupLayer);
 
@@ -44,13 +55,17 @@ describe('StateSerializer.getSerializedLayer', () => {
       o: 10,
       c: 0,
       e: 1,
-      z: []
+      z: [],
+      x: []
     });
   });
 
   it('should return serialized data for a GroupLayer (isChecked)', () => {
+    const theme = new ThemeLayer(1, 'test-theme', 0);
     const groupLayer = new GroupLayer(11, 'Group 1', 10);
     groupLayer.activeState = 'on';
+    theme.children.push(groupLayer);
+    StateManager.getInstance().state.themes._allThemes[theme.id] = theme;
 
     // @ts-ignore
     const sharedLayer = serializer.getSerializedLayer(groupLayer);
@@ -60,12 +75,16 @@ describe('StateSerializer.getSerializedLayer', () => {
       o: 10,
       c: 1,
       e: 0,
-      z: []
+      z: [],
+      x: []
     });
   });
 
   it('should return serialized data for a GroupLayer with children', () => {
+    const theme = new ThemeLayer(1, 'test-theme', 0);
     const groupLayer = new GroupLayer(11, 'Group 1', 10);
+    theme.children.push(groupLayer);
+    StateManager.getInstance().state.themes._allThemes[theme.id] = theme;
 
     const wmtsLayer = new LayerWmts(21, 'Layer WMTS 1', 20, 'https://test.url/', 'test_layer');
     groupLayer.children.push(wmtsLayer);
@@ -77,7 +96,78 @@ describe('StateSerializer.getSerializedLayer', () => {
       o: 10,
       c: 0,
       e: 0,
-      z: [{ i: 21, o: 20, c: 0, e: 0, z: [] }]
+      z: [{ i: 21, o: 20, c: 0, e: 0, z: [], x: [] }],
+      x: []
+    });
+  });
+
+  it('should serialize a missing original group correctly (explicitely removed)', () => {
+    const theme = new ThemeLayer(0, 'test-theme', 0);
+    StateManager.getInstance().state.themes._allThemes[theme.id] = theme;
+
+    const groupLayer1 = new GroupLayer(1, 'Group 1', 1);
+    const groupLayer11 = new GroupLayer(11, 'Group 11', 11);
+    const groupLayer12 = new GroupLayer(12, 'Group 12', 12);
+    groupLayer1.children.push(groupLayer11, groupLayer12);
+    theme.children.push(groupLayer1);
+
+    // Clone the original object and remove a child
+    const clone = groupLayer1.clone();
+    clone.children.splice(1, 1);
+    // @ts-ignore
+    const sharedLayer = serializer.getSerializedLayer(clone);
+
+    expect(sharedLayer).toEqual({
+      i: 1,
+      o: 1,
+      c: 0,
+      e: 0,
+      x: [12],
+      z: [
+        {
+          i: 11,
+          o: 11,
+          c: 0,
+          e: 0,
+          x: [],
+          z: []
+        }
+      ]
+    });
+  });
+
+  it('should serialize a missing original layer correctly (explicitely removed)', () => {
+    const theme = new ThemeLayer(0, 'test-theme', 0);
+    StateManager.getInstance().state.themes._allThemes[theme.id] = theme;
+
+    const groupLayer1 = new GroupLayer(1, 'Group 1', 1);
+    const layer1 = new LayerWmts(3, 'Layer 1', 3, 'https://test.url/', 'test_layer_1');
+    const layer2 = new LayerWmts(4, 'Layer 2', 4, 'https://test.url/', 'test_layer_2');
+    groupLayer1.children.push(layer1, layer2);
+    theme.children.push(groupLayer1);
+
+    // Clone the original object and remove a child
+    const clone = groupLayer1.clone();
+    clone.children.splice(1, 1);
+    // @ts-ignore
+    const sharedLayer = serializer.getSerializedLayer(clone);
+
+    expect(sharedLayer).toEqual({
+      i: 1,
+      o: 1,
+      c: 0,
+      e: 0,
+      x: [4],
+      z: [
+        {
+          i: 3,
+          o: 3,
+          c: 0,
+          e: 0,
+          x: [],
+          z: []
+        }
+      ]
     });
   });
 });
@@ -136,18 +226,22 @@ describe('StateSerializer.getSerializedState', () => {
   });
 
   it('should serialize a complex layer tree with multiple levels', () => {
+    const theme = new ThemeLayer(0, 'test-theme', 0);
+    StateManager.getInstance().state.themes._allThemes[theme.id] = theme;
+
     const groupLayer1 = new GroupLayer(1, 'Group 1', 1);
     const groupLayer2 = new GroupLayer(2, 'Group 2', 2);
     const layer1 = new LayerWmts(3, 'Layer 1', 3, 'https://test.url/', 'test_layer_1');
     const layer2 = new LayerWmts(4, 'Layer 2', 4, 'https://test.url/', 'test_layer_2');
 
+    theme.children.push(groupLayer1);
+
     groupLayer2.children.push(layer1);
     groupLayer1.children.push(groupLayer2, layer2);
 
-    const state = new State();
-    state.layers.layersList.push(groupLayer1);
+    StateManager.getInstance().state.layers.layersList.push(groupLayer1);
 
-    const compressedState = serializer.getSerializedState(state);
+    const compressedState = serializer.getSerializedState(StateManager.getInstance().state);
 
     // Decode to verify
     const stringState = LZString.decompressFromBase64(compressedState);
@@ -159,18 +253,21 @@ describe('StateSerializer.getSerializedState', () => {
         o: 1,
         c: 0,
         e: 0,
+        x: [],
         z: [
           {
             i: 2,
             o: 2,
             c: 0,
             e: 0,
+            x: [],
             z: [
               {
                 i: 3,
                 o: 3,
                 c: 0,
                 e: 0,
+                x: [],
                 z: []
               }
             ]
@@ -180,6 +277,7 @@ describe('StateSerializer.getSerializedState', () => {
             o: 4,
             c: 0,
             e: 0,
+            x: [],
             z: []
           }
         ]

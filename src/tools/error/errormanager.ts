@@ -5,10 +5,12 @@ import StateManager from '../state/statemanager';
 import ErrorStackParser from 'error-stack-parser';
 import { SourceMapConsumer } from 'source-map-js';
 import ShareManager from '../share/sharemanager';
+import I18nManager from '../i18n/i18nmanager';
 
 class ErrorManager extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
+  i18nManager: I18nManager;
 
   private sourceMaps: { [key: string]: SourceMapConsumer } = {};
 
@@ -16,6 +18,7 @@ class ErrorManager extends GirafeSingleton {
     super(type);
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
+    this.i18nManager = I18nManager.getInstance();
     this.listenToAllErrors();
   }
 
@@ -40,12 +43,27 @@ ${stack}
     return errorMessage;
   }
 
+  public pushMessage(id: string, text: string, level: 'info' | 'warning' | 'error') {
+    // Remove existing message with the same id
+    this.stateManager.state.infobox.elements.splice(
+      this.stateManager.state.infobox.elements.findIndex((el) => el.id === id),
+      1
+    );
+
+    // Add a new one
+    this.stateManager.state.infobox.elements.push({
+      id: id,
+      text: text,
+      type: level
+    });
+  }
+
   private listenToAllErrors() {
     // Listen to all uncatched errors
     window.onerror = async (_message, file, line, col, error) => {
       const title = error?.message ?? `Unknown error in ${file} at line ${line} and column ${col}.`;
       const stack = await this.getStackTrace(error);
-      this.pushMessage(title, stack);
+      this.pushErrorMessageWithStack(title, stack);
       return false;
     };
 
@@ -54,7 +72,7 @@ ${stack}
       const error = (event.reason as Error) ?? new Error('Unknown reason');
       const title = `Unhandled rejection: ${error.message}`;
       const stack = await this.getStackTrace(error);
-      this.pushMessage(title, stack);
+      this.pushErrorMessageWithStack(title, stack);
       return false;
     });
   }
@@ -76,7 +94,7 @@ ${stack}
     return stack;
   }
 
-  private pushMessage(title: string, stack: string) {
+  private pushErrorMessageWithStack(title: string, stack: string) {
     // Add new errormessage only if not already present
     const pendingMessages = this.stateManager.state.infobox.elements.map((ele) => ele.text);
     const contextUrl = this.getContextUrl();

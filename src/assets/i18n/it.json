@@ -241,6 +241,7 @@
     "An error occurred while loading the themes. This has nothing to do with GeoGirafe and is very probably a backend-configuration error (wrong content in themes.json, or CORS error). Please check the backend configuration.": "Si è verificato un errore durante il caricamento dei temi. Questo non ha nulla a che fare con GeoGirafe ed è molto probabilmente un errore di configurazione del backend (contenuto errato in themes.json o errore CORS). Si prega di controllare la configurazione del backend.",
     "This instance of GeoGirafe cannot be used at the moment.": "Questa istanza di GeoGirafe non può essere utilizzata al momento.",
     "Backend error": "Errore del backend",
-    "Web Mercator projection distorts distances and areas": "La proiezione Web Mercator distorce le distanze e le aree"
+    "Web Mercator projection distorts distances and areas": "La proiezione Web Mercator distorce le distanze e le aree",
+    "Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.": "Alcuni livelli non possono essere aggiunti all'albero dei livelli. Questo accade perché non si dispone dei diritti necessari o perché questo livello non esiste più."
   }
 }

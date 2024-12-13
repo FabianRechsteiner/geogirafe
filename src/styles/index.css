@@ -129,7 +129,7 @@ girafe-map {
 .info-area {
   z-index: 10;
   position: absolute;
-  bottom: 0;
+  bottom: var(--app-standard-height);
   width: 100%;
 }
 

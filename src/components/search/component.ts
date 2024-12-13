@@ -18,11 +18,11 @@ import PaintbrushIcon from './images/paintbrush.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SearchResult, { type GeometryResult, GeometryCollectionResult } from '../../models/searchresult';
-import ThemesManager from '../../tools/themes/themesmanager';
 import MapManager from '../../tools/state/mapManager';
 import Layer from '../../models/layers/layer';
 import LayerManager from '../../tools/layermanager';
 import { parseCoordinates } from '../../tools/geometrytools';
+import ThemesHelper from '../../tools/themes/themeshelper';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -31,8 +31,8 @@ class SearchComponent extends GirafeHTMLElement {
   public searchIcon: string = SearchIcon;
   public paintbrushIcon: string = PaintbrushIcon;
 
-  private themeManager: ThemesManager;
-  private layerManager: LayerManager;
+  private readonly themesHelper: ThemesHelper;
+  private readonly layerManager: LayerManager;
   private readonly map: Map;
   private previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   private previewLayer: Layer | null = null;
@@ -44,9 +44,9 @@ class SearchComponent extends GirafeHTMLElement {
   protected allResults: SearchResult[] = [];
   protected forceHide: boolean = true;
 
-  private searchTermPlaceholder = '###SEARCHTERM###';
-  private searchLangPlaceholder = '###SEARCHLANG###';
-  private COORD_REGEX = /^(\d+[.,]?\d*)\s*[,;/\s]\s*(\d+[.,]?\d*)$/;
+  private readonly searchTermPlaceholder = '###SEARCHTERM###';
+  private readonly searchLangPlaceholder = '###SEARCHLANG###';
+  private readonly COORD_REGEX = /^(\d+[.,]?\d*)\s*[,;/\s]\s*(\d+[.,]?\d*)$/;
 
   private focusedResultIndex: number = -1;
   private focusedResult: SearchResult | null = null;
@@ -62,7 +62,7 @@ class SearchComponent extends GirafeHTMLElement {
 
   constructor() {
     super('search');
-    this.themeManager = ThemesManager.getInstance();
+    this.themesHelper = ThemesHelper.getInstance();
     this.layerManager = LayerManager.getInstance();
     this.map = MapManager.getInstance().getMap();
 
@@ -292,7 +292,7 @@ class SearchComponent extends GirafeHTMLElement {
         this.updatePreviewLayerStyle();
       }
     } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
-      const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
+      const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
       if (layer.parent && !this.state.layers.layersList.includes(layer.parent)) {
         // Preview layer
         layer.parent.order = 0;
@@ -376,19 +376,19 @@ class SearchComponent extends GirafeHTMLElement {
       // Result with geometry
       this.zoomTo(result.bbox);
     } else if (result.properties?.actions[0].action === 'add_theme') {
-      const theme = this.themeManager.findThemeByName(result.properties?.actions[0].data);
+      const theme = this.themesHelper.findThemeByName(result.properties?.actions[0].data);
       if (!this.state.layers.layersList.includes(theme)) {
         theme.order = 0;
         this.state.layers.layersList.push(theme);
       }
     } else if (result.properties?.actions[0].action === 'add_group') {
-      const group = this.themeManager.findGroupByName(result.properties?.actions[0].data);
+      const group = this.themesHelper.findGroupByName(result.properties?.actions[0].data);
       if (!this.state.layers.layersList.includes(group)) {
         group.order = 0;
         this.state.layers.layersList.push(group);
       }
     } else if (result.properties?.actions[0].action === 'add_layer') {
-      const layer = this.themeManager.findLayerByName(result.properties?.actions[0].data);
+      const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
       if (layer.parent && !this.state.layers.layersList.includes(layer.parent)) {
         layer.parent.order = 0;
         this.state.layers.layersList.push(layer);

@@ -23,6 +23,7 @@ import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
 import I18nManager from '../../tools/i18n/i18nmanager';
+import ErrorManager from '../../tools/error/errormanager';
 
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -422,17 +423,18 @@ export default class DrawingComponent extends GirafeHTMLElement {
         );
       case 'gpx':
         if (this.selectedFeatures.some((f) => !f.isPointOrPolyline())) {
-          return this.state.infobox.elements.push({
-            id: uuidv4(),
-            text: 'Warning : The GPX format only supports points and polylines',
-            type: 'warning'
-          });
+          ErrorManager.getInstance().pushMessage(
+            'export-gpx-error',
+            'The GPX format only supports points and polylines',
+            'warning'
+          );
+        } else {
+          return download(
+            new GPX().writeFeatures(olFeatures, { featureProjection: this.state.projection }),
+            fileName + '.gpx',
+            'application/gpx+xml'
+          );
         }
-        return download(
-          new GPX().writeFeatures(olFeatures, { featureProjection: this.state.projection }),
-          fileName + '.gpx',
-          'application/gpx+xml'
-        );
     }
   }
 }

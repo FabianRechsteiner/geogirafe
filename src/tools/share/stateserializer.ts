@@ -7,12 +7,15 @@ import LayerManager from '../layermanager';
 import State from '../state/state';
 import ComponentManager from '../state/componentManager';
 import ThemeLayer from '../../models/layers/themelayer';
+import ThemesHelper from '../themes/themeshelper';
 
 class StateSerializer {
   layerManager: LayerManager;
+  themesHelper: ThemesHelper;
 
   constructor() {
     this.layerManager = LayerManager.getInstance();
+    this.themesHelper = ThemesHelper.getInstance();
   }
 
   public getSerializedState(state: State) {
@@ -75,10 +78,19 @@ class StateSerializer {
 
     // Manage children
     const sharedChildren: SharedLayer[] = [];
+    const removedChildren: number[] = [];
     if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
-      for (const child of layer.children) {
-        const sharedChild = this.getSerializedLayer(child);
-        sharedChildren.push(sharedChild);
+      // First get the original version of the object
+      const originalLayer = this.themesHelper.findBaseLayerById(layer.id) as GroupLayer | ThemeLayer; // Is always of this type.
+      for (const child of originalLayer.children) {
+        const index = layer.children.findIndex((el) => el.id === child.id);
+        if (index >= 0) {
+          // Element was found => it is still in the list
+          const sharedChild = this.getSerializedLayer(layer.children[index]);
+          sharedChildren.push(sharedChild);
+        } else {
+          removedChildren.push(child.id);
+        }
       }
     }
 
@@ -87,7 +99,8 @@ class StateSerializer {
       o: layer.order,
       c: Number(layer.active),
       e: Number(isExpanded),
-      z: sharedChildren
+      z: sharedChildren,
+      x: removedChildren
     };
   }
 }
