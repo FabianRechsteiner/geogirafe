@@ -58,19 +58,25 @@ export const polygonFromCircle = (geometry: Circle) => {
 
 /**
  * @param coordinates ol Coordinate list
- * @returns the length between two coordinates considering the current map projection (projected or geographic)
+ * @returns the length between coordinates, considering the current map projection (projected or geographic)
  */
 export const getDistance = (coordinates: Coordinate[]) => {
   const projection: Projection | null = getProjection(StateManager.getInstance().state.projection);
   if (projection?.getUnits() === 'degrees') {
-    return getSphericalDistance(coordinates[0], coordinates[1]);
+    let totalLength = 0;
+    coordinates.forEach((coordinate, idx) => {
+      if (coordinates[idx + 1]) {
+        totalLength += getSphericalDistance(coordinate, coordinates[idx + 1]);
+      }
+    });
+    return totalLength;
   }
   return new LineString(coordinates).getLength();
 };
 
 /**
  * @param polygon ol Polygon
- * @returns the area of a polygon considering the current map projection (projected or geographic)
+ * @returns the area of a polygon, considering the current map projection (projected or geographic)
  */
 export const getArea = (polygon: Polygon) => {
   const projection: Projection | null = getProjection(StateManager.getInstance().state.projection);
