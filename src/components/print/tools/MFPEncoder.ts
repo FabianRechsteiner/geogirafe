@@ -6,10 +6,12 @@ import State from '../../../tools/state/state';
 
 import { getAbsoluteUrl, getWmtsMatrices, getWmtsUrl, MFPVectorEncoder } from '@geoblocks/mapfishprint';
 import { toDegrees } from 'ol/math';
+import LayerLocalFile from '../../../models/layers/layerlocalfile';
 import LayerWms from '../../../models/layers/layerwms';
 import LayerWmts from '../../../models/layers/layerwmts';
 import VectorLayer from 'ol/layer/Vector';
 import { isLayerVisible } from './printUtils';
+import VectorSource from 'ol/source/Vector';
 
 /** Options for encoding a map. */
 export interface EncodeMapOptions {
@@ -136,6 +138,9 @@ export default class MFPEncoder {
     if (layer.className === LayerWmts.name) {
       return this.encodeTileWmtsLayer(layer as LayerWmts);
     }
+    if (layer.className === LayerLocalFile.name) {
+      return this.encodeLocalFileLayer(layer as LayerLocalFile);
+    }
     return null;
   }
 
@@ -234,6 +239,26 @@ export default class MFPEncoder {
       type: 'wmts',
       version: source.getVersion()
     };
+  }
+
+  /**
+   * Encodes a local file layer.
+   * @returns The encoded local file layer or null if the layer is not visible.
+   */
+  encodeLocalFileLayer(layer: LayerLocalFile): MFPLayer | null {
+    const vectorSource = new VectorSource({
+      features: layer._features
+    });
+    const olayer = new VectorLayer({
+      source: vectorSource
+    });
+
+    if (!this.options?.customizer) {
+      return null;
+    }
+    return new MFPVectorEncoder(olayer.getLayerState(), this.options.customizer).encodeVectorLayer(
+      this.printResolution
+    );
   }
 
   /**
