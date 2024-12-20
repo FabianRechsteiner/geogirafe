@@ -2,6 +2,9 @@
   "general": {
     "locale": "de-CH"
   },
+  "gmfauth": {
+    "url": "https://geomapfish-demo-2-8.camptocamp.com"
+  },
   "languages": {
     "translations": {
       "de": ["i18n/de.json", "Mock/de.json"],
