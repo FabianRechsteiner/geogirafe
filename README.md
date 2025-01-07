@@ -6,6 +6,20 @@
 ![GitLab Merge Requests](https://img.shields.io/gitlab/merge-requests/open-raw/geogirafe/gg-viewer)
 ![GitLab last commit](https://img.shields.io/gitlab/last-commit/geogirafe/gg-viewer)
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=bugs)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=coverage)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
+
+
 ![GitLab License](https://img.shields.io/gitlab/license/geogirafe/gg-viewer)
 
 # GeoGirafe
