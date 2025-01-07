@@ -1,6 +1,7 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MapPosition from '../../tools/state/mapposition';
 import { Bookmark } from './Bookmark';
+import UserDataManager from '../../tools/userdata/userdatamanager';
 
 class NavigationComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -12,6 +13,8 @@ class NavigationComponent extends GirafeHTMLElement {
   public bookmarks: Bookmark[] = [];
   private readonly storagePath: string = 'bookmarks';
 
+  private readonly userDataManager: UserDataManager;
+
   public get hasBookmark() {
     return this.bookmarks.length > 0;
   }
@@ -20,6 +23,7 @@ class NavigationComponent extends GirafeHTMLElement {
 
   constructor() {
     super('navigation');
+    this.userDataManager = UserDataManager.getInstance();
   }
 
   render() {
@@ -51,14 +55,12 @@ class NavigationComponent extends GirafeHTMLElement {
   }
 
   saveBookmarks() {
-    this.configManager.saveUserPreference(this.storagePath, this.bookmarks);
+    this.userDataManager.saveUserData(this.storagePath, this.bookmarks);
   }
 
   loadBookmarks() {
     this.bookmarks = [];
-    const userPreferences = this.configManager.loadUserPreferences();
-    const storedBookmarks: Bookmark[] = userPreferences[this.storagePath] as Bookmark[];
-
+    const storedBookmarks = this.userDataManager.getUserData(this.storagePath) as Bookmark[];
     if (storedBookmarks) {
       for (const bookmark of storedBookmarks) {
         try {

@@ -1,5 +1,5 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import ConfigManager from '../configuration/configmanager';
+import UserDataManager from '../userdata/userdatamanager';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
@@ -9,13 +9,13 @@ import StateDeserializer from '../share/statedeserializer';
 import CustomTheme from '../../models/customtheme';
 
 class CustomThemesManager extends GirafeSingleton {
-  configManager: ConfigManager;
+  userDataManager: UserDataManager;
   customThemes: CustomTheme[] = [];
-  private readonly storagePath: string = 'customthemes';
+  private readonly storagePath: string = 'customThemes';
 
   constructor(type: string) {
     super(type);
-    this.configManager = ConfigManager.getInstance();
+    this.userDataManager = UserDataManager.getInstance();
   }
 
   public addTheme(themeName: string, layersList: BaseLayer[]) {
@@ -61,27 +61,25 @@ class CustomThemesManager extends GirafeSingleton {
     for (const customTheme of this.customThemes) {
       serializedObject[customTheme.name] = customTheme.getSerialized();
     }
-    this.configManager.saveUserPreference(this.storagePath, serializedObject);
+    this.userDataManager.saveUserData(this.storagePath, serializedObject);
   }
 
   public loadCustomThemes() {
-    const userPreferences = this.configManager.loadUserPreferences();
-    const customThemes = userPreferences[this.storagePath] as Record<string, SharedLayer[]>;
-    if (!customThemes) {
-      return;
-    }
-    try {
-      for (const customThemeName in customThemes) {
-        const customTheme = new CustomTheme(customThemeName);
-        const serializedLayerTree = customThemes[customThemeName];
-        const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedLayerTree);
-        customTheme.layers.push(...layerTree);
-        this.customThemes.push(customTheme);
+    const customThemes = this.userDataManager.getUserData(this.storagePath) as Record<string, SharedLayer[]>;
+    if (customThemes) {
+      for (const customThemeName of Object.keys(customThemes)) {
+        try {
+          const customTheme = new CustomTheme(customThemeName);
+          const serializedLayerTree = customThemes[customThemeName];
+          const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedLayerTree);
+          customTheme.layers.push(...layerTree);
+          this.customThemes.push(customTheme);
+        } catch (error) {
+          console.warn('Cannot deserialize custom themes from local storage');
+          console.warn(error);
+          // Do not throw the error, the themes selector can still be used
+        }
       }
-    } catch (error) {
-      console.warn('Cannot deserialize custom themes from local storage');
-      console.warn(error);
-      // Do not throw the error, the themes selector can still be used
     }
   }
 }

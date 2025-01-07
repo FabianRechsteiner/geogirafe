@@ -1,13 +1,14 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 import GirafeConfig from './girafeconfig';
-import { getPropertyByPath, setPropertyByPath, createObjectFromPath, deletePropertyByPath } from '../utils/pathUtils';
+import UserDataManager from '../userdata/userdatamanager';
+import { getPropertyByPath, mergeObjects } from '../utils/pathUtils';
 
 class ConfigManager extends GirafeSingleton {
   private config: GirafeConfig | null = null;
-  // Config before applying user preferences
+  // Backup of config before applying user overrides
   private defaultConfig: GirafeConfig | null = null;
   private loadingPromise: Promise<GirafeConfig> | null = null;
-  private readonly userPreferencesStorageKey: string = 'userPreferences';
+  private readonly storagePathForOverrides: string = 'configOverrides';
 
   // TODO REG: With multiple interface (not only desktop and mobile)
   // We have to find another solution here.
@@ -48,11 +49,12 @@ class ConfigManager extends GirafeSingleton {
           console.warn('No configuration found for mobile. Defaulting to desktop configuration.');
         }
       }
-      // Create a backup of the default config before applying custom user preferences
+      // Create a backup of the default config before applying overrides
       this.defaultConfig = new GirafeConfig(structuredClone(jsonConfig));
 
-      const userPreferences = this.loadUserPreferences();
-      jsonConfig = this.mergeConfigs(jsonConfig, userPreferences);
+      // Load config overrides and merge them with the default config
+      const configOverrides = this.getConfigOverrides(this.defaultConfig.userdata.source);
+      jsonConfig = this.mergeConfigs(jsonConfig, configOverrides);
 
       this.config = new GirafeConfig(jsonConfig);
       console.log('Application Configuration loaded.');
@@ -62,71 +64,31 @@ class ConfigManager extends GirafeSingleton {
     return this.loadingPromise;
   }
 
+  /**
+   * Merges two configuration objects recursively.
+   */
   private mergeConfigs(obj1: Record<string, unknown>, obj2: Record<string, unknown>) {
-    for (const key in obj2) {
-      if (Object.prototype.hasOwnProperty.call(obj1, key)) {
-        // NOSONAR: Can be solved when migrating to ES2022
-        if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
-          this.mergeConfigs(obj1[key] as Record<string, unknown>, obj2[key] as Record<string, unknown>);
-        } else {
-          obj1[key] = obj2[key];
-        }
-      } else {
-        obj1[key] = obj2[key];
-      }
-    }
-    return obj1;
+    return mergeObjects(obj1, obj2);
   }
 
   /**
-   * Get the original config value from the config files(s) before any custom user preferences were applied
+   * Retrieves saved configuration overrides based on the user data source.
+   * @param userDataSource The source of user data.
+   */
+  private getConfigOverrides(userDataSource: string) {
+    const userDataManager = UserDataManager.getInstance();
+    // Set the user data source first before requesting config overrides from the userDataManager
+    userDataManager.setSource(userDataSource);
+    return (userDataManager.getUserData(this.storagePathForOverrides) as Record<string, unknown>) || {};
+  }
+
+  /**
+   * Retrieves the original (default) configuration value before applying overrides.
+   * @param path The path to the configuration property.
    */
   public getDefaultConfigValue(path: string): unknown {
-    const result = getPropertyByPath(this.defaultConfig, path);
-    if (result.found && result.parentObject && result.lastKey) {
-      return result.parentObject[result.lastKey];
-    }
-  }
-
-  /**
-   * Load user preferences from the local browser storage.
-   * @returns the user preference object containing all custom settings.
-   */
-  public loadUserPreferences(): Record<string, unknown> {
-    const userPreferences = localStorage.getItem(this.userPreferencesStorageKey);
-    return userPreferences ? JSON.parse(userPreferences) : {};
-  }
-
-  /**
-   * Saves user preferences to the local storage.
-   */
-  public saveUserPreference(path: string, newValue: unknown): void {
-    let userPreferences = this.loadUserPreferences() ?? {};
-    const result = getPropertyByPath(userPreferences, path);
-    if (!result.found) {
-      // User preference does not exist yet, create it
-      const newPreference: Record<string, unknown> = createObjectFromPath(path);
-      userPreferences = this.mergeConfigs(userPreferences, newPreference);
-    }
-    if (setPropertyByPath(userPreferences, path, newValue)) {
-      localStorage.setItem(this.userPreferencesStorageKey, JSON.stringify(userPreferences));
-    }
-  }
-
-  /**
-   * Delete a part of the user preferences in the local storage
-   */
-  public deleteUserPreference(path: string): void {
-    const currentUserPreferences = this.loadUserPreferences() ?? {};
-    deletePropertyByPath(currentUserPreferences, path);
-    localStorage.setItem(this.userPreferencesStorageKey, JSON.stringify(currentUserPreferences));
-  }
-
-  /**
-   * DANGER: Delete all custom user preferences including custom themes in the local storage
-   */
-  public deleteAllUserPreferences(): void {
-    localStorage.removeItem(this.userPreferencesStorageKey);
+    const { found, parentObject, lastKey } = getPropertyByPath(this.defaultConfig, path);
+    return found && parentObject && lastKey ? parentObject[lastKey] : undefined;
   }
 }
 

@@ -74,3 +74,29 @@ export const deletePropertyByPath = (obj: any, path: string) => {
   }
   deletePropertyByPath(obj, path);
 };
+
+
+/**
+ * Merges the properties of two objects recursively. If properties in both objects
+ * are of type 'object', they will be merged deeply. Otherwise, properties in the
+ * second object will overwrite properties with the same keys in the first object.
+ *
+ * @param obj1 - The target object to be merged into.
+ * @param obj2 - The source object providing properties to merge.
+ * @returns The merged object containing properties from both input objects.
+ */
+export const mergeObjects = (obj1: Record<string, unknown>, obj2: Record<string, unknown>) => {
+  for (const key in obj2) {
+    if (Object.prototype.hasOwnProperty.call(obj1, key)) {
+      // NOSONAR: Can be solved when migrating to ES2022
+      if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
+        mergeObjects(obj1[key] as Record<string, unknown>, obj2[key] as Record<string, unknown>);
+      } else {
+        obj1[key] = obj2[key];
+      }
+    } else {
+      obj1[key] = obj2[key];
+    }
+  }
+  return obj1;
+};

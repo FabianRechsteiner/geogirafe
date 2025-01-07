@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { createObjectFromPath, deletePropertyByPath, getPropertyByPath, setPropertyByPath } from './pathUtils';
+import {
+  createObjectFromPath,
+  deletePropertyByPath,
+  getPropertyByPath,
+  setPropertyByPath,
+  mergeObjects
+} from './pathUtils';
 
 describe('pathUtils.getPropertyPath', () => {
   it('getPropertyByPath should get property by path', () => {
@@ -168,5 +174,48 @@ describe('pathUtils.objectFromPath', () => {
     const obj = { level1: { level2: { level3: { level4: { level5: 42 } } } } };
     deletePropertyByPath(obj, 'level1.level2.level3.level4.level999');
     expect(obj['level1']['level2']['level3']['level4']['level5']).toBe(42);
+  });
+});
+
+
+describe('pathUtils.mergeObjects', () => {
+  it('should merge two empty objects', () => {
+    const obj1 = {};
+    const obj2 = {};
+    // @ts-ignore
+    const result = mergeObjects(obj1, obj2);
+    expect(result).toEqual({});
+  });
+
+  it('should merge two objects with no common properties', () => {
+    const obj1 = { a: 1, b: 2 };
+    const obj2 = { c: 3, d: 4 };
+    // @ts-ignore
+    const result = mergeObjects(obj1, obj2);
+    expect(result).toEqual({ a: 1, b: 2, c: 3, d: 4 });
+  });
+
+  it('should merge two objects with common properties', () => {
+    const obj1 = { a: 1, b: 2, c: { x: 1, y: 2 } };
+    const obj2 = { b: 3, c: { y: 4, z: 5 }, d: 4 };
+    // @ts-ignore
+    const result = mergeObjects(obj1, obj2);
+    expect(result).toEqual({ a: 1, b: 3, c: { x: 1, y: 4, z: 5 }, d: 4 });
+  });
+
+  it('should merge two objects with nested common properties', () => {
+    const obj1 = { a: { b: { c: 1 } } };
+    const obj2 = { a: { b: { d: 2 } } };
+    // @ts-ignore
+    const result = mergeObjects(obj1, obj2);
+    expect(result).toEqual({ a: { b: { c: 1, d: 2 } } });
+  });
+
+  it('should merge two objects with nested non-common properties', () => {
+    const obj1 = { a: { b: { c: 1 } } };
+    const obj2 = { a: { d: 2 } };
+    // @ts-ignore
+    const result = mergeObjects(obj1, obj2);
+    expect(result).toEqual({ a: { b: { c: 1 }, d: 2 } });
   });
 });

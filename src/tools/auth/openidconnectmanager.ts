@@ -15,9 +15,11 @@ import {
   TokenEndpointResponse,
   validateAuthResponse
 } from 'oauth4webapi';
+import UserDataManager from '../userdata/userdatamanager';
 
 export default class OpenIdConnectManager extends AbstractConnectManager {
   private authorizationServer?: AuthorizationServer;
+  private readonly storagePath = 'oAuth';
 
   private get issuerConfig() {
     return this.configManager.Config.oauth!.issuer;
@@ -50,15 +52,15 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
 
   /**
    * Code verifier for Authorization Code Grant with Proof Key for Code Exchange (PKCE)
-   * It has be be the same when coming back from the issuer after a redirect
+   * It has to be the same when coming back from the issuer after a redirect
    * Therefore, we keep it in localStorage.
    */
   get codeVerifier(): string {
-    return localStorage.getItem('oAuth-CodeVerifier') ?? '';
+    return this.loadFromLocalStorage('codeVerifier') as string;
   }
 
   set codeVerifier(value: string) {
-    localStorage.setItem('oAuth-CodeVerifier', value);
+    this.saveToLocalStorage('codeVerifier', value);
   }
 
   /**
@@ -67,11 +69,19 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
    * Therefore, we keep it in localStorage.
    */
   get redirectUrl() {
-    return localStorage.getItem('oAuth-RedirectUrl') ?? '';
+    return this.loadFromLocalStorage('redirectUrl') as string;
   }
 
   set redirectUrl(value: string) {
-    localStorage.setItem('oAuth-RedirectUrl', value);
+    this.saveToLocalStorage('redirectUrl', value);
+  }
+
+  private loadFromLocalStorage(path: string): unknown {
+    return UserDataManager.getInstance().getUserData(`${this.storagePath}.${path}`, true) ?? '';
+  }
+
+  private saveToLocalStorage(path: string, value: string) {
+    return UserDataManager.getInstance().saveUserData(`${this.storagePath}.${path}`, value, true);
   }
 
   private async getAuthorizationServer(): Promise<AuthorizationServer> {

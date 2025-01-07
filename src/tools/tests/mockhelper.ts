@@ -1,6 +1,7 @@
 import ConfigManager from '../configuration/configmanager';
 import GirafeConfig from '../configuration/girafeconfig';
 import I18nManager from '../i18n/i18nmanager';
+import UserDataManager from '../userdata/userdatamanager';
 
 class MockHelper {
   public static mockConfig = {
@@ -47,6 +48,9 @@ class MockHelper {
     },
     lidar: {
       url: 'https://pytree.test.url'
+    },
+    userdata: {
+      source: 'localStorage'
     }
   };
 
@@ -56,7 +60,11 @@ class MockHelper {
     configManager['config'] = new GirafeConfig(MockHelper.mockConfig);
     // @ts-ignore
     configManager['defaultConfig'] = new GirafeConfig(MockHelper.mockConfig);
-    configManager.deleteAllUserPreferences();
+
+    const userDataManager = UserDataManager.getInstance();
+    userDataManager.setSource(MockHelper.mockConfig.userdata.source);
+    userDataManager.deleteAllUserData();
+
     I18nManager.getInstance().translations = { fr: { a: 'translated_a', b: 'translated_b' } };
   }
 
@@ -64,7 +72,7 @@ class MockHelper {
     const configManager = ConfigManager.getInstance();
     // @ts-ignore
     configManager.config = null;
-    configManager.deleteAllUserPreferences();
+    UserDataManager.getInstance().deleteAllUserData();
   }
 }
 
