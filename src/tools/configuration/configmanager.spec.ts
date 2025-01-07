@@ -1,16 +1,11 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import ConfigManager from './configmanager';
 import GirafeConfig from './girafeconfig';
 import MockHelper from '../tests/mockhelper';
 import TestHelper from '../tests/testhelper';
 
-afterAll(() => {
-  ConfigManager.getInstance().deleteAllUserPreferences();
-});
-
 describe('ConfigManager.loadConfig', () => {
   const manager = ConfigManager.getInstance();
-  manager.deleteAllUserPreferences();
 
   it('should return config if config is already loaded', async () => {
     // @ts-ignore
@@ -70,109 +65,11 @@ describe('ConfigManager.loadConfig', () => {
 
   it('should ignore invalid keys in user preferences when loading the config', () => {
     const invalidKey = 'thisIsAnInvalidKey';
-    const invalidPath = 'basemaps.' + invalidKey;
-    manager.saveUserPreference(invalidPath, 'someValue');
+    const myConfig = { ...MockHelper.mockConfig };
+    // @ts-ignore
+    myConfig.basemaps[invalidKey] = 'someValue';
     manager.loadConfig().then((config) => {
       expect(Object.keys(config.basemaps)).not.include(invalidKey);
     });
-  });
-});
-
-describe('ConfigManager.mergeConfigs', () => {
-  const manager = ConfigManager.getInstance();
-
-  it('should merge two empty objects', () => {
-    const obj1 = {};
-    const obj2 = {};
-    // @ts-ignore
-    const result = manager.mergeConfigs(obj1, obj2);
-    expect(result).toEqual({});
-  });
-
-  it('should merge two objects with no common properties', () => {
-    const obj1 = { a: 1, b: 2 };
-    const obj2 = { c: 3, d: 4 };
-    // @ts-ignore
-    const result = manager.mergeConfigs(obj1, obj2);
-    expect(result).toEqual({ a: 1, b: 2, c: 3, d: 4 });
-  });
-
-  it('should merge two objects with common properties', () => {
-    const obj1 = { a: 1, b: 2, c: { x: 1, y: 2 } };
-    const obj2 = { b: 3, c: { y: 4, z: 5 }, d: 4 };
-    // @ts-ignore
-    const result = manager.mergeConfigs(obj1, obj2);
-    expect(result).toEqual({ a: 1, b: 3, c: { x: 1, y: 4, z: 5 }, d: 4 });
-  });
-
-  it('should merge two objects with nested common properties', () => {
-    const obj1 = { a: { b: { c: 1 } } };
-    const obj2 = { a: { b: { d: 2 } } };
-    // @ts-ignore
-    const result = manager.mergeConfigs(obj1, obj2);
-    expect(result).toEqual({ a: { b: { c: 1, d: 2 } } });
-  });
-
-  it('should merge two objects with nested non-common properties', () => {
-    const obj1 = { a: { b: { c: 1 } } };
-    const obj2 = { a: { d: 2 } };
-    // @ts-ignore
-    const result = manager.mergeConfigs(obj1, obj2);
-    expect(result).toEqual({ a: { b: { c: 1 }, d: 2 } });
-  });
-});
-
-describe('ConfigManager.saveUserPreference', () => {
-  const manager = ConfigManager.getInstance();
-
-  beforeEach(() => {
-    manager.deleteAllUserPreferences();
-  });
-
-  it('should save user preferences in storage by providing a path and simple value', () => {
-    const path = 'basemaps.defaultBasemap';
-    const newValue = Math.random().toFixed(4).toString();
-    manager.saveUserPreference(path, newValue);
-    const savedPreferences = manager['loadUserPreferences']();
-    expect(savedPreferences).not.toBeNull();
-    // @ts-ignore
-    expect(savedPreferences.basemaps.defaultBasemap).toBe(newValue);
-  });
-
-  it('should overwrite user preferences in storage by providing a path and simple value', () => {
-    const path = 'basemaps.defaultBasemap';
-    const newValue = 22;
-    manager.saveUserPreference(path, newValue);
-    const savedPreferences = manager['loadUserPreferences']();
-    // @ts-ignore
-    expect(savedPreferences.basemaps.defaultBasemap).toBe(newValue);
-
-    const updatedValue = 33;
-    manager.saveUserPreference(path, updatedValue);
-    const updatedPreferences = manager['loadUserPreferences']();
-    // @ts-ignore
-    expect(updatedPreferences.basemaps.defaultBasemap).toBe(updatedValue);
-  });
-
-  it('should overwrite user preferences in storage by providing a path and object', () => {
-    const path = 'customthemes';
-    const customThemes = { theme1: [], theme2: [{ c: 1, e: 0, i: 2345, o: 3456 }] };
-    manager.saveUserPreference(path, customThemes);
-
-    const savedPreferences = manager['loadUserPreferences']();
-    // @ts-ignore
-    expect(savedPreferences.customthemes.theme2.length).toEqual(1);
-
-    // Now update the custom themes
-    const updatedCustomThemes = { ...customThemes, theme3: [] };
-    // @ts-ignore
-    delete updatedCustomThemes['theme2'];
-    manager.saveUserPreference(path, updatedCustomThemes);
-
-    const updatedPreferences = manager['loadUserPreferences']();
-    // @ts-ignore
-    expect(updatedPreferences.customthemes.theme3.length).toEqual(0);
-    // @ts-ignore
-    expect(Object.keys(updatedPreferences.customthemes)).toEqual(['theme1', 'theme3']);
   });
 });

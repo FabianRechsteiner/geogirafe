@@ -152,6 +152,11 @@ class GirafeConfig {
       anonymousUsername: string;
     };
   };
+  userdata: {
+    source: 'localStorage' | 'server';
+    getUrl: string | undefined;
+    postUrl: string | undefined;
+  };
 
   public static readonly DEFAULT_LOCALE = 'en-US';
 
@@ -181,6 +186,7 @@ class GirafeConfig {
     this.query = this.initConfigQuery(config);
     this.oauth = this.initConfigOauth(config);
     this.gmfauth = this.initGmfOauth(config);
+    this.userdata = this.initUserData(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -479,6 +485,16 @@ class GirafeConfig {
     return {
       issuer: issuerConfig,
       geomapfish: config.oauth.geomapfish
+    };
+  }
+
+  private initUserData(config: GirafeConfig) {
+    const defaultConfig = {
+      source: 'localStorage'
+    };
+    return {
+      ...defaultConfig,
+      ...config.userdata
     };
   }
 }

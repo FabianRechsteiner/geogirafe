@@ -3,12 +3,14 @@ import UserPreferencesComponent from './component';
 import MockHelper from '../../tools/tests/mockhelper';
 import StateManager from '../../tools/state/statemanager';
 import ConfigManager from '../../tools/configuration/configmanager';
+import UserDataManager from '../../tools/userdata/userdatamanager';
 import { getPropertyByPath } from '../../tools/utils/pathUtils';
 import CustomThemesManager from '../../tools/themes/customthemesmanager';
 
 describe('UserPreferencesComponent', () => {
   let stateManager: StateManager;
   let configManager: ConfigManager;
+  let userDataManager: UserDataManager;
   let customThemesManager: CustomThemesManager;
   let component: UserPreferencesComponent;
 
@@ -16,6 +18,7 @@ describe('UserPreferencesComponent', () => {
     MockHelper.startMocking();
     stateManager = StateManager.getInstance();
     configManager = ConfigManager.getInstance();
+    userDataManager = UserDataManager.getInstance();
     customThemesManager = CustomThemesManager.getInstance();
     if (!customElements.get('girafe-user-preferences')) {
       customElements.define('girafe-user-preferences', UserPreferencesComponent);
@@ -35,6 +38,7 @@ describe('UserPreferencesComponent', () => {
         if (preference.options.length === 0) {
           continue;
         }
+        // Select a random option from the available options
         const randomOption = Math.round(Math.random() * preference.options.length);
         newRandomValue = preference.options[Math.max(randomOption - 1, 0)].value;
       } else if (preference.uiElement === 'checkbox') {
@@ -42,7 +46,7 @@ describe('UserPreferencesComponent', () => {
       } else if (preference.uiElement === 'color') {
         newRandomValue = '#' + ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0');
       } else {
-        throw Error(`${key} can't be tested, no random value defined.`);
+        throw Error(`${key} can't be tested, no random value created.`);
       }
       component.preferences[key].currentValue = newRandomValue;
     }
@@ -75,12 +79,12 @@ describe('UserPreferencesComponent', () => {
       const result = getPropertyByPath(configManager.Config, preference.configPath);
       expect(
         preference.currentValue,
-        `${key} isn't correctly updated in config, path: ${preference.configPath}`
+        `${key} isn't correctly updated in config, used config path: ${preference.configPath}`
       ).toEqual(result.parentObject[result.lastKey!]);
     }
   });
 
-  it('deletes all user preferences in the local storage when resetting the preferences', () => {
+  it('deletes all user preferences in the user data storage when resetting the preferences', () => {
     component['initPreferenceOptions']();
     component['initCurrentPreferenceValues']();
     setRandomPreferenceValues();
@@ -91,12 +95,12 @@ describe('UserPreferencesComponent', () => {
     // @ts-ignore
     component.resetAll();
 
-    const localStorage = configManager['loadUserPreferences']();
+    const savedUserPreferences = userDataManager.getUserData(component['storagePath']) || '';
     const allUserPreferencesKeys = Object.keys(component.preferences);
-    expect(Object.keys(localStorage)).not.toContain(allUserPreferencesKeys);
+    expect(Object.keys(savedUserPreferences)).not.toContain(allUserPreferencesKeys);
   });
 
-  it('does not delete any additional properties in the local storage when resetting the preferences', () => {
+  it('does not delete any other user data in the storage when resetting the preferences', () => {
     component['initPreferenceOptions']();
     component['initCurrentPreferenceValues']();
     setRandomPreferenceValues();
@@ -104,15 +108,15 @@ describe('UserPreferencesComponent', () => {
     for (const key in component.preferences) {
       component['updatePreferenceInStorage'](key);
     }
-    configManager.saveUserPreference(customThemesManager['storagePath'], { thisIsACustomTheme: [] });
+    // Save some other user data in the storage
+    userDataManager.saveUserData(customThemesManager['storagePath'], { thisIsACustomTheme: [] });
 
     // Now reset user preferences
     // @ts-ignore
     component.resetAll();
 
-    const localStorage = configManager['loadUserPreferences']();
-    const allUserPreferencesKeys = Object.keys(component.preferences);
-    expect(Object.keys(localStorage)).not.toContain(allUserPreferencesKeys);
-    expect(Object.keys(localStorage)).toContain(customThemesManager['storagePath']);
+    const allSavedUserData = userDataManager['load'](false);
+    expect(Object.keys(allSavedUserData)).not.toContain(component['storagePath']);
+    expect(Object.keys(allSavedUserData)).toContain(customThemesManager['storagePath']);
   });
 });

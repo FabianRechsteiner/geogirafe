@@ -1,4 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import UserDataManager from '../../tools/userdata/userdatamanager';
 import { PreferenceGroup, PreferenceGroups, PreferenceOption, UserPreference } from './userPreference';
 import CustomThemesManager from '../../tools/themes/customthemesmanager';
 import CustomTheme from '../../models/customtheme';
@@ -6,19 +7,12 @@ import { getPropertyByPath, setPropertyByPath } from '../../tools/utils/pathUtil
 import { Color } from 'vanilla-picker';
 import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
-import checkedIcon from '../../assets/icons/checked-full.svg?raw';
-import noCheckedIcon from '../../assets/icons/checked-no.svg?raw';
-
 /**
- Lets users change (default) configuration values, updates the state accordingly and saves the changes in the local
- browser storage.
+ Lets the user override default configuration values and saves them as user data.
  */
 export default class UserPreferencesComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
-
-  checkedIcon: string = checkedIcon;
-  noCheckedIcon: string = noCheckedIcon;
 
   visible = false;
   ready: boolean = false;
@@ -26,13 +20,16 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   preferenceGroups: PreferenceGroup[] = PreferenceGroups;
   colorPickers: Record<string, GirafeColorPicker> = {};
 
-  customThemesManager: CustomThemesManager;
+  userDataManager: UserDataManager;
+
+  private readonly storagePath = 'configOverrides';
 
   constructor() {
     super('user-preferences');
 
-    this.customThemesManager = CustomThemesManager.getInstance();
+    this.userDataManager = UserDataManager.getInstance();
 
+    // Define all settings that the user can change
     this.preferences = {
       language: new UserPreference('languages.defaultLanguage', 'language', 'system', 'select'),
       logLevel: new UserPreference('general.logLevel', null, 'system', 'select'),
@@ -157,7 +154,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
       defaultThemes.push({ label: themeName, value: themeName });
     });
     defaultThemes = defaultThemes.sort((a, b) => a.label.toUpperCase().localeCompare(b.label.toUpperCase()));
-    const customThemes: PreferenceOption[] = this.customThemesManager.customThemes.map((ct: CustomTheme) => {
+    const customThemes: PreferenceOption[] = CustomThemesManager.getInstance().customThemes.map((ct: CustomTheme) => {
       return { label: ct.name, value: ct.name };
     });
     this.preferences.theme.options = [...defaultThemes, ...customThemes];
@@ -167,12 +164,12 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
    Readout the default value from the config to show in the component
    */
   private initCurrentPreferenceValues(): void {
-    let result;
     for (const key in this.preferences) {
-      result = getPropertyByPath(this.configManager.Config, this.preferences[key].configPath);
-      if (result?.found && result.parentObject && result.lastKey) {
-        this.preferences[key].currentValue = result.parentObject[result.lastKey];
-      }
+      const { found, parentObject, lastKey } = getPropertyByPath(
+        this.configManager.Config,
+        this.preferences[key].configPath
+      );
+      this.preferences[key].currentValue = found && parentObject && lastKey ? parentObject[lastKey] : undefined;
     }
   }
 
@@ -249,29 +246,30 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
    */
   private updatePreferenceInState(preferenceKey: string): void {
     const preference = this.preferences[preferenceKey];
-    if (preference?.statePath) {
+    if (preference.statePath) {
       setPropertyByPath(this.state, preference.statePath, preference.getCurrentValueForState());
     }
   }
 
   /**
-   Save the user preference as a partial config object in the local browser storage
+   Save the user preference as a config override in user data storage
    */
   private updatePreferenceInStorage(preferenceKey: string): void {
     const preference = this.preferences[preferenceKey];
-    this.configManager.saveUserPreference(preference.configPath, preference.currentValue);
+    // Values are saved under 'configOverrides' in the same structure as in the config
+    this.userDataManager.saveUserData(`${this.storagePath}.${preference.configPath}`, preference.currentValue);
   }
 
   /**
    Delete user preference in the local browser storage
    */
   private deletePreferenceInStorage(preferenceKey: string): void {
-    this.configManager.deleteUserPreference(this.preferences[preferenceKey].configPath);
+    this.userDataManager.deleteUserData(`${this.storagePath}.${this.preferences[preferenceKey].configPath}`);
   }
 
   /**
-   * Reset user preferences back to defaults. This will delete the data in the local storage and set the current state
-   * back to the defaults from config.json
+   * Reset user preferences back to defaults. This will delete the configOverrides object in storage and set the
+   * current state back to the defaults from config.json
    */
   public async onResetAll() {
     const confirm = await window.gConfirm('Reset user preferences back to default values?', 'Reset preferences');
@@ -293,6 +291,9 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
     this.render();
   }
 
+  /**
+   * @returns all preferences of a group for easy usage in the template.
+   */
   public getPreferencesByGroup(group: string): [UserPreference, string][] {
     return Object.keys(this.preferences)
       .map((key) => {
