@@ -64,12 +64,15 @@ export default class MFPEncoder {
   }
 
   /**
-   * @returns An array of all active layers from the state object.
+   * @returns An array of all active layers from the state object in the right order
    */
   getAllLayers(state: State) {
+    // Sort layers from layertree
     const treeLayers = this.getFlatLayers(state.layers.layersList).filter((layer) => layer.active);
+    const sortedLayers = [...treeLayers].sort((a, b) => a.order - b.order);
+    // But basemaps are always at the bottom
     const baseMap = state.activeBasemap?.layersList ?? [];
-    return [...treeLayers, ...baseMap];
+    return [...sortedLayers, ...baseMap];
   }
 
   /**
