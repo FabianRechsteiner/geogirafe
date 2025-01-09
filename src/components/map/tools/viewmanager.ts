@@ -24,6 +24,7 @@ class ViewManager {
   resolution: number | null = null;
   scale: number | null = null;
 
+  defaultSrid: string;
   center: number[];
   extent?: number[];
   scales: number[];
@@ -35,6 +36,7 @@ class ViewManager {
     this.map = map;
 
     this.configManager = ConfigManager.getInstance();
+    this.defaultSrid = this.configManager.getDefaultConfigValue('map.srid') as string;
     this.center = this.configManager.Config.map.startPosition.split(',').map(Number);
     this.state.position.zoom = Number(this.configManager.Config.map.startZoom);
     this.constrainScales = this.configManager.Config.map.constrainScales;
@@ -75,11 +77,12 @@ class ViewManager {
     return scale;
   }
 
-  getView() {
+  getDefaultView() {
+    // Will return the default map view based on the map properties from config.json
     return new View({
       center: this.center,
       zoom: this.zoom ?? undefined,
-      projection: this.state.projection,
+      projection: this.defaultSrid,
       extent: this.extent,
       resolutions: this.allowedResolutions,
       constrainResolution: this.constrainScales,
@@ -101,12 +104,12 @@ class ViewManager {
     const currentRotation = currentView.getRotation();
 
     // ... to new ones
-    const newCenter = transform(currentCenter, currentProjection, this.projection);
+    this.center = transform(currentCenter, currentProjection, this.projection);
     const currentMPU = currentProjection.getMetersPerUnit()!;
     const newMPU = this.projection.getMetersPerUnit()!;
     const currentPointResolution =
       getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') * currentMPU;
-    const newPointResolution = getPointResolution(this.projection, 1 / newMPU, newCenter, 'm') * newMPU;
+    const newPointResolution = getPointResolution(this.projection, 1 / newMPU, this.center, 'm') * newMPU;
     const newResolution = (currentResolution * currentPointResolution) / newPointResolution;
     this.allowedResolutions = this.scalesToResolutions(this.scales);
 
@@ -120,7 +123,7 @@ class ViewManager {
     }
 
     const newView = new View({
-      center: newCenter,
+      center: this.center,
       resolution: newResolution,
       rotation: currentRotation,
       projection: this.projection,

@@ -20,3 +20,22 @@ class MapPosition {
 }
 
 export default MapPosition;
+
+
+/**
+ * Extracts map position details `map_x`, `map_y`, and `map_zoom` from the current URL's query parameters.
+ * @returns {MapPosition | undefined} A `MapPosition` instance if valid parameters are found, otherwise undefined.
+ */
+export const parseMapPositionFromUrl = (): MapPosition | undefined => {
+  const url = new URL(window.location.href);
+  const mapX = url.searchParams.get('map_x');
+  const mapY = url.searchParams.get('map_y');
+  const mapZoom = url.searchParams.get('map_zoom');
+  if (mapX && mapY && mapZoom) {
+    const newPosition = new MapPosition();
+    newPosition.center = [parseFloat(mapX), parseFloat(mapY)];
+    newPosition.zoom = parseFloat(mapZoom);
+    return newPosition.isValid ? newPosition : undefined;
+  }
+  return undefined;
+};

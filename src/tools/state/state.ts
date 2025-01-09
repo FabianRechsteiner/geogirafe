@@ -157,6 +157,9 @@ export default class State {
   // Is the application currently loading data ?
   loading = false;
 
+  // Does a shared state exist and is it loaded? null = no shared state in URL
+  sharedStateIsLoaded: boolean | null = null;
+
   // Current position configuration of the map
   position: MapPosition = new MapPosition();
 

@@ -61,8 +61,7 @@ export const polygonFromCircle = (geometry: Circle) => {
  * @returns the length between coordinates, considering the current map projection (projected or geographic)
  */
 export const getDistance = (coordinates: Coordinate[]) => {
-  const projection: Projection | null = getProjection(StateManager.getInstance().state.projection);
-  if (projection?.getUnits() === 'degrees') {
+  if (isProjectionInDegrees()) {
     let totalLength = 0;
     coordinates.forEach((coordinate, idx) => {
       if (coordinates[idx + 1]) {
@@ -79,9 +78,17 @@ export const getDistance = (coordinates: Coordinate[]) => {
  * @returns the area of a polygon, considering the current map projection (projected or geographic)
  */
 export const getArea = (polygon: Polygon) => {
-  const projection: Projection | null = getProjection(StateManager.getInstance().state.projection);
-  if (projection?.getUnits() === 'degrees') {
-    return getSphericalArea(polygon, { projection: projection! });
+  if (isProjectionInDegrees()) {
+    return getSphericalArea(polygon, { projection: getProjection(StateManager.getInstance().state.projection)! });
   }
   return polygon.getArea();
+};
+
+export const isProjectionInDegrees = (): boolean => {
+  const projection: Projection | null = getProjection(StateManager.getInstance().state.projection);
+  return projection?.getUnits() === 'degrees';
+};
+
+export const isCoordinateInDegrees = (coordinate: Coordinate): boolean => {
+  return coordinate[0] > -90 && coordinate[0] < 90 && coordinate[1] > -180 && coordinate[1] < 180;
 };

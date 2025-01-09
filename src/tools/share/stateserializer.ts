@@ -22,7 +22,6 @@ class StateSerializer {
     // We want to save the following objects :
     // TODO REG : Export swiped layers
     // TODO REG : Export Cesium camera position
-    // TODO REG : Export projection
     // TODO REG : Do we want to export the configuration of the interface ? (what panel is open, treeview width, ...)
 
     // Treeview configuration and layers
@@ -33,6 +32,9 @@ class StateSerializer {
       p: {
         c: state.position.center,
         r: state.position.resolution
+      },
+      m: {
+        p: state.projection
       },
       t: {
         a: Number(state.treeview.advanced)

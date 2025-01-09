@@ -175,6 +175,7 @@ describe('StateSerializer.getSerializedLayer', () => {
 describe('StateSerializer.getSerializedState', () => {
   it('should serialized state correctly if no basemap', () => {
     const state = new State();
+    state.projection = 'EPSG:4326';
     state.position.center = [22, 33];
     state.position.resolution = 99.987;
     const compressedState = serializer.getSerializedState(state);
@@ -187,6 +188,9 @@ describe('StateSerializer.getSerializedState', () => {
       p: {
         c: [22, 33],
         r: 99.987
+      },
+      m: {
+        p: 'EPSG:4326'
       },
       t: {
         a: 0
@@ -200,6 +204,7 @@ describe('StateSerializer.getSerializedState', () => {
 
   it('should serialize state with active basemap', () => {
     const state = new State();
+    state.projection = 'EPSG:4326';
     state.position.center = [22, 33];
     state.position.resolution = 99.987;
     state.activeBasemap = new Basemap({ id: 1, name: 'test' });
@@ -213,6 +218,9 @@ describe('StateSerializer.getSerializedState', () => {
       p: {
         c: [22, 33],
         r: 99.987
+      },
+      m: {
+        p: 'EPSG:4326'
       },
       t: {
         a: 0
