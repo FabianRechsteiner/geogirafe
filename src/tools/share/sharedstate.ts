@@ -26,6 +26,10 @@ export type SharedState = {
     c: Coordinate; // center
     r: number; // resolution
   };
+  // map
+  m: {
+    p: string; // Projection code
+  };
   t: {
     // treeview
     a: number; // advanced (boolean)

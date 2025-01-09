@@ -1,6 +1,6 @@
 import { Map, Feature, MapBrowserEvent, MapEvent, Collection } from 'ol';
 import { Style, Stroke, Fill, Circle } from 'ol/style';
-import { ProjectionLike, get as getProjection } from 'ol/proj';
+import { get as getProjection, ProjectionLike, transform } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { platformModifierKeyOnly } from 'ol/events/condition';
@@ -38,7 +38,7 @@ import LayerLocalFile from '../../models/layers/layerlocalfile';
 import GeoEvents from '../../models/events';
 
 import MapManager from '../../tools/state/mapManager';
-import MapPosition from '../../tools/state/mapposition';
+import MapPosition, { parseMapPositionFromUrl } from '../../tools/state/mapposition';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import { FocusFeature } from './tools/focusfeature';
@@ -48,6 +48,7 @@ import { debounce } from '../../tools/utils/debounce';
 import SelectionParam from '../../models/selectionparam';
 import WfsManager from '../../tools/wfs/wfsmanager';
 import I18nManager from '../../tools/i18n/i18nmanager';
+import { isProjectionInDegrees, isCoordinateInDegrees } from '../../tools/utils/olutils';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -80,10 +81,10 @@ export default class MapComponent extends GirafeHTMLElement {
   viewManager!: ViewManager;
   vectorTilesManager!: VectorTilesManager;
   localFileManager!: LocalFileManager;
+  defaultSrid!: ProjectionLike;
 
-  srid!: ProjectionLike;
   get projection() {
-    return getProjection(this.srid);
+    return this.olMap.getView().getProjection();
   }
 
   // For object selection
@@ -173,7 +174,9 @@ export default class MapComponent extends GirafeHTMLElement {
     super.render();
     this.activateTooltips(false, [800, 0], 'right');
 
-    this.srid = this.configManager.Config.map.srid;
+    // Read out the default projection from config, ignoring user preferences
+    this.defaultSrid = this.configManager.getDefaultConfigValue('map.srid') as string;
+    this.setMapPositionFromUrlAfterInit();
 
     // Initialize the map element
     this.mapTarget = this.shadow.getElementById('ol-map') as HTMLDivElement;
@@ -202,7 +205,7 @@ export default class MapComponent extends GirafeHTMLElement {
     );
 
     // View
-    const view = this.viewManager.getView();
+    const view = this.viewManager.getDefaultView();
     this.olMap.setView(view);
 
     // Create layer for highlighted features
@@ -631,6 +634,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.zoomToResolution(position.resolution);
     if (position.isValid) {
       this.panToCoordinate(position.center);
+      this.updateUrlWithMapPosition();
     }
   }
 
@@ -654,7 +658,6 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onChangeProjection(_oldSrid: string, newSrid: string) {
-    this.srid = newSrid;
     const newView = this.viewManager.getViewConvertedToSrid(newSrid);
     this.olMap.setView(newView);
   }
@@ -766,6 +769,87 @@ export default class MapComponent extends GirafeHTMLElement {
       } else {
         throw new Error('Unknown basemap type');
       }
+    }
+  }
+
+  // TODO REG: Move the 3 following methods to a dedicated manager to manage URL status globaly?
+  /**
+   * Add the current map position and zoom level to the URL. The coordinates are provided in
+   * the default reference system or in WGS84.
+   */
+  private updateUrlWithMapPosition() {
+    let mapX = this.state.position.center[0];
+    let mapY = this.state.position.center[1];
+    if (!mapX || !mapY) {
+      return;
+    }
+    if (!isProjectionInDegrees()) {
+      // Round to meters
+      mapX = Math.round(mapX);
+      mapY = Math.round(mapY);
+    }
+
+    const currentPosition = new MapPosition();
+    currentPosition.center = [mapX, mapY];
+    currentPosition.zoom = this.state.position.zoom;
+
+    // Transform position if it's not in the default reference system or WGS84
+    if (this.state.projection !== this.defaultSrid && this.state.projection !== 'EPSG:4326') {
+      currentPosition.center = transform(currentPosition.center, this.projection, 'EPSG:4326');
+    }
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('map_x', JSON.stringify(currentPosition.center[0]));
+    url.searchParams.set('map_y', JSON.stringify(currentPosition.center[1]));
+    url.searchParams.set('map_zoom', JSON.stringify(currentPosition.zoom));
+    window.history.replaceState({}, '', url.toString());
+  }
+
+  /**
+   * Reads the map position data from the URL and applies it to the map,
+   * making sure map initialization and loading of the shared state have finished beforehand.
+   */
+  private setMapPositionFromUrlAfterInit() {
+    const positionFromUrl = parseMapPositionFromUrl();
+    if (!positionFromUrl) {
+      return;
+    }
+
+    if (this.stateManager.state.sharedStateIsLoaded === false) {
+      // A shared state exists and has to be loaded first
+      this.subscribe('sharedStateIsLoaded', (_: boolean, isLoaded: boolean) => {
+        if (isLoaded) {
+          this.applyMapPositionFromUrl(positionFromUrl);
+        }
+      });
+    } else {
+      this.olMap.once('rendercomplete', () => {
+        this.applyMapPositionFromUrl(positionFromUrl);
+      });
+    }
+  }
+
+  /**
+   * Updates the map position based on a provided position from the URL. Ensures the position is transformed
+   * to the correct map reference system and applies it to the map view if valid.
+   * @param {MapPosition} position - The map position object, including center coordinates in the default reference
+   * system or WGS84, and zoom level.
+   */
+  private applyMapPositionFromUrl(position: MapPosition) {
+    // Make sure the map has finished initializing
+    if (!this.state.projection || !this.olMap.getView().getResolution()) {
+      return;
+    }
+
+    // Transform position into current map reference system
+    const projectionInUrl = getProjection(isCoordinateInDegrees(position.center) ? 'EPSG:4326' : this.defaultSrid)!;
+    if (projectionInUrl.getCode() !== this.state.projection) {
+      position.center = transform(position.center, projectionInUrl, this.projection);
+    }
+
+    if (position.isValid) {
+      this.olMap.getView().setCenter(position.center);
+      this.olMap.getView().setZoom(position.zoom);
     }
   }
 }

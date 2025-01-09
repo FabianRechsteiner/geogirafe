@@ -5,7 +5,6 @@ import { SharedLayer, SharedState } from './sharedstate';
 import LZString from 'lz-string';
 import LayerManager from '../layermanager';
 import StateManager from '../state/statemanager';
-
 import ComponentManager from '../state/componentManager';
 import ThemeLayer from '../../models/layers/themelayer';
 import ErrorManager from '../error/errormanager';
@@ -35,8 +34,7 @@ class StateDeserializer {
     const stringState = LZString.decompressFromBase64(compressedState);
     const sharedState: SharedState = JSON.parse(stringState);
 
-    // TODO REG : Today only default SRID is managed. The coordinates here can have invalid format.
-
+    this.state.projection = sharedState.m.p;
     this.state.position.center = sharedState.p.c;
     this.state.position.resolution = sharedState.p.r;
     this.state.treeview.advanced = Boolean(sharedState.t.a);
