@@ -59,7 +59,7 @@
     "proj4": "2"
   },
   "devDependencies": {
-    "@geoblocks/mapfishprint": "0.2.16",
+    "@geoblocks/mapfishprint": "0.2.19",
     "@geoblocks/print": "0.7.9",
     "@types/babel__generator": "7.6.8",
     "@types/d3": "7.4.3",

@@ -103,7 +103,8 @@ export default class PrintManager {
     return {
       attributes,
       format: options.format,
-      layout: options.layout
+      layout: options.layout,
+      lang: options.state.language ?? undefined
     };
   }
 
