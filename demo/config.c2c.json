@@ -39,9 +39,8 @@
     "url": "https://geomapfish-demo-2-8.camptocamp.com/printproxy/",
     "formats": ["png", "pdf", "jpg", "jpeg", "notvalid"],
     "defaultFormat": "pdf",
-    "layouts": ["1 A4 portrait", "4 A3 landscape"],
     "defaultLayout": "1 A4 portrait",
-    "scales": [500000, 25000, 10000, 99999, 5000, 2500],
+    "scales": [500000, 100000, 50000, 25000, 10000, 5000, 2500, 500, 250, 100],
     "attributeNames": ["legend", "title", "comments"],
     "printLegend": {
       "showGroupsTitle": true

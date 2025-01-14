@@ -371,6 +371,14 @@ class PrintComponent extends GirafeHTMLElement {
         scaleElement.value = newVal;
       })
     );
+    this.eventsCallbacks.push(
+      this.subscribe('oauth.status', async (_oldValue, newValue) => {
+        if (newValue === 'loggedIn' || newValue === 'loggedOut') {
+          await this.initComponentConfig();
+          this.render();
+        }
+      })
+    );
   }
 
   /**
@@ -454,7 +462,7 @@ class PrintComponent extends GirafeHTMLElement {
     let capabilities: MFPCapabilities | undefined = undefined;
     try {
       const fetchOptions = { referrer: '' } as RequestInit;
-      if (this.configManager.Config.oauth) {
+      if (this.configManager.Config.oauth || this.state.oauth.status === 'loggedIn') {
         fetchOptions.credentials = 'include';
       }
       const response = await fetch(this.getCapabilitiesUrl(), fetchOptions);
