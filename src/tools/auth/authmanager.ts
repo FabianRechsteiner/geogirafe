@@ -66,7 +66,7 @@ export default class AuthManager extends GirafeSingleton {
     try {
       if (this.state.oauth.status === 'issuer.loggedIn') {
         // We are logged in to the identity provider
-        // We must now login to GMF
+        // We must now login to GMF (for GMF < 2.9 only)
         // If we got a token from the issuer, we first call the GMF login route with Token
         if (this.state.oauth.tokens) {
           await this.gmfManager.loginWithToken();

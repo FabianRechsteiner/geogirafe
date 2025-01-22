@@ -2,7 +2,7 @@ import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
 
 export default class AuthHelper {
-  public static getFetchOptions(includeToken: boolean = false) {
+  public static getFetchOptions() {
     let fetchOptions: RequestInit | undefined;
     if (ConfigManager.getInstance().Config.oauth || ConfigManager.getInstance().Config.gmfauth) {
       // A authentication is defined (GMF or oAuth2)
@@ -13,7 +13,7 @@ export default class AuthHelper {
         referrerPolicy: 'no-referrer'
       };
 
-      if (includeToken && StateManager.getInstance().state.oauth.tokens?.access_token) {
+      if (StateManager.getInstance().state.oauth.tokens?.access_token) {
         // If there is an access token, we also send it as Authorization Header
         fetchOptions.headers = {
           Authorization: `Bearer ${StateManager.getInstance().state.oauth.tokens!.access_token}`
