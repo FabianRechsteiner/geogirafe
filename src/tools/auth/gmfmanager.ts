@@ -41,14 +41,19 @@ export default class GMFManager extends GirafeSingleton {
   }
 
   public async loginWithToken() {
-    console.debug('Auth: 2.1. Backend login with token');
-    if (!this.isOAuth) {
-      throw new Error('Login with JWT token if the issuer does not support oAuth is not supported.');
-    }
+    // NOTE: With the new OICD Worflow that has been integrated in GMF 2.9, this is not needed any more.
+    // But for OICD integration before 2.9, this is still needed
+    // TOOD REG : Remove this code when MapBS will be migrated to the standard GMF flow
+    if (this.gmfConfigForOAuth.loginUrl) {
+      console.debug('Auth: 2.1. Backend login with token');
+      if (!this.isOAuth) {
+        throw new Error('Login with JWT token if the issuer does not support oAuth is not supported.');
+      }
 
-    const gmfLoginResponse = await fetch(this.gmfConfigForOAuth.loginUrl, AuthHelper.getFetchOptions(true));
-    if (!gmfLoginResponse.ok) {
-      throw new Error(gmfLoginResponse.statusText);
+      const gmfLoginResponse = await fetch(this.gmfConfigForOAuth.loginUrl, AuthHelper.getFetchOptions());
+      if (!gmfLoginResponse.ok) {
+        throw new Error(gmfLoginResponse.statusText);
+      }
     }
 
     this.state.oauth.status = 'loggedIn';
@@ -56,10 +61,22 @@ export default class GMFManager extends GirafeSingleton {
 
   public async logout() {
     console.debug('Auth: 4. Backend logout');
-    const logoutUrl = this.isOAuth ? this.gmfConfigForOAuth.logoutUrl : `${this.gmfConfigForGmfAuth.url}/logout`;
-    const gmfLogoutResponse = await fetch(logoutUrl, AuthHelper.getFetchOptions());
-    if (!gmfLogoutResponse.ok) {
-      throw new Error(gmfLogoutResponse.statusText);
+    let logoutUrl = null;
+    if (this.isOAuth && this.gmfConfigForOAuth.logoutUrl) {
+      // OICD but Logout from Backend (case for BS)
+      logoutUrl = this.gmfConfigForOAuth.logoutUrl;
+    } else if (!this.isOAuth) {
+      // GMF-Auth
+      logoutUrl = `${this.gmfConfigForGmfAuth.url}/logout`;
+    }
+
+    // If logoutUrl is not set, it means we do not need to logout from backend.
+    // The token will be removed when loging out from the OIDC provider.
+    if (logoutUrl) {
+      const gmfLogoutResponse = await fetch(logoutUrl, AuthHelper.getFetchOptions());
+      if (!gmfLogoutResponse.ok) {
+        throw new Error(gmfLogoutResponse.statusText);
+      }
     }
     this.state.oauth.userInfo = undefined;
     this.state.oauth.status = 'backend.loggedOut';
