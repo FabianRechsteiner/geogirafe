@@ -2,7 +2,13 @@ import StateManager from '../state/statemanager';
 import SelectionParam from '../../models/selectionparam';
 import LayerWms from '../../models/layers/layerwms';
 import ServerWfs from '../../models/serverwfs';
-import WfsClient, { WfsClientMapServer, WfsClientOptionalOptions, WfsClientQgis } from './wfsclient';
+import WfsClient, {
+  WfsClientDefault,
+  WfsClientGeoServer,
+  WfsClientMapServer,
+  WfsClientOptionalOptions,
+  WfsClientQgis
+} from './wfsclient';
 import WfsFilter from './wfsfilter';
 import ServerOgc from '../../models/serverogc';
 import VendorSpecificOgcServerManager from '../vendorspecificogcservermanager';
@@ -26,7 +32,8 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
     });
 
     // Register the default client
-    this.registerClientClass('default', WfsClientMapServer);
+    this.registerClientClass('default', WfsClientDefault);
+    this.registerClientClass('geoserver', WfsClientGeoServer);
     this.registerClientClass('mapserver', WfsClientMapServer);
     this.registerClientClass('qgisserver', WfsClientQgis);
   }

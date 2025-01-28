@@ -39,8 +39,8 @@ export default abstract class VendorSpecificOgcServerManager<
     if (!client) {
       let clientClass = this._clientClasses.get(type);
       if (!clientClass) {
-        console.error(
-          `clientClass not found for ogcServer with id: ${clientId}, type: ${type}, ogcServer: ${ogcServer}`
+        console.info(
+          `Client not found for ogcServer with type: ${type}. Using default client. ogcServer: ${ogcServer}. `
         );
         clientClass = this._clientClasses.get('default')!;
       }

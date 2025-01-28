@@ -1,6 +1,6 @@
 import { Map as OlMap } from 'ol';
 
-import WmsClient, { WmsClientMapServer, WmsClientQgis } from './wmsclient';
+import WmsClient, { WmsClientDefault, WmsClientGeoServer, WmsClientMapServer, WmsClientQgis } from './wmsclient';
 import ServerOgc from '../../models/serverogc';
 import VendorSpecificOgcServerManager from '../vendorspecificogcservermanager';
 
@@ -11,7 +11,8 @@ export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient
     super(type);
 
     // Register the default client
-    this.registerClientClass('default', WmsClientMapServer);
+    this.registerClientClass('default', WmsClientDefault);
+    this.registerClientClass('geoserver', WmsClientGeoServer);
     this.registerClientClass('mapserver', WmsClientMapServer);
     this.registerClientClass('qgisserver', WmsClientQgis);
   }
