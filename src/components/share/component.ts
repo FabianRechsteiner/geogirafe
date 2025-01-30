@@ -13,7 +13,6 @@ class ShareComponent extends GirafeDraggableElement {
   styleUrls = ['../../styles/common.css', './style.css'];
 
   loading = true;
-
   shareLink?: string;
   qrCode?: string;
   success: boolean = true;
@@ -24,6 +23,37 @@ class ShareComponent extends GirafeDraggableElement {
 
   shareManager: ShareManager;
   urlShortener?: IUrlShortener;
+
+  currentTab = 'share-map';
+  iframeUrl?: string;
+  iframeCode?: string;
+
+  iframeSize: 'small' | 'medium' | 'large' = 'small';
+  public get iframeWidth() {
+    switch (this.iframeSize) {
+      case 'small':
+        return 400;
+      case 'medium':
+        return 600;
+      case 'large':
+        return 800;
+      default:
+        throw new Error('Unknown iframe size');
+    }
+  }
+
+  public get iframeHeight() {
+    switch (this.iframeSize) {
+      case 'small':
+        return 300;
+      case 'medium':
+        return 450;
+      case 'large':
+        return 600;
+      default:
+        throw new Error('Unknown iframe size');
+    }
+  }
 
   constructor() {
     super('share');
@@ -57,19 +87,33 @@ class ShareComponent extends GirafeDraggableElement {
     if (this.urlShortener && visible) {
       this.loading = true;
       this.render();
-      const base = window.location.href.split('#')[0];
-      const hash = this.shareManager.getStateToShare();
-      const longurl = `${base}#${hash}`;
 
-      const response = await this.urlShortener.shortenUrl(longurl);
+      const currentUrl = new URL(window.location.href);
+      const baseUrl = `${currentUrl.protocol}//${currentUrl.host}${currentUrl.pathname}`;
+      const hash = this.shareManager.getStateToShare();
+
+      // Get short URL
+      const longurl = `${baseUrl}#${hash}`;
+      let response = await this.urlShortener.shortenUrl(longurl);
       this.shareLink = response.shorturl;
       this.success = response.success;
       this.qrCode = response.qrcode;
+
+      // Get short URL for iframe
+      const longIframeUrl = `${baseUrl}iframe.html#${hash}`;
+      response = await this.urlShortener.shortenUrl(longIframeUrl);
+      this.iframeUrl = response.shorturl;
+      this.setIframeCode();
+
       this.loading = false;
-      this.render();
+      this.refreshRender();
     } else {
       this.renderEmpty();
     }
+  }
+
+  setIframeCode() {
+    this.iframeCode = `<iframe title="iframe MapBS" src="${this.iframeUrl}" width="${this.iframeWidth}" height="${this.iframeHeight}"></iframe>`;
   }
 
   closeWindow() {
@@ -94,8 +138,29 @@ class ShareComponent extends GirafeDraggableElement {
     window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
   }
 
-  copyToClipboard() {
-    navigator.clipboard.writeText(this.shareLink!);
+  activateTab(tabName: string) {
+    this.currentTab = tabName;
+    this.refreshRender();
+  }
+
+  copyToClipboard(type: 'short' | 'iframe') {
+    let textToCopy = '';
+
+    if (type === 'short') {
+      textToCopy = this.shareLink ?? '';
+    } else if (type === 'iframe') {
+      textToCopy = this.iframeCode ?? '';
+    }
+
+    if (textToCopy) {
+      navigator.clipboard.writeText(textToCopy);
+    }
+  }
+
+  onSizeChanged(event: Event) {
+    this.iframeSize = (event.target as HTMLInputElement)?.value as 'small' | 'medium' | 'large';
+    this.setIframeCode();
+    this.refreshRender();
   }
 
   connectedCallback() {

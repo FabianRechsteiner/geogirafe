@@ -1,13 +1,13 @@
-import GirafeSingleton from '../base/GirafeSingleton';
-import BaseLayer from '../models/layers/baselayer';
-import GroupLayer from '../models/layers/grouplayer';
-import Layer from '../models/layers/layer';
-import ConfigManager from './configuration/configmanager';
-import StateManager from './state/statemanager';
-import LayerWms from '../models/layers/layerwms';
-import ILayerWithLegend from '../models/layers/ilayerwithlegend';
-import ILayerWithFilter from '../models/layers/ilayerwithfilter';
-import ThemeLayer from '../models/layers/themelayer';
+import GirafeSingleton from '../../base/GirafeSingleton';
+import BaseLayer from '../../models/layers/baselayer';
+import GroupLayer from '../../models/layers/grouplayer';
+import Layer from '../../models/layers/layer';
+import ConfigManager from '../configuration/configmanager';
+import StateManager from '../state/statemanager';
+import LayerWms from '../../models/layers/layerwms';
+import ILayerWithLegend from '../../models/layers/ilayerwithlegend';
+import ILayerWithFilter from '../../models/layers/ilayerwithfilter';
+import ThemeLayer from '../../models/layers/themelayer';
 
 class LayerManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -32,6 +32,10 @@ class LayerManager extends GirafeSingleton {
     this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) =>
       this.onLayersListChanged(oldLayers, newLayers)
     );
+    this.stateManager.subscribe(
+      /layers\.layersList\..*\.children/,
+      (oldChildren: BaseLayer[], newChildren: BaseLayer[]) => this.onChildrenListChanged(oldChildren, newChildren)
+    );
   }
 
   private onLayersListChanged(oldLayers: BaseLayer[], newLayers: BaseLayer[]) {
@@ -42,6 +46,15 @@ class LayerManager extends GirafeSingleton {
       );
     }
     this.layerClones.push(...addedLayers);
+    this.activateDefaultLayers(addedLayers);
+  }
+  protected onChildrenListChanged(oldChildren: BaseLayer[], newChildren: BaseLayer[]) {
+    // If we added a new group to the list of layers
+    // Then we activate the layers that should be activated by default
+    const addedLayers = newChildren.filter(
+      (newChild) => !oldChildren.find((oldChild) => oldChild.treeItemId === newChild.treeItemId)
+    );
+    this.activateDefaultLayers(addedLayers);
   }
 
   public getTreeItem(treeItemId: string): BaseLayer {
@@ -282,6 +295,37 @@ class LayerManager extends GirafeSingleton {
 
   isLayerWithFilter(layer: ILayerWithFilter | Layer): layer is ILayerWithFilter {
     return (<ILayerWithFilter>layer).filter !== undefined;
+  }
+
+  public getSortedLayers(layers: BaseLayer[]) {
+    const orderedLayers = layers.slice().sort((l1: BaseLayer, l2: BaseLayer) => {
+      return l1.order - l2.order;
+    });
+    return orderedLayers ?? [];
+  }
+
+  public activateDefaultLayers(layers: BaseLayer[]) {
+    for (const layer of layers) {
+      // Activate the layer by default
+      this.activateIfDefaultChecked(layer);
+
+      // Manage the legend visibility
+      if (
+        layer instanceof Layer &&
+        !layer.active &&
+        this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated &&
+        this.isLayerWithLegend(layer)
+      ) {
+        // Hide Legend
+        (layer as ILayerWithLegend).isLegendExpanded = false;
+        (layer as ILayerWithLegend).wasLegendExpanded = true;
+      }
+
+      // Continue recursively
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+        this.activateDefaultLayers(layer.children);
+      }
+    }
   }
 }
 

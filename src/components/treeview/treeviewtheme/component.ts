@@ -1,4 +1,3 @@
-import BaseLayer from '../../../models/layers/baselayer';
 import ThemeLayer from '../../../models/layers/themelayer';
 import TreeViewGroupElement from '../tools/treeviewgroupelement';
 // @ts-ignore This import is not used in the typescript file but needed in the HTML Template
@@ -34,10 +33,8 @@ class TreeViewThemeComponent extends TreeViewGroupElement {
     this.subscribe(/layers\.layersList\..*\.activeState/, (_oldValue: boolean, _newValue: boolean, theme: ThemeLayer) =>
       this.refreshRender(theme)
     );
-    this.subscribe(
-      /layers\.layersList\..*\.children/,
-      (oldChildren: BaseLayer[], newChildren: BaseLayer[], theme: ThemeLayer) =>
-        this.onChildrenListChanged(oldChildren, newChildren, theme)
+    this.subscribe(/layers\.layersList\..*\.children/, (_oldValue: boolean, _newValue: boolean, group: GroupLayer) =>
+      this.refreshRender(group)
     );
     this.subscribe(/layers\.layersList\..*\.filter/, (_oldValue: boolean, _newValue: boolean, layer: ThemeLayer) =>
       this.refreshRender(layer)

@@ -10,7 +10,7 @@ import LayerOsm from '../../models/layers/layerosm';
 import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
-import LayerManager from '../layermanager';
+import LayerManager from '../layers/layermanager';
 import ShareManager from '../share/sharemanager';
 import LayerConsts from '../../models/layers/layerconsts';
 import LayerCog from '../../models/layers/layercog';

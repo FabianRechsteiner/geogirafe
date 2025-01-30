@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import MockHelper from '../../tools/tests/mockhelper';
 import OfflineComponent from './component';
 import { createTestBasemap, createTestLayerWmts } from '../../tools/tests/layerhelpers';
-import LayerManager from '../../tools/layermanager';
+import LayerManager from '../../tools/layers/layermanager';
 
 describe('OfflineComponent.getAllWmtsLayers', () => {
   let element: OfflineComponent;

@@ -6,7 +6,7 @@ import { Map } from 'ol';
 import LayerWms from '../../models/layers/layerwms';
 import StateManager from '../state/statemanager';
 import SelectionParam from '../../models/selectionparam';
-import LayerManager from '../layermanager';
+import LayerManager from '../layers/layermanager';
 import WfsFilter from '../wfs/wfsfilter';
 import ServerOgc from '../../models/serverogc';
 

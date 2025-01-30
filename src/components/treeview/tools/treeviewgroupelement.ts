@@ -1,7 +1,6 @@
 import BaseLayer from '../../../models/layers/baselayer';
 import GroupLayer from '../../../models/layers/grouplayer';
 import ThemeLayer from '../../../models/layers/themelayer';
-import GroupHelper from './grouphelper';
 import TreeViewElement from './treeviewelement';
 
 export default abstract class TreeViewGroupElement extends TreeViewElement {
@@ -13,7 +12,7 @@ export default abstract class TreeViewGroupElement extends TreeViewElement {
   }
 
   public sortedChildren() {
-    return GroupHelper.getSortedLayers(this.layer.children);
+    return this.layerManager.getSortedLayers(this.layer.children);
   }
 
   protected deactivateThemeOrGroup(layer: BaseLayer) {
@@ -23,16 +22,6 @@ export default abstract class TreeViewGroupElement extends TreeViewElement {
         this.deactivateThemeOrGroup(child);
       }
     }
-  }
-
-  protected onChildrenListChanged(oldChildren: BaseLayer[], newChildren: BaseLayer[], theme: GroupLayer | ThemeLayer) {
-    this.refreshRender(theme);
-    // If we added a new group to the list of layers
-    // Then we activate the layers that should be activated by default
-    const addedLayers = newChildren.filter(
-      (newChild) => !oldChildren.find((oldChild) => oldChild.treeItemId === newChild.treeItemId)
-    );
-    GroupHelper.activateDefaultLayers(addedLayers);
   }
 
   public toggle(state?: 'on' | 'off' | 'semi') {

@@ -101,6 +101,9 @@ a:visited {
   padding: 0.5rem;
   height: 6rem;
 }
+.gg-input {
+  cursor: text;
+}
 .gg-checkbox {
   accent-color: var(--text-color);
   width: 1.2rem;
@@ -211,6 +214,29 @@ a:visited {
 .gg-opacity:hover {
   background-color: transparent;
   opacity: 1;
+}
+
+/* Tabs */
+.gg-tabs {
+  display: flex;
+  justify-content: left;
+  margin: 0.5rem auto 0;
+  border-bottom: 1px solid grey;
+  cursor: pointer;
+  height: 2rem;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.gg-tab {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+.gg-tab.active {
+  border-bottom: solid 2px var(--text-color-grad2);
+  font-weight: 600;
 }
 
 /* TODO REG : Suppress all the following styles. */

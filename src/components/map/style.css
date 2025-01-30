@@ -155,12 +155,11 @@ input[type='range']::-moz-range-thumb {
 
 @media screen and (max-width: 1000px) {
   .ol-zoom {
-    top: 46vh !important;
-    right: 0.5rem !important;
+    display: none !important;
   }
 
   .ol-rotate {
-    top: calc(46vh + 5rem) !important;
+    top: 0.5rem !important;
     right: 0.5rem !important;
   }
 }

@@ -60,6 +60,9 @@
     "Select none": "Select none",
     "Select operator...": "Select operator...",
     "Share this map": "Share this map",
+    "Embed this map": "Embed this map",
+    "Share or embed this map": "Share or embed this map",
+    "Preview": "Preview",
     "Source": "Source",
     "Stroke color": "Stroke color",
     "Take measure": "Take measure",
@@ -242,6 +245,11 @@
     "This instance of GeoGirafe cannot be used at the moment.": "This instance of GeoGirafe cannot be used at the moment.",
     "Backend error": "Backend error",
     "Web Mercator projection distorts distances and areas": "Web Mercator projection distorts distances and areas",
-    "Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.": "Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore."
+    "Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.": "Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.",
+    "Copy link": "Copy link",
+    "Small": "Small",
+    "Medium": "Medium",
+    "Large": "Large",
+    "Copy code": "Copy code"
   }
 }

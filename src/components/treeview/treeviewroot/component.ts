@@ -2,15 +2,14 @@ import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import BaseLayer from '../../../models/layers/baselayer';
 import GroupLayer from '../../../models/layers/grouplayer';
 import ThemeLayer from '../../../models/layers/themelayer';
-import LayerManager from '../../../tools/layermanager';
+import LayerManager from '../../../tools/layers/layermanager';
 import LayerWms from '../../../models/layers/layerwms';
-import GroupHelper from '../tools/grouphelper';
 
 class TreeViewRootComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['./style.css', '../../../styles/common.css'];
 
-  private layerManager: LayerManager;
+  private readonly layerManager: LayerManager;
 
   private isAllExpanded: boolean = false;
   private areAllLegendExpanded: boolean = true;
@@ -21,7 +20,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   }
 
   public sortedLayers() {
-    return GroupHelper.getSortedLayers(this.state.layers.layersList);
+    return this.layerManager.getSortedLayers(this.state.layers.layersList);
   }
 
   public render() {
@@ -31,23 +30,10 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   }
 
   private registerEvents() {
-    this.subscribe('layers.layersList', (oldLayers, newLayers) => this.onLayersListChanged(oldLayers, newLayers));
+    this.subscribe('layers.layersList', () => this.refreshRender());
     this.subscribe('treeview.advanced', () => this.refreshRender());
     this.subscribe('basemaps', () => this.refreshRender());
     this.subscribe(/layers\.layersList\..*\.order/, () => this.refreshRender());
-  }
-
-  private onLayersListChanged(oldLayers: BaseLayer[], newLayers: BaseLayer[]) {
-    super.refreshRender();
-    // If we added a new group to the list of layers
-    // Then we activate the layers that should be activated by default
-    let addedLayers = newLayers;
-    if (oldLayers) {
-      addedLayers = newLayers.filter(
-        (newLayer) => !oldLayers.find((oldLayer) => oldLayer.treeItemId === newLayer.treeItemId)
-      );
-    }
-    GroupHelper.activateDefaultLayers(addedLayers);
   }
 
   protected connectedCallback() {

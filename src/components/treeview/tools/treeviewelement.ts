@@ -1,6 +1,6 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import BaseLayer from '../../../models/layers/baselayer';
-import LayerManager from '../../../tools/layermanager';
+import LayerManager from '../../../tools/layers/layermanager';
 import DragManager from './dragmanager';
 
 export default abstract class TreeViewElement extends GirafeHTMLElement {

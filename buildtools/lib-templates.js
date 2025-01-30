@@ -32,3 +32,5 @@ copy('index.html', sourceDir, targetDir);
 replaceInFile(path.join(targetDir, 'index.html'), /href="src\/styles/gm, 'href="styles');
 copy('mobile.html', sourceDir, targetDir);
 replaceInFile(path.join(targetDir, 'mobile.html'), /href="src\/styles/gm, 'href="styles');
+copy('iframe.html', sourceDir, targetDir);
+replaceInFile(path.join(targetDir, 'iframe.html'), /href="src\/styles/gm, 'href="styles');

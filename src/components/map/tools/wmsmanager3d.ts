@@ -1,7 +1,7 @@
 import LayerWms from '../../../models/layers/layerwms';
 import StateManager from '../../../tools/state/statemanager';
 import SelectionParam from '../../../models/selectionparam';
-import LayerManager from '../../../tools/layermanager';
+import LayerManager from '../../../tools/layers/layermanager';
 import { Scene as CesiumScene, WebMapServiceImageryProvider, ImageryLayer } from 'cesium';
 import ConfigManager from '../../../tools/configuration/configmanager';
 
