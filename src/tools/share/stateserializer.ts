@@ -3,7 +3,7 @@ import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
 import { SharedLayer, SharedState } from './sharedstate';
 import LZString from 'lz-string';
-import LayerManager from '../layermanager';
+import LayerManager from '../layers/layermanager';
 import State from '../state/state';
 import ComponentManager from '../state/componentManager';
 import ThemeLayer from '../../models/layers/themelayer';

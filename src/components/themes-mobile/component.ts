@@ -4,7 +4,7 @@ import Layer from '../../models/layers/layer';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MapManager from '../../tools/state/mapManager';
 import ThemeLayer from '../../models/layers/themelayer';
-import LayerManager from '../../tools/layermanager';
+import LayerManager from '../../tools/layers/layermanager';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 

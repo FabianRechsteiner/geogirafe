@@ -1,5 +1,5 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import LayerManager from '../layermanager';
+import LayerManager from '../layers/layermanager';
 import StateManager from '../state/statemanager';
 import StateDeserializer from './statedeserializer';
 import StateSerializer from './stateserializer';

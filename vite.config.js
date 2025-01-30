@@ -50,7 +50,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         desktop: resolve(__dirname, 'index.html'),
-        mobile: resolve(__dirname, 'mobile.html')
+        mobile: resolve(__dirname, 'mobile.html'),
+        iframe: resolve(__dirname, 'iframe.html')
       },
       output: {
         manualChunks: {

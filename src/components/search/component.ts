@@ -20,7 +20,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SearchResult, { type GeometryResult, GeometryCollectionResult } from '../../models/searchresult';
 import MapManager from '../../tools/state/mapManager';
 import Layer from '../../models/layers/layer';
-import LayerManager from '../../tools/layermanager';
+import LayerManager from '../../tools/layers/layermanager';
 import { parseCoordinates } from '../../tools/geometrytools';
 import ThemesHelper from '../../tools/themes/themeshelper';
 

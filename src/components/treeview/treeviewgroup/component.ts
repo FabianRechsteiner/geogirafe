@@ -1,4 +1,3 @@
-import BaseLayer from '../../../models/layers/baselayer';
 import GroupLayer from '../../../models/layers/grouplayer';
 import ThemeLayer from '../../../models/layers/themelayer';
 import TreeViewGroupElement from '../tools/treeviewgroupelement';
@@ -31,10 +30,8 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
     this.subscribe(/layers\.layersList\..*\.activeState/, (_oldValue: boolean, _newValue: boolean, group: GroupLayer) =>
       this.refreshRender(group)
     );
-    this.subscribe(
-      /layers\.layersList\..*\.children/,
-      (oldChildren: BaseLayer[], newChildren: BaseLayer[], group: GroupLayer) =>
-        this.onChildrenListChanged(oldChildren, newChildren, group)
+    this.subscribe(/layers\.layersList\..*\.children/, (_oldValue: boolean, _newValue: boolean, group: GroupLayer) =>
+      this.refreshRender(group)
     );
     this.subscribe(/layers\.layersList\..*\.order/, (_oldValue: boolean, _newValue: boolean, layer: ThemeLayer) => {
       this.refreshRender(layer);

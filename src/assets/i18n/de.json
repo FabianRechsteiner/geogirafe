@@ -60,6 +60,9 @@
     "Select none": "Nichts auswählen",
     "Select operator...": "Operator auswählen...",
     "Share this map": "Diese Karte teilen",
+    "Embed this map": "Diese Karte einbetten",
+    "Share or embed this map": "Diese Karte teilen oder einbetten",
+    "Preview": "Vorschau",
     "Source": "Quelle",
     "Stroke color": "Strichfarbe",
     "Take measure": "Messen",
@@ -242,6 +245,11 @@
     "This instance of GeoGirafe cannot be used at the moment.": "Diese Instanz von GeoGirafe kann momentan nicht verwendet werden.",
     "Backend error": "Backend-Fehler",
     "Web Mercator projection distorts distances and areas": "Die Web Mercator Projektion verzerrt Distanz- und Flächenangaben",
-    "Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.": "Einige Ebenen konnten nicht zum Ebenenbaum hinzugefügt werden. Dies liegt entweder daran, dass Sie keine Rechte dafür haben, oder weil diese Ebene nicht mehr existiert."
+    "Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.": "Einige Ebenen konnten nicht zum Ebenenbaum hinzugefügt werden. Dies liegt entweder daran, dass Sie keine Rechte dafür haben, oder weil diese Ebene nicht mehr existiert.",
+    "Copy link": "Link kopieren",
+    "Small": "Klein",
+    "Medium": "Mittel",
+    "Large": "Groß",
+    "Copy code": "Code kopieren"
   }
 }
