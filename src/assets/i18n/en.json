@@ -208,6 +208,7 @@
     "Cancel": "Cancel",
     "Do you want to logout ?": "Do you want to logout?",
     "Logout": "Logout",
+    "User has been logged out.": "User has been logged out.",
     "Do you want to remove \"${feature.name}\" ?": "Do you want to remove \"${feature.name}\"?",
     "Delete Feature": "Delete Feature",
     "Give a name to your bookmark": "Give a name to your bookmark",
