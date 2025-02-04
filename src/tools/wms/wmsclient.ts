@@ -370,3 +370,6 @@ export class WmsClientMapServer extends WmsClient {
     }
   }
 }
+
+export const WmsClientDefault = WmsClientQgis;
+export const WmsClientGeoServer = WmsClientMapServer;

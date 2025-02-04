@@ -21,7 +21,7 @@ export type WfsClientOptionalOptions = {
   featureNS?: string;
 };
 
-export class WfsClient<WfsXmlTypes = XmlTypes> {
+export default class WfsClient<WfsXmlTypes = XmlTypes> {
   stateManager: StateManager;
   get state() {
     return this.stateManager.state;
@@ -279,12 +279,21 @@ export class WfsClientMapServer extends WfsClient {
   constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
     super(ogcServer, { featurePrefix: 'feature', featureNS: 'https://mapserver.gis.umn.edu/mapserver', ...options });
   }
+  async getFeatureRaw(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions) {
+    console.debug('WFS CLIENT MAPSERVER getFeatureRaw() featureTypes:', featureTypes);
+    return super.getFeatureRaw(featureTypes, getFeatureOptions);
+  }
 }
 
 export class WfsClientQgis extends WfsClient {
   constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
     super(ogcServer, { featurePrefix: 'feature', featureNS: 'https://www.qgis.org/gml', ...options });
   }
+  async getFeatureRaw(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions) {
+    console.debug('WFS CLIENT QGIS getFeatureRaw() featureTypes:', featureTypes);
+    return super.getFeatureRaw(featureTypes, getFeatureOptions);
+  }
 }
 
-export default WfsClient;
+export const WfsClientDefault = WfsClientQgis;
+export const WfsClientGeoServer = WfsClientMapServer;
