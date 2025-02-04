@@ -3,6 +3,8 @@ import StateManager from '../state/statemanager';
 import GirafeSingleton from '../../base/GirafeSingleton';
 import AuthHelper from './authhelper';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export type GMFUserInfo = {
   username: string;
   email: string;
@@ -89,7 +91,16 @@ export default class GMFManager extends GirafeSingleton {
     if (this.state.oauth.userInfo?.username) {
       this.state.oauth.status = 'loggedIn';
     } else {
-      this.state.oauth.status = 'loggedOut';
+      this.handleExternalLogout();
     }
+  }
+
+  public handleExternalLogout() {
+    this.state.oauth.status = 'loggedOut';
+    this.stateManager.state.infobox.elements.push({
+      id: uuidv4(),
+      text: 'User has been logged out.',
+      type: 'info'
+    });
   }
 }

@@ -208,6 +208,7 @@
     "Cancel": "Annuler",
     "Do you want to logout ?": "Voulez-vous vous déconnecter ?",
     "Logout": "Déconnexion",
+    "User has been logged out.": "L'utilisateur a été déconnecté.",
     "Do you want to remove \"${feature.name}\" ?": "Voulez-vous supprimer \"${feature.name}\" ?",
     "Delete Feature": "Supprimer la fonctionnalité",
     "Give a name to your bookmark": "Donnez un nom à votre marque-page",

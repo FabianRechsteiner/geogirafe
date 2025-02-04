@@ -208,6 +208,7 @@
     "Cancel": "Annulla",
     "Do you want to logout ?": "Vuoi disconnetterti?",
     "Logout": "Disconnetti",
+    "User has been logged out.": "L'utente è stato disconnesso.",
     "Do you want to remove \"${feature.name}\" ?": "Vuoi rimuovere \"${feature.name}\"?",
     "Delete Feature": "Elimina funzionalità",
     "Give a name to your bookmark": "Dai un nome al tuo segnalibro",
