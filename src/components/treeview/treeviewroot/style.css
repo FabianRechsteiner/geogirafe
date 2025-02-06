@@ -22,6 +22,38 @@
   flex-grow: 1;
 }
 
-.spacer {
+.treeview-search {
   flex-grow: 1;
+  align-self: center;
+  background-color: var(--bkg-color);
+  width: auto;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #cfd6dd;
+  border-radius: 4px;
+}
+
+#treeview-search-field {
+  font-size: 1rem;
+  outline: none;
+  border: 0;
+  flex: 1 1 auto;
+  width: 90%;
+  background: transparent;
+  color: var(--text-color);
+  padding: 0;
+}
+
+.filter-icon,
+.delete-icon {
+  width: 16px;
+  color: var(--text-color);
+  padding: 0 0.5rem;
+}
+
+.delete-button {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
 }

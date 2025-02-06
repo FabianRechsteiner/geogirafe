@@ -72,9 +72,9 @@
   </header>
 
   <!-- Sub layers -->
-  <div class="${((this.layer as GroupLayer).isExpanded ? 'children' : 'hidden')}">
+  <div class="${((this.layer as GroupLayer).isExpanded && this.layer.isVisible ? 'children' : 'hidden')}">
     <!-- prettier-ignore -->
-    ${this.sortedChildren().map(layer => (layer instanceof GroupLayer) ? uHtmlFor(layer, layer.treeItemId)`
+    ${this.sortedChildren().filter(layer => layer.isVisible).map(layer => (layer instanceof GroupLayer) ? uHtmlFor(layer, layer.treeItemId)`
     <girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>
     ` : uHtmlFor(layer, layer.treeItemId)`
     <girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>

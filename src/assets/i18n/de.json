@@ -251,6 +251,8 @@
     "Small": "Klein",
     "Medium": "Mittel",
     "Large": "Groß",
-    "Copy code": "Code kopieren"
+    "Copy code": "Code kopieren",
+    "Filter layer tree": "Layerliste filtern",
+    "Reset filter": "Filter zurücksetzen"
   }
 }

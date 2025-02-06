@@ -84,6 +84,17 @@ class LayerManager extends GirafeSingleton {
     return null;
   }
 
+  public getFlattenedLayerTree(layers: BaseLayer[]): BaseLayer[] {
+    const allLayers: BaseLayer[] = [];
+    for (const layer of layers) {
+      allLayers.push(layer);
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+        allLayers.push(...this.getFlattenedLayerTree(layer.children));
+      }
+    }
+    return allLayers;
+  }
+
   activateIfDefaultChecked(layer: BaseLayer) {
     if (layer.isDefaultChecked) {
       this.toggle(layer, 'on');

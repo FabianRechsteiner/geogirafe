@@ -251,6 +251,8 @@
     "Small": "Petite",
     "Medium": "Moyenne",
     "Large": "Grande",
-    "Copy code": "Copier le code"
+    "Copy code": "Copier le code",
+    "Filter layer tree": "Filtrer les couches",
+    "Reset filter": "Réinitialiser le filtre"
   }
 }

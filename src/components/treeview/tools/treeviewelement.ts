@@ -31,7 +31,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
   public refreshRender(): void;
   public refreshRender(layer?: BaseLayer): void;
   public refreshRender(layer?: BaseLayer): void {
-    if (!layer || layer === this.layer) {
+    if (this.state.treeview.renderEnabled && (!layer || layer === this.layer)) {
       // Is called without param, call refresh
       // Else, call refresh only if the layer in param is the current one
       super.refreshRender();

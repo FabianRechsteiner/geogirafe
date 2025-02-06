@@ -251,6 +251,8 @@
     "Small": "Small",
     "Medium": "Medium",
     "Large": "Large",
-    "Copy code": "Copy code"
+    "Copy code": "Copy code",
+    "Filter layer tree": "Filter layer tree",
+    "Reset filter": "Reset filter"
   }
 }

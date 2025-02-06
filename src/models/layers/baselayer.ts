@@ -25,6 +25,7 @@ abstract class BaseLayer {
   public isDefaultChecked: boolean;
   public disclaimer?: string;
   public metadataUrl?: string;
+  public isVisible: boolean = true;
 
   public hasError: boolean = false;
   public errorMessage: string | null = null;
