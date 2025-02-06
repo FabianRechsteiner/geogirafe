@@ -4,6 +4,7 @@ import GroupLayer from '../../../models/layers/grouplayer';
 import ThemeLayer from '../../../models/layers/themelayer';
 import LayerManager from '../../../tools/layers/layermanager';
 import LayerWms from '../../../models/layers/layerwms';
+import { filterLayerTree } from '../tools/treeviewfilter';
 
 class TreeViewRootComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -13,6 +14,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
 
   private isAllExpanded: boolean = false;
   private areAllLegendExpanded: boolean = true;
+  public isTreeFiltered: boolean = false;
 
   constructor() {
     super('treeviewroot');
@@ -30,7 +32,11 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   }
 
   private registerEvents() {
-    this.subscribe('layers.layersList', () => this.refreshRender());
+    this.subscribe('layers.layersList', () => {
+      // Whenever tree items are added or removed to the tree, reset the filter
+      this.clearFilter();
+      this.refreshRender();
+    });
     this.subscribe('treeview.advanced', () => this.refreshRender());
     this.subscribe('basemaps', () => this.refreshRender());
     this.subscribe(/layers\.layersList\..*\.order/, () => this.refreshRender());
@@ -80,6 +86,45 @@ class TreeViewRootComponent extends GirafeHTMLElement {
     }
     this.state.layers.layersList = [];
     this.state.themes.lastSelectedTheme = null;
+  }
+
+  public filterTree(searchText: string) {
+    if (searchText === '') {
+      this.clearFilter();
+      return;
+    }
+    // Pause rendering during filtering to improve performance
+    this.state.treeview.renderEnabled = false;
+    try {
+      filterLayerTree(this.state.layers.layersList, searchText);
+      this.isTreeFiltered = true;
+    } finally {
+      this.state.treeview.renderEnabled = true;
+      this.refreshRender();
+    }
+  }
+
+  public clearFilter() {
+    // Pause rendering during filtering to improve performance
+    this.state.treeview.renderEnabled = false;
+    try {
+      // Remove search term
+      const filterField = this.shadow.getElementById('treeview-search-field') as HTMLInputElement;
+      filterField.value = '';
+
+      // Set all layers back to being visible
+      const allLayers = LayerManager.getInstance().getFlattenedLayerTree(this.state.layers.layersList);
+      allLayers.forEach((layer) => {
+        if (!layer.isVisible) {
+          layer.isVisible = true;
+        }
+      });
+
+      this.isTreeFiltered = false;
+    } finally {
+      this.state.treeview.renderEnabled = true;
+      this.refreshRender();
+    }
   }
 }
 

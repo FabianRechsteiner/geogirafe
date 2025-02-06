@@ -46,6 +46,7 @@ type LayersConfig = {
 
 type TreeviewConfig = {
   advanced: boolean;
+  renderEnabled: boolean;
 };
 
 // Current Print state
@@ -170,7 +171,8 @@ export default class State {
 
   // Current Treeview state
   treeview: TreeviewConfig = {
-    advanced: false
+    advanced: false,
+    renderEnabled: true
   };
 
   // Current Print state
