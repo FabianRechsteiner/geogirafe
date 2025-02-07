@@ -34,7 +34,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   private registerEvents() {
     this.subscribe('layers.layersList', () => {
       // Whenever tree items are added or removed to the tree, reset the filter
-      this.clearFilter();
+      if (this.isTreeFiltered) this.clearFilter();
       this.refreshRender();
     });
     this.subscribe('treeview.advanced', () => this.refreshRender());
