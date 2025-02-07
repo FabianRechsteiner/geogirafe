@@ -131,8 +131,10 @@ export default class ThemesHelper extends GirafeSingleton {
       for (const element of this.state.layers.layersList) {
         element.activeState = 'off';
       }
-      // 2. Add new layers
-      this.state.layers.layersList = clonedTheme.children;
+      // 2. Add new layers: Delay this step to give tree view time to render the previous step
+      setTimeout(() => {
+        this.state.layers.layersList = clonedTheme.children;
+      });
     } else if (!this.state.layers.layersList.find((l) => l.id == clonedTheme.id)) {
       // Mode is <add>
       // Add new theme to the list if is not in the list yet

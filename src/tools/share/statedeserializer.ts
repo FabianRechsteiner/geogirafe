@@ -124,13 +124,13 @@ class StateDeserializer {
         const explicitlyRemoved = sharedLayer.x.find((id) => id == child.id);
         if (explicitlyRemoved) {
           originalLayer.children.splice(i, 1);
-          console.debug(`Layer ${originalLayer.children[i].name} was removed from initial state`);
+          console.debug(`Layer ${child.name} was removed from initial state`);
         } else {
           // Otherwise it is a new layer. We do not remove it
           // But we have to set the right order for it.
           // In this case we have to reorder all the layers at this level
           // In order to keep the order defined in the initial group
-          console.debug(`Layer ${originalLayer.children[i].name} will be added to the treeview because it is new`);
+          console.debug(`Layer ${child.name} will be added to the treeview because it is new`);
           console.debug(`Layer ${originalLayer.name} needs a reorering of its children`);
           reorder = true;
         }
