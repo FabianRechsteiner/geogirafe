@@ -3,3 +3,8 @@
   flex-direction: column;
   width: max-content;
 }
+
+.active-basemap {
+  background-color: var(--bkg-color-grad1) !important;
+  cursor: default !important;
+}
