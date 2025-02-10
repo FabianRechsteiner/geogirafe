@@ -54,3 +54,8 @@ span {
 .confirm-buttons button {
   width: 7rem;
 }
+
+h2,
+span {
+  color: var(--text-color);
+}
