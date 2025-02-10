@@ -659,7 +659,8 @@ export class Scatterplot {
       .attr('fill', 'none')
       .attr('font-size', 12)
       .attr('font-family', 'sans-serif')
-      .attr('text-anchor', 'middle');
+      .attr('text-anchor', 'middle')
+      .attr('style', 'color: var(--text-color)');
   }
 
   updateXAxis(): void {
