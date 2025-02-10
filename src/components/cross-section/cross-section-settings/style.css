@@ -25,6 +25,11 @@
   justify-content: space-between;
 }
 
+h3,
+.text-label {
+  color: var(--text-color);
+}
+
 /* Tables */
 .scrollable-table-container {
   width: 100%;
