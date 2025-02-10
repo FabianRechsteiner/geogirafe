@@ -25,6 +25,10 @@
   padding: 0;
 }
 
+.new-theme > button > span {
+  color: var(--text-color);
+}
+
 .theme > img,
 .custom-theme > button > img,
 .new-theme > img {
