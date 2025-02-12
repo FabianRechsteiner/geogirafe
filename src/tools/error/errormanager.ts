@@ -110,8 +110,12 @@ ${stack}
 
   private getContextUrl() {
     const base = window.location.href.split('#')[0];
-    const hash = ShareManager.getInstance().getStateToShare();
-    return `${base}#${hash}`;
+    try {
+      const hash = ShareManager.getInstance().getStateToShare();
+      return `${base}#${hash}`;
+    } catch (e) {
+      return base;
+    }
   }
 
   private async getOriginalStackTrace(error: Error): Promise<string> {

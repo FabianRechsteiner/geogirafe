@@ -87,3 +87,9 @@ header:hover .tool {
 .gg-selected {
   opacity: 1;
 }
+
+.legend-file {
+  display: flex;
+  font-style: italic;
+  color: var(--text-color);
+}
