@@ -38,6 +38,9 @@ class I18nManager extends GirafeSingleton {
 
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
+
+    this.stateManager.subscribe('language', () => this.handleLanguageChange());
+    this.handleLanguageChange();
   }
 
   formatNumber(number: string | number): string {
@@ -119,6 +122,15 @@ class I18nManager extends GirafeSingleton {
         item.innerHTML = translation;
       }
     });
+  }
+
+  handleLanguageChange() {
+    const newLanguage = this.stateManager.state.language;
+    if (!newLanguage) {
+      return;
+    }
+    const htmlLangElement = document.querySelector('html[lang]');
+    htmlLangElement?.setAttribute('lang', newLanguage);
   }
 
   private getFnTranslated(item: Element, key: string): string {
