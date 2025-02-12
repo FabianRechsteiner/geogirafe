@@ -24,9 +24,8 @@ export default class OrderingManager extends GirafeSingleton {
   }
 
   private registerEvents() {
-    this.stateManager.subscribe('layers.layersList', () => {
-      this.reorderLayers();
-    });
+    this.stateManager.subscribe('layers.layersList', () => this.reorderLayers());
+    this.stateManager.subscribe(/layers\.layersList\..*\.children/, () => this.reorderLayers());
     this.stateManager.subscribe(/layers\.layersList\..*\.order/, () => this.reorderLayers());
   }
 

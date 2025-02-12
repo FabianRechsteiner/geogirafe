@@ -55,9 +55,15 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
   deleteGroup() {
     this.deactivateThemeOrGroup(this.layer);
     setTimeout(() => {
+      let index;
       if (this.layer.parent) {
-        const index = this.layer.parent.children.findIndex((l) => l === this.layer);
-        this.layer.parent.children.splice(index, 1);
+        index = this.layer.parent.children.findIndex((l) => l === this.layer);
+      } else {
+        // When group is at root of layersList, it does not have a parent
+        index = this.state.layers.layersList.findIndex((l) => l === this.layer);
+      }
+      if (index > -1) {
+        this.state.layers.layersList.splice(index, 1);
       }
     });
   }

@@ -22,16 +22,28 @@ class LocalFileManager {
     }
   > = {};
 
-  layerGroup: GroupLayer = new GroupLayer(0, 'LocalFiles', 0, { isDefaultChecked: true, isDefaultExpanded: true });
+  layerGroup?: GroupLayer;
+  layerGroupProxy?: GroupLayer;
 
   constructor(map: Map) {
     this.map = map;
 
     this.stateManager = StateManager.getInstance();
+    this.registerEvents();
 
-    // Add drag n drop interraction to add local files
+    // Add drag n drop interaction to add local files
     const dragAndDropInteraction = this.createInteraction();
     this.map.addInteraction(dragAndDropInteraction);
+  }
+
+  private registerEvents(): void {
+    this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) => {
+      if (oldLayers.includes(this.layerGroup) && !newLayers.includes(this.layerGroup)) {
+        // Group was deleted in tree, cleanup references
+        delete this.layerGroupProxy;
+        delete this.layerGroup;
+      }
+    });
   }
 
   createInteraction() {
@@ -40,6 +52,9 @@ class LocalFileManager {
       formatConstructors: [GPX, GeoJSON, IGC, new KML({ extractStyles: true }), TopoJSON]
     });
     dragAndDropInteraction.on('addfeatures', (e) => {
+      if (!this.layerGroup) {
+        this.layerGroup = new GroupLayer(0, 'Local Files', 0, { isDefaultChecked: true, isDefaultExpanded: true });
+      }
       // Check if all features can be displayed in the current map maximum extent
       // This will also approximately validate if the SRID is correct
       const featureType = e.file.name.replace('.', '_');
@@ -54,24 +69,18 @@ class LocalFileManager {
         Verify that those features can be displayed within the maximal extent configured in your application.`;
       }
 
-      // Is the group already in the treeview ?
-      const group = this.stateManager.state.layers.layersList.find(
-        (l) => l.treeItemId === this.layerGroup.treeItemId
-      ) as GroupLayer;
-      if (group) {
-        // If yes, add the child to the list
-        // And keep a reference to the proxy object, because when we will be doing changes, we want the state to be informed.
-        // And the proxy will be created only if the object has already been added to the list
-        this.layerGroup = group;
-        this.layerGroup.children.push(layer);
+      if (this.layerGroupProxy) {
+        // If group is already in the treeview, add layer to the tree directly
+        this.layerGroupProxy.children.push(layer);
       } else {
-        // Otherwise, if the group is not in the list yet, first clear the list of actual childs
-        // Because the object has been removed from the treeview, and it means we shoud reinitialize it
-        this.layerGroup.children.length = 0;
-        // And then add element to layertree
+        // Otherwise, add the layer to the group
         this.layerGroup.children.push(layer);
-        // And last add the group to the treeview
+        // then add the group to the treeview
         this.stateManager.state.layers.layersList.push(this.layerGroup);
+        // Save a reference to the proxy object in the tree for next time a file is added
+        this.layerGroupProxy = this.stateManager.state.layers.layersList.find(
+          (l) => l.treeItemId === this.layerGroup!.treeItemId
+        ) as GroupLayer;
       }
     });
 
@@ -94,8 +103,6 @@ class LocalFileManager {
           feature.setId(`${featureType}.${++counter}`);
           validatedFeatures.push(feature);
           globalExtent = globalExtent == null ? [...featureExtent] : extend(globalExtent, featureExtent);
-          // Everything is ok, continue the loop
-          continue;
         }
       }
     }

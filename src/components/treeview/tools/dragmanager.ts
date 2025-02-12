@@ -30,10 +30,10 @@ class DragManager extends GirafeSingleton {
   }
 
   public dragEnter(target: BaseLayer): boolean {
-    if (this.layer !== target && this.layer?.parent === target.parent) {
+    if (this.layer && this.layer !== target && this.layer?.parent === target.parent) {
       // Same parent, but different item
       this.destination = target;
-      if (this.layer!.order > target.order) {
+      if (this.layer.order > target.order) {
         this.dragBefore = true;
       } else {
         this.dragAfter = true;

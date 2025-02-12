@@ -19,8 +19,8 @@
     "Error, can not fetch the config. Please try again later.": "Fehler, Konfiguration kann nicht abgerufen werden. Bitte versuche es später erneut.",
     "Error, can not fetch the shortener service. Please try again later.": "Fehler, der Verkürzungsdienst kann nicht abgerufen werden. Bitte versuche es später erneut.",
     "Export": "Exportieren",
-    "features": "Funktionen",
-    "File from": "Datei von",
+    "features": "Elemente",
+    "File from": "Datei vom",
     "Fill color": "Füllfarbe",
     "Filtering deactivated: layers in layergroup don't have identical attributes.": "Filterung deaktiviert: Layer in der Layergruppe haben nicht identische Attribute.",
     "Fix length to": "Länge festlegen auf",
@@ -253,6 +253,7 @@
     "Large": "Groß",
     "Copy code": "Code kopieren",
     "Filter layer tree": "Layerliste filtern",
-    "Reset filter": "Filter zurücksetzen"
+    "Reset filter": "Filter zurücksetzen",
+    "Local Files": "Lokale Dateien"
   }
 }
