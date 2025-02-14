@@ -14,7 +14,7 @@
     <div class="${this.getRenderState() === 'setup' ? '' : 'hidden'}">
       <div class="option">
         <label for="layout" i18n="Layout" class="gg-label">Layout</label>
-        <select id="layout" class="gg-select" onchange="${(evt:Event) => this.onLayoutChanged(evt)}">
+        <select id="layout" class="gg-select" onchange="${(evt: KeyboardEvent) => this.onLayoutChanged(evt)}">
           ${this.layouts.map((layout) => uHtml`
           <option i18n="${layout.name}" ?selected="${this.selectedLayout?.name === layout.name}" value="${layout.name}">
             ${layout.name}
@@ -23,20 +23,43 @@
         </select>
       </div>
 
-      <div class="option">
+      <div class="option gg-custom-scale">
         <label for="scale" i18n="Scale" class="gg-label">Scale</label>
-        <select id="scale" class="gg-select" onchange="${(evt:Event) => this.onScaleChanged(evt)}">
+        <select id="scale" class="gg-select" onchange="${(evt: KeyboardEvent) => this.onScaleChanged(evt)}">
           ${this.scales.map((scale) => uHtml`
           <option ?selected="${this.getSelectedScale() === scale}" value="${scale}">
             <span>1&nbsp;:&nbsp;</span><span i18n="${scale}" i18nFn="formatNumber">${scale}</span>
           </option>
           `)}
+          <option
+            i18n="Manual entry"
+            class="${this.configManager.Config.print.customScale === true ? '' : 'hidden'}"
+            value="custom">
+            Manual entry
+          </option>
         </select>
+      </div>
+
+      <div class="${this.showCustomScale === true ? 'option' : 'hidden'}">
+        <div id="custom-scale">
+          <label for="scale" i18n="Custom scale" class="gg-label">Custom scale</label>
+          <div>
+            <span>1&nbsp;:&nbsp;</span
+            ><input
+              class="gg-input"
+              type="number"
+              min="10"
+              onkeypress="${(evt: KeyboardEvent) => this.onCustomScaleTyped(evt)}" />
+            <span class="svg-info" tip="Press 'Enter' to apply" tip-placement="top"
+              ><img alt="Info" src="icons/info.svg"
+            /></span>
+          </div>
+        </div>
       </div>
 
       <div class="option">
         <label for="format" i18n="Format" class="gg-label">Format</label>
-        <select id="format" class="gg-select" onchange="${(evt:Event) => this.onFormatChanged(evt)}">
+        <select id="format" class="gg-select" onchange="${(evt: KeyboardEvent) => this.onFormatChanged(evt)}">
           ${this.printFormats.map((format) => uHtml`
           <option ?selected="${this.getSelectedFormat() === format}" value="${format}">${format.toUpperCase()}</option>
           `)}

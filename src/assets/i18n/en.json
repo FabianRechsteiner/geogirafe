@@ -254,6 +254,9 @@
     "Copy code": "Copy code",
     "Filter layer tree": "Filter layer tree",
     "Reset filter": "Reset filter",
-    "Local Files": "Local Files"
+    "Local Files": "Local Files",
+    "Custom scale": "Custom scale",
+    "Press 'Enter' to apply": "Press 'Enter' to apply",
+    "Manual entry": "Manual entry"
   }
 }

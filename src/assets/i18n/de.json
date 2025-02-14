@@ -254,6 +254,9 @@
     "Copy code": "Code kopieren",
     "Filter layer tree": "Layerliste filtern",
     "Reset filter": "Filter zurücksetzen",
-    "Local Files": "Lokale Dateien"
+    "Local Files": "Lokale Dateien",
+    "Custom scale": "Benutzerdefinierter Massstab",
+    "Press 'Enter' to apply": "Drücken Sie 'Enter' um anzuwenden",
+    "Manual entry": "Manuelle Eingabe"
   }
 }

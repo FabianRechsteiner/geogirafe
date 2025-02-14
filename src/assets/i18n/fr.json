@@ -254,6 +254,9 @@
     "Copy code": "Copier le code",
     "Filter layer tree": "Filtrer les couches",
     "Reset filter": "Réinitialiser le filtre",
-    "Local Files": "Fichiers locaux"
+    "Local Files": "Fichiers locaux",
+    "Custom scale": "Échelle personnalisée",
+    "Press 'Enter' to apply": "Appuyez sur 'Entrée' pour appliquer",
+    "Manual entry": "Entrée manuelle"
   }
 }

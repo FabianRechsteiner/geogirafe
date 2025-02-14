@@ -60,6 +60,7 @@ class GirafeConfig {
       params?: Record<string, Record<string, unknown>>;
       showGroupsTitle?: boolean;
     };
+    customScale?: boolean;
   };
   selection: {
     maxFeature: number;

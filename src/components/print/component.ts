@@ -66,6 +66,7 @@ class PrintComponent extends GirafeHTMLElement {
   private visible = false;
   private isWithCapabilitiesComponentSetup = false;
   private hasErrorFetchingCapabilities = false;
+  showCustomScale = false;
   attributeNames: string[] = [];
   printFormats: string[] = [];
   layouts: MFPCapabilitiesLayout[] = [];
@@ -113,7 +114,7 @@ class PrintComponent extends GirafeHTMLElement {
    * Set scale and print format in the state.
    * Renders the panel with new info.
    */
-  onLayoutChanged(event: Event) {
+  onLayoutChanged(event: KeyboardEvent) {
     const eventValue = (event.target as HTMLInputElement)?.value;
     this.selectedLayout = this.getCapabilitiesLayout(eventValue);
     const clientInfo = this.getClientInfo();
@@ -127,9 +128,33 @@ class PrintComponent extends GirafeHTMLElement {
   /**
    * Set selected scale in the state and update the mask.
    */
-  onScaleChanged(event: Event) {
+  onScaleChanged(event: KeyboardEvent) {
+    this.printMaskManager?.setManuallySelectedScale(false);
+    if (this.configManager.Config.print.customScale) {
+      if ((event.target as HTMLInputElement)?.value === 'custom') {
+        this.showCustomScale = true;
+        this.render();
+        return;
+      }
+      this.showCustomScale = false;
+      this.render();
+    }
     this.state.print.scale = parseInt((event.target as HTMLInputElement)?.value);
     this.printMaskManager?.zoomToScale(this.state.print.scale);
+    this.printMaskManager?.setManuallySelectedScale(false);
+  }
+
+  onCustomScaleTyped(evt: KeyboardEvent) {
+    // Only when the user presses the Enter key.
+    if (evt.key === 'Enter') {
+      const value = parseInt((evt.target as HTMLInputElement)?.value);
+      if (value) {
+        this.state.print.scale = value;
+        this.printMaskManager?.zoomToScale(this.state.print.scale);
+        this.render();
+        this.printMaskManager?.setManuallySelectedScale(true);
+      }
+    }
   }
 
   /**
