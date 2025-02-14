@@ -19,6 +19,7 @@ class PrintMaskManager {
   private readonly map: Map;
   private readonly eventsCallbacks: Callback[] = [];
   private possibleScales: number[] = [];
+  scaleManuallySelected = false;
 
   constructor(map: Map) {
     this.map = map;
@@ -36,6 +37,10 @@ class PrintMaskManager {
     this.eventsCallbacks.length = 0;
     this.state.print.maskVisible = false;
     this.onPrintMaskVisibleChanged();
+  }
+
+  setManuallySelectedScale(value: boolean) {
+    this.scaleManuallySelected = value;
   }
 
   /**
@@ -79,12 +84,14 @@ class PrintMaskManager {
     const viewResolution = frameState.viewState.resolution;
     console.assert(this.state.print.pageSize, 'Can not get optimal scale without print pageSize');
     const pageSize = this.state.print.pageSize ?? [0, 0];
-    let optimalScale = PrintMaskManager.getOptimalScale(mapSize, viewResolution, pageSize, this.possibleScales);
-    if (optimalScale < 0) {
+    let optimalScale;
+    if (this.scaleManuallySelected) {
       optimalScale = this.state.print.scale ?? 10000;
+    } else {
+      optimalScale = PrintMaskManager.getOptimalScale(mapSize, viewResolution, pageSize, this.possibleScales);
     }
     this.state.print.scale = optimalScale;
-    return optimalScale;
+    return this.state.print.scale;
   }
 
   /**

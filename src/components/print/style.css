@@ -142,3 +142,26 @@
   right: 0;
   margin-right: 0.5rem;
 }
+
+#custom-scale {
+  color: var(--text-color);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+#custom-scale .svg-info {
+  margin-left: 0.5rem;
+}
+
+#custom-scale > div {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.gg-custom-scale {
+  justify-content: flex-end;
+}

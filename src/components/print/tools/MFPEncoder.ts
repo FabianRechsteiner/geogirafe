@@ -59,7 +59,8 @@ export default class MFPEncoder {
       projection,
       rotation,
       scale: options.scale,
-      layers: mfpLayers
+      layers: mfpLayers,
+      useNearestScale: false
     };
   }
 

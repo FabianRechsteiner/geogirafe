@@ -254,6 +254,9 @@
     "Copy code": "Copia codice",
     "Filter layer tree": "Albero dei livelli di filtraggio",
     "Reset filter": "Azzeramento del filtro",
-    "Local Files": "File locali"
+    "Local Files": "File locali",
+    "Custom scale": "Scala personalizzata",
+    "Press 'Enter' to apply": "Premi 'Invio' per applicare",
+    "Manual entry": "Inserimento manuale"
   }
 }

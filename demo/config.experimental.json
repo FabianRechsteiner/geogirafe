@@ -44,7 +44,8 @@
     "attributeNames": ["legend", "title", "comments"],
     "printLegend": {
       "showGroupsTitle": true
-    }
+    },
+    "customScale": true
   },
   "share": {
     "service": "lstu",
@@ -60,7 +61,8 @@
     "scales": [1000000, 500000, 200000, 100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200],
     "startPosition": "2628597,1186378",
     "startZoom": "3",
-    "maxExtent": "2200000,1040000,3000000,1310000"
+    "maxExtent": "2200000,1040000,3000000,1310000",
+    "constrainScales": false
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
