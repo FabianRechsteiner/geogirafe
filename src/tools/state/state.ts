@@ -19,7 +19,7 @@ type GraphicalInterface = {
   selectionComponent: string;
   aboutVisible: boolean;
   userPreferencesPanelVisible: boolean;
-  metadataVisible: boolean;
+  infoWindowVisible: boolean;
   shareVisible: boolean;
   darkMapMode: boolean;
   darkFrontendMode: boolean;
@@ -90,9 +90,13 @@ type LoginState = {
   userInfo?: UserInfoResponse;
 };
 
-export type Metadata = {
+export type InfoWindow = {
   title: string | null;
   url: string | null;
+  width: string | number | null;
+  height: string | number | null;
+  top: string | number | null;
+  left: string | number | null;
 };
 
 export default class State {
@@ -140,7 +144,7 @@ export default class State {
     selectionComponent: '',
     aboutVisible: false,
     userPreferencesPanelVisible: false,
-    metadataVisible: false,
+    infoWindowVisible: false,
     shareVisible: false,
     darkMapMode: false,
     darkFrontendMode: false
@@ -206,9 +210,13 @@ export default class State {
     elements: [] as InfoBoxContent[]
   };
 
-  metadata: Metadata = {
+  infoWindow: InfoWindow = {
     title: null,
-    url: null
+    url: null,
+    width: null,
+    height: null,
+    top: null,
+    left: null
   };
 
   // Indicates is the application is currently used in offline mode

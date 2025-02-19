@@ -193,12 +193,10 @@ girafe-share {
   left: 50%;
 }
 
-girafe-metadata-window {
+girafe-info-window {
   position: absolute;
   z-index: 100;
   background: var(--bkg-color);
-  top: 1rem;
-  left: 2rem;
 }
 
 .border-top {

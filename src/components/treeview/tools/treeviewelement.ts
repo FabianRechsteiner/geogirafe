@@ -44,11 +44,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
   }
 
   protected showMetadata() {
-    this.state.metadata = {
-      title: this.layer.name,
-      url: this.layer.metadataUrl ?? null
-    };
-    this.state.interface.metadataVisible = true;
+    window.gOpenWindow(this.layer.name, this.layer.metadataUrl!);
   }
 
   private initializeDrag() {
