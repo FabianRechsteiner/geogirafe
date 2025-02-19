@@ -21,8 +21,8 @@ import ColorSwitcherComponent from './components/colorswitcher/component';
 import CoordinateComponent from './components/coordinate/component';
 import LayoutComponent from './components/layout/component';
 import HelpComponent from './components/help/component';
-import MetadataWindowComponent from './components/metadatawindow/component';
 import InfoboxComponent from './components/infobox/component';
+import InfoWindowComponent from './components/infowindow/component';
 import CrossSectionSettingsComponent from './components/cross-section/cross-section-settings/component';
 import CrossSectionViewComponent from './components/cross-section/cross-section-viewer/component';
 import LRPanelComponent from './components/lr-panel/component';
@@ -73,6 +73,15 @@ declare global {
     gConfirm(message: string, title?: string): Promise<boolean>;
     gAlert(message: string, title?: string): Promise<boolean>;
     gPrompt(message: string, title?: string, placeholder?: string): Promise<string | false>;
+
+    gOpenWindow(
+      title: string,
+      url: string,
+      width?: string | number,
+      height?: string | number,
+      top?: string | number,
+      left?: string | number
+    ): void;
   }
 }
 
@@ -126,8 +135,8 @@ try {
       customElements.define('girafe-coordinate', CoordinateComponent);
       customElements.define('girafe-layout', LayoutComponent);
       customElements.define('girafe-help', HelpComponent);
-      customElements.define('girafe-metadata-window', MetadataWindowComponent);
       customElements.define('girafe-infobox', InfoboxComponent);
+      customElements.define('girafe-info-window', InfoWindowComponent);
       customElements.define('girafe-cross-section-settings', CrossSectionSettingsComponent);
       customElements.define('girafe-cross-section-view', CrossSectionViewComponent);
       customElements.define('girafe-lr-panel', LRPanelComponent);

@@ -78,7 +78,9 @@
     ]
   },
   "metadata": {
-    "metadataUrlPrefix": "https://map.geo.bs.ch",
+    "metadataUrlPrefix": "https://map.geo.bs.ch"
+  },
+  "infoWindow": {
     "defaultWindowWidth": "500px",
     "defaultWindowHeight": "350px"
   },

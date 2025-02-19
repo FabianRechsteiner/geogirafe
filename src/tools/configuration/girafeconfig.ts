@@ -121,8 +121,12 @@ class GirafeConfig {
   };
   metadata: {
     metadataUrlPrefix: string;
+  };
+  infoWindow: {
     defaultWindowWidth: string;
     defaultWindowHeight: string;
+    defaultWindowPositionTop: string;
+    defaultWindowPositionLeft: string;
   };
   offline?: {
     downloadStartZoom: number;
@@ -183,6 +187,7 @@ class GirafeConfig {
     this.lidar = this.initConfigLidar(config);
     this.csv = this.initConfigCsv(config);
     this.metadata = this.initConfigMetadata(config);
+    this.infoWindow = this.initConfigInfoWindow(config);
     this.offline = this.initConfigOffline(config);
     this.query = this.initConfigQuery(config);
     this.oauth = this.initConfigOauth(config);
@@ -383,13 +388,24 @@ class GirafeConfig {
 
   private initConfigMetadata(config: GirafeConfig) {
     const defaultConfig = {
-      metadataUrlPrefix: '',
-      defaultWindowWidth: '960px',
-      defaultWindowHeight: '460px'
+      metadataUrlPrefix: ''
     };
     return {
       ...defaultConfig,
       ...config.metadata
+    };
+  }
+
+  private initConfigInfoWindow(config: GirafeConfig) {
+    const defaultConfig = {
+      defaultWindowWidth: '960px',
+      defaultWindowHeight: '460px',
+      defaultWindowPositionTop: '1rem',
+      defaultWindowPositionLeft: '2rem'
+    };
+    return {
+      ...defaultConfig,
+      ...config.infoWindow
     };
   }
 
