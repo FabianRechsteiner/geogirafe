@@ -1,5 +1,5 @@
 import { Map, Feature, MapBrowserEvent, MapEvent, Collection } from 'ol';
-import { Style, Stroke, Fill, Circle } from 'ol/style';
+import { Style, Stroke, Fill, Circle, RegularShape } from 'ol/style';
 import { get as getProjection, ProjectionLike, transform } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -7,7 +7,7 @@ import { platformModifierKeyOnly } from 'ol/events/condition';
 import { DragBox } from 'ol/interaction';
 import { ScaleLine } from 'ol/control';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
-import { Geometry } from 'ol/geom';
+import { Geometry, Point } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
 import { Extent } from 'ol/extent';
 
@@ -82,6 +82,8 @@ export default class MapComponent extends GirafeHTMLElement {
   vectorTilesManager!: VectorTilesManager;
   localFileManager!: LocalFileManager;
   defaultSrid!: ProjectionLike;
+  crosshairFeature!: Feature;
+  crosshairLayer!: VectorLayer<VectorSource>;
 
   get projection() {
     return this.olMap.getView().getProjection();
@@ -433,6 +435,21 @@ export default class MapComponent extends GirafeHTMLElement {
             color: this.configManager.Config.selection.highlightStrokeColor,
             width: this.configManager.Config.selection.defaultStrokeWidth
           })
+        })
+      })
+    );
+  }
+
+  private setCrosshairStyle() {
+    this.crosshairLayer.setStyle(
+      new Style({
+        image: new RegularShape({
+          fill: new Fill({ color: this.configManager.Config.selection.defaultFillColor }),
+          stroke: new Stroke({ color: this.configManager.Config.selection.defaultStrokeColor, width: 2 }),
+          points: 4,
+          radius: 10,
+          radius2: 0,
+          angle: 0
         })
       })
     );
@@ -845,6 +862,19 @@ export default class MapComponent extends GirafeHTMLElement {
     const projectionInUrl = getProjection(isCoordinateInDegrees(position.center) ? 'EPSG:4326' : this.defaultSrid)!;
     if (projectionInUrl.getCode() !== this.state.projection) {
       position.center = transform(position.center, projectionInUrl, this.projection);
+    }
+
+    if (position.crosshair) {
+      // remove existing crosshair first
+      if (this.crosshairFeature) {
+        this.olMap.removeLayer(this.crosshairLayer);
+      }
+
+      // set new crosshair
+      this.crosshairFeature = new Feature(new Point(position.center));
+      this.crosshairLayer = new VectorLayer({ source: new VectorSource({ features: [this.crosshairFeature] }) });
+      this.setCrosshairStyle();
+      this.olMap.addLayer(this.crosshairLayer);
     }
 
     if (position.isValid) {
