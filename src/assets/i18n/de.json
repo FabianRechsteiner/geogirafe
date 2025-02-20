@@ -255,6 +255,9 @@
     "Filter layer tree": "Layerliste filtern",
     "Reset filter": "Filter zurücksetzen",
     "Local Files": "Lokale Dateien",
+    "File _fileName_ is not supported": "Datei _fileName_ wird nicht unterstützt",
+    "Files _fileNames_ are not supported": "Dateien '_fileNames_' werden nicht unterstützt",
+    "Unsupported file format": "Nicht unterstütztes Dateiformat",
     "Custom scale": "Benutzerdefinierter Massstab",
     "Press 'Enter' to apply": "Drücken Sie 'Enter' um anzuwenden",
     "Manual entry": "Manuelle Eingabe"
