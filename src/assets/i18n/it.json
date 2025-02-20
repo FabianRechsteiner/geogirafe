@@ -255,6 +255,9 @@
     "Filter layer tree": "Albero dei livelli di filtraggio",
     "Reset filter": "Azzeramento del filtro",
     "Local Files": "File locali",
+    "File _fileName_ is not supported": "Il file _fileName_ non è supportato",
+    "Files _fileNames_ are not supported": "I file _fileNames_ non sono supportati",
+    "Unsupported file format": "Formato di file non supportato",
     "Custom scale": "Scala personalizzata",
     "Press 'Enter' to apply": "Premi 'Invio' per applicare",
     "Manual entry": "Inserimento manuale"

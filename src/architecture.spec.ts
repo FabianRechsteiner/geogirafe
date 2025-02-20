@@ -541,8 +541,8 @@ describe('Components translations', () => {
         for (const param of params) {
           // trim before because the space can be part of the translation
           let i18nId = param.trim();
-          if (i18nId.startsWith('`')) {
-            // Ignore templated string
+          if (i18nId.startsWith('`') || !(i18nId.startsWith('"') && i18nId.startsWith("'"))) {
+            // Ignore templated strings or variable names
             continue;
           }
 

@@ -8,11 +8,16 @@ import LayerLocalFile from '../../../models/layers/layerlocalfile';
 import GroupLayer from '../../../models/layers/grouplayer';
 import StateManager from '../../../tools/state/statemanager';
 import { extend, intersects } from 'ol/extent';
+import I18nManager from '../../../tools/i18n/i18nmanager';
 
 class LocalFileManager {
   map: Map;
 
+  private readonly supportedFileFormats = [GPX, GeoJSON, IGC, new KML({ extractStyles: true }), TopoJSON];
+  private readonly supportedFileExtensions = ['gpx', 'geojson', 'igc', 'kml', 'topojson', 'json'];
+
   stateManager: StateManager;
+  i18nManager: I18nManager;
 
   activeLayers: Record<
     string,
@@ -29,6 +34,7 @@ class LocalFileManager {
     this.map = map;
 
     this.stateManager = StateManager.getInstance();
+    this.i18nManager = I18nManager.getInstance();
     this.registerEvents();
 
     // Add drag n drop interaction to add local files
@@ -47,9 +53,12 @@ class LocalFileManager {
   }
 
   createInteraction() {
+    // Handle dropping of unsupported files
+    this.map.getViewport().addEventListener('drop', (event) => this.handleUnsupportedFiles(event));
+
     const dragAndDropInteraction = new DragAndDrop({
       // @ts-expect-error ol Format types
-      formatConstructors: [GPX, GeoJSON, IGC, new KML({ extractStyles: true }), TopoJSON]
+      formatConstructors: this.supportedFileFormats
     });
     dragAndDropInteraction.on('addfeatures', (e) => {
       if (!this.layerGroup) {
@@ -85,6 +94,29 @@ class LocalFileManager {
     });
 
     return dragAndDropInteraction;
+  }
+
+  private handleUnsupportedFiles(dropEvent: DragEvent) {
+    const files: FileList | undefined = dropEvent.dataTransfer?.files;
+    if (!files?.length) {
+      return;
+    }
+    const unsupportedFiles = Array.from(files).filter(
+      (file) => !this.supportedFileExtensions.includes(file.name.split('.').slice(-1)[0].toLowerCase())
+    );
+    if (!unsupportedFiles?.length) {
+      return;
+    }
+    let msg;
+    if (unsupportedFiles.length > 1) {
+      msg = this.i18nManager.getTranslation('Files _fileNames_ are not supported');
+      msg = msg.replace('_fileNames_', unsupportedFiles.map((f) => `"${f.name}"`).join(', '));
+    } else {
+      msg = this.i18nManager.getTranslation('File _fileName_ is not supported');
+      msg = msg.replace('_fileName_', `"${unsupportedFiles[0].name}"`);
+    }
+    void window.gAlert(msg, 'Unsupported file format');
+    
   }
 
   validateAndCompleteFeatures(featureType: string, features: Feature<Geometry>[]) {
