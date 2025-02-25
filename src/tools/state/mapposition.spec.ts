@@ -13,6 +13,8 @@ describe('MapPosition', () => {
     expect(mapPosition.zoom).toBe(0);
     expect(mapPosition.resolution).toBe(100);
     expect(mapPosition.scale).toBe(0);
+    expect(mapPosition.crosshair).toBe(false);
+    expect(mapPosition.tooltip).toBe('');
   });
 
   describe('isValid', () => {

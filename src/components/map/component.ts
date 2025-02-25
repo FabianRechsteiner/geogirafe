@@ -1,4 +1,4 @@
-import { Map, Feature, MapBrowserEvent, MapEvent, Collection } from 'ol';
+import { Map, Feature, MapBrowserEvent, MapEvent, Collection, Overlay } from 'ol';
 import { Style, Stroke, Fill, Circle, RegularShape } from 'ol/style';
 import { get as getProjection, ProjectionLike, transform } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
@@ -84,6 +84,8 @@ export default class MapComponent extends GirafeHTMLElement {
   defaultSrid!: ProjectionLike;
   crosshairFeature!: Feature;
   crosshairLayer!: VectorLayer<VectorSource>;
+  tooltipContainer!: HTMLElement;
+  tooltipOverlay!: Overlay;
 
   get projection() {
     return this.olMap.getView().getProjection();
@@ -257,6 +259,14 @@ export default class MapComponent extends GirafeHTMLElement {
     setTimeout(() => {
       this.olMap.updateSize();
     }, 1000);
+  }
+
+  /**
+   * Add a click handler to hide the popup.
+   */
+  closePopup() {
+    this.tooltipOverlay.setPosition(undefined);
+    this.tooltipContainer.classList.add('hidden');
   }
 
   listenOpenLayersEvents() {
@@ -865,16 +875,40 @@ export default class MapComponent extends GirafeHTMLElement {
     }
 
     if (position.crosshair) {
-      // remove existing crosshair first
+      // Remove existing crosshair first
       if (this.crosshairFeature) {
         this.olMap.removeLayer(this.crosshairLayer);
       }
 
-      // set new crosshair
+      // Set new crosshair
       this.crosshairFeature = new Feature(new Point(position.center));
       this.crosshairLayer = new VectorLayer({ source: new VectorSource({ features: [this.crosshairFeature] }) });
       this.setCrosshairStyle();
       this.olMap.addLayer(this.crosshairLayer);
+    }
+
+    if (position.tooltip) {
+      this.tooltipContainer = this.shadow.getElementById('popup') as HTMLElement;
+      const tooltipContent = this.shadow.getElementById('popup-content') as HTMLElement;
+
+      // Remove existing overlay first
+      if (this.tooltipOverlay) {
+        this.olMap.removeOverlay(this.tooltipOverlay);
+      }
+
+      // Create new overlay
+      this.tooltipOverlay = new Overlay({
+        element: this.tooltipContainer,
+        autoPan: {
+          animation: {
+            duration: 250
+          }
+        }
+      });
+      this.olMap.addOverlay(this.tooltipOverlay);
+      tooltipContent.innerHTML = position.tooltip;
+      this.tooltipOverlay.setPosition(position.center);
+      this.tooltipContainer.classList.remove('hidden');
     }
 
     if (position.isValid) {
