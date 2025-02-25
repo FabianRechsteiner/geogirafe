@@ -4,7 +4,6 @@ import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
 import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
-import LayerWms from '../../models/layers/layerwms';
 import ILayerWithLegend from '../../models/layers/ilayerwithlegend';
 import ILayerWithFilter from '../../models/layers/ilayerwithfilter';
 import ThemeLayer from '../../models/layers/themelayer';
@@ -98,12 +97,6 @@ class LayerManager extends GirafeSingleton {
   activateIfDefaultChecked(layer: BaseLayer) {
     if (layer.isDefaultChecked) {
       this.toggle(layer, 'on');
-    }
-  }
-
-  initializeLegends(layer: LayerWms) {
-    if (layer.inactive && this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated) {
-      layer.isLegendExpanded = false;
     }
   }
 

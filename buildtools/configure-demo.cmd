@@ -51,6 +51,12 @@ if "%1"=="geogr" (
     goto :end
 )
 
+if "%1"=="jura" (
+    echo "Preparing environment JURA..."
+    copy demo\config.jura.json %APPDIR%\config.json /Y
+    goto :end
+)
+
 if "%1"=="lausanne" (
     echo "Preparing environment LAUSANNE..."
     copy demo\config.lausanne.json %APPDIR%\config.json /Y
@@ -113,7 +119,7 @@ if "%1"=="ticino" (
 )
 
 echo "Usage: ./configure-demo-win <environment>"
-echo "Possible environments: ['c2c', 'experimental', 'cartolacote', 'cartoriviera', 'cjl', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
+echo "Possible environments: ['c2c', 'experimental', 'cartolacote', 'cartoriviera', 'cjl', 'geogr', 'jura', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
 echo "Usage example: ./configure-demo-win mapbs"
 echo "Usage example with npm: npm run configure-demo-win mapbs"
 

@@ -46,6 +46,11 @@ then
     echo "Preparing environment GEOGR..."
     cp demo/config.$1.json $APPDIR/config.json
 
+elif [ "$1" = 'jura' ];
+then
+    echo "Preparing environment JURA..."
+    cp demo/config.$1.json $APPDIR/config.json
+
 elif [ "$1" = 'lausanne' ];
 then
     echo "Preparing environment LAUSANNE..."
@@ -101,7 +106,7 @@ then
 
 else
     echo "Usage: ./configure-demo <environment>"
-    echo "Possible environments: ['c2c', 'experimental', 'cartolacote', 'cartoriviera', 'cjl', 'geogr', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
+    echo "Possible environments: ['c2c', 'experimental', 'cartolacote', 'cartoriviera', 'cjl', 'geogr', 'jura', 'lausanne', 'lie', 'mapbs', 'mapnv', 'schwyz', 'sigip', 'sitn', 'ticino']"
     echo "Usage example: ./configure-demo mapbs"
     echo "Usage example with npm: npm run configure-demo mapbs"
 

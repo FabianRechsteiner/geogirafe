@@ -313,6 +313,8 @@ pages:
     - *prepare_demo
     - demo='geogr'
     - *prepare_demo
+    - demo='jura'
+    - *prepare_demo
     - demo='lausanne'
     - *prepare_demo
     - demo='lie'
