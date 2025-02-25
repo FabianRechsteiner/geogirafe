@@ -74,7 +74,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     this.legendRule = opts?.legendRule;
     this.legendImage = opts?.legendImage;
     this.isLegendExpanded = opts?.isLegendExpanded ?? false;
-    this.wasLegendExpanded = opts?.wasLegendExpanded ?? !this.isLegendExpanded;
+    this.wasLegendExpanded = opts?.wasLegendExpanded ?? this.isLegendExpanded;
     this.hiDPILegendImages = opts?.hiDPILegendImages;
     this.printNativeAngle = opts?.printNativeAngle;
     this.queryable = opts?.queryable ?? false;

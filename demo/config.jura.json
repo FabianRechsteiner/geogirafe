@@ -1,0 +1,55 @@
+{
+  "general": {
+    "locale": "fr-FR"
+  },
+  "languages": {
+    "translations": {
+      "fr": ["i18n/fr.json", "https://geo.jura.ch/static/X/fr.json"]
+    },
+    "defaultLanguage": "fr"
+  },
+  "themes": {
+    "url": "https://geo.jura.ch/themes?background=background&interface=desktop",
+    "defaultTheme": "POI"
+  },
+  "basemaps": {
+    "defaultBasemap": "sdt_01_03_mensuration_officielle",
+    "OSM": true,
+    "SwissTopoVectorTiles": true
+  },
+  "search": {
+    "url": "https://geo.jura.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr",
+    "objectPreview": true,
+    "layerPreview": true
+  },
+  "print": {
+    "url": "https://geo.jura.ch/printproxy/",
+    "defaultLayout": "1 A4 paysage"
+  },
+  "share": {
+    "service": "lstu",
+    "createUrl": "https://lstu.fr/a"
+  },
+  "projections": {
+    "EPSG:3857": "W-M",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "LV95"
+  },
+  "map": {
+    "srid": "EPSG:2056",
+    "startZoom": "1",
+    "startPosition": "2580387,1242892",
+    "maxExtent": "2420000,1030000,2900000,1350000",
+    "scales": [400000, 200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 250, 200, 100]
+  },
+  "map3d": {
+    "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
+    "terrainImagery": {
+      "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
+      "minLoD": 8,
+      "maxLoD": 17,
+      "coverageArea": [5.013926957923385, 45.35600133779394, 11.477436312994008, 48.27502358353741]
+    },
+    "tilesetsUrls": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"]
+  }
+}
