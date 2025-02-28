@@ -3,8 +3,8 @@ import { register } from 'ol/proj/proj4';
 import State from './tools/state/state.js';
 
 import ConfigManager from './tools/configuration/configmanager';
-import ErrorManager from './tools/error/errormanager.js';
 import CsvManager from './tools/export/csvmanager.js';
+import ErrorManager from './tools/error/errormanager.js';
 import I18nManager from './tools/i18n/i18nmanager.js';
 import LogManager from './tools/logging/logmanager.js';
 import OfflineManager from './tools/offline/offlinemanager';
@@ -128,9 +128,9 @@ try {
 
       // Define components names
       customElements.define('girafe-map', MapComponent);
+      customElements.define('girafe-offline', OfflineComponent);
       customElements.define('girafe-search', MobileSearchComponent);
       customElements.define('girafe-theme-select', MobileThemeComponent);
-      customElements.define('girafe-offline', OfflineComponent);
     });
 } finally {
   // To prevent the FOUC effect (flash of unstyled content),

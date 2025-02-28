@@ -6,16 +6,16 @@ import State from './tools/state/state';
 import ConfigManager from './tools/configuration/configmanager';
 import ErrorManager from './tools/error/errormanager';
 import I18nManager from './tools/i18n/i18nmanager';
+import LayerManager from './tools/layers/layermanager';
 import LogManager from './tools/logging/logmanager';
 import StateManager from './tools/state/statemanager';
 import ThemesManager from './tools/themes/themesmanager';
-import LayerManager from './tools/layers/layermanager';
 
 import BasemapComponent from './components/basemap/component';
 import InfoboxComponent from './components/infobox/component';
 import MapComponent from './components/map/component';
-import ShareManager from './tools/share/sharemanager';
 import OfflineManager from './tools/offline/offlinemanager';
+import ShareManager from './tools/share/sharemanager';
 
 // Extend default Document and Window interfaces
 declare global {
