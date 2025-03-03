@@ -1,10 +1,11 @@
 import GirafeHTMLElement from './GirafeHTMLElement';
+import { debounce } from '../tools/utils/debounce';
 
 /*
 Minimal template for a draggable object : 
 It must have 2 divs :
 - One for the whole box (id="draggable")
-- One for the header (id="header"). This is the div that will be used for dragging the while box
+- One for the header (id="header"). This is the div that will be used for dragging the whole box
 
 Example:
 
@@ -47,6 +48,12 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     this.header = this.shadow.querySelector('#header')!;
     this.setDefaultPosition();
     this.header.onmousedown = (e) => this.dragMouseDown(this, e);
+
+    // Reposition the draggable element in the window if it is out of bounds
+    window.addEventListener(
+      'resize',
+      debounce(() => this.resize(this), 200)
+    );
 
     this.closeButton = this.shadow.getElementById('close')!;
     if (!this.isNullOrUndefined(this.closeButton)) {
@@ -126,6 +133,19 @@ class GirafeDraggableElement extends GirafeHTMLElement {
       document.documentElement.offsetHeight,
       document.documentElement.clientHeight
     );
+  }
+
+  resize(_this: GirafeDraggableElement) {
+    const width = this.getBodyWidth();
+    const height = this.getBodyHeight();
+    const left = _this.host.style.left;
+    const top = _this.host.style.top;
+    if (parseInt(left) + _this.host.offsetWidth > width) {
+      _this.host.style.left = width - _this.host.offsetWidth + 'px';
+    }
+    if (parseInt(top) + _this.host.offsetHeight > height) {
+      _this.host.style.top = height - _this.host.offsetHeight + 'px';
+    }
   }
 
   closeDragElement() {
