@@ -486,6 +486,7 @@ export default class MapComponent extends GirafeHTMLElement {
       });
       const scene = this.map3d.getCesiumScene();
       const config = this.configManager.Config.map3d;
+      scene.screenSpaceCameraController.maximumZoomDistance = config.maximumZoomDistance ?? 30000;
 
       // Add terrain
       if (config.terrainUrl) {

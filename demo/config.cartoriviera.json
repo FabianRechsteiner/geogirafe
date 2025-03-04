@@ -61,7 +61,8 @@
       "https://uzuflycesium.s3.amazonaws.com/Jongny/BTI/Cesium/Scene/JongnymCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_lac_sans_lat/Scene/Vevey_cesium_lac_sans_lat.json",
       "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_sans_lac/Scene/Vevey_cesium_sans_lac.json"
-    ]
+    ],
+    "maximumZoomDistance": 25000
   },
   "gmfauth": {
     "url": "https://map.cartoriviera.ch",

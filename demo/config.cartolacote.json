@@ -53,6 +53,7 @@
       "maxLoD": 17,
       "coverageArea": [5.013926957923385, 45.35600133779394, 11.477436312994008, 48.27502358353741]
     },
-    "tilesetsUrls": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"]
+    "tilesetsUrls": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"],
+    "maximumZoomDistance": 25000
   }
 }

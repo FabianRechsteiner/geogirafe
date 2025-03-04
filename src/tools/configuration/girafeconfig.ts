@@ -108,6 +108,7 @@ class GirafeConfig {
     tilesetsMaxError: number | undefined;
     terrainUrl: string;
     tilesetsUrls: string[];
+    maximumZoomDistance: number;
   };
   lidar: {
     url: string;
