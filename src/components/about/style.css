@@ -1,43 +1,15 @@
-#draggable {
-  border-radius: 1px;
-  box-shadow: var(--bx-shdw);
-}
-
-#header {
-  padding: 0.5rem;
-  cursor: grabbing;
-  z-index: 10;
-  background: var(--bkg-color-grad2);
+#panel {
   color: var(--text-color);
-  text-align: center;
 }
 
-#content {
-  padding: 0rem 2rem;
-  width: 23rem;
-  height: 13rem;
-}
-
-#close {
-  cursor: pointer;
-  float: right;
-  width: 12px;
-  color: var(--text-color);
+#panel > div {
+  padding: 1rem;
 }
 
 img.logo {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
   filter: var(--svg-filter);
   height: 4rem;
   opacity: 0.8;
-}
-
-h3 {
-  font-size: 1rem;
-  font-weight: normal;
-  margin: 0.2rem;
-  color: var(--text-color);
 }
 
 a:link {
@@ -54,6 +26,4 @@ a:hover {
 
 a:active {
   color: var(--lnk-active);
-  text-decoration: none;
-  font-weight: normal;
 }

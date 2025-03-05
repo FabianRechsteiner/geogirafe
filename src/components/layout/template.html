@@ -1,18 +1,21 @@
-<girafe-menu-button open="left">
-  <button slot="menu-button" class="gg-icon-button gg-big">
-    <img alt="menu-icon" src="${this.currentLayoutIcon}" />
-  </button>
-
-  <button slot="menu-content" class="gg-icon-button gg-big-withtext" onclick="${() => this.state.globe.display='none'}">
-    <img alt="help-icon" src="icons/layout-2d.svg" />
-    <span>2D</span>
-  </button>
-  <button slot="menu-content" class="gg-icon-button gg-big-withtext" onclick="${() => this.state.globe.display='side'}">
-    <img alt="help-icon" src="icons/layout-mix.svg" />
-    <span i18n="Mix">Mix</span>
-  </button>
-  <button slot="menu-content" class="gg-icon-button gg-big-withtext" onclick="${() => this.state.globe.display='full'}">
-    <img alt="help-icon" src="icons/layout-3d.svg" />
-    <span>3D</span>
-  </button>
-</girafe-menu-button>
+<div id="panel">
+  <div>
+    <div class="option">
+      <label for="layout" i18n="View" class="gg-label">View</label>
+      <select id="layout" class="gg-select" onchange="${this.onLayoutSelect}">
+        <option i18n="2D" value="2D">2D</option>
+        <option i18n="2D / 3D" value="2D/3D">2D / 3D</option>
+        <option i18n="3D" value="3D">3D</option>
+      </select>
+    </div>
+    <div class="option shadow-option hidden">
+      <label for="shadowCheckbox" i18n="Enable shadows" class="gg-label">Enable shadows</label>
+      <input
+        id="shadowCheckbox"
+        type="checkbox"
+        class="gg-checkbox"
+        disabled
+        title="TODO: Connect to globe shadow feature" />
+    </div>
+  </div>
+</div>

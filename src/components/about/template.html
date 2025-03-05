@@ -1,19 +1,15 @@
-<div id="draggable">
-  <div id="header">
-    <span i18n="About">About</span>
-    <img id="close" alt="close-icon" src="icons/close.svg" />
-  </div>
-  <div id="content">
+<div id="panel">
+  <div>
     <img class="logo" alt="geogirafe-logo" src="images/logo/horizontal_black.svg" />
-    <h3><span i18n="Version">Version</span>:&nbsp;<span>${this.version}</span></h3>
-    <h3><span i18n="Build">Build</span>:&nbsp;<span>${this.build}</span></h3>
+    <p>
+      <span i18n="Version">Version</span> : ${this.version}<br />
+      <span i18n="Build">Build</span> : ${this.build}<br />
+      <span i18n="Date">Date</span> : ${this.date}
+    </p>
 
-    <h3><span i18n="Date">Date</span>:&nbsp;<span>${this.date}</span></h3>
-    <h3>
-      <span i18n="Source">Source</span>:&nbsp;
-      <a href="https://gitlab.com/geogirafe/gg-viewer" rel="noopener" target="_blank"
-        >https://gitlab.com/geogirafe/gg-viewer</a
-      >
-    </h3>
+    <p>
+      <span i18n="Source">Source</span> :
+      <a href="https://gitlab.com/geogirafe/gg-viewer" i18n="GitLab" rel="noopener" target="_blank">GitLab</a>
+    </p>
   </div>
 </div>

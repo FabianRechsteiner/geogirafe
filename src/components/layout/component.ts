@@ -1,42 +1,65 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
+type LayoutType = '2D' | '3D' | '2D/3D';
+const ALLOWED_LAYOUTS: LayoutType[] = ['2D', '3D', '2D/3D'];
+
 class LayoutComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = '../../styles/common.css';
+  styleUrls = ['../../styles/common.css', './style.css'];
 
-  public currentLayoutIcon: string = 'icons/layout-3d.svg';
+  visible = false;
 
   constructor() {
     super('layout');
+    this.onLayoutSelect = this.onLayoutSelect.bind(this);
   }
 
-  registerEvents() {
-    this.subscribe('globe.display', () => this.onLayoutChanged());
+  private registerEvents() {
+    this.subscribe('interface.layoutPanelVisible', (_oldValue: boolean, newValue: boolean) =>
+      this.togglePanel(newValue)
+    );
+    this.subscribe('globe.display', (_oldValue: string, newValue: string) => this.onLayoutChanged(newValue));
   }
 
-  private onLayoutChanged() {
-    switch (this.state.globe.display) {
-      case 'none':
-        this.currentLayoutIcon = 'icons/layout-3d.svg';
-        break;
-      case 'side':
-        this.currentLayoutIcon = 'icons/layout-3d.svg';
-        break;
-      case 'full':
-        this.currentLayoutIcon = 'icons/layout-2d.svg';
-        break;
-      default:
-        throw Error('Invalid value for layout.');
+  private togglePanel(visible: boolean) {
+    this.visible = visible;
+    this.render();
+  }
+
+  private onLayoutSelect(event: Event) {
+    const selectedLayout = (event.target as HTMLSelectElement)?.value as LayoutType;
+    if (ALLOWED_LAYOUTS.includes(selectedLayout)) {
+      this.state.globe.display = selectedLayout;
+      return;
     }
-    super.refreshRender();
+    console.error(`${selectedLayout} is not a valid layout!`);
+  }
+
+  private onLayoutChanged(globe: string) {
+    if (this.visible) {
+      const shadowOption = this.shadowRoot?.querySelector('.shadow-option') as HTMLElement;
+
+      if (shadowOption) {
+        if (globe === '2D/3D' || globe === '3D') {
+          shadowOption.classList.remove('hidden');
+        } else {
+          shadowOption.classList.add('hidden');
+        }
+      }
+      super.refreshRender();
+    }
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
       this.registerEvents();
-      super.girafeTranslate();
     });
+  }
+
+  render() {
+    this.visible ? super.render() : this.hide();
+    super.girafeTranslate();
   }
 }
 

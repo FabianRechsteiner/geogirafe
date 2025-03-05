@@ -34,7 +34,6 @@ import ModalsComponent from './components/modals/component';
 import NavigationComponent from './components/navigation/component';
 import OauthComponent from './components/auth/component';
 import PrintComponent from './components/print/component';
-import ProjectionComponent from './components/projection/component';
 import PrototypeBannerComponent from './components/prototypebanner/component';
 import QueryBuilderComponent from './components/querybuilder/component';
 import ScaleComponent from './components/scale/component';
@@ -147,7 +146,6 @@ try {
       customElements.define('girafe-nav-history', NavigationComponent);
       customElements.define('girafe-oauth', OauthComponent);
       customElements.define('girafe-print', PrintComponent);
-      customElements.define('girafe-proj-select', ProjectionComponent);
       customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
       customElements.define('girafe-query-builder', QueryBuilderComponent);
       customElements.define('girafe-scale', ScaleComponent);
