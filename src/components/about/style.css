@@ -11,19 +11,3 @@ img.logo {
   height: 4rem;
   opacity: 0.8;
 }
-
-a:link {
-  color: var(--lnk);
-}
-
-a:visited {
-  color: var(--lnk-visited);
-}
-
-a:hover {
-  color: var(--lnk-hover);
-}
-
-a:active {
-  color: var(--lnk-active);
-}
