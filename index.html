@@ -61,7 +61,6 @@
       <girafe-theme-select></girafe-theme-select>
       <img class="logo" alt="geogirafe-logo" src="images/logo/horizontal_black.svg" />
       <girafe-search id="search"></girafe-search>
-
       <girafe-oauth></girafe-oauth>
       <girafe-nav-history></girafe-nav-history>
       <girafe-video-record></girafe-video-record>
@@ -110,13 +109,20 @@
             slot="main"
             data-toggle-path="interface.crossSectionPanelVisible"
             data-title="cross-section-settings"></girafe-cross-section-settings>
+          <girafe-layout
+            slot="main"
+            data-toggle-path="interface.layoutPanelVisible"
+            data-title="layout-panel"></girafe-layout>
+          <girafe-about
+            slot="main"
+            data-toggle-path="interface.aboutPanelVisible"
+            data-title="about-panel"></girafe-about>
           <girafe-user-preferences
             slot="main"
             data-toggle-path="interface.userPreferencesPanelVisible"
             data-title="user-preferences-panel"></girafe-user-preferences>
         </girafe-lr-panel>
 
-        <girafe-about></girafe-about>
         <girafe-share></girafe-share>
         <girafe-selection-window></girafe-selection-window>
       </div>
@@ -148,21 +154,22 @@
       <button class="gg-icon-button gg-big" onclick="document.geogirafe.state.interface.shareVisible = true">
         <img alt="help-icon" src="icons/share.svg" />
       </button>
-      <girafe-layout></girafe-layout>
-      <girafe-proj-select></girafe-proj-select>
+      <button
+        class="gg-icon-button gg-big"
+        onclick="document.geogirafe.state.interface.layoutPanelVisible = !document.geogirafe.state.interface.layoutPanelVisible">
+        <img alt="help-icon" src="icons/layout.svg" />
+      </button>
 
       <div class="filler"></div>
 
       <button class="gg-icon-button gg-big" onclick="document.geogirafe.state.interface.helpVisible = true">
         <img alt="help-icon" src="icons/help.svg" />
       </button>
-
       <button
         class="gg-icon-button gg-big"
-        onclick="document.geogirafe.state.interface.aboutVisible = !document.geogirafe.state.interface.aboutVisible">
+        onclick="document.geogirafe.state.interface.aboutPanelVisible = !document.geogirafe.state.interface.aboutPanelVisible">
         <img alt="help-icon" src="icons/info.svg" />
       </button>
-
       <button
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.userPreferencesPanelVisible = !document.geogirafe.state.interface.userPreferencesPanelVisible">

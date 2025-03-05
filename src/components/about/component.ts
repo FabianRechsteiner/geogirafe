@@ -1,9 +1,10 @@
-import GirafeDraggableElement from '../../base/GirafeDraggableElement';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
-class AboutComponent extends GirafeDraggableElement {
+class AboutComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
+  visible = false;
   loaded = false;
   version!: string;
   build!: string;
@@ -14,47 +15,42 @@ class AboutComponent extends GirafeDraggableElement {
   }
 
   async loadVersionInfos() {
-    if (!this.loaded) {
-      // Version infos were not loaded yet.
-      const response = await fetch('about.json');
-      const versionInfos = await response.json();
-      this.version = versionInfos.version;
-      this.build = versionInfos.build;
-      this.date = versionInfos.date;
-      this.loaded = true;
-      console.log(this.version);
-      console.log(this.build);
-      console.log(this.date);
-    }
+    if (this.loaded) return;
+
+    const response = await fetch('about.json');
+    const { version, build, date } = await response.json();
+    this.version = version;
+    this.build = build;
+    this.date = date;
+    this.loaded = true;
 
     this.render();
   }
 
-  registerEvents() {
-    this.subscribe('interface.aboutVisible', (_oldValue: boolean, newValue: boolean) => this.toggleAbout(newValue));
+  private registerEvents() {
+    this.subscribe('interface.aboutPanelVisible', (_oldValue: boolean, newValue: boolean) =>
+      this.togglePanel(newValue)
+    );
   }
 
-  toggleAbout(visible: boolean) {
+  private togglePanel(visible: boolean) {
+    this.visible = visible;
     if (visible) {
-      this.loadVersionInfos().then(() => {
-        ((this.shadow.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'block';
-      });
-    } else {
-      ((this.shadow.getRootNode() as ShadowRoot).host as HTMLElement).style.display = 'none';
+      this.loadVersionInfos();
     }
-  }
-
-  closeWindow() {
-    this.state.interface.aboutVisible = false;
+    this.render();
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      this.girafeTranslate();
-      this.makeDraggable();
       this.registerEvents();
     });
+  }
+
+  render() {
+    this.visible ? super.render() : this.hide();
+    super.girafeTranslate();
   }
 }
 

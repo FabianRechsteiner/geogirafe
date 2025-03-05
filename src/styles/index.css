@@ -184,7 +184,6 @@ girafe-nav-history {
   z-index: 10;
 }
 
-girafe-about,
 girafe-share {
   position: absolute;
   z-index: 100;

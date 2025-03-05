@@ -196,7 +196,7 @@ describe('StateSerializer.getSerializedState', () => {
         a: 0
       },
       g: {
-        d: 'none'
+        d: '2D'
       },
       l: []
     });
@@ -226,7 +226,7 @@ describe('StateSerializer.getSerializedState', () => {
         a: 0
       },
       g: {
-        d: 'none'
+        d: '2D'
       },
       l: [],
       b: { i: 1 }

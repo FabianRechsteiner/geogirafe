@@ -17,7 +17,8 @@ type GraphicalInterface = {
   crossSectionPanelVisible: boolean;
   selectionComponentVisible: boolean;
   selectionComponent: string;
-  aboutVisible: boolean;
+  layoutPanelVisible: boolean;
+  aboutPanelVisible: boolean;
   userPreferencesPanelVisible: boolean;
   infoWindowVisible: boolean;
   shareVisible: boolean;
@@ -60,7 +61,7 @@ type PrintConfig = {
 
 // Current 3D-Globe state
 type GlobeConfig = {
-  display: 'none' | 'full' | 'side';
+  display: '2D' | '3D' | '2D/3D';
   loaded: boolean;
 };
 
@@ -142,7 +143,8 @@ export default class State {
     crossSectionPanelVisible: false,
     selectionComponentVisible: false,
     selectionComponent: '',
-    aboutVisible: false,
+    layoutPanelVisible: false,
+    aboutPanelVisible: false,
     userPreferencesPanelVisible: false,
     infoWindowVisible: false,
     shareVisible: false,
@@ -190,8 +192,8 @@ export default class State {
 
   // Current 3D-Globe state
   globe: GlobeConfig = {
-    // Possible values : ['full, 'side', 'none']
-    display: 'none',
+    // Possible values : ['3D, '2D/3D', '2D']
+    display: '2D',
     loaded: false
   };
 

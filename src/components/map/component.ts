@@ -610,7 +610,7 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   async onGlobeToggled(): Promise<void> {
-    if (this.state.globe.display === 'full') {
+    if (this.state.globe.display === '3D') {
       // Full screen globe has been enabled
       this.mapTarget.style.display = 'none';
       this.map3dTarget.style.display = 'block';
@@ -618,7 +618,7 @@ export default class MapComponent extends GirafeHTMLElement {
       this.map3dTarget.style.width = '100%';
       await this.create3dMap();
       this.map3d.setEnabled(true);
-    } else if (this.state.globe.display === 'side') {
+    } else if (this.state.globe.display === '2D/3D') {
       // Side by side has been enabled
       this.mapTarget.style.display = 'inline-block';
       this.mapTarget.style.width = '45%';

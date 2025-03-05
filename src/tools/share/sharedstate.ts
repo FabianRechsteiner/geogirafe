@@ -36,7 +36,7 @@ export type SharedState = {
   };
   g: {
     // globe
-    d: 'none' | 'full' | 'side'; // display
+    d: '2D' | '3D' | '2D/3D'; // display
   };
   b?: {
     // basemap

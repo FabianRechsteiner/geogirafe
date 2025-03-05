@@ -1,0 +1,32 @@
+#panel {
+  color: var(--text-color);
+}
+
+#panel > div {
+  padding: 1rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.option {
+  margin-top: 0.5rem;
+  display: flex;
+}
+
+.option select {
+  flex-grow: 1;
+}
+
+.option input.gg-checkbox {
+  flex-grow: 0;
+}
+
+.option label {
+  margin-right: 0.5rem;
+}
+
+.option label:after {
+  content: ' :';
+}
