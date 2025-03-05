@@ -10,13 +10,19 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
 
   registerEvents() {
     this.subscribe('interface.darkFrontendMode', (_, newValue) => this.onChangeDarkFrontendMode(newValue));
-    this.subscribe('interface.darkMapMode', () => super.refreshRender());
+    this.subscribe('interface.darkMapMode', (_, newValue) => this.onChangeDarkMapMode(newValue));
+  }
+
+  onChangeDarkMapMode(newValue: boolean | undefined) {
+    const currentTheme = newValue ? 'dark' : 'light';
+    this.activateTheme(currentTheme, 'map');
+    super.refreshRender();
   }
 
   onChangeDarkFrontendMode(newValue: boolean | undefined) {
     const themeIsDark = newValue ?? this.systemIsInDarkMode();
     const currentTheme = themeIsDark ? 'dark' : 'light';
-    this.activateTheme(currentTheme);
+    this.activateTheme(currentTheme, 'theme');
     super.refreshRender();
   }
 
@@ -30,10 +36,10 @@ class ColorSwitcherComponent extends GirafeHTMLElement {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
-  activateTheme(mode: 'dark' | 'light') {
+  activateTheme(mode: 'dark' | 'light', className: string) {
     const otherMode = mode === 'dark' ? 'light' : 'dark';
-    document.body.classList.remove(`${otherMode}-theme`);
-    document.body.classList.add(`${mode}-theme`);
+    document.body.classList.remove(`${otherMode}-${className}`);
+    document.body.classList.add(`${mode}-${className}`);
   }
 
   connectedCallback() {

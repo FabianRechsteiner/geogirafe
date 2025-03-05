@@ -8,6 +8,7 @@ body {
 
   --bx-shdw: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.16);
   --t-bkg: #ffffffbb;
+  --legend-bkg: rgb(255, 255, 255);
   --text-color: #222;
   --text-color-grad1: #444;
   --text-color-grad2: #666;
@@ -22,6 +23,8 @@ body {
   --error-color: #bb0000;
   --warning-color: #ffa500;
   --svg-filter: none;
+  --svg-map-filter: none;
+  --svg-legend-bkg: var(--legend-bkg);
 }
 
 /* Dark theme colors */
@@ -41,6 +44,15 @@ body.dark-theme {
   --lnk-active: #ff4040;
   --error-color: #ff6347;
   --svg-filter: invert(1);
+  --svg-legend-bkg: var(--legend-bkg);
+}
+
+/* Legends theme colors for the map */
+body.light-map {
+  --svg-map-filter: none;
+}
+body.dark-map {
+  --svg-map-filter: invert(1) hue-rotate(180deg);
 }
 
 /* Styles for users who prefer dark mode at the OS level */
@@ -49,6 +61,7 @@ body.dark-theme {
   body {
     --bx-shdw: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 2px 4px 0 rgba(255, 255, 255, 0.16);
     --t-bkg: #000000bb;
+    --legend-bkg: rgb(255, 255, 255);
     --text-color: #eee;
     --text-color-grad1: #ccc;
     --text-color-grad2: #aaa;
@@ -61,12 +74,15 @@ body.dark-theme {
     --lnk-hover: #ffffff;
     --lnk-active: #ff4040;
     --svg-filter: invert(1);
+    --svg-map-filter: invert(1) hue-rotate(180deg);
+    --svg-legend-bkg: var(--legend-bkg);
   }
 
   /* Override dark mode with light mode styles if the user decides to swap */
   body.light-theme {
     --bx-shdw: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.16);
     --t-bkg: #ffffffbb;
+    --legend-bkg: rgb(255, 255, 255);
     --text-color: #222;
     --text-color-grad1: #444;
     --text-color-grad2: #666;
@@ -79,5 +95,12 @@ body.dark-theme {
     --lnk-hover: #0099ff;
     --lnk-active: #ff0000;
     --svg-filter: none;
+    --svg-legend-bkg: var(--legend-bkg);
+  }
+  body.dark-theme.light-map {
+    --svg-map-filter: none;
+  }
+  body.dark-theme.dark-map {
+    --svg-map-filter: invert(1) hue-rotate(180deg);
   }
 }

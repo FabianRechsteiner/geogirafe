@@ -116,7 +116,7 @@
   ${Object.keys(this.legendUrls).map((l:string) => uHtml`
   <div class="${this.isLegendExpanded ? 'legend' : 'hidden'}">
     <div class="gg-spacer gg-small"></div>
-    <img alt="${'Legend for ' + l}" src="${this.legendUrls[l]}" />
+    <img class="legend-image" alt="${'Legend for ' + l}" src="${this.legendUrls[l]}" />
   </div>
   ` )}
 

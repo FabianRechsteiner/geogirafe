@@ -17,6 +17,10 @@
 img {
   filter: var(--svg-filter);
 }
+img.legend-image {
+  filter: var(--svg-map-filter);
+  background: var(--svg-legend-bkg);
+}
 div {
   scrollbar-width: thin;
 }
