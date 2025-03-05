@@ -72,6 +72,7 @@
       "https://sitn.ne.ch/3dtiles/vdt/P6_Ouest_cesium/ouest_cesium.json",
       "https://uzuflycesium.s3.amazonaws.com/LeLanderon/3Dtiles/LeLanderon_3DTiles_OUT/Scene/LeLanderon_3DTiles_OUT.json",
       "https://uzuflycesium.s3.amazonaws.com/LeLanderon/3Dtiles/LeLanderon_3Dtiles_IN_Raw/Scene/LeLanderon_3Dtiles_IN_Raw.json"
-    ]
+    ],
+    "maximumZoomDistance": 25000
   }
 }

@@ -75,7 +75,8 @@
       "https://3d.geo.bs.ch/cesium/tiles/bl-gebaeude-2023/tileset.json",
       "https://3d.geo.bs.ch/cesium/tiles/de-gebaeude-2023/tileset.json",
       "https://3d.geo.bs.ch/cesium/tiles/fr-gebaeude-2023/tileset.json"
-    ]
+    ],
+    "maximumZoomDistance": 25000
   },
   "metadata": {
     "metadataUrlPrefix": "https://map.geo.bs.ch"

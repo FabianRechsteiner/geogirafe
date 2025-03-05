@@ -54,7 +54,8 @@
     "tilesetsUrls": [
       "https://uzuflycesium.s3.amazonaws.com/Pully/3Dtiles/Pully_3Dtiles_update_kml/Scene/Pully_3Dtiles_update_kml.json",
       "https://uzuflycesium.s3.amazonaws.com/Pully/3Dtiles/Pully-Nord_3Dtiles/Scene/PullymNord_3Dtiles.json"
-    ]
+    ],
+    "maximumZoomDistance": 25000
   },
   "query": {
     "legacy": true
