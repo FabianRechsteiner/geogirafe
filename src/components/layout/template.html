@@ -8,14 +8,13 @@
         <option i18n="3D" value="3D">3D</option>
       </select>
     </div>
-    <div class="option shadow-option hidden">
-      <label for="shadowCheckbox" i18n="Enable shadows" class="gg-label">Enable shadows</label>
-      <input
-        id="shadowCheckbox"
-        type="checkbox"
-        class="gg-checkbox"
-        disabled
-        title="TODO: Connect to globe shadow feature" />
+    <div class="option shadows-option hidden">
+      <label for="shadowsCheckbox" i18n="Enable shadows" class="gg-label">Enable shadows</label>
+      <input id="shadowsCheckbox" type="checkbox" class="gg-checkbox" onchange="${this.onShadowsToggle}" />
+    </div>
+    <div class="option shadows-date hidden">
+      <label for="shadowsDate" i18n="Date" class="gg-label">Date</label>
+      <input id="shadowsDate" type="datetime-local" class="gg-input" />
     </div>
   </div>
 </div>

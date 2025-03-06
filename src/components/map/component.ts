@@ -47,7 +47,6 @@ import ThemeLayer from '../../models/layers/themelayer';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionParam from '../../models/selectionparam';
 import WfsManager from '../../tools/wfs/wfsmanager';
-import I18nManager from '../../tools/i18n/i18nmanager';
 import { isProjectionInDegrees, isCoordinateInDegrees } from '../../tools/utils/olutils';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
@@ -68,6 +67,7 @@ export default class MapComponent extends GirafeHTMLElement {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map3d!: any;
   map3dTarget!: HTMLDivElement;
+  map3dShadowsTimestamp!: number;
   loading: boolean = false;
   swiper!: HTMLInputElement;
   closeSwiperButton!: HTMLButtonElement;
@@ -158,6 +158,10 @@ export default class MapComponent extends GirafeHTMLElement {
     );
 
     this.subscribe('globe.display', () => this.onGlobeToggled());
+    this.subscribe('globe.shadows', (_oldShadows: boolean, newShadows: boolean) => this.onShadowsToggled(newShadows));
+    this.subscribe('globe.shadowsTimestamp', (_oldTimestamp: number, newTimestamp: number) =>
+      this.onShadowsTimestampChanged(newTimestamp)
+    );
 
     this.subscribe(/layers\.layersList\..*\.activeState/, (_oldActive: boolean, _newActive: boolean, layer: Layer) =>
       this.onLayerToggled(layer)
@@ -480,7 +484,7 @@ export default class MapComponent extends GirafeHTMLElement {
         map: this.olMap,
         target: this.map3dTarget,
         time: () => {
-          const date = new Date(timeDatePicker.value);
+          const date = new Date(this.map3dShadowsTimestamp);
           return isNaN(date.getTime()) ? Cesium.JulianDate.now() : Cesium.JulianDate.fromDate(date);
         }
       });
@@ -525,36 +529,6 @@ export default class MapComponent extends GirafeHTMLElement {
       config.tilesetsUrls.forEach((tilesetUrl) => {
         Cesium3DTileset.fromUrl(tilesetUrl, tilesetOptions).then((t: Cesium3DTileset) => scene.primitives.add(t));
       });
-
-      // Shadows and lighting
-      const date = new Date();
-      const timeDatePicker = document.createElement('input');
-      timeDatePicker.type = 'datetime-local';
-      timeDatePicker.classList.add('ui-input');
-      timeDatePicker.style.display = 'none';
-      timeDatePicker.valueAsNumber = Math.round((date.valueOf() - date.getTimezoneOffset() * 60000) / 60000) * 60000;
-      const timeDatePickerContainer = document.createElement('div');
-      timeDatePickerContainer.appendChild(timeDatePicker);
-
-      const shadowCheckbox = document.createElement('input');
-      shadowCheckbox.type = 'checkbox';
-      shadowCheckbox.onchange = () => {
-        scene.shadowMap.enabled = scene.globe.enableLighting = shadowCheckbox.checked;
-        timeDatePicker.style.display = shadowCheckbox.checked ? 'block' : 'none';
-      };
-      const shadowLabel = document.createElement('label');
-      shadowLabel.innerText = I18nManager.getInstance().getTranslation('Enable shadows');
-      shadowLabel.setAttribute('i18n', 'Enable shadows');
-      const shadowEnabledContainer = document.createElement('div');
-      shadowEnabledContainer.classList.add('ui-input');
-      shadowEnabledContainer.appendChild(shadowCheckbox);
-      shadowEnabledContainer.appendChild(shadowLabel);
-
-      const timeContainer = document.createElement('div');
-      timeContainer.style.position = 'absolute';
-      timeContainer.appendChild(shadowEnabledContainer);
-      timeContainer.appendChild(timeDatePickerContainer);
-      this.map3dTarget.appendChild(timeContainer);
 
       const ambientOcclusion = scene.postProcessStages.ambientOcclusion;
       ambientOcclusion.enabled = true;
@@ -635,6 +609,20 @@ export default class MapComponent extends GirafeHTMLElement {
       this.mapTarget.style.display = 'block';
       this.mapTarget.style.width = '100%';
       this.map3dTarget.style.display = 'none';
+    }
+  }
+
+  onShadowsToggled(shadows: boolean) {
+    console.log('onShadowsToggled');
+    if (this.map3d) {
+      const scene = this.map3d.getCesiumScene();
+      scene.shadowMap.enabled = scene.globe.enableLighting = shadows;
+    }
+  }
+
+  onShadowsTimestampChanged(shadowsTimestamp: number) {
+    if (this.map3d) {
+      this.map3dShadowsTimestamp = shadowsTimestamp;
     }
   }
 
