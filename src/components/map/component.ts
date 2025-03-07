@@ -613,7 +613,6 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onShadowsToggled(shadows: boolean) {
-    console.log('onShadowsToggled');
     if (this.map3d) {
       const scene = this.map3d.getCesiumScene();
       scene.shadowMap.enabled = scene.globe.enableLighting = shadows;
