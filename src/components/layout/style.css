@@ -10,6 +10,10 @@
   display: none;
 }
 
+fieldset {
+  margin-top: 1rem;
+}
+
 .option {
   margin-top: 0.5rem;
   display: flex;
