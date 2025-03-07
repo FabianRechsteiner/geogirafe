@@ -15,7 +15,8 @@
   display: flex;
 }
 
-.option select {
+.option select,
+.option input {
   flex-grow: 1;
 }
 

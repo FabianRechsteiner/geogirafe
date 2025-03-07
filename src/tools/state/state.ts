@@ -63,6 +63,8 @@ type PrintConfig = {
 type GlobeConfig = {
   display: '2D' | '3D' | '2D/3D';
   loaded: boolean;
+  shadows: boolean;
+  shadowsTimestamp: number;
 };
 
 export type InfoBoxContent = {
@@ -194,7 +196,9 @@ export default class State {
   globe: GlobeConfig = {
     // Possible values : ['3D, '2D/3D', '2D']
     display: '2D',
-    loaded: false
+    loaded: false,
+    shadows: false,
+    shadowsTimestamp: new Date().valueOf()
   };
 
   // To manage selected and focused features

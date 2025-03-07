@@ -12,6 +12,7 @@ class LayoutComponent extends GirafeHTMLElement {
   constructor() {
     super('layout');
     this.onLayoutSelect = this.onLayoutSelect.bind(this);
+    this.onShadowsToggle = this.onShadowsToggle.bind(this);
   }
 
   private registerEvents() {
@@ -37,17 +38,44 @@ class LayoutComponent extends GirafeHTMLElement {
 
   private onLayoutChanged(globe: string) {
     if (this.visible) {
-      const shadowOption = this.shadowRoot?.querySelector('.shadow-option') as HTMLElement;
+      const shadowsOption = this.shadowRoot?.querySelector('.shadows-option') as HTMLElement;
 
-      if (shadowOption) {
-        if (globe === '2D/3D' || globe === '3D') {
-          shadowOption.classList.remove('hidden');
-        } else {
-          shadowOption.classList.add('hidden');
-        }
+      if (shadowsOption) {
+        const has3Dlayout = globe === '2D/3D' || globe === '3D';
+        shadowsOption.classList.toggle('hidden', !has3Dlayout);
       }
-      super.refreshRender();
     }
+  }
+
+  private onShadowsToggle(event: Event) {
+    const shadowsDate = this.shadowRoot?.querySelector('.shadows-date') as HTMLElement;
+
+    if (shadowsDate) {
+      const isChecked = (event.target as HTMLInputElement).checked;
+
+      shadowsDate.classList.toggle('hidden', !isChecked);
+      this.state.globe.shadows = isChecked;
+
+      if (isChecked) {
+        this.setDateTimePicker();
+      }
+    }
+  }
+
+  private setDateTimePicker() {
+    const timeDatePicker = this.shadowRoot?.querySelector('#shadowsDate') as HTMLInputElement;
+
+    if (timeDatePicker) {
+      const date = new Date();
+      timeDatePicker.valueAsNumber = Math.round((date.valueOf() - date.getTimezoneOffset() * 60000) / 60000) * 60000;
+      timeDatePicker.addEventListener('input', () => {
+        this.update3dMapTimestamp(new Date(timeDatePicker.value));
+      });
+    }
+  }
+
+  private update3dMapTimestamp(date: Date) {
+    this.state.globe.shadowsTimestamp = date.valueOf();
   }
 
   connectedCallback() {
