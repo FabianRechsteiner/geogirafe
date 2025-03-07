@@ -38,27 +38,25 @@ class LayoutComponent extends GirafeHTMLElement {
 
   private onLayoutChanged(globe: string) {
     if (this.visible) {
-      const shadowsOption = this.shadowRoot?.querySelector('.shadows-option') as HTMLElement;
+      const shadowsGroup = this.shadowRoot?.querySelector('.shadows-group') as HTMLElement;
+      const shadowsDate = this.shadowRoot?.querySelector('.shadows-date') as HTMLElement;
+      const shadowsCheckbox = this.shadowRoot?.querySelector('#shadowsCheckbox') as HTMLInputElement;
+      const has3Dlayout = globe === '2D/3D' || globe === '3D';
 
-      if (shadowsOption) {
-        const has3Dlayout = globe === '2D/3D' || globe === '3D';
-        shadowsOption.classList.toggle('hidden', !has3Dlayout);
-      }
+      shadowsGroup?.classList.toggle('hidden', !has3Dlayout);
+      shadowsDate?.classList.toggle('hidden', !has3Dlayout || !shadowsCheckbox?.checked);
     }
   }
 
   private onShadowsToggle(event: Event) {
     const shadowsDate = this.shadowRoot?.querySelector('.shadows-date') as HTMLElement;
+    const isChecked = (event.target as HTMLInputElement).checked;
 
-    if (shadowsDate) {
-      const isChecked = (event.target as HTMLInputElement).checked;
+    shadowsDate?.classList.toggle('hidden', !isChecked);
+    this.state.globe.shadows = isChecked;
 
-      shadowsDate.classList.toggle('hidden', !isChecked);
-      this.state.globe.shadows = isChecked;
-
-      if (isChecked) {
-        this.setDateTimePicker();
-      }
+    if (isChecked) {
+      this.setDateTimePicker();
     }
   }
 
