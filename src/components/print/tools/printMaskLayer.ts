@@ -1,32 +1,18 @@
 import type { FrameState } from 'ol/Map';
-import Layer from 'ol/layer/Layer';
-import { createCanvasContext2D } from 'ol/dom';
 import { toRadians } from 'ol/math';
 import GeoConsts from '../../../tools/geoconsts';
+import SimpleMaskLayer from '../../../tools/layers/simplemasklayer';
 
 export type ScaleFn = (frameState: FrameState) => number;
 
 /**
- * A layer to display a mask for a zone to print.
+ * A layer to display a mask with a scale- and page size dependent cut-out box for printing.
  */
-class PrintMaskLayer extends Layer {
-  private readonly context: CanvasRenderingContext2D;
-  private size: [number, number] | null = null;
+class PrintMaskLayer extends SimpleMaskLayer {
   private scaleFn?: ScaleFn;
 
   constructor(options = {}) {
     super({ className: 'printMask', ...options });
-
-    this.context = createCanvasContext2D();
-    this.context.canvas.style.opacity = '0.5';
-    this.context.canvas.style.position = 'absolute';
-  }
-
-  /**
-   * Updates the size (width, height), in pixel, of the mask.
-   */
-  updateSize(size: [number, number]) {
-    this.size = size;
   }
 
   /**
@@ -53,20 +39,8 @@ class PrintMaskLayer extends Layer {
     }
 
     const cwidth = frameState.size[0];
-    this.context.canvas.width = cwidth;
     const cheight = frameState.size[1];
-    this.context.canvas.height = cheight;
     const center = [cwidth / 2, cheight / 2];
-
-    // background (clockwise)
-    this.context.beginPath();
-    this.context.moveTo(0, 0);
-    this.context.lineTo(cwidth, 0);
-    this.context.lineTo(cwidth, cheight);
-    this.context.lineTo(0, cheight);
-    this.context.lineTo(0, 0);
-    this.context.closePath();
-
     const height = this.size[1];
     const width = this.size[0];
     const resolution = frameState.viewState.resolution;
@@ -95,17 +69,7 @@ class PrintMaskLayer extends Layer {
     const x4 = center[0] - Math.sin(omega) * diagonal;
     const y4 = center[1] - Math.cos(omega) * diagonal;
 
-    // hole (counter-clockwise)
-    this.context.moveTo(x1, y1);
-    this.context.lineTo(x2, y2);
-    this.context.lineTo(x3, y3);
-    this.context.lineTo(x4, y4);
-    this.context.lineTo(x1, y1);
-    this.context.closePath();
-
-    this.context.fillStyle = '#000';
-    this.context.fill();
-
+    this.drawBoxMask(cwidth, cheight, [x1, y1], [x2, y2], [x3, y3], [x4, y4]);
     return this.context.canvas;
   }
 }

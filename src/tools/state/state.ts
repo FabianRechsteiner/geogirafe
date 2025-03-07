@@ -15,13 +15,13 @@ type GraphicalInterface = {
   printPanelVisible: boolean;
   lidarPanelVisible: boolean;
   crossSectionPanelVisible: boolean;
+  sharePanelVisible: boolean;
   selectionComponentVisible: boolean;
   selectionComponent: string;
   layoutPanelVisible: boolean;
   aboutPanelVisible: boolean;
   userPreferencesPanelVisible: boolean;
   infoWindowVisible: boolean;
-  shareVisible: boolean;
   darkMapMode: boolean;
   darkFrontendMode: boolean;
 };
@@ -141,13 +141,13 @@ export default class State {
     printPanelVisible: false,
     lidarPanelVisible: false,
     crossSectionPanelVisible: false,
+    sharePanelVisible: false,
     selectionComponentVisible: false,
     selectionComponent: '',
     layoutPanelVisible: false,
     aboutPanelVisible: false,
     userPreferencesPanelVisible: false,
     infoWindowVisible: false,
-    shareVisible: false,
     darkMapMode: false,
     darkFrontendMode: false
   };

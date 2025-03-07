@@ -184,14 +184,6 @@ girafe-nav-history {
   z-index: 10;
 }
 
-girafe-share {
-  position: absolute;
-  z-index: 100;
-  background: var(--bkg-color);
-  top: 50%;
-  left: 50%;
-}
-
 girafe-info-window {
   position: absolute;
   z-index: 100;

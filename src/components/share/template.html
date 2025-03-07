@@ -1,43 +1,29 @@
-<div id="draggable">
-  <div id="header">
-    <span i18n="Share or embed this map">Share or embed this map</span>
-    <img id="close" alt="close-icon" src="icons/close.svg" />
-  </div>
-
-  <nav class="gg-tabs">
-    <button
-      class="${(this.currentTab === 'share-map' ? 'gg-tab active' : 'gg-tab')}"
-      onclick="${() => this.activateTab('share-map')}"
-      i18n="Share this map">
-      Share this map
-    </button>
-    <button
-      class="${(this.currentTab === 'embed-map' ? 'gg-tab active' : 'gg-tab')}"
-      onclick="${() => this.activateTab('embed-map')}"
-      i18n="Embed this map">
-      Embed this map
-    </button>
-  </nav>
-
+<div id="panel">
   <div id="content">
-    <!-- loading -->
-    <img alt="loading-icon" src="icons/loading.svg" class="${(this.loading ? 'gg-spin' : 'hidden')}" />
-
+    
     <!-- share tab -->
-    <div id="share-map" class="${(!this.loading && this.currentTab === 'share-map' ? '' : 'hidden')}">
+    <div id="share-map" class="group">
+      <h3
+        class="title"
+        i18n="Share this map">
+        Share this map
+      </h3>
+      
       <div>
         <div class="link">
           <input type="text" value="${this.shareLink}" class="gg-input" />
-          <button class="gg-button" i18n="Copy link" onclick="${() => this.copyToClipboard('short')}">Copy link</button>
+          <button class="gg-button"
+                  disabled="${!(this.loading || this.shareLink)}"
+                  i18n="Copy link"
+                  onclick="${() => this.copyToClipboard('short')}">Copy link</button>
         </div>
       </div>
 
       <img alt="share-qrcode" class="${(this.qrCode ? 'qrcode' : 'hidden')}" src="${this.qrCode}" />
       <div class="${(this.success ? 'hidden' : 'qrcode error')}">
         <img alt="error-icon" src="icons/error.svg" />
-        <span i18n="Error, can not fetch the shortener service. Please try again later."
-          >Error, can not fetch the shortener service. Please try again later.</span
-        >
+        <span i18n="Error, can not fetch the shortener service. Please try again later.">
+          Error, can not fetch the shortener service. Please try again later.</span>
       </div>
 
       <div class="social">
@@ -55,24 +41,29 @@
         </button>
       </div>
     </div>
-
-    <!-- iframe tab -->
-    <div id="embed-map" class="${(!this.loading && this.currentTab === 'embed-map' ? '' : 'hidden')}">
+    
+    
+    <!-- embed tab -->
+    <div id="embed-map" class="group">
+      <h3
+        class="title"
+        i18n="Embed this map">
+        Embed this map
+      </h3>
+      
       <div class="link">
         <select class="gg-select" id="logLevel" onchange="${(evt: Event) => this.onSizeChanged(evt)}">
+          <option ?selected="${this.iframeSize === ''}" i18n="Select map size..." value="">Select map size...</option>
           <option ?selected="${this.iframeSize === 'small'}" i18n="Small" value="small">Small</option>
           <option ?selected="${this.iframeSize === 'medium'}" i18n="Medium" value="medium">Medium</option>
           <option ?selected="${this.iframeSize === 'large'}" i18n="Large" value="large">Large</option>
         </select>
         <input type="text" value="${this.iframeCode}" class="gg-input" />
-        <button class="gg-button" i18n="Copy code" onclick="${() => this.copyToClipboard('iframe')}">Copy code</button>
+        <button class="gg-button" 
+                disabled="${!(this.loading || !this.iframeSize || this.iframeCode)}"
+                i18n="Copy code"
+                onclick="${() => this.copyToClipboard('iframe')}">Copy code</button>
       </div>
-      <p i18n="Preview">Preview</p>
-      <iframe
-        title="embeded map"
-        src="${this.iframeUrl}"
-        width="${this.iframeWidth}"
-        height="${this.iframeHeight}"></iframe>
-    </div>
+    </div>    
   </div>
 </div>
