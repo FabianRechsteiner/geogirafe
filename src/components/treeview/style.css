@@ -44,6 +44,7 @@ header:hover .tool {
 .legend-icon {
   max-height: 1.5rem;
   margin-left: 0.5rem;
+  filter: var(--svg-map-filter);
 }
 
 .children {
