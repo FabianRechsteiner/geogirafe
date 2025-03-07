@@ -1,37 +1,22 @@
-#draggable {
-  border-radius: 1px;
-  box-shadow: var(--bx-shdw);
-}
-
-#header {
-  padding: 0.5rem;
-  cursor: grabbing;
-  z-index: 10;
-  background: var(--bkg-color-grad2);
-  color: var(--text-color);
-  text-align: center;
-}
-
 #content {
-  padding: 0 2rem 2rem;
-  min-width: 24rem;
-  text-align: center;
-}
-
-#close {
-  cursor: pointer;
-  float: right;
-  width: 12px;
+  background: var(--bkg-color);
   color: var(--text-color);
+  padding: 1rem;
+  margin: 0;
 }
 
-.loading {
-  margin-top: 8rem;
+.group {
+  padding-bottom: 4em;
+}
+
+.title {
+  margin-top: 0;
 }
 
 .link {
   margin-top: 0.5rem;
   display: flex;
+  flex-direction: column;
   gap: 0.2rem;
 }
 
@@ -49,7 +34,7 @@
 
 .social button {
   margin: auto;
-  margin-top: 3rem;
+  margin-top: 2rem;
   cursor: pointer;
   border: none;
   background-color: transparent;
@@ -77,11 +62,8 @@ input {
 .error {
   order: 3;
   color: var(--error-color);
-}
-
-#embed-map {
-  margin: 0 auto;
-  text-align: left;
+  text-align: center;
+  width: 90%;
 }
 
 iframe {

@@ -1,5 +1,5 @@
-import { it, expect } from 'vitest';
-import { getValidIndex, minMax, hexToRgbaArray, rgbStrToRgbaArray } from './utils';
+import { describe, it, expect, vi } from 'vitest';
+import { getValidIndex, minMax, hexToRgbaArray, rgbStrToRgbaArray, debounce } from './utils';
 
 it('tests getValidIndex function', () => {
   // Test a case where maxIndex is not provided or 0
@@ -67,4 +67,55 @@ it('converts an rgb string to an rgba array', () => {
   expect(rgbStrToRgbaArray('rgb(0, 51, 256)')).toBe(null);
   expect(rgbStrToRgbaArray('rgb(0, 51, 255, 100)')).toBe(null);
   expect(rgbStrToRgbaArray('rgb(-50, 51, 255)')).toBe(null);
+});
+
+describe('debounce', () => {
+  it('debounces a function call', async () => {
+    const callback = vi.fn();
+    const debouncedFn = debounce(callback, 100);
+
+    debouncedFn();
+    debouncedFn();
+    debouncedFn();
+
+    // Callback should not be called immediately
+    expect(callback).not.toHaveBeenCalled();
+    // Wait for the debounce delay
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    // Callback should be called only once
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls the function with the latest arguments after the delay', async () => {
+    const callback = vi.fn();
+    const debouncedFn = debounce(callback, 100);
+
+    debouncedFn('first');
+    debouncedFn('second');
+
+    // Wait for the debounce delay
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    // Callback should be called with the latest arguments
+    expect(callback).toHaveBeenCalledWith(undefined, ['second']);
+  });
+
+  it('restarts the timer if called again before the delay', async () => {
+    const callback = vi.fn();
+    const debouncedFn = debounce(callback, 100);
+
+    debouncedFn();
+
+    // Call the function again before the delay
+    setTimeout(() => debouncedFn(), 50);
+
+    // Wait for the original delay
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    // Callback should not have been called because the timer restarted
+    expect(callback).not.toHaveBeenCalled();
+    // Wait for the extended delay
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Callback should be called
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
 });

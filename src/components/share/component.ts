@@ -1,4 +1,3 @@
-import GirafeDraggableElement from '../../base/GirafeDraggableElement';
 import TwitterLogo from './images/twitter.svg';
 import FacebookLogo from './images/facebook.svg';
 import LinkedInLogo from './images/linkedin.svg';
@@ -7,11 +6,18 @@ import ShareManager from '../../tools/share/sharemanager';
 import { IUrlShortener } from './tools/iurlshortener';
 import LstuManager from './tools/lstumanager';
 import GmfManager from './tools/gmfmanager';
+import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import SimpleMaskManager from '../../tools/layers/simplemaskmanager';
+import MapManager from '../../tools/state/mapManager';
+import type { Callback } from '../../tools/state/statemanager';
+import { debounce } from '../../tools/utils/utils';
 
-class ShareComponent extends GirafeDraggableElement {
+
+class ShareComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
+  visible = false;
   loading = true;
   shareLink?: string;
   qrCode?: string;
@@ -20,15 +26,17 @@ class ShareComponent extends GirafeDraggableElement {
   facebookLogo: string = FacebookLogo;
   linkedInLogo: string = LinkedInLogo;
   mailLogo: string = MailLogo;
-
-  shareManager: ShareManager;
-  urlShortener?: IUrlShortener;
-
-  currentTab = 'share-map';
   iframeUrl?: string;
   iframeCode?: string;
 
-  iframeSize: 'small' | 'medium' | 'large' = 'small';
+  shareManager: ShareManager;
+  urlShortener?: IUrlShortener;
+  private readonly mapManager: MapManager;
+  private simpleMaskManager?: SimpleMaskManager;
+
+  private readonly eventsCallbacks: Callback[] = [];
+
+  iframeSize: 'small' | 'medium' | 'large' | '' = '';
   public get iframeWidth() {
     switch (this.iframeSize) {
       case 'small':
@@ -59,14 +67,10 @@ class ShareComponent extends GirafeDraggableElement {
     super('share');
 
     this.shareManager = ShareManager.getInstance();
-  }
-
-  registerEvents() {
-    this.subscribe('interface.shareVisible', (_oldValue: boolean, newValue: boolean) => this.togglePopup(newValue));
+    this.mapManager = MapManager.getInstance();
   }
 
   initializeShortenerService() {
-    // Initialize UrlShortener
     switch (this.configManager.Config.share.service) {
       case 'gmf':
         this.urlShortener = new GmfManager(this.configManager.Config.share.createUrl);
@@ -78,16 +82,75 @@ class ShareComponent extends GirafeDraggableElement {
   }
 
   render() {
-    super.render();
-    super.makeDraggable();
-    this.girafeTranslate();
+    this.visible ? this.renderComponent() : this.renderEmptyComponent();
+    this.activateTooltips(false, [800, 0], 'top-end');
+    super.girafeTranslate();
   }
 
-  async togglePopup(visible: boolean) {
-    if (this.urlShortener && visible) {
-      this.loading = true;
-      this.render();
+  /**
+   * Renders the component by calling the necessary methods.
+   * @private
+   */
+  private renderComponent() {
+    super.render();
+    
+    if (!this.urlShortener) {
+      this.renderEmptyComponent();
+      return;
+    }
+    this.state.selection.enabled = false;
+    this.simpleMaskManager = new SimpleMaskManager(this.mapManager.getMap());
 
+    // While the component is visible, listen for changes in the state to update the shared link
+    this.registerEvents();
+
+    void this.generateShareLink();
+  }
+
+  /**
+   * Renders an empty component when it's not visible.
+   * @private
+   */
+  private renderEmptyComponent() {
+    this.state.selection.enabled = true;
+    this.simpleMaskManager?.setMaskVisibility(false);
+    this.iframeSize = '';
+    this.unregisterEvents();
+    this.renderEmpty();
+  }
+
+  private registerEvents() {
+    // Use a debounced version of the share link generation with 500ms delay to reduce the number of times it's called
+    //  from tree view changes (can go up to 100x times).
+    const debouncedShareLinkCallback = debounce(() => {
+      void this.generateShareLink();
+    }, 500);
+
+    this.eventsCallbacks.push(
+      this.subscribe('position', () => debouncedShareLinkCallback()),
+      this.subscribe('layers.layersList', () => debouncedShareLinkCallback()),
+      this.subscribe(/layers\.layersList\..*\.activeState/, () => debouncedShareLinkCallback()),
+      this.subscribe(/layers\.layersList\..*\.order/, () => debouncedShareLinkCallback()),
+      this.subscribe('activeBasemap', () => debouncedShareLinkCallback())
+    );
+  }
+
+  private unregisterEvents(): void {
+    this.unsubscribe(this.eventsCallbacks);
+    this.eventsCallbacks.length = 0;
+  }
+
+  private async generateShareLink() {
+    if (!this.urlShortener) {
+      return;
+    }
+    this.loading = true;
+    this.shareLink = '';
+    this.iframeUrl = '';
+    this.iframeCode = '';
+    this.refreshRender();
+
+    try {
       const currentUrl = new URL(window.location.href);
       const baseUrl = `${currentUrl.protocol}//${currentUrl.host}${currentUrl.pathname}`;
       const hash = this.shareManager.getStateToShare();
@@ -104,20 +167,22 @@ class ShareComponent extends GirafeDraggableElement {
       response = await this.urlShortener.shortenUrl(longIframeUrl);
       this.iframeUrl = response.shorturl;
       this.setIframeCode();
-
+    } finally {
       this.loading = false;
       this.refreshRender();
-    } else {
-      this.renderEmpty();
     }
   }
 
   setIframeCode() {
-    this.iframeCode = `<iframe title="iframe MapBS" src="${this.iframeUrl}" width="${this.iframeWidth}" height="${this.iframeHeight}"></iframe>`;
+    if (this.iframeSize && this.iframeUrl) {
+      this.iframeCode = `<iframe title="iframe MapBS" src="${this.iframeUrl}" width="${this.iframeWidth}" height="${this.iframeHeight}"></iframe>`;
+    } else {
+      this.iframeCode = '';
+    }
   }
 
   closeWindow() {
-    this.state.interface.shareVisible = false;
+    this.state.interface.sharePanelVisible = false;
   }
 
   shareFacebook() {
@@ -138,11 +203,6 @@ class ShareComponent extends GirafeDraggableElement {
     window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
   }
 
-  activateTab(tabName: string) {
-    this.currentTab = tabName;
-    this.refreshRender();
-  }
-
   copyToClipboard(type: 'short' | 'iframe') {
     let textToCopy = '';
 
@@ -158,16 +218,36 @@ class ShareComponent extends GirafeDraggableElement {
   }
 
   onSizeChanged(event: Event) {
-    this.iframeSize = (event.target as HTMLInputElement)?.value as 'small' | 'medium' | 'large';
+    this.iframeSize = (event.target as HTMLInputElement)?.value as 'small' | 'medium' | 'large' | '';
     this.setIframeCode();
     this.refreshRender();
+    if (this.iframeSize) {
+      this.showMapPreview();
+    } else {
+      this.hideMapPreview();
+    }
+  }
+
+  /**
+   * Displays a greyed out area in the main map indicating the size of the embedded map.
+   */
+  private showMapPreview() {
+    this.simpleMaskManager?.setMaskSize([this.iframeWidth, this.iframeHeight]);
+    this.simpleMaskManager?.setMaskVisibility(true);
+  }
+
+  private hideMapPreview() {
+    this.simpleMaskManager?.setMaskVisibility(false);
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
       this.initializeShortenerService();
-      this.registerEvents();
+      this.subscribe('interface.sharePanelVisible', (_, newValue) => {
+        this.visible = newValue;
+        this.render();
+      });
     });
   }
 }
