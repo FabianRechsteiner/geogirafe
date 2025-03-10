@@ -10,7 +10,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SimpleMaskManager from '../../tools/layers/simplemaskmanager';
 import MapManager from '../../tools/state/mapManager';
 import type { Callback } from '../../tools/state/statemanager';
-import { debounce } from '../../tools/utils/utils';
+import { debounce } from '../../tools/utils/debounce';
 
 
 class ShareComponent extends GirafeHTMLElement {

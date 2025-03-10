@@ -105,21 +105,3 @@ export const colorToRgbaArray = (color: string): [number, number, number, number
   return rgbaColor;
 };
 
-
-/**
- * Creates a debounced version of the provided callback function that delays its execution until after a specified delay
- * has elapsed since the last time it was invoked. This is useful for limiting the rate at which a function is called,
- * such as during high-frequency events like resizing, scrolling, layer tree changes, etc.
- *
- * @param {function} callback - The function to be debounced. It will be executed after the delay period.
- * @param {number} delay - The delay duration in milliseconds to wait before invoking the callback function.
- * @returns {function} A debounced version of the input function. Subsequent calls to this function
- * will reset the delay timer.
- */
-export const debounce = (callback: (...args: unknown[]) => void, delay: number) => {
-  let timer: NodeJS.Timeout;
-  return (...args: unknown[]) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => callback(this, args), delay);
-  };
-};
