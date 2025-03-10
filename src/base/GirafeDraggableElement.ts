@@ -29,6 +29,7 @@ class GirafeDraggableElement extends GirafeHTMLElement {
   div?: HTMLElement;
   header?: HTMLElement;
   closeButton?: HTMLElement;
+  container?: HTMLElement;
 
   get host(): HTMLElement {
     return (this.shadow.getRootNode() as ShadowRoot).host as HTMLElement;
@@ -43,7 +44,8 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     super(component);
   }
 
-  makeDraggable() {
+  makeDraggable(container?: HTMLElement | undefined) {
+    this.container = container || document.querySelector('#content')!;
     this.div = this.shadow.querySelector('#draggable')!;
     this.header = this.shadow.querySelector('#header')!;
     this.setDefaultPosition();
@@ -92,8 +94,8 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     const newRight = newLeft + hostRect.width;
     if (newLeft < 0) {
       _this.host.style.left = '0px';
-    } else if (newRight > this.getBodyWidth()) {
-      _this.host.style.left = this.getBodyWidth() - hostRect.width + 'px';
+    } else if (newRight > this.getContainerWidth()) {
+      _this.host.style.left = this.getContainerWidth() - hostRect.width + 'px';
     } else {
       _this.pos1 = pos1;
       _this.pos3 = e.clientX;
@@ -106,8 +108,8 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     const newBottom = newTop + hostRect.height;
     if (newTop < 0) {
       _this.host.style.top = '0px';
-    } else if (newBottom > this.getBodyHeight()) {
-      _this.host.style.top = this.getBodyHeight() - hostRect.height + 'px';
+    } else if (newBottom > this.getContainerHeight()) {
+      _this.host.style.top = this.getContainerHeight() - hostRect.height + 'px';
     } else {
       _this.pos2 = pos2;
       _this.pos4 = e.clientY;
@@ -115,29 +117,17 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     }
   }
 
-  getBodyWidth() {
-    return Math.max(
-      document.body.scrollWidth,
-      document.documentElement.scrollWidth,
-      document.body.offsetWidth,
-      document.documentElement.offsetWidth,
-      document.documentElement.clientWidth
-    );
+  getContainerWidth(): number {
+    return Math.max(this.container?.scrollWidth as number, this.container?.offsetWidth as number);
   }
 
-  getBodyHeight() {
-    return Math.max(
-      document.body.scrollHeight,
-      document.documentElement.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.offsetHeight,
-      document.documentElement.clientHeight
-    );
+  getContainerHeight(): number {
+    return Math.max(this.container?.scrollHeight as number, this.container?.offsetHeight as number);
   }
 
   resize(_this: GirafeDraggableElement) {
-    const width = this.getBodyWidth();
-    const height = this.getBodyHeight();
+    const width = this.getContainerWidth();
+    const height = this.getContainerHeight();
     const left = _this.host.style.left;
     const top = _this.host.style.top;
     if (parseInt(left) + _this.host.offsetWidth > width) {
