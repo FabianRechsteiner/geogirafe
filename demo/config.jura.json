@@ -26,6 +26,9 @@
     "url": "https://geo.jura.ch/printproxy/",
     "defaultLayout": "1 A4 paysage"
   },
+  "lidar": {
+    "url": "https://geo.jura.ch/pytree"
+  },
   "share": {
     "service": "lstu",
     "createUrl": "https://lstu.fr/a"
@@ -52,5 +55,8 @@
     },
     "tilesetsUrls": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"],
     "maximumZoomDistance": 25000
+  },
+  "gmfauth": {
+    "url": "https://geo.jura.ch"
   }
 }
