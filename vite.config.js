@@ -16,11 +16,16 @@ import dns from 'dns';
  * to resolve app.localhost to 127.0.0.1
  */
 const originalDnsLookup = dns.lookup;
-function customDnsLookup(hostname, callback) {
+function customDnsLookup(hostname, options, callback) {
+  if (typeof options === 'function') {
+    callback = options;
+    options = undefined;
+  }
+
   if (hostname === 'app.localhost') {
     callback(null, '127.0.0.1', 4);
   } else {
-    originalDnsLookup(hostname, callback);
+    originalDnsLookup(hostname, options, callback);
   }
 }
 dns.lookup = customDnsLookup;
