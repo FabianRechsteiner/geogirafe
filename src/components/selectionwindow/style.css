@@ -1,69 +1,3 @@
-.ctx {
-  --window-header-height: 2rem;
-  --window-footer-height: 2rem;
-}
-
-.hidden {
-  display: none !important;
-}
-
-#draggable {
-  border: solid 1px var(--text-color-grad1);
-  border-radius: 3px;
-  box-shadow:
-    0 1px 2px rgba(60, 64, 67, 0.3),
-    0 1px 3px 1px rgba(60, 64, 67, 0.15);
-  background: var(--bkg-color);
-  width: 100%;
-  height: 100%;
-}
-
-#header {
-  height: var(--window-header-height);
-  padding: 0 0.5rem;
-  cursor: move;
-  z-index: 10;
-  background-color: var(--text-color-grad2);
-  color: var(--bkg-color);
-  text-align: center;
-}
-
-#header p {
-  line-height: var(--window-header-height);
-  margin: 0;
-}
-
-#close {
-  border: none;
-  color: var(--text-color);
-  padding: 0;
-  margin: 0.5rem;
-  width: 1rem;
-  height: 1rem;
-  line-height: 1rem;
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: transparent;
-  cursor: pointer;
-}
-
-#close i:before {
-  content: '\f00d';
-}
-
-#close:hover {
-  border-color: #000;
-  color: #000;
-}
-
-#content {
-  width: 100%;
-  height: calc(100% - (var(--window-header-height) + var(--window-footer-height)));
-  overflow-y: auto;
-  color: var(--text-color);
-}
-
 #content div {
   padding: 1rem 2rem;
 }
@@ -83,14 +17,6 @@ td.label {
 
 td.label:after {
   content: ' :';
-}
-
-#footer {
-  height: var(--window-footer-height);
-  color: var(--text-color-grad1);
-  border-top: solid 1px var(--text-color-grad1);
-  display: flex;
-  justify-content: space-around;
 }
 
 button {
@@ -126,90 +52,6 @@ button > img {
   margin-top: 0;
 }
 
-/* ==== Under - to resize ==== */
-.resizer {
-  --resize-size: 6px;
-  --negative-resize-size: -6px;
-}
-
-button.resizer {
-  position: absolute;
-  background-color: transparent;
-  border: none;
-}
-
-.resizer.corner {
-  width: var(--resize-size);
-  height: var(--resize-size);
-}
-
-.resizer.top-bottom {
-  width: calc(100% - (2 * var(--resize-size)));
-  height: var(--resize-size);
-}
-
-.resizer.left-right {
-  width: var(--resize-size);
-  height: calc(100% - (2 * var(--resize-size)));
-}
-
-.resizer.tl:hover,
-.resizer.br:hover {
-  cursor: nw-resize;
-}
-
-.resizer.tr:hover,
-.resizer.bl:hover {
-  cursor: ne-resize;
-}
-
-.resizer.top-bottom:hover {
-  cursor: n-resize;
-}
-
-.resizer.left-right:hover {
-  cursor: e-resize;
-}
-
-.resizer.tl {
-  top: var(--negative-resize-size);
-  left: var(--negative-resize-size);
-}
-
-.resizer.t {
-  top: var(--negative-resize-size);
-  left: var(--resize-size);
-}
-
-.resizer.tr {
-  top: var(--negative-resize-size);
-  right: var(--negative-resize-size);
-}
-
-.resizer.r {
-  top: var(--resize-size);
-  right: var(--negative-resize-size);
-}
-
-.resizer.br {
-  bottom: var(--negative-resize-size);
-  right: var(--negative-resize-size);
-}
-
-.resizer.b {
-  bottom: var(--negative-resize-size);
-  left: var(--resize-size);
-}
-
-.resizer.bl {
-  bottom: var(--negative-resize-size);
-  left: var(--negative-resize-size);
-}
-
-.resizer.l {
-  top: var(--resize-size);
-  left: var(--negative-resize-size);
-}
 
 /** ==== Layers Dropdown ==== */
 #layers-dropdown {

@@ -22,100 +22,14 @@ enum Direction {
  * With "t" standing for top, "l" for left, "b" for bottom and "r" for right.
  * The window can implement one or multiple of these buttons:
  *
- * <button tabindex="-1" class="resizer tl corner"></button>
- * <button tabindex="-1" class="resizer t top-bottom"></button>
- * <button tabindex="-1" class="resizer tr corner"></button>
- * <button tabindex="-1" class="resizer r left-right"></button>
- * <button tabindex="-1" class="resizer br corner"></button>
- * <button tabindex="-1" class="resizer b top-bottom"></button>
- * <button tabindex="-1" class="resizer bl corner"></button>
- * <button tabindex="-1" class="resizer l left-right"></button>
- *
- * Proposed CSS
- *
- * .resizer {
- *   --resize-size: 6px;
- *   --negative-resize-size: -6px;
- * }
- *
- * button.resizer {
- *   position: absolute;
- *   background-color: transparent;
- *   border: none;
- * }
- *
- * .resizer.corner {
- *   width: var(--resize-size);
- *   height: var(--resize-size);
- * }
- *
- * .resizer.top-bottom {
- *   width: calc(100% - (2 * var(--resize-size)));
- *   height: var(--resize-size);
- * }
- *
- * .resizer.left-right {
- *   width: var(--resize-size);
- *   height: calc(100% - (2 * var(--resize-size)));
- * }
- *
- * .resizer.tl:hover,
- * .resizer.br:hover {
- *   cursor: nw-resize;
- * }
- *
- * .resizer.tr:hover,
- * .resizer.bl:hover {
- *   cursor: ne-resize;
- * }
- *
- * .resizer.top-bottom:hover {
- *   cursor: n-resize;
- * }
- *
- * .resizer.left-right:hover {
- *   cursor: e-resize;
- * }
- *
- * .resizer.tl {
- *   top: var(--negative-resize-size);
- *   left: var(--negative-resize-size);
- * }
- *
- * .resizer.t {
- *   top: var(--negative-resize-size);
- *   left: var(--resize-size);
- * }
- *
- * .resizer.tr {
- *   top: var(--negative-resize-size);
- *   right: var(--negative-resize-size);
- * }
- *
- * .resizer.r {
- *   top: var(--resize-size);
- *   right: var(--negative-resize-size);
- * }
- *
- * .resizer.br {
- *   bottom: var(--negative-resize-size);
- *   right: var(--negative-resize-size);
- * }
- *
- * .resizer.b {
- *   bottom: var(--negative-resize-size);
- *   left: var(--resize-size);
- * }
- *
- * .resizer.bl {
- *   bottom: var(--negative-resize-size);
- *   left: var(--negative-resize-size);
- * }
- *
- * .resizer.l {
- *   top: var(--resize-size);
- *   left: var(--negative-resize-size);
- * }
+ * <button tabindex="-1" class="girafe-resizer tl corner"></button>
+ * <button tabindex="-1" class="girafe-resizer t top-bottom"></button>
+ * <button tabindex="-1" class="girafe-resizer tr corner"></button>
+ * <button tabindex="-1" class="girafe-resizer r left-right"></button>
+ * <button tabindex="-1" class="girafe-resizer br corner"></button>
+ * <button tabindex="-1" class="girafe-resizer b top-bottom"></button>
+ * <button tabindex="-1" class="girafe-resizer bl corner"></button>
+ * <button tabindex="-1" class="girafe-resizer l left-right"></button>
  *
  */
 export default class ResizeWindow {
@@ -142,6 +56,7 @@ export default class ResizeWindow {
   private originX = 0;
   private originY = 0;
   private elements: (HTMLElement | null)[] = [];
+  private readonly className: string = 'girafe-resizer';
 
   /**
    * Create the instance and calls init.
@@ -175,7 +90,7 @@ export default class ResizeWindow {
    * @return The element with the attached event listener, or null if no matching element was found.
    */
   private attachEvent(direction: Direction): HTMLElement | null {
-    const element: HTMLElement | null = this.shadow.querySelector(`.resizer.${direction}`);
+    const element: HTMLElement | null = this.shadow.querySelector(`.${this.className}.${direction}`);
     if (!element) {
       return null;
     }

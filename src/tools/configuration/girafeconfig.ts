@@ -402,7 +402,7 @@ class GirafeConfig {
       defaultWindowWidth: '960px',
       defaultWindowHeight: '460px',
       defaultWindowPositionTop: '1rem',
-      defaultWindowPositionLeft: '2rem'
+      defaultWindowPositionLeft: '370px'
     };
     return {
       ...defaultConfig,

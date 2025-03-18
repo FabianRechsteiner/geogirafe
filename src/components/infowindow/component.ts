@@ -1,12 +1,17 @@
 import GirafeDraggableElement from '../../base/GirafeDraggableElement';
+import ResizeWindow from '../../tools/resizewindow';
 
 class InfoWindowComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
+  visible: boolean = false;
+  private resizeWindow: ResizeWindow | null = null;
+
   constructor() {
     super('infowindow');
 
+    // Initialize floating window
     window.gOpenWindow = (
       title: string,
       url: string,
@@ -15,44 +20,59 @@ class InfoWindowComponent extends GirafeDraggableElement {
       top?: string | number,
       left?: string | number
     ): void => {
-      // Update state to trigger rendering
-      this.state.infoWindow = {
-        title: title,
-        url: url,
-        width: width ?? null,
-        height: height ?? null,
-        top: top ?? null,
-        left: left ?? null
-      };
+      // Update infoWindow state
+      this.state.infoWindow.title = title;
+      this.state.infoWindow.url = url;
+      this.state.infoWindow.width = width ?? null;
+      this.state.infoWindow.height = height ?? null;
+      this.state.infoWindow.top = top ?? null;
+      this.state.infoWindow.left = left ?? null;
+      // Trigger window to appear
       this.state.interface.infoWindowVisible = true;
     };
+
+    this.updateWindowSizeAndPosition();
   }
 
   registerEvents() {
     this.subscribe('interface.infoWindowVisible', (_oldValue: boolean, isVisible: boolean) => {
-      if (isVisible) {
-        this.render();
-      } else {
-        this.renderEmpty();
-      }
+      this.visible = isVisible;
+      this.render();
     });
 
-    this.subscribe(/infoWindow.*/, () => {
-      if (this.state.interface.infoWindowVisible) this.render();
+    this.subscribe(/infoWindow\.(width|height|top|left)/, (oldValue, newValue) => {
+      if (oldValue !== newValue) {
+        this.updateWindowSizeAndPosition();
+        this.render();
+      }
     });
+    this.subscribe(/infoWindow\.(url|title)/, () => this.render());
   }
 
   render() {
+    this.visible ? this.renderComponent() : this.renderEmptyComponent();
+  }
+
+  renderComponent() {
+    super.render();
+    this.girafeTranslate();
+    this.resizeWindow = new ResizeWindow(this.shadow);
+    this.makeDraggable();
+  }
+
+  private renderEmptyComponent() {
+    this.resizeWindow?.destroy();
+    this.resizeWindow = null;
+    this.renderEmpty();
+  }
+
+  private updateWindowSizeAndPosition() {
     const windowConfig = this.configManager.Config.infoWindow;
     const host = (this.shadow.getRootNode() as ShadowRoot).host as HTMLElement;
     host.style.width = this.configToCssValue(this.state.infoWindow.width) ?? windowConfig.defaultWindowWidth;
     host.style.height = this.configToCssValue(this.state.infoWindow.height) ?? windowConfig.defaultWindowHeight;
     host.style.top = this.configToCssValue(this.state.infoWindow.top) ?? windowConfig.defaultWindowPositionTop;
     host.style.left = this.configToCssValue(this.state.infoWindow.left) ?? windowConfig.defaultWindowPositionLeft;
-
-    super.render();
-    this.girafeTranslate();
-    this.makeDraggable();
   }
 
   closeWindow() {
@@ -62,8 +82,6 @@ class InfoWindowComponent extends GirafeDraggableElement {
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
-      this.girafeTranslate();
-      this.makeDraggable();
       this.registerEvents();
     });
   }
