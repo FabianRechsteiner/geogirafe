@@ -6,15 +6,20 @@ Minimal template for a draggable object :
 It must have 2 divs :
 - One for the whole box (id="draggable")
 - One for the header (id="header"). This is the div that will be used for dragging the whole box
+- footer is optional
+- use class girafe-draggable-window to get the gg floating window style
 
 Example:
 
-<div id="draggable">
+<div id="draggable" class="girafe-draggable-window">
   <div id="header">
     Click here to move
     <img id="close" alt="close-icon" src="icons/close.svg" />
   </div>
-  <!-- PLACE CONTENT HERE -->
+  <div id="content">
+    <!-- PLACE CONTENT HERE -->
+  </div>
+  <div id="footer"></div>
 </div>
 
 Then in order to make an component draggable, 

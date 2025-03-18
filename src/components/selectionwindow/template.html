@@ -1,17 +1,15 @@
-<div id="draggable" class="${this.visible ? 'ctx' : 'hidden'}">
-  <button tabindex="-1" class="resizer tl corner"></button>
-  <button tabindex="-1" class="resizer t top-bottom"></button>
-  <button tabindex="-1" class="resizer tr corner"></button>
-  <button tabindex="-1" class="resizer r left-right"></button>
-  <button tabindex="-1" class="resizer br corner"></button>
-  <button tabindex="-1" class="resizer b top-bottom"></button>
-  <button tabindex="-1" class="resizer bl corner"></button>
-  <button tabindex="-1" class="resizer l left-right"></button>
+<div id="draggable" class="${this.visible ? 'girafe-draggable-window' : 'hidden'}">
+  <button tabindex="-1" class="girafe-resizer tl corner"></button>
+  <button tabindex="-1" class="girafe-resizer t top-bottom"></button>
+  <button tabindex="-1" class="girafe-resizer tr corner"></button>
+  <button tabindex="-1" class="girafe-resizer r left-right"></button>
+  <button tabindex="-1" class="girafe-resizer br corner"></button>
+  <button tabindex="-1" class="girafe-resizer b top-bottom"></button>
+  <button tabindex="-1" class="girafe-resizer bl corner"></button>
+  <button tabindex="-1" class="girafe-resizer l left-right"></button>
   <div id="header">
-    <p i18n="${this.getWindowFeature()?.id}"></p>
-    <button id="close" onclick="${() => this.closeWindow()}">
-      <img alt="close-icon" src="icons/close.svg" />
-    </button>
+    <span i18n="${this.getWindowFeature()?.id}"></span>
+    <img id="close" alt="close-icon" src="icons/close.svg" />
   </div>
   <div id="content">
     <div>
