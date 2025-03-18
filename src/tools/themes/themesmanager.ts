@@ -202,7 +202,7 @@ class ThemesManager extends GirafeSingleton {
       if (!themeJson.icon.startsWith('http') && this.configManager.Config.themes.imagesUrlPrefix) {
         themeJson.icon = this.configManager.Config.themes.imagesUrlPrefix + themeJson.icon;
       }
-      const theme = new ThemeLayer(themeJson['id'], themeJson['name'], index, themeJson['icon']);
+      const theme = new ThemeLayer(themeJson['id'], themeJson['name'], index, themeJson['icon'], themeJson['metadata']);
       themeJson.children.forEach((layerJson: GMFTreeItem) => {
         const layer = this.prepareThemeLayer(layerJson, null, order);
         if (layer) {
