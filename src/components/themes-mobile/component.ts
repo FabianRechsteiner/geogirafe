@@ -43,6 +43,13 @@ class MobileThemeComponent extends GirafeHTMLElement {
   onThemeChanged(theme: ThemeLayer) {
     this.preventBlur = true;
     this.state.themes.lastSelectedTheme = theme;
+    if (theme.disclaimer) {
+      this.state.infobox.elements.push({
+        id: theme.treeItemId,
+        text: theme.disclaimer,
+        type: 'info'
+      });
+    }
 
     if (theme.location != null || theme.zoom != null) {
       const view = MapManager.getInstance().getMap().getView();

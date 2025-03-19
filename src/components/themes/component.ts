@@ -49,6 +49,13 @@ class ThemeComponent extends GirafeHTMLElement {
 
   onThemeChanged(theme: ThemeLayer) {
     this.state.themes.lastSelectedTheme = theme;
+    if (theme.disclaimer) {
+      this.state.infobox.elements.push({
+        id: theme.treeItemId,
+        text: theme.disclaimer,
+        type: 'info'
+      });
+    }
     this.onBlur();
 
     if (theme.location != null || theme.zoom != null) {
