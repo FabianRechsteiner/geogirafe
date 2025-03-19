@@ -1,21 +1,25 @@
 <div id="panel">
   <div id="content">
-    
+    <div class="${!this.urlShortener ? '' : 'hidden'}">
+      <div class="message" i18n="Error, the shortener service is not defined.">
+        Error, the shortener service is not defined.
+      </div>
+    </div>
+
     <!-- share tab -->
-    <div id="share-map" class="group">
-      <h3
-        class="title"
-        i18n="Share this map">
-        Share this map
-      </h3>
-      
+    <div id="share-map" class="${this.urlShortener ? 'group' : 'hidden'}">
+      <h3 class="title" i18n="Share this map">Share this map</h3>
+
       <div>
         <div class="link">
           <input type="text" value="${this.shareLink}" class="gg-input" />
-          <button class="gg-button"
-                  disabled="${!(this.loading || this.shareLink)}"
-                  i18n="Copy link"
-                  onclick="${() => this.copyToClipboard('short')}">Copy link</button>
+          <button
+            class="gg-button"
+            disabled="${!(this.loading || this.shareLink)}"
+            i18n="Copy link"
+            onclick="${() => this.copyToClipboard('short')}">
+            Copy link
+          </button>
         </div>
       </div>
 
@@ -23,7 +27,8 @@
       <div class="${(this.success ? 'hidden' : 'qrcode error')}">
         <img alt="error-icon" src="icons/error.svg" />
         <span i18n="Error, can not fetch the shortener service. Please try again later.">
-          Error, can not fetch the shortener service. Please try again later.</span>
+          Error, can not fetch the shortener service. Please try again later.</span
+        >
       </div>
 
       <div class="social">
@@ -41,16 +46,11 @@
         </button>
       </div>
     </div>
-    
-    
+
     <!-- embed tab -->
-    <div id="embed-map" class="group">
-      <h3
-        class="title"
-        i18n="Embed this map">
-        Embed this map
-      </h3>
-      
+    <div id="embed-map" class="${this.urlShortener ? 'group' : 'hidden'}">
+      <h3 class="title" i18n="Embed this map">Embed this map</h3>
+
       <div class="link">
         <select class="gg-select" id="logLevel" onchange="${(evt: Event) => this.onSizeChanged(evt)}">
           <option ?selected="${this.iframeSize === ''}" i18n="Select map size..." value="">Select map size...</option>
@@ -59,11 +59,14 @@
           <option ?selected="${this.iframeSize === 'large'}" i18n="Large" value="large">Large</option>
         </select>
         <input type="text" value="${this.iframeCode}" class="gg-input" />
-        <button class="gg-button" 
-                disabled="${!(this.loading || !this.iframeSize || this.iframeCode)}"
-                i18n="Copy code"
-                onclick="${() => this.copyToClipboard('iframe')}">Copy code</button>
+        <button
+          class="gg-button"
+          disabled="${!(this.loading || !this.iframeSize || this.iframeCode)}"
+          i18n="Copy code"
+          onclick="${() => this.copyToClipboard('iframe')}">
+          Copy code
+        </button>
       </div>
-    </div>    
+    </div>
   </div>
 </div>

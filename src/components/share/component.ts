@@ -12,7 +12,6 @@ import MapManager from '../../tools/state/mapManager';
 import type { Callback } from '../../tools/state/statemanager';
 import { debounce } from '../../tools/utils/debounce';
 
-
 class ShareComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
@@ -93,11 +92,7 @@ class ShareComponent extends GirafeHTMLElement {
    */
   private renderComponent() {
     super.render();
-    
-    if (!this.urlShortener) {
-      this.renderEmptyComponent();
-      return;
-    }
+
     this.state.selection.enabled = false;
     this.simpleMaskManager = new SimpleMaskManager(this.mapManager.getMap());
 

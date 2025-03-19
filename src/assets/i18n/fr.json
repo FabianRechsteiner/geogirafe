@@ -22,6 +22,7 @@
     "Draw LiDAR profile line": "Tracer la ligne du profil LiDAR",
     "Error, can not fetch the config. Please try again later.": "Erreur, impossible de récupérer la configuration. Veuillez réessayer plus tard.",
     "Error, can not fetch the shortener service. Please try again later.": "Erreur, impossible de récupérer le service de raccourcissement. Veuillez réessayer plus tard.",
+    "Error, the shortener service is not defined.": "Erreur, le service de raccourcissement n'est pas défini.",
     "Export": "Exporter",
     "features": "caractéristiques",
     "File from": "Fichier de",
