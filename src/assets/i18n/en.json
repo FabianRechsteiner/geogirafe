@@ -22,6 +22,7 @@
     "Draw LiDAR profile line": "Draw LiDAR profile line",
     "Error, can not fetch the config. Please try again later.": "Error, can not fetch the config. Please try again later.",
     "Error, can not fetch the shortener service. Please try again later.": "Error, can not fetch the shortener service. Please try again later.",
+    "Error, the shortener service is not defined.": "Error, the shortener service is not defined.",
     "Export": "Export",
     "features": "features",
     "File from": "File from",

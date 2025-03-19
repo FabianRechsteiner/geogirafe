@@ -22,6 +22,7 @@
     "Draw LiDAR profile line": "LiDAR-Profillinie zeichnen",
     "Error, can not fetch the config. Please try again later.": "Fehler, Konfiguration kann nicht abgerufen werden. Bitte versuche es später erneut.",
     "Error, can not fetch the shortener service. Please try again later.": "Fehler, der Verkürzungsdienst kann nicht abgerufen werden. Bitte versuche es später erneut.",
+    "Error, the shortener service is not defined.": "Fehler, der Verkürzungsdienst ist nicht definiert.",
     "Export": "Exportieren",
     "features": "Elemente",
     "File from": "Datei vom",
