@@ -1,7 +1,6 @@
 import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
 import GirafeSingleton from '../../base/GirafeSingleton';
-import AuthHelper from './authhelper';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -44,7 +43,7 @@ export default class GMFManager extends GirafeSingleton {
 
   public async loginWithToken() {
     // NOTE: With the new OICD Worflow that has been integrated in GMF 2.9, this is not needed any more.
-    // But for OICD integration before 2.9, this is still needed
+    // But for OICD integration before 2.9, this is still needed (This is for the moment specific to workflow at BS)
     // TOOD REG : Remove this code when MapBS will be migrated to the standard GMF flow
     if (this.gmfConfigForOAuth.loginUrl) {
       console.debug('Auth: 2.1. Backend login with token');
@@ -52,7 +51,11 @@ export default class GMFManager extends GirafeSingleton {
         throw new Error('Login with JWT token if the issuer does not support oAuth is not supported.');
       }
 
-      const gmfLoginResponse = await fetch(this.gmfConfigForOAuth.loginUrl, AuthHelper.getFetchOptions());
+      const gmfLoginResponse = await fetch(this.gmfConfigForOAuth.loginUrl, {
+        headers: {
+          Authorization: `Bearer ${this.state.oauth.tokens?.access_token}`
+        }
+      });
       if (!gmfLoginResponse.ok) {
         throw new Error(gmfLoginResponse.statusText);
       }
@@ -75,7 +78,7 @@ export default class GMFManager extends GirafeSingleton {
     // If logoutUrl is not set, it means we do not need to logout from backend.
     // The token will be removed when loging out from the OIDC provider.
     if (logoutUrl) {
-      const gmfLogoutResponse = await fetch(logoutUrl, AuthHelper.getFetchOptions());
+      const gmfLogoutResponse = await fetch(logoutUrl);
       if (!gmfLogoutResponse.ok) {
         throw new Error(gmfLogoutResponse.statusText);
       }
@@ -87,7 +90,7 @@ export default class GMFManager extends GirafeSingleton {
   public async getUserInfo() {
     console.debug('Auth: 3. Get UserInfo');
     const userInfoUrl = this.isOAuth ? this.gmfConfigForOAuth.userInfoUrl : `${this.gmfConfigForGmfAuth.url}/loginuser`;
-    this.state.oauth.userInfo = await fetch(userInfoUrl, AuthHelper.getFetchOptions()).then((r) => r.json());
+    this.state.oauth.userInfo = await fetch(userInfoUrl).then((r) => r.json());
     if (this.state.oauth.userInfo?.username) {
       this.state.oauth.status = 'loggedIn';
     } else {

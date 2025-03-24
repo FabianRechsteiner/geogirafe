@@ -46,10 +46,12 @@
         onclick="${() => this.zoomToVisibleResolution()}">
         <img alt="Zoom to visible resolution" src="icons/zoom.svg" />
       </button>
+      <!-- layer icon -->
       <img
         class="${this.layer.active && this.iconUrl ? 'legend-icon' : 'hidden'}"
         alt="${'Icon for ' + this.layer.name}"
-        src="${this.iconUrl}" />
+        src="${this.iconUrl}"
+        crossorigin="${this.getCrossOrigin(this.iconUrl)}" />
     </div>
 
     <!-- zoom to full extent -->
@@ -89,7 +91,7 @@
       class="${this.hasLegend ? 'gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
       tip="Toggle legend"
       onclick="${() => this.toggleLegend()}">
-      <img alt="Toggle legend" src="icons/legend.svg" />
+      <img alt="Toggle legend" src="icons/legend.svg" loading="lazy" />
     </button>
 
     <!-- Metadata icon -->
@@ -116,7 +118,11 @@
   ${Object.keys(this.legendUrls).map((l:string) => uHtml`
   <div class="${this.isLegendExpanded ? 'legend' : 'hidden'}">
     <div class="gg-spacer gg-small"></div>
-    <img class="legend-image" alt="${'Legend for ' + l}" src="${this.legendUrls[l]}" />
+    <img
+      alt="${'Legend for ' + l}"
+      src="${this.legendUrls[l]}"
+      loading="lazy"
+      crossorigin="${this.getCrossOrigin(this.legendUrls[l])}" />
   </div>
   ` )}
 

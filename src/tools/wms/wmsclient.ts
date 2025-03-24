@@ -90,7 +90,8 @@ export default abstract class WmsClient {
       params: {
         LAYERS: orderedLayerNames,
         FORMAT: imageType
-      }
+      },
+      crossOrigin: this.state.oauth.audience.includes(new URL(url).hostname) ? 'use-credentials' : 'anonymous'
     });
 
     // We intercept the event in order to set an error icon if the WMS query has an error

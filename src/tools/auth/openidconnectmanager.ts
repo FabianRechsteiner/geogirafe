@@ -78,6 +78,22 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     this.saveToLocalStorage('redirectUrl', value);
   }
 
+  /**
+   * The currentState cannot just be passed as parameter in the URL
+   * Because the URL-length is limited.
+   * Therefore, we keep it in localStorage.
+   */
+  get currentState() {
+    return this.loadFromLocalStorage('currentState') as string;
+  }
+
+  set currentState(value: string) {
+    if (value.startsWith('#')) {
+      value = value.substring(1);
+    }
+    this.saveToLocalStorage('currentState', value);
+  }
+
   private loadFromLocalStorage(path: string): unknown {
     return UserDataManager.getInstance().getUserData(`${this.storagePath}.${path}`, true) ?? '';
   }
@@ -131,22 +147,12 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     await this.logoutFromIssuer();
   }
 
-  private getLoginRedirectUrl(silent: boolean) {
-    if (silent) {
-      // Auto-Login on start
-      // For the state, we use the one in the URL
-      // If there isn't any, we just use no state
-      return `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=true${window.location.hash}`;
-    }
-
-    // Else, this is a normal login
-    // We use the current state of the application
-    const state = ShareManager.getInstance().getStateToShare();
-    return `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=true#${state}`;
+  private getLoginRedirectUrl() {
+    return `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=true`;
   }
 
   private getLogoutRedirectUrl() {
-    return `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=false${window.location.hash}`;
+    return `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=false`;
   }
 
   private async redirectToIssuerLogin(silent: boolean) {
@@ -159,9 +165,14 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     this.codeVerifier = generateRandomCodeVerifier();
     const code_challenge = await calculatePKCECodeChallenge(this.codeVerifier);
 
+    // Save the current state of the application before login
+    // If we are in an autologin case, we use the state from the URL
+    // Otherwise we use the current state of the application
+    this.currentState = silent ? window.location.hash : ShareManager.getInstance().getStateToShare();
+
     // Redirect user to authorizationServer.authorization_endpoint
     const authorizationUrl = new URL(authorizationServer.authorization_endpoint);
-    this.redirectUrl = this.getLoginRedirectUrl(silent);
+    this.redirectUrl = this.getLoginRedirectUrl();
     authorizationUrl.searchParams.set('client_id', this.issuerConfig.clientId);
     authorizationUrl.searchParams.set('redirect_uri', this.redirectUrl);
     authorizationUrl.searchParams.set('response_type', 'code');
@@ -207,6 +218,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     }
 
     this.setToken(openIdTokens as TokenEndpointResponse);
+    this.state.oauth.audience = this.issuerConfig.audience;
 
     // Removing oauth URL parameters
     this.resetUrlHistory(true);
@@ -227,14 +239,15 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     this.state.oauth.status = 'loggedOut';
     this.state.oauth.tokens = undefined;
     this.state.oauth.userInfo = undefined;
+    this.state.oauth.audience = [];
   }
 
   private resetUrlHistory(authentified: boolean) {
     let newUrl;
     if (authentified) {
-      newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`;
+      newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}#${this.currentState}`;
     } else {
-      newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=${authentified}${window.location.hash}`;
+      newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=${authentified}#${this.currentState}`;
     }
     window.history.replaceState(null, '', newUrl);
   }
@@ -276,6 +289,9 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
   }
 
   async logoutFromIssuer() {
+    // Save the current state of the application before logout
+    this.currentState = ShareManager.getInstance().getStateToShare();
+
     const authorizationServer = await this.getAuthorizationServer();
     const issuerLogoutUrl = new URL(authorizationServer.end_session_endpoint as string);
     const logoutRedirectUrl = this.getLogoutRedirectUrl();

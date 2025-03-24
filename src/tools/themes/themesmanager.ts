@@ -18,7 +18,6 @@ import LayerXYZ from '../../models/layers/layerxyz';
 import ServerOgc from '../../models/serverogc';
 import ThemeLayer from '../../models/layers/themelayer';
 import WfsManager from '../wfs/wfsmanager';
-import AuthHelper from '../auth/authhelper';
 import CustomThemesManager from './customthemesmanager';
 import ErrorManager from '../error/errormanager';
 
@@ -73,7 +72,7 @@ class ThemesManager extends GirafeSingleton {
    */
   async loadThemes() {
     this.state.themes.isLoaded = false;
-    const response = await fetch(this.configManager.Config.themes.url, AuthHelper.getFetchOptions());
+    const response = await fetch(this.configManager.Config.themes.url);
 
     const content = await response.json();
     this.state.ogcServers = this.prepareOgcServers(content['ogcServers']);

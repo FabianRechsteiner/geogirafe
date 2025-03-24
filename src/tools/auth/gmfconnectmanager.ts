@@ -72,6 +72,7 @@ export default class GMFConnectManager extends AbstractConnectManager {
     // Removing oauth URL parameters
     this.resetUrlHistory(true);
     this.state.oauth.status = 'issuer.loggedIn';
+    this.state.oauth.audience = this.authConfig.audience;
   }
 
   private resetUrlHistory(_authentified: boolean) {

@@ -77,6 +77,9 @@ class WmtsManager {
     const options = optionsFromCapabilities(capabilities, {
       layer: layer.layer,
       projection: this.state.projection
+      // NOTE REG : Do not use credentials for WMTS at the moment
+      // Otherwise every WMTS-Server must be configured with the right CORS.
+      //crossOrigin: (this.state.oauth.audience.includes(new URL(layer.url).hostname)) ? 'use-credentials' : 'anonymous'
     });
 
     if (options === null) {

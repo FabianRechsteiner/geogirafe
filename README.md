@@ -81,6 +81,38 @@ npm install
 npm start
 ```
 
+## Create a local development certificat
+
+In order to make some functionalities work locally (like service-workers), a valid local certificate for development is needed.
+The following command will help generate new certificates and trust them locally on your system.  
+This command needs root/admin rights, because it will trust the developments certificates at the system level.
+
+### On Linux
+
+Run as normal user. The sudo password will be asked. This command will:
+- Create a new certificate
+- Trust it at the system level
+- Trust it at the browser level in chrome and firefox
+
+(On linux, the browser are not using the system certificate as default store. That's why the new certificate has to be trusted at both system and browser levels.)
+
+```bash
+npm run generate-dev-certs
+```
+
+### On Windows
+
+Run in a console as administrator. This command will:
+- Create a new certificate
+- Trust it at the system level.
+
+(On Windows, Chrome and Firefox are using the certificate store from the system. Thus, there's not need to trust the certificated at the browser level as well.)
+
+Run
+```bash
+npm run generate-dev-certs-win
+```
+
 ## Working locally
 
 > ❗❗ IMPORTANT ❗❗  

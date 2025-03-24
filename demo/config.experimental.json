@@ -2,9 +2,6 @@
   "general": {
     "locale": "de-CH"
   },
-  "gmfauth": {
-    "url": "https://geomapfish-demo-2-9.camptocamp.com"
-  },
   "languages": {
     "translations": {
       "de": ["i18n/de.json", "Mock/de.json"],
@@ -80,5 +77,16 @@
   },
   "csv": {
     "separator": ";"
+  },
+  "oauth": {
+    "issuer": {
+      "url": "https://geomapfish-demo-sso.camptocamp.com",
+      "clientId": "288833770369390672",
+      "audience": ["geomapfish-demo-2-9.camptocamp.com"]
+    },
+    "geomapfish": {
+      "userInfoUrl": "https://geomapfish-demo-2-9.camptocamp.com/loginuser",
+      "authMode": "token"
+    }
   }
 }

@@ -66,6 +66,6 @@
   },
   "gmfauth": {
     "url": "https://map.cartoriviera.ch",
-    "loginRequired": false
+    "audience": ["map.cartoriviera.ch"]
   }
 }

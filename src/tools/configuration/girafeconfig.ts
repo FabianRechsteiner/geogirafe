@@ -140,6 +140,9 @@ class GirafeConfig {
     url: string;
     loginRequired: boolean;
     checkSessionOnLoad: boolean;
+    audience: string[];
+    authMode: 'cookie';
+    refererPolicy: ReferrerPolicy;
   };
   oauth?: {
     issuer: {
@@ -150,12 +153,15 @@ class GirafeConfig {
       scope: string;
       loginRequired: boolean;
       checkSessionOnLoad: boolean;
+      audience: string[];
     };
     geomapfish: {
       userInfoUrl: string;
       loginUrl: string;
       logoutUrl: string;
       anonymousUsername: string;
+      authMode: 'token' | 'cookie';
+      refererPolicy: ReferrerPolicy;
     };
   };
   userdata: {
@@ -466,10 +472,19 @@ class GirafeConfig {
       throw new Error(`Configuration for gmfauth.url is required. See https://doc.geomapfish.dev/docs/configuration.`);
     }
 
+    if (!config.gmfauth.audience) {
+      throw new Error(
+        `Configuration for gmfauth.audience is required. See https://doc.geomapfish.dev/docs/configuration.`
+      );
+    }
+
     return {
       url: config.gmfauth.url,
+      audience: config.gmfauth.audience,
       loginRequired: config.gmfauth.loginRequired ?? false,
-      checkSessionOnLoad: config.gmfauth.checkSessionOnLoad ?? true
+      checkSessionOnLoad: config.gmfauth.checkSessionOnLoad ?? true,
+      authMode: 'cookie' as const,
+      refererPolicy: config.gmfauth.refererPolicy ?? 'strict-origin-when-cross-origin'
     };
   }
 
@@ -489,6 +504,16 @@ class GirafeConfig {
         `Configuration for oauth.issuer.clientId is required. See https://doc.geomapfish.dev/docs/configuration.`
       );
     }
+    if (!config.oauth.issuer.audience) {
+      throw new Error(
+        `Configuration for oauth.issuer.audience is required. See https://doc.geomapfish.dev/docs/configuration.`
+      );
+    }
+    if (!config.oauth.geomapfish.userInfoUrl) {
+      throw new Error(
+        `Configuration for oauth.geomapfish.userInfoUrl is required. See https://doc.geomapfish.dev/docs/configuration.`
+      );
+    }
 
     const issuerConfig = {
       url: config.oauth.issuer.url,
@@ -497,12 +522,22 @@ class GirafeConfig {
       clientId: config.oauth.issuer.clientId,
       scope: config.oauth.issuer.scope ?? 'openid',
       loginRequired: config.oauth.issuer.loginRequired ?? false,
-      checkSessionOnLoad: config.oauth.issuer.checkSessionOnLoad ?? false
+      checkSessionOnLoad: config.oauth.issuer.checkSessionOnLoad ?? false,
+      audience: config.oauth.issuer.audience
+    };
+
+    const geomapfishConfig = {
+      userInfoUrl: config.oauth.geomapfish.userInfoUrl,
+      loginUrl: config.oauth.geomapfish.loginUrl,
+      logoutUrl: config.oauth.geomapfish.logoutUrl,
+      anonymousUsername: config.oauth.geomapfish.anonymousUsername,
+      authMode: config.oauth.geomapfish.authMode ?? 'cookie',
+      refererPolicy: config.oauth.geomapfish.refererPolicy ?? 'strict-origin-when-cross-origin'
     };
 
     return {
       issuer: issuerConfig,
-      geomapfish: config.oauth.geomapfish
+      geomapfish: geomapfishConfig
     };
   }
 

@@ -102,6 +102,15 @@ class TreeViewItemComponent extends TreeViewElement {
     }
   }
 
+  getCrossOrigin(url: string | null) {
+    if (!url) {
+      return 'anonymous';
+    }
+
+    const hostname = new URL(url).hostname;
+    return this.state.oauth.audience.includes(hostname) ? 'use-credentials' : 'anonymous';
+  }
+
   getLegendImageUrlFromWms(iconOnly: boolean): Record<string, string> {
     if (!(this.layer instanceof LayerWms)) {
       throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called.`);
@@ -109,10 +118,12 @@ class TreeViewItemComponent extends TreeViewElement {
 
     const legends: Record<string, string> = {};
     for (const l of this.layer.layers!.split(',')) {
+      const hostname = new URL(this.layer.ogcServer.url).hostname;
       const wmsSource = new ImageWMS({
         url: this.layer.ogcServer.url,
         params: { LAYERS: l },
-        ratio: 1
+        ratio: 1,
+        crossOrigin: this.state.oauth.audience.includes(hostname) ? 'use-credentials' : 'anonymous'
       });
 
       let graphicUrl = wmsSource.getLegendUrl(this.state.position.resolution);

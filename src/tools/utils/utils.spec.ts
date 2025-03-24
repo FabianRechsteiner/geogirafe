@@ -21,7 +21,6 @@ it('tests minMax function', () => {
   expect(minMax(15, 10, 20)).toBe(15);
 });
 
-
 it('converts a hex to an rgba array', () => {
   // Regular hex colors
   expect(hexToRgbaArray('#0033ff')).toEqual([0, 51, 255, 1]);
@@ -68,4 +67,3 @@ it('converts an rgb string to an rgba array', () => {
   expect(rgbStrToRgbaArray('rgb(0, 51, 255, 100)')).toBe(null);
   expect(rgbStrToRgbaArray('rgb(-50, 51, 255)')).toBe(null);
 });
-
