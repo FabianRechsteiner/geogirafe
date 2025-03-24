@@ -18,7 +18,7 @@ let tilesStoreName: string; // Name of the store used to downloaded tiles. Value
 let logLevel: string; // Current log level. Value is defined by OfflineManager.
 
 let audience: string[]; // List of domains for which the Authorization Token and cookies should be sent
-let excludeAuthPaths: string[]; // List of regex paths at audience where Authorization Token and cookies should not be sent
+let audienceExcludedPaths: RegExp[]; // List of regex paths at audience where Authorization Token and cookies should not be sent
 let accessToken: string; // The current access token
 let authMode: 'token' | 'cookie'; // How the authentication should be sent to the audience
 let refererPolicy: string; // RefererPolicy used for the queries. Default strict-origin-when-cross-origin
@@ -60,9 +60,9 @@ function handleMessage(event: ExtendableMessageEvent): void {
     audience = data.audience ?? [];
     log(`audience changed: ${audience}`);
   }
-  if (data.excludeAuthPaths) {
-    excludeAuthPaths = data.excludeAuthPaths ?? [];
-    log(`excludeAuthPaths changed: ${excludeAuthPaths}`);
+  if (data.audienceExcludedPaths) {
+    audienceExcludedPaths = data.audienceExcludedPaths ? data.audienceExcludedPaths.map((str) => new RegExp(str)) : [];
+    log(`audienceExcludedPaths changed: ${audienceExcludedPaths}`);
   }
   if (data.access_token) {
     accessToken = data.access_token;
@@ -146,7 +146,7 @@ function getRequest(request: Request): Request {
     const requestedUrl = new URL(request.url);
     const hostname = requestedUrl.hostname;
 
-    const shouldExclude = excludeAuthPaths.some((pattern) => new RegExp(pattern).test(requestedUrl.pathname));
+    const shouldExclude = audienceExcludedPaths?.some((pattern) => pattern.test(requestedUrl.pathname));
     if (audience?.includes(hostname) && !shouldExclude) {
       // Prepare headers
       const headers = new Headers(request.headers);

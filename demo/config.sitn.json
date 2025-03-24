@@ -5,7 +5,7 @@
   "gmfauth": {
     "url": "https://sitn.ne.ch",
     "audience": ["sitn.ne.ch"],
-    "excludeAuthPaths": ["^/web_getcapabilities/", "^/static/(.*)"]
+    "audienceExcludedPaths": ["^/web_getcapabilities/", "^/static/(.*)"]
   },
   "languages": {
     "translations": {

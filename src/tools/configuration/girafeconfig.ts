@@ -143,6 +143,7 @@ class GirafeConfig {
     audience: string[];
     authMode: 'cookie';
     refererPolicy: ReferrerPolicy;
+    audienceExcludedPaths: string[];
   };
   oauth?: {
     issuer: {
@@ -154,6 +155,7 @@ class GirafeConfig {
       loginRequired: boolean;
       checkSessionOnLoad: boolean;
       audience: string[];
+      audienceExcludedPaths: string[];
     };
     geomapfish: {
       userInfoUrl: string;
@@ -484,7 +486,8 @@ class GirafeConfig {
       loginRequired: config.gmfauth.loginRequired ?? false,
       checkSessionOnLoad: config.gmfauth.checkSessionOnLoad ?? true,
       authMode: 'cookie' as const,
-      refererPolicy: config.gmfauth.refererPolicy ?? 'strict-origin-when-cross-origin'
+      refererPolicy: config.gmfauth.refererPolicy ?? 'strict-origin-when-cross-origin',
+      audienceExcludedPaths: config.gmfauth.audienceExcludedPaths ?? []
     };
   }
 
@@ -523,7 +526,8 @@ class GirafeConfig {
       scope: config.oauth.issuer.scope ?? 'openid',
       loginRequired: config.oauth.issuer.loginRequired ?? false,
       checkSessionOnLoad: config.oauth.issuer.checkSessionOnLoad ?? false,
-      audience: config.oauth.issuer.audience
+      audience: config.oauth.issuer.audience,
+      audienceExcludedPaths: config.oauth.issuer.audienceExcludedPaths ?? []
     };
 
     const geomapfishConfig = {
