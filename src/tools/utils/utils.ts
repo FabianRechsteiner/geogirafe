@@ -74,7 +74,10 @@ export const rgbStrToRgbaArray = (rgbaStr: string): [number, number, number, num
   const alpha = 1;
 
   try {
-    rgb = rgbaStr.replace(/[^\d,.-]/g, '').split(',').map((c, idx) => idx < 3 ? Math.round(Number(c)) : Number(c));
+    rgb = rgbaStr
+      .replace(/[^\d,.-]/g, '')
+      .split(',')
+      .map((c, idx) => (idx < 3 ? Math.round(Number(c)) : Number(c)));
   } catch (e) {
     return null;
   }
@@ -85,7 +88,7 @@ export const rgbStrToRgbaArray = (rgbaStr: string): [number, number, number, num
   } else if (rgb.length < 3 || rgb.length > 4) {
     return null;
   }
-  if (rgb.includes(NaN) || rgb.some(c => c < 0 || c > 255) || rgb[3] > alpha) {
+  if (rgb.includes(NaN) || rgb.some((c) => c < 0 || c > 255) || rgb[3] > alpha) {
     return null;
   }
 
@@ -104,4 +107,3 @@ export const colorToRgbaArray = (color: string): [number, number, number, number
   }
   return rgbaColor;
 };
-

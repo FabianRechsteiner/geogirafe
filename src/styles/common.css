@@ -409,7 +409,6 @@ button.girafe-resizer {
   left: var(--negative-resize-size);
 }
 
-
 /* Draggable window */
 .girafe-draggable-window {
   --window-header-height: 2rem;
@@ -472,5 +471,3 @@ button.girafe-resizer {
   display: flex;
   justify-content: space-around;
 }
-
-

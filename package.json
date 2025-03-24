@@ -68,11 +68,11 @@
     "@types/geojson": "7946.0.14",
     "@types/jsts": "^0.17.24",
     "@types/proj4": "2.5.5",
+    "@types/serviceworker": "0.0.122",
     "@types/tabulator-tables": "^6.2.3",
     "@types/uuid": "10.0.0",
     "@typescript-eslint/eslint-plugin": "7.15.0",
     "@typescript-eslint/parser": "7.15.0",
-    "@vitejs/plugin-basic-ssl": "^1.1.0",
     "@vitest/coverage-v8": "1.6.0",
     "cesium": "1.119.0",
     "cross-env": "7.0.3",
@@ -124,9 +124,9 @@
   ],
   "browser": "main.js",
   "scripts": {
-    "start": "tsc && vite serve",
-    "start-rebundle-deps": "tsc && vite serve --force",
-    "build": "node buildtools/app-clean.js && tsc && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
+    "start": "npm run tsc && vite serve",
+    "start-rebundle-deps": "npm run tsc && vite serve --force",
+    "build": "node buildtools/app-clean.js && npm run tsc && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "preview": "vite preview",
     "build-lib": "node buildtools/lib-clean.js && node buildtools/lib-inline.js && node buildtools/lib-collect.js && node buildtools/lib-main-file.js && tsc --project tsconfig.lib.json && node buildtools/lib-templates.js && node buildtools/lib-finalize.js",
     "publish-lib": "cd dist/lib && npm publish",
@@ -139,8 +139,11 @@
     "configure-demo-win": "buildtools\\configure-demo.cmd",
     "lint": "eslint src/**/*.ts",
     "pretty": "prettier --write .",
-    "tsc": "tsc",
+    "tsc": "tsc && npm run tsc-sw",
+    "tsc-sw": "tsc --module ESNext --target ES2021 --lib WebWorker --skipLibCheck src/service-worker.ts",
     "prepare_commit": "npm run lint && npm run pretty && npm run tsc",
-    "check-all": "npm run tsc && npm run lint && npm run test && npm run build && npm run build-lib"
+    "check-all": "npm run tsc && npm run lint && npm run test && npm run build && npm run build-lib",
+    "generate-dev-certs-win": "buildtools\\generate-dev-certs.cmd",
+    "generate-dev-certs": "bash -C './buildtools/generate-dev-certs.sh'"
   }
 }

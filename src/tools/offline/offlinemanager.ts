@@ -139,8 +139,7 @@ class OfflineManager extends GirafeSingleton {
     this.serviceWorker.postMessage({
       storeVersion: this.storeVersion,
       dbCacheName: this.dbCacheName,
-      tilesStoreName: this.tilesStoreName,
-      logLevel: this.configManager.Config.general.logLevel
+      tilesStoreName: this.tilesStoreName
     });
   }
 

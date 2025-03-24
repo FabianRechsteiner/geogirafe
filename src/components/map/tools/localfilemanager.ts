@@ -44,7 +44,7 @@ class LocalFileManager {
 
   private registerEvents(): void {
     this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) => {
-      if (oldLayers.includes(this.layerGroup) && !newLayers.includes(this.layerGroup)) {
+      if (oldLayers?.includes(this.layerGroup) && !newLayers?.includes(this.layerGroup)) {
         // Group was deleted in tree, cleanup references
         delete this.layerGroupProxy;
         delete this.layerGroup;
@@ -116,7 +116,6 @@ class LocalFileManager {
       msg = msg.replace('_fileName_', `"${unsupportedFiles[0].name}"`);
     }
     void window.gAlert(msg, 'Unsupported file format');
-    
   }
 
   validateAndCompleteFeatures(featureType: string, features: Feature<Geometry>[]) {

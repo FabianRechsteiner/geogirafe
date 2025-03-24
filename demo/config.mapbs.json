@@ -90,13 +90,16 @@
       "url": "https://auth.geo.bs.ch/auth/realms/geobs",
       "clientId": "MapBS-ui",
       "loginRequired": false,
-      "checkSessionOnLoad": true
+      "checkSessionOnLoad": true,
+      "audience": ["map.geo.bs.ch", "api.geo.bs.ch"]
     },
     "geomapfish": {
       "userInfoUrl": "https://map.geo.bs.ch/loginuser",
       "loginUrl": "https://map.geo.bs.ch/KeycloakLogin",
       "logoutUrl": "https://map.geo.bs.ch/KeycloakLogout",
-      "anonymousUsername": "service-account-service_mapbs_anonymous"
+      "anonymousUsername": "service-account-service_mapbs_anonymous",
+      "authMode": "cookie",
+      "refererPolicy": "no-referrer"
     }
   }
 }

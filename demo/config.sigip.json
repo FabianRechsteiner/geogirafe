@@ -62,6 +62,6 @@
   },
   "gmfauth": {
     "url": "https://www.sigip.ch",
-    "loginRequired": false
+    "audience": ["www.sigip.ch"]
   }
 }

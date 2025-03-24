@@ -7,6 +7,7 @@ import AbstractConnectManager from './abstractconnectmanager';
 import GMFConnectManager from './gmfconnectmanager';
 
 export default class AuthManager extends GirafeSingleton {
+  private serviceWorker: ServiceWorker | null = null;
   private readonly stateManager: StateManager;
 
   private issuerManager!: AbstractConnectManager;
@@ -21,9 +22,15 @@ export default class AuthManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
     this.gmfManager = GMFManager.getInstance();
     this.stateManager.subscribe('oauth.status', () => this.loginStateChanged());
+    this.stateManager.subscribe('oauth.tokens', () => this.tokensChanged());
   }
 
-  public initialize() {
+  public initialize(sw: ServiceWorker | null) {
+    if (!sw) {
+      console.warn("ServiceWorker cannot be initialized. Authentication won't work properly.");
+    }
+    this.serviceWorker = sw;
+
     const oauthIssuerConfig = ConfigManager.getInstance().Config.oauth?.issuer;
     if (oauthIssuerConfig) {
       // Standard oAuth workflow
@@ -78,6 +85,10 @@ export default class AuthManager extends GirafeSingleton {
       this.state.oauth.status = 'loginFailed';
       throw e;
     }
+  }
+
+  private tokensChanged() {
+    this.serviceWorker?.postMessage({ access_token: this.state.oauth.tokens?.access_token });
   }
 
   public async login() {

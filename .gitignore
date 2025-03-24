@@ -8,3 +8,5 @@ public/Mock
 public/*.json
 vite.config.js.timestamp-*.mjs
 .npm
+buildtools/certs
+src/service-worker.js

@@ -89,4 +89,3 @@ const getChildIdsRecursively = (layer: BaseLayer): string[] => {
   }
   return [layer.treeItemId];
 };
-

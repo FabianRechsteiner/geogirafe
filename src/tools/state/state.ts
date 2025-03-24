@@ -91,6 +91,7 @@ type LoginState = {
   status: 'issuer.loggedIn' | 'loggedIn' | 'loginFailed' | 'backend.loggedOut' | 'loggedOut' | 'logoutFailed';
   tokens?: TokenEndpointResponse;
   userInfo?: UserInfoResponse;
+  audience: string[];
 };
 
 export type InfoWindow = {
@@ -229,7 +230,8 @@ export default class State {
   isOffline: boolean = false;
 
   oauth: LoginState = {
-    status: 'loggedOut'
+    status: 'loggedOut',
+    audience: []
   };
 
   // The State object is defined as <not extensible> by the StateManager.
