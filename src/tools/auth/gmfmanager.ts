@@ -68,7 +68,7 @@ export default class GMFManager extends GirafeSingleton {
     console.debug('Auth: 4. Backend logout');
     let logoutUrl = null;
     if (this.isOAuth && this.gmfConfigForOAuth.logoutUrl) {
-      // OICD but Logout from Backend (case for BS)
+      // OIDC but Logout from Backend (case for BS)
       logoutUrl = this.gmfConfigForOAuth.logoutUrl;
     } else if (!this.isOAuth) {
       // GMF-Auth

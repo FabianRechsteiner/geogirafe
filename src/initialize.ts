@@ -77,6 +77,7 @@ async function initializeServiceWorker() {
     const audience = [...issuerConfig.audience, issuerHostname];
     registration.active.postMessage({
       audience: audience,
+      audienceExcludedPaths: issuerConfig.audienceExcludedPaths,
       authMode: gmfConfig.authMode,
       refererPolicy: gmfConfig.refererPolicy
     });

@@ -58,6 +58,6 @@
   },
   "gmfauth": {
     "url": "https://geo.jura.ch",
-    "audience": "geo.jura.ch"
+    "audience": ["geo.jura.ch"]
   }
 }

@@ -16,7 +16,7 @@ class ShareManager extends GirafeSingleton {
     this.layerManager = LayerManager.getInstance();
     this.serializer = new StateSerializer();
     this.deserializer = new StateDeserializer();
-    this.stateManager.state.sharedStateIsLoaded = this.hasSharedState() ? false : null;
+    this.stateManager.state.sharedStateIsLoaded = !this.hasSharedState();
   }
 
   public getStateToShare() {
