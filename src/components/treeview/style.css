@@ -39,11 +39,14 @@ header:hover .tool {
 
 .legend img {
   height: fit-content;
+  background: var(--svg-legend-bkg);
+  filter: var(--svg-map-filter);
 }
 
 .legend-icon {
   max-height: 1.5rem;
   margin-left: 0.5rem;
+  background: var(--svg-legend-bkg);
   filter: var(--svg-map-filter);
 }
 
