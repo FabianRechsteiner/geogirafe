@@ -146,7 +146,7 @@ function getRequest(request: Request): Request {
     const requestedUrl = new URL(request.url);
     const hostname = requestedUrl.hostname;
 
-    const shouldExclude = audienceExcludedPaths?.some((pattern) => pattern.test(requestedUrl.pathname));
+    const shouldExclude = audienceExcludedPaths.some((pattern) => pattern.test(requestedUrl.pathname));
     if (audience?.includes(hostname) && !shouldExclude) {
       // Prepare headers
       const headers = new Headers(request.headers);

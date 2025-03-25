@@ -4,7 +4,8 @@
   },
   "gmfauth": {
     "url": "https://geomapfish-demo-2-8.camptocamp.com",
-    "audience": "geomapfish-demo-2-8.camptocamp.com"
+    "audience": ["geomapfish-demo-2-8.camptocamp.com"],
+    "audienceExcludedPaths": ["^/tiles/"]
   },
   "languages": {
     "translations": {

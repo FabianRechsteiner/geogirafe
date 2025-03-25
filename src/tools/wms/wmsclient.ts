@@ -253,7 +253,7 @@ export default abstract class WmsClient {
     //const promises: Promise<void>[] = [];
     const urlsAndLayerNames = this.getFeatureInfoUrl(selectionParam);
     const promises = Object.keys(urlsAndLayerNames).map((url) =>
-      fetch(url) //, {credentials: "include"})
+      fetch(url)
         .then((r) => r.text())
         .then((response) => this.handleGetFeatureInfoResponse(response, url, urlsAndLayerNames))
     );

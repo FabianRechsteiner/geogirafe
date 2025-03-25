@@ -38,7 +38,7 @@ import LayerLocalFile from '../../models/layers/layerlocalfile';
 import GeoEvents from '../../models/events';
 
 import MapManager from '../../tools/state/mapManager';
-import MapPosition, { parseMapPositionFromUrl } from '../../tools/state/mapposition';
+import MapPosition, { parseMapPositionFromUrl, setUrlFromMapPosition } from '../../tools/state/mapposition';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import { FocusFeature } from './tools/focusfeature';
@@ -99,6 +99,9 @@ export default class MapComponent extends GirafeHTMLElement {
   pixelTolerance = 10;
   dragbox!: DragBox;
   focusFeature: FocusFeature;
+
+  // Remember initial position configuration from URL
+  private readonly initialPositionFromUrl: MapPosition | undefined = parseMapPositionFromUrl();
 
   constructor() {
     super('map');
@@ -176,6 +179,34 @@ export default class MapComponent extends GirafeHTMLElement {
       this.onChangeFilter(layer)
     );
     this.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder());
+
+    this.subscribe('sharedStateIsLoaded', (_: boolean, isLoaded: boolean) => {
+      if (isLoaded) {
+        // The map component can be loaded after the initialization of the shared state.
+        // And then, the callbacks from previous subscribes have perhaps not be called, because this component did not exist yet.
+        // Therefore, if there is a shared state, we have to initialize all the layers and position manually.
+        // TODO REG : Find another solution for this, because this could happen in other contexts.
+        this.onPositionChanged(this.state.position);
+        this.activateSharedLayers(this.state.layers.layersList);
+        this.setMapPositionFromUrlAfterInit();
+      }
+    });
+  }
+
+  public activateSharedLayers(layers: BaseLayer[]) {
+    for (const layer of layers) {
+      // Activate the layer by default
+      if (layer instanceof Layer && layer.isDefaultChecked) {
+        this.onLayerToggled(layer);
+        this.onChangeOpacity(layer);
+        this.onChangeFilter(layer);
+      }
+
+      // Continue recursively
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+        this.activateSharedLayers(layer.children);
+      }
+    }
   }
 
   render() {
@@ -813,11 +844,7 @@ export default class MapComponent extends GirafeHTMLElement {
       currentPosition.center = transform(currentPosition.center, this.projection, 'EPSG:4326');
     }
 
-    const url = new URL(window.location.href);
-    url.searchParams.set('map_x', JSON.stringify(currentPosition.center[0]));
-    url.searchParams.set('map_y', JSON.stringify(currentPosition.center[1]));
-    url.searchParams.set('map_zoom', JSON.stringify(currentPosition.zoom));
-    window.history.replaceState({}, '', url.toString());
+    setUrlFromMapPosition(currentPosition);
   }
 
   /**
@@ -825,22 +852,17 @@ export default class MapComponent extends GirafeHTMLElement {
    * making sure map initialization and loading of the shared state have finished beforehand.
    */
   private setMapPositionFromUrlAfterInit() {
-    const positionFromUrl = parseMapPositionFromUrl();
-    if (!positionFromUrl) {
+    if (!this.initialPositionFromUrl) {
       return;
     }
 
-    if (this.stateManager.state.sharedStateIsLoaded === false) {
-      // A shared state exists and has to be loaded first
-      this.subscribe('sharedStateIsLoaded', (_: boolean, isLoaded: boolean) => {
-        if (isLoaded) {
-          this.applyMapPositionFromUrl(positionFromUrl);
-        }
+    if (!this.state.projection || !this.olMap.getView().getResolution()) {
+      // Everything os not ready yet. Delay the execution of this method on rendercomplete
+      this.olMap.once('rendercomplete', () => {
+        this.applyMapPositionFromUrl(this.initialPositionFromUrl!);
       });
     } else {
-      this.olMap.once('rendercomplete', () => {
-        this.applyMapPositionFromUrl(positionFromUrl);
-      });
+      this.applyMapPositionFromUrl(this.initialPositionFromUrl);
     }
   }
 
