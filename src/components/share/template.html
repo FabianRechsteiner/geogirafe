@@ -14,8 +14,9 @@
         <div class="link">
           <input type="text" value="${this.shareLink}" class="gg-input" />
           <button
+            id="btn-copy-short"
             class="gg-button"
-            disabled="${!(this.loading || this.shareLink)}"
+            disabled="${this.loading || !this.shareLink}"
             i18n="Copy link"
             onclick="${() => this.copyToClipboard('short')}">
             Copy link
@@ -58,10 +59,11 @@
           <option ?selected="${this.iframeSize === 'medium'}" i18n="Medium" value="medium">Medium</option>
           <option ?selected="${this.iframeSize === 'large'}" i18n="Large" value="large">Large</option>
         </select>
-        <input type="text" value="${this.iframeCode}" class="gg-input" />
+        <textarea value="${this.iframeCode}" class="gg-input gg-textarea textarea-for-code"></textarea>
         <button
+          id="btn-copy-iframe"
           class="gg-button"
-          disabled="${!(this.loading || !this.iframeSize || this.iframeCode)}"
+          disabled="${this.loading || !this.iframeSize || !this.iframeCode}"
           i18n="Copy code"
           onclick="${() => this.copyToClipboard('iframe')}">
           Copy code

@@ -22,6 +22,7 @@ body {
   --tst: #ff0000;
   --error-color: #bb0000;
   --warning-color: #ffa500;
+  --success-color: #a8e9a8;
   --svg-filter: none;
   --svg-map-filter: none;
   --svg-legend-bkg: var(--legend-bkg);
@@ -43,6 +44,7 @@ body.dark-theme {
   --lnk-hover: #ffffff;
   --lnk-active: #ff4040;
   --error-color: #ff6347;
+  --success-color: #529c52;
   --svg-filter: invert(1);
   --svg-legend-bkg: var(--legend-bkg);
 }

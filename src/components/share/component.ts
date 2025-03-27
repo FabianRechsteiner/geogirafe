@@ -170,7 +170,7 @@ class ShareComponent extends GirafeHTMLElement {
 
   setIframeCode() {
     if (this.iframeSize && this.iframeUrl) {
-      this.iframeCode = `<iframe title="iframe MapBS" src="${this.iframeUrl}" width="${this.iframeWidth}" height="${this.iframeHeight}"></iframe>`;
+      this.iframeCode = `<iframe title="iframe GeoGirafe" width="${this.iframeWidth}" height="${this.iframeHeight}" src="${this.iframeUrl}"></iframe>`;
     } else {
       this.iframeCode = '';
     }
@@ -209,6 +209,7 @@ class ShareComponent extends GirafeHTMLElement {
 
     if (textToCopy) {
       navigator.clipboard.writeText(textToCopy);
+      this.showCopySuccessEffect(`btn-copy-${type}`);
     }
   }
 
@@ -233,6 +234,12 @@ class ShareComponent extends GirafeHTMLElement {
 
   private hideMapPreview() {
     this.simpleMaskManager?.setMaskVisibility(false);
+  }
+
+  private showCopySuccessEffect(btnId: string) {
+    const copyButton = this.shadow.getElementById(btnId) as HTMLDivElement;
+    copyButton.classList.add('copy-success');
+    setTimeout(() => copyButton.classList.remove('copy-success'), 1000);
   }
 
   connectedCallback() {
