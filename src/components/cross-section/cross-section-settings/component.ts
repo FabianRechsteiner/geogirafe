@@ -28,6 +28,7 @@ import { Draw, Modify } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
 import { ModifyEvent } from 'ol/interaction/Modify';
 import { KML, GeoJSON, GPX } from 'ol/format';
+import { noModifierKeys, primaryAction } from 'ol/events/condition';
 // @ts-expect-error: JSTS typing issue
 import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser.js';
 // @ts-expect-error: JSTS typing issue
@@ -264,7 +265,10 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.drawInteraction = new Draw({
       source: this.linestringSource,
       type: 'LineString',
-      freehand: false
+      freehand: false,
+      // noModifierKeys(e) is the default condition for drawing
+      // canExecute: If another tool is exclusively drawing, this interaction will be prevented from reacting
+      condition: (e) => noModifierKeys(e) && this.canExecute('map.draw')
     });
 
     this.drawInteraction.on('drawstart', (_e: DrawEvent) => {
@@ -278,7 +282,10 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   private initializeModifyInteraction(): void {
-    this.modifyInteraction = new Modify({ source: this.linestringSource });
+    this.modifyInteraction = new Modify({
+      source: this.linestringSource,
+      condition: (e) => primaryAction(e) && this.canExecute('map.modify')
+    });
 
     this.modifyInteraction.on('modifystart', (_e: ModifyEvent) => {
       this.polygonSource.clear();
@@ -892,7 +899,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
   // Hide the panel and removes listeners
   private renderEmptyComponent(): void {
-    this.state.selection.enabled = true;
     this.deleteProfile();
     this.removeInteractions();
     this.unregisterEvents();
@@ -900,6 +906,15 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   registerEvents(): void {
+    // Register listeners in state
+    this.registerInteractionListener('map.select', true);
+    this.registerInteractionListener('map.draw', true);
+    this.registerInteractionListener('map.modify', true);
+    this.registerInteractionListener('keydown.ArrowUp', true);
+    this.registerInteractionListener('keydown.ArrowDown', true);
+    this.registerInteractionListener('keydown.ArrowLeft', true);
+    this.registerInteractionListener('keydown.ArrowRight', true);
+
     this.eventsCallbacks.push(
       // Subscribe to dark mode toggle
       this.subscribe('interface.darkFrontendMode', (_oldValue: boolean, _newValue: boolean) => {
@@ -1085,13 +1100,13 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
     // Listen to keyboard arrow key down events to shift profile
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowUp') {
+      if (e.key === 'ArrowUp' && this.canExecute('keydown.ArrowUp')) {
         this.shiftLinestring([0.0, this.crossSectionState.linestringShift]);
-      } else if (e.key === 'ArrowDown') {
+      } else if (e.key === 'ArrowDown' && this.canExecute('keydown.ArrowDown')) {
         this.shiftLinestring([0.0, -this.crossSectionState.linestringShift]);
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === 'ArrowLeft' && this.canExecute('keydown.ArrowLeft')) {
         this.shiftLinestring([-this.crossSectionState.linestringShift, 0.0]);
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === 'ArrowRight' && this.canExecute('keydown.ArrowRight')) {
         this.shiftLinestring([this.crossSectionState.linestringShift, 0.0]);
       }
     });
@@ -1116,7 +1131,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
   private async togglePanel(visible: boolean): Promise<void> {
     this.visible = visible;
-    this.state.selection.enabled = !this.visible;
     this.render();
   }
 

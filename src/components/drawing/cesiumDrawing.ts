@@ -14,6 +14,8 @@ import { KML, GeoJSON } from 'ol/format';
 import DrawingFeature, { DrawingShape } from './drawingFeature';
 import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
+import UserInteractionManager from '../../tools/state/userInteractionManager';
+import { GgUserInteractionEvent } from '../../tools/state/userinteractionevent';
 import State from '../../tools/state/state';
 import proj4 from 'proj4';
 
@@ -103,7 +105,9 @@ function getPolygonEntity(positions: Cartesian3[], feature: DrawingFeature) {
 }
 
 export default class CesiumDrawing {
+  toolName: string;
   state: State;
+  userInteractionManager: UserInteractionManager;
   activeShapePoints: Cartesian3[] = [];
   activeShapes: Entity[] = [];
   floatingPoint: Entity | undefined = undefined;
@@ -112,8 +116,10 @@ export default class CesiumDrawing {
   entities: Cesium.EntityCollection | undefined = undefined;
   fixedLength: number = 0;
 
-  constructor(map: MapComponent) {
+  constructor(map: MapComponent, toolName: string) {
+    this.toolName = toolName;
     this.state = StateManager.getInstance().state;
+    this.userInteractionManager = UserInteractionManager.getInstance();
     StateManager.getInstance().subscribe('globe.loaded', () => {
       if (this.state.globe.loaded) {
         this.scene = map.map3d.getCesiumScene();
@@ -131,7 +137,9 @@ export default class CesiumDrawing {
   }
 
   activateTool(tool: DrawingShape) {
-    this.state.selection.enabled = false;
+    if (!this.canExecute('globe.draw')) {
+      return;
+    }
     this.handler!.setInputAction(this.addPoint(tool), ScreenSpaceEventType.LEFT_CLICK);
     this.handler!.setInputAction(this.updateShape(tool), ScreenSpaceEventType.MOUSE_MOVE);
     this.handler!.setInputAction(this.removeLastPointAndTerminateShape(tool), ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
@@ -148,7 +156,6 @@ export default class CesiumDrawing {
   }
 
   deactivateTool() {
-    this.state.selection.enabled = true;
     this.handler!.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
     this.handler!.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
     this.handler!.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
@@ -420,5 +427,19 @@ export default class CesiumDrawing {
       default:
         throw Error(`Unrecognized tool : ${tool}`);
     }
+  }
+
+  registerInteractions() {
+    this.userInteractionManager.registerListener('globe.select', true, this.toolName);
+    this.userInteractionManager.registerListener('globe.draw', true, this.toolName);
+  }
+
+  unregisterInteractions() {
+    this.userInteractionManager.unregisterListener('globe.select', this.toolName);
+    this.userInteractionManager.unregisterListener('globe.draw', this.toolName);
+  }
+
+  private canExecute(event: GgUserInteractionEvent): boolean {
+    return this.userInteractionManager.canListenerExecute(event, this.toolName);
   }
 }

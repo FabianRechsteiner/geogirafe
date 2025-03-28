@@ -24,11 +24,20 @@ import VectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Projection } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
-import { mouseOnly, never, primaryAction } from 'ol/events/condition';
+import { never, noModifierKeys, primaryAction } from 'ol/events/condition';
 import { Pixel } from 'ol/pixel';
 import ConfigManager from '../../tools/configuration/configmanager';
 import MapManager from '../../tools/state/mapManager';
+import UserInteractionManager from '../../tools/state/userInteractionManager';
 import { getDistance, getArea } from '../../tools/utils/olutils';
+import { ContextMenu, MenuEntry } from '../map/tools/contextmenu';
+import { formatCoordinates } from '../../tools/geometrytools';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  GgUserInteractionEvent,
+  isAlternateMouseClick,
+  isPrimaryPointerAction
+} from '../../tools/state/userinteractionevent';
 
 function getHalfPoint(coordinates: Coordinate[]) {
   return new Point(new LineString(coordinates).getCoordinateAt(0.5));
@@ -63,19 +72,27 @@ function extractVerticesFromGeometry(geometry: Geometry): MultiPoint {
 
 export default class OlDrawing {
   map: MapComponent;
+  toolName: string;
   state: State;
+  configManager: ConfigManager;
+  userInteractionManager: UserInteractionManager;
   drawingSource!: VectorSource;
   modifiableFeatures: Collection<Feature> = new Collection([]);
   draw: Draw | null = null;
   modify: Modify | null = null;
   snap: Snap | null = null;
+  editContextMenu: ContextMenu | null = null;
   currentShape: DrawingShape | null = null;
   featuresMap: Map<string, { feature: Feature<Geometry>; shape: DrawingShape }> = new Map();
   fixedLength: number = 0;
 
-  constructor(map: MapComponent) {
+  constructor(map: MapComponent, toolName: string) {
     this.map = map;
+    this.toolName = toolName;
     this.state = StateManager.getInstance().state;
+    this.configManager = ConfigManager.getInstance();
+    this.userInteractionManager = UserInteractionManager.getInstance();
+
     this.drawingSource = new VectorSource({ features: new Collection() });
     this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
     this.map.olMap.addLayer(
@@ -106,8 +123,9 @@ export default class OlDrawing {
 
     this.modify = new Modify({
       features: this.modifiableFeatures,
-      // 'condition' needs to be set to mouseOnly instead of primaryAction so that primary and alternate clicks are registered.
-      condition: mouseOnly,
+      // Feature editing is triggered by: 1) primary action = click or touch, 2) alternate mouse click = remove vertices
+      // If another tool is exclusively modifying, this interaction will be prevented from reacting via canExecute()
+      condition: (e) => (isPrimaryPointerAction(e) || isAlternateMouseClick(e)) && this.canExecute('map.modify'),
       deleteCondition: never,
       insertVertexCondition: primaryAction,
       style: new DrawingFeature(1, {}, '').getVertexStyle(true),
@@ -115,18 +133,44 @@ export default class OlDrawing {
       pixelTolerance: this.map.pixelTolerance
     });
     this.map.olMap.addInteraction(this.modify);
+
+    this.createEditContextMenu();
+    this.setInteractionsActive(false);
   }
 
-  enableAllInteractions() {
-    this.draw?.setActive(true);
-    this.modify?.setActive(true);
-    this.snap?.setActive(true);
+  createEditContextMenu() {
+    this.removeEditContextMenu();
+    const menuEntries: MenuEntry[] = [
+      {
+        entry: 'Remove vertex',
+        callback: (_evt: MouseEvent, mapCoordinate: Coordinate) => {
+          const successful = this.removeLastInteractedVertex();
+          if (!successful) {
+            const errorMessage = `It's not possible to remove vertex at ${formatCoordinates(mapCoordinate, this.configManager.Config.general.locale)}`;
+            this.state.infobox.elements.push({
+              id: uuidv4(),
+              text: errorMessage,
+              type: 'warning'
+            });
+          }
+        }
+      }
+    ];
+    const conditionToOpen = (_evt: MouseEvent, mapCoordinate: Coordinate) => {
+      if (!this.modify?.getActive() || this.modifiableFeatures.getArray().length === 0) {
+        return false;
+      }
+      // Only proceed if there is an editable vertex under the mouse pointer
+      return this.hasEditableVertexAtCoordinate(mapCoordinate);
+    };
+    this.editContextMenu = new ContextMenu(menuEntries, true, conditionToOpen);
   }
 
-  disableAllInteractions() {
-    this.draw?.setActive(false);
-    this.modify?.setActive(false);
-    this.snap?.setActive(false);
+  setInteractionsActive(active: boolean) {
+    this.draw?.setActive(active);
+    this.modify?.setActive(active);
+    this.snap?.setActive(active);
+    this.editContextMenu?.setActive(active);
   }
 
   hasEditableVertexAtCoordinate(coordinate: Coordinate): boolean {
@@ -290,7 +334,8 @@ export default class OlDrawing {
 
   activateDrawTool(tool: DrawingShape) {
     this.deactivateDrawTool();
-    this.state.selection.enabled = false;
+    // Block feature selection while drawing by registering 'map.select' exclusively
+    this.userInteractionManager.registerListener('map.select', true, this.toolName);
     this.currentShape = tool;
     let geomFunction = undefined;
     let olTool;
@@ -333,7 +378,9 @@ export default class OlDrawing {
       freehand: tool == DrawingShape.FreehandPolyline || tool == DrawingShape.FreehandPolygon,
       stopClick: true,
       geometryFunction: geomFunction,
-      condition: (e) => primaryAction(e),
+      // Default condition for ol drawing is noModifierKeys(e)
+      // canExecute: If another tool is exclusively drawing, this interaction will be prevented from reacting
+      condition: (e) => noModifierKeys(e) && this.canExecute('map.draw'),
       style: (f) => this.getStyle(new DrawingFeature(tool, {}, ''), f as Feature<Geometry>)
     });
     this.draw.on('drawend', () => {
@@ -346,10 +393,10 @@ export default class OlDrawing {
   }
 
   deactivateDrawTool() {
-    this.state.selection.enabled = true;
     if (this.draw) {
       this.map.olMap.removeInteraction(this.draw);
     }
+    this.userInteractionManager.unregisterListener('map.select', this.toolName);
   }
 
   addSnapInteraction() {
@@ -504,5 +551,28 @@ export default class OlDrawing {
       polygon.setCoordinates([segments]);
     }
     return segments;
+  }
+
+  private removeEditContextMenu() {
+    if (this.editContextMenu) {
+      this.editContextMenu.remove();
+      this.editContextMenu = null;
+    }
+  }
+
+  registerInteractions() {
+    this.userInteractionManager.registerListener('map.draw', true, this.toolName);
+    this.userInteractionManager.registerListener('map.modify', true, this.toolName);
+    this.userInteractionManager.registerListener('map.snap', true, this.toolName);
+  }
+
+  unregisterInteractions() {
+    this.userInteractionManager.unregisterListener('map.draw', this.toolName);
+    this.userInteractionManager.unregisterListener('map.modify', this.toolName);
+    this.userInteractionManager.unregisterListener('map.snap', this.toolName);
+  }
+
+  private canExecute(event: GgUserInteractionEvent): boolean {
+    return this.userInteractionManager.canListenerExecute(event, this.toolName);
   }
 }

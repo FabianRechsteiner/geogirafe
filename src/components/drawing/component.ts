@@ -7,13 +7,10 @@ import CesiumDrawing from './cesiumDrawing';
 import { KML, GeoJSON, GPX } from 'ol/format';
 import { Polygon, Geometry } from 'ol/geom';
 import Feature from 'ol/Feature';
-import { Coordinate } from 'ol/coordinate';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { download } from '../../tools/export/download';
 import MapComponent from '../map/component';
-import { alternateMouseClick, ContextMenu, MenuEntry } from '../map/tools/contextmenu';
-import { formatCoordinates } from '../../tools/geometrytools';
 import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
 import checkedIcon from '../../assets/icons/checked-full.svg?raw';
@@ -56,7 +53,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   olDrawing: OlDrawing;
   cesiumDrawing: CesiumDrawing;
-  mapContextMenu: ContextMenu | undefined = undefined;
   fixedLengthEnabled: boolean = false;
   // Batch Create mode is currently not used. Batch mode allows the user to create multiple shapes without re-selecting
   //  the drawing tool. It possibly will be part of advanced drawing/editing tools.
@@ -67,16 +63,22 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.state.extendedState.drawing = new DrawingState();
     this.drawingState = this.state.extendedState.drawing as DrawingState;
     const map = this.componentManager.getComponents(MapComponent)[0];
-    this.olDrawing = new OlDrawing(map);
-    this.cesiumDrawing = new CesiumDrawing(map);
+    this.olDrawing = new OlDrawing(map, this.name);
+    this.cesiumDrawing = new CesiumDrawing(map, this.name);
     this.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news));
     this.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
+    this.subscribe('globe.loaded', () => {
+      if (this.state.globe.loaded && this.visible) {
+        this.cesiumDrawing.registerInteractions();
+      } else {
+        this.cesiumDrawing.unregisterInteractions();
+      }
+    });
   }
 
   render() {
     super.render();
     this.visible ? this.renderComponent() : this.hide();
-    this.state.selection.enabled = !this.visible;
     this.activateTooltips(false, [800, 0], 'top-end');
     super.girafeTranslate();
   }
@@ -135,8 +137,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
           this.cesiumDrawing.setFixedLength(0);
         }
       };
-
-      this.createMapContextMenu();
       this.setTool();
     }
     this.warnWhenInWebMercator();
@@ -150,6 +150,16 @@ export default class DrawingComponent extends GirafeHTMLElement {
       this.colorPickers.forEach((val) => val[0].setColor(val[1](), false));
     }
     super.refreshRender();
+  }
+
+  registerEvents() {
+    this.olDrawing.registerInteractions();
+    if (this.state.globe.loaded) this.cesiumDrawing.registerInteractions();
+  }
+
+  unregisterEvents() {
+    this.olDrawing.unregisterInteractions();
+    this.cesiumDrawing.unregisterInteractions();
   }
 
   addColorPicker(id: string, set: (c: Color) => unknown, get: () => string) {
@@ -204,17 +214,18 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   togglePanel(visible: boolean) {
     this.visible = visible;
-    if (this.renderedOnce) {
-      if (this.visible) {
-        this.olDrawing.enableAllInteractions();
-        this.mapContextMenu?.enable();
-      } else {
-        this.olDrawing.disableAllInteractions();
-        // Deselect features so the vertex symbology disappears, also disable context menu
-        this.deselectAllFeatures();
-        this.mapContextMenu?.disable();
-      }
+    if (this.visible) {
+      this.registerEvents();
+      this.olDrawing.setInteractionsActive(true);
+    } else {
+      // Unset map interactions
+      this.setTool(null);
+      this.olDrawing.setInteractionsActive(false);
+      // Deselect features so the vertex symbology disappears, also disable context menu
+      this.deselectAllFeatures();
+      this.unregisterEvents();
     }
+
     this.render();
   }
 
@@ -345,39 +356,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const currentVisibility = this.selectedFeatures.some((f) => f.displayMeasure);
     this.selectedFeatures.forEach((f) => (f.displayMeasure = !currentVisibility));
     this.refreshRender();
-  }
-
-  createMapContextMenu() {
-    const menuEntries: MenuEntry[] = [
-      {
-        entry: 'Remove vertex',
-        callback: (_evt: MouseEvent, mapCoordinate: Coordinate) => {
-          const successful = this.olDrawing.removeLastInteractedVertex();
-          if (!successful) {
-            const errorMessage = `It's not possible to remove vertex at ${formatCoordinates(mapCoordinate, this.configManager.Config.general.locale)}`;
-            this.stateManager.state.infobox.elements.push({
-              id: uuidv4(),
-              text: errorMessage,
-              type: 'warning'
-            });
-          }
-        }
-      }
-    ];
-    const conditionToOpen = (_evt: MouseEvent, mapCoordinate: Coordinate) => {
-      if (!this.visible || this.selectedFeatures.length === 0) {
-        return false;
-      }
-      // Only proceed if there is an editable vertex under the mouse pointer
-      return this.olDrawing.hasEditableVertexAtCoordinate(mapCoordinate);
-    };
-
-    this.mapContextMenu = new ContextMenu(
-      this.componentManager.getComponents(MapComponent)[0],
-      menuEntries,
-      alternateMouseClick,
-      conditionToOpen
-    );
   }
 
   private warnWhenInWebMercator(projection: string = this.state.projection) {

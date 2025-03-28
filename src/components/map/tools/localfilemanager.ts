@@ -9,15 +9,19 @@ import GroupLayer from '../../../models/layers/grouplayer';
 import StateManager from '../../../tools/state/statemanager';
 import { extend, intersects } from 'ol/extent';
 import I18nManager from '../../../tools/i18n/i18nmanager';
+import UserInteractionManager from '../../../tools/state/userInteractionManager';
+import { v4 as uuidv4 } from 'uuid';
 
 class LocalFileManager {
   map: Map;
+  name: string;
 
   private readonly supportedFileFormats = [GPX, GeoJSON, IGC, new KML({ extractStyles: true }), TopoJSON];
   private readonly supportedFileExtensions = ['gpx', 'geojson', 'igc', 'kml', 'topojson', 'json'];
 
   stateManager: StateManager;
   i18nManager: I18nManager;
+  userInteractionManager: UserInteractionManager;
 
   activeLayers: Record<
     string,
@@ -32,9 +36,11 @@ class LocalFileManager {
 
   constructor(map: Map) {
     this.map = map;
+    this.name = `localFileManager-${uuidv4()}`;
 
     this.stateManager = StateManager.getInstance();
     this.i18nManager = I18nManager.getInstance();
+    this.userInteractionManager = UserInteractionManager.getInstance();
     this.registerEvents();
 
     // Add drag n drop interaction to add local files
@@ -43,6 +49,8 @@ class LocalFileManager {
   }
 
   private registerEvents(): void {
+    this.userInteractionManager.registerListener('map.drop', false, this.name);
+
     this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) => {
       if (oldLayers?.includes(this.layerGroup) && !newLayers?.includes(this.layerGroup)) {
         // Group was deleted in tree, cleanup references
@@ -60,7 +68,10 @@ class LocalFileManager {
       // @ts-expect-error ol Format types
       formatConstructors: this.supportedFileFormats
     });
+
     dragAndDropInteraction.on('addfeatures', (e) => {
+      if (!this.userInteractionManager.canListenerExecute('map.drop', this.name)) return;
+
       if (!this.layerGroup) {
         this.layerGroup = new GroupLayer(0, 'Local Files', 0, { isDefaultChecked: true, isDefaultExpanded: true });
       }
@@ -97,6 +108,8 @@ class LocalFileManager {
   }
 
   private handleUnsupportedFiles(dropEvent: DragEvent) {
+    if (!this.userInteractionManager.canListenerExecute('map.drop', this.name)) return;
+
     const files: FileList | undefined = dropEvent.dataTransfer?.files;
     if (!files?.length) {
       return;

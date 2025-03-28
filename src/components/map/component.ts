@@ -283,13 +283,6 @@ export default class MapComponent extends GirafeHTMLElement {
       }
     });
 
-    // Add dragbox selection interaction
-    this.dragbox = new DragBox({
-      condition: platformModifierKeyOnly
-    });
-    this.olMap.addInteraction(this.dragbox);
-    this.dragbox.on('boxend', (e) => this.onDragSelection(e));
-
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {
       this.olMap.updateSize();
@@ -307,25 +300,57 @@ export default class MapComponent extends GirafeHTMLElement {
   listenOpenLayersEvents() {
     // https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html
     //this.olMap.on('change', (e) => console.log(e));
-    this.olMap.on('singleclick', (e) => this.onClick(e));
     //this.olMap.on('click', (e) => console.log(e));
     //this.olMap.on('dblclick', (e) => console.log(e));
     //this.olMap.on('error', (e) => console.log(e));
     this.olMap.on('loadstart', (e) => this.onLoadStart(e));
     this.olMap.on('loadend', (e) => this.onLoadEnd(e));
-    this.olMap.on('moveend', (e) => this.onMoveEnd(e));
     //this.olMap.on('movestart', (e) => console.log(e));
     //this.olMap.on('pointerdrag', (e) => console.log(e));
-    this.olMap.on('pointermove', (e) => this.onPointerMove(e));
     //this.olMap.on('postcompose', (e) => console.log(e));
     //this.olMap.on('postrender', (e) => console.log(e));
     //this.olMap.on('precompose', (e) => console.log(e));
     //this.olMap.on('propertychange', (e) => console.log(e));
-    //this.olMap.on('rendercomplete', (e) => this.onRenderComplete(e));
+    //this.olMap.on('rendercomplete', (e) => console.log(e));
     //? change:layerGroup
     //? change:size
     //? change:target
     //? change:view
+
+    // Register all mouse and keyboard interactions with the UserInteractionManager as non-exclusive
+    // events. If another tool registers one of these events exclusively, the listeners bellow will
+    // be paused temporarily and reactivate once the tool is closed.
+
+    // Select features via GetFeatureInfo
+    if (this.registerInteractionListener('map.select', false)) {
+      // Simple click for single feature selection
+      this.olMap.on('singleclick', (e) => {
+        if (this.canExecute('map.select')) {
+          this.onClick(e);
+        }
+      });
+      // Dragbox interaction for multiple features selection
+      this.dragbox = new DragBox({
+        condition: (e) => platformModifierKeyOnly(e) && this.canExecute('map.select')
+      });
+      this.olMap.addInteraction(this.dragbox);
+      this.dragbox.on('boxend', (e) => this.onDragSelection(e));
+    }
+
+    if (this.registerInteractionListener('map.mousemove', false)) {
+      // Current map position
+      this.olMap.on('moveend', (e) => {
+        if (this.canExecute('map.mousemove')) {
+          this.onMoveEnd(e);
+        }
+      });
+      // Cursor coordinates
+      this.olMap.on('pointermove', (e) => {
+        if (this.canExecute('map.mousemove')) {
+          this.onPointerMove(e);
+        }
+      });
+    }
   }
 
   onLoadStart(_e: MapEvent) {
@@ -355,9 +380,6 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onClick(e: MapBrowserEvent<UIEvent>) {
-    if (!this.state.selection.enabled) {
-      return;
-    }
     // Build selection box using the default tolerance.
     const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
     const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);
@@ -582,10 +604,11 @@ export default class MapComponent extends GirafeHTMLElement {
         return ray == undefined ? undefined : scene.globe.pick(ray, scene);
       };
 
+      this.registerInteractionListener('globe.select', true);
       const eventHandler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
       eventHandler.setInputAction((event: ScreenSpaceEventHandler.PositionedEvent) => {
-        // If the click is on the map and selection is enabled
-        if (Cesium.defined(event.position) && this.state.selection.enabled) {
+        // If the click is on the map and selection is allowed
+        if (Cesium.defined(event.position) && this.canExecute('globe.select')) {
           const topLeftScreen = event.position.clone();
           topLeftScreen.x -= this.pixelTolerance;
           topLeftScreen.y -= this.pixelTolerance;
@@ -640,6 +663,7 @@ export default class MapComponent extends GirafeHTMLElement {
       this.mapTarget.style.display = 'block';
       this.mapTarget.style.width = '100%';
       this.map3dTarget.style.display = 'none';
+      this.unregisterInteractionListeners('globe.select');
     }
   }
 

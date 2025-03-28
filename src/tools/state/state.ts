@@ -8,6 +8,7 @@ import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
 import { TokenEndpointResponse, UserInfoResponse } from 'oauth4webapi';
 import SelectionParam from '../../models/selectionparam';
+import { GgUserInteractionListener } from './userInteractionManager';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -31,7 +32,6 @@ type Selection = {
   selectedFeatures: Feature[];
   focusedFeatures: Feature[] | null;
   highlightedFeatures?: Feature[] | null;
-  enabled: boolean;
   gridSelected: boolean;
 };
 
@@ -155,6 +155,8 @@ export default class State {
     darkFrontendMode: false
   };
 
+  userInteractionListeners: GgUserInteractionListener[] = [];
+
   // Current language
   language: string | null = null;
 
@@ -207,7 +209,6 @@ export default class State {
     selectionParameters: [],
     selectedFeatures: [],
     focusedFeatures: null,
-    enabled: true,
     gridSelected: false
   };
 

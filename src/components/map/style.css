@@ -204,7 +204,6 @@ input[type='range']::-moz-range-thumb {
   background-color: var(--bkg-color);
   color: var(--text-color);
   box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.4);
-  padding: 10px;
   border: 1px solid #cccccc;
 
   .hidden {
@@ -213,5 +212,6 @@ input[type='range']::-moz-range-thumb {
 
   .menu-entry {
     cursor: pointer;
+    padding: 10px;
   }
 }

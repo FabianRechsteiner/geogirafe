@@ -4,6 +4,8 @@ import I18nManager from '../tools/i18n/i18nmanager';
 import ConfigManager from '../tools/configuration/configmanager';
 import StateManager, { Callback } from '../tools/state/statemanager';
 import ComponentManager from '../tools/state/componentManager';
+import UserInteractionManager from '../tools/state/userInteractionManager';
+import { GgUserInteractionEvent } from '../tools/state/userinteractionevent';
 
 class GirafeHTMLElement extends HTMLElement {
   templateUrl: string | null = null;
@@ -22,6 +24,7 @@ class GirafeHTMLElement extends HTMLElement {
   configManager: ConfigManager;
   stateManager: StateManager;
   componentManager: ComponentManager;
+  userInteractionManager: UserInteractionManager;
 
   private readonly unsafeCache = new Map<string, TemplateStringsArray>();
 
@@ -32,6 +35,7 @@ class GirafeHTMLElement extends HTMLElement {
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
     this.componentManager = ComponentManager.getInstance();
+    this.userInteractionManager = UserInteractionManager.getInstance();
     this.componentManager.registerComponent(this);
 
     this.shadow = this.attachShadow({ mode: 'open' });
@@ -236,6 +240,7 @@ class GirafeHTMLElement extends HTMLElement {
    */
   hide() {
     this.style.display = 'none';
+    this.unregisterInteractionListeners();
   }
 
   /**
@@ -300,6 +305,25 @@ class GirafeHTMLElement extends HTMLElement {
       this.stateManager.unsubscribe(callback);
     }
     this.callbacks.length = 0;
+    this.unregisterInteractionListeners();
+  }
+
+  registerInteractionListener(eventName: GgUserInteractionEvent, isExclusive: boolean): boolean {
+    return this.userInteractionManager.registerListener(eventName, isExclusive, this.name);
+  }
+
+  unregisterInteractionListeners(eventNames?: GgUserInteractionEvent | GgUserInteractionEvent[]): void {
+    if (!eventNames) {
+      this.userInteractionManager.unregisterAllListenersOfTool(this.name);
+    }
+    if (!Array.isArray(eventNames)) {
+      eventNames = [eventNames!];
+    }
+    eventNames.forEach((event) => this.userInteractionManager.unregisterListener(event, this.name));
+  }
+
+  canExecute(eventName: GgUserInteractionEvent) {
+    return this.userInteractionManager.canListenerExecute(eventName, this.name);
   }
 }
 
