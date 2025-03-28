@@ -569,3 +569,70 @@ describe('Components translations', () => {
     }
   });
 });
+
+
+describe('Manage User Interactions', () => {
+  const searchComponents = (regexPatterns: RegExp[]) => {
+    const componentsPath = path.join(__dirname, 'components');
+    let candidates: string[] = [];
+    const tsFiles = getAllTypescriptFiles(componentsPath);
+    for (const tsFile of tsFiles) {
+      const code = fs.readFileSync(tsFile, 'utf8');
+      for (const pattern of regexPatterns) {
+        const addMatches = (code ?? '').match(pattern);
+        if (addMatches) {
+          candidates.push(tsFile.replace(componentsPath + '/', ''));
+          break;
+        }
+      }
+    }
+    // Return unique list of shortened file paths that contain interaction event listeners
+    return Array.from(new Set(candidates));
+  };
+
+  it('Components register listeners for user interactions with the UserInteractionManager', async () => {
+    // Add names of components that should be ignored when searching for event listeners
+    const fileIgnoreList = [
+      'menubutton/component.ts', // contains 'click' listener to remove menu overlays, management not necessary
+      'cross-section/scatterplot.ts' // contains 'click' and 'drag' listener for d3 plots
+    ];
+
+    // Search patterns
+    const searchKeyboardListeners = new RegExp(/\.addEventListener\(['"]key/gm);
+    const searchMouseListenersOnDocument = new RegExp(
+      /document\.addEventListener\(['"](click|mouse|contextmenu|drop|onwheel)/gm
+    );
+    const searchMouseListenersOnMapViewport = new RegExp(
+      /Viewport\S*\.addEventListener\(['"](click|mouse|contextmenu|drop|onwheel)/gm
+    );
+    const searchOlInteractionListeners = new RegExp(/\.on\(['"](\w*move|\w*click|\w*drag)/gm);
+    const searchOlInteractionInitializations = new RegExp(/new Draw\(|new Modify\(|new Snap\(/gm);
+    const searchEventRegistrations = new RegExp(/(\.registerInteractionListener\()|(\.registerListener\()/gm);
+
+    const filesWithEventListener = searchComponents([
+      searchKeyboardListeners,
+      searchMouseListenersOnDocument,
+      searchMouseListenersOnMapViewport,
+      searchOlInteractionListeners,
+      searchOlInteractionInitializations
+    ]).filter((c) => fileIgnoreList.indexOf(c) === -1);
+
+    const filesWithRegistration = searchComponents([searchEventRegistrations]);
+
+    console.log('User Interaction Manager:');
+    console.log('The following tools contain event listeners:\n-', filesWithEventListener.join('\n- '));
+    console.log('The following tools contain listener registration:\n-', filesWithRegistration.join('\n- '));
+
+    // Compare occurrence of event listeners and listener registration
+    const errors: string[] = [];
+    for (const file of filesWithEventListener) {
+      if (!filesWithRegistration.includes(file)) {
+        errors.push(`${file} contains event listeners but does not register any with the user interaction manager.`);
+      }
+    }
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+});
