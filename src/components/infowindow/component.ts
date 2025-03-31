@@ -3,7 +3,7 @@ import ResizeWindow from '../../tools/resizewindow';
 
 class InfoWindowComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
-  styleUrls = ['../../styles/common.css', './style.css'];
+  styleUrls = ['../../styles/common.css', '../../styles/resizable.css', './style.css'];
 
   visible: boolean = false;
   private resizeWindow: ResizeWindow | null = null;
