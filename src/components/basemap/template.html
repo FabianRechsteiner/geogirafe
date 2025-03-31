@@ -1,14 +1,12 @@
-<link rel="stylesheet" href="styles/common.css" />
-
-<girafe-menu-button open="up">
-  <button slot="menu-button" class="gg-icon-button gg-medium">
-    <img alt="menu-icon" src="icons/layer-group.svg" />
+<girafe-menu-button open="up-right">
+  <button slot="menu-button" class="basemap-button" tip="Select basemap">
+    <img alt="menu-icon" src="images/button_basemaps.png" />
   </button>
 
   <div slot="menu-content" id="container">
     ${Object.values(this.state.basemaps).map(basemap => uHtmlFor(basemap, basemap.id)`
     <button
-      class="${this.activeBasemap === basemap.name ? 'girafe-button-large active-basemap' : 'girafe-button-large'}"
+      class="${this.activeBasemapName === basemap.name ? 'girafe-button-large active-basemap' : 'girafe-button-large'}"
       onclick="${() => this.changeBasemap(basemap)}">
       <img alt="basemap-icon" src="images/basemap.png" />
       <span i18n="${basemap.name}">${basemap.name}</span></button

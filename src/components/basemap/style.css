@@ -1,3 +1,18 @@
+.basemap-button {
+  background-color: var(--bkg-color);
+  color: var(--text-color);
+  outline: 0;
+  border: var(--app-standard-border);
+  border-radius: 4px;
+  border-width: 2px;
+  display: inline-flex;
+  box-sizing: border-box;
+  padding: 5px;
+  margin: 0;
+  cursor: pointer;
+  box-shadow: var(--bx-shdw);
+}
+
 #container {
   display: inline-flex;
   flex-direction: column;
@@ -5,6 +20,5 @@
 }
 
 .active-basemap {
-  background-color: var(--bkg-color-grad1) !important;
-  cursor: default !important;
+  background-color: var(--bkg-color-grad2) !important;
 }

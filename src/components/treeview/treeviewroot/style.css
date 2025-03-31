@@ -31,6 +31,7 @@
   flex-direction: row;
   border: 1px solid #cfd6dd;
   border-radius: 4px;
+  margin-right: 2px;
 }
 
 #treeview-search-field {
