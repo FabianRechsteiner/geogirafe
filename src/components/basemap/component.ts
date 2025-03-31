@@ -6,34 +6,25 @@ class BasemapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  servers = {};
-  basemapJson = {};
-
   shareManager: ShareManager;
 
-  activeBasemap: string = '';
+  activeBasemapName: string = '';
 
   constructor() {
     super('basemap');
 
     this.shareManager = ShareManager.getInstance();
-
-    this.configManager.loadConfig().then(() => {
-      if (!this.configManager.Config.basemaps.show) {
-        this.hide();
-      }
-    });
   }
 
   onBasemapsLoaded(basemaps: { [key: number]: Basemap }) {
-    super.render();
+    this.render();
 
     // Configure default basemap (only if there is no sharedstate)
     if (!this.shareManager.hasSharedState()) {
       for (const basemap of Object.values(basemaps)) {
         if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
           this.state.activeBasemap = basemap;
-          this.activeBasemap = basemap.name;
+          this.activeBasemapName = basemap.name;
           this.render();
           break;
         }
@@ -42,13 +33,15 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   changeBasemap(basemap: Basemap) {
-    console.log('change basemap', basemap);
+    if (basemap.id === this.state.activeBasemap?.id) {
+      return;
+    }
     if (basemap.projection) {
       this.state.projection = basemap.projection;
     }
     this.state.activeBasemap = basemap;
-    this.activeBasemap = basemap.name;
-    this.render();
+    this.activeBasemapName = basemap.name;
+    this.refreshRender();
   }
 
   registerEvents() {
@@ -56,13 +49,24 @@ class BasemapComponent extends GirafeHTMLElement {
       this.onBasemapsLoaded(newBasemaps)
     );
     this.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) => this.changeBasemap(newBasemap));
+    this.subscribe('themes.isLoaded', () => {
+      if (this.state.themes.isLoaded) {
+        if (Object.keys(this.state.basemaps).length === 0) {
+          this.renderEmpty();
+        }
+      }
+    });
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-      this.registerEvents();
+      if (this.configManager.Config.basemaps.show) {
+        this.render();
+        super.girafeTranslate();
+        this.registerEvents();
+      } else {
+        this.renderEmpty();
+      }
     });
   }
 }

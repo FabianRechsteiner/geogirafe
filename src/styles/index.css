@@ -129,8 +129,12 @@ girafe-map {
 .info-area {
   z-index: 10;
   position: absolute;
-  bottom: var(--app-standard-height);
-  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: flex-end;
+  bottom: calc(var(--app-footer-height) + 1rem);
+  margin: 0 1rem;
 }
 
 footer {
@@ -140,11 +144,9 @@ footer {
   align-items: center;
   z-index: 10;
   background-color: var(--bkg-color);
-  height: calc(var(--app-standard-height) / 1.2);
-}
-
-footer > * {
-  margin: 0 0.5rem;
+  height: var(--app-footer-height);
+  gap: 1rem;
+  padding: 0 1rem;
 }
 
 footer .copyright {
