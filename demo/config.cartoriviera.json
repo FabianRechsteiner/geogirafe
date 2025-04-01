@@ -66,6 +66,7 @@
   },
   "gmfauth": {
     "url": "https://map.cartoriviera.ch",
-    "audience": ["map.cartoriviera.ch"]
+    "audience": ["map.cartoriviera.ch"],
+    "audienceExcludedPaths": ["^/tiles/", "^/pytree/"]
   }
 }
