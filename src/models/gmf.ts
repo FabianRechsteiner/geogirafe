@@ -21,6 +21,7 @@ export interface GMFMetadata {
   wmsLayers?: string;
   printNativeAngle?: boolean;
   protected?: boolean;
+  thumbnail?: string;
 }
 
 export interface GMFChildLayer {
@@ -64,10 +65,7 @@ export interface GMFGroup extends GMFTreeItem {
   children: GMFTreeItem[];
 }
 
-export interface GMFBackgroundLayer extends GMFTreeItem {
-  children?: Array<GMFTreeItem>;
-  mixed?: boolean;
-}
+export interface GMFBackgroundLayer extends GMFTreeItem {}
 
 export interface GMFServerOgc {
   url: string;

@@ -33,7 +33,7 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   changeBasemap(basemap: Basemap) {
-    if (basemap.id === this.state.activeBasemap?.id) {
+    if (basemap.id === this.state.activeBasemap?.id && this.activeBasemapName === basemap.name) {
       return;
     }
     if (basemap.projection) {

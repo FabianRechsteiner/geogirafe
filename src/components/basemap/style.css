@@ -19,6 +19,11 @@
   width: max-content;
 }
 
+.basemap-icon {
+  background: var(--svg-legend-bkg);
+  filter: var(--svg-map-filter);
+}
+
 .active-basemap {
   background-color: var(--bkg-color-grad2) !important;
 }

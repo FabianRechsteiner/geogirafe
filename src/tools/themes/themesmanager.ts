@@ -141,22 +141,42 @@ class ThemesManager extends GirafeSingleton {
   prepareBasemaps(basemapJson: GMFBackgroundLayer[]) {
     const basemaps: { [key: number]: Basemap } = {};
 
+    const basemapMetadata = {
+      isLegendExpanded: false,
+      wasLegendExpanded: false,
+      exclusiveGroup: false,
+      isExpanded: false,
+      isChecked: false
+    };
+
     if (this.configManager.Config.basemaps.emptyBasemap) {
       // Add an empty basemap
-      const emptyBasemap = new Basemap({ id: 0, name: 'Empty' });
+      const emptyBasemap = new Basemap({
+        id: 0,
+        name: 'Empty',
+        metadata: { ...basemapMetadata, thumbnail: 'images/basemap_empty.png' }
+      });
       basemaps[emptyBasemap.id] = emptyBasemap;
     }
 
     if (this.configManager.Config.basemaps.OSM) {
       // Add default OSM Option
-      const osmBasemap = new Basemap({ id: -1, name: 'OpenStreetMap' });
+      const osmBasemap = new Basemap({
+        id: -1,
+        name: 'OpenStreetMap',
+        metadata: { ...basemapMetadata, thumbnail: 'images/basemap_osm.png' }
+      });
       basemaps[osmBasemap.id] = osmBasemap;
       osmBasemap.layersList.push(new LayerOsm(0));
     }
 
     if (this.configManager.Config.basemaps.SwissTopoVectorTiles) {
       // Add default Vector Tiles
-      const vectorBasemap = new Basemap({ id: -2, name: 'Vector-Tiles' });
+      const vectorBasemap = new Basemap({
+        id: -2,
+        name: 'Vector-Tiles',
+        metadata: { ...basemapMetadata, thumbnail: 'images/basemap_vectortiles.png' }
+      });
       basemaps[vectorBasemap.id] = vectorBasemap;
       const vectorTilesLayer = new LayerVectorTiles(
         LayerConsts.LayerSwisstopoVectorTilesId,
