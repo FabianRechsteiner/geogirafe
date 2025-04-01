@@ -66,7 +66,7 @@ Please follow the small documentation in the Docker Hub Readme.
 
 ## Development
 
-First, install [Node 20](https://nodejs.org/en/download/).
+First, install [Node](https://nodejs.org/en/download/).
 
 Then, clone the Repository:
 
