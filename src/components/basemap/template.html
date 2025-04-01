@@ -1,6 +1,6 @@
 <girafe-menu-button open="up-right">
   <button slot="menu-button" class="basemap-button" tip="Select basemap">
-    <img alt="menu-icon" src="images/button_basemaps.png" />
+    <img class="basemap-icon" alt="menu-icon" src="images/button_basemaps.png" />
   </button>
 
   <div slot="menu-content" id="container">
@@ -8,7 +8,7 @@
     <button
       class="${this.activeBasemapName === basemap.name ? 'girafe-button-large active-basemap' : 'girafe-button-large'}"
       onclick="${() => this.changeBasemap(basemap)}">
-      <img alt="basemap-icon" src="images/basemap.png" />
+      <img class="basemap-icon" alt="basemap-icon" src="${basemap.thumbnail}" />
       <span i18n="${basemap.name}">${basemap.name}</span></button
     >` )}
   </div>
