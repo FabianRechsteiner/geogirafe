@@ -16,7 +16,7 @@
   <button
     class="${this.isThemeActive(theme)? 'theme selected' : 'theme'}"
     onmousedown="${() => this.onThemeChanged(theme)}">
-    <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
+    <img class="theme-icon" alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
     <span i18n="${theme.name}">${theme.name}</span>
   </button>
   `)} ${Object.values(this.customThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`

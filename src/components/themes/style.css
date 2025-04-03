@@ -71,3 +71,7 @@ button.delete {
 .custom-theme.selected {
   background-color: var(--bkg-color-grad2);
 }
+
+.theme-icon {
+  --svg-filter: none;
+}
