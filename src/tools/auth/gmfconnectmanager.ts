@@ -31,7 +31,7 @@ export default class GMFConnectManager extends AbstractConnectManager {
     return new URL(window.location.href).searchParams.get('authentified') === 'true';
   }
 
-  public override initialize() {
+  public override async initialize() {
     if (this.isAuthentified()) {
       // We are back from GMF authentication.
       // Go to the next step with the backend authentication
@@ -41,7 +41,7 @@ export default class GMFConnectManager extends AbstractConnectManager {
 
   public override async login() {
     console.debug('Auth: 1. Issuer login');
-    await this.redirectToIssuerLogin();
+    this.redirectToIssuerLogin();
   }
 
   public override async silentLogin() {
@@ -58,7 +58,7 @@ export default class GMFConnectManager extends AbstractConnectManager {
     this.state.oauth.status = 'loggedOut';
   }
 
-  private async redirectToIssuerLogin() {
+  private redirectToIssuerLogin() {
     const state = ShareManager.getInstance().getStateToShare();
     const redirectUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=true#${state}`;
     const authorizationUrl = new URL(`${this.authConfig.url}/login.html`);
@@ -67,17 +67,36 @@ export default class GMFConnectManager extends AbstractConnectManager {
     window.open(authorizationUrl, '_self');
   }
 
-  private async handleLoggedInToIssuer() {
+  private handleLoggedInToIssuer() {
     console.debug('Auth: 2. Issuer login handle');
     // Removing oauth URL parameters
     this.resetUrlHistory(true);
     this.state.oauth.status = 'issuer.loggedIn';
     this.state.oauth.audience = this.authConfig.audience;
+
+    // Prepare refresh login
+    this.checkConnection();
+  }
+
+  private checkConnection() {
+    const expiresInMs = 600000; // 10 min
+    setTimeout(() => this.refreshToken(), expiresInMs);
   }
 
   private resetUrlHistory(_authentified: boolean) {
-    let newUrl;
-    newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`;
+    const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`;
     window.history.replaceState(null, '', newUrl);
+  }
+
+  private async refreshToken() {
+    console.debug('Refreshing token');
+    const userInfoUrl = `${this.authConfig.url}/loginuser`;
+    this.state.oauth.userInfo = await fetch(userInfoUrl).then((r) => r.json());
+    if (!this.state.oauth.userInfo?.username) {
+      this.resetUrlHistory(false);
+      this.loggedOutFromBackend();
+    } else {
+      this.checkConnection();
+    }
   }
 }

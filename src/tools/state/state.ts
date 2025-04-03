@@ -88,7 +88,14 @@ export type Lidar = {
  * 5. logoutFailed      : Logout failed
  */
 type LoginState = {
-  status: 'issuer.loggedIn' | 'loggedIn' | 'loginFailed' | 'backend.loggedOut' | 'loggedOut' | 'logoutFailed';
+  status:
+    | 'issuer.loggedIn'
+    | 'loggedIn'
+    | 'loginFailed'
+    | 'backend.loggedOut'
+    | 'loggedOut'
+    | 'logoutFailed'
+    | 'loggedOutForcedFromBackend';
   tokens?: TokenEndpointResponse;
   userInfo?: UserInfoResponse;
   audience: string[];

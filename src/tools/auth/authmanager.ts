@@ -5,6 +5,7 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import ConfigManager from '../configuration/configmanager';
 import AbstractConnectManager from './abstractconnectmanager';
 import GMFConnectManager from './gmfconnectmanager';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class AuthManager extends GirafeSingleton {
   private serviceWorker: ServiceWorker | null = null;
@@ -25,47 +26,47 @@ export default class AuthManager extends GirafeSingleton {
     this.stateManager.subscribe('oauth.tokens', () => this.tokensChanged());
   }
 
-  public initialize(sw: ServiceWorker | null) {
+  public async initialize(sw: ServiceWorker | null) {
     if (!sw) {
       console.warn("ServiceWorker cannot be initialized. Authentication won't work properly.");
     }
     this.serviceWorker = sw;
 
     const oauthIssuerConfig = ConfigManager.getInstance().Config.oauth?.issuer;
+    const gmfauthConfig = ConfigManager.getInstance().Config.gmfauth;
+
     if (oauthIssuerConfig) {
       // Standard oAuth workflow
-      this.initializeOAuth(oauthIssuerConfig);
+      await this.initializeOAuth(oauthIssuerConfig);
+    } else if (gmfauthConfig) {
+      await this.initializeGmfAuth(gmfauthConfig);
     }
-
-    const gmfauthConfig = ConfigManager.getInstance().Config.gmfauth;
-    if (gmfauthConfig) {
-      this.initializeGmfAuth(gmfauthConfig);
-    }
-
-    // Else: oo auth configured
+    // Else: no auth configured
     // Nothing to do
   }
 
-  private initializeOAuth(config: any) {
+  private async initializeOAuth(config: any) {
     this.issuerManager = OpenIdConnectManager.getInstance();
-    this.issuerManager.initialize();
-    if (config.checkSessionOnLoad) {
-      this.silentLogin();
+    await this.issuerManager.initialize();
+    // No silent login if user is in the process of being logged in ('issuer.loggedIn' is second step of login process)
+    if (config.checkSessionOnLoad && this.state.oauth.status !== 'issuer.loggedIn') {
+      await this.silentLogin();
     }
     if (config.loginRequired && this.state.oauth.status === 'loggedOut') {
-      this.login();
+      await this.login();
     }
   }
 
   private async initializeGmfAuth(config: any) {
     this.issuerManager = GMFConnectManager.getInstance();
-    this.issuerManager.initialize();
+    await this.issuerManager.initialize();
     // For GMF, the silent login is actually the same as checkin if the userinfos are already defined
     if (config.checkSessionOnLoad) {
       await this.gmfManager.getUserInfo();
+      this.state.oauth.status = this.state.oauth.userInfo?.username ? 'loggedIn' : 'loggedOut';
     }
     if (config.loginRequired && this.state.oauth.status === 'loggedOut') {
-      this.login();
+      await this.login();
     }
   }
 
@@ -80,11 +81,29 @@ export default class AuthManager extends GirafeSingleton {
         }
         // And then we get the UserInfos
         await this.gmfManager.getUserInfo();
+        if (this.state.oauth.userInfo?.username) {
+          this.state.oauth.status = 'loggedIn';
+        } else {
+          throw new Error('Login failed, no user found.');
+        }
+      } else if (this.state.oauth.status === 'loggedOutForcedFromBackend') {
+        // The user was loggedout from the backend
+        // This can happen either if the user has been loggedout from another tab in the browser
+        // Or if the user session was closed from the identity provider
+        this.userLoggedOutFromBackend();
       }
     } catch (e) {
       this.state.oauth.status = 'loginFailed';
       throw e;
     }
+  }
+
+  private userLoggedOutFromBackend() {
+    this.stateManager.state.infobox.elements.push({
+      id: uuidv4(),
+      text: 'User has been logged out.',
+      type: 'warning'
+    });
   }
 
   private tokensChanged() {
@@ -105,6 +124,7 @@ export default class AuthManager extends GirafeSingleton {
 
   private async silentLogin() {
     try {
+      console.log('silentLogin');
       await this.issuerManager.silentLogin();
     } catch (e) {
       this.state.oauth.status = 'loggedOut';
