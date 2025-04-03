@@ -1,16 +1,12 @@
-import BaseLayer from './layers/baselayer';
 import { Coordinate } from 'ol/coordinate';
 
 class Theme {
   // Properties
   id: number;
-  icon: string;
+  icon?: string;
   name: string;
   location?: Coordinate;
   zoom?: number;
-
-  // Layers
-  _layersTree: BaseLayer[] = [];
 
   constructor(elem: { id: number; name: string; icon: string; location?: Coordinate; zoom?: number }) {
     this.id = elem.id;

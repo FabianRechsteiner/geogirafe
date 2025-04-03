@@ -13,12 +13,14 @@
 
 <div class="${(this.menuOpen ? 'themes' : 'hidden')}">
   ${Object.values(this.state.themes._allThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
-  <button class="theme" onmousedown="${() => this.onThemeChanged(theme)}">
+  <button
+    class="${this.isThemeActive(theme)? 'theme selected' : 'theme'}"
+    onmousedown="${() => this.onThemeChanged(theme)}">
     <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
     <span i18n="${theme.name}">${theme.name}</span>
   </button>
   `)} ${Object.values(this.customThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
-  <div class="custom-theme">
+  <div class="${this.isThemeActive(theme)? 'custom-theme selected' : 'custom-theme'}">
     <button class="select" onmousedown="${() => this.onCustomThemeChanged(theme)}">
       <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
       <span i18n="${theme.name}">${theme.name}</span>
