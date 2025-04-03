@@ -1,5 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ThemeLayer from '../../models/layers/themelayer';
+import Theme from '../../models/theme';
 import MapManager from '../../tools/state/mapManager';
 import NewIcon from './images/new.svg';
 import CustomTheme from '../../models/customtheme';
@@ -68,6 +69,10 @@ class ThemeComponent extends GirafeHTMLElement {
     }
   }
 
+  isThemeActive(theme: Theme) {
+    return theme.id === this.state.themes.lastSelectedTheme?.id;
+  }
+
   onCustomThemeChanged(customTheme: CustomTheme) {
     if (customTheme.hasThemes) {
       for (let i = customTheme.layers.length - 1; i >= 0; --i) {
@@ -79,14 +84,14 @@ class ThemeComponent extends GirafeHTMLElement {
         }
       }
     } else {
-      this.state.themes.lastSelectedTheme = customTheme.getThemeLayer();
+      this.state.themes.lastSelectedTheme = customTheme.getThemeLayer(customTheme.id);
     }
   }
 
   async onAddCustomTheme() {
     const themeName = await window.gPrompt(
       'Please enter a name for the new custom theme',
-      'Create cutsom theme',
+      'Create custom theme',
       'my theme'
     );
     if (themeName !== false && themeName.trim().length > 0) {

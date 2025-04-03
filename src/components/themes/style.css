@@ -23,10 +23,23 @@
   cursor: pointer;
   margin: 0.5rem;
   padding: 0;
+  border-radius: 0.5rem;
 }
 
+.themes > button > span,
+.custom-theme > button > span,
 .new-theme > button > span {
+  display: inline-block;
+  width: 95%;
+  text-align: center;
   color: var(--text-color);
+}
+
+.themes > button > span,
+.custom-theme > button > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .theme > img,
@@ -40,6 +53,7 @@ button.select {
   padding: 0;
   background-color: transparent;
   cursor: pointer;
+  width: 100%;
 }
 
 button.select > img {
@@ -53,12 +67,7 @@ button.delete {
   right: 0;
 }
 
-.themes > button > span {
-  display: inline-block;
-  width: 9rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: left;
-  color: var(--text-color);
+.theme.selected,
+.custom-theme.selected {
+  background-color: var(--bkg-color-grad2);
 }

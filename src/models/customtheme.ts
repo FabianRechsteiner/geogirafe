@@ -3,10 +3,9 @@ import ThemeLayer from './layers/themelayer';
 import { SharedLayer } from '../tools/share/sharedstate';
 import StateSerializer from '../tools/share/stateserializer';
 import CustomIcon from '../components/themes/images/custom.svg';
-import { v4 as uuidv4 } from 'uuid';
 
 export default class CustomTheme {
-  id: string;
+  id: number;
   layers: BaseLayer[];
   name: string;
   icon: string;
@@ -21,7 +20,7 @@ export default class CustomTheme {
   }
 
   constructor(name: string) {
-    this.id = uuidv4();
+    this.id = Date.now();
     this.name = name;
     this.layers = [];
     this.icon = CustomIcon;
@@ -31,8 +30,8 @@ export default class CustomTheme {
     return new StateSerializer().getSerializedLayerTree(this.layers);
   }
 
-  getThemeLayer() {
-    const theme = new ThemeLayer(1000000, this.name, 0);
+  getThemeLayer(id: number = 1000000) {
+    const theme = new ThemeLayer(id, this.name, 0);
     theme.children.push(...this.layers);
     return theme;
   }
