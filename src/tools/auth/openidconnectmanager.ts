@@ -17,8 +17,6 @@ import {
 } from 'oauth4webapi';
 import UserDataManager from '../userdata/userdatamanager';
 
-import { v4 as uuidv4 } from 'uuid';
-
 export default class OpenIdConnectManager extends AbstractConnectManager {
   private authorizationServer?: AuthorizationServer;
   private readonly storagePath = 'oAuth';
@@ -39,14 +37,15 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     return new URL(window.location.href).searchParams.has('error');
   }
 
-  public override initialize() {
+  public override async initialize() {
     if (this.isAuthentified()) {
       if (!this.hasAuthError()) {
         // We are back from issuer authentication.
         // Go to the next step with the backend authentication
-        this.handleLoggedInToIssuer();
+        await this.handleLoggedInToIssuer();
       } else {
         // We are back but with an error.
+        this.resetUrlHistory(false);
         this.handleErrorFromIssuer();
       }
     }
@@ -234,14 +233,6 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     this.state.oauth.status = 'issuer.loggedIn';
   }
 
-  private handleErrorFromIssuer() {
-    this.resetUrlHistory(false);
-    this.state.oauth.status = 'loggedOut';
-    this.state.oauth.tokens = undefined;
-    this.state.oauth.userInfo = undefined;
-    this.state.oauth.audience = [];
-  }
-
   private resetUrlHistory(authentified: boolean) {
     let newUrl;
     if (authentified) {
@@ -273,11 +264,12 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       openIdTokens = await processRefreshTokenResponse(authorizationServer, client, response);
     } catch (error) {
       // an error here means the user was logged out somehow somewhere else.
-      this.handleExternalLogout();
+      this.resetUrlHistory(false);
+      this.loggedOutFromBackend();
     }
 
     if (openIdTokens) {
-      this.setToken(openIdTokens as TokenEndpointResponse);
+      this.setToken(openIdTokens);
     }
   }
 
@@ -302,14 +294,5 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     }
 
     window.open(issuerLogoutUrl, '_self');
-  }
-
-  public handleExternalLogout() {
-    this.handleErrorFromIssuer();
-    this.stateManager.state.infobox.elements.push({
-      id: uuidv4(),
-      text: 'User has been logged out.',
-      type: 'info'
-    });
   }
 }

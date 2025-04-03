@@ -82,8 +82,8 @@ async function initializeServiceWorker() {
       refererPolicy: gmfConfig.refererPolicy
     });
   }
-  OfflineManager.getInstance().setServiceWorker(registration.active, storeVersion, dbCacheName);
-  AuthManager.getInstance().initialize(registration.active);
+  await OfflineManager.getInstance().setServiceWorker(registration.active, storeVersion, dbCacheName);
+  await AuthManager.getInstance().initialize(registration.active);
 }
 
 export async function initialize() {

@@ -57,6 +57,7 @@ export default defineConfig(({ command }) => {
       outDir: 'dist/app',
       sourcemap: true,
       emptyOutDir: true,
+      chunkSizeWarningLimit: 2500,
       rollupOptions: {
         input: {
           desktop: resolve(__dirname, 'index.html'),

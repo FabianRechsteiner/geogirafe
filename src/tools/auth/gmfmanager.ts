@@ -2,8 +2,6 @@ import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
 import GirafeSingleton from '../../base/GirafeSingleton';
 
-import { v4 as uuidv4 } from 'uuid';
-
 export type GMFUserInfo = {
   username: string;
   email: string;
@@ -91,19 +89,5 @@ export default class GMFManager extends GirafeSingleton {
     console.debug('Auth: 3. Get UserInfo');
     const userInfoUrl = this.isOAuth ? this.gmfConfigForOAuth.userInfoUrl : `${this.gmfConfigForGmfAuth.url}/loginuser`;
     this.state.oauth.userInfo = await fetch(userInfoUrl).then((r) => r.json());
-    if (this.state.oauth.userInfo?.username) {
-      this.state.oauth.status = 'loggedIn';
-    } else {
-      this.handleExternalLogout();
-    }
-  }
-
-  public handleExternalLogout() {
-    this.state.oauth.status = 'loggedOut';
-    this.stateManager.state.infobox.elements.push({
-      id: uuidv4(),
-      text: 'User has been logged out.',
-      type: 'info'
-    });
   }
 }

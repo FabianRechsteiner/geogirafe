@@ -16,8 +16,22 @@ export default abstract class AbstractConnectManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
   }
 
-  public abstract initialize(): void;
+  public abstract initialize(): Promise<void>;
   public abstract login(): Promise<void>;
   public abstract silentLogin(): Promise<void>;
   public abstract logout(): Promise<void>;
+
+  protected loggedOutFromBackend() {
+    this.state.oauth.status = 'loggedOutForcedFromBackend';
+    this.state.oauth.tokens = undefined;
+    this.state.oauth.userInfo = undefined;
+    this.state.oauth.audience = [];
+  }
+
+  protected handleErrorFromIssuer() {
+    this.state.oauth.status = 'loggedOut';
+    this.state.oauth.tokens = undefined;
+    this.state.oauth.userInfo = undefined;
+    this.state.oauth.audience = [];
+  }
 }
