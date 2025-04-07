@@ -156,9 +156,10 @@ export default class CesiumDrawing {
   }
 
   deactivateTool() {
-    this.handler!.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
-    this.handler!.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
-    this.handler!.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    if (!this.handler) return;
+    this.handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    this.handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    this.handler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
     if (this.floatingPoint) {
       this.entities!.remove(this.floatingPoint);
     }
@@ -435,6 +436,7 @@ export default class CesiumDrawing {
   }
 
   unregisterInteractions() {
+    this.deactivateTool();
     this.userInteractionManager.unregisterListener('globe.select', this.toolName);
     this.userInteractionManager.unregisterListener('globe.draw', this.toolName);
   }

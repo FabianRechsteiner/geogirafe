@@ -1,6 +1,6 @@
 import { Color } from 'vanilla-picker';
 import { v4 as uuidv4 } from 'uuid';
-import DrawingFeature, { DrawingState, SerializedFeature, DrawingShape } from './drawingFeature';
+import DrawingFeature, { DrawingState, DrawingShape } from './drawingFeature';
 import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
 
@@ -60,7 +60,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   constructor() {
     super('drawing');
-    this.state.extendedState.drawing = new DrawingState();
+    if (!this.state.extendedState.drawing) {
+      this.state.extendedState.drawing = new DrawingState();
+    }
     this.drawingState = this.state.extendedState.drawing as DrawingState;
     const map = this.componentManager.getComponents(MapComponent)[0];
     this.olDrawing = new OlDrawing(map, this.name);
@@ -174,16 +176,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.colorPickers.push([picker, get]);
   }
 
-  serialize() {
-    return this.drawingState.features.map((f) => f.serialize());
-  }
-
-  deserialize(serializedFeatures: SerializedFeature[]) {
-    const df: DrawingFeature[] = [];
-    serializedFeatures.forEach((f) => df.push(DrawingFeature.deserialize(f)));
-    this.drawingState.features = df;
-  }
-
   setTool(tool: DrawingShape | null = null) {
     if (this.toolSelected !== null) {
       this.toolSelected.classList.remove('selected');
@@ -216,13 +208,11 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.visible = visible;
     if (this.visible) {
       this.registerEvents();
-      this.olDrawing.setInteractionsActive(true);
     } else {
-      // Unset map interactions
       this.setTool(null);
-      this.olDrawing.setInteractionsActive(false);
-      // Deselect features so the vertex symbology disappears, also disable context menu
+      // Deselect features so the vertex symbology disappears
       this.deselectAllFeatures();
+      // Unregister events, remove interactions
       this.unregisterEvents();
     }
 
@@ -234,8 +224,10 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   deselectAllFeatures() {
-    this.drawingState.features.forEach((f) => (f.selected = false));
-    this.olDrawing.updateModifiableFeatures([]);
+    for (const idx of this.drawingState.features.keys()) {
+      // To guarantee change detection, use the list index to change the feature property
+      this.drawingState.features[idx].selected = false;
+    }
   }
 
   onFeaturesChanged(oldFeatures: DrawingFeature[], newFeatures: DrawingFeature[]) {
@@ -245,28 +237,32 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const deleted = oldFeatures.filter((f) => !newIds.includes(f.id));
     const added = newFeatures.filter((f) => !oldIds.includes(f.id));
 
-    if (added.length > 0) {
-      // Update the current selection: no selection if in batch mode or if component isn't visible (e.g. if features
-      // are added via share link), otherwise only include the newly created feature(s)
-      this.drawingState.features.forEach(
-        (feature: DrawingFeature) =>
-          (feature.selected =
-            this.batchCreateMode || !this.visible ? false : added.map((f) => f.id).includes(feature.id))
-      );
+    // Update the current feature selection
+    if (!this.visible || this.batchCreateMode) {
+      // If component isn't visible (e.g. if features are added via share link)
+      // or user is in batch mode, deselect all features
+      this.deselectAllFeatures();
+    } else if (added.length > 0) {
+      // Only select the newly created feature
+      for (const [idx, feature] of this.drawingState.features.entries()) {
+        // To guarantee change detection, use the list index to change the feature property
+        this.drawingState.features[idx].selected = added.map((f) => f.id).includes(feature.id);
+      }
     }
     // Update drawing source
-    this.olDrawing.deleteFeatures(deleted);
-    this.olDrawing.addFeatures(added);
-    this.olDrawing.updateModifiableFeatures(this.selectedFeatures);
+    if (deleted.length > 0) this.olDrawing.deleteFeatures(deleted);
+    if (added.length > 0) this.olDrawing.addFeatures(added);
     // OlCesium is currently managing features in Cesium
     //this.cesiumDrawing.addFeatures(added)
     //this.cesiumDrawing.deleteFeatures(deleted)
 
-    // Deactivate the drawing tool after finishing the shape
-    if (!this.batchCreateMode) {
-      this.setTool(null);
+    if (this.visible) {
+      // Deactivate the drawing tool after finishing the shape
+      if (!this.batchCreateMode) {
+        this.setTool(null);
+      }
+      this.refreshRender();
     }
-    this.refreshRender();
   }
 
   onProjectionChanged(oldProj: string, newProj: string) {
@@ -282,7 +278,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
       // Refresh all the listeners
       this.drawingState.features = [];
       this.drawingState.features = features;
-      this.olDrawing.updateModifiableFeatures(this.selectedFeatures);
     }
   }
 
@@ -305,7 +300,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   onToggleFeatureSelection(feature: DrawingFeature) {
     feature.selected = !feature.selected;
-    this.olDrawing.updateModifiableFeatures(this.selectedFeatures);
     this.refreshRender();
   }
 
@@ -332,8 +326,11 @@ export default class DrawingComponent extends GirafeHTMLElement {
   async deleteFeature(feature: DrawingFeature) {
     const confirm = await window.gConfirm(`Do you want to remove "${feature.name}" ?`, 'Delete Feature');
     if (confirm) {
-      this.drawingState.features = this.drawingState.features.filter((f) => f.id != feature.id);
-      this.refreshRender();
+      const idx = this.drawingState.features.findIndex((f) => f.id === feature.id);
+      if (idx > -1) {
+        this.drawingState.features.splice(idx, 1);
+        this.refreshRender();
+      }
     }
   }
 
