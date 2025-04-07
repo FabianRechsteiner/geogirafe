@@ -1,7 +1,8 @@
 import { Coordinate } from 'ol/coordinate';
+import { SerializedFeature } from '../../components/drawing/drawingFeature';
 
 // In those types, the boolean are converted to numbers (true=1, false=0)
-// This will save characters in the string to minize the length in the URL
+// This will save characters in the string to minimize the length in the URL
 export type SharedLayer = {
   i: number; // id
   o: number; // order
@@ -9,10 +10,10 @@ export type SharedLayer = {
   e: number; // isGroupExpanded or isLegendExpanded (boolean)
   z: SharedLayer[]; // children
   /**
-   * The following attribute will be useful to know which children were explicitely deleted from the view.
+   * The following attribute will be useful to know which children were explicitly deleted from the view.
    * Without this, we are not able to know if the layer is new in the server configuration
-   * And should be forcely added to the layertree because the user just didn't know this layer when he has created this shared state
-   * Or if it was explicitely removed from the user, and then we won't have to display it again
+   * And should forcefully be added to the layer tree because the user just didn't know this layer when he has created this shared state
+   * Or if it was explicitly removed from the user, and then we won't have to display it again
    */
   x: number[]; // explicit excluded children.
 };
@@ -43,5 +44,5 @@ export type SharedState = {
     i: number; // id
   };
   l: SharedLayer[]; // layers;
-  f?: unknown; // Drawn features
+  f?: SerializedFeature[]; // Drawn features
 };

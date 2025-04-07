@@ -8,6 +8,7 @@ import StateManager from '../state/statemanager';
 import ComponentManager from '../state/componentManager';
 import ThemeLayer from '../../models/layers/themelayer';
 import ErrorManager from '../error/errormanager';
+import DrawingFeature, { DrawingState, SerializedFeature } from '../../components/drawing/drawingFeature';
 
 class StateDeserializer {
   stateManager: StateManager;
@@ -60,11 +61,8 @@ class StateDeserializer {
       this.state.layers.layersList.push(deserializedLayer);
     }
 
-    // Set drawn objects
-    const drawingComponents = ComponentManager.getInstance().getComponentsByName('drawing');
-    if (drawingComponents != undefined && sharedState.f != undefined) {
-      drawingComponents[0].deserialize(sharedState.f);
-    }
+    // Set drawn features
+    this.deserializeDrawingFeatures(sharedState.f);
   }
 
   public getDeserializedLayerTree(sharedLayers: SharedLayer[]) {
@@ -175,6 +173,20 @@ class StateDeserializer {
       }
     }
     return null;
+  }
+
+  private deserializeDrawingFeatures(serializedFeatures: SerializedFeature[] | undefined): void {
+    if (serializedFeatures) {
+      if (this.state.extendedState.drawing) {
+        // First, delete existing drawing features in the state before adding new ones.
+        //  This will trigger removal of the ol features in the map.
+        const drawingState = this.state.extendedState.drawing as DrawingState;
+        drawingState.features.splice(0, drawingState.features.length);
+      } else {
+        this.state.extendedState.drawing = new DrawingState();
+      }
+      serializedFeatures.forEach((f) => DrawingFeature.deserialize(f));
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import DrawingFeature, { DrawingShape } from './drawingFeature';
+import DrawingFeature, { DrawingShape, DrawingState } from './drawingFeature';
 import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
 import State from '../../tools/state/state';
@@ -76,6 +76,8 @@ export default class OlDrawing {
   state: State;
   configManager: ConfigManager;
   userInteractionManager: UserInteractionManager;
+
+  drawingState: DrawingState;
   drawingSource!: VectorSource;
   modifiableFeatures: Collection<Feature> = new Collection([]);
   draw: Draw | null = null;
@@ -83,7 +85,6 @@ export default class OlDrawing {
   snap: Snap | null = null;
   editContextMenu: ContextMenu | null = null;
   currentShape: DrawingShape | null = null;
-  featuresMap: Map<string, { feature: Feature<Geometry>; shape: DrawingShape }> = new Map();
   fixedLength: number = 0;
 
   constructor(map: MapComponent, toolName: string) {
@@ -92,6 +93,7 @@ export default class OlDrawing {
     this.state = StateManager.getInstance().state;
     this.configManager = ConfigManager.getInstance();
     this.userInteractionManager = UserInteractionManager.getInstance();
+    this.drawingState = this.state.extendedState.drawing as DrawingState;
 
     this.drawingSource = new VectorSource({ features: new Collection() });
     this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
@@ -106,7 +108,11 @@ export default class OlDrawing {
       })
     );
     this.map.stateManager.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
-      newTool === null ? this.deactivateDrawTool() : this.activateDrawTool(newTool)
+      newTool === null ? this.removeDrawInteraction() : this.addDrawInteraction(newTool)
+    );
+
+    this.map.stateManager.subscribe(/extendedState.drawing.features.*\.selected/, (_old, _new) =>
+      this.updateModifiableFeatures()
     );
 
     // OlCesium duplicates drawn shapes when 3D view is open if its eventListener is not removed
@@ -118,12 +124,13 @@ export default class OlDrawing {
         this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
       }
     });
+  }
 
-    this.addSnapInteraction();
-
+  private addModifyInteraction() {
+    this.removeModifyInteraction();
     this.modify = new Modify({
       features: this.modifiableFeatures,
-      // Feature editing is triggered by: 1) primary action = click or touch, 2) alternate mouse click = remove vertices
+      // Feature editing is triggered by: 1) primary action = click or touch, 2) alternate mouse click = remove vertex
       // If another tool is exclusively modifying, this interaction will be prevented from reacting via canExecute()
       condition: (e) => (isPrimaryPointerAction(e) || isAlternateMouseClick(e)) && this.canExecute('map.modify'),
       deleteCondition: never,
@@ -134,11 +141,29 @@ export default class OlDrawing {
     });
     this.map.olMap.addInteraction(this.modify);
 
-    this.createEditContextMenu();
-    this.setInteractionsActive(false);
+    // Update the modified geometries in the state
+    this.modify.on('modifyend', (e) => {
+      e.features.forEach((olFeature) => {
+        const idx = this.drawingState.features.findIndex((f) => f.id === olFeature.getId());
+        if (idx > -1) {
+          this.drawingState.features[idx].geojson = this.getGeoJsonFromOlFeature(olFeature);
+        }
+      });
+    });
   }
 
-  createEditContextMenu() {
+  private addSnapInteraction() {
+    this.removeSnapInteraction();
+    // Activate snapping on all existing drawing shapes
+    this.snap = new Snap({ source: this.drawingSource, pixelTolerance: this.map.pixelTolerance });
+    this.map.olMap.addInteraction(this.snap);
+  }
+
+  /**
+   * Adds a context menu to the map with a single entry 'remove vertex'. The menu is configured to open
+   * when the user does an alternate click ( = context event) on or near a vertex of a modifiable feature.
+   */
+  private addEditContextMenu() {
     this.removeEditContextMenu();
     const menuEntries: MenuEntry[] = [
       {
@@ -166,19 +191,25 @@ export default class OlDrawing {
     this.editContextMenu = new ContextMenu(menuEntries, true, conditionToOpen);
   }
 
-  setInteractionsActive(active: boolean) {
-    this.draw?.setActive(active);
-    this.modify?.setActive(active);
-    this.snap?.setActive(active);
-    this.editContextMenu?.setActive(active);
+  addEditInteractions() {
+    if (!this.modify) this.addModifyInteraction();
+    if (!this.editContextMenu) this.addEditContextMenu();
+    // Always recreate snap interaction to get snapping behavior on latest features
+    this.addSnapInteraction();
   }
 
+  removeEditInteractions() {
+    this.removeModifyInteraction();
+    this.removeEditContextMenu();
+    if (!this.draw) this.removeSnapInteraction();
+  }
+
+  /**
+   Check if there is a vertex of a selected (=editable) feature within the pixel tolerance of the clicked coordinates.
+   */
   hasEditableVertexAtCoordinate(coordinate: Coordinate): boolean {
-    /*
-    Check if there is a vertex of a selected (=editable) feature within the pixel tolerance of the clicked coordinates.
-     */
-    const filter = (f: Feature) =>
-      this.modifiableFeatures.getArray().some((editFeature: Feature<Geometry>) => f == editFeature);
+    const filter = (olFeature: Feature) =>
+      this.modifiableFeatures.getArray().some((editFeature: Feature<Geometry>) => olFeature == editFeature);
     // Use filter to only query currently selected features
     const closestElements = this.getClosestVertexAndFeature(coordinate, filter);
     if (closestElements) {
@@ -195,108 +226,146 @@ export default class OlDrawing {
     return false;
   }
 
-  getClosestVertexAndFeature(
+  /**
+   Returns the closest vertex and feature to a coordinate from the drawing source.
+   The feature source can be pre-filtered via an optional filter function.
+   */
+  private getClosestVertexAndFeature(
     coordinate: Coordinate,
     filter: (f: Feature) => boolean = () => true
   ): [Coordinate, Feature<Geometry>] | undefined {
-    /*
-    Returns the closest vertex and feature from the drawing source. Feature source can be pre-filtered via filter function.
-     */
-    const feature = this.drawingSource.getClosestFeatureToCoordinate(coordinate, filter);
-    const geometry = feature?.getGeometry();
+    const olFeature = this.drawingSource.getClosestFeatureToCoordinate(coordinate, filter);
+    const geometry = olFeature?.getGeometry();
     if (geometry) {
       const vertices: MultiPoint = extractVerticesFromGeometry(geometry);
       const closestVertex: Coordinate = vertices.getClosestPoint(coordinate);
-      return [closestVertex, feature];
+      return [closestVertex, olFeature];
     }
     return undefined;
   }
 
-  removeLastInteractedVertex(): boolean | undefined {
-    /* 
-    Deletes the vertex that the user interacted with last via the modify interaction. Handled events are defined by the
-     modify option properties 'condition' and 'insertVertexCondition'.
-    */
+  /**
+   Deletes the vertex the user interacted with last via the modify interaction. Handled events are defined by the
+   modify option properties 'condition' and 'insertVertexCondition'.
+   */
+  private removeLastInteractedVertex(): boolean | undefined {
     return this.modify?.removePoint();
   }
 
-  addFeatures(features: DrawingFeature[]) {
-    features.forEach((feature) => {
-      let olFeature = this.featuresMap.get(feature.id)?.feature;
-      if (olFeature == undefined) {
-        olFeature = this.createOlFeature(feature);
-        this.featuresMap.set(feature.id, { feature: olFeature, shape: feature.type });
+  /**
+   * Adds features to the drawing source if they are missing, and updates their style each time a property changes.
+   * Adding them to the source is only necessary, if the feature originates from a deserialized state and not
+   * from a drawing action in the map.
+   *
+   * @param {DrawingFeature[]} dFeatures - An array of `DrawingFeature` objects to be added.
+   */
+  addFeatures(dFeatures: DrawingFeature[]) {
+    dFeatures.forEach((df) => {
+      let olFeature = this.getOlFeatureFromDrawingSource(df.id);
+      if (olFeature === null) {
+        olFeature = this.createOlFeature(df);
         this.drawingSource.addFeature(olFeature);
       }
-      feature.onChange = (df: DrawingFeature) => olFeature.setStyle((f) => this.getStyle(df, f as Feature<Geometry>));
-      feature.onChange(feature);
+      df.onChange = (df: DrawingFeature) => olFeature!.setStyle((f) => this.getStyle(df, f as Feature<Geometry>));
+      df.onChange(df);
     });
-
-    // Refresh the snap interaction
-    this.addSnapInteraction();
   }
 
-  deleteFeatures(features: DrawingFeature[]) {
-    features.forEach((f) => {
-      const toRemove = this.featuresMap.get(f.id)?.feature;
-      if (toRemove != undefined) {
+  /**
+   * Deletes the provided features from the drawing source.
+   *
+   * @param {DrawingFeature[]} dFeatures - The list of features to be deleted.
+   */
+  deleteFeatures(dFeatures: DrawingFeature[]) {
+    dFeatures.forEach((df) => {
+      const toRemove = this.getOlFeatureFromDrawingSource(df.id);
+      if (toRemove !== null) {
         this.drawingSource.removeFeature(toRemove);
-        this.featuresMap.delete(f.id);
       }
     });
+    this.updateModifiableFeatures();
   }
 
-  updateModifiableFeatures(features: DrawingFeature[]) {
-    // Restricts the modify interaction to the currently selected drawing features
+  /**
+   * Restrict modify interaction to the currently selected features via updating the features collection
+   */
+  private updateModifiableFeatures() {
+    const selectedDrawingFeatures = this.drawingState.features.filter((f) => f.selected);
     this.modifiableFeatures.clear();
-
-    features.forEach((df: DrawingFeature) => {
-      const olFeature = this.featuresMap.get(df.id)?.feature;
+    selectedDrawingFeatures.forEach((df: DrawingFeature) => {
+      const olFeature = this.getOlFeatureFromDrawingSource(df.id);
       if (olFeature) {
         this.modifiableFeatures.push(olFeature);
       }
     });
-  }
-
-  onFeatureAdded(e: VectorSourceEvent) {
-    if (e.feature && this.currentShape !== null) {
-      // If the shape is not in the state already
-      if (
-        !Array.from(this.featuresMap.values())
-          .map((x) => x.feature)
-          .includes(e.feature)
-      ) {
-        let geoJson = {};
-        // GeoJson does not support disks, so we create our own definition
-        if (this.currentShape == DrawingShape.Disk) {
-          const disk = e.feature.getGeometry()! as CircleGeom;
-          geoJson = {
-            type: 'Feature',
-            geometry: {
-              type: 'Disk',
-              center: disk.getCenter(),
-              radius: disk.getRadius()
-            }
-          };
-        } else {
-          geoJson = JSON.parse(new GeoJSON().writeFeature(e.feature));
-        }
-        const feature = new DrawingFeature(this.currentShape, geoJson);
-        this.featuresMap.set(feature.id, { feature: e.feature, shape: feature.type });
-        feature.addToState();
-      }
+    // Only activate interaction if there are features to modify
+    if (this.modifiableFeatures.getLength() > 0) {
+      this.addEditInteractions();
+    } else {
+      this.removeEditInteractions();
     }
   }
 
-  createOlFeature(feature: DrawingFeature) {
-    const geometry = (feature.geojson as any).geometry;
+  /**
+   * Handles the addition of a feature to the vector source. This method is triggered when a new feature is drawn
+   * and added to the vector source at end of the draw interaction.
+   * It creates a `DrawingFeature` to save in the state, containing a unique id and the feature geometry as a geojson.
+   * To identify the ol feature in the map, it receives the same id as the `DrawingFeature`.
+   *
+   * @param {VectorSourceEvent} e - The add-feature event.
+   */
+  onFeatureAdded(e: VectorSourceEvent) {
+    // Cancel if the shape or feature isn't defined or the feature is already in the state
+    if (this.currentShape === null || !e.feature || this.isOlFeatureInState(e.feature)) {
+      return;
+    }
+    const olFeature = e.feature;
+    const dFeature = new DrawingFeature(this.currentShape);
+
+    olFeature.setId(dFeature.id);
+
+    dFeature.geojson = this.getGeoJsonFromOlFeature(olFeature);
+    dFeature.addToState();
+  }
+
+  private getGeoJsonFromOlFeature(olFeature: Feature<Geometry>) {
+    // GeoJson does not support disks, so we create our own definition
+    if (this.currentShape == DrawingShape.Disk) {
+      const disk = olFeature.getGeometry()! as CircleGeom;
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Disk',
+          center: disk.getCenter(),
+          radius: disk.getRadius()
+        }
+      };
+    } else {
+      return JSON.parse(new GeoJSON().writeFeature(olFeature));
+    }
+  }
+
+  private getOlFeatureFromDrawingSource(id: string): Feature<Geometry> | null {
+    return this.drawingSource.getFeatureById(id);
+  }
+
+  private isOlFeatureInState(feature: Feature<Geometry>): boolean {
+    if (!feature.getId()) {
+      return false;
+    }
+    return this.drawingState.features.map((f) => f.id).includes(feature.getId() as string);
+  }
+
+  createOlFeature(dFeature: DrawingFeature): Feature<Geometry> {
+    const geometry = (dFeature.geojson as any).geometry;
     let olFeature;
     if (geometry.type == 'Disk') {
       olFeature = new Feature(new CircleGeom(geometry.center, geometry.radius));
     } else {
-      olFeature = new Feature(new GeoJSON().readFeatures(feature.geojson)[0].getGeometry());
+      olFeature = new Feature(new GeoJSON().readFeatures(dFeature.geojson)[0].getGeometry());
     }
-    olFeature.setStyle((f) => this.getStyle(feature, f as Feature<Geometry>));
+    olFeature.setId(dFeature.id);
+    olFeature.setStyle((f) => this.getStyle(dFeature, f as Feature<Geometry>));
     return olFeature;
   }
 
@@ -332,10 +401,11 @@ export default class OlDrawing {
     return geom;
   }
 
-  activateDrawTool(tool: DrawingShape) {
-    this.deactivateDrawTool();
+  addDrawInteraction(tool: DrawingShape) {
+    this.removeDrawInteraction();
     // Block feature selection while drawing by registering 'map.select' exclusively
     this.userInteractionManager.registerListener('map.select', true, this.toolName);
+
     this.currentShape = tool;
     let geomFunction = undefined;
     let olTool;
@@ -392,23 +462,8 @@ export default class OlDrawing {
     this.addSnapInteraction();
   }
 
-  deactivateDrawTool() {
-    if (this.draw) {
-      this.map.olMap.removeInteraction(this.draw);
-    }
-    this.userInteractionManager.unregisterListener('map.select', this.toolName);
-  }
-
-  addSnapInteraction() {
-    if (this.snap) {
-      this.map.olMap.removeInteraction(this.snap);
-    }
-    this.snap = new Snap({ source: this.drawingSource, pixelTolerance: this.map.pixelTolerance });
-    this.map.olMap.addInteraction(this.snap);
-  }
-
-  centerViewOnFeature(feature: DrawingFeature) {
-    const olFeature = this.featuresMap.get(feature.id)?.feature;
+  centerViewOnFeature(drawingFeature: DrawingFeature) {
+    const olFeature = this.getOlFeatureFromDrawingSource(drawingFeature.id);
     const extent = olFeature?.getGeometry()?.getExtent();
     if (extent) {
       const minResolution = ConfigManager.getInstance().Config.search.minResolution;
@@ -417,29 +472,24 @@ export default class OlDrawing {
   }
 
   // TODO Move as much parameters as possible into DrawingFeature
-  getStyle(feature: DrawingFeature | null, olFeature: Feature<Geometry>) {
-    if (feature == null) {
-      const shape = Array.from(this.featuresMap.values()).filter((x) => x.feature == olFeature)[0].shape;
-      feature = new DrawingFeature(shape, {}, '');
-    }
-
+  getStyle(dFeature: DrawingFeature, olFeature: Feature<Geometry>) {
     const geometry = olFeature.getGeometry() as Geometry;
-    const measureFont = 'Bold ' + feature.measureFontSize + 'px/1 ' + feature.font;
-    const nameFont = 'Bold ' + feature.nameFontSize + 'px/1 ' + feature.font;
+    const measureFont = 'Bold ' + dFeature.measureFontSize + 'px/1 ' + dFeature.font;
+    const nameFont = 'Bold ' + dFeature.nameFontSize + 'px/1 ' + dFeature.font;
     const measureColor = 'rgba(0, 0, 0, 0.4)';
     const defaultStyle = new Style({
-      stroke: new Stroke({ color: feature.strokeColor, width: feature.strokeWidth }),
-      fill: new Fill({ color: feature.fillColor }),
+      stroke: new Stroke({ color: dFeature.strokeColor, width: dFeature.strokeWidth }),
+      fill: new Fill({ color: dFeature.fillColor }),
       image: new Circle({
-        radius: feature.strokeWidth, // Points are using default stroke parameters
-        fill: new Fill({ color: feature.strokeColor })
+        radius: dFeature.strokeWidth, // Points are using default stroke parameters
+        fill: new Fill({ color: dFeature.strokeColor })
       }),
       text: new Text({
-        text: feature.displayName ? feature.name : '',
+        text: dFeature.displayName ? dFeature.name : '',
         font: nameFont,
         textBaseline: 'bottom',
-        offsetY: feature.type == DrawingShape.Point ? 2 * feature.nameFontSize : 1.2 * feature.nameFontSize,
-        fill: new Fill({ color: feature.nameColor })
+        offsetY: dFeature.type == DrawingShape.Point ? 2 * dFeature.nameFontSize : 1.2 * dFeature.nameFontSize,
+        fill: new Fill({ color: dFeature.nameColor })
       })
     });
 
@@ -448,8 +498,8 @@ export default class OlDrawing {
         font: measureFont,
         padding: [2, 2, 2, 2],
         textBaseline: 'bottom',
-        offsetY: -1 * feature.nameFontSize,
-        fill: new Fill({ color: feature.measureColor })
+        offsetY: -1 * dFeature.nameFontSize,
+        fill: new Fill({ color: dFeature.measureColor })
       }),
       image: new RegularShape({
         radius: 6,
@@ -474,62 +524,62 @@ export default class OlDrawing {
     // If the shape is being constructed (ex. it is a polygon for which only two points are placed yet)
     if (
       geometry.getType() == 'LineString' &&
-      feature.type !== DrawingShape.Polyline &&
-      feature.type !== DrawingShape.FreehandPolyline
+      dFeature.type !== DrawingShape.Polyline &&
+      dFeature.type !== DrawingShape.FreehandPolyline
     ) {
       return [];
     }
 
-    if (feature.type == DrawingShape.Point || geometry.getType() === 'Point') {
-      addLabel(geometry as Point, feature.getCoordText((geometry as Point).getCoordinates()));
-    } else if (feature.type == DrawingShape.Polyline) {
+    if (dFeature.type == DrawingShape.Point || geometry.getType() === 'Point') {
+      addLabel(geometry as Point, dFeature.getCoordText((geometry as Point).getCoordinates()));
+    } else if (dFeature.type == DrawingShape.Polyline) {
       (geometry as LineString).forEachSegment((a, b) =>
-        addLabel(getHalfPoint([a, b]), feature.getLengthText(getDistance([a, b])))
+        addLabel(getHalfPoint([a, b]), dFeature.getLengthText(getDistance([a, b])))
       );
-    } else if (feature.type == DrawingShape.Polygon) {
+    } else if (dFeature.type == DrawingShape.Polygon) {
       const polygon = geometry as Polygon;
       const segments = this.ensurePolygonIsProperlyClosed(polygon);
       new LineString(segments).forEachSegment((a, b) =>
-        addLabel(getHalfPoint([a, b]), feature.getLengthText(getDistance([a, b])))
+        addLabel(getHalfPoint([a, b]), dFeature.getLengthText(getDistance([a, b])))
       );
-      addLabel(polygon.getInteriorPoint(), feature.getAreaText(getArea(polygon)));
-    } else if (feature.type == DrawingShape.Disk) {
+      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getArea(polygon)));
+    } else if (dFeature.type == DrawingShape.Disk) {
       const radius = (geometry as CircleGeom).getRadius();
       const center = (geometry as CircleGeom).getCenter();
       const radiusLine = [center, [center[0] + radius, center[1]]];
       const radiusLineStyle = defaultStyle.clone();
-      radiusLineStyle.setStroke(new Stroke({ color: measureColor, width: feature.strokeWidth }));
+      radiusLineStyle.setStroke(new Stroke({ color: measureColor, width: dFeature.strokeWidth }));
       radiusLineStyle.getText()!.setText('');
-      radiusLineStyle.setGeometry(feature.displayMeasure ? new LineString(radiusLine) : new LineString([]));
+      radiusLineStyle.setGeometry(dFeature.displayMeasure ? new LineString(radiusLine) : new LineString([]));
       styles.push(radiusLineStyle);
-      addLabel(getHalfPoint(radiusLine), feature.getLengthText(radius));
-    } else if (feature.type == DrawingShape.FreehandPolygon) {
+      addLabel(getHalfPoint(radiusLine), dFeature.getLengthText(radius));
+    } else if (dFeature.type == DrawingShape.FreehandPolygon) {
       const polygon = geometry as Polygon;
       this.ensurePolygonIsProperlyClosed(polygon);
-      addLabel(polygon.getInteriorPoint(), feature.getAreaText(getArea(polygon)));
+      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getArea(polygon)));
       addLabel(
         new Point(polygon.getCoordinates()[0][0]),
-        feature.getLengthText(getDistance(polygon.getCoordinates()[0]))
+        dFeature.getLengthText(getDistance(polygon.getCoordinates()[0]))
       );
-    } else if (feature.type == DrawingShape.FreehandPolyline) {
+    } else if (dFeature.type == DrawingShape.FreehandPolyline) {
       const line = geometry as LineString;
-      addLabel(new Point(line.getCoordinates()[0]), feature.getLengthText(getDistance(line.getCoordinates())));
-    } else if (feature.type == DrawingShape.Rectangle) {
+      addLabel(new Point(line.getCoordinates()[0]), dFeature.getLengthText(getDistance(line.getCoordinates())));
+    } else if (dFeature.type == DrawingShape.Rectangle) {
       const rect = geometry as Polygon;
       const segment1 = [rect.getCoordinates()[0][0], rect.getCoordinates()[0][1]];
       const segment2 = [rect.getCoordinates()[0][1], rect.getCoordinates()[0][2]];
-      addLabel(getHalfPoint(segment1), feature.getLengthText(getDistance(segment1)));
-      addLabel(getHalfPoint(segment2), feature.getLengthText(getDistance(segment2)));
-      addLabel(rect.getInteriorPoint(), feature.getAreaText(getArea(rect)));
-    } else if (feature.type == DrawingShape.Square) {
+      addLabel(getHalfPoint(segment1), dFeature.getLengthText(getDistance(segment1)));
+      addLabel(getHalfPoint(segment2), dFeature.getLengthText(getDistance(segment2)));
+      addLabel(rect.getInteriorPoint(), dFeature.getAreaText(getArea(rect)));
+    } else if (dFeature.type == DrawingShape.Square) {
       const square = geometry as Polygon;
       const segment = [square.getCoordinates()[0][0], square.getCoordinates()[0][1]];
-      addLabel(getHalfPoint(segment), feature.getLengthText(getDistance(segment)));
-      addLabel(square.getInteriorPoint(), feature.getAreaText(getArea(square)));
+      addLabel(getHalfPoint(segment), dFeature.getLengthText(getDistance(segment)));
+      addLabel(square.getInteriorPoint(), dFeature.getAreaText(getArea(square)));
     }
 
-    if (feature.selected) {
-      const vertexStyle = feature.getVertexStyle();
+    if (dFeature.selected) {
+      const vertexStyle = dFeature.getVertexStyle();
       // Add a node style to every vertex of the geometry
       vertexStyle.setGeometry(function (f) {
         const geom = f?.getGeometry();
@@ -553,6 +603,29 @@ export default class OlDrawing {
     return segments;
   }
 
+  private removeDrawInteraction() {
+    if (this.draw) {
+      this.map.olMap.removeInteraction(this.draw);
+      this.draw = null;
+    }
+    // Reactivate feature selection by unregistering 'map.select'
+    this.userInteractionManager.unregisterListener('map.select', this.toolName);
+  }
+
+  private removeModifyInteraction() {
+    if (this.modify) {
+      this.map.olMap.removeInteraction(this.modify);
+      this.modify = null;
+    }
+  }
+
+  private removeSnapInteraction() {
+    if (this.snap) {
+      this.map.olMap.removeInteraction(this.snap);
+      this.snap = null;
+    }
+  }
+
   private removeEditContextMenu() {
     if (this.editContextMenu) {
       this.editContextMenu.remove();
@@ -567,6 +640,8 @@ export default class OlDrawing {
   }
 
   unregisterInteractions() {
+    this.removeDrawInteraction();
+    this.removeEditInteractions();
     this.userInteractionManager.unregisterListener('map.draw', this.toolName);
     this.userInteractionManager.unregisterListener('map.modify', this.toolName);
     this.userInteractionManager.unregisterListener('map.snap', this.toolName);

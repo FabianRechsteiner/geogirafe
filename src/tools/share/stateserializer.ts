@@ -5,9 +5,9 @@ import { SharedLayer, SharedState } from './sharedstate';
 import LZString from 'lz-string';
 import LayerManager from '../layers/layermanager';
 import State from '../state/state';
-import ComponentManager from '../state/componentManager';
 import ThemeLayer from '../../models/layers/themelayer';
 import ThemesHelper from '../themes/themeshelper';
+import { DrawingState } from '../../components/drawing/drawingFeature';
 
 class StateSerializer {
   layerManager: LayerManager;
@@ -46,9 +46,8 @@ class StateSerializer {
     };
 
     // Drawn features
-    const drawingComponents = ComponentManager.getInstance().getComponentsByName('drawing');
-    if (drawingComponents != undefined) {
-      sharedState.f = drawingComponents[0].serialize();
+    if (state.extendedState.drawing) {
+      sharedState.f = (state.extendedState.drawing as DrawingState).features.map((f) => f.serialize());
     }
 
     // Is there a basemap ?
