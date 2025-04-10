@@ -12,18 +12,10 @@ if [ "$1" = 'c2c' ];
 then
     echo "Preparing environment CAMPTOCAMP..."
     cp demo/config.$1.json $APPDIR/config.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/de.json" --silent --output $MOCKDIR/de.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/en.json" --silent --output $MOCKDIR/en.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
 elif [ "$1" = 'experimental' ];
 then
     echo "Preparing environment EXPERIMENTAL..."
     cp demo/config.$1.json $APPDIR/config.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/themes?background=background&interface=experimental" --silent --output $MOCKDIR/themes.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/de.json" --silent --output $MOCKDIR/de.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/en.json" --silent --output $MOCKDIR/en.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
 elif [ "$1" = 'cartolacote' ];
 then
     echo "Preparing environment CARTOLACOTE..."

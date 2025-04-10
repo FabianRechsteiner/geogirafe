@@ -4,9 +4,9 @@
   },
   "languages": {
     "translations": {
-      "de": ["i18n/de.json", "Mock/de.json"],
-      "en": ["i18n/en.json", "Mock/en.json"],
-      "fr": ["i18n/fr.json", "Mock/fr.json"],
+      "de": ["i18n/de.json", "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/de.json"],
+      "en": ["i18n/en.json", "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/en.json"],
+      "fr": ["i18n/fr.json", "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/fr.json"],
       "it": ["i18n/it.json"]
     },
     "defaultLanguage": "en"
@@ -15,7 +15,7 @@
     "defaultSelectionComponent": "grid"
   },
   "themes": {
-    "url": "Mock/themes.json",
+    "url": "https://geomapfish-demo-2-9.camptocamp.com/themes?background=background&interface=experimental",
     "defaultTheme": "Demo"
   },
   "selection": {

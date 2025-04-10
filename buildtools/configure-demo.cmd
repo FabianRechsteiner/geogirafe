@@ -7,10 +7,6 @@ if not exist %OUTPUTDIR% mkdir %OUTPUTDIR%
 if "%1"=="c2c" (
     echo "Preparing environment CAMPTOCAMP..."
     copy demo\config.c2c.json %APPDIR%\config.json /Y
-    curl "https://geomapfish-demo-2-8.camptocamp.com/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/de.json" --output %OUTPUTDIR%\de.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/en.json" --output %OUTPUTDIR%\en.json
-    curl "https://geomapfish-demo-2-8.camptocamp.com/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
     goto :end
 )
 
@@ -18,10 +14,6 @@ if "%1"=="c2c" (
 if "%1"=="experimental" (
     echo "Preparing environment EXPERIMENTAL..."
     copy demo\config.experimental.json %APPDIR%\config.json /Y
-    curl "https://geomapfish-demo-2-9.camptocamp.com/themes?background=background&interface=experimental" --output %OUTPUTDIR%\themes.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/de.json" --output %OUTPUTDIR%\de.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/en.json" --output %OUTPUTDIR%\en.json
-    curl "https://geomapfish-demo-2-9.camptocamp.com/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
     goto :end
 )
 
