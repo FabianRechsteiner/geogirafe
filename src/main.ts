@@ -1,7 +1,6 @@
 import tippy from 'tippy.js';
 import AboutComponent from './components/about/component';
 import BasemapComponent from './components/basemap/component';
-import ColorSwitcherComponent from './components/colorswitcher/component';
 import CoordinateComponent from './components/coordinate/component';
 import CrossSectionSettingsComponent from './components/cross-section/cross-section-settings/component';
 import CrossSectionViewComponent from './components/cross-section/cross-section-viewer/component';
@@ -46,7 +45,6 @@ initialize().then(() => {
   // Define components names
   customElements.define('girafe-about', AboutComponent);
   customElements.define('girafe-basemap', BasemapComponent);
-  customElements.define('girafe-colorswitcher', ColorSwitcherComponent);
   customElements.define('girafe-coordinate', CoordinateComponent);
   customElements.define('girafe-layout', LayoutComponent);
   customElements.define('girafe-help', HelpComponent);

@@ -73,6 +73,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
       if (isLoaded) {
         this.initPreferenceOptions();
         this.initCurrentPreferenceValues();
+        this.initDarkModeDefaults();
         this.initColorPicker();
         this.ready = true;
         this.render();
@@ -84,6 +85,8 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
     this.loadConfig().then(() => {
       this.render();
       this.subscribe('interface.userPreferencesPanelVisible', (_, newValue) => this.togglePanel(newValue));
+      this.subscribe('interface.darkFrontendMode', (_, newValue) => this.onChangeDarkFrontendMode(newValue));
+      this.subscribe('interface.darkMapMode', (_, newValue) => this.onChangeDarkMapMode(newValue));
     });
   }
 
@@ -103,6 +106,27 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   private togglePanel(visible: boolean): void {
     this.visible = visible;
     this.render();
+  }
+
+  onChangeDarkMapMode(newValue: boolean | undefined) {
+    const currentTheme = newValue ? 'dark' : 'light';
+    this.activateTheme(currentTheme, 'map');
+  }
+
+  onChangeDarkFrontendMode(newValue: boolean | undefined) {
+    const themeIsDark = newValue ?? this.systemIsInDarkMode();
+    const currentTheme = themeIsDark ? 'dark' : 'light';
+    this.activateTheme(currentTheme, 'theme');
+  }
+
+  activateTheme(mode: 'dark' | 'light', className: string) {
+    const otherMode = mode === 'dark' ? 'light' : 'dark';
+    document.body.classList.remove(`${otherMode}-${className}`);
+    document.body.classList.add(`${mode}-${className}`);
+  }
+
+  systemIsInDarkMode(): boolean {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
   /**
@@ -171,6 +195,15 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
       );
       this.preferences[key].currentValue = found && parentObject && lastKey ? parentObject[lastKey] : undefined;
     }
+  }
+
+  /**
+   * Initializes dark mode-related preferences with fallback logic
+   */
+  private initDarkModeDefaults() {
+    const config = this.configManager.Config.interface.darkFrontendMode;
+    this.state.interface.darkFrontendMode = config ?? this.systemIsInDarkMode();
+    this.state.interface.darkMapMode = this.configManager.Config.interface.darkMapMode;
   }
 
   /**
