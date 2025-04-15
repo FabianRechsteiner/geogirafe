@@ -28,6 +28,9 @@ button.selected {
   flex-wrap: wrap;
 }
 
+.label-container {
+  flex-grow: 1;
+}
 .icon {
   width: 1.2rem;
   height: 1.2rem;
@@ -37,6 +40,9 @@ button.selected {
 }
 .icon:hover {
   fill: var(--text-color-grad2);
+}
+.gg-icon-button:hover {
+  border: none;
 }
 .colorPicker {
   border-radius: 5px;

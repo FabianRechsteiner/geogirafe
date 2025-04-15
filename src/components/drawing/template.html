@@ -64,11 +64,21 @@
       <div id="${'f-' + feature.id}" class="girafe">
         <button
           id="${'f-select-' + feature.id}"
-          class="gg-icon-button icon"
+          class="gg-icon-button gg-small"
           tip="Select to change appearance"
           onclick="${() => this.onToggleFeatureSelection(feature)}">
-          ${this.htmlUnsafe(feature.selected ? this.checkedIcon : this.noCheckedIcon)}
+          <div class="icon">
+            ${this.htmlUnsafe(feature.selected ? this.checkedIcon : this.noCheckedIcon)}
+          </div>
         </button>
+
+        <div class="label-container">
+          <button
+            class="${feature.selected ? 'selectable-label gg-icon-button gg-small gg-selected' : 'selectable-label gg-icon-button gg-small gg-opacity'}"
+            onclick="${() => this.onToggleFeatureSelection(feature)}">
+            <span id="${'f-name-' + feature.id}">${feature.name}</span>
+          </button>
+        </div>
 
         <button
           class="gg-icon-button icon"
@@ -76,8 +86,6 @@
           onclick="${() => this.olDrawing.centerViewOnFeature(feature)}">
           ${this.htmlUnsafe(this.locateIcon)}
         </button>
-
-        <span id="${'f-name-' + feature.id}">${feature.name}</span>
 
         <button class="gg-icon-button icon" tip="Delete shape" onclick="${() => this.deleteFeature(feature)}">
           ${this.htmlUnsafe(this.trashIcon)}
