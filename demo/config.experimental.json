@@ -83,7 +83,9 @@
       "url": "https://geomapfish-demo-sso.camptocamp.com",
       "clientId": "288833770369390672",
       "audience": ["geomapfish-demo-2-9.camptocamp.com"],
-      "scope": "openid profile email"
+      "audienceExcludedPaths": ["^/static/", "^/tiles/"],
+      "scope": "openid profile email",
+      "checkSessionOnLoad": "true"
     },
     "geomapfish": {
       "userInfoUrl": "https://geomapfish-demo-2-9.camptocamp.com/loginuser",
