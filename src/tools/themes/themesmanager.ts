@@ -306,13 +306,18 @@ class ThemesManager extends GirafeSingleton {
           metadataUrl: elem.metadata?.metadataUrl,
           disclaimer: elem.metadata?.disclaimer,
           isDefaultExpanded: elem.metadata?.isExpanded,
-          isExclusiveGroup: elem.metadata?.exclusiveGroup
+          isExclusiveGroup: elem.metadata?.exclusiveGroup,
+          time: elem.time
         };
         const group = new GroupLayer(elem.id, elem.name, order.value, options);
 
-        // Append childs
+        // Append children
         if (elem.children) {
           elem.children.forEach((child: GMFTreeItem) => {
+            // Append time options to child
+            if (options.time) {
+              child.time = { ...options.time };
+            }
             const childLayer = this.prepareThemeLayer(child, ogcServerName, order);
             if (childLayer) {
               childLayer.parent = group;

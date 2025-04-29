@@ -1,0 +1,6 @@
+#container {
+    background-color: var(--bkg-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+}

@@ -8,6 +8,7 @@ import State from '../state/state';
 import ThemeLayer from '../../models/layers/themelayer';
 import ThemesHelper from '../themes/themeshelper';
 import { DrawingState } from '../../components/drawing/drawingFeature';
+import { isTimeAwareLayer } from '../../models/layers/timeawarelayer';
 
 class StateSerializer {
   layerManager: LayerManager;
@@ -100,6 +101,7 @@ class StateSerializer {
       o: layer.order,
       c: Number(layer.active),
       e: Number(isExpanded),
+      t: isTimeAwareLayer(layer) ? layer.timeRestriction : undefined,
       z: sharedChildren,
       x: removedChildren
     };

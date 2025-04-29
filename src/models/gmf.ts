@@ -1,3 +1,4 @@
+import ITimeOptions from '../tools/time/itimeoptions';
 /**
  * These are the models for a GeoMapFish backend
  */
@@ -47,6 +48,7 @@ export interface GMFTreeItem {
   childLayers?: GMFChildLayer[];
   layer?: string;
   dimensions?: Record<string, object>;
+  time?: ITimeOptions;
 }
 
 export interface GMFTheme {

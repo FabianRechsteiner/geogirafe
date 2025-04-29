@@ -2,6 +2,11 @@ import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import BaseLayer from '../../../models/layers/baselayer';
 import LayerManager from '../../../tools/layers/layermanager';
 import DragManager from './dragmanager';
+import { isTimeAwareLayer, TimeAwareLayer } from '../../../models/layers/timeawarelayer';
+import tippy from 'tippy.js';
+import TimeRestrictionComponent from '../../timerestriction/component';
+import LayerWms from '../../../models/layers/layerwms';
+import Layer from '../../../models/layers/layer';
 
 export default abstract class TreeViewElement extends GirafeHTMLElement {
   private dragManager: DragManager;
@@ -26,6 +31,10 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     super.girafeTranslate();
     this.initializeDrag();
     this.createTooltips();
+
+    if (isTimeAwareLayer(this.layer)) {
+      this.createTimeRestrictionTooltip(this.layer);
+    }
   }
 
   public refreshRender(): void;
@@ -87,5 +96,55 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
       this.container.classList.remove('dragAfter');
       this.container.classList.remove('dragBefore');
     }
+  }
+
+  getButtonClass(button: string) {
+    const buttonClasses = 'gg-icon-button gg-small gg-opacity tool';
+    const activeButtonClasses = buttonClasses + ' active';
+    switch (button) {
+      case 'swipedLeft':
+        if (!this.layer.inactive && this.layer instanceof Layer) {
+          return this.layer.swiped === 'left' ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      case 'swipedRight':
+        if (!this.layer.inactive && this.layer instanceof Layer) {
+          return this.layer.swiped === 'right' ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      case 'opacity':
+        if (!this.layer.inactive && this.layer instanceof Layer) {
+          return this.layer.opacity < 1 ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      case 'filter':
+        if (!this.layer.inactive && this.layer instanceof LayerWms && this.layer.queryable) {
+          return this.layer.hasFilter ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      case 'timeRestriction':
+        if (!this.layer.inactive && isTimeAwareLayer(this.layer)) {
+          return this.layer.hasTimeRestriction ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      default:
+        throw Error('Unsupported type: ' + button);
+    }
+  }
+
+  private createTimeRestrictionTooltip(layer: TimeAwareLayer) {
+    const el = this.shadow.getElementById('timeRestriction');
+    if (!el) return;
+    tippy(el, {
+      trigger: 'click',
+      arrow: true,
+      interactive: true,
+      theme: 'light',
+      placement: 'right',
+      appendTo: document.body,
+      content: (_reference: object) => {
+        return new TimeRestrictionComponent(layer);
+      }
+    });
   }
 }

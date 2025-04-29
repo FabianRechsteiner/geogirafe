@@ -1,0 +1,23 @@
+<div id="container">
+
+  <input id="input-lower"
+         type="range"
+         min="0"
+         max="1"
+         step="1" />
+
+  <input id="input-upper"
+         type="range"
+         min="0"
+         max="1"
+         step="1" />
+
+  <div id="slider-track"></div>
+
+  <div class="slider-label">
+    <output id="output-label-lower"></output>
+    <div class="${this.mode === 'range' ? '' : 'hidden'}">/</div>
+    <output id="output-label-upper"
+            class="${this.mode === 'range' ? '' : 'hidden'}"></output>
+  </div>
+</div>

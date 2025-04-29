@@ -3,6 +3,9 @@ import { GMFChildLayer, GMFTreeItem } from '../gmf';
 import ServerOgc from '../serverogc';
 import ILayerWithFilter from './ilayerwithfilter';
 import ILayerWithLegend from './ilayerwithlegend';
+import ILayerWithTime from './ilayerwithtime';
+import ITimeOptions from '../../tools/time/itimeoptions';
+import LayerTimeFormatter from '../../tools/time/layertimeformatter';
 import Layer from './layer';
 
 export type LayerWmsOptions = {
@@ -25,9 +28,10 @@ export type LayerWmsOptions = {
   printNativeAngle?: boolean;
   queryable?: boolean;
   queryLayers?: string;
+  time?: ITimeOptions;
 };
 
-class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
+class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILayerWithTime {
   /**
    * This class is a used in the state of the application, which will be accessed behind a javascript proxy.
    * This means that each modification made to its properties must come from outside,
@@ -59,6 +63,9 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
   public queryLayers?: string;
   public filter?: WfsFilter;
 
+  public timeOptions?: ITimeOptions;
+  public timeRestriction?: string;
+
   constructor(id: number, name: string, order: number, ogcServer: ServerOgc, options?: GMFTreeItem | LayerWmsOptions) {
     let opts = options ?? {};
     opts = LayerWms.isGMFTreeItem(opts) ? LayerWms.getOptionsFromGMFTreeItem(opts) : opts;
@@ -79,16 +86,18 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
     this.printNativeAngle = opts?.printNativeAngle;
     this.queryable = opts?.queryable ?? false;
     this.queryLayers = opts?.queryLayers;
+    this.timeOptions = opts?.time;
 
     if (this.queryable && (!this.ogcServer.wfsSupport || this.ogcServer.urlWfs?.length === 0)) {
       this.hasError = true;
       this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
       this.queryable = false;
     }
+    this.setDefaultTimeRestriction();
   }
 
   clone(): LayerWms {
-    const options = {
+    const options: LayerWmsOptions = {
       isDefaultChecked: this.isDefaultChecked,
       metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
@@ -107,12 +116,14 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
       hiDPILegendImages: this.hiDPILegendImages,
       printNativeAngle: this.printNativeAngle,
       queryable: this.queryable,
-      queryLayers: this.queryLayers
+      queryLayers: this.queryLayers,
+      time: this.timeOptions
     };
 
     const clonedObject = new LayerWms(this.id, this.name, this.order, this.ogcServer, options);
     clonedObject.filter = this.filter;
     clonedObject.activeState = this.activeState;
+    clonedObject.timeRestriction = this.timeRestriction;
     return clonedObject;
   }
 
@@ -129,6 +140,17 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
 
   get hasFilter() {
     return this.filter !== null && this.filter !== undefined;
+  }
+
+  get hasTimeRestriction() {
+    return !!this.timeRestriction;
+  }
+
+  setDefaultTimeRestriction() {
+    if (this.timeOptions) {
+      const timeFormatter = new LayerTimeFormatter(this.timeOptions);
+      this.timeRestriction = timeFormatter.getFormattedDefault();
+    }
   }
 
   get serverUniqueQueryId() {
@@ -161,7 +183,8 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter {
       isLegendExpanded: options.metadata?.isLegendExpanded,
       wasLegendExpanded: options.metadata?.wasLegendExpanded,
       printNativeAngle: options.metadata?.printNativeAngle,
-      hiDPILegendImages: options.metadata?.hiDPILegendImages
+      hiDPILegendImages: options.metadata?.hiDPILegendImages,
+      time: options.time
     };
 
     if (options.childLayers) {
