@@ -1,0 +1,12 @@
+<div id="container">
+
+  ${[this.widget].map(widget => widget === 'datepicker' ? uHtml`
+    <girafe-time-picker id="time-widget"></girafe-time-picker>
+    ` : uHtml`
+    <girafe-time-slider id="time-widget"></girafe-time-slider>
+    `)}
+
+  <button class="gg-icon-button gg-medium" tip="Remove filter" onclick="${() => this.onRemove()}">
+    <img alt="delete-icon" src="icons/trash.svg" />
+  </button>
+</div>

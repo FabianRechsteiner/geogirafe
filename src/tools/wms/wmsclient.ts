@@ -186,12 +186,16 @@ export default abstract class WmsClient {
     this.#manageLayerOptions(layerWms);
   }
 
+  changeTimeRestriction(layerWms: LayerWms) {
+    this.#manageLayerOptions(layerWms);
+  }
+
   #manageLayerOptions(layerWms: LayerWms) {
     if (!this.layerExists(layerWms)) {
       throw new Error('Cannot change filter for this layer: it does not exist');
     }
 
-    if (!layerWms.hasFilter && !layerWms.isTransparent && layerWms.swiped === 'no') {
+    if (!layerWms.hasFilter && !layerWms.hasTimeRestriction && !layerWms.isTransparent && layerWms.swiped === 'no') {
       // There is no more filter or opacity => Back to normal
       if (layerWms.treeItemId in this.independentLayers) {
         const olayer = this.independentLayers[layerWms.treeItemId].olayer;
@@ -207,7 +211,12 @@ export default abstract class WmsClient {
       if (layerWms.isTransparent) {
         olayer.setOpacity(layerWms.opacity);
       }
-      this.updateOpenLayerFilter(layerWms);
+      if (layerWms.hasFilter) {
+        this.updateOpenLayerFilter(layerWms);
+      }
+      if (layerWms.hasTimeRestriction) {
+        this.updateTimeRestriction(layerWms);
+      }
     } else if (this.layerInStandardLayers(layerWms)) {
       this.makeLayerIndependent(layerWms);
     }
@@ -226,7 +235,12 @@ export default abstract class WmsClient {
         opacity: layerWms.opacity
       });
       this.independentLayers[layerWms.treeItemId] = { layerWms: layerWms, olayer: olayer };
-      this.updateOpenLayerFilter(layerWms);
+      if (layerWms.hasTimeRestriction) {
+        this.updateTimeRestriction(layerWms);
+      }
+      if (layerWms.hasFilter) {
+        this.updateOpenLayerFilter(layerWms);
+      }
       this.map.addLayer(olayer);
     } else {
       throw new Error('A layer can be made independent only if it has already been added to the map.');
@@ -234,6 +248,11 @@ export default abstract class WmsClient {
   }
 
   abstract updateOpenLayerFilter(layerWms: LayerWms): void;
+
+  updateTimeRestriction(layerWms: LayerWms) {
+    const olayer = this.independentLayers[layerWms.treeItemId].olayer;
+    (olayer.getSource() as ImageWMS).updateParams({ TIME: layerWms.timeRestriction });
+  }
 
   selectFeatures(extent: number[]) {
     const selectionParams: SelectionParam[] = [];

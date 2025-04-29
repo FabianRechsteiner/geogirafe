@@ -6,6 +6,7 @@ import LayerLocalFile from '../../../models/layers/layerlocalfile';
 import QueryBuilderComponent from '../../querybuilder/component';
 import MapManager from '../../../tools/state/mapManager';
 import LayerWmts from '../../../models/layers/layerwmts';
+import Baselayer from '../../../models/layers/baselayer';
 import TreeViewElement from '../tools/treeviewelement';
 
 class TreeViewItemComponent extends TreeViewElement {
@@ -207,6 +208,9 @@ class TreeViewItemComponent extends TreeViewElement {
     this.subscribe(/layers\.layersList\..*\.filter/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
       this.refreshRender(layer)
     );
+    this.subscribe(/layers\.layersList\..*\.timeRestriction/, (_old: boolean, _new: boolean, layer: Baselayer) => {
+      if (layer === this.layer || layer === this.layer.parent) this.refreshRender(this.layer);
+    });
     this.subscribe(/layers\.layersList\..*\.opacity/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
       this.refreshRender(layer)
     );
@@ -226,35 +230,6 @@ class TreeViewItemComponent extends TreeViewElement {
 
   toggle(state?: 'on' | 'off') {
     this.layerManager.toggleLayer(this.layer, state);
-  }
-
-  getButtonClass(button: string) {
-    const buttonClasses = 'gg-icon-button gg-small gg-opacity tool';
-    const activeButtonClasses = buttonClasses + ' active';
-    switch (button) {
-      case 'swipedLeft':
-        if (this.layer.active) {
-          return this.layer.swiped === 'left' ? activeButtonClasses : buttonClasses;
-        }
-        return 'hidden';
-      case 'swipedRight':
-        if (this.layer.active) {
-          return this.layer.swiped === 'right' ? activeButtonClasses : buttonClasses;
-        }
-        return 'hidden';
-      case 'opacity':
-        if (this.layer.active) {
-          return this.layer.opacity < 1 ? activeButtonClasses : buttonClasses;
-        }
-        return 'hidden';
-      case 'filter':
-        if (this.layer.active && this.layer instanceof LayerWms && this.layer.queryable) {
-          return this.layer.hasFilter ? activeButtonClasses : buttonClasses;
-        }
-        return 'hidden';
-      default:
-        throw Error('Unsupported type: ' + button);
-    }
   }
 
   zoomToVisibleResolution() {

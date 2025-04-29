@@ -50,6 +50,8 @@
     "Date": "Date",
     "de": "Allemand",
     "debug": "Debug",
+    "Define time restriction on layer": "Définir la restriction temporelle sur la couche",
+    "Define time restriction on group": "Définir la restriction temporelle pour le groupe",
     "Delete bookmark": "Supprimer le marque-page",
     "Delete Feature": "Supprimer la fonctionnalité",
     "Delete shape": "Supprimer la forme",

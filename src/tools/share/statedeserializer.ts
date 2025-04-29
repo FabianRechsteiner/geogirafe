@@ -7,6 +7,7 @@ import LayerManager from '../layers/layermanager';
 import StateManager from '../state/statemanager';
 import ComponentManager from '../state/componentManager';
 import ThemeLayer from '../../models/layers/themelayer';
+import { isTimeAwareLayer } from '../../models/layers/timeawarelayer';
 import ErrorManager from '../error/errormanager';
 import DrawingFeature, { DrawingState, SerializedFeature } from '../../components/drawing/drawingFeature';
 
@@ -89,6 +90,9 @@ class StateDeserializer {
       this.checkUnknownLayers(sharedLayer, originalLayer);
     } else if (originalLayer instanceof Layer && this.layerManager.isLayerWithLegend(originalLayer)) {
       originalLayer.isLegendExpanded = Boolean(sharedLayer.e);
+    }
+    if (isTimeAwareLayer(originalLayer)) {
+      originalLayer.timeRestriction = sharedLayer.t;
     }
   }
 

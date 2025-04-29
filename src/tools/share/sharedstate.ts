@@ -8,6 +8,7 @@ export type SharedLayer = {
   o: number; // order
   c: number; // checked (boolean)
   e: number; // isGroupExpanded or isLegendExpanded (boolean)
+  t: string | undefined; // timeRestriction (string)
   z: SharedLayer[]; // children
   /**
    * The following attribute will be useful to know which children were explicitly deleted from the view.

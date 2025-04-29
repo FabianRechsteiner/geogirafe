@@ -36,7 +36,6 @@ import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
 import GeoEvents from '../../models/events';
-
 import MapManager from '../../tools/state/mapManager';
 import MapPosition, { parseMapPositionFromUrl, setUrlFromMapPosition } from '../../tools/state/mapposition';
 import BaseLayer from '../../models/layers/baselayer';
@@ -44,6 +43,7 @@ import GroupLayer from '../../models/layers/grouplayer';
 import { FocusFeature } from './tools/focusfeature';
 import XyzManager from './tools/xyzmanager';
 import ThemeLayer from '../../models/layers/themelayer';
+import { isTimeAwareLayer } from '../../models/layers/timeawarelayer';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionParam from '../../models/selectionparam';
 import WfsManager from '../../tools/wfs/wfsmanager';
@@ -178,6 +178,9 @@ export default class MapComponent extends GirafeHTMLElement {
     this.subscribe(/layers\.layersList\..*\.filter/, (_oldFilter: string, _newFilter: string, layer: Layer) =>
       this.onChangeFilter(layer)
     );
+    this.subscribe(/layers\.layersList\..*\.timeRestriction/, (_oldTime: string, _newTime: string, layer: Layer) =>
+      this.onChangeTime(layer)
+    );
     this.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder());
 
     this.subscribe('sharedStateIsLoaded', (_: boolean, isLoaded: boolean) => {
@@ -200,6 +203,7 @@ export default class MapComponent extends GirafeHTMLElement {
         this.onLayerToggled(layer);
         this.onChangeOpacity(layer);
         this.onChangeFilter(layer);
+        this.onChangeTime(layer);
       }
 
       // Continue recursively
@@ -808,6 +812,23 @@ export default class MapComponent extends GirafeHTMLElement {
     if (layerInfos instanceof LayerWms) {
       this.wmsManager.getClient(layerInfos).changeFilter(layerInfos);
       if (this.wmsManager3d != null) this.wmsManager3d.changeFilter(layerInfos);
+    }
+  }
+
+  onChangeTime(layer: Layer | BaseLayer) {
+    if (layer instanceof LayerWms) {
+      this.wmsManager.getClient(layer).changeTimeRestriction(layer);
+    } else if (layer instanceof GroupLayer) {
+      // Apply the time restriction to all children of the group layers
+      layer.children.forEach((childLayer) => {
+        if (isTimeAwareLayer(childLayer) && childLayer.timeRestriction !== layer.timeRestriction) {
+          childLayer.timeRestriction = layer.timeRestriction;
+          if (childLayer.activeState !== 'off') {
+            // If the child layer is visible, it's refetched
+            this.onChangeTime(childLayer);
+          }
+        }
+      });
     }
   }
 

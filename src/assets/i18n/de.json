@@ -50,6 +50,8 @@
     "Date": "Datum",
     "de": "Deutsch",
     "debug": "Debug",
+    "Define time restriction on layer": "Zeitliche Begrenzung für Layer definieren",
+    "Define time restriction on group": "Zeitliche Begrenzung für Gruppe definieren",
     "Delete bookmark": "Lesezeichen löschen",
     "Delete Feature": "Funktion löschen",
     "Delete shape": "Form löschen",

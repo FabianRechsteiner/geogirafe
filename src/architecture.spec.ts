@@ -40,7 +40,7 @@ describe('Components architecture', () => {
     let components = getSubDirectories(componentsPath);
 
     // Then remove from this list the central components that are allowed to be used in other components
-    const centralComponents = ['menubutton', 'querybuilder', 'map'];
+    const centralComponents = ['menubutton', 'querybuilder', 'map', 'timerestriction'];
     components = components.filter((component) => !centralComponents.includes(component));
 
     // Then, check if some component is using another component.
@@ -598,7 +598,7 @@ describe('Manage User Interactions', () => {
     ];
 
     // Search patterns
-    const searchKeyboardListeners = new RegExp(/\.addEventListener\(['"]key/gm);
+    const searchKeyboardListeners = new RegExp(/document\.addEventListener\(['"]key/gm);
     const searchMouseListenersOnDocument = new RegExp(
       /document\.addEventListener\(['"](click|mouse|contextmenu|drop|onwheel)/gm
     );

@@ -37,6 +37,9 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
       this.refreshRender(layer);
       this.refreshRender(layer.parent);
     });
+    this.subscribe(/layers\.layersList\..*\.timeRestriction/, (_old: boolean, _new: boolean, layer: GroupLayer) => {
+      if (layer === this.layer) this.refreshRender(this.layer);
+    });
     this.subscribe('treeview.renderEnabled', (_oldValue: boolean, enabled: boolean) => {
       if (enabled) {
         this.refreshRender();
