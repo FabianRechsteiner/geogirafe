@@ -25,6 +25,7 @@ type GraphicalInterface = {
   infoWindowVisible: boolean;
   darkMapMode: boolean;
   darkFrontendMode: boolean;
+  contextMenuVisible: boolean;
 };
 
 type Selection = {
@@ -159,7 +160,8 @@ export default class State {
     userPreferencesPanelVisible: false,
     infoWindowVisible: false,
     darkMapMode: false,
-    darkFrontendMode: false
+    darkFrontendMode: false,
+    contextMenuVisible: false
   };
 
   userInteractionListeners: GgUserInteractionListener[] = [];

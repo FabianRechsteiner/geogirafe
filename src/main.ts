@@ -2,6 +2,8 @@ import tippy from 'tippy.js';
 import AboutComponent from './components/about/component';
 import BasemapComponent from './components/basemap/component';
 import CoordinateComponent from './components/coordinate/component';
+import MapContextMenuComponent from './components/context-menu/component';
+import MapContextMenuContentComponent from './components/context-menu/context-menu-content/component';
 import CrossSectionSettingsComponent from './components/cross-section/cross-section-settings/component';
 import CrossSectionViewComponent from './components/cross-section/cross-section-viewer/component';
 import DrawingComponent from './components/drawing/component';
@@ -49,6 +51,8 @@ initialize().then(() => {
   customElements.define('girafe-about', AboutComponent);
   customElements.define('girafe-basemap', BasemapComponent);
   customElements.define('girafe-coordinate', CoordinateComponent);
+  customElements.define('girafe-context-menu', MapContextMenuComponent);
+  customElements.define('girafe-context-menu-content', MapContextMenuContentComponent);
   customElements.define('girafe-layout', LayoutComponent);
   customElements.define('girafe-help', HelpComponent);
   customElements.define('girafe-infobox', InfoboxComponent);
