@@ -113,6 +113,24 @@ class GirafeConfig {
   lidar: {
     url: string;
   };
+  contextmenu: {
+    crs: {
+      code: string;
+      translation: string;
+      format: 'decimal' | 'dms';
+      precision: number;
+    }[];
+    sources: {
+      id: string;
+      translation: string;
+      prefix: string;
+      suffix: string;
+      precision: number;
+      crs: string;
+      url: string;
+    }[];
+  };
+  crs: { code: string; definition: string }[];
   csv: {
     encoding: string;
     extension: string;
@@ -202,6 +220,8 @@ class GirafeConfig {
     this.oauth = this.initConfigOauth(config);
     this.gmfauth = this.initGmfOauth(config);
     this.userdata = this.initUserData(config);
+    this.contextmenu = this.initContextMenu(config);
+    this.crs = this.initCRS(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -553,6 +573,21 @@ class GirafeConfig {
       ...defaultConfig,
       ...config.userdata
     };
+  }
+
+  private initContextMenu(config: GirafeConfig) {
+    const contextMenuConfig = {
+      crs: config.contextmenu?.crs ?? [
+        { code: 'EPSG:4326', translation: 'EPSG:4326', format: 'decimal', precision: 7 },
+        { code: 'EPSG:4326', translation: 'EPSG:4326-DMS', format: 'dms', precision: 2 }
+      ],
+      sources: config.contextmenu?.sources ?? []
+    };
+    return contextMenuConfig;
+  }
+
+  private initCRS(config: GirafeConfig) {
+    return config.crs;
   }
 }
 

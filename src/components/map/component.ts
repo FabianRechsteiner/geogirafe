@@ -136,6 +136,8 @@ export default class MapComponent extends GirafeHTMLElement {
       this.onChangeProjection(oldProjection, newProjection)
     );
     this.subscribe('interface.darkMapMode', (_oldValue: boolean, _newValue: boolean) => this.onChangeDarkMode());
+
+
     this.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
       this.onPositionChanged(newPosition)
     );
@@ -325,6 +327,7 @@ export default class MapComponent extends GirafeHTMLElement {
     // events. If another tool registers one of these events exclusively, the listeners bellow will
     // be paused temporarily and reactivate once the tool is closed.
 
+
     // Select features via GetFeatureInfo
     if (this.registerInteractionListener('map.select', false)) {
       // Simple click for single feature selection
@@ -333,6 +336,7 @@ export default class MapComponent extends GirafeHTMLElement {
           this.onClick(e);
         }
       });
+
       // Dragbox interaction for multiple features selection
       this.dragbox = new DragBox({
         condition: (e) => platformModifierKeyOnly(e) && this.canExecute('map.select')
