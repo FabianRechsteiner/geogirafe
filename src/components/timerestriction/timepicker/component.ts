@@ -1,4 +1,5 @@
 import TimeWidget, { TimeRangeLimit } from '../tools/timewidget';
+import { isFirefox, isSafari } from '../../../tools/utils/utils';
 
 /**
  * A component consisting of two `<input>` elements of type date picker for temporal layer filtering.
@@ -67,6 +68,11 @@ class TimePickerComponent extends TimeWidget {
   }
 
   private getHtmlInputType(): string {
+    // Safari and Firefox do not support input type 'month',
+    // see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/month
+    if (isSafari() || isFirefox()) {
+      return 'date';
+    }
     switch (this.resolution) {
       case 'day':
         return 'date';
