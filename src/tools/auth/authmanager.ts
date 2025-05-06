@@ -46,6 +46,7 @@ export default class AuthManager extends GirafeSingleton {
   }
 
   private async initializeOAuth(config: any) {
+    this.serviceWorker?.postMessage({ clear_access_token: true });
     this.issuerManager = OpenIdConnectManager.getInstance();
     await this.issuerManager.initialize();
     // No silent login if user is in the process of being logged in ('issuer.loggedIn' is second step of login process)
