@@ -161,6 +161,7 @@ function getRequest(request: Request): Request {
       const fetchOptions: RequestInit = {
         headers: headers,
         credentials: authMode === 'cookie' ? 'include' : 'omit',
+        referrer: request.referrer,
         referrerPolicy: refererPolicy as ReferrerPolicy
       };
 
