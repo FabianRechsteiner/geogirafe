@@ -149,6 +149,11 @@ class TimeSliderComponent extends TimeWidget {
         this.dispatchTimeChangeEvent();
       });
     }
+
+    // Register clicks on the slider track and translate them to handle positions
+    this.getById('slider-track').addEventListener('click', (event: MouseEvent) => {
+      this.trackClickToSliderPosition(event);
+    });
   }
 
   private updateOutputLabel(limit: TimeRangeLimit) {
@@ -179,8 +184,40 @@ class TimeSliderComponent extends TimeWidget {
   private toggleSliderState(active: boolean) {
     this.getById('output-label-lower').style.color = active ? 'var(--slider-color)' : 'var(--slider-disabled-color)';
     this.getById('output-label-upper').style.color = active ? 'var(--slider-color)' : 'var(--slider-disabled-color)';
-    this.getById('slider-track').style.border =
-      `1px solid ${active ? 'var(--slider-track-border-color)' : 'var(--slider-disabled-color)'}`;
+    this.getById('slider-track').style.borderColor = active
+      ? 'var(--slider-track-border-color)'
+      : 'var(--slider-disabled-color)';
+  }
+
+  /**
+   * Registers the position where the user clicks on the slider track
+   * and moves the lower or upper slider handle to that position.
+   *
+   * @param {MouseEvent} event - The mouse event triggered by the click on the slider track.
+   */
+  private trackClickToSliderPosition(event: MouseEvent) {
+    const offsetX = event.offsetX;
+    const trackWidth = (event.target as HTMLDivElement).offsetWidth;
+
+    const sliderPosition = Math.round((offsetX / trackWidth) * this.countSliderStepsInRange());
+    const dateStr = this.sliderPositionToDateString(sliderPosition.toString());
+    if (this.mode === 'value') {
+      this.setValue(dateStr, 'lower');
+    } else {
+      // Decide which slider handle to move
+      const currentLowerPosition = Number(this.lowerInputElem.value);
+      const currentUpperPosition = Number(this.upperInputElem.value);
+      const middlePosition = (currentLowerPosition + currentUpperPosition) / 2;
+      let elementToMove: TimeRangeLimit;
+      if (sliderPosition <= currentLowerPosition) {
+        elementToMove = 'lower';
+      } else if (sliderPosition >= currentUpperPosition) {
+        elementToMove = 'upper';
+      } else {
+        elementToMove = sliderPosition < middlePosition ? 'lower' : 'upper';
+      }
+      this.setValue(dateStr, elementToMove);
+    }
   }
 
   /**

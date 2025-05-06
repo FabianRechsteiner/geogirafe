@@ -71,7 +71,7 @@ input[type=range]::-moz-range-thumb:active {
     border-color: var(--bkg-color);
 }
 
-input[type="range"]::-moz-range-track {
+input[type=range]::-moz-range-track {
     height: var(--slider-track-height);
 }
 
@@ -96,7 +96,8 @@ input[type=range] {
     margin-left: var(--margin-left);
     height: var(--slider-track-height);
     position: absolute;
-    pointer-events: none;
+    cursor: pointer;
+    pointer-events: all;
     z-index: 0;
     border: 1px solid var(--slider-track-border-color);
 }

@@ -7,6 +7,14 @@ export const isSafari = () => {
 };
 
 /**
+ * Checks if on Firefox.
+ * @returns True if on Firefox.
+ */
+export const isFirefox = () => {
+  return navigator.userAgent.includes('Mozilla') && !navigator.userAgent.includes('Chrome');
+};
+
+/**
  * Returns a valid index within the given maximum index.
  * Out of bound index loops back to the first valid index.
  * @param index - The index to validate.
