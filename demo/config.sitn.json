@@ -87,21 +87,12 @@
     "sources": [
       {
         "id": "altitude2022",
-        "label": "context-altitude",
+        "translation": "Altitude",
         "prefix": "",
         "suffix": " m",
         "precision": 1,
         "crs": "EPSG:2056",
         "url": "https://sitn.ne.ch/geodata/pointclouds/Aeriallidar/Lidar2022/05_Grid/mnt/1m/sitn_lidar2022_mnt_1m_b128.cog.tif"
-      },
-      {
-        "id": "intensity2022",
-        "label": "context-intensity",
-        "prefix": "",
-        "suffix": "",
-        "precision": 0,
-        "crs": "EPSG:2056",
-        "url": "https://sitn.ne.ch/geodata/pointclouds/Aeriallidar/Lidar2022/05_Grid/intensity/1m/sitn_lidar2022_intensity_1m.cog.tif"
       }
     ]
   },
