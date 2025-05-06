@@ -68,6 +68,10 @@ function handleMessage(event: ExtendableMessageEvent): void {
     accessToken = data.access_token;
     log(`access_token changed: ${accessToken}`);
   }
+  if (data.clear_access_token) {
+    accessToken = undefined;
+    log('access_token cleared');
+  }
   if (data.authMode) {
     authMode = data.authMode;
     log(`authMode changed: ${authMode}`);

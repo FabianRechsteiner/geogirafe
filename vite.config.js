@@ -96,6 +96,7 @@ export default defineConfig(({ command }) => {
           { src: `${geogirafeSource}/service-worker.js`, dest: '' },
           { src: `${geogirafeSource}/styles/*.css`, dest: 'styles/' },
           { src: `${geogirafeSource}/assets/*`, dest: '' },
+          { src: `${geogirafeSource}/tools/auth/silentlogincallback.html`, dest: '' },
           { src: 'node_modules/ol/ol.css', dest: 'lib/ol/' },
           { src: 'node_modules/tabulator-tables/dist/css/tabulator.min.css', dest: 'lib/tabulator-tables/' },
           { src: 'node_modules/tippy.js/dist/*.css', dest: 'lib/tippy.js/' },

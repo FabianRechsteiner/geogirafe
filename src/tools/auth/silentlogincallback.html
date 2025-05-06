@@ -1,0 +1,14 @@
+<script type="module">
+  try {
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+
+    if (params.has('error')) {
+      window.parent.postMessage({ type: 'OAUTH_ERROR', error: `${params.get("error")}: ${params.get("error_description")}`}, '*');
+    } else {
+      window.parent.postMessage({ type: 'OAUTH_CALLBACK', data: Object.fromEntries(params.entries()) }, '*');
+    }
+  } catch (error) {
+    window.parent.postMessage({ type: 'OAUTH_ERROR', error: error.message }, '*');
+  }
+</script>
