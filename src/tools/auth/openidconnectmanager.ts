@@ -189,7 +189,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
 
   private getLoginRedirectUrl(silent: boolean) {
     if (silent) {
-      return `${window.location.protocol}//${window.location.host}/silentlogincallback.html?authentified=true`;
+      return `${window.location.protocol}//${window.location.host}${window.location.pathname}silentlogincallback.html?authentified=true`;
     }
     return `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=true`;
   }
