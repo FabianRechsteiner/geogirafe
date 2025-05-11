@@ -285,6 +285,11 @@
     "Yes": "Oui",
     "Zoom to full extent": "Zoomer sur l'étendue complète",
     "Zoom to visible resolution": "Invisible à cette échelle. Cliquez pour zoomer.",
-    "Zoom to": "Zoomer sur"
+    "Zoom to": "Zoomer sur",
+    "Nothing here yet!": "Rien ici pour le moment !",
+    "Add your first items": "Ajoutez vos premiers éléments",
+    "by selecting a theme": "en sélectionnant un thème",
+    "or": "ou",
+    "using the search bar": "en utilisant la barre de recherche"
   }
 }

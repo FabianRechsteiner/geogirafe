@@ -5,46 +5,11 @@
 
 <div id="container">
   <header>
-    <!-- Caret -->
-    <button
-      class="gg-icon-button gg-small gg-opacity"
-      tip="Expand / Collapse"
-      onclick="${() => (this.layer as ThemeLayer).isExpanded = !(this.layer as ThemeLayer).isExpanded}">
-      <img
-        class="${(this.layer as ThemeLayer).isExpanded ? 'gg-rotate90 gg-caret' : 'gg-caret'}"
-        alt="Expand/Collapse button"
-        src="icons/expand.svg" />
-    </button>
-
-    <!-- Checkbox -->
-    <button
-      class="${this.layer.activeState === 'on' ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
-      tip="Activate / Deactivate"
-      onclick="${() => this.toggle()}">
-      <img
-        class="${this.layer.activeState === 'on' ? 'gg-checkbox' : 'hidden'}"
-        alt="Expand/Collapse button"
-        src="icons/checked-full.svg" />
-      <img
-        class="${this.layer.activeState === 'semi' ? 'gg-checkbox' : 'hidden'}"
-        alt="Expand/Collapse button"
-        src="icons/checked-half.svg" />
-      <img
-        class="${this.layer.activeState === 'off' ? 'gg-checkbox' : 'hidden'}"
-        alt="Expand/Collapse button"
-        src="icons/checked-no.svg" />
-    </button>
-
-    <!-- Error icon -->
-    <button class="${this.layer.hasError ? 'error gg-icon-button gg-small gg-opacity' : 'hidden'}" tip="Error on layer">
-      <img alt="Error on layer" src="icons/error.svg" />
-    </button>
-
     <!-- Label -->
     <div class="label-container">
       <button
-        class="${this.layer.activeState === 'on' ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
-        onclick="${() => this.toggle()}">
+        class="gg-icon-button gg-small gg-selected"
+        onclick="${() => (this.layer as ThemeLayer).isExpanded = !(this.layer as ThemeLayer).isExpanded}">
         <span i18n="${this.layer.name}" class="gg-tree-label"> ${this.layer.name} </span>
       </button>
     </div>

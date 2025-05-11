@@ -53,7 +53,7 @@
     </div>
   </div>
 
-  <div class="treeview-list">
+  <div class="${this.state.layers.layersList.length > 0 ? 'treeview-list' : 'hidden'}">
     <!-- prettier-ignore -->
     ${this.sortedLayers().filter(layer => layer.isVisible).map(layer => (layer instanceof ThemeLayer) ? uHtmlFor(layer, layer.treeItemId)`
     <girafe-tree-view-theme themeid="${layer.treeItemId}"></girafe-tree-view-theme>
@@ -62,5 +62,16 @@
     ` : uHtmlFor(layer, layer.treeItemId)`
     <girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>
     ` )}
+  </div>
+
+  <div class="${this.state.layers.layersList.length > 0 ? 'hidden' : 'treeview-no-data'}">
+    <div class="no-data">
+      <span i18n="Nothing here yet!">Nothing here yet!</span>
+      <span>-</span>
+      <span i18n="Add your first items">Add your first items</span>
+      <span i18n="by selecting a theme">by selecting a theme</span>
+      <span i18n="or">or</span>
+      <span i18n="using the search bar">using the search bar</span>
+    </div>
   </div>
 </div>

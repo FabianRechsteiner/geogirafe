@@ -127,13 +127,13 @@ export default class ThemesHelper extends GirafeSingleton {
 
     if (this.configManager.Config.themes.selectionMode === 'replace') {
       // Mode is <replace>
-      // 1. Deactivate all active layers
+      // => Deactivate all active layers
       for (const element of this.state.layers.layersList) {
         element.activeState = 'off';
       }
-      // 2. Add new layers: Delay this step to give tree view time to render the previous step
+      // Add new selected theme: Delay this step to give tree view time to render the previous step
       setTimeout(() => {
-        this.state.layers.layersList = clonedTheme.children;
+        this.state.layers.layersList = [clonedTheme];
       });
     } else if (!this.state.layers.layersList.find((l) => l.id == clonedTheme.id)) {
       // Mode is <add>

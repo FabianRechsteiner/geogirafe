@@ -7,7 +7,7 @@ import GroupLayer from '../../../models/layers/grouplayer';
 
 class TreeViewThemeComponent extends TreeViewGroupElement {
   templateUrl = './template.html';
-  styleUrls = ['../style.css', '../../../styles/common.css'];
+  styleUrls = ['../../../styles/common.css', '../style.css', './style.css'];
 
   override layer: ThemeLayer;
 
