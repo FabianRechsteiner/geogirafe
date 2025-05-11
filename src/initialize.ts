@@ -51,6 +51,27 @@ interface Connection {
   type: string;
 }
 
+async function waitForServiceWorkerActivation(): Promise<ServiceWorker> {
+  const registration = await navigator.serviceWorker.register('service-worker.js');
+  if (registration.active) {
+    return registration.active;
+  }
+
+  const sw = registration.installing || registration.waiting;
+  if (!sw) {
+    throw new Error('No service worker is installing or waiting.');
+  }
+
+  return new Promise((resolve) => {
+    sw.addEventListener('statechange', function onStateChange() {
+      if (sw.state === 'activated') {
+        sw.removeEventListener('statechange', onStateChange);
+        resolve(sw);
+      }
+    });
+  });
+}
+
 async function initializeServiceWorker() {
   const storeVersion: number = 6;
   const dbCacheName: string = 'geogirafe-cache';
@@ -59,15 +80,17 @@ async function initializeServiceWorker() {
     return;
   }
 
-  const registration = await navigator.serviceWorker.register('service-worker.js');
-  if (!registration.active) {
+  let sw: ServiceWorker;
+  try {
+    sw = await waitForServiceWorkerActivation();
+  } catch {
     console.warn("Service worker could not be initialized. Authentication and offline maps won't work");
     return;
   }
 
   // Communicate logging configuration to service-worker
   const config = ConfigManager.getInstance().Config;
-  registration.active.postMessage({ logLevel: config.general.logLevel });
+  sw.postMessage({ logLevel: config.general.logLevel });
 
   // Communicate oauth configuration to service-worker
   const issuerConfig = config.oauth?.issuer ?? config.gmfauth;
@@ -75,15 +98,15 @@ async function initializeServiceWorker() {
   if (issuerConfig && gmfConfig) {
     const issuerHostname = new URL(issuerConfig.url).hostname;
     const audience = [...issuerConfig.audience, issuerHostname];
-    registration.active.postMessage({
+    sw.postMessage({
       audience: audience,
       audienceExcludedPaths: issuerConfig.audienceExcludedPaths,
       authMode: gmfConfig.authMode,
       refererPolicy: gmfConfig.refererPolicy
     });
   }
-  await OfflineManager.getInstance().setServiceWorker(registration.active, storeVersion, dbCacheName);
-  await AuthManager.getInstance().initialize(registration.active);
+  await OfflineManager.getInstance().setServiceWorker(sw, storeVersion, dbCacheName);
+  await AuthManager.getInstance().initialize(sw);
 }
 
 export async function initialize() {
