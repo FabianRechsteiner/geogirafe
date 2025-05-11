@@ -234,37 +234,28 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     const client = this.getClient();
     const currentUrl = new URL(document.URL);
 
-    let params;
     try {
-      params = validateAuthResponse(authorizationServer, client, currentUrl);
+      const params = validateAuthResponse(authorizationServer, client, currentUrl);
+      const response = await authorizationCodeGrantRequest(
+        authorizationServer,
+        client,
+        TlsClientAuth(),
+        params,
+        this.redirectUrl,
+        this.codeVerifier
+      );
+
+      const openIdTokens = await processAuthorizationCodeResponse(authorizationServer, client, response);
+      this.setToken(openIdTokens);
+      this.state.oauth.audience = this.issuerConfig.audience;
+      // Remove oauth URL parameters
+      this.resetUrlHistory(true);
     } catch (error) {
       this.manageError(error as Error);
     }
-
-    const response = await authorizationCodeGrantRequest(
-      authorizationServer,
-      client,
-      TlsClientAuth(),
-      params as URLSearchParams,
-      this.redirectUrl,
-      this.codeVerifier
-    );
-
-    let openIdTokens;
-    try {
-      openIdTokens = await processAuthorizationCodeResponse(authorizationServer, client, response);
-    } catch (error) {
-      this.manageError(error as Error);
-    }
-
-    this.setToken(openIdTokens as TokenEndpointResponse);
-    this.state.oauth.audience = this.issuerConfig.audience;
-
-    // Removing oauth URL parameters
-    this.resetUrlHistory(true);
   }
 
-  setToken(tokens: TokenEndpointResponse) {
+  private setToken(tokens: TokenEndpointResponse) {
     this.state.oauth.tokens = tokens;
     // Prepare refresh token
     if (this.state.oauth.tokens.expires_in) {
@@ -305,6 +296,8 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       openIdTokens = await processRefreshTokenResponse(authorizationServer, client, response);
     } catch (error) {
       // an error here means the user was logged out somehow somewhere else.
+      const errorMsg = `OAuth: Refresh token failed: ${(error as Error).message}`;
+      console.error(errorMsg);
       this.resetUrlHistory(false);
       this.loggedOutFromBackend();
     }
@@ -318,7 +311,8 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     this.state.oauth.status = 'loginFailed';
     const errorMsg = `OAuth: Issuer login failed: ${error.message}`;
     console.error(errorMsg);
-    throw error;
+    this.resetUrlHistory(false);
+    this.handleErrorFromIssuer();
   }
 
   async logoutFromIssuer() {
