@@ -1,4 +1,3 @@
-import BaseLayer from './layers/baselayer';
 import ThemeLayer from './layers/themelayer';
 import { SharedLayer } from '../tools/share/sharedstate';
 import StateSerializer from '../tools/share/stateserializer';
@@ -6,7 +5,7 @@ import CustomIcon from '../components/themes/images/custom.svg';
 
 export default class CustomTheme {
   id: number;
-  layers: BaseLayer[];
+  layers: ThemeLayer[];
   name: string;
   icon: string;
 

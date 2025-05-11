@@ -9,6 +9,7 @@ import type ServerOgc from '../../models/serverogc';
 import { TokenEndpointResponse, UserInfoResponse } from 'oauth4webapi';
 import SelectionParam from '../../models/selectionparam';
 import { GgUserInteractionListener } from './userInteractionManager';
+import CustomTheme from '../../models/customtheme';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -39,7 +40,7 @@ type Selection = {
 type ThemesConfig = {
   _allThemes: Record<number, ThemeLayer>;
   isLoaded: boolean;
-  lastSelectedTheme: ThemeLayer | null;
+  lastSelectedTheme: ThemeLayer | CustomTheme | null;
 };
 
 type LayersConfig = {

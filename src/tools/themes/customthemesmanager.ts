@@ -21,7 +21,7 @@ class CustomThemesManager extends GirafeSingleton {
   public addTheme(themeName: string, layersList: BaseLayer[]) {
     const theme = new CustomTheme(themeName);
     for (const layerBase of layersList) {
-      const layer = layerBase.clone();
+      const layer = (layerBase as ThemeLayer).clone();
       this.manageActiveStateForClonedObject(layer);
       theme.layers.push(layer);
     }
@@ -71,7 +71,7 @@ class CustomThemesManager extends GirafeSingleton {
         try {
           const customTheme = new CustomTheme(customThemeName);
           const serializedLayerTree = customThemes[customThemeName];
-          const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedLayerTree);
+          const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedLayerTree) as ThemeLayer[];
           customTheme.layers.push(...layerTree);
           this.customThemes.push(customTheme);
         } catch (error) {
