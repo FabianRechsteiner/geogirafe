@@ -1,4 +1,5 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
+import CustomTheme from '../../models/customtheme';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
@@ -18,7 +19,8 @@ export default class ThemesHelper extends GirafeSingleton {
 
     this.stateManager.subscribe(
       'themes.lastSelectedTheme',
-      (_oldTheme: ThemeLayer | null, newTheme: ThemeLayer | null) => this.onChangeTheme(newTheme)
+      (_oldTheme: ThemeLayer | CustomTheme | null, newTheme: ThemeLayer | CustomTheme | null) =>
+        this.onSelectedThemeChanged(newTheme)
     );
   }
 
@@ -111,12 +113,23 @@ export default class ThemesHelper extends GirafeSingleton {
     return null;
   }
 
-  onChangeTheme(theme: ThemeLayer | null) {
+  onSelectedThemeChanged(theme: ThemeLayer | CustomTheme | null) {
     if (!theme) {
       // Theme is null, nothing to do here
       return;
     }
 
+    if (theme instanceof CustomTheme) {
+      theme.layers.sort((a, b) => a.order - b.order);
+      for (const t of theme.layers) {
+        this.onThemeChanged(t);
+      }
+    } else {
+      this.onThemeChanged(theme);
+    }
+  }
+
+  private onThemeChanged(theme: ThemeLayer) {
     // Create a clone of the theme object to use it in the treeview.
     // This is essential, otherwise all changes done in the layers
     // (For example when expanding legend, expanding a group, or activating the layer)

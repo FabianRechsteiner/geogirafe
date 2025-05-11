@@ -99,7 +99,7 @@ class ThemesManager extends GirafeSingleton {
     if (!this.isNullOrUndefinedOrBlank(this.configManager.Config.themes.defaultTheme)) {
       const themes = [
         ...Object.values(this.state.themes._allThemes),
-        ...Object.values(this.customThemesManager.customThemes.map((ct) => ct.getThemeLayer()))
+        ...Object.values(this.customThemesManager.customThemes)
       ];
       const defaultTheme = themes.find((t) => t.name === this.configManager.Config.themes.defaultTheme);
       if (defaultTheme) {

@@ -74,18 +74,8 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   onCustomThemeChanged(customTheme: CustomTheme) {
-    if (customTheme.hasThemes) {
-      for (let i = customTheme.layers.length - 1; i >= 0; --i) {
-        const theme = customTheme.layers[i];
-        if (theme instanceof ThemeLayer) {
-          this.state.themes.lastSelectedTheme = theme;
-        } else {
-          throw new Error('There is an error in the custom');
-        }
-      }
-    } else {
-      this.state.themes.lastSelectedTheme = customTheme.getThemeLayer(customTheme.id);
-    }
+    this.state.themes.lastSelectedTheme = customTheme;
+    this.onBlur();
   }
 
   async onAddCustomTheme() {
