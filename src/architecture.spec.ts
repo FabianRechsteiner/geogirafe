@@ -321,7 +321,8 @@ describe('Components translations', () => {
     '/',
     '[',
     ']',
-    '.'
+    '.',
+    '-'
   ];
 
   function getSupportedLanguages() {
@@ -342,7 +343,7 @@ describe('Components translations', () => {
     const errors: string[] = [];
     for (const htmlFile of htmlFiles) {
       let code = fs.readFileSync(htmlFile, 'utf8');
-      // Replace characters < and > that are used in attributes (for example for compareason tests of function with =>)
+      // Replace characters < and > that are used in attributes (for example for comparison tests of function with =>)
       code = code.replace(/(="[^"]*)>([^"]*")/g, '$1&gt;$2');
       code = code.replace(/(="[^"]*)<([^"]*")/g, '$1&lt;$2');
 
@@ -570,7 +571,6 @@ describe('Components translations', () => {
   });
 });
 
-
 describe('Manage User Interactions', () => {
   const searchComponents = (regexPatterns: RegExp[]) => {
     const componentsPath = path.join(__dirname, 'components');
@@ -593,8 +593,8 @@ describe('Manage User Interactions', () => {
   it('Components register listeners for user interactions with the UserInteractionManager', async () => {
     // Add names of components that should be ignored when searching for event listeners
     const fileIgnoreList = [
-      'menubutton/component.ts', // contains 'click' listener to remove menu overlays, management not necessary
-      'cross-section/scatterplot.ts' // contains 'click' and 'drag' listener for d3 plots
+      `menubutton${path.sep}component.ts`, // contains 'click' listener to remove menu overlays, management not necessary
+      `cross-section${path.sep}scatterplot.ts` // contains 'click' and 'drag' listener for d3 plots
     ];
 
     // Search patterns
@@ -615,7 +615,7 @@ describe('Manage User Interactions', () => {
       searchMouseListenersOnMapViewport,
       searchOlInteractionListeners,
       searchOlInteractionInitializations
-    ]).filter((c) => fileIgnoreList.indexOf(c) === -1);
+    ]).filter((c) => !fileIgnoreList.some((i) => c.includes(i)));
 
     const filesWithRegistration = searchComponents([searchEventRegistrations]);
 

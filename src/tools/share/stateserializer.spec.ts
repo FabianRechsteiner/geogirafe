@@ -247,7 +247,7 @@ describe('StateSerializer.getSerializedState', () => {
     groupLayer2.children.push(layer1);
     groupLayer1.children.push(groupLayer2, layer2);
 
-    StateManager.getInstance().state.layers.layersList.push(groupLayer1);
+    StateManager.getInstance().state.layers.layersList.push(theme);
 
     const compressedState = serializer.getSerializedState(StateManager.getInstance().state);
 
@@ -257,36 +257,45 @@ describe('StateSerializer.getSerializedState', () => {
 
     expect(sharedState.l).toEqual([
       {
-        i: 1,
-        o: 1,
         c: 0,
-        e: 0,
+        e: 1,
+        i: 0,
+        o: 0,
         x: [],
         z: [
           {
-            i: 2,
-            o: 2,
             c: 0,
             e: 0,
+            i: 1,
+            o: 1,
             x: [],
             z: [
               {
-                i: 3,
-                o: 3,
                 c: 0,
                 e: 0,
+                i: 2,
+                o: 2,
+                x: [],
+                z: [
+                  {
+                    c: 0,
+                    e: 0,
+                    i: 3,
+                    o: 3,
+                    x: [],
+                    z: []
+                  }
+                ]
+              },
+              {
+                c: 0,
+                e: 0,
+                i: 4,
+                o: 4,
                 x: [],
                 z: []
               }
             ]
-          },
-          {
-            i: 4,
-            o: 4,
-            c: 0,
-            e: 0,
-            x: [],
-            z: []
           }
         ]
       }

@@ -184,7 +184,7 @@ class LayerManager extends GirafeSingleton {
 
     if (groupOrTheme.activeState != newState) {
       console.log(`Setting Group ${groupOrTheme.name} to ${newState}`);
-      groupOrTheme.activeState = newState;
+      this.getTreeItem(groupOrTheme.treeItemId).activeState = newState;
     }
   }
 

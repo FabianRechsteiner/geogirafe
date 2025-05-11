@@ -15,7 +15,8 @@
   display: flex;
 }
 
-.treeview-list {
+.treeview-list,
+.treeview-no-data {
   padding-top: 0.5rem;
   overflow-y: auto;
   overflow-x: hidden;
@@ -57,4 +58,26 @@
   padding: 0;
   background-color: transparent;
   cursor: pointer;
+}
+
+.treeview-no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-data {
+  color: #999;
+  text-align: center;
+  display: flex;
+  align-items: anchor-center;
+  font-variant: small-caps;
+  font-size: 1rem;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.no-data span {
+  display: block;
+  flex-grow: 1;
 }

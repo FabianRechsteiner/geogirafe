@@ -43,6 +43,7 @@ type ThemesConfig = {
 };
 
 type LayersConfig = {
+  // TODO REG : This should probably be changes to type ThemeLayer[], but this need a refactoring of some depending classes and tests
   layersList: BaseLayer[];
 };
 

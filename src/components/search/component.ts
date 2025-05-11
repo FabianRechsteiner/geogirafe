@@ -19,10 +19,12 @@ import PaintbrushIcon from './images/paintbrush.svg';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SearchResult, { type GeometryResult, GeometryCollectionResult } from '../../models/searchresult';
 import MapManager from '../../tools/state/mapManager';
-import Layer from '../../models/layers/layer';
 import LayerManager from '../../tools/layers/layermanager';
 import { parseCoordinates } from '../../tools/geometrytools';
 import ThemesHelper from '../../tools/themes/themeshelper';
+import ThemeLayer from '../../models/layers/themelayer';
+import BaseLayer from '../../models/layers/baselayer';
+import GroupLayer from '../../models/layers/grouplayer';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -34,8 +36,8 @@ class SearchComponent extends GirafeHTMLElement {
   private readonly themesHelper: ThemesHelper;
   private readonly layerManager: LayerManager;
   private readonly map: Map;
-  private previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
-  private previewLayer: Layer | null = null;
+  private readonly previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
+  private previewTheme: ThemeLayer | null = null;
   private previewGeoLayer: VectorLayer<VectorSource> | null = null;
   private maxExtent?: number[];
 
@@ -293,15 +295,53 @@ class SearchComponent extends GirafeHTMLElement {
       }
     } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
-      if (layer.parent && !this.state.layers.layersList.includes(layer.parent)) {
+      const clonedTheme = this.getMinimalClonedThemeForLayer(layer);
+      if (!this.isAlreadyPresent(clonedTheme)) {
         // Preview layer
-        layer.parent.order = 0;
-        layer.parent.isExpanded = true;
-        this.previewLayer = layer;
-        this.state.layers.layersList.push(layer.parent);
-        this.layerManager.toggleLayer(layer, 'on');
+        clonedTheme.order = 0;
+        clonedTheme.isExpanded = true;
+        this.previewTheme = clonedTheme;
+        this.state.layers.layersList.push(clonedTheme);
+        this.layerManager.toggleGroupOrTheme(clonedTheme, 'on');
       }
     }
+  }
+
+  private isAlreadyPresent(theme: ThemeLayer): boolean {
+    return this.state.layers.layersList.some((t) => t.id === theme.id);
+  }
+
+  private getMinimalClonedThemeForLayer(layer: BaseLayer): ThemeLayer {
+    const hierarchy = this.getHierarchyFromLayer(layer);
+    const theme = hierarchy[0] as ThemeLayer;
+    const clone = theme.clone();
+    // Remove unnecessary clones
+    let children = clone.children;
+    for (let i = 1; i < hierarchy.length; ++i) {
+      this.removeOthers(children, hierarchy[i]);
+      (children[0] as GroupLayer).isExpanded = true;
+      children = (children[0] as GroupLayer).children;
+    }
+    return clone;
+  }
+
+  private removeOthers(layers: BaseLayer[], keep: BaseLayer) {
+    for (let i = layers.length - 1; i >= 0; --i) {
+      if (layers[i].id !== keep.id) {
+        layers.splice(i, 1);
+      }
+    }
+  }
+
+  private getHierarchyFromLayer(layer: BaseLayer): BaseLayer[] {
+    if (layer instanceof ThemeLayer) {
+      return [layer];
+    }
+    if (!layer.parent) {
+      throw new Error('A group or a layer should always have a parent.');
+    }
+    const parents = this.getHierarchyFromLayer(layer.parent);
+    return [...parents, layer];
   }
 
   private addFeatureToPreview(geometry: GeometryResult | GeometryCollectionResult) {
@@ -352,16 +392,15 @@ class SearchComponent extends GirafeHTMLElement {
     this.previewFeaturesCollection.clear();
 
     // Clear preview layer
-    if (this.previewLayer?.parent) {
-      const treeItemId = this.previewLayer.parent.treeItemId;
-      this.layerManager.toggleLayer(this.previewLayer, 'off');
-      const index = this.state.layers.layersList.findIndex((l) => l.treeItemId === treeItemId);
+    if (this.previewTheme) {
+      this.layerManager.toggle(this.previewTheme, 'off');
+      const index = this.state.layers.layersList.findIndex((l) => l.treeItemId === this.previewTheme?.treeItemId);
       if (index >= 0) {
         this.state.layers.layersList.splice(index, 1);
       } else {
         console.warn('Error while removing preview layer.');
       }
-      this.previewLayer = null;
+      this.previewTheme = null;
     }
   }
 
@@ -369,33 +408,33 @@ class SearchComponent extends GirafeHTMLElement {
     this.selectedResult = result;
     this.ignoreBlur = false;
     this.forceHide = true;
-    this.previewLayer = null;
+    this.previewTheme = null;
     super.render();
 
     if (result.bbox) {
       // Result with geometry
       this.zoomTo(result.bbox);
-    } else if (result.properties?.actions[0].action === 'add_theme') {
-      const theme = this.themesHelper.findThemeByName(result.properties?.actions[0].data);
-      if (!this.state.layers.layersList.includes(theme)) {
-        theme.order = 0;
-        this.state.layers.layersList.push(theme);
-      }
-    } else if (result.properties?.actions[0].action === 'add_group') {
-      const group = this.themesHelper.findGroupByName(result.properties?.actions[0].data);
-      if (!this.state.layers.layersList.includes(group)) {
-        group.order = 0;
-        this.state.layers.layersList.push(group);
-      }
-    } else if (result.properties?.actions[0].action === 'add_layer') {
-      const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
-      if (layer.parent && !this.state.layers.layersList.includes(layer.parent)) {
-        layer.parent.order = 0;
-        this.state.layers.layersList.push(layer);
-      }
     } else {
-      console.warn('Unsupported result type');
+      let clonedTheme;
+      if (result.properties?.actions[0].action === 'add_theme') {
+        const theme = this.themesHelper.findThemeByName(result.properties?.actions[0].data);
+        clonedTheme = theme.clone();
+      } else if (result.properties?.actions[0].action === 'add_group') {
+        const group = this.themesHelper.findGroupByName(result.properties?.actions[0].data);
+        clonedTheme = this.getMinimalClonedThemeForLayer(group);
+      } else if (result.properties?.actions[0].action === 'add_layer') {
+        const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
+        clonedTheme = this.getMinimalClonedThemeForLayer(layer);
+      } else {
+        console.warn('Unsupported result type');
+      }
+
+      if (clonedTheme && !this.isAlreadyPresent(clonedTheme)) {
+        clonedTheme.order = 0;
+        this.state.layers.layersList.push(clonedTheme);
+      }
     }
+
     this.onFocusOut();
 
     // Update searchbox with result
