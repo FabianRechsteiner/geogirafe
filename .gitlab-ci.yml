@@ -311,6 +311,8 @@ pages:
     - *prepare_demo
     - demo='cjl'
     - *prepare_demo
+    - demo='geocommunes'
+    - *prepare_demo
     - demo='geogr'
     - *prepare_demo
     - demo='jura'
