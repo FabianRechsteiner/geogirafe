@@ -50,7 +50,10 @@
     </div>
 
     <!-- Time restriction -->
-    <button id="timeRestriction" class="${this.getButtonClass('timeRestriction')}" tip="Define time restriction on group">
+    <button
+      id="timeRestriction"
+      class="${this.getButtonClass('timeRestriction')}"
+      tip="Define time restriction on group">
       <img alt="Define time restriction on group" src="icons/clock.svg" />
     </button>
 
@@ -70,9 +73,9 @@
     <!-- Remove icon -->
     <button
       class="remove gg-icon-button gg-small gg-opacity tool"
-      tip="Remove theme"
+      tip="Remove group"
       onclick="${() => this.deleteGroup()}">
-      <img alt="Remove theme" src="icons/trash.svg" />
+      <img alt="Remove group" src="icons/trash.svg" />
     </button>
   </header>
 

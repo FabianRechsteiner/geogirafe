@@ -98,7 +98,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     }
   }
 
-  getButtonClass(button: string) {
+  public getButtonClass(button: string) {
     const buttonClasses = 'gg-icon-button gg-small gg-opacity tool';
     const activeButtonClasses = buttonClasses + ' active';
     switch (button) {
@@ -144,6 +144,22 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
       appendTo: document.body,
       content: (_reference: object) => {
         return new TimeRestrictionComponent(layer);
+      }
+    });
+  }
+
+  protected removeFromParent() {
+    setTimeout(() => {
+      if (this.layer.parent) {
+        const index = this.layer.parent.children.findIndex((l) => l === this.layer);
+        if (index >= 0) {
+          this.layer.parent.children.splice(index, 1);
+        }
+      } else {
+        const index = this.state.layers.layersList.findIndex((l) => l === this.layer);
+        if (index >= 0) {
+          this.state.layers.layersList.splice(index, 1);
+        }
       }
     });
   }
