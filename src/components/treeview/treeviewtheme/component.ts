@@ -58,13 +58,10 @@ class TreeViewThemeComponent extends TreeViewGroupElement {
     });
   }
 
-  deleteTheme() {
+  public deleteTheme() {
     this.deactivateThemeOrGroup(this.layer);
-    setTimeout(() => {
-      const index = this.state.layers.layersList.findIndex((l) => l === this.layer);
-      this.state.layers.layersList.splice(index, 1);
-      this.state.themes.lastSelectedTheme = null;
-    });
+    this.removeFromParent();
+    this.state.themes.lastSelectedTheme = null;
   }
 }
 

@@ -271,12 +271,9 @@ class TreeViewItemComponent extends TreeViewElement {
     MapManager.getInstance().zoomToExtent(this.layer.extent);
   }
 
-  deleteLayer() {
+  public deleteLayer() {
     this.layerManager.toggleLayer(this.layer, 'off');
-    setTimeout(() => {
-      const index = this.layer.parent!.children.findIndex((l) => l === this.layer);
-      this.layer.parent!.children.splice(index, 1);
-    });
+    this.removeFromParent();
   }
 
   connectedCallback() {
