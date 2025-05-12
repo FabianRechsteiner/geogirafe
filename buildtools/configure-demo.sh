@@ -33,6 +33,11 @@ then
     echo "Preparing environment CARTOJURALEMAN..."
     cp demo/config.$1.json $APPDIR/config.json
 
+elif [ "$1" = 'geocommunes' ];
+then
+    echo "Preparing environment GEOCOMMUNES..."
+    cp demo/config.$1.json $APPDIR/config.json
+
 elif [ "$1" = 'geogr' ];
 then
     echo "Preparing environment GEOGR..."
