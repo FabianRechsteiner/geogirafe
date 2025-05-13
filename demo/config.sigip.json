@@ -67,7 +67,7 @@
   },
   "contextmenu": {
     "crs": [
-      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 1 },
+      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 2 },
       { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 },
       { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
     ]
