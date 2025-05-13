@@ -62,7 +62,8 @@
   },
   "gmfauth": {
     "url": "https://www.sigip.ch",
-    "audience": ["www.sigip.ch"]
+    "audience": ["www.sigip.ch"],
+    "audienceExcludedPaths": ["^/static/", "^/tiles/"]
   },
   "contextmenu": {
     "crs": [
