@@ -39,6 +39,7 @@ describe('WMS Client tests', () => {
   */
 
   describe('WmsClient.addLayer()', () => {
+    MockHelper.startMocking();
     wmsClientQg1L1.addLayer(layerQg1L1);
     wmsClientQg1L1.addLayer(layerQg1L2);
     wmsClientQg1L1.addLayer(layerQg1L3);
@@ -58,6 +59,7 @@ describe('WMS Client tests', () => {
   });
 
   describe('WmsClient.selectFeatures()', () => {
+    MockHelper.startMocking();
     // add selection param wmsClientQg1 standardLayers + 1 wmsClientQg1 independantLayer (layerQg1L2)
     wmsClientQg1L1.selectFeatures([0, 1, 2, 3]);
     // add selection param wmsClientQg2 standardLayers
@@ -85,6 +87,7 @@ describe('WMS Client tests', () => {
   });
 
   describe('WmsClient.GetFeatureInfo()', () => {
+    MockHelper.startMocking();
     const selectionParams = wmsClientQg1L1.state.selection.selectionParameters;
     const selectionParam1Qg1 = selectionParams[0];
     const selectionParam2Qg1 = selectionParams[1];

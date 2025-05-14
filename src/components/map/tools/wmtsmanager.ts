@@ -72,41 +72,48 @@ class WmtsManager {
 
     // Remove the abort controller from the list.
     delete this.wmtsAbortsByLayer[layer.layerUniqueId];
-
     console.debug(`Displaying WMTS Layer ${layer.name} : UniqueID=${layer.layerUniqueId}`);
-    const options = optionsFromCapabilities(capabilities, {
-      layer: layer.layer,
-      projection: this.state.projection
-    });
 
-    if (options === null) {
-      console.warn('Cannot create WMTS layer for layer ' + layer.layer);
-      return;
-    }
+    let olayer = layer._olayer;
+    if (!olayer) {
+      const options = optionsFromCapabilities(capabilities, {
+        layer: layer.layer,
+        projection: this.state.projection
+      });
 
-    // Set the right dimensions
-    for (const key in layer.dimensions) {
-      if (key in options.dimensions) {
-        // Update value
-        options.dimensions[key] = layer.dimensions[key];
-      } else {
-        console.warn(
-          'A dimension ' +
-            key +
-            ' was defined for the WMTS layer ' +
-            layer.layer +
-            ' but the server does not seem to accept it.'
-        );
+      if (options === null) {
+        console.warn('Cannot create WMTS layer for layer ' + layer.layer);
+        return;
       }
+      // Set the right dimensions
+      for (const key in layer.dimensions) {
+        if (key in options.dimensions) {
+          // Update value
+          options.dimensions[key] = layer.dimensions[key];
+        } else {
+          console.warn(
+            'A dimension ' +
+              key +
+              ' was defined for the WMTS layer ' +
+              layer.layer +
+              ' but the server does not seem to accept it.'
+          );
+        }
+      }
+
+      olayer = new TileLayer({
+        opacity: layer.opacity,
+        source: new WMTS(options)
+      });
+
+      this.enrichWmtsLayerFromCapabilities(layer, olayer, capabilities);
+      layer._olayer = olayer;
     }
 
-    const olayer = new TileLayer({
-      opacity: layer.opacity,
-      source: new WMTS(options)
-    });
-
-    this.enrichWmtsLayerFromCapabilities(layer, olayer, capabilities);
-
+    // Set zindex for this new layer
+    // (The bigger the order is, the deeper in the map it should be displayed.)
+    // (order is the inverse of z-index)
+    // For basemap, set a minimal number (arbitrary defined to less than -5000)
     let zindex;
     if (isBasemap) {
       this.basemapLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
@@ -115,18 +122,12 @@ class WmtsManager {
       this.wmtsLayers[layer.layerUniqueId] = { olayer: olayer, layerWmts: layer };
       zindex = -layer.order;
     }
-
-    // Set zindex for this new layer
-    // (The bigger the order is, the deeper in the map it should be displayed.)
-    // (order is the inverse of z-index)
-    // For basemap, set a minimal number (arbitrary defined to less than -5000)
     olayer.setZIndex(zindex);
 
     // Add to map
-    this.map.addLayer(olayer);
-
-    // Add to state
-    layer._olayer = olayer;
+    if (!this.map.getLayers().getArray().includes(olayer)) {
+      this.map.addLayer(olayer);
+    }
   }
 
   public refreshZIndexes() {

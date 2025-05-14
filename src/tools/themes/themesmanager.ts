@@ -28,6 +28,9 @@ class ThemesManager extends GirafeSingleton {
   shareManager: ShareManager;
   customThemesManager: CustomThemesManager;
 
+  isInitializingForUserInfo = new WeakMap<object, boolean>();
+  anonymousUserInfo = { u: 'anonymous' };
+
   get state() {
     return this.stateManager.state;
   }
@@ -41,13 +44,21 @@ class ThemesManager extends GirafeSingleton {
     this.shareManager = ShareManager.getInstance();
     this.customThemesManager = CustomThemesManager.getInstance();
 
-    this.stateManager.subscribe('oauth.userInfo', () => this.initialize());
+    this.stateManager.subscribe('oauth.userInfo', () => {
+      this.initialize();
+    });
   }
 
   public async initialize() {
-    await this.configManager.loadConfig();
+    const userInfo = this.state.oauth.userInfo ?? this.anonymousUserInfo;
+    if (this.isInitializingForUserInfo.get(userInfo)) {
+      // Already initializing for this userinfo
+      return;
+    }
 
+    this.isInitializingForUserInfo.set(userInfo, true);
     try {
+      await this.configManager.loadConfig();
       await this.loadThemes();
       console.log('Themes were loaded');
 
@@ -66,6 +77,8 @@ class ThemesManager extends GirafeSingleton {
       );
       await window.gAlert('This instance of GeoGirafe cannot be used at the moment.', 'Backend error');
       console.error(error);
+    } finally {
+      this.isInitializingForUserInfo.set(userInfo, false);
     }
   }
 

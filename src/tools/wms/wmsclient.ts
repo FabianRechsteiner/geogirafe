@@ -9,15 +9,25 @@ import SelectionParam from '../../models/selectionparam';
 import LayerManager from '../layers/layermanager';
 import WfsFilter from '../wfs/wfsfilter';
 import ServerOgc from '../../models/serverogc';
+import ConfigManager from '../configuration/configmanager';
 
 export default abstract class WmsClient {
   map: Map;
   ogcServer: ServerOgc;
   layerManager: LayerManager;
+  configManager: ConfigManager;
   resolutionTolerance = 5;
 
   get state() {
     return StateManager.getInstance().state;
+  }
+
+  get audienceExcludedPaths() {
+    return (
+      this.configManager.Config.oauth?.issuer.audienceExcludedPaths ??
+      this.configManager.Config.gmfauth?.audienceExcludedPaths ??
+      []
+    );
   }
 
   // The Id of this dictionary if an unique ID that allow the differenciantion of server queries.
@@ -43,6 +53,7 @@ export default abstract class WmsClient {
     this.ogcServer = ogcServer;
     this.map = map;
     this.layerManager = LayerManager.getInstance();
+    this.configManager = ConfigManager.getInstance();
   }
 
   get uniqueQueryId(): string {
@@ -85,13 +96,18 @@ export default abstract class WmsClient {
     });
     const orderedLayerNames = this.getOpenLayerLayerNames(orderedLayers);
 
+    const requestedUrl = new URL(url);
+    const shouldExclude = this.audienceExcludedPaths.some((pattern) => new RegExp(pattern).test(requestedUrl.pathname));
+    const crossOrigin =
+      this.state.oauth.audience?.includes(requestedUrl.hostname) && !shouldExclude ? 'use-credentials' : 'anonymous';
+
     const source = new ImageWMS({
       url: url,
       params: {
         LAYERS: orderedLayerNames,
         FORMAT: imageType
       },
-      crossOrigin: this.state.oauth.audience.includes(new URL(url).hostname) ? 'use-credentials' : 'anonymous'
+      crossOrigin: crossOrigin
     });
 
     // We intercept the event in order to set an error icon if the WMS query has an error
