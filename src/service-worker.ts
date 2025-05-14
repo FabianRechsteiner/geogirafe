@@ -19,7 +19,7 @@ let logLevel: string; // Current log level. Value is defined by OfflineManager.
 
 let audience: string[]; // List of domains for which the Authorization Token and cookies should be sent
 let audienceExcludedPaths: RegExp[]; // List of regex paths at audience where Authorization Token and cookies should not be sent
-let accessToken: string; // The current access token
+let accessToken: string | undefined; // The current access token
 let authMode: 'token' | 'cookie'; // How the authentication should be sent to the audience
 let refererPolicy: string; // RefererPolicy used for the queries. Default strict-origin-when-cross-origin
 
