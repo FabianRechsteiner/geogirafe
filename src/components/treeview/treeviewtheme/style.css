@@ -34,3 +34,7 @@ header:hover {
 button {
   border-radius: 1rem;
 }
+
+.tool {
+  z-index: 1;
+}

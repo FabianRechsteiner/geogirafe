@@ -42,6 +42,22 @@ if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Andr
   window.location.href = 'mobile.html';
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+  // At this point, the config and translations have not been loaded yet
+  // Therefore, we hardcode this simple 'loading' text and use the browser configuration
+  const language = navigator.language.toLowerCase();
+  console.log(`Navigator language: ${language}`);
+  let loading = 'Loading...';
+  if (language.startsWith('fr')) {
+    loading = 'Chargement...';
+  } else if (language.startsWith('de')) {
+    loading = 'Wird geladen...';
+  } else if (language.startsWith('it')) {
+    loading = 'Caricamento...';
+  }
+  (document.getElementById('splash-screen')?.getElementsByTagName('span')[0] as HTMLElement).innerHTML = loading;
+});
+
 // Common initialization
 initialize().then(() => {
   // Override default tooltip maxWidth:
@@ -85,8 +101,10 @@ initialize().then(() => {
   customElements.define('girafe-user-preferences', UserPreferencesComponent);
   customElements.define('girafe-video-record', VideoRecordComponent);
 
-  // To prevent the FOUC effect (flash of unstyled content),
-  // the html element is set to invisible when the application starts.
-  // When all elements have been declared, the html element is made visible
-  document.documentElement.style.opacity = '1';
+  // Remove the splash-screen from the DOM
+  const splash = document.getElementById('splash-screen');
+  if (splash) {
+    splash.style.opacity = '0';
+    setTimeout(() => splash.remove(), 700);
+  }
 });
