@@ -68,8 +68,40 @@ describe('ConfigManager.loadConfig', () => {
     const myConfig = { ...MockHelper.mockConfig };
     // @ts-ignore
     myConfig.basemaps[invalidKey] = 'someValue';
+    // @ts-ignore
+    manager.config = new GirafeConfig(myConfig);
     manager.loadConfig().then((config) => {
       expect(Object.keys(config.basemaps)).not.include(invalidKey);
+    });
+  });
+
+
+  it('should manage if there is no third-party config in the extended configuration', () => {
+    // @ts-ignore
+    manager.config = new GirafeConfig(MockHelper.mockConfig);
+    manager.loadConfig().then((config) => {
+      expect(Object.keys(config)).toContain('extendedConfig');
+      expect(config.extendedConfig).toBeUndefined();
+    });
+  });
+
+  it('should contain third-party config in the extended configuration', () => {
+    const thirdPartyConfig = {
+      fancyExtension: {
+        someConfig: 'someValue',
+        someOtherConfig: 42,
+        someThirdConfig: ['someThirdValue']
+      }
+    };
+    const myConfig = { ...MockHelper.mockConfig };
+    // @ts-ignore
+    myConfig.extendedConfig = thirdPartyConfig;
+    // @ts-ignore
+    manager.config = new GirafeConfig(myConfig);
+    manager.loadConfig().then((config) => {
+      expect(config.extendedConfig).toBeDefined();
+      // @ts-ignore
+      expect(TestHelper.obj2ContainsObj1PropertiesValues(myConfig.extendedConfig, config.extendedConfig)).toBeTruthy();
     });
   });
 });

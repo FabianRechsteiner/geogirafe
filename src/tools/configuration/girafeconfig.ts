@@ -189,6 +189,9 @@ class GirafeConfig {
     getUrl: string | undefined;
     postUrl: string | undefined;
   };
+  // The extended configuration can be used by third-party components or extensions
+  // to add custom attributes to the GirafeConfig.
+  extendedConfig?: Record<string, object>;
 
   public static readonly DEFAULT_LOCALE = 'en-US';
 
@@ -222,6 +225,7 @@ class GirafeConfig {
     this.userdata = this.initUserData(config);
     this.contextmenu = this.initContextMenu(config);
     this.crs = this.initCRS(config);
+    this.extendedConfig = this.initExtendedConfig(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -588,6 +592,10 @@ class GirafeConfig {
 
   private initCRS(config: GirafeConfig) {
     return config.crs;
+  }
+
+  private initExtendedConfig(config: GirafeConfig) {
+    return config.extendedConfig ?? undefined;
   }
 }
 
