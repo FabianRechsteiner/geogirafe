@@ -24,39 +24,40 @@ tr {
 }
 
 .map-info-contextmenu {
+  --contextmenu-border-width: 1px;
+  --contextmenu-triangle-width: 20px;
+  --contextmenu-triangle-height: 10px;
   min-width: 300px !important;
   position: absolute;
+  box-sizing: content-box;
   background-color: var(--bkg-color) !important;
   color: var(--text-color);
-  box-shadow: 0 1px 4px var(--bx-shdw);
   padding: 15px;
   border-radius: 0px;
-  border: 1px solid var(--text-color-grad1);
-  bottom: 12px;
+  border: var(--contextmenu-border-width) solid var(--text-color-grad1);
+  bottom: var(--contextmenu-triangle-height); /* 10px */
   left: -165px; /* Half popup width + padding */
 }
 
-.map-info-contextmenu:after,
-.map-info-contextmenu:before {
-  top: 100%;
-  border: solid transparent;
-  content: ' ';
-  height: 0;
-  width: 0;
+.map-info-contextmenu .tooltip-triangle {
   position: absolute;
-  pointer-events: none;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
+  width: 20px;
+  height: var(--contextmenu-triangle-height);
+  pointer-events: none;
 }
 
-.map-info-contextmenu:after {
-  border-top-color: white;
-  border-width: 10px;
+.map-info-contextmenu .tooltip-triangle .triangle-fill {
+  fill: var(--bkg-color);
+  stroke: none;
 }
 
-.map-info-contextmenu:before {
-  border-top-color: #cccccc;
-  border-width: 11px;
+.map-info-contextmenu .tooltip-triangle .triangle-border {
+  fill: none;
+  stroke: var(--text-color-grad1);
+  stroke-width: var(--contextmenu-border-width);
 }
 
 .contextmenu-closer {
