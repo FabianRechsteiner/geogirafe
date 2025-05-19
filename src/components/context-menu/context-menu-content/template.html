@@ -31,7 +31,7 @@
                 tip="Copy value"
                 tip-placement="top"
                 onclick="${() => {navigator.clipboard.writeText(this.printCoordinate(this.proj4(this.projection, f.code, this.position), f.format,
-            f.precision).toString())}}">
+            f.precision).join(', '))}}">
                 <img src="icons/content_copy.svg" alt="${this.i18nManager.getTranslation('Copy value')}" />
               </button>
             </div>
@@ -64,4 +64,8 @@
       </tbody>
     </table>
   </div>
+  <svg class="tooltip-triangle" viewBox="0 0 20 10" preserveAspectRatio="none">
+    <polygon points="0,0 10,10 20,0" class="triangle-fill" />
+    <path d="M0,0 L10,10 L20,0" class="triangle-border" />
+  </svg>
 </div>
