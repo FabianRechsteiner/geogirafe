@@ -37,6 +37,10 @@ const cesiumBaseUrl = 'lib/cesium/';
 // Will be automatically set to the library path when working with the library @geogirafe/lib-geoportal
 const geogirafeSource = 'src';
 
+// Path where the SSL-Certificates for local debugging are stored
+// Will be automatically set to the right path when working with the library
+const certsDirectory = 'buildtools/certs';
+
 // https://v2.vitejs.dev/config/
 export default defineConfig(({ command }) => {
   return {
@@ -48,8 +52,8 @@ export default defineConfig(({ command }) => {
       https:
         command === 'serve'
           ? {
-              key: readFileSync('buildtools/certs/app.localhost.key.pem'),
-              cert: readFileSync('buildtools/certs/app.localhost.cert.pem')
+              key: readFileSync(`${certsDirectory}/app.localhost.key.pem`),
+              cert: readFileSync(`${certsDirectory}/app.localhost.cert.pem`)
             }
           : false
     },

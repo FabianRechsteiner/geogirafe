@@ -12,7 +12,7 @@ IF %ERRORLEVEL% NEQ 0 (
 REM Ensure that Docker est installed
 where docker >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-  echo Docker not found. Please install it first (https://www.docker.com/products/docker-desktop)
+  echo Docker not found. Please install it first [https://www.docker.com/products/docker-desktop]
   exit /b 1
 )
 
@@ -36,4 +36,3 @@ certutil -addstore root "rootCA.pem"
 echo Certificate was added successfully.
 
 popd
-pause
