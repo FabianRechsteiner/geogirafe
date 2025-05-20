@@ -34,6 +34,8 @@ copy('main.js', sourceDir, targetDir);
 copy('lib-inline.js', sourceDir, targetDir);
 copy('vite-inline-templates-plugin.js', sourceDir, targetDir);
 copy('vite-restart-plugin.js', sourceDir, targetDir);
+copy('generate-dev-certs.cmd', sourceDir, targetDir);
+copy('generate-dev-certs.sh', sourceDir, targetDir);
 
 // Copy typing files
 console.info(`Copying the Typings...`);

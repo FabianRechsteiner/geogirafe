@@ -2,22 +2,28 @@ set +x
 
 # Ensure that certutil is installed
 if ! command -v certutil &> /dev/null; then
-    echo "certutil not found. Please install it first"
-    exit
+    echo "certutil not found. Please install it first (e.g. libnss3-tools on Ubuntu)"
+    exit 1
+fi
+
+# Ensure that Docker est installed
+if ! command -v docker &> /dev/null; then
+    echo "Docker not found. Please install it first (https://docs.docker.com/get-docker/)"
+    exit 1
 fi
 
 # Ask for sudo rights, it will be needed to trust the certificate
 sudo -v
 
 # Create directories
-cd buildtools
-mkdir -p certs
-cd certs
+TARGET_DIR="${1:-buildtools/certs}"
+mkdir -p "$TARGET_DIR"
+cd "$TARGET_DIR"
 
 # Generate certificates
 echo Generating development certificates
-docker run --rm -v .:/root/.local/share/mkcert alpine/mkcert -install
-docker run --rm -v .:/root/.local/share/mkcert alpine/mkcert -cert-file /root/.local/share/mkcert/app.localhost.cert.pem -key-file /root/.local/share/mkcert/app.localhost.key.pem app.localhost localhost 127.0.0.1
+docker run --rm -v "$(pwd)":/root/.local/share/mkcert alpine/mkcert -install
+docker run --rm -v "$(pwd)":/root/.local/share/mkcert alpine/mkcert -cert-file /root/.local/share/mkcert/app.localhost.cert.pem -key-file /root/.local/share/mkcert/app.localhost.key.pem app.localhost localhost 127.0.0.1
 sudo chmod a+r app.localhost.*
 
 # Add root certificate to system trusted store
