@@ -3,8 +3,8 @@ import { copy, replaceInFile } from './tools.js';
 
 // Generate template files
 console.info(`Copying the Templates...`);
-const sourceDir = './';
-const targetDir = path.join('dist', 'lib', 'templates');
+let sourceDir = './';
+let targetDir = path.join('dist', 'lib', 'templates');
 copy('tsconfig.json', sourceDir, targetDir);
 copy('vite.config.js', sourceDir, targetDir);
 replaceInFile(
@@ -39,3 +39,10 @@ copy('mobile.html', sourceDir, targetDir);
 replaceInFile(path.join(targetDir, 'mobile.html'), /href="src\/styles/gm, 'href="styles');
 copy('iframe.html', sourceDir, targetDir);
 replaceInFile(path.join(targetDir, 'iframe.html'), /href="src\/styles/gm, 'href="styles');
+
+// Copy public assets (images, favicon, ...)
+sourceDir = './public';
+targetDir = path.join('dist', 'lib', 'templates', 'public');
+copy('images', sourceDir, targetDir);
+copy('favicon.ico', sourceDir, targetDir);
+copy('site.webmanifest', sourceDir, targetDir);

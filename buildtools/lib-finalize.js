@@ -53,8 +53,6 @@ copy('package.json', sourceDir, targetDir);
 copy('README.md', sourceDir, targetDir);
 copy('CONTRIBUTING.md', sourceDir, targetDir);
 copy('LICENSE', sourceDir, targetDir);
-copy('public', sourceDir, targetDir);
-deleteDirectory(path.join(targetDir, 'public', 'Mock'));
 
 const fileList = findFilesRecursive(path.resolve('src', 'components'), ['.png', '.webp', '.jpg', '.jpeg', '.svg']);
 for (const filepath of fileList) {
