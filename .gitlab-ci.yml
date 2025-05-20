@@ -189,7 +189,7 @@ build-lib:
     - npm list --all --omit=dev
     # Generate Version Number
     - version=$(jq -r '.version' package.json)
-    - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > dist/lib/public/about.json
+    - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > dist/lib/templates/public/about.json
   artifacts:
     paths:
       - dist/lib
