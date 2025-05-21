@@ -106,7 +106,7 @@ async function handleFetchEvent(event: FetchEvent): Promise<Response> {
   let response = await fetchAndCache(newRequest);
 
   // Use cache only for GET queries
-  if (event.request.method === 'GET') {
+  if (isCacheAllowed(event.request)) {
     if (!response) {
       // Fetch was unsuccessful. We try to load the data from cache.
       response = await loadFromCache(event.request);
@@ -120,6 +120,18 @@ async function handleFetchEvent(event: FetchEvent): Promise<Response> {
   return response ?? new Response(null, { status: 503 });
 }
 
+function isCacheAllowed(request: Request) {
+  if (request.method !== 'GET') {
+    return false;
+  }
+  if (request.headers.get('Range')) {
+    // RANGE Request (for COG, FlatGeoBuf or GeoParquet for example)
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * Execute a fetch for the query, and cache the result if successful
  * Returns null if unsuccessful
@@ -127,7 +139,7 @@ async function handleFetchEvent(event: FetchEvent): Promise<Response> {
 async function fetchAndCache(request: Request): Promise<Response | null> {
   try {
     const response = await fetch(request);
-    if (cacheCount < maxCacheCount && request.method === 'GET' && response.type !== 'opaque') {
+    if (cacheCount < maxCacheCount && isCacheAllowed(request) && response.type !== 'opaque') {
       // Fetch was successful. We cache the result if necessary and return the response.
       cacheCount++;
       log(`SW ${cacheCount}/${maxCacheCount} caching ${request.url} for offline use.`);
