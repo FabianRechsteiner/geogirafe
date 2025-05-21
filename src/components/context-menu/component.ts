@@ -1,4 +1,5 @@
 import type { Callback } from '../../tools/state/statemanager';
+
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MapManager from '../../tools/state/mapManager';
 import ConfigManager from '../../tools/configuration/configmanager';
@@ -6,25 +7,26 @@ import { Map, Overlay } from 'ol';
 import { RasterManager } from './rasterquerymanager';
 import { MapContextMenuState } from './contextmenustate';
 
+class ContextMenuContainer extends HTMLElement {
+  container!: HTMLElement;
+}
+
 class MapContextMenuComponent extends GirafeHTMLElement {
   templateUrl = null;
   styleUrls = null;
 
   private readonly map: Map;
   private readonly eventsCallbacks: Callback[] = [];
-  private readonly MapContextMenuState: MapContextMenuState;
+  readonly MapContextMenuState: MapContextMenuState;
   private readonly rasterQueryManager: RasterManager;
-  private contextMenuContainer!: HTMLElement;
-  private contextMenuOverlay!: Overlay;
 
   constructor() {
     super('map-context-menu');
     this.state.extendedState.mapcontextmenu = new MapContextMenuState();
     this.MapContextMenuState = this.state.extendedState.mapcontextmenu as MapContextMenuState;
-
     this.MapContextMenuState.crs = ConfigManager.getInstance().Config.contextmenu.crs;
     this.map = MapManager.getInstance().getMap();
-    this.rasterQueryManager = new RasterManager();
+    this.rasterQueryManager = new RasterManager(this.MapContextMenuState);
   }
 
   async updateData() {
@@ -34,65 +36,64 @@ class MapContextMenuComponent extends GirafeHTMLElement {
     this.rasterQueryManager.refresh(this.MapContextMenuState.projection, this.MapContextMenuState.position);
   }
 
-  showContextMenu(): void {
-    this.updateData();
+  showContextMenu(id: string, position: [number, number], containerElement: string): void {
+    let contextMenuOverlay = this.map.getOverlayById(id);
 
     // Remove existing overlay
-    if (this.contextMenuOverlay) {
-      this.map.removeOverlay(this.contextMenuOverlay);
+    if (contextMenuOverlay) {
+      this.map.removeOverlay(contextMenuOverlay);
     }
 
     // Create new overlay
-    this.contextMenuContainer = document.createElement('girafe-context-menu-content');
+    const contextMenuContainer = document.createElement(containerElement) as ContextMenuContainer;
+    contextMenuContainer.container = this;
 
-    this.contextMenuOverlay = new Overlay({
-      element: this.contextMenuContainer,
-      position: this.MapContextMenuState.position!,
+    contextMenuOverlay = new Overlay({
+      id: id,
+      element: contextMenuContainer,
+      position: position,
       autoPan: {
         animation: {
           duration: 250
         }
       }
     });
-    this.map.addOverlay(this.contextMenuOverlay);
+    this.map.addOverlay(contextMenuOverlay);
   }
 
-  hideContextMenu(): void {
-    if (this.contextMenuOverlay) {
-      this.contextMenuOverlay.setPosition(undefined);
+  hideContextMenu(id: string): void {
+    const contextMenuOverlay = this.map.getOverlayById(id);
+    if (contextMenuOverlay) {
+      contextMenuOverlay.setPosition(undefined);
     }
   }
 
   registerEvents() {
     // Right click on map event
     if (this.registerInteractionListener('map.contextmenu', false)) {
-      this.map.getViewport().addEventListener('contextmenu', (e) => {
+      this.map.getViewport().addEventListener('contextmenu', async (e) => {
         if (this.canExecute('map.contextmenu')) {
           e.preventDefault();
-          this.showContextMenu();
+          await this.updateData();
+          this.showContextMenu(
+            'default-overlay',
+            this.MapContextMenuState.position!,
+            'girafe-default-context-menu-content'
+          );
         }
       });
     }
 
-    this.eventsCallbacks.push(
-      this.subscribe(
-        'extendedState.mapcontextmenu.position',
-        (_oldValue: [number, number], _newValue: [number, number]) => {
-          console.debug(`extendedState.mapcontextmenu.position: ${this.MapContextMenuState.position}`);
-          this.state.interface.contextMenuVisible = true;
-        }
-      ),
-
-      this.subscribe('interface.contextMenuVisible', (_oldValue: boolean, _newValue: boolean) => {
-        console.debug(`contextMenuVisible: ${this.state.interface.contextMenuVisible}`);
-
-        if (_newValue) {
-          this.showContextMenu();
-        } else {
-          this.hideContextMenu();
-        }
-      })
-    );
+    // Map rendering complete event
+    this.map.once('rendercomplete', () => {
+      if (this.state.position.tooltip) {
+        this.showContextMenu(
+          'custom-overlay',
+          this.state.position.center as [number, number],
+          'girafe-custom-context-menu-content'
+        );
+      }
+    });
   }
 
   unregisterEvents(): void {

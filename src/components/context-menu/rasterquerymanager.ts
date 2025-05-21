@@ -1,4 +1,3 @@
-import StateManager from '../../tools/state/statemanager';
 import ConfigManager from '../../tools/configuration/configmanager';
 import { MapContextMenuState } from './contextmenustate';
 import { GeoTIFFImage } from 'geotiff';
@@ -35,8 +34,8 @@ export class RasterManager {
   private readonly sources: RasterSource[];
   public rasters: Raster[];
 
-  constructor() {
-    this.MapContextMenuState = StateManager.getInstance().state.extendedState.mapcontextmenu as MapContextMenuState;
+  constructor(MapContextMenuState: MapContextMenuState) {
+    this.MapContextMenuState = MapContextMenuState;
     this.sources = ConfigManager.getInstance().Config.contextmenu.sources;
     this.rasters = [];
     this.init();
