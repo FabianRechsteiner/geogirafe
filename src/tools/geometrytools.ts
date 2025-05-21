@@ -47,3 +47,32 @@ export function parseCoordinates(coords: number[], extent: number[] | undefined,
 
   return [];
 }
+
+export function decimalToDMS(coordinate: number[]): string[] {
+  const convertToDMS = (decimal: number, isLatitude: boolean): string => {
+    const degrees = Math.floor(Math.abs(decimal));
+    const minutes = Math.floor((Math.abs(decimal) - degrees) * 60);
+    const seconds = Math.round((Math.abs(decimal) - degrees - minutes / 60) * 3600 * 100) / 100;
+    let direction;
+    if (isLatitude) {
+      direction = decimal >= 0 ? 'N' : 'S';
+    } else {
+      direction = decimal >= 0 ? 'E' : 'W';
+    }
+    return `${degrees}° ${minutes}' ${seconds}" ${direction}`;
+  };
+
+  const latitude = coordinate[1];
+  const longitude = coordinate[0];
+  return [convertToDMS(longitude, false), convertToDMS(latitude, true)];
+}
+
+export function printCoordinate(coordinate: number[], format: 'dms' | 'decimal', precision: number): string[] {
+  let coordString: string[] = [];
+  if (format === 'dms') {
+    coordString = decimalToDMS(coordinate);
+  } else if (format === 'decimal') {
+    coordString = coordinate.map((x) => x.toFixed(precision));
+  }
+  return coordString;
+}

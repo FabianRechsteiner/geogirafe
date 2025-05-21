@@ -7,7 +7,7 @@ class MapPosition {
   resolution: number = 100; /* dummy default value because it should never be null. It will be recalculated when the map will be created */
   scale: number = 0;
   crosshair: boolean = false;
-  tooltip: string = '';
+  tooltip?: string;
 
   get isValid() {
     if (Number.isNaN(this.resolution)) {
@@ -40,7 +40,7 @@ export function parseMapPositionFromUrl(): MapPosition | undefined {
     newPosition.center = [parseFloat(mapX), parseFloat(mapY)];
     newPosition.zoom = parseFloat(mapZoom);
     newPosition.crosshair = crosshair === 'true';
-    newPosition.tooltip = DOMPurify.sanitize(tooltip as string) ?? '';
+    newPosition.tooltip = DOMPurify.sanitize(tooltip as string) ?? undefined;
     return newPosition.isValid ? newPosition : undefined;
   }
   return undefined;

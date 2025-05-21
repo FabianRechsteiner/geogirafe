@@ -136,8 +136,6 @@ export default class MapComponent extends GirafeHTMLElement {
       this.onChangeProjection(oldProjection, newProjection)
     );
     this.subscribe('interface.darkMapMode', (_oldValue: boolean, _newValue: boolean) => this.onChangeDarkMode());
-
-
     this.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
       this.onPositionChanged(newPosition)
     );
@@ -327,7 +325,6 @@ export default class MapComponent extends GirafeHTMLElement {
     // events. If another tool registers one of these events exclusively, the listeners bellow will
     // be paused temporarily and reactivate once the tool is closed.
 
-
     // Select features via GetFeatureInfo
     if (this.registerInteractionListener('map.select', false)) {
       // Simple click for single feature selection
@@ -381,6 +378,7 @@ export default class MapComponent extends GirafeHTMLElement {
     newPosition.zoom = view.getZoom()!;
     newPosition.resolution = view.getResolution()!;
     newPosition.scale = this.viewManager.getScale();
+    newPosition.tooltip = this.state.position.tooltip;
 
     if (newPosition.isValid) {
       this.state.position = newPosition;
@@ -905,6 +903,8 @@ export default class MapComponent extends GirafeHTMLElement {
       return;
     }
 
+    this.state.position = this.initialPositionFromUrl;
+
     if (!this.state.projection || !this.olMap.getView().getResolution()) {
       // Everything os not ready yet. Delay the execution of this method on rendercomplete
       this.olMap.once('rendercomplete', () => {
@@ -944,30 +944,6 @@ export default class MapComponent extends GirafeHTMLElement {
       this.crosshairLayer = new VectorLayer({ source: new VectorSource({ features: [this.crosshairFeature] }) });
       this.setCrosshairStyle();
       this.olMap.addLayer(this.crosshairLayer);
-    }
-
-    if (position.tooltip) {
-      this.tooltipContainer = this.shadow.getElementById('popup') as HTMLElement;
-      const tooltipContent = this.shadow.getElementById('popup-content') as HTMLElement;
-
-      // Remove existing overlay first
-      if (this.tooltipOverlay) {
-        this.olMap.removeOverlay(this.tooltipOverlay);
-      }
-
-      // Create new overlay
-      this.tooltipOverlay = new Overlay({
-        element: this.tooltipContainer,
-        autoPan: {
-          animation: {
-            duration: 250
-          }
-        }
-      });
-      this.olMap.addOverlay(this.tooltipOverlay);
-      tooltipContent.innerHTML = position.tooltip;
-      this.tooltipOverlay.setPosition(position.center);
-      this.tooltipContainer.classList.remove('hidden');
     }
 
     if (position.isValid) {

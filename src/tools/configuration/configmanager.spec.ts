@@ -75,7 +75,6 @@ describe('ConfigManager.loadConfig', () => {
     });
   });
 
-
   it('should manage if there is no third-party config in the extended configuration', () => {
     // @ts-ignore
     manager.config = new GirafeConfig(MockHelper.mockConfig);
