@@ -4,28 +4,28 @@
   },
   "languages": {
     "translations": {
-      "fr": ["i18n/fr.json", "https://demo-br.geocommunes.ch/static/0/fr-br.json"]
+      "fr": ["i18n/fr.json", "https://demo-ai.geocommunes.ch/static/0/fr-ai.json"]
     },
     "defaultLanguage": "fr"
   },
   "themes": {
-    "url": "https://demo-br.geocommunes.ch/themes?background=br-background&interface=br-desktop",
-    "defaultTheme": "br-thm_cadastre",
+    "url": "https://demo-ai.geocommunes.ch/themes?background=ai-background&interface=ai-desktop",
+    "defaultTheme": "ai-thm_cadastre",
     "selectionMode": "add"
   },
   "basemaps": {
-    "defaultBasemap": "br-asitvd.fond_cadastral_grp",
+    "defaultBasemap": "ai-asitvd.fond_cadastral_grp",
     "OSM": true,
     "SwissTopoVectorTiles": true
   },
   "search": {
-    "url": "https://demo-br.geocommunes.ch/search?limit=30&partitionlimit=5&interface=br-desktop&query=###SEARCHTERM###&lang=fr",
+    "url": "https://demo-ai.geocommunes.ch/search?limit=30&partitionlimit=5&interface=ai-desktop&query=###SEARCHTERM###&lang=fr",
     "objectPreview": true,
     "layerPreview": true
   },
   "print": {
-    "url": "https://demo-br.geocommunes.ch/printproxy/",
-    "defaultLayout": "1 A4 portrait br"
+    "url": "https://demo-ai.geocommunes.ch/printproxy/",
+    "defaultLayout": "1 A4 portrait ai"
   },
   "share": {
     "service": "lstu",
@@ -38,10 +38,10 @@
   },
   "map": {
     "srid": "EPSG:2056",
-    "startZoom": "1",
-    "startPosition": "2544123,1171426",
-    "maxExtent": "2487222,1027732,2826766,1297682",
-    "scales": [200000, 80000, 40000, 20000, 10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]
+    "startZoom": "2",
+    "startPosition": "2564960,1129407",
+    "maxExtent": "2434850,1046400,2817600,1250705",
+    "scales": [100000, 50000, 30000, 15000, 7000, 6000, 5000, 2500, 1000, 500, 300, 150, 50]
   },
   "map3d": {
     "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
@@ -55,9 +55,19 @@
     "maximumZoomDistance": 25000
   },
   "gmfauth": {
-    "url": "https://demo-br.geocommunes.ch",
-    "audience": ["demo-br.geocommunes.ch"],
-    "audienceExcludedPaths": ["^/tiles/", "^/pytree/"]
+    "url": "https://demo-ai.geocommunes.ch",
+    "audience": ["demo-ai.geocommunes.ch"],
+    "audienceExcludedPaths": ["^/static/(.*)", "^/tiles/"]
+  },
+  "lidar": {
+    "url": "https://pytree.geocommune.apps.openshift-ch-1.camptocamp.com"
+  },
+  "contextmenu": {
+    "crs": [
+      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 1 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
+    ]
   },
   "crs": [
     {
