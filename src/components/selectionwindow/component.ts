@@ -10,6 +10,8 @@ import IconCenter from './images/center.svg';
 import ResizeWindow from '../../tools/resizewindow';
 import DOMPurify from 'dompurify';
 import CsvManager from '../../tools/export/csvmanager';
+import { getColumnAlias } from '../../tools/utils/aliases';
+import I18nManager from '../../tools/i18n/i18nmanager';
 
 /**
  * Represents a Feature displayed in the SelectionWindowComponent.
@@ -173,8 +175,9 @@ class SelectionWindowComponent extends GirafeDraggableElement {
           ADD_URI_SAFE_ATTR: ['onclick']
         };
       }
+
+      keyValue[0] = I18nManager.getInstance().getTranslation(getColumnAlias(windowFeature.id, keyValue[0]));
       keyValue[1] = DOMPurify.sanitize(keyValue[1] as string, config);
-      return keyValue[1];
     });
     // Render and translate data.
     this.render();
