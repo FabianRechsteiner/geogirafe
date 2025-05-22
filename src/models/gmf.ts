@@ -76,4 +76,11 @@ export interface GMFServerOgc {
   urlWfs?: string;
   type: string;
   imageType: string;
+  attributes?: GMFServerOgcAttributes;
+}
+
+export type GMFServerOgcAttributes = Record<string, GMFServerOgcObjectAttributes>;
+export type GMFServerOgcObjectAttributes = Record<string, GMFServerOgcColumnAttributes>;
+export interface GMFServerOgcColumnAttributes {
+  alias: string;
 }

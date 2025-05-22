@@ -7,6 +7,7 @@ import FormatGridGeomValue from './formatgridgeomvalue';
 import { ColumnDefinition, TabulatorFull as Tabulator } from 'tabulator-tables';
 import StateManager from '../../../tools/state/statemanager';
 import { getUid } from 'ol/util';
+import { getColumnAlias } from '../../../tools/utils/aliases';
 
 /**
  * Represents the header text and state of a tab.
@@ -36,7 +37,7 @@ export interface TabContent {
 
 export default class SelectionTabulatorManager {
   private readonly formatGridGeomValue = new FormatGridGeomValue();
-  private configManager: ConfigManager;
+  private readonly configManager: ConfigManager;
   private readonly featureToGridData = new FeatureToGridDataById({ keepGeomProperty: true });
   private readonly stateManager: StateManager;
   idTab: Record<string, TabContent> = {};
@@ -61,7 +62,7 @@ export default class SelectionTabulatorManager {
    * Replace the data of the current grid with the data of the specified tab.
    */
   replaceData(id: string): void {
-    const columns = this.columnsToGridColumns(this.data[id].columns);
+    const columns = this.columnsToGridColumns(id, this.data[id].columns);
     this.table?.setColumns(columns);
     this.table?.replaceData(this.data[id].notOlProperties);
   }
@@ -88,7 +89,7 @@ export default class SelectionTabulatorManager {
 
     this.table = new Tabulator(this.element, {
       data: this.data[id].notOlProperties,
-      columns: this.columnsToGridColumns(this.data[id].columns),
+      columns: this.columnsToGridColumns(id, this.data[id].columns),
       selectableRows: true,
       layout: 'fitColumns',
       locale: true,
@@ -158,21 +159,22 @@ export default class SelectionTabulatorManager {
       return;
     }
     this.idTab[id] = {
-      columns: gridData.columns.map((column) => this.createGridColumn(column)),
+      columns: gridData.columns.map((column) => this.createGridColumn(id, column)),
       data: gridData.data.map((data) => this.createGridData(data)),
       features: gridData.features
     };
   }
 
-  columnsToGridColumns(columns: string[]): ColumnDefinition[] {
+  columnsToGridColumns(idTable: string, columns: string[]): ColumnDefinition[] {
     const columnDefinition: ColumnDefinition[] = [];
-    columns.map((column) =>
+    columns.forEach((column) => {
+      const columnAlias = getColumnAlias(idTable, column);
       columnDefinition.push({
-        title: I18nManager.getInstance().getTranslation(column),
+        title: I18nManager.getInstance().getTranslation(columnAlias),
         field: column,
         formatter: 'html'
-      })
-    );
+      });
+    });
 
     columnDefinition.forEach((column) => {
       if (column.field === 'the_geom' || column.field === 'geom' || column.field === 'geometry') {
@@ -204,10 +206,11 @@ export default class SelectionTabulatorManager {
    * @returns A newly created grid column object.
    * @private
    */
-  private createGridColumn(id: string): Column {
+  private createGridColumn(idTable: string, idColumn: string): Column {
+    const columnAlias = getColumnAlias(idTable, idColumn);
     return {
-      id,
-      name: I18nManager.getInstance().getTranslation(id)
+      id: idColumn,
+      name: I18nManager.getInstance().getTranslation(columnAlias)
     };
   }
 
