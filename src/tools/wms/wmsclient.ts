@@ -227,12 +227,8 @@ export default abstract class WmsClient {
       if (layerWms.isTransparent) {
         olayer.setOpacity(layerWms.opacity);
       }
-      if (layerWms.hasFilter) {
-        this.updateOpenLayerFilter(layerWms);
-      }
-      if (layerWms.hasTimeRestriction) {
-        this.updateTimeRestriction(layerWms);
-      }
+      this.updateLayerFilter(layerWms);
+      this.updateTimeRestriction(layerWms);
     } else if (this.layerInStandardLayers(layerWms)) {
       this.makeLayerIndependent(layerWms);
     }
@@ -251,23 +247,49 @@ export default abstract class WmsClient {
         opacity: layerWms.opacity
       });
       this.independentLayers[layerWms.treeItemId] = { layerWms: layerWms, olayer: olayer };
-      if (layerWms.hasTimeRestriction) {
-        this.updateTimeRestriction(layerWms);
-      }
-      if (layerWms.hasFilter) {
-        this.updateOpenLayerFilter(layerWms);
-      }
+
+      this.updateLayerFilter(layerWms);
+      this.updateTimeRestriction(layerWms);
+
       this.map.addLayer(olayer);
     } else {
       throw new Error('A layer can be made independent only if it has already been added to the map.');
     }
   }
 
-  abstract updateOpenLayerFilter(layerWms: LayerWms): void;
+  updateLayerFilter(layerWms: LayerWms) {
+    if (layerWms.treeItemId in this.independentLayers) {
+      const olayer = this.independentLayers[layerWms.treeItemId].olayer;
+      const source = olayer.getSource() as ImageWMS;
+      if (layerWms.hasFilter) {
+        const filterStr = this.buildFilterQuery(layerWms);
+        source.updateParams({ FILTER: filterStr });
+      } else {
+        // If present, remove the filter parameter
+        const params = source.getParams();
+        if (params.FILTER) {
+          delete params.FILTER;
+          source.updateParams(params);
+        }
+      }
+    }
+  }
+
+  abstract buildFilterQuery(layerWms: LayerWms): string;
 
   updateTimeRestriction(layerWms: LayerWms) {
     const olayer = this.independentLayers[layerWms.treeItemId].olayer;
-    (olayer.getSource() as ImageWMS).updateParams({ TIME: layerWms.timeRestriction });
+    const source = olayer.getSource() as ImageWMS;
+    if (layerWms.hasTimeRestriction) {
+      (olayer.getSource() as ImageWMS).updateParams({ TIME: layerWms.timeRestriction });
+    } else {
+      // If present, remove the time parameter
+      const params = source.getParams();
+      if (params.TIME) {
+        delete params.TIME;
+        source.updateParams(params);
+      }
+    }
   }
 
   selectFeatures(extent: number[]) {
@@ -361,7 +383,7 @@ export default abstract class WmsClient {
 
 export class WmsClientQgis extends WmsClient {
   /** QGIS-server does not filter on a WMS layer made from multiple underlying WFS queryLayers
-   * Solution: query directly the queryLayers
+   * Solution: directly query the queryLayers
    */
   getOpenLayerLayerNames(layerList: LayerWms[]) {
     const hasFilter = layerList.some((layerWms) => layerWms.hasFilter);
@@ -380,14 +402,14 @@ export class WmsClientQgis extends WmsClient {
    * MapServer: (<filter>...</filter><filter>...</filter>)
    * QGIS-server: (<filter>...</filter>)(<filter>...</filter>)
    */
-  updateOpenLayerFilter(layerWms: LayerWms) {
-    if (layerWms.hasFilter && layerWms.treeItemId in this.independentLayers) {
+  buildFilterQuery(layerWms: LayerWms) {
+    let filterStr = '';
+    if (layerWms.hasFilter) {
       const filter = layerWms.filter as WfsFilter;
       const nbQuerylayers = layerWms.queryLayers!.split(',').length;
-      const filtrerStr = ('(' + filter.toWmsGetMapFilter() + ')').repeat(nbQuerylayers);
-      const olayer = this.independentLayers[layerWms.treeItemId].olayer;
-      (olayer.getSource() as ImageWMS).updateParams({ FILTER: filtrerStr });
+      filterStr = ('(' + filter.toWmsGetMapFilter() + ')').repeat(nbQuerylayers);
     }
+    return filterStr;
   }
 }
 
@@ -396,14 +418,14 @@ export class WmsClientMapServer extends WmsClient {
     return layerList.map((l: LayerWms) => l.layers) as string[];
   }
 
-  updateOpenLayerFilter(layerWms: LayerWms) {
-    if (layerWms.hasFilter && layerWms.treeItemId in this.independentLayers) {
+  buildFilterQuery(layerWms: LayerWms): string {
+    let filterStr = '';
+    if (layerWms.hasFilter) {
       const filter = layerWms.filter as WfsFilter;
       const nbQuerylayers = layerWms.queryLayers!.split(',').length;
-      const filtrerStr = '(' + filter.toWmsGetMapFilter().repeat(nbQuerylayers) + ')';
-      const olayer = this.independentLayers[layerWms.treeItemId].olayer;
-      (olayer.getSource() as ImageWMS).updateParams({ FILTER: filtrerStr });
+      filterStr = '(' + filter.toWmsGetMapFilter().repeat(nbQuerylayers) + ')';
     }
+    return filterStr;
   }
 }
 

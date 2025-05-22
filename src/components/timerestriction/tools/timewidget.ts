@@ -1,6 +1,7 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import LayerTimeFormatter from '../../../tools/time/layertimeformatter';
 import ITimeOptions, { TimeMode, TimeResolution } from '../../../tools/time/itimeoptions';
+import { debounce } from '../../../tools/utils/debounce';
 
 export type TimeRangeLimit = 'lower' | 'upper';
 export const TimeChangeEvent = 'timeChange';
@@ -26,6 +27,9 @@ class TimeWidget extends GirafeHTMLElement {
 
   protected minDefaultValue: string = '';
   protected maxDefaultValue: string = '';
+
+  private readonly debounceTime = 500;
+  private timeChangeEventDebounced: ((unset: boolean) => void) | undefined = undefined;
 
   constructor(name: string) {
     super(name);
@@ -110,7 +114,7 @@ class TimeWidget extends GirafeHTMLElement {
    *
    * @param {boolean} unset - Set the time restriction to undefined.
    */
-  protected dispatchTimeChangeEvent(unset: boolean = false) {
+  private createTimeChangeEvent(unset: boolean = false) {
     this.dispatchEvent(
       new CustomEvent(TimeChangeEvent, {
         bubbles: true,
@@ -118,6 +122,17 @@ class TimeWidget extends GirafeHTMLElement {
         detail: unset ? undefined : this.getTimeRestriction()
       })
     );
+  }
+
+  /**
+   * Dispatches a debounced time change event to prevent frequent server calls.
+   *
+   * @param {boolean} [unset=false] - Indicates whether the time will be set to undefined.
+   */
+  protected dispatchTimeChangeEvent(unset: boolean = false) {
+    // Debounce the time change event to limit server calls
+    this.timeChangeEventDebounced ??= debounce(this.createTimeChangeEvent, this.debounceTime);
+    this.timeChangeEventDebounced(unset);
   }
 
   connectedCallback() {

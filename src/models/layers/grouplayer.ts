@@ -10,6 +10,7 @@ export type GroupLayerOptions = {
   isDefaultExpanded?: boolean;
   isExclusiveGroup?: boolean;
   time?: ITimeOptions;
+  timeAttribute?: string;
 };
 
 class GroupLayer extends BaseLayer implements ILayerWithTime {
@@ -26,6 +27,7 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
   public activeState: 'on' | 'off' | 'semi' = 'off';
 
   public timeOptions?: ITimeOptions;
+  public timeAttribute?: string;
   public timeRestriction?: string;
 
   children: BaseLayer[] = [];
@@ -35,6 +37,7 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
     this.isExpanded = options?.isDefaultExpanded || false;
     this.isExclusiveGroup = options?.isExclusiveGroup ?? false;
     this.timeOptions = options?.time;
+    this.timeAttribute = options?.timeAttribute;
 
     this.setDefaultTimeRestriction();
   }
@@ -46,7 +49,8 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
       disclaimer: this.disclaimer,
       isDefaultExpanded: this.isExpanded,
       isExclusiveGroup: this.isExclusiveGroup,
-      time: this.timeOptions
+      time: this.timeOptions,
+      timeAttribute: this.timeAttribute
     };
     const clonedObject = new GroupLayer(this.id, this.name, this.order, options);
     clonedObject.activeState = this.activeState;

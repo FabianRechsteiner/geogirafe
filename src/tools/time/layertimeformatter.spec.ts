@@ -88,6 +88,14 @@ describe('LayerTimeFormatter', () => {
       expect(week).toBe('2024-12-30/2025-01-05');
     });
 
+    it('should format week range ignoring value mode', () => {
+      const options: ITimeOptions = { ...defaultOptions, mode: 'value', resolution: 'week' };
+      const timeRestriction = new LayerTimeFormatter(options);
+      const week = timeRestriction.formatDateString(new Date('2025-01-05T23:59:59Z')); // Sunday night
+
+      expect(week).toBe('2024-12-30/2025-01-05');
+    });
+
     it('should format month value with month resolution', () => {
       const options: ITimeOptions = { ...defaultOptions, mode: 'value', resolution: 'month' };
       const timeRestriction = new LayerTimeFormatter(options);
