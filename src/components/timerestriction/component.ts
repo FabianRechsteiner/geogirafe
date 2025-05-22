@@ -2,7 +2,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { TimeAwareLayer } from '../../models/layers/timeawarelayer';
 import TimePickerComponent from './timepicker/component';
 import TimeSliderComponent from './timeslider/component';
-import LayerTimeFormatter from '../../tools/time/layertimeformatter';
+import LayerTimeFormatter, { TIME_RANGE_SEPARATOR } from '../../tools/time/layertimeformatter';
 import ITimeOptions, { TimeMode, TimeWidget } from '../../tools/time/itimeoptions';
 import { TimeChangeEvent } from './tools/timewidget';
 
@@ -59,7 +59,6 @@ class TimeRestrictionComponent extends GirafeHTMLElement {
   public onTimeChange(newTimeRestriction: string | undefined) {
     newTimeRestriction = newTimeRestriction === null ? undefined : newTimeRestriction;
     if (newTimeRestriction !== this.layer.timeRestriction) {
-      console.log('time restriction component: onTimeChange: ', newTimeRestriction);
       this.layer.timeRestriction = newTimeRestriction;
     }
   }
@@ -72,7 +71,7 @@ class TimeRestrictionComponent extends GirafeHTMLElement {
     if (!newTime) {
       this.timeWidget.reset();
     } else {
-      const [lowerValue, upperValue] = newTime.split('/');
+      const [lowerValue, upperValue] = newTime.split(TIME_RANGE_SEPARATOR);
       this.timeWidget.setValue(lowerValue, 'lower');
       if (this.mode === 'range') this.timeWidget.setValue(upperValue, 'upper');
     }

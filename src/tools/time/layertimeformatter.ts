@@ -1,5 +1,9 @@
 import ITimeOptions, { TimeMode, TimeResolution } from './itimeoptions';
+import Filter from 'ol/format/filter/Filter';
+import { during } from 'ol/format/filter';
 
+
+export const TIME_RANGE_SEPARATOR = '/';
 
 // In ISO 8601 format
 const MIN_DATE = '1900-01-01T00:00:00.000Z';
@@ -108,6 +112,56 @@ class LayerTimeFormatter {
     return undefined;
   }
 
+  /**
+   * Converts the WMS temporal query string into an OpenLayers WFS filter.
+   *
+   * @param {string} timeRestriction - The time restriction query string used for the WMS request, e.g. '2020-02', '2012-11-04/2012-11-14'.
+   * @param {string} timeAttribute - The name of the attribute that is used for temporal filtering.
+   * @return {Filter | undefined} Returns a new OpenLayers WFS filter object, or undefined if no valid filter could be created.
+   */
+  public toOpenLayersWfsFilter(timeRestriction: string, timeAttribute: string): Filter | undefined {
+    let lower = timeRestriction.split('/')[0];
+    let upper = timeRestriction.split('/')[1] ?? undefined;
+    let temporalFilter: Filter | undefined = undefined;
+
+    if (this.mode === 'range') {
+      temporalFilter = during(timeAttribute, lower, upper);
+    } else {
+      const date = this.parseDateString(timeRestriction);
+      if (!date) return temporalFilter;
+
+      // Based on the specified resolution, create a dateTime range in UTC time as ISO strings
+      switch (this.resolution) {
+        case 'day':
+          lower = date.toISOString();
+          date.setUTCDate(date.getUTCDay() + 1);
+          date.setUTCMilliseconds(-1);
+          upper = date.toISOString();
+          break;
+        case 'week':
+          lower = LayerTimeFormatter.getMondayOfWeek(date).toISOString();
+          upper = LayerTimeFormatter.getSundayOfWeek(date).toISOString();
+          break;
+        case 'month':
+          lower = date.toISOString();
+          date.setUTCMonth(date.getUTCMonth() + 1);
+          date.setUTCMilliseconds(-1);
+          upper = date.toISOString();
+          break;
+        case 'year':
+          lower = date.toISOString();
+          date.setUTCFullYear(date.getUTCFullYear() + 1);
+          date.setUTCMilliseconds(-1);
+          upper = date.toISOString();
+          break;
+        default:
+          return temporalFilter;
+      }
+      temporalFilter = during(timeAttribute, lower, upper);
+    }
+    return temporalFilter;
+  }
+
   private isValidDateString(dateString: string): boolean {
     return !isNaN(Date.parse(dateString));
   }
@@ -116,27 +170,43 @@ class LayerTimeFormatter {
     return date >= this.minValue && date <= this.maxValue;
   }
 
+  /**
+   * Formats a given date into a date string of type 'YYYY-MM-DD'.
+   */
   static formatAsDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
 
-  /**
-   * Formats a given date into a string, representing the week range from Monday to Sunday that the date falls into.
-   */
-  static formatAsWeekRange(date: Date): string {
-    const dayOfTheWeek = date.getUTCDay();
-    const dayOfTheMonth = date.getUTCDate();
-    const monday = dayOfTheMonth - dayOfTheWeek + (dayOfTheWeek === 0 ? -6 : 1);
-    const sunday = dayOfTheMonth - (dayOfTheWeek === 0 ? 7 : dayOfTheWeek) + 7;
-    const startOfWeek = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), monday));
-    const endOfWeek = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), sunday));
-    return `${LayerTimeFormatter.formatAsDate(startOfWeek)}/${LayerTimeFormatter.formatAsDate(endOfWeek)}`;
+  static getMondayOfWeek(date: Date): Date {
+    const monday = date.getUTCDate() - date.getUTCDay() + (date.getUTCDay() === 0 ? -6 : 1);
+    return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), monday));
   }
 
+  static getSundayOfWeek(date: Date): Date {
+    const weekEndDay = date.getUTCDate() - (date.getUTCDay() === 0 ? 7 : date.getUTCDay()) + 7;
+    return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), weekEndDay));
+  }
+
+  /**
+   * Formats a given date into a string, representing the week range from Monday to Sunday that the date falls into,
+   * e.g. 'YYYY-MM-DD/YYYY-MM-DD'
+   */
+  static formatAsWeekRange(date: Date): string {
+    const startOfWeek = LayerTimeFormatter.getMondayOfWeek(date);
+    const endOfWeek = LayerTimeFormatter.getSundayOfWeek(date);
+    return `${LayerTimeFormatter.formatAsDate(startOfWeek)}${TIME_RANGE_SEPARATOR}${LayerTimeFormatter.formatAsDate(endOfWeek)}`;
+  }
+
+  /**
+   * Formats a given date into a date string of type 'YYYY-MM'.
+   */
   static formatAsMonth(date: Date): string {
     return `${date.toISOString().split('T')[0].slice(0, -3)}`;
   }
 
+  /**
+   * Formats a given date into a year string of type 'YYYY'.
+   */
   static formatAsYear(date: Date): string {
     return `${date.getUTCFullYear()}`;
   }
@@ -153,8 +223,8 @@ class LayerTimeFormatter {
       case 'day':
         return LayerTimeFormatter.formatAsDate(date);
       case 'week':
-        // If in 'value' mode, a week resolution is not supported. Return the date as is.
-        return LayerTimeFormatter.formatAsDate(date);
+        // This will return a range, even when in 'value' mode!
+        return LayerTimeFormatter.formatAsWeekRange(date);
       case 'month':
         return LayerTimeFormatter.formatAsMonth(date);
       case 'year':
@@ -176,15 +246,15 @@ class LayerTimeFormatter {
   static queryStringFromDateRangeAnResolution(lowerLimit: Date, upperLimit: Date, resolution: TimeResolution): string {
     switch (resolution) {
       case 'day':
-        return `${LayerTimeFormatter.formatAsDate(lowerLimit)}/${LayerTimeFormatter.formatAsDate(upperLimit)}`;
+        return `${LayerTimeFormatter.formatAsDate(lowerLimit)}${TIME_RANGE_SEPARATOR}${LayerTimeFormatter.formatAsDate(upperLimit)}`;
       case 'week':
-        return `${LayerTimeFormatter.formatAsWeekRange(lowerLimit)}/${LayerTimeFormatter.formatAsWeekRange(upperLimit)}`;
+        return `${LayerTimeFormatter.formatAsDate(LayerTimeFormatter.getMondayOfWeek(lowerLimit))}/${LayerTimeFormatter.formatAsDate(LayerTimeFormatter.getSundayOfWeek(upperLimit))}`;
       case 'month':
-        return `${LayerTimeFormatter.formatAsMonth(lowerLimit)}/${LayerTimeFormatter.formatAsMonth(upperLimit)}`;
+        return `${LayerTimeFormatter.formatAsMonth(lowerLimit)}${TIME_RANGE_SEPARATOR}${LayerTimeFormatter.formatAsMonth(upperLimit)}`;
       case 'year':
-        return `${LayerTimeFormatter.formatAsYear(lowerLimit)}/${LayerTimeFormatter.formatAsYear(upperLimit)}`;
+        return `${LayerTimeFormatter.formatAsYear(lowerLimit)}${TIME_RANGE_SEPARATOR}${LayerTimeFormatter.formatAsYear(upperLimit)}`;
       default:
-        return `${lowerLimit.toISOString()}/${upperLimit.toISOString()}`;
+        return `${lowerLimit.toISOString()}${TIME_RANGE_SEPARATOR}${upperLimit.toISOString()}`;
     }
   }
 }

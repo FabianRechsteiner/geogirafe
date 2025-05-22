@@ -155,13 +155,6 @@ class TimePickerComponent extends TimeWidget {
       this.upperInputElem.value = this.maxDefaultValue;
     }
   }
-
-  connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-    });
-  }
 }
 
 export default TimePickerComponent;

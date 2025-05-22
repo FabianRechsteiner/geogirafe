@@ -1,7 +1,6 @@
 import LayerTimeFormatter from '../../../tools/time/layertimeformatter';
 import ITimeOptions from '../../../tools/time/itimeoptions';
 import TimeWidget, { TimeRangeLimit } from '../tools/timewidget';
-import { debounce } from '../../../tools/utils/debounce';
 
 
 /**
@@ -17,9 +16,6 @@ class TimeSliderComponent extends TimeWidget {
   styleUrls = ['../../../styles/common.css', './style.css'];
 
   private discreteTimeSteps?: string[];
-
-  private readonly debounceTime = 500;
-  private timeChangeEventDebounced: ((unset: boolean) => void) | undefined = undefined;
 
   constructor() {
     super('time-slider');
@@ -241,7 +237,7 @@ class TimeSliderComponent extends TimeWidget {
     }
     // Increase z-index of the upper handle if it is at the 0 position,
     // otherwise it is behind the other slider and can't be grabbed any more
-    if (Number(newValue) <= 0) {
+    if (Number(this.upperInputElem.value) <= 0) {
       this.upperInputElem.style.zIndex = '3';
     } else {
       this.upperInputElem.style.zIndex = '1';
@@ -369,17 +365,6 @@ class TimeSliderComponent extends TimeWidget {
     }
     const formattedDate = this.timeFormatter.formatDateString(date);
     return this.discreteTimeSteps.findIndex((value) => value === formattedDate);
-  }
-
-  /**
-   * Dispatches a debounced time change event to prevent frequent server calls.
-   *
-   * @param {boolean} [unset=false] - Indicates whether the time will be set to undefined.
-   */
-  dispatchTimeChangeEvent(unset: boolean = false) {
-    // Debounce the time change event to limit server calls
-    this.timeChangeEventDebounced ??= debounce(super.dispatchTimeChangeEvent, this.debounceTime);
-    this.timeChangeEventDebounced(unset);
   }
 }
 

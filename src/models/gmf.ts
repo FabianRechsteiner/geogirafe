@@ -23,6 +23,7 @@ export interface GMFMetadata {
   printNativeAngle?: boolean;
   protected?: boolean;
   thumbnail?: string;
+  timeAttribute?: string;
 }
 
 export interface GMFChildLayer {

@@ -11,6 +11,9 @@ import LayerWms from '../../models/layers/layerwms';
 import ServerWfs from '../../models/serverwfs';
 import { XmlTypes, xmlTypesStrList } from '../../models/xmlTypes';
 import ServerOgc from '../../models/serverogc';
+import LayerTimeFormatter from '../time/layertimeformatter';
+import Filter from 'ol/format/filter/Filter';
+import { and } from 'ol/format/filter';
 
 export type WfsClientOptions = {
   featurePrefix: string;
@@ -34,6 +37,7 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
   featurePrefix: string;
   featureNS: string;
 
+  private readonly urlParameters: URLSearchParams = new URLSearchParams();
   serverWfs: Promise<ServerWfs<WfsXmlTypes>> | undefined;
 
   constructor(ogcServer: ServerOgc, options: WfsClientOptions) {
@@ -212,12 +216,13 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     const featureTypes = queryableLayers.map((l) => l.queryLayers.split(',')).flat(1);
     const geometryColumnNameToFeatureType = serverWfs.getGeometryColumnNameToFeatureTypes(featureTypes);
 
-    const olFilter = queryableLayers[0].filter?.toOpenLayersFilter();
+    const olFilter: Filter | undefined = queryableLayers[0].filter?.toOpenLayersFilter();
+    const timeFilter: Filter | undefined = this.setTimeRestriction(queryableLayers[0]);
 
     const getFeatureOptions = {
       srsName: selectionParam.srid,
       bbox: selectionParam.selectionBox,
-      filter: olFilter
+      filter: olFilter && timeFilter ? and(olFilter, timeFilter) : olFilter ?? timeFilter
     };
     const getFeatureRequests = Object.entries(geometryColumnNameToFeatureType).map(async ([columnName, featureTypes]) =>
       this.getFeatureRaw(featureTypes, { geometryName: columnName, ...getFeatureOptions })
@@ -252,7 +257,12 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     // WFS GetFeature
     const featureRequest = new WFS().writeGetFeature(options);
 
-    const response = await fetch(this.wfsUrl, {
+    // If URL parameters have been specified, add them to the URL (e.g. TIME parameter)
+    const url = new URL(this.wfsUrl);
+    for (const [key, value] of this.urlParameters.entries()) {
+      url.searchParams.set(key, value);
+    }
+    const response = await fetch(url, {
       method: 'POST',
       body: new XMLSerializer().serializeToString(featureRequest)
     });
@@ -261,6 +271,41 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     // TODO REG: Do we always want to use the format GML3 here ?
     const features = new GML3().readFeatures(gml);
     return features;
+  }
+
+  /**
+   * Sets or removes a time restriction on the provided query layer. Depending on the presence of a time attribute,
+   * either a temporal XML filter is created or a TIME parameter is added to the URL.
+   *
+   * @param {QueryableLayerWms} queryLayer - The layer on which the time restriction is to be applied.
+   * @return {Filter | undefined} Returns a temporal XML filter if a time attribute exists; otherwise, undefined.
+   */
+  private setTimeRestriction(queryLayer: QueryableLayerWms): Filter | undefined {
+    if (queryLayer.timeAttribute) {
+      return this.getTimeRestrictionFilter(queryLayer);
+    } else {
+      this.addTimeRestrictionAsUrlParameter(queryLayer);
+    }
+    return undefined;
+  }
+
+  private getTimeRestrictionFilter(queryLayer: QueryableLayerWms): Filter | undefined {
+    if (queryLayer.timeRestriction && queryLayer.timeAttribute) {
+      // Create temporal XML filter
+      const timeFormatter = new LayerTimeFormatter(queryLayer.timeOptions);
+      return timeFormatter.toOpenLayersWfsFilter(queryLayer.timeRestriction, queryLayer.timeAttribute);
+    }
+    return undefined;
+  }
+
+  private addTimeRestrictionAsUrlParameter(queryLayer: QueryableLayerWms): void {
+    if (queryLayer.timeRestriction) {
+      // Add time filter as a URL parameter
+      this.urlParameters.set('TIME', queryLayer.timeRestriction);
+    } else if (this.urlParameters.has('TIME')) {
+      // Remove URL parameter if no time restriction is set
+      this.urlParameters.delete('TIME');
+    }
   }
 }
 

@@ -178,7 +178,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.subscribe(/layers\.layersList\..*\.filter/, (_oldFilter: string, _newFilter: string, layer: Layer) =>
       this.onChangeFilter(layer)
     );
-    this.subscribe(/layers\.layersList\..*\.timeRestriction/, (_oldTime: string, _newTime: string, layer: Layer) =>
+    this.subscribe(/layers\.layersList\..*\.timeRestriction/, (_oldTime: string, _newTime: string, layer: BaseLayer) =>
       this.onChangeTime(layer)
     );
     this.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder());
@@ -817,20 +817,16 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onChangeTime(layer: Layer | BaseLayer) {
-    if (layer instanceof LayerWms) {
+  onChangeTime(layer: BaseLayer) {
+    if (layer instanceof LayerWms && layer.active) {
       this.wmsManager.getClient(layer).changeTimeRestriction(layer);
     } else if (layer instanceof GroupLayer) {
       // Apply the time restriction to all children of the group layers
-      layer.children.forEach((childLayer) => {
+      for (const childLayer of layer.children) {
         if (isTimeAwareLayer(childLayer) && childLayer.timeRestriction !== layer.timeRestriction) {
           childLayer.timeRestriction = layer.timeRestriction;
-          if (childLayer.activeState !== 'off') {
-            // If the child layer is visible, it's refetched
-            this.onChangeTime(childLayer);
-          }
         }
-      });
+      }
     }
   }
 

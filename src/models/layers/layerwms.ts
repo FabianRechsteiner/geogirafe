@@ -29,6 +29,7 @@ export type LayerWmsOptions = {
   queryable?: boolean;
   queryLayers?: string;
   time?: ITimeOptions;
+  timeAttribute?: string;
 };
 
 class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILayerWithTime {
@@ -65,6 +66,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
 
   public timeOptions?: ITimeOptions;
   public timeRestriction?: string;
+  public timeAttribute?: string;
 
   constructor(id: number, name: string, order: number, ogcServer: ServerOgc, options?: GMFTreeItem | LayerWmsOptions) {
     let opts = options ?? {};
@@ -87,6 +89,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     this.queryable = opts?.queryable ?? false;
     this.queryLayers = opts?.queryLayers;
     this.timeOptions = opts?.time;
+    this.timeAttribute = opts?.timeAttribute;
 
     if (this.queryable && (!this.ogcServer.wfsSupport || this.ogcServer.urlWfs?.length === 0)) {
       this.hasError = true;
@@ -117,7 +120,8 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       printNativeAngle: this.printNativeAngle,
       queryable: this.queryable,
       queryLayers: this.queryLayers,
-      time: this.timeOptions
+      time: this.timeOptions,
+      timeAttribute: this.timeAttribute
     };
 
     const clonedObject = new LayerWms(this.id, this.name, this.order, this.ogcServer, options);
@@ -184,7 +188,8 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       wasLegendExpanded: options.metadata?.wasLegendExpanded,
       printNativeAngle: options.metadata?.printNativeAngle,
       hiDPILegendImages: options.metadata?.hiDPILegendImages,
-      time: options.time
+      time: options.time,
+      timeAttribute: options.metadata?.timeAttribute
     };
 
     if (options.childLayers) {
