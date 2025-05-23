@@ -40,7 +40,11 @@ export function parseMapPositionFromUrl(): MapPosition | undefined {
     newPosition.center = [parseFloat(mapX), parseFloat(mapY)];
     newPosition.zoom = parseFloat(mapZoom);
     newPosition.crosshair = crosshair === 'true';
-    newPosition.tooltip = DOMPurify.sanitize(tooltip as string) ?? undefined;
+    newPosition.tooltip =
+      DOMPurify.sanitize(tooltip as string, {
+        ALLOWED_TAGS: ['br', 'b', 'div', 'em', 'i', 'p', 'strong'],
+        ALLOWED_ATTR: []
+      }) ?? undefined;
     return newPosition.isValid ? newPosition : undefined;
   }
   return undefined;
