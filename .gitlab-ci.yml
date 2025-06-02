@@ -333,6 +333,8 @@ pages:
     - *prepare_demo
     - demo='ticino'
     - *prepare_demo
+    - demo='georama'
+    - *prepare_demo
     # Rename the release directory to public
     - rm -Rf public && mv release public
     # Copy demo index page
