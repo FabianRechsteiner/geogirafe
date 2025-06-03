@@ -181,7 +181,7 @@ class TreeViewItemComponent extends TreeViewElement {
       arrow: true,
       interactive: true,
       theme: 'light',
-      placement: 'right',
+      placement: 'bottom',
       appendTo: document.body,
       content: (_reference: object) => {
         const filterbox = new QueryBuilderComponent(this.layer as LayerWms);
