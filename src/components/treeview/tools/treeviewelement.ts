@@ -140,7 +140,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
       arrow: true,
       interactive: true,
       theme: 'light',
-      placement: 'right',
+      placement: 'bottom',
       appendTo: document.body,
       content: (_reference: object) => {
         return new TimeRestrictionComponent(layer);

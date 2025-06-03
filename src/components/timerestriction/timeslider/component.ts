@@ -150,13 +150,60 @@ class TimeSliderComponent extends TimeWidget {
     this.getById('slider-track').addEventListener('click', (event: MouseEvent) => {
       this.trackClickToSliderPosition(event);
     });
+
+    // Make time labels editable if resolution is year
+    if (this.resolution === 'year') {
+      const lowerLabel = this.getById(`output-label-lower`);
+      const upperLabel = this.getById(`output-label-upper`);
+      [lowerLabel, upperLabel].forEach((label) => {
+        label.removeAttribute('disabled');
+        label.setAttribute('type', 'number');
+      });
+      const yearEntryToSliderVal = (event: Event) => {
+        let year = (event.target as HTMLInputElement)?.value;
+        year = year.padStart(4, '0');
+        return this.dateStringToSliderPosition(`${year}-01-01`);
+      };
+      // Update the slider position and track when the label is changed
+      lowerLabel.addEventListener('change', (event: Event) => {
+        this.lowerInputElem.value = yearEntryToSliderVal(event);
+        this.lowerInputElem.dispatchEvent(new Event('input'));
+      });
+      // Trigger a time restriction change when the enter key is pressed
+      lowerLabel.addEventListener('keypress', (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+          this.lowerInputElem.dispatchEvent(new Event('change'));
+        }
+      });
+      // Trigger a time restriction change when the input looses focus
+      lowerLabel.addEventListener('focusout', (_event: Event) =>
+        this.lowerInputElem.dispatchEvent(new Event('change'))
+      );
+      if (this.mode === 'range') {
+        // Same event listeners for the upper input element
+        upperLabel.addEventListener('change', (event: Event) => {
+          this.upperInputElem.value = yearEntryToSliderVal(event);
+          this.upperInputElem.dispatchEvent(new Event('input'));
+        });
+        upperLabel.addEventListener('keypress', (event: KeyboardEvent) => {
+          if (event.key === 'Enter') {
+            this.upperInputElem.dispatchEvent(new Event('change'));
+          }
+        });
+        upperLabel.addEventListener('focusout', (_event: Event) =>
+          this.upperInputElem.dispatchEvent(new Event('change'))
+        );
+      }
+    }
   }
 
   private updateOutputLabel(limit: TimeRangeLimit) {
     const inputElem = this.getInputElement(limit);
     const valueOutput = this.getById(`output-label-${limit}`);
     const newValue = inputElem.value ?? '';
-    valueOutput.innerText = this.timeFormatter.formatDateString(this.sliderPositionToDateString(newValue));
+    (valueOutput as HTMLInputElement).value = this.timeFormatter.formatDateString(
+      this.sliderPositionToDateString(newValue)
+    );
   }
 
   /**

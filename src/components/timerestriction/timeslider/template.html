@@ -14,10 +14,11 @@
 
   <div id="slider-track"></div>
 
-  <div class="slider-label">
-    <output id="output-label-lower"></output>
+  <div class="${this.resolution === 'year' ? 'slider-label editable' : 'slider-label'}">
+    <input id="output-label-lower" disabled
+           class="gg-input gg-small">
     <div class="${this.mode === 'range' ? '' : 'hidden'}">/</div>
-    <output id="output-label-upper"
-            class="${this.mode === 'range' ? '' : 'hidden'}"></output>
+    <input id="output-label-upper" disabled
+           class="${this.mode === 'range' ? 'gg-input gg-small' : 'hidden'}">
   </div>
 </div>

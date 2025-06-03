@@ -2,10 +2,15 @@
     --slider-color: var(--text-color);
     --slider-disabled-color: var(--text-color-grad2);
     --slider-highlight-color: var(--bkg-color-grad2);
-    --slider-length: 130px;
-    --thumb-width: 16px;
+    /* length of input slider including the thumb */
+    --slider-width: 170px;
+    /* Length of the slider track */
+    --track-width: calc(var(--slider-width) - var(--thumb-width));
+    --thumb-width: 19px;
     --margin-left: calc(var(--thumb-width) / 2);
-    --slider-track-height: 6px;
+    --slider-track-height: 9px;
+    /* Thumb must move down have its radius and center align with the track */
+    --thumb-margin-top: calc(-0.5 * var(--thumb-width) + 0.5 * var(--slider-track-height));
     --slider-track-border-color: var(--text-color-grad2);
     --slider-track-outside-color: var(--bkg-color-grad2);
     --slider-track-inside-color: var(--text-color);
@@ -13,7 +18,7 @@
     color: var(--text-color);
     display: flex;
     flex-direction: column;
-    margin: 0.5rem 0 0 var(--margin-left);
+    margin: 0.5rem 0 0 0.5rem;
 }
 
 /* Chrome & Edge overwrites: Overwrite browser defaults for  range input element */
@@ -22,7 +27,7 @@ input[type=range]::-webkit-slider-thumb {
     pointer-events: all;
     width: var(--thumb-width);
     height: var(--thumb-width);
-    margin-top: calc(-1 * var(--slider-track-height));
+    margin-top: var(--thumb-margin-top);
     background: var(--slider-color);
     border: 1px solid var(--slider-highlight-color);
     border-radius: 50%;
@@ -53,7 +58,7 @@ input[type=range]::-moz-range-thumb {
     pointer-events: all;
     width: var(--thumb-width);
     height: var(--thumb-width);
-    margin-top: calc(-1 * var(--slider-track-height));
+    margin-top: var(--thumb-margin-top);
     background: var(--slider-color);
     border: 1px solid var(--slider-highlight-color);
     border-radius: 50%;
@@ -81,10 +86,11 @@ input[type=range] {
     -webkit-appearance: none;
     appearance: none;
     height: var(--slider-track-height);
-    width: var(--slider-length);
+    width: var(--slider-width);
     background-color: transparent;
     pointer-events: none;
     z-index: 2;
+    margin: 0;
 }
 
 #input-upper {
@@ -92,7 +98,7 @@ input[type=range] {
 }
 
 #slider-track {
-    width: calc(var(--slider-length) - var(--thumb-width));
+    width: var(--track-width);
     margin-left: var(--margin-left);
     height: var(--slider-track-height);
     position: absolute;
@@ -100,14 +106,54 @@ input[type=range] {
     pointer-events: all;
     z-index: 0;
     border: 1px solid var(--slider-track-border-color);
+    border-radius: 3px;
 }
 
 .slider-label {
-    font-size: 0.8rem;
-    margin: 2px;
+    width: var(--track-width);
+    margin: calc(0.25 * var(--thumb-width)) 0 0 var(--margin-left);
     display: flex;
     justify-content: space-around;
-    pointer-events: none;
-    height: 1.1rem;
+    align-items: center;
+    line-height: 1em;
+    /* Necessary for alignment */
+    border: 1px solid transparent;
 }
 
+.slider-label.editable {
+    margin-top: calc(0.5 * var(--thumb-width));
+    margin-bottom: 0.3rem;
+}
+
+.slider-label > input {
+    line-height: 1em;
+    text-align: center;
+    padding: 0;
+    max-width: 80px;
+}
+
+/* Remove input spinners in Chrome, Safari, Edge, Opera */
+.slider-label > input::-webkit-outer-spin-button,
+.slider-label > input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remove input spinners for Firefox */
+.slider-label > input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Remove input style if labels can't be edited */
+.slider-label > input:disabled {
+    border-color: transparent;
+}
+
+.slider-label > input:disabled:hover {
+    background-color: initial;
+    cursor: default;
+}
+
+.slider-label > div {
+    margin: 0 2px;
+}
