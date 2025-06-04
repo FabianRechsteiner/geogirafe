@@ -43,6 +43,10 @@ h3,
   border-collapse: collapse;
 }
 
+.scrollable-table td {
+  color: var(--text-color);
+}
+
 .table-cell {
   border: none;
   padding: 4px 2px;
