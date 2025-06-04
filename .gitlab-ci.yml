@@ -223,9 +223,9 @@ optimize:
 # Create a docker image with the production build
 publish-docker:
   stage: publish
-  image: docker:26
+  image: docker:28
   services:
-    - docker:26-dind
+    - docker:28-dind
   needs:
     - job: optimize
       artifacts: true
@@ -350,9 +350,9 @@ pages:
 # Create a docker image with the production build
 docker-scout:
   stage: scan
-  image: docker:26
+  image: docker:28
   services:
-    - docker:26-dind
+    - docker:28-dind
   needs:
     - job: publish-docker
       artifacts: false
