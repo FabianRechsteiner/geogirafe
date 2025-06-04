@@ -5,7 +5,7 @@
       <button
         id="draw-profile-btn"
         class="${this.crossSectionState.drawProfile ? 'gg-button active' : 'gg-button'}"
-        title="${this.i18nManager.getTranslation('draw_profile_help')}"
+        tip="draw_profile_help"
         onclick="${() => this.toggleLineDraw()}"
         i18n="draw_profile">
         Draw
@@ -13,7 +13,7 @@
       <button
         id="delete-profile-btn"
         class="gg-button"
-        title="${this.i18nManager.getTranslation('delete_help')}"
+        tip="delete_help"
         onclick="${() => this.deleteProfile()}"
         i18n="delete">
         Delete
@@ -39,7 +39,7 @@
       <button
         id="reset-zoom-btn"
         class="gg-button"
-        title="${this.i18nManager.getTranslation('profile_reset_view_help')}"
+        tip="profile_reset_view_help"
         onclick="${() => this.resetZoom()}"
         i18n="profile_reset_view">
         Reset view
@@ -47,7 +47,7 @@
       <button
         id="sync-views-btn"
         class="${this.crossSectionState.syncViews ? 'gg-button active' : 'gg-button'}"
-        title="${this.i18nManager.getTranslation('profile_sync_view_help')}"
+        tip="profile_sync_view_help"
         onclick="${() => this.setViewSync(!this.crossSectionState.syncViews)}"
         i18n="profile_sync_view">
         Sync. views
@@ -58,28 +58,28 @@
     <div class="btn-group-flex">
       <button
         class="gg-icon-button gg-big"
-        title="${this.i18nManager.getTranslation('profile_shift_up_help')}"
+        tip="profile_shift_up_help"
         onclick="${() => this.shiftLinestring([0.0, this.crossSectionState.linestringShift])}"
         i18n="">
         <img src="icons/arrow_up.svg" alt="${this.i18nManager.getTranslation('profile_shift_up_help')}" />
       </button>
       <button
         class="gg-icon-button gg-big"
-        title="${this.i18nManager.getTranslation('profile_shift_down_help')}"
+        tip="profile_shift_down_help"
         onclick="${() => this.shiftLinestring([0.0, -this.crossSectionState.linestringShift])}"
         i18n="">
         <img src="icons/arrow_down.svg" alt="${this.i18nManager.getTranslation('profile_shift_down_help')}" />
       </button>
       <button
         class="gg-icon-button gg-big"
-        title="${this.i18nManager.getTranslation('profile_shift_left_help')}"
+        tip="profile_shift_left_help"
         onclick="${() => this.shiftLinestring([-this.crossSectionState.linestringShift, 0.0])}"
         i18n="">
         <img src="icons/arrow_left.svg" alt="${this.i18nManager.getTranslation('profile_shift_left_help')}" />
       </button>
       <button
         class="gg-icon-button gg-big"
-        title="${this.i18nManager.getTranslation('profile_shift_right_help')}"
+        tip="profile_shift_right_help"
         onclick="${() => this.shiftLinestring([this.crossSectionState.linestringShift, 0.0])}"
         i18n="">
         <img src="icons/arrow_right.svg" alt="${this.i18nManager.getTranslation('profile_shift_right_help')}" />
@@ -106,7 +106,7 @@
           <button
             id="z-ratio-reset-btn"
             class="reset-btn"
-            title="${this.i18nManager.getTranslation('profile_exaggeration_reset_help')}"
+            tip="profile_exaggeration_reset_help"
             onclick="${() => this.setVerticalExaggeration(this.crossSectionState.verticalExaggerationSettings.default)}">
             <img
               src="icons/restart_alt.svg"
@@ -136,7 +136,7 @@
           <button
             id="point-size-reset-btn"
             class="reset-btn"
-            title="${this.i18nManager.getTranslation('profile_point_size_reset_help')}"
+            tip="profile_point_size_reset_help"
             onclick="${() => this.setPointSize(this.crossSectionState.pointSizeSettings.default)}">
             <img
               src="icons/restart_alt.svg"
@@ -249,7 +249,7 @@
       <button
         id="draw-measurements-btn"
         class="${this.crossSectionState.drawMeasurement ? 'gg-button active' : 'gg-button'}"
-        title="${this.i18nManager.getTranslation('profile_measurement_help')}"
+        tip="profile_measurement_help"
         onclick="${() => this.toggleMeasureDraw()}"
         i18n="profile_measurement"
         ?disabled="${!this.crossSectionState.enableMeasurement}">
@@ -258,7 +258,7 @@
       <button
         id="delete-measurements-btn"
         class="gg-button"
-        title="${this.i18nManager.getTranslation('profile_delete_measurements_help')}"
+        tip="profile_delete_measurements_help"
         onclick="${() => this.deleteAllMeasurements()}"
         i18n="profile_delete_measurements">
         Delete all
@@ -285,7 +285,7 @@
       <button
         id="draw-markers-btn"
         class="${this.crossSectionState.drawMarker ? 'gg-button active' : 'gg-button'}"
-        title="${this.i18nManager.getTranslation('profile_draw_markers_help')}"
+        tip="profile_draw_markers_help"
         onclick="${() => this.toggleMarkerDraw()}"
         i18n="profile_draw_markers"
         ?disabled="${!this.crossSectionState.enableAnnotation}">
@@ -294,7 +294,7 @@
       <button
         id="delete-markers-btn"
         class="gg-button"
-        title="${this.i18nManager.getTranslation('profile_delete_markers_help')}"
+        tip="profile_delete_markers_help"
         onclick="${() => this.deleteAllMarkers()}"
         i18n="profile_delete_markers">
         Delete all
@@ -330,7 +330,7 @@
       <button
         id="print-profile-btn"
         class="gg-button"
-        title="${this.i18nManager.getTranslation('profile_print_help')}"
+        tip="profile_print_help"
         onclick="${() => this.printPlot(this.crossSectionState.printFileFormat)}"
         i18n="profile_print">
         Print
@@ -353,7 +353,7 @@
       <button
         id="download-markers-btn"
         class="gg-button"
-        title="${this.i18nManager.getTranslation('download_help')}"
+        tip="download_help"
         onclick="${() => this.exportFeature(this.points, 'markers', this.crossSectionState.downloadAnnotationsFormat)}"
         i18n="download"
         ?disabled="${!this.crossSectionState.enableAnnotationsDownload}">
@@ -375,7 +375,7 @@
       <button
         id="download-linestring-btn"
         class="gg-button"
-        title="${this.i18nManager.getTranslation('download_help')}"
+        tip="download_help"
         onclick="${() => this.exportFeature([this.linestring], 'linestring', this.crossSectionState.downloadLinestringFormat)}"
         i18n="download"
         ?disabled="${!this.crossSectionState.enableLinestringDownload}">
