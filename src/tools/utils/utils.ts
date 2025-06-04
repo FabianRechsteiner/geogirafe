@@ -1,4 +1,17 @@
 /**
+ * Checks if the system prefers dark mode.
+ * Falls back safely if matchMedia is not supported.
+ * @returns True if system is in dark mode.
+ */
+export const systemIsInDarkMode = () => {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+};
+
+/**
  * Checks if on Safari.
  * @returns True if on Safari.
  */

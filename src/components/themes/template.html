@@ -1,6 +1,6 @@
 <button
   class="gg-icon-button gg-big-withtext"
-  title="Theme Selection"
+  tip="Theme selection"
   onclick="${() => this.toggleThemesList()}"
   onblur="${() => this.onBlur()}">
   <img
@@ -8,7 +8,7 @@
     src="icons/themes.svg"
     class="${(!this.state.loading ? (this.openedOnce ? '' : 'gg-spin-wait') : 'hidden')}" />
   <img alt="loading-icon" src="icons/loading.svg" class="${(this.state.loading ? 'gg-spin' : 'hidden')}" />
-  <span i18n="themes">Themes</span>
+  <span i18n="Themes">Themes</span>
 </button>
 
 <div class="${(this.menuOpen ? 'themes' : 'hidden')}">

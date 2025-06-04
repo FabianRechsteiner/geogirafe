@@ -84,7 +84,7 @@ export class Scatterplot {
                 // FRAGMENT SHADER
                 precision lowp float;
                 in vec3 vert_color;
-                out vec4 color;      
+                out vec4 color;
                 void main() {
                     color = vec4( vert_color, 1.0 );
                 }`;
@@ -1170,7 +1170,7 @@ export class Scatterplot {
   }
 
   generateId(markers: Marker[]): string {
-    let id = 0;
+    let id = 1;
     const existingIds = new Set(markers.map((marker) => parseInt(marker.label)));
 
     while (existingIds.has(id)) {
