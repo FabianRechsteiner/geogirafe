@@ -6,6 +6,7 @@ import CustomTheme from '../../models/customtheme';
 import { getPropertyByPath, setPropertyByPath } from '../../tools/utils/pathUtils';
 import { Color } from 'vanilla-picker';
 import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
+import { systemIsInDarkMode } from '../../tools/utils/utils';
 
 /**
  Lets the user override default configuration values and saves them as user data.
@@ -114,7 +115,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   }
 
   onChangeDarkFrontendMode(newValue: boolean | undefined) {
-    const themeIsDark = newValue ?? this.systemIsInDarkMode();
+    const themeIsDark = newValue ?? systemIsInDarkMode();
     const currentTheme = themeIsDark ? 'dark' : 'light';
     this.activateTheme(currentTheme, 'theme');
   }
@@ -123,10 +124,6 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
     const otherMode = mode === 'dark' ? 'light' : 'dark';
     document.body.classList.remove(`${otherMode}-${className}`);
     document.body.classList.add(`${mode}-${className}`);
-  }
-
-  systemIsInDarkMode(): boolean {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
   /**
@@ -202,7 +199,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
    */
   private initDarkModeDefaults() {
     const config = this.configManager.Config.interface.darkFrontendMode;
-    this.state.interface.darkFrontendMode = config ?? this.systemIsInDarkMode();
+    this.state.interface.darkFrontendMode = config ?? systemIsInDarkMode();
     this.state.interface.darkMapMode = this.configManager.Config.interface.darkMapMode;
   }
 

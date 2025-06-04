@@ -1,6 +1,7 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ArrowBlack from './images/arrow_black.webp';
 import ArrowWhite from './images/arrow_white.webp';
+import { systemIsInDarkMode } from '../../tools/utils/utils';
 
 class HelpComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -41,7 +42,7 @@ class HelpComponent extends GirafeHTMLElement {
   registerEvents() {
     this.subscribe('interface.helpVisible', (_oldValue: boolean, newValue: boolean) => this.toggleHelp(newValue));
     this.subscribe('interface.darkFrontendMode', (_oldValue: boolean, newValue: boolean) => {
-      this.darkFrontendMode = newValue;
+      this.darkFrontendMode = newValue ?? systemIsInDarkMode();
     });
     this.content.addEventListener('click', () => {
       this.state.interface.helpVisible = false;
@@ -50,7 +51,7 @@ class HelpComponent extends GirafeHTMLElement {
 
   changeArrowColor() {
     // change the arrow color depending on the darkFrontendMode state
-    this.darkFrontendMode = this.stateManager.state.interface.darkFrontendMode;
+    this.darkFrontendMode = this.stateManager.state.interface.darkFrontendMode ?? systemIsInDarkMode();
     this.currentArrow = this.darkFrontendMode ? this.arrowBlack : this.arrowWhite;
 
     this.themes.style.backgroundImage = `url(${this.currentArrow})`;
