@@ -78,7 +78,9 @@ class ModalsComponent extends GirafeHTMLElement {
   }
 
   public promptOk() {
-    const text = (this.shadow.getElementById('input-text') as HTMLInputElement).value;
+    const input = this.shadow.getElementById('input-text') as HTMLInputElement;
+    const text = input.value;
+    input.value = '';
     this.resetBox();
     this.resolvePrompt(text);
   }
