@@ -31,7 +31,7 @@ class NavigationComponent extends GirafeHTMLElement {
   }
 
   public async addBookmark() {
-    const name = await window.gPrompt('Give a name to your bookmark', 'Add bookmark', 'Enter a name...');
+    const name = await window.gPrompt('Enter a name for your bookmark', 'Add bookmark', 'Enter a name...');
     if (name) {
       const bookmark = new Bookmark(name, this.state.position);
       this.bookmarks.push(bookmark);

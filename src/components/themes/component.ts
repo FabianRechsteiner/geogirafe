@@ -80,9 +80,9 @@ class ThemeComponent extends GirafeHTMLElement {
 
   async onAddCustomTheme() {
     const themeName = await window.gPrompt(
-      'Please enter a name for the new custom theme',
+      'Enter a name for your custom theme',
       'Create custom theme',
-      'my theme'
+      'Enter a name...'
     );
     if (themeName !== false && themeName.trim().length > 0) {
       this.customThemesManager.addTheme(themeName, this.state.layers.layersList);
