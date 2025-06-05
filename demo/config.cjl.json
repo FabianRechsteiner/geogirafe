@@ -45,7 +45,7 @@
     "constrainScales": false
   },
   "map3d": {
-    "terrainUrl": "https://terrain100.geo.admin.ch/1.0.0/ch.swisstopo.terrain.3d/",
+    "terrainUrl": "https://3d.geo.admin.ch/ch.swisstopo.terrain.3d/v1/",
     "terrainImagery": {
       "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
       "minLoD": 8,
