@@ -3,5 +3,15 @@
   "singleQuote": true,
   "quoteProps": "consistent",
   "trailingComma": "none",
-  "bracketSameLine": true
+  "bracketSameLine": true,
+  "overrides": [
+    {
+      "files": ["./src/assets/i18n/**"],
+      "options": {
+        "plugins": ["prettier-plugin-sort-json"],
+        "jsonRecursiveSort": true,
+        "jsonSortOrder": "{\"/.+/i\": \"caseInsensitiveLexical\"}"
+      }
+    }
+  ]
 }
