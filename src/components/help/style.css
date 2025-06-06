@@ -8,83 +8,87 @@
   display: none;
 }
 
-#themes {
+.box {
   position: absolute;
+  background-repeat: no-repeat;
+}
+
+.description {
+  position: absolute;
+  color: var(--bkg-color);
+  font-size: 1.2rem;
+  width: 15rem;
+}
+
+#themes {
   top: 4.5rem;
   left: 0;
   width: 150px;
   height: 120px;
-  background-repeat: no-repeat;
   transform: rotateY(0deg) rotateX(0deg) rotateZ(90deg);
   background-position: bottom -50px left -60px;
 }
 
+#themes-description {
+  top: 10.5rem;
+  left: 10rem;
+}
+
 #search {
-  position: absolute;
   top: 8rem;
   left: 45%;
   width: 180px;
   height: 70px;
-  background-repeat: no-repeat;
   transform: rotateY(0deg) rotateX(0deg) rotateZ(90deg);
   background-position: -60px -30px;
 }
 
+#search-description {
+  top: 16rem;
+  left: 45%;
+  text-align: center;
+}
+
 #menu {
-  position: absolute;
   top: 4.5rem;
-  right: 0;
+  right: 3rem;
   width: 150px;
   height: 120px;
-  background-repeat: no-repeat;
-  transform: rotateY(180deg) rotateX(0deg) rotateZ(90deg);
+  transform: rotateY(0deg) rotateX(0deg) rotateZ(180deg);
   background-position: bottom -50px left -60px;
 }
 
+#menu-description {
+  top: 14rem;
+  right: 10rem;
+  text-align: right;
+}
+
 #basemap {
-  position: absolute;
-  bottom: 3rem;
-  left: 21rem;
+  bottom: 11rem;
+  left: 26rem;
   width: 150px;
   height: 120px;
-  background-repeat: no-repeat;
   transform: rotateY(0deg) rotateX(180deg) rotateZ(90deg);
   background-position: bottom -50px left -60px;
 }
 
-#themes-descr {
-  position: absolute;
-  top: 10rem;
-  left: 10rem;
-  color: var(--bkg-color);
-  font-size: 1.2rem;
-  width: 12rem;
+#basemap-description {
+  bottom: 17rem;
+  left: 36rem;
 }
 
-#search-descr {
-  position: absolute;
-  top: 16rem;
-  left: 45%;
-  color: var(--bkg-color);
-  font-size: 1.2rem;
-  width: 12rem;
+#user-preferences {
+  bottom: 0.5rem;
+  right: 3rem;
+  width: 150px;
+  height: 120px;
+  transform: rotateY(180deg) rotateX(0deg) rotateZ(0);
+  background-position: bottom -50px left -60px;
 }
 
-#menu-descr {
-  position: absolute;
-  top: 10rem;
+#user-preferences-description {
+  bottom: 10rem;
   right: 10rem;
-  color: var(--bkg-color);
-  font-size: 1.2rem;
-  width: 12rem;
   text-align: right;
-}
-
-#basemap-descr {
-  position: absolute;
-  bottom: 9rem;
-  left: 31rem;
-  color: var(--bkg-color);
-  font-size: 1.2rem;
-  width: 12rem;
 }
