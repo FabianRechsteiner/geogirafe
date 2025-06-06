@@ -75,7 +75,6 @@ export const deletePropertyByPath = (obj: any, path: string) => {
   deletePropertyByPath(obj, path);
 };
 
-
 /**
  * Merges the properties of two objects recursively. If properties in both objects
  * are of type 'object', they will be merged deeply. Otherwise, properties in the

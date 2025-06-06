@@ -177,7 +177,6 @@ describe('pathUtils.objectFromPath', () => {
   });
 });
 
-
 describe('pathUtils.mergeObjects', () => {
   it('should merge two empty objects', () => {
     const obj1 = {};

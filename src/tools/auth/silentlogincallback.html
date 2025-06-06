@@ -4,7 +4,10 @@
     const params = url.searchParams;
 
     if (params.has('error')) {
-      window.parent.postMessage({ type: 'OAUTH_ERROR', error: `${params.get("error")}: ${params.get("error_description")}`}, '*');
+      window.parent.postMessage(
+        { type: 'OAUTH_ERROR', error: `${params.get('error')}: ${params.get('error_description')}` },
+        '*'
+      );
     } else {
       window.parent.postMessage({ type: 'OAUTH_CALLBACK', data: Object.fromEntries(params.entries()) }, '*');
     }

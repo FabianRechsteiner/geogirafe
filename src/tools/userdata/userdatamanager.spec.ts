@@ -112,7 +112,6 @@ describe('UserDataManager.deleteUserData', () => {
     manager.deleteAllUserData();
   });
 
-
   it('should delete data from the specified path in storage', () => {
     const path1 = 'userPreferences.language';
     const value1 = 'en-US';
@@ -137,7 +136,6 @@ describe('UserDataManager.deleteUserData', () => {
     }).not.toThrowError();
   });
 });
-
 
 describe('UserDataManager.deleteAllUserData', () => {
   const manager = UserDataManager.getInstance();

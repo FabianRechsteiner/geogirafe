@@ -19,7 +19,6 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=geogirafe_gg-viewer&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=geogirafe_gg-viewer)
 
-
 ![GitLab License](https://img.shields.io/gitlab/license/geogirafe/gg-viewer)
 
 # GeoGirafe
@@ -90,6 +89,7 @@ This command needs root/admin rights, because it will trust the developments cer
 ### On Linux
 
 Run as normal user. The sudo password will be asked. This command will:
+
 - Create a new certificate
 - Trust it at the system level
 - Trust it at the browser level in chrome and firefox
@@ -103,12 +103,14 @@ npm run generate-dev-certs
 ### On Windows
 
 Run in a console as administrator. This command will:
+
 - Create a new certificate
 - Trust it at the system level.
 
 (On Windows, Chrome and Firefox are using the certificate store from the system. Thus, there's not need to trust the certificated at the browser level as well.)
 
 Run
+
 ```bash
 npm run generate-dev-certs-win
 ```

@@ -11,7 +11,6 @@ const getGeometryIconsInfo = (geometry: OlGeomGeometry | null): [string, number[
 };
 
 describe('FormatGridGeomValue', () => {
-
   beforeAll(() => {
     MockHelper.startMocking();
   });
@@ -19,7 +18,7 @@ describe('FormatGridGeomValue', () => {
   afterAll(() => {
     MockHelper.stopMocking();
   });
-  
+
   test('Testing Point type null geometry', () => {
     const [icon, coords] = getGeometryIconsInfo(null);
     expect(icon).toBeNull();

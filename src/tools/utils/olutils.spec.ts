@@ -75,11 +75,11 @@ describe('deleteFeatureOlParams', () => {
 
 describe('getDistance', () => {
   let stateManager: StateManager;
-  
+
   beforeAll(() => {
     MockHelper.startMocking();
     stateManager = StateManager.getInstance();
-    
+
     proj4.defs(
       'EPSG:2056',
       '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs'
@@ -90,7 +90,6 @@ describe('getDistance', () => {
   afterAll(() => {
     MockHelper.stopMocking();
   });
-
 
   it('calculates the correct distances of coordinates in geographic and projected coordinate systems', () => {
     // Simple coordinates in 1000m distance
@@ -131,7 +130,7 @@ describe('getArea', () => {
   beforeAll(() => {
     MockHelper.startMocking();
     stateManager = StateManager.getInstance();
-    
+
     proj4.defs(
       'EPSG:2056',
       '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs'

@@ -92,7 +92,7 @@ class ShareComponent extends GirafeHTMLElement {
    */
   private renderComponent() {
     super.render();
-    
+
     this.simpleMaskManager = new SimpleMaskManager(this.mapManager.getMap());
 
     // While the component is visible, listen for changes in the state to update the shared link
