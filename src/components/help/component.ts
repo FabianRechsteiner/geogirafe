@@ -12,6 +12,7 @@ class HelpComponent extends GirafeHTMLElement {
   search!: HTMLElement;
   menu!: HTMLElement;
   basemap!: HTMLElement;
+  userPreferences!: HTMLElement;
 
   darkFrontendMode: boolean = false;
 
@@ -31,11 +32,12 @@ class HelpComponent extends GirafeHTMLElement {
     this.search = this.shadow.querySelector('#search') as HTMLElement;
     this.menu = this.shadow.querySelector('#menu') as HTMLElement;
     this.basemap = this.shadow.querySelector('#basemap') as HTMLElement;
+    this.userPreferences = this.shadow.querySelector('#user-preferences') as HTMLElement;
 
     // hide and show help content depending on state
     if (!this.configManager.Config.basemaps.show) {
       (this.shadow.querySelector('#basemap') as HTMLElement).style.display = 'none';
-      (this.shadow.querySelector('#basemap-descr') as HTMLElement).style.display = 'none';
+      (this.shadow.querySelector('#basemap-description') as HTMLElement).style.display = 'none';
     }
   }
 
@@ -58,6 +60,7 @@ class HelpComponent extends GirafeHTMLElement {
     this.search.style.backgroundImage = `url(${this.currentArrow})`;
     this.menu.style.backgroundImage = `url(${this.currentArrow})`;
     this.basemap.style.backgroundImage = `url(${this.currentArrow})`;
+    this.userPreferences.style.backgroundImage = `url(${this.currentArrow})`;
 
     this.content.style.backgroundColor = this.darkFrontendMode ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)';
   }
