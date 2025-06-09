@@ -293,7 +293,8 @@ class SearchComponent extends GirafeHTMLElement {
         this.addFeatureToPreview(result.geometry);
         this.updatePreviewLayerStyle();
       }
-    } else if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
+    }
+    if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
       const clonedTheme = this.getMinimalClonedThemeForLayer(layer);
       if (!this.isAlreadyPresent(clonedTheme)) {
