@@ -82,7 +82,6 @@ class ShareComponent extends GirafeHTMLElement {
 
   render() {
     this.visible ? this.renderComponent() : this.renderEmptyComponent();
-    this.activateTooltips(false, [800, 0], 'top-end');
     super.girafeTranslate();
   }
 

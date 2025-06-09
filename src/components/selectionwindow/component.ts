@@ -194,7 +194,6 @@ class SelectionWindowComponent extends GirafeDraggableElement {
       this.setupVisibleComponent();
     }
     super.girafeTranslate();
-    this.activateTooltips(false, [800, 0], 'top-end');
   }
 
   /**

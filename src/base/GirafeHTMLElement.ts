@@ -1,5 +1,4 @@
 import { render as uRender, html as uHtml, Hole } from 'uhtml';
-import tippy from 'tippy.js';
 import I18nManager from '../tools/i18n/i18nmanager';
 import ConfigManager from '../tools/configuration/configmanager';
 import StateManager, { Callback } from '../tools/state/statemanager';
@@ -18,8 +17,6 @@ class GirafeHTMLElement extends HTMLElement {
   rendered: boolean = false;
 
   callbacks: Callback[] = [];
-
-  activeTooltips: (typeof tippy)[] = [];
 
   configManager: ConfigManager;
   stateManager: StateManager;
@@ -56,14 +53,7 @@ class GirafeHTMLElement extends HTMLElement {
   }
 
   girafeTranslate() {
-    I18nManager.getInstance()
-      .translate(this.shadow)
-      .then(() => {
-        // Translate tooltips
-        for (const tooltip of this.activeTooltips) {
-          tooltip.setContent(I18nManager.getInstance().getTranslation(tooltip.props.content));
-        }
-      });
+    I18nManager.getInstance().translate(this.shadow);
   }
 
   /**
@@ -100,33 +90,6 @@ class GirafeHTMLElement extends HTMLElement {
     }
 
     return this.getParentOfType(parentNodeName, parent, elem);
-  }
-
-  activateTooltips(arrow: boolean, delay: [number, number], defaultPlacement: string) {
-    // First, deactivate all existing tooltips
-    for (const tooltip of this.activeTooltips) {
-      tooltip.destroy();
-    }
-    this.activeTooltips = [];
-
-    const elementsWithTooltip = Array.from(this.shadow.querySelectorAll('[tip]'));
-    elementsWithTooltip.forEach((el) => {
-      const tooltipText = el.getAttribute('tip');
-      if (tooltipText && tooltipText !== '') {
-        const placement = el.getAttribute('tip-placement') ?? defaultPlacement;
-        const theme = el.getAttribute('tip-theme') ?? '';
-        const tooltip = tippy(el, {
-          arrow: arrow,
-          delay: delay,
-          placement: placement,
-          theme: theme,
-          //animateFill: false,
-          //animation: 'scale-with-inertia',
-          content: tooltipText
-        });
-        this.activeTooltips.push(tooltip);
-      }
-    });
   }
 
   /**

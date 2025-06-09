@@ -7,7 +7,7 @@ export default class ServerOgc {
   urlWfs?: string;
   type: string;
   imageType: string;
-  aliases: Map<string, string>;
+  aliases: Record<string, string>;
 
   constructor(name: string, elem: GMFServerOgc) {
     this.name = name;
@@ -20,17 +20,17 @@ export default class ServerOgc {
     this.aliases = this.initializeAliases(elem);
   }
 
-  private getAliasKey(table: string, column: string) {
+  private getAliasKey(table: string, column: string): string {
     return `${table}-${column}`;
   }
 
-  private initializeAliases(elem: GMFServerOgc): Map<string, string> {
-    const aliases = new Map<string, string>();
+  private initializeAliases(elem: GMFServerOgc): Record<string, string> {
+    const aliases: Record<string, string> = {};
     if (elem.attributes) {
       for (const [table, columns] of Object.entries(elem.attributes)) {
         for (const [column, attributes] of Object.entries(columns)) {
           if (attributes.alias) {
-            aliases.set(this.getAliasKey(table, column), attributes.alias);
+            aliases[this.getAliasKey(table, column)] = attributes.alias;
           }
         }
       }
@@ -40,7 +40,7 @@ export default class ServerOgc {
 
   public getAlias(table: string, column: string) {
     const key = this.getAliasKey(table, column);
-    return this.aliases.get(key);
+    return this.aliases[key];
   }
 
   get uniqueWmsQueryId(): string {

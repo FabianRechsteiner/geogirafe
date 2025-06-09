@@ -893,7 +893,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.setLineDrawingMode(true);
 
     // Tooltips
-    this.activateTooltips(false, [800, 0], 'top-end');
     this.registerEvents();
   }
 

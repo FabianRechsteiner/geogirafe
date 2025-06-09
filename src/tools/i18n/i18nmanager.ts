@@ -106,14 +106,11 @@ class I18nManager extends GirafeSingleton {
     const toTranslate = dom.querySelectorAll('[i18n]');
     toTranslate.forEach((item) => {
       const key = item.getAttribute('i18n');
-      if (!key) {
-        return;
-      }
       let translation: string;
       if (item.hasAttribute('i18nFn')) {
-        translation = this.getFnTranslated(item, key);
+        translation = this.getFnTranslated(item, key!);
       } else {
-        translation = this.getTranslation(key);
+        translation = this.getTranslation(key!);
       }
       if (item.hasAttribute('placeholder')) {
         item.setAttribute('placeholder', translation);
@@ -121,6 +118,13 @@ class I18nManager extends GirafeSingleton {
         // Default : simply set innerHTML.
         item.innerHTML = translation;
       }
+    });
+
+    const tooltips = dom.querySelectorAll('[tip]');
+    tooltips.forEach((item) => {
+      const key = item.getAttribute('tip');
+      const translation = this.getTranslation(key!);
+      item.setAttribute('title', translation);
     });
   }
 

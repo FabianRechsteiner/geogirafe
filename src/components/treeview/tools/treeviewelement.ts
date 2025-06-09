@@ -9,7 +9,7 @@ import LayerWms from '../../../models/layers/layerwms';
 import Layer from '../../../models/layers/layer';
 
 export default abstract class TreeViewElement extends GirafeHTMLElement {
-  private dragManager: DragManager;
+  private readonly dragManager: DragManager;
   protected layerManager: LayerManager;
   protected layer: BaseLayer;
 
@@ -30,7 +30,6 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
 
     super.girafeTranslate();
     this.initializeDrag();
-    this.createTooltips();
 
     if (isTimeAwareLayer(this.layer)) {
       this.createTimeRestrictionTooltip(this.layer);
@@ -44,12 +43,8 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
       // Is called without param, call refresh
       // Else, call refresh only if the layer in param is the current one
       super.refreshRender();
-      this.createTooltips();
+      super.girafeTranslate();
     }
-  }
-
-  private createTooltips() {
-    super.activateTooltips(false, [800, 0], 'top');
   }
 
   protected showMetadata() {
@@ -149,18 +144,16 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
   }
 
   protected removeFromParent() {
-    setTimeout(() => {
-      if (this.layer.parent) {
-        const index = this.layer.parent.children.findIndex((l) => l === this.layer);
-        if (index >= 0) {
-          this.layer.parent.children.splice(index, 1);
-        }
-      } else {
-        const index = this.state.layers.layersList.findIndex((l) => l === this.layer);
-        if (index >= 0) {
-          this.state.layers.layersList.splice(index, 1);
-        }
+    if (this.layer.parent) {
+      const index = this.layer.parent.children.findIndex((l) => l === this.layer);
+      if (index >= 0) {
+        this.layer.parent.children.splice(index, 1);
       }
-    });
+    } else {
+      const index = this.state.layers.layersList.findIndex((l) => l === this.layer);
+      if (index >= 0) {
+        this.state.layers.layersList.splice(index, 1);
+      }
+    }
   }
 }

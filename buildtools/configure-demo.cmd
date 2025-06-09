@@ -81,9 +81,6 @@ if "%1"=="mapbs" (
     echo "Preparing environment MAPBS..."
     copy demo\config.mapbs.json %APPDIR%\config.json /Y
     copy demo\config.mapbs.mobile.json %APPDIR%\config.mobile.json /Y
-    curl "https://map.geo.bs.ch/static/dummy/de.json" --output %OUTPUTDIR%\de.json
-    curl "https://map.geo.bs.ch/static/dummy/en.json" --output %OUTPUTDIR%\en.json
-    curl "https://map.geo.bs.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
     goto :end
 )
 

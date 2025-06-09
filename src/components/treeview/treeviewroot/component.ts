@@ -27,7 +27,6 @@ class TreeViewRootComponent extends GirafeHTMLElement {
 
   public render() {
     super.render();
-    this.activateTooltips(false, [800, 0], 'right');
     this.girafeTranslate();
   }
 

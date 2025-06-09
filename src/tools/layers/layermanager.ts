@@ -108,7 +108,7 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  onLayerToggled(layer: BaseLayer) {
+  private onLayerToggled(layer: BaseLayer) {
     if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       // Toggle parents if necessary
       this.#manageExclusiveGroups(layer);

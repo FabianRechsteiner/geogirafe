@@ -215,7 +215,6 @@ export default class MapComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    this.activateTooltips(false, [800, 0], 'right');
 
     // Read out the default projection from config, ignoring user preferences
     this.defaultSrid = this.configManager.getDefaultConfigValue('map.srid') as string;

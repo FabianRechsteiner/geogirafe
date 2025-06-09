@@ -155,7 +155,6 @@ class SelectionGridComponent extends GirafeResizableElement {
       this.setupVisibleComponent();
     }
     super.girafeTranslate();
-    this.activateTooltips(false, [800, 0], 'top-end');
   }
 
   /**
