@@ -100,7 +100,6 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
       return;
     }
     super.render();
-    this.activateTooltips(false, [800, 0], 'top-end');
     super.girafeTranslate();
   }
 

@@ -14,4 +14,3 @@ interface ILayerWithTime {
 }
 
 export default ILayerWithTime;
-

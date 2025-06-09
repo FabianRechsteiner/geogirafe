@@ -72,9 +72,6 @@ then
     echo "Preparing environment MAPBS..."
     cp demo/config.$1.json $APPDIR/config.json
     cp demo/config.$1.mobile.json $APPDIR/config.mobile.json
-    curl "https://map.geo.bs.ch/static/dummy/de.json" --silent --output $MOCKDIR/de.json
-    curl "https://map.geo.bs.ch/static/dummy/en.json" --silent --output $MOCKDIR/en.json
-    curl "https://map.geo.bs.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
 
 elif [ "$1" = 'mapnv' ];
 then

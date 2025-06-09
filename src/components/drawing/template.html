@@ -67,9 +67,7 @@
           class="gg-icon-button gg-small"
           tip="Select to change appearance"
           onclick="${() => this.onToggleFeatureSelection(feature)}">
-          <div class="icon">
-            ${this.htmlUnsafe(feature.selected ? this.checkedIcon : this.noCheckedIcon)}
-          </div>
+          <div class="icon">${this.htmlUnsafe(feature.selected ? this.checkedIcon : this.noCheckedIcon)}</div>
         </button>
 
         <div class="label-container">

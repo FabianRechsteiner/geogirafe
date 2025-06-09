@@ -2,13 +2,11 @@ import ITimeOptions, { TimeMode, TimeResolution } from './itimeoptions';
 import Filter from 'ol/format/filter/Filter';
 import { during } from 'ol/format/filter';
 
-
 export const TIME_RANGE_SEPARATOR = '/';
 
 // In ISO 8601 format
 const MIN_DATE = '1900-01-01T00:00:00.000Z';
 const MAX_DATE = '2100-01-01T00:00:00.000Z';
-
 
 /**
  * A class for formatting date and time values based on an `ITimeOption` object.

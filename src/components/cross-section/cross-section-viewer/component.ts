@@ -263,7 +263,6 @@ class CrossSectionViewComponent extends GirafeResizableElement {
   private renderComponent() {
     super.render();
     super.girafeTranslate();
-    this.activateTooltips(false, [800, 0], 'top-end');
 
     this.panel = this.shadowRoot!.getElementById('profile-panel') as HTMLDivElement;
 

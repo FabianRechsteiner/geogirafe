@@ -103,7 +103,6 @@ class ThemeComponent extends GirafeHTMLElement {
     this.loadConfig().then(() => {
       super.render();
       this.registerEvents();
-      this.activateTooltips(false, [800, 0], 'top');
       this.girafeTranslate();
     });
   }

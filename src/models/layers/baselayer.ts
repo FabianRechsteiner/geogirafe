@@ -1,4 +1,5 @@
 import ConfigManager from '../../tools/configuration/configmanager';
+import { BrainIgnoreClone } from '../../tools/state/brain/decorators';
 import GroupLayer from './grouplayer';
 import ThemeLayer from './themelayer';
 import { v4 as uuidv4 } from 'uuid';
@@ -38,6 +39,7 @@ abstract class BaseLayer {
   public abstract get inactive(): boolean;
   public abstract clone(): BaseLayer;
 
+  @BrainIgnoreClone
   public parent?: ThemeLayer | GroupLayer;
 
   constructor(id: number, name: string, order: number, options?: BaseLayerOptions) {

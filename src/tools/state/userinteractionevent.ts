@@ -97,7 +97,7 @@ type MouseEventWithModifier = `${gGMouseEvent}${OptionalKey<modifier>}`;
 // Combine keyboard and mouse events
 export type GgUserInteractionEvent = MouseEventWithModifier | KeyEventWithModifier;
 
-// Some events consist of multiple simpler events. gGEventDependencies defines 
+// Some events consist of multiple simpler events. gGEventDependencies defines
 // which additional events have to be considered/blocked when an event registers exclusively.
 export const gGEventDependencies: Partial<Record<GgUserInteractionEvent, Array<GgUserInteractionEvent>>> = {
   'map.select': ['map.mouseclick', 'map.mouseclick.ctrl', 'map.mouseclick.shift'],

@@ -24,7 +24,19 @@ export default abstract class TreeViewGroupElement extends TreeViewElement {
     }
   }
 
-  public toggle(state?: 'on' | 'off' | 'semi') {
-    this.layerManager.toggleGroupOrTheme(this.layer, state);
+  public toggle() {
+    this.stateManager.batchChanges(() => {
+      this.layerManager.toggleGroupOrTheme(this.layer);
+      this.toggleLayers(this.layer.children, this.layer.activeState as 'on' | 'off');
+    });
+  }
+
+  private toggleLayers(layers: BaseLayer[], activeState: 'on' | 'off') {
+    for (const layer of layers) {
+      this.layerManager.toggle(layer, activeState);
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+        this.toggleLayers(layer.children, activeState);
+      }
+    }
   }
 }

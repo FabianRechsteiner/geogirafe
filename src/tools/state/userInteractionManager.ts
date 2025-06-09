@@ -2,7 +2,6 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import StateManager from './statemanager';
 import { gGEventDependencies, GgUserInteractionEvent } from './userinteractionevent';
 
-
 /**
  * The GgUserInteractionListener interface is used to save listeners to the state. It defines a listener
  * as a combination of event name, tool / component name (GirafeHTMLElement.name) and if it's listening exclusively.

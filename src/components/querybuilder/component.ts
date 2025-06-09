@@ -77,7 +77,6 @@ class QueryBuilderComponent extends GirafeHTMLElement {
         this.layerAttributes = commonAttributes;
         this.loading = false;
         super.render();
-        this.activateTooltips(false, [800, 0], 'top-end');
         super.girafeTranslate();
       });
   }

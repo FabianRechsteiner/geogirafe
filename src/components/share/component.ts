@@ -82,7 +82,6 @@ class ShareComponent extends GirafeHTMLElement {
 
   render() {
     this.visible ? this.renderComponent() : this.renderEmptyComponent();
-    this.activateTooltips(false, [800, 0], 'top-end');
     super.girafeTranslate();
   }
 
@@ -92,7 +91,7 @@ class ShareComponent extends GirafeHTMLElement {
    */
   private renderComponent() {
     super.render();
-    
+
     this.simpleMaskManager = new SimpleMaskManager(this.mapManager.getMap());
 
     // While the component is visible, listen for changes in the state to update the shared link

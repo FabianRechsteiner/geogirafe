@@ -300,7 +300,6 @@ class PrintComponent extends GirafeHTMLElement {
   private renderComponent() {
     super.render();
     this.renderComponentCapabilitiesPart();
-    this.activateTooltips(false, [800, 0], 'top-end');
     super.girafeTranslate();
   }
 

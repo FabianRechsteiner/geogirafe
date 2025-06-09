@@ -81,7 +81,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
   render() {
     super.render();
     this.visible ? this.renderComponent() : this.hide();
-    this.activateTooltips(false, [800, 0], 'top-end');
     super.girafeTranslate();
   }
 
@@ -224,10 +223,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   deselectAllFeatures() {
-    for (const idx of this.drawingState.features.keys()) {
-      // To guarantee change detection, use the list index to change the feature property
-      this.drawingState.features[idx].selected = false;
-    }
+    this.drawingState.features.forEach((feature) => (feature.selected = false));
   }
 
   onFeaturesChanged(oldFeatures: DrawingFeature[], newFeatures: DrawingFeature[]) {
@@ -244,10 +240,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
       this.deselectAllFeatures();
     } else if (added.length > 0) {
       // Only select the newly created feature
-      for (const [idx, feature] of this.drawingState.features.entries()) {
-        // To guarantee change detection, use the list index to change the feature property
-        this.drawingState.features[idx].selected = added.map((f) => f.id).includes(feature.id);
-      }
+      this.drawingState.features.forEach((feature) => (feature.selected = added.map((f) => f.id).includes(feature.id)));
     }
     // Update drawing source
     if (deleted.length > 0) this.olDrawing.deleteFeatures(deleted);

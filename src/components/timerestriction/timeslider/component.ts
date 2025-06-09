@@ -2,7 +2,6 @@ import LayerTimeFormatter from '../../../tools/time/layertimeformatter';
 import ITimeOptions from '../../../tools/time/itimeoptions';
 import TimeWidget, { TimeRangeLimit } from '../tools/timewidget';
 
-
 /**
  * A widget that represents a time slider with configurable time resolution. The slider supports
  * a single value or a time range depending on the specified mode.

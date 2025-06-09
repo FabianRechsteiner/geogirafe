@@ -147,4 +147,3 @@ describe('InteractionManager.canListenerExecute', () => {
     expect(manager.canListenerExecute(compoundEvent, 'exclusiveListener')).toBe(false);
   });
 });
-
