@@ -15,7 +15,7 @@
         <span class="${this.state.oauth.userInfo?.given_name ? '' : 'hidden'}"
           >${this.state.oauth.userInfo?.given_name + ' ' + this.state.oauth.userInfo?.family_name}</span
         >
-        <span>${this.state.oauth.userInfo?.username}</span>
+        <span>${this.getDisplayName()}</span>
       </div>
     </button>
   </div>

@@ -20,8 +20,13 @@ let logLevel: string; // Current log level. Value is defined by OfflineManager.
 let audience: string[]; // List of domains for which the Authorization Token and cookies should be sent
 let audienceExcludedPaths: RegExp[]; // List of regex paths at audience where Authorization Token and cookies should not be sent
 let accessToken: string | undefined; // The current access token
+let loginState: string | undefined; // The current login status
 let authMode: 'token' | 'cookie'; // How the authentication should be sent to the audience
 let refererPolicy: string; // RefererPolicy used for the queries. Default strict-origin-when-cross-origin
+
+function isLoggedIn() {
+  return loginState === 'loggedIn' || loginState === 'issuer.loggedIn';
+}
 
 const offlineTimeout = 3000; // Timeout in case of not reachable IndexedDB. (3 sec.)
 const appCacheName = 'pages'; // Name of the cache for application pages
@@ -79,6 +84,18 @@ function handleMessage(event: ExtendableMessageEvent): void {
   if (data.refererPolicy) {
     refererPolicy = data.refererPolicy;
     log(`refererPolicy changed: ${refererPolicy}`);
+  }
+  if (data.loginState) {
+    loginState = data.loginState;
+    log(`loginState changed: ${loginState}`);
+  }
+
+  if (data.messageId) {
+    // Reply to the message with the same messageId
+    const source = event.source;
+    if (source) {
+      source.postMessage({ messageId: data.messageId, status: 'ServiceWorker updated' });
+    }
   }
 }
 
@@ -166,13 +183,13 @@ function getRequest(request: Request): Request {
     if (audience?.includes(hostname) && !shouldExclude) {
       // Prepare headers
       const headers = new Headers(request.headers);
-      if (authMode == 'token' && accessToken) {
+      if (authMode == 'token' && isLoggedIn()) {
         headers.set('Authorization', `Bearer ${accessToken}`);
       }
       // Prepare options
       const fetchOptions: RequestInit = {
         headers: headers,
-        credentials: authMode === 'cookie' ? 'include' : 'omit',
+        credentials: isLoggedIn() && authMode === 'cookie' ? 'include' : 'omit',
         referrer: request.referrer,
         referrerPolicy: refererPolicy as ReferrerPolicy
       };

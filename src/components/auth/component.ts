@@ -21,9 +21,20 @@ export class OauthComponent extends GirafeHTMLElement {
     this.subscribe(/oauth\.userInfo.*/, () => this.refreshRender());
   }
 
-  async refreshRender() {
-    this.userIconUrl = await this.getUserIconUrl();
-    super.refreshRender();
+  public getDisplayName() {
+    if (this.state.oauth.userInfo?.display_name) {
+      return this.state.oauth.userInfo.display_name;
+    } else if (this.state.oauth.userInfo?.username) {
+      return this.state.oauth.userInfo.username;
+    }
+    return this.state.oauth.userInfo?.email ?? 'Unknown User';
+  }
+
+  refreshRender() {
+    this.getUserIconUrl().then((url) => {
+      this.userIconUrl = url;
+      super.refreshRender();
+    });
   }
 
   public onLoginClick() {
