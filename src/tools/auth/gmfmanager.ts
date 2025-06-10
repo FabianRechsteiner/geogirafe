@@ -4,6 +4,7 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 
 export type GMFUserInfo = {
   username: string;
+  display_name: string;
   email: string;
   family_name: string;
   given_name: string;

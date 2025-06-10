@@ -6,9 +6,10 @@ import ConfigManager from '../configuration/configmanager';
 import AbstractConnectManager from './abstractconnectmanager';
 import GMFConnectManager from './gmfconnectmanager';
 import { v4 as uuidv4 } from 'uuid';
+import ServiceWorkerHelper from '../utils/swhelper';
 
 export default class AuthManager extends GirafeSingleton {
-  private serviceWorker: ServiceWorker | null = null;
+  private serviceWorkerHelper!: ServiceWorkerHelper;
   private readonly stateManager: StateManager;
 
   private issuerManager!: AbstractConnectManager;
@@ -29,8 +30,9 @@ export default class AuthManager extends GirafeSingleton {
   public async initialize(sw: ServiceWorker | null) {
     if (!sw) {
       console.warn("ServiceWorker cannot be initialized. Authentication won't work properly.");
+      return;
     }
-    this.serviceWorker = sw;
+    this.serviceWorkerHelper = new ServiceWorkerHelper(sw);
 
     const oauthIssuerConfig = ConfigManager.getInstance().Config.oauth?.issuer;
     const gmfauthConfig = ConfigManager.getInstance().Config.gmfauth;
@@ -46,7 +48,7 @@ export default class AuthManager extends GirafeSingleton {
   }
 
   private async initializeOAuth(config: any) {
-    this.serviceWorker?.postMessage({ clear_access_token: true });
+    await this.serviceWorkerHelper.sendMessageToServiceWorker({ clear_access_token: true });
     this.issuerManager = OpenIdConnectManager.getInstance();
     await this.issuerManager.initialize();
     // No silent login if user is in the process of being logged in ('issuer.loggedIn' is second step of login process)
@@ -73,6 +75,9 @@ export default class AuthManager extends GirafeSingleton {
 
   private async loginStateChanged() {
     try {
+      console.log('Login state changed:', this.state.oauth.status);
+      // Notify the service worker about the login state change
+      await this.serviceWorkerHelper.sendMessageToServiceWorker({ loginState: this.state.oauth.status });
       if (this.state.oauth.status === 'issuer.loggedIn') {
         // We are logged in to the identity provider
         // We must now login to GMF (for GMF < 2.9 only)
@@ -107,8 +112,8 @@ export default class AuthManager extends GirafeSingleton {
     });
   }
 
-  private tokensChanged() {
-    this.serviceWorker?.postMessage({ access_token: this.state.oauth.tokens?.access_token });
+  private async tokensChanged() {
+    await this.serviceWorkerHelper.sendMessageToServiceWorker({ access_token: this.state.oauth.tokens?.access_token });
   }
 
   public async login() {
@@ -127,9 +132,8 @@ export default class AuthManager extends GirafeSingleton {
     try {
       console.log('silentLogin');
       await this.issuerManager.silentLogin();
-    } catch (e) {
+    } catch {
       this.state.oauth.status = 'loggedOut';
-      // TODO REG : Test anonymous username ?
     }
   }
 
