@@ -234,7 +234,7 @@ girafe-prototype-banner {
   transition: opacity 0.7s;
 }
 
-#splash-screen img {
+#splash-screen svg {
   position: absolute;
   width: 160px;
   top: 50%;
