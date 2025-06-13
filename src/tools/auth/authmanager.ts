@@ -74,6 +74,14 @@ export default class AuthManager extends GirafeSingleton {
   }
 
   private async loginStateChanged() {
+    // The serviceWorkerHelper is instantiated in the initialize() method and not in the constructor
+    // of AuthManager. Yet this method (.loginStateChanged()) is expected to be called from the constructor
+    // as a propagation of subscribing to a change of 'oauth.status' with an already non-empty status.
+    // To prevent unnecessary error login in console:
+    if (!this.serviceWorkerHelper) {
+      return;
+    }
+
     try {
       console.log('Login state changed:', this.state.oauth.status);
       // Notify the service worker about the login state change
