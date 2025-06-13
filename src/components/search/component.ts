@@ -62,6 +62,9 @@ class SearchComponent extends GirafeHTMLElement {
 
   private abortController = new AbortController();
 
+  // Keeping track of the last input timeout
+  private ongoingSearchTimeoutId = 0;
+
   constructor() {
     super('search');
     this.themesHelper = ThemesHelper.getInstance();
@@ -172,6 +175,27 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   /**
+   * Debounce the fetch call to API to prevent sending request at every stroke.
+   * @param e
+   */
+  public async doSearchDebounced(e: Event) {
+    if (this.ongoingSearchTimeoutId !== 0) {
+      clearTimeout(this.ongoingSearchTimeoutId);
+    }
+
+    // The original even cannot be passed because event objects are ephemeral and
+    // not designed to be used asynchronously (the target property would be undefined)
+    const syntheticEvent = {
+      target: { value: e.target && 'value' in e.target ? e.target.value : undefined }
+    } as unknown as Event;
+
+    this.ongoingSearchTimeoutId = window.setTimeout(() => {
+      this.ongoingSearchTimeoutId = 0;
+      this.doSearch(syntheticEvent);
+    }, 300);
+  }
+
+  /**
    * Will render the result of the search with coordinates
    * @param term typed string
    */
@@ -206,6 +230,11 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   private displayResults(results: { type: string; features: SearchResult[] }) {
+    const uniqueLayersNames = Array.from(
+      new Set(results.features.map((f) => f.properties?.layer_name).filter((name) => name !== undefined))
+    );
+    console.log('uniqueLayersNames:', uniqueLayersNames);
+
     // First, group the results
     results.features.forEach((result) => {
       let type = 'Unknown layer type';
