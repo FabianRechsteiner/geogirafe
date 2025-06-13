@@ -23,7 +23,7 @@
   ${Object.keys(this.groupedResults).map(group => uHtml`
   <div class="title">
     <img alt="result icon" src="${this.getIcon(group)}" />
-    <span>${group}</span>
+    <span i18n="${group}"></span>
   </div>
   ${this.groupedResults[group].map(result => uHtml`
   <button
