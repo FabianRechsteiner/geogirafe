@@ -5,6 +5,7 @@ import StateManager, { Callback } from '../tools/state/statemanager';
 import ComponentManager from '../tools/state/componentManager';
 import UserInteractionManager from '../tools/state/userInteractionManager';
 import { GgUserInteractionEvent } from '../tools/state/userinteractionevent';
+import PluginManager from '../tools/auth/pluginmanager';
 
 class GirafeHTMLElement extends HTMLElement {
   templateUrl: string | null = null;
@@ -37,7 +38,8 @@ class GirafeHTMLElement extends HTMLElement {
 
     this.shadow = this.attachShadow({ mode: 'open' });
 
-    this.subscribe('language', (_oldLanguage: string, _newLanguage: string) => this.girafeTranslate());
+    this.subscribe('language', () => this.girafeTranslate());
+    this.subscribe('oauth.userInfo', () => this.userInfoChanged());
   }
 
   get state() {
@@ -54,6 +56,10 @@ class GirafeHTMLElement extends HTMLElement {
 
   girafeTranslate() {
     I18nManager.getInstance().translate(this.shadow);
+  }
+
+  userInfoChanged() {
+    PluginManager.getInstance().filterPlugins(this.shadow);
   }
 
   /**
@@ -106,6 +112,7 @@ class GirafeHTMLElement extends HTMLElement {
       this.show();
       uRender(this.shadow, this.template);
       this.rendered = true;
+      this.userInfoChanged();
     } else {
       console.warn(`Cannot render: no template has been defined for component ${this.name}.`);
     }
@@ -130,6 +137,7 @@ class GirafeHTMLElement extends HTMLElement {
     this.timeoutId = setTimeout(() => {
       uRender(this.shadow, this.template);
       this.girafeTranslate();
+      this.userInfoChanged();
     });
   }
 

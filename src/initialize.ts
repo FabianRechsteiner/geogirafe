@@ -12,6 +12,7 @@ import CsvManager from './tools/export/csvmanager';
 import I18nManager from './tools/i18n/i18nmanager';
 import WfsManager from './tools/wfs/wfsmanager';
 import OrderingManager from './tools/ordering/orderingmanager';
+import PluginManager from './tools/auth/pluginmanager';
 import State from './tools/state/state';
 
 // Extend default Document and Window interfaces
@@ -133,6 +134,7 @@ export async function initialize() {
   I18nManager.getInstance();
   WfsManager.getInstance();
   OrderingManager.getInstance();
+  PluginManager.getInstance();
   await ThemesManager.getInstance().initialize();
 
   // Add the state to document, so that it will be accessible everywhere
