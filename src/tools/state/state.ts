@@ -6,7 +6,7 @@ import type BaseLayer from '../../models/layers/baselayer';
 import type ThemeLayer from '../../models/layers/themelayer';
 import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
-import { TokenEndpointResponse, UserInfoResponse } from 'oauth4webapi';
+import { TokenEndpointResponse } from 'oauth4webapi';
 import SelectionParam from '../../models/selectionparam';
 import { GgUserInteractionListener } from './userInteractionManager';
 import CustomTheme from '../../models/customtheme';
@@ -80,6 +80,22 @@ export type Lidar = {
   drawActive: boolean;
 };
 
+type Functionalities = {
+  authorized_plugins?: string[];
+};
+
+type UserInfo = {
+  username: string;
+  display_name: string;
+  email: string;
+  family_name: string;
+  given_name: string;
+  is_intranet: boolean;
+  two_factor_enable: boolean;
+  roles: Object[];
+  functionalities?: Functionalities;
+};
+
 /**
  * Login states :
  * 1. issuer.loggedIn   : Logged in to identity provider
@@ -99,7 +115,7 @@ type LoginState = {
     | 'logoutFailed'
     | 'loggedOutForcedFromBackend';
   tokens?: TokenEndpointResponse;
-  userInfo?: UserInfoResponse;
+  userInfo?: UserInfo;
   audience: string[];
 };
 

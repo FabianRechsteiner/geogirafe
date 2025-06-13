@@ -2,18 +2,6 @@ import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
 import GirafeSingleton from '../../base/GirafeSingleton';
 
-export type GMFUserInfo = {
-  username: string;
-  display_name: string;
-  email: string;
-  family_name: string;
-  given_name: string;
-  is_intranet: boolean;
-  two_factor_enable: boolean;
-  roles: Object[];
-  functionalities: Object;
-};
-
 export default class GMFManager extends GirafeSingleton {
   private readonly configManager: ConfigManager;
   private readonly stateManager: StateManager;
