@@ -17,6 +17,7 @@ type GraphicalInterface = {
   printPanelVisible: boolean;
   lidarPanelVisible: boolean;
   crossSectionPanelVisible: boolean;
+  editPanelVisible: boolean;
   sharePanelVisible: boolean;
   selectionComponentVisible: boolean;
   selectionComponent: string;
@@ -169,6 +170,7 @@ export default class State {
     printPanelVisible: false,
     lidarPanelVisible: false,
     crossSectionPanelVisible: false,
+    editPanelVisible: false,
     sharePanelVisible: false,
     selectionComponentVisible: false,
     selectionComponent: '',
