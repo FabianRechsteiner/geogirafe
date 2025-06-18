@@ -8,6 +8,7 @@ import MapCustomContextMenuContentComponent from './components/context-menu/cust
 import CrossSectionSettingsComponent from './components/cross-section/cross-section-settings/component';
 import CrossSectionViewComponent from './components/cross-section/cross-section-viewer/component';
 import DrawingComponent from './components/drawing/component';
+import EditComponent from './components/edit/component';
 import HelpComponent from './components/help/component';
 import InfoboxComponent from './components/infobox/component';
 import InfoWindowComponent from './components/infowindow/component';
@@ -87,6 +88,7 @@ initialize().then(() => {
   customElements.define('girafe-query-builder', QueryBuilderComponent);
   customElements.define('girafe-oauth', OauthComponent);
   customElements.define('girafe-drawing', DrawingComponent);
+  customElements.define('girafe-edit', EditComponent);
   customElements.define('girafe-scale', ScaleComponent);
   customElements.define('girafe-search', SearchComponent);
   customElements.define('girafe-selection-grid', SelectionGridComponent);

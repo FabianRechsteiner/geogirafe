@@ -125,6 +125,7 @@
             slot="main"
             data-toggle-path="interface.crossSectionPanelVisible"
             data-title="cross-section-settings"></girafe-cross-section-settings>
+          <girafe-edit slot="main" data-toggle-path="interface.editPanelVisible" data-title="edit-panel"></girafe-edit>
           <girafe-layout
             slot="main"
             data-toggle-path="interface.layoutPanelVisible"
@@ -157,13 +158,13 @@
         slot="menu-content"
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
-        <img alt="help-icon" src="icons/draw.svg" />
+        <img alt="draw-icon" src="icons/draw.svg" />
       </button>
       <button
         slot="menu-content"
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
-        <img alt="help-icon" src="icons/print.svg" />
+        <img alt="print-icon" src="icons/print.svg" />
       </button>
       <button
         slot="menu-content"
@@ -174,13 +175,19 @@
       <button
         slot="menu-content"
         class="gg-icon-button gg-big"
+        onclick="document.geogirafe.state.interface.editPanelVisible = !document.geogirafe.state.interface.editPanelVisible">
+        <img alt="edit-icon" src="icons/edit.svg" />
+      </button>
+      <button
+        slot="menu-content"
+        class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.sharePanelVisible = !document.geogirafe.state.interface.sharePanelVisible">
-        <img alt="help-icon" src="icons/share.svg" />
+        <img alt="share-icon" src="icons/share.svg" />
       </button>
       <button
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.layoutPanelVisible = !document.geogirafe.state.interface.layoutPanelVisible">
-        <img alt="help-icon" src="icons/layout.svg" />
+        <img alt="layout-icon" src="icons/layout.svg" />
       </button>
       <button class="gg-icon-button gg-big" plugin="plugin_infra3d" onclick="alert('plugin')">
         <img alt="help-icon" src="icons/infra3d.svg" />
@@ -194,7 +201,7 @@
       <button
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.aboutPanelVisible = !document.geogirafe.state.interface.aboutPanelVisible">
-        <img alt="help-icon" src="icons/info.svg" />
+        <img alt="info-icon" src="icons/info.svg" />
       </button>
       <button
         class="gg-icon-button gg-big"

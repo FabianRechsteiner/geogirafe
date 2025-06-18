@@ -1,0 +1,69 @@
+<div id="content">
+  <div class="girafe-prototype" i18n="PROTOTYPE - Work in progress">PROTOTYPE - Work in progress</div>
+
+  <div class="editing">
+    <select
+      id="layer-selector"
+      class="gg-select"
+      disabled="${this.hasFeature()}"
+      onchange="${(evt: Event) => this.onSelectLayer(evt)}">
+      <option i18n="Choose a layer..." ?selected="true" value="">Choose a layer...</option>
+      ${this.editableLayersList.map(layer => uHtmlFor(layer, layer.id)`
+      <option value="${layer.id}">${layer.name}</option>
+      `)}
+    </select>
+
+    ${this.layer ? uHtml`
+
+    <div class="draw-btn">
+      ${this.displayDrawingStartButton() ? uHtml`
+
+      <button class="gg-button gg-medium-withtext" onclick="${() => this.onStartDrawing()}">
+        <img alt="start-drawing-icon" src="${this.getButtonIcon()}" />
+        <span i18n="${this.getButtonText()}">${this.getButtonText()}</span>
+      </button>
+
+      ` : uHtml`
+
+      <button class="gg-button gg-medium-withtext btn-active" onclick="${() => this.onCancelEditing()}">
+        <img alt="cancel-drawing-icon" src="icons/close.svg" />
+        <span i18n="Cancel editing">Cancel editing</span>
+      </button>
+
+      `}
+    </div>
+
+    ${this.hasFeature() ? uHtml`
+
+    <div class="current-feature">
+      <h3 i18n="Current Feature">Current Feature</h3>
+      <div class="current-feature-row">
+        <div i18n="Feature ID">Feature ID</div>
+        <div>${this.getFeatureId()}</div>
+        <button class="gg-button gg-medium-withtext delete-btn" disabled onclick="${() => this.onDelete()}">
+          <img alt="delete-icon" src="icons/trash.svg" />
+          <span i18n="delete">Delete</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="attribute-form">
+      <div class="attribute-form-row">
+        <label for="attribute-test">${this.layer.attributeName}</label>
+        <input id="attribute-test" type="${this.layer.attributeType}" class="gg-input" />
+      </div>
+
+      <div class="attribute-form-btns">
+        <button class="gg-button" disabled="${!this.isValidForm()}" onclick="${() => this.onSave()}">
+          <span i18n="Save">Save</span>
+        </button>
+
+        <button class="gg-button" onclick="${() => this.onDiscard()}">
+          <span i18n="Discard">Discard</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  ` : uHtml``} ` : uHtml``}
+</div>

@@ -130,6 +130,10 @@ a:visited {
   cursor: not-allowed;
 }
 
+.gg-button > img {
+  vertical-align: middle;
+}
+
 /* Icon buttons */
 .gg-icon-button {
   border: none;
