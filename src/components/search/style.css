@@ -96,3 +96,42 @@
   background-color: #aaa !important;
   color: var(--text-color);
 }
+
+
+
+#no-result {
+  position: absolute;
+  background: var(--warning-color);
+  top: 3.5rem;
+  padding: 0.5rem 0;
+  border-radius: 6px;
+  opacity: 0.75;
+  font-size: 1rem;
+  width: fit-content;
+  left: 0;
+  right: 0;
+  margin: auto;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#no-result > span {
+  padding: 1.3rem;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.shown-then-fadeout {
+  visibility: visible !important;
+  animation: fadeOut 2s ease-in-out forwards;
+}

@@ -1,13 +1,13 @@
-import Map from 'ol/Map';
+import type OLMap from 'ol/Map';
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Geometry, LineString, MultiLineString, MultiPolygon, Point, MultiPoint, Polygon } from 'ol/geom';
+import { type Geometry, LineString, MultiLineString, MultiPolygon, Point, MultiPoint, Polygon } from 'ol/geom';
 import { Style, Icon, Stroke, Fill } from 'ol/style';
-import { buffer, getWidth, getHeight, getCenter, containsExtent, Extent } from 'ol/extent';
-import { Coordinate } from 'ol/coordinate';
-import { Color } from 'vanilla-picker';
+import { buffer, getWidth, getHeight, getCenter, containsExtent, type Extent } from 'ol/extent';
+import type { Coordinate } from 'ol/coordinate';
+import type { Color } from 'vanilla-picker';
 import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
 import PinIcon from './images/pin.svg';
@@ -17,14 +17,15 @@ import SearchIcon from './images/search.svg';
 import PaintbrushIcon from './images/paintbrush.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import SearchResult, { type GeometryResult, GeometryCollectionResult } from '../../models/searchresult';
+import type SearchResult from '../../models/searchresult';
+import type { GeometryResult, GeometryCollectionResult } from '../../models/searchresult';
 import MapManager from '../../tools/state/mapManager';
 import LayerManager from '../../tools/layers/layermanager';
 import { parseCoordinates } from '../../tools/geometrytools';
 import ThemesHelper from '../../tools/themes/themeshelper';
 import ThemeLayer from '../../models/layers/themelayer';
-import BaseLayer from '../../models/layers/baselayer';
-import GroupLayer from '../../models/layers/grouplayer';
+import type BaseLayer from '../../models/layers/baselayer';
+import type GroupLayer from '../../models/layers/grouplayer';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -35,7 +36,7 @@ class SearchComponent extends GirafeHTMLElement {
 
   private readonly themesHelper: ThemesHelper;
   private readonly layerManager: LayerManager;
-  private readonly map: Map;
+  private readonly map: OLMap;
   private readonly previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   private previewTheme: ThemeLayer | null = null;
   private previewGeoLayer: VectorLayer<VectorSource> | null = null;
@@ -44,13 +45,13 @@ class SearchComponent extends GirafeHTMLElement {
   private ignoreBlur = false;
   public groupedResults: Record<string, SearchResult[]> = {};
   protected allResults: SearchResult[] = [];
-  protected forceHide: boolean = true;
+  protected forceHide = true;
 
   private readonly searchTermPlaceholder = '###SEARCHTERM###';
   private readonly searchLangPlaceholder = '###SEARCHLANG###';
   private readonly COORD_REGEX = /^(\d+[.,]?\d*)\s*[,;/\s]\s*(\d+[.,]?\d*)$/;
 
-  private focusedResultIndex: number = -1;
+  private focusedResultIndex = -1;
   private focusedResult: SearchResult | null = null;
   private selectedResult: SearchResult | null = null;
 
@@ -61,6 +62,7 @@ class SearchComponent extends GirafeHTMLElement {
   public defaultSearchFillColor: string;
 
   private abortController = new AbortController();
+  public showNoResultWarning = false;
 
   // Keeping track of the last input timeout
   private ongoingSearchTimeoutId = 0;
@@ -126,7 +128,7 @@ class SearchComponent extends GirafeHTMLElement {
     });
   }
 
-  protected clearSearch(purge: boolean = false) {
+  protected clearSearch(purge = false) {
     if (purge) {
       if (this.searchBox) {
         this.searchBox.value = '';
@@ -142,13 +144,15 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   public async doSearch(e: Event) {
+    this.showNoResultWarning = false;
+
     // Cancel any previous search
     this.abortController.abort();
     // Create a new controller for the new request
     const currentAbortController = new AbortController();
     this.abortController = currentAbortController;
 
-    const target = e.target! as HTMLInputElement;
+    const target = e.target as HTMLInputElement;
     const term = target.value.trim();
     this.clearSearch();
 
@@ -159,10 +163,17 @@ class SearchComponent extends GirafeHTMLElement {
     if (term.length > 0) {
       const url = this.configManager.Config.search.url
         .replace(this.searchTermPlaceholder, term)
-        .replace(this.searchLangPlaceholder, this.state.language!);
+        .replace(this.searchLangPlaceholder, this.state.language as string);
       try {
         const response = await fetch(url, { signal: this.abortController.signal });
         const data = await response.json();
+
+        // If the search term is at least two charecter but yieds no result, a warning
+        // box is displayed for 2 seconds and then fades out (CSS)
+        if ((data.features as SearchResult[]).length === 0 && term.length >= 2) {
+          this.showNoResultWarning = true;
+        }
+
         this.displayResults(data);
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
@@ -200,9 +211,9 @@ class SearchComponent extends GirafeHTMLElement {
    * @param term typed string
    */
   private displayCoordinates(term: string) {
-    const matches = this.COORD_REGEX.exec(term)!;
-    const coord1 = parseFloat(matches[1].replace(',', '.'));
-    const coord2 = parseFloat(matches[2].replace(',', '.'));
+    const matches = this.COORD_REGEX.exec(term) as RegExpExecArray;
+    const coord1 = Number.parseFloat(matches[1].replace(',', '.'));
+    const coord2 = Number.parseFloat(matches[2].replace(',', '.'));
 
     const current_srid = this.map.getView().getProjection().getCode();
     const [east_coord, north_coord] = parseCoordinates([coord1, coord2], this.maxExtent, current_srid);
@@ -224,19 +235,15 @@ class SearchComponent extends GirafeHTMLElement {
     } as SearchResult;
 
     this.allResults = [result];
-    this.groupedResults['recenter_map'] = [result];
+    this.groupedResults.recenter_map = [result];
     super.render();
     super.girafeTranslate();
   }
 
   private displayResults(results: { type: string; features: SearchResult[] }) {
-    const uniqueLayersNames = Array.from(
-      new Set(results.features.map((f) => f.properties?.layer_name).filter((name) => name !== undefined))
-    );
-    console.log('uniqueLayersNames:', uniqueLayersNames);
-
     // First, group the results
-    results.features.forEach((result) => {
+    for (const result of results.features) {
+    // results.features.forEach((result) => {
       let type = 'Unknown layer type';
       if (result.properties) {
         if (result.properties.layer_name) {
@@ -259,10 +266,10 @@ class SearchComponent extends GirafeHTMLElement {
       }
 
       resultList.push(result);
-    });
+    }
 
     // Manage a flat list with all results
-    this.allResults = Object.values(this.groupedResults).flatMap((results) => results);
+    this.allResults = Object.values(this.groupedResults).flat()
 
     // And then rerender the results
     super.render();
@@ -407,13 +414,13 @@ class SearchComponent extends GirafeHTMLElement {
         return;
       }
       case 'GeometryCollection': {
-        geometry.geometries.forEach((geom) => {
+        for (const geom of geometry.geometries) {
           this.addFeatureToPreview(geom);
-        });
+        }
         return;
       }
       default:
-        throw new Error(`Geometry type of search result is not being supported.`);
+        throw new Error("Geometry type of search result is not being supported.");
     }
   }
 
@@ -445,7 +452,7 @@ class SearchComponent extends GirafeHTMLElement {
       // Result with geometry
       this.zoomTo(result.bbox);
     } else {
-      let clonedTheme;
+      let clonedTheme: ThemeLayer | undefined;
       if (result.properties?.actions[0].action === 'add_theme') {
         const theme = this.themesHelper.findThemeByName(result.properties?.actions[0].data);
         clonedTheme = theme.clone();
@@ -479,7 +486,7 @@ class SearchComponent extends GirafeHTMLElement {
     const bufferedExtent = buffer(extent, bufferValue);
 
     const minResolution = this.configManager.Config.search.minResolution;
-    const currentResolution = this.map.getView().getResolution()!;
+    const currentResolution = this.map.getView().getResolution() as number;
     const currentExtent = this.map.getView().calculateExtent();
 
     if (minResolution) {
@@ -500,7 +507,12 @@ class SearchComponent extends GirafeHTMLElement {
   public onMouseMove() {
     // if the mouse moves, we activate the hover effect
     const results = this.shadowRoot?.querySelectorAll('.result');
-    for (const result of results!) {
+    
+    if (!results) {
+      return;
+    }
+
+    for (const result of results) {
       result.classList.remove('active');
       const htmlResult = result as HTMLElement;
       htmlResult.style.removeProperty('background-color');
@@ -568,26 +580,29 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   private updatePreviewLayerStyle(fillColor?: string | number[], strokeColor?: string) {
+    if (!this.previewGeoLayer) {
+      return;
+    }
+
     // Only update style if new colors were provided via color picker or default colors have changed
     if (this.defaultColorHasChanged()) {
       this.defaultSearchFillColor = this.configManager.Config.search.defaultFillColor as string;
       this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor as string;
     }
-    fillColor ??= this.defaultSearchFillColor;
-    strokeColor ??= this.defaultSearchStrokeColor;
+    const strokeColorWithFallback = strokeColor ?? this.defaultSearchStrokeColor;
 
-    this.previewGeoLayer!.setStyle(
+    this.previewGeoLayer.setStyle(
       new Style({
         stroke: new Stroke({
-          color: strokeColor,
+          color: strokeColorWithFallback,
           width: this.configManager.Config.search.defaultStrokeWidth
         }),
-        fill: new Fill({ color: fillColor }),
+        fill: new Fill({ color: fillColor ?? this.defaultSearchFillColor }),
         image: new Icon({
           anchor: [0.5, 1],
           anchorXUnits: 'fraction',
           anchorYUnits: 'fraction',
-          src: this.getColoredPinIcon(strokeColor),
+          src: this.getColoredPinIcon(strokeColorWithFallback),
           scale: 0.3
         })
       })
@@ -611,7 +626,7 @@ class SearchComponent extends GirafeHTMLElement {
                              307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/>
                  </svg>`;
 
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent(pin);
+    return `data:image/svg+xml;utf8,${encodeURIComponent(pin)}`;
   }
 }
 

@@ -25,6 +25,7 @@ body {
   --tst: #ff0000;
   --error-color: #bb0000;
   --svg-filter: none;
+  --warning-color: #ffa500;
 }
 
 girafe-theme-select {
