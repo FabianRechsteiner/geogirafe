@@ -58,17 +58,7 @@ export default class EditComponent extends GirafeHTMLElement {
     this.stateManager = StateManager.getInstance();
     this.oapifManager = OgcApiFeaturesManager.getInstance();
     this.map = MapManager.getInstance().getMap();
-
-    // List of POC demo layers
-    //  The GMF demo layer is only selectable when in the experimental demo and logged in
-    const isOnGMF29DemoAndLoggedIn =
-      this.configManager.Config.themes.url.includes('geomapfish-demo-2-9.camptocamp') &&
-      this.state.oauth.status === 'loggedIn';
-    this.editableLayersList = Object.keys(DEMO_INSTANCES)
-      .filter((layerID) => layerID !== 'GMF' || isOnGMF29DemoAndLoggedIn)
-      .map((layerID) => {
-        return { id: layerID, name: DEMO_INSTANCES[layerID].name };
-      });
+    this.subscribe('oauth.status', () => this.loginStateChanged());
   }
 
   render() {
@@ -88,6 +78,20 @@ export default class EditComponent extends GirafeHTMLElement {
   private renderEmptyComponent() {
     this.resetComponent();
     this.renderEmpty();
+  }
+
+  private loginStateChanged() {
+    // List of POC demo layers
+    // The GMF demo layer is only selectable when in the experimental demo and logged in
+    const isOnGMF29DemoAndLoggedIn =
+      this.configManager.Config.themes.url.includes('geomapfish-demo-2-9.camptocamp') &&
+      this.state.oauth.status === 'loggedIn';
+    this.editableLayersList = Object.keys(DEMO_INSTANCES)
+      .filter((layerID) => layerID !== 'GMF' || isOnGMF29DemoAndLoggedIn)
+      .map((layerID) => {
+        return { id: layerID, name: DEMO_INSTANCES[layerID].name };
+      });
+    this.render();
   }
 
   public onSelectLayer(evt: Event) {
