@@ -5,6 +5,7 @@ import MobileSearchComponent from './components/search-mobile/component';
 import MobileThemeComponent from './components/themes-mobile/component';
 import OfflineComponent from './components/offline/component';
 import { initialize } from './initialize';
+import SwipeUpPanelMobile from './components/swipe-up-panel-mobile/component';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
@@ -48,6 +49,7 @@ initialize().then(() => {
   customElements.define('girafe-search', MobileSearchComponent);
   customElements.define('girafe-theme-select', MobileThemeComponent);
   customElements.define('girafe-offline', OfflineComponent);
+  customElements.define('girafe-swipe-up-panel', SwipeUpPanelMobile);
 
   // To prevent the FOUC effect (flash of unstyled content),
   // the html element is set to invisible when the application starts.
