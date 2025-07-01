@@ -189,6 +189,11 @@ class GirafeConfig {
     getUrl: string | undefined;
     postUrl: string | undefined;
   };
+  contact: {
+    url: string;
+    reasons: string[];
+    email: string;
+  };
   // The extended configuration can be used by third-party components or extensions
   // to add custom attributes to the GirafeConfig.
   extendedConfig?: Record<string, object>;
@@ -225,6 +230,7 @@ class GirafeConfig {
     this.userdata = this.initUserData(config);
     this.contextmenu = this.initContextMenu(config);
     this.crs = this.initCRS(config);
+    this.contact = this.initConfigContact(config);
     this.extendedConfig = this.initExtendedConfig(config);
 
     try {
@@ -440,6 +446,10 @@ class GirafeConfig {
       ...defaultConfig,
       ...config.infoWindow
     };
+  }
+
+  private initConfigContact(config: GirafeConfig) {
+    return config.contact;
   }
 
   private initConfigOffline(config: GirafeConfig) {

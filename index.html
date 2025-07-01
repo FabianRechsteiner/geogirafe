@@ -142,6 +142,10 @@
             slot="main"
             data-toggle-path="interface.sharePanelVisible"
             data-title="share-panel"></girafe-share>
+          <girafe-contact
+            slot="main"
+            data-toggle-path="interface.contactPanelVisible"
+            data-title="contact-panel"></girafe-contact>
         </girafe-lr-panel>
 
         <girafe-info-window></girafe-info-window>
@@ -169,6 +173,7 @@
       <button
         slot="menu-content"
         class="gg-icon-button gg-big"
+        plugin="state:lidar"
         onclick="document.geogirafe.state.interface.crossSectionPanelVisible = !document.geogirafe.state.interface.crossSectionPanelVisible">
         <img alt="cross-section-icon" src="icons/cross-section.svg" />
       </button>
@@ -188,6 +193,12 @@
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.layoutPanelVisible = !document.geogirafe.state.interface.layoutPanelVisible">
         <img alt="layout-icon" src="icons/layout.svg" />
+      </button>
+      <button
+        class="gg-icon-button gg-big"
+        plugin="config:contact"
+        onclick="document.geogirafe.state.interface.contactPanelVisible = !document.geogirafe.state.interface.contactPanelVisible">
+        <img alt="layout-icon" src="icons/mail.svg" />
       </button>
       <button class="gg-icon-button gg-big" plugin="plugin_infra3d" onclick="alert('plugin')">
         <img alt="help-icon" src="icons/infra3d.svg" />

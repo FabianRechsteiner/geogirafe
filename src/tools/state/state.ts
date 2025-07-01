@@ -24,6 +24,7 @@ type GraphicalInterface = {
   layoutPanelVisible: boolean;
   aboutPanelVisible: boolean;
   userPreferencesPanelVisible: boolean;
+  contactPanelVisible: boolean;
   infoWindowVisible: boolean;
   darkMapMode: boolean;
   darkFrontendMode: boolean;
@@ -179,7 +180,8 @@ export default class State {
     userPreferencesPanelVisible: false,
     infoWindowVisible: false,
     darkMapMode: false,
-    darkFrontendMode: false
+    darkFrontendMode: false,
+    contactPanelVisible: false
   };
 
   userInteractionListeners: GgUserInteractionListener[] = [];

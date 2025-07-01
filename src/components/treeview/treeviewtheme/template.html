@@ -8,16 +8,11 @@
     <!-- Label -->
     <div class="label-container">
       <button
-        class="gg-icon-button gg-small gg-selected"
+        class="gg-icon-button gg-small theme-button"
         onclick="${() => (this.layer as ThemeLayer).isExpanded = !(this.layer as ThemeLayer).isExpanded}">
         <span i18n="${this.layer.name}" class="gg-tree-label"> ${this.layer.name} </span>
       </button>
     </div>
-
-    <!-- Drag -->
-    <button id="drag-button" class="gg-icon-button gg-small gg-grab gg-opacity tool" tip="Move">
-      <img alt="Move layer" src="icons/drag.svg" />
-    </button>
 
     <!-- Remove icon -->
     <button
@@ -25,6 +20,11 @@
       tip="Remove theme"
       onclick="${() => this.deleteTheme()}">
       <img alt="Remove theme" src="icons/trash.svg" />
+    </button>
+
+    <!-- Drag -->
+    <button id="drag-button" class="gg-icon-button gg-small gg-grab gg-opacity tool" tip="Move">
+      <img alt="Move layer" src="icons/drag.svg" />
     </button>
   </header>
 

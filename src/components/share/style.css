@@ -63,10 +63,8 @@ input {
 }
 
 .textarea-for-code {
-  max-height: initial;
   line-height: 1.1rem;
   font-size: 0.75rem;
-  height: 6.25rem;
   font-family: monospace, Arial, sans-serif;
 }
 

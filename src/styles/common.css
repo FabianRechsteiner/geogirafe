@@ -89,7 +89,8 @@ a:visited {
   background-color: var(--bkg-color);
   color: var(--text-color);
   border: none;
-  display: inline-block;
+  display: flex;
+  align-items: center;
   padding: 0;
   margin: 0;
 }
@@ -98,12 +99,13 @@ a:visited {
 .gg-input,
 .gg-label {
   min-height: calc(var(--app-standard-height) / 1.5);
-  max-height: calc(var(--app-standard-height) / 1.5);
-  line-height: calc(var(--app-standard-height) / 1.5);
 }
 .gg-textarea {
+  max-height: initial;
   padding: 0.5rem;
   height: 6rem;
+  resize: vertical;
+  line-height: 1.3rem;
 }
 .gg-input {
   cursor: text;
@@ -127,6 +129,14 @@ a:visited {
   background-color: lightgrey;
   color: grey;
   border: none;
+  cursor: not-allowed;
+}
+
+.gg-input:disabled,
+.gg-select:disabled,
+.gg-textarea:disabled {
+  background-color: lightgrey;
+  color: grey;
   cursor: not-allowed;
 }
 
