@@ -2,6 +2,7 @@ import tippy from 'tippy.js';
 import AboutComponent from './components/about/component';
 import BasemapComponent from './components/basemap/component';
 import CoordinateComponent from './components/coordinate/component';
+import ContactComponent from './components/contact/component';
 import MapContextMenuComponent from './components/context-menu/component';
 import MapDefaultContextMenuContentComponent from './components/context-menu/default-context-menu-content/component';
 import MapCustomContextMenuContentComponent from './components/context-menu/custom-context-menu-content/component';
@@ -69,6 +70,7 @@ initialize().then(() => {
   customElements.define('girafe-about', AboutComponent);
   customElements.define('girafe-basemap', BasemapComponent);
   customElements.define('girafe-coordinate', CoordinateComponent);
+  customElements.define('girafe-contact', ContactComponent);
   customElements.define('girafe-context-menu', MapContextMenuComponent);
   customElements.define('girafe-default-context-menu-content', MapDefaultContextMenuContentComponent);
   customElements.define('girafe-custom-context-menu-content', MapCustomContextMenuContentComponent);

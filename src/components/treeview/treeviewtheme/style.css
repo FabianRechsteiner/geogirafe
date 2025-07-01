@@ -1,13 +1,15 @@
 header {
-  border: solid 1px #ddd;
-  border-radius: 1rem;
-  margin: 0.5rem;
+  border: none;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
   flex-direction: row-reverse;
   position: relative;
 }
 
-header:hover {
-  background-color: var(--bkg-color-grad1);
+.theme-button:hover {
+  background-color: transparent;
+  cursor: default;
+  border: none;
 }
 
 .children {
@@ -29,10 +31,6 @@ header:hover {
 .label-container button {
   flex-grow: 1;
   text-align: center;
-}
-
-button {
-  border-radius: 1rem;
 }
 
 .tool {
