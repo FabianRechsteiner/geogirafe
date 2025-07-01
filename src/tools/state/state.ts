@@ -6,10 +6,11 @@ import type BaseLayer from '../../models/layers/baselayer';
 import type ThemeLayer from '../../models/layers/themelayer';
 import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
-import { TokenEndpointResponse } from 'oauth4webapi';
-import SelectionParam from '../../models/selectionparam';
-import { GgUserInteractionListener } from './userInteractionManager';
-import CustomTheme from '../../models/customtheme';
+import type { TokenEndpointResponse } from 'oauth4webapi';
+import type SelectionParam from '../../models/selectionparam';
+import type { GgUserInteractionListener } from './userInteractionManager';
+import type CustomTheme from '../../models/customtheme';
+import { systemIsInDarkMode } from '../utils/utils';
 
 type GraphicalInterface = {
   helpVisible: boolean;
@@ -28,6 +29,7 @@ type GraphicalInterface = {
   infoWindowVisible: boolean;
   darkMapMode: boolean;
   darkFrontendMode: boolean;
+  swipeupPanelMode: SwipeupPanelMode;
 };
 
 type Selection = {
@@ -94,7 +96,7 @@ type UserInfo = {
   given_name: string;
   is_intranet: boolean;
   two_factor_enable: boolean;
-  roles: Object[];
+  roles: unknown[];
   functionalities?: Functionalities;
 };
 
@@ -129,6 +131,16 @@ export type InfoWindow = {
   top: string | number | null;
   left: string | number | null;
 };
+
+/**
+ * The pannel can be:
+ * - "closed": it is invisible, below screen
+ * - "reduced": only a small tray is visible at the bottom of the screen
+ * - "half": about half of the screen
+ * - "full": the pannel is fully open, covering up to almost the top of the screen
+ * - "manual": a state reserved for when the panel handle was used to manually adjust the panel height
+ */
+export type SwipeupPanelMode = 'closed' | 'reduced' | 'half' | 'full' | 'manual';
 
 export default class State {
   /**
@@ -180,8 +192,10 @@ export default class State {
     userPreferencesPanelVisible: false,
     infoWindowVisible: false,
     darkMapMode: false,
-    darkFrontendMode: false,
-    contactPanelVisible: false
+    // TODO: remove of adjust this when the component UserDataManager is monted on mobile UI
+    darkFrontendMode: systemIsInDarkMode() ?? false,
+    swipeupPanelMode: 'closed',
+    contactPanelVisible: false,
   };
 
   userInteractionListeners: GgUserInteractionListener[] = [];
@@ -257,7 +271,7 @@ export default class State {
   };
 
   // Indicates is the application is currently used in offline mode
-  isOffline: boolean = false;
+  isOffline = false;
 
   oauth: LoginState = {
     status: 'loggedOut',

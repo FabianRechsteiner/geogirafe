@@ -146,4 +146,14 @@ export async function initialize() {
     themesManager: ThemesManager.getInstance(),
     configManager: ConfigManager.getInstance()
   };
+
+  // Automatically toggle dark/light mode when changed in the system
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    const state = StateManager.getInstance().state;
+    if (e.matches) {
+      state.interface.darkFrontendMode = true;
+    } else {
+      state.interface.darkFrontendMode = false;
+    }
+  });
 }

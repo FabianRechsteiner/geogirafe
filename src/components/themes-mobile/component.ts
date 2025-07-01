@@ -1,20 +1,20 @@
-import Basemap from '../../models/basemap';
+import type Basemap from '../../models/basemap';
 import ShareManager from '../../tools/share/sharemanager';
 import Layer from '../../models/layers/layer';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MapManager from '../../tools/state/mapManager';
 import ThemeLayer from '../../models/layers/themelayer';
 import LayerManager from '../../tools/layers/layermanager';
-import BaseLayer from '../../models/layers/baselayer';
+import type BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 
 class MobileThemeComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  public showBasemaps: boolean = true;
-  public menuOpen: boolean = false;
-  private preventBlur: boolean = false;
+  public showBasemaps = true;
+  public menuOpen = false;
+  private preventBlur = false;
 
   constructor() {
     super('themes-mobile');
@@ -73,17 +73,15 @@ class MobileThemeComponent extends GirafeHTMLElement {
       layers: BaseLayer[],
       parentThemeIcon = this.state.themes.lastSelectedTheme?.icon
     ): [Layer, string][] => {
-      return layers
-        .map((l) => {
-          if (l instanceof ThemeLayer) {
-            return flattenLayerGroupsRecursive(l.children, l.icon);
-          }
-          if (l instanceof GroupLayer) {
-            return flattenLayerGroupsRecursive(l.children, parentThemeIcon);
-          }
-          return [[l as Layer, parentThemeIcon]];
-        })
-        .flat() as [Layer, string][];
+      return layers.flatMap((l) => {
+        if (l instanceof ThemeLayer) {
+          return flattenLayerGroupsRecursive(l.children, l.icon);
+        }
+        if (l instanceof GroupLayer) {
+          return flattenLayerGroupsRecursive(l.children, parentThemeIcon);
+        }
+        return [[l as Layer, parentThemeIcon]];
+      }) as [Layer, string][];
     };
     return flattenLayerGroupsRecursive(this.state.layers.layersList);
   }
