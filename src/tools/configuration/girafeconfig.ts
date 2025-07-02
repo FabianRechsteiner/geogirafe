@@ -110,7 +110,7 @@ class GirafeConfig {
     tilesetsUrls: string[];
     maximumZoomDistance: number;
   };
-  lidar: {
+  lidar?: {
     url: string;
   };
   contextmenu: {
@@ -189,7 +189,7 @@ class GirafeConfig {
     getUrl: string | undefined;
     postUrl: string | undefined;
   };
-  contact: {
+  contact?: {
     url: string;
     reasons: string[];
     email: string;
@@ -403,12 +403,7 @@ class GirafeConfig {
   }
 
   private initConfigLidar(config: GirafeConfig) {
-    if (!config.lidar?.url) {
-      console.info('No LiDAR URL');
-    }
-    return {
-      url: config.lidar?.url ?? 'noLidarUrlInConfig'
-    };
+    return config.lidar;
   }
 
   private initConfigCsv(config: GirafeConfig) {

@@ -43,7 +43,7 @@ class CrossSectionViewComponent extends GirafeResizableElement {
   }
 
   async initPytreeManager() {
-    const baseURL = ConfigManager.getInstance().Config.lidar.url.replace(/\/?$/, '/');
+    const baseURL = ConfigManager.getInstance().Config.lidar?.url.replace(/\/?$/, '/') ?? '';
     this.pytreeManager = new PytreeManager(baseURL);
 
     await this.pytreeManager.getConfig();

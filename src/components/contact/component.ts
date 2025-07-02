@@ -38,7 +38,7 @@ class ContactComponent extends GirafeHTMLElement {
     const reason = (this.shadow.getElementById('reason') as HTMLSelectElement).value;
     const message = (this.shadow.getElementById('message') as HTMLTextAreaElement).value;
 
-    if (!this.configManager.Config.contact.reasons.includes(reason)) {
+    if (!this.configManager.Config.contact?.reasons.includes(reason)) {
       window.gAlert('Invalid reason', 'Cannot send message');
       return;
     }
