@@ -1,4 +1,3 @@
-import ConfigManager from './tools/configuration/configmanager';
 import OfflineManager from './tools/offline/offlinemanager';
 import MapComponent from './components/map/component';
 import MobileSearchComponent from './components/search-mobile/component';
@@ -22,9 +21,6 @@ declare const Connection: {
   CELL: string;
   NONE: string;
 };
-
-// Tell configManager it should load the mobile configuration as well
-ConfigManager.getInstance().initMobile();
 
 // Common initialization
 initialize().then(() => {

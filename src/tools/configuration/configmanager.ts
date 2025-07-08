@@ -10,15 +10,6 @@ class ConfigManager extends GirafeSingleton {
   private loadingPromise: Promise<GirafeConfig> | null = null;
   private readonly storagePathForOverrides: string = 'configOverrides';
 
-  // TODO REG: With multiple interface (not only desktop and mobile)
-  // We have to find another solution here.
-  // Perhaps something more generic where we can pass a list of interfaces
-  private isMobile: boolean = false;
-
-  public initMobile() {
-    this.isMobile = true;
-  }
-
   get Config() {
     return this.config!;
   }
@@ -38,25 +29,32 @@ class ConfigManager extends GirafeSingleton {
 
     // Load config
     this.loadingPromise = (async () => {
-      const response = await fetch('config.json');
-      let jsonConfig = await response.json();
-      if (this.isMobile) {
-        try {
-          const responseMobile = await fetch('config.mobile.json');
-          const jsonMobileConfig = await responseMobile.json();
-          jsonConfig = this.mergeConfigs(jsonConfig, jsonMobileConfig);
-        } catch {
-          console.warn('No configuration found for mobile. Defaulting to desktop configuration.');
+      const configNames = document
+        .querySelector('meta[name=configs]')
+        ?.getAttribute('content')
+        ?.split(',')
+        .map((name) => name.trim());
+      if (!configNames) {
+        throw new Error("No configuration names found in 'configs' meta tag.");
+      }
+      let jsonConfig = {};
+      for (const configName of configNames) {
+        const configUrl = document.querySelector(`link[rel=config-${configName}-url]`)?.getAttribute('href');
+        if (!configUrl) {
+          throw new Error(`Configuration URL for '${configName}' not found in 'config-${configName}-url' meta tag.`);
         }
+        const response = await fetch(configUrl);
+        const newJsonConfig = await response.json();
+        jsonConfig = this.mergeConfigs(jsonConfig, newJsonConfig);
       }
       // Create a backup of the default config before applying overrides
-      this.defaultConfig = new GirafeConfig(structuredClone(jsonConfig));
+      this.defaultConfig = new GirafeConfig(structuredClone(jsonConfig as GirafeConfig));
 
       // Load config overrides and merge them with the default config
       const configOverrides = this.getConfigOverrides(this.defaultConfig.userdata.source);
       jsonConfig = this.mergeConfigs(jsonConfig, configOverrides);
 
-      this.config = new GirafeConfig(jsonConfig);
+      this.config = new GirafeConfig(jsonConfig as GirafeConfig);
       console.log('Application Configuration loaded.');
       return this.config;
     })();
