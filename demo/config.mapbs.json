@@ -107,6 +107,28 @@
       { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 1 },
       { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 },
       { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
+    ],
+    "links": [
+      {
+        "translation": "Google Street View",
+        "crs": "EPSG:4326",
+        "url": "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "Google Earth",
+        "crs": "EPSG:4326",
+        "url": "https://earth.google.com/web/@###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "OpenStreetMap",
+        "crs": "EPSG:4326",
+        "url": "https://www.openstreetmap.org/#map=14/###MAPY###/###MAPX###"
+      },
+      {
+        "translation": "map.geo.admin.ch",
+        "crs": "EPSG:2056",
+        "url": "https://map.geo.admin.ch/#/map?lang=en&center=###MAPX###,###MAPY###&z=7"
+      }
     ]
   },
   "crs": [

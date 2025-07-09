@@ -3,9 +3,9 @@
   <div>
     <table class="custom-table">
       <colgroup>
-        <col style="width: 150px" />
-        <col style="width: 120px" />
-        <col style="width: 30px" />
+        <col class="col-1" />
+        <col />
+        <col class="col-3" />
       </colgroup>
       <thead>
         <tr>
@@ -18,20 +18,12 @@
         ${ this.MapContextMenuState.crs.map(f => uHtml`
         <tr>
           <td i18n="${f.translation}"></td>
-          <td>
-            ${ this.printCoordinate(this.proj4(this.projection, f.code, this.position), f.format,
-            f.precision).map((x:string) => uHtml`
-            <div>${x}</div>
-            `)}
-          </td>
+          <td>${ this.printCoordinate(f.coordinate, f.format, f.precision).join(', ') }</td>
           <td>
             <div class="justify-right">
               <button
                 class="gg-icon-button gg-small"
-                tip="Copy value"
-                tip-placement="top"
-                onclick="${() => {navigator.clipboard.writeText(this.printCoordinate(this.proj4(this.projection, f.code, this.position), f.format,
-            f.precision).join(', '))}}">
+                onclick="${() => {navigator.clipboard.writeText(this.printCoordinate(f.coordinate, f.format,f.precision).join(', '))}}">
                 <img src="icons/content_copy.svg" alt="${this.i18nManager.getTranslation('Copy value')}" />
               </button>
             </div>
@@ -41,19 +33,18 @@
         <tr>
           <td i18n="${f.translation}"></td>
           <td>
-            <span class="custom-cell"
-              >${f.content ? f.content : uHtml`<img
+            <div class="center-vertically">
+              ${f.loading ? uHtml`<img
                 src="icons/progress.svg"
                 class="gg-spin gg-small"
-                alt="${this.i18nManager.getTranslation('Loading')}" />`}
-            </span>
+                alt="${this.i18nManager.getTranslation('Loading')}" />
+              ` : ''} ${f.content ? f.content : this.i18nManager.getTranslation('No data')}
+            </div>
           </td>
           <td>
             <div class="justify-right">
               <button
                 class="gg-icon-button gg-small"
-                tip="Copy value"
-                tip-placement="top"
                 onclick="${() => {navigator.clipboard.writeText(f.content ? f.content : '')}}">
                 <img src="icons/content_copy.svg" alt="${this.i18nManager.getTranslation('Copy value')}" />
               </button>
@@ -63,7 +54,17 @@
         `) }
       </tbody>
     </table>
+
+    <div>
+      ${ this.MapContextMenuState.links.map(f => uHtml`
+      <div class="link-div">
+        <a href="${f.content}" target="_blank">${this.i18nManager.getTranslation(f.translation)}</a>
+        <img src="icons/open_in_new.svg" alt="" />
+      </div>
+      `) }
+    </div>
   </div>
+
   <svg class="tooltip-triangle" viewBox="0 0 20 10" preserveAspectRatio="none">
     <polygon points="0,0 10,10 20,0" class="triangle-fill" />
     <path d="M0,0 L10,10 L20,0" class="triangle-border" />

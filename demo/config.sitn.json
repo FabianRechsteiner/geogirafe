@@ -99,7 +99,30 @@
         "suffix": " m",
         "precision": 1,
         "crs": "EPSG:2056",
+        "nodata": 0.0,
         "url": "https://sitn.ne.ch/geodata/pointclouds/Aeriallidar/Lidar2022/05_Grid/mnt/1m/sitn_lidar2022_mnt_1m_b128.cog.tif"
+      }
+    ],
+    "links": [
+      {
+        "translation": "Google Street View",
+        "crs": "EPSG:4326",
+        "url": "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "Google Earth",
+        "crs": "EPSG:4326",
+        "url": "https://earth.google.com/web/@###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "OpenStreetMap",
+        "crs": "EPSG:4326",
+        "url": "https://www.openstreetmap.org/#map=13/###MAPY###/###MAPX###"
+      },
+      {
+        "translation": "map.geo.admin.ch",
+        "crs": "EPSG:2056",
+        "url": "https://map.geo.admin.ch/#/map?lang=en&center=###MAPX###,###MAPY###"
       }
     ]
   },
