@@ -1,0 +1,21 @@
+<div>
+  <div class="title-container">
+    <div
+      class="${this.collapsed ? 'expander' : 'expander expanded'}"
+      onpointerup="${(e: PointerEvent) => this.toggleCollapse(e)}">
+      <img src="icons/expand.svg" alt="Expand the list of themes" />
+    </div>
+    <div><span class="title" i18n="Themes"></span> <span class="counter">${"(" + this.themes.length + ")"}</span></div>
+    <div>
+      <span
+        class="selection"
+        i18n="${this.state.themes.lastSelectedTheme && this.state.themes.lastSelectedTheme.name}"></span>
+    </div>
+  </div>
+
+  <div class="grid">
+    ${Object.values(this.state.themes._allThemes).map((theme: ThemeLayer) => uHtmlFor(theme, theme.id)`
+    <girafe-theme-list-item-mobile themeid="${theme.id}"></girafe-theme-list-item-mobile>
+    `)}
+  </div>
+</div>

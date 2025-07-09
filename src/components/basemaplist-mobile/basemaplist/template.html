@@ -1,0 +1,21 @@
+<div>
+  <div class="title-container">
+    <div
+      class="${this.collapsed ? 'expander' : 'expander expanded'}"
+      onpointerup="${(e: PointerEvent) => this.toggleCollapse(e)}">
+      <img src="icons/expand.svg" alt="Expand the list of basemaps" />
+    </div>
+    <div>
+      <span class="title" i18n="Basemaps"></span> <span class="counter">${"(" + this.basemaps.length + ")"}</span>
+    </div>
+    <div>
+      <span class="selection" i18n="${this.state.activeBasemap && this.state.activeBasemap.name}"></span>
+    </div>
+  </div>
+
+  <div class="grid">
+    ${this.basemaps.map((basemap: Basemap) => uHtmlFor(basemap, basemap.id)`
+    <girafe-basemap-list-item-mobile basemapid="${basemap.id}"></girafe-basemap-list-item-mobile>
+    `)}
+  </div>
+</div>

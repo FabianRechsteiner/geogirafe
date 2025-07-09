@@ -20,6 +20,8 @@ class BasemapComponent extends GirafeHTMLElement {
     this.render();
 
     // Configure default basemap (only if there is no sharedstate)
+    // TODO REG : This is now done in the ThemesManager (in order to work with Mobile as well).
+    // Should we remove the set of activeBasemap from the basemap component?
     if (!this.shareManager.hasSharedState()) {
       for (const basemap of Object.values(basemaps)) {
         if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {

@@ -1,0 +1,66 @@
+.title {
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.counter {
+  font-size: 1.5em;
+  font-weight: 200;
+  opacity: 0.7;
+}
+
+.title-container {
+  background: #833ab4;
+  background: linear-gradient(155deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
+  padding: 1em 0 1em 2em;
+  margin-bottom: 5px;
+  color: white;
+  position: relative;
+}
+
+.layer-list {
+  transition: all ease 0.3s;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.expander {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: inline-flex;
+  width: fit-content;
+  height: fit-content;
+  margin: auto 1.5em;
+  background: #ffffff2a;
+  border-radius: 23px;
+  transition: all 0.3s;
+}
+
+.expander > img {
+  transform: rotate(90deg);
+  filter: brightness(0) invert(1);
+  width: 40px;
+  border-radius: 100%;
+  transition: all 0.3s;
+}
+
+.expanded {
+  transform: rotate(-180deg);
+}
+
+.dark-mode {
+  background: rgb(103, 45, 141);
+  background: linear-gradient(155deg, rgb(103, 45, 141) 0%, rgb(158, 17, 17) 50%, rgb(170, 118, 46) 100%);
+  color: black;
+}
+
+.dark-mode .expander {
+  background: #0000002a;
+}
+
+.dark-mode .expander > img {
+  filter: brightness(0);
+  opacity: 0.6;
+}

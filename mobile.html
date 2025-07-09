@@ -54,19 +54,24 @@
   </head>
 
   <body>
-    <girafe-theme-select></girafe-theme-select>
-    <button
-      class="switch3d girafe-button-big"
-      onclick="document.geogirafe.state.globe.display = document.geogirafe.state.globe.display==='3D'?'2D':'3D'">
-      <img alt="switch-icon" src="icons/globe.svg" />
-    </button>
-    <girafe-offline></girafe-offline>
+    <div class="bottom-button-container-mobile">
+      <button
+        class="switch3d girafe-button-big"
+        onclick="document.geogirafe.state.globe.display = document.geogirafe.state.globe.display==='3D'?'2D':'3D'">
+        <img alt="switch-icon" src="icons/globe.svg" />
+      </button>
+
+      <!-- <girafe-offline></girafe-offline> -->
+
+      <girafe-display-selector-button-mobile></girafe-display-selector-button-mobile>
+    </div>
+
     <girafe-search></girafe-search>
     <div id="content">
       <girafe-map></girafe-map>
     </div>
     <girafe-swipe-up-panel>
-      <div slot="main">some div</div>
+      <girafe-basemap-theme-layer-selector-mobile slot="main"></girafe-basemap-theme-layer-selector-mobile>
     </girafe-swipe-up-panel>
   </body>
 </html>

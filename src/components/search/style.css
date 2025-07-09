@@ -97,8 +97,6 @@
   color: var(--text-color);
 }
 
-
-
 #no-result {
   position: absolute;
   background: var(--warning-color);

@@ -30,6 +30,7 @@ type GraphicalInterface = {
   darkMapMode: boolean;
   darkFrontendMode: boolean;
   swipeupPanelMode: SwipeupPanelMode;
+  swipeupPanelContent: 'selector' | null;
 };
 
 type Selection = {
@@ -40,7 +41,7 @@ type Selection = {
   gridSelected: boolean;
 };
 
-type ThemesConfig = {
+export type ThemesConfig = {
   _allThemes: Record<number, ThemeLayer>;
   isLoaded: boolean;
   lastSelectedTheme: ThemeLayer | CustomTheme | null;
@@ -196,6 +197,7 @@ export default class State {
     darkFrontendMode: systemIsInDarkMode() ?? false,
     swipeupPanelMode: 'closed',
     contactPanelVisible: false,
+    swipeupPanelContent: 'selector'
   };
 
   userInteractionListeners: GgUserInteractionListener[] = [];

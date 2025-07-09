@@ -1,10 +1,17 @@
 import OfflineManager from './tools/offline/offlinemanager';
 import MapComponent from './components/map/component';
 import MobileSearchComponent from './components/search-mobile/component';
-import MobileThemeComponent from './components/themes-mobile/component';
 import OfflineComponent from './components/offline/component';
 import { initialize } from './initialize';
 import SwipeUpPanelMobile from './components/swipe-up-panel-mobile/component';
+import LayerListMobile from './components/layerlist-mobile/layerlist/component';
+import LayerListItemMobile from './components/layerlist-mobile/layerlistitem/component';
+import BasemapListItemMobile from './components/basemaplist-mobile/basemaplistitem/component';
+import BasemapListMobile from './components/basemaplist-mobile/basemaplist/component';
+import ThemeListMobile from './components/themelist-mobile/themelist/component';
+import ThemeListItemMobile from './components/themelist-mobile/themelistitem/component';
+import BasemapThemeLayerSelectorMobile from './components/basemapthemelayerselector-mobile/component';
+import DisplaySelectorButtonMobile from './components/displayselectorbutton-mobile/component';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
@@ -43,8 +50,15 @@ initialize().then(() => {
   // Define components names
   customElements.define('girafe-map', MapComponent);
   customElements.define('girafe-search', MobileSearchComponent);
-  customElements.define('girafe-theme-select', MobileThemeComponent);
   customElements.define('girafe-offline', OfflineComponent);
+  customElements.define('girafe-basemap-list-item-mobile', BasemapListItemMobile);
+  customElements.define('girafe-basemap-list-mobile', BasemapListMobile);
+  customElements.define('girafe-theme-list-item-mobile', ThemeListItemMobile);
+  customElements.define('girafe-theme-list-mobile', ThemeListMobile);
+  customElements.define('girafe-layer-list-item-mobile', LayerListItemMobile);
+  customElements.define('girafe-layer-list-mobile', LayerListMobile);
+  customElements.define('girafe-basemap-theme-layer-selector-mobile', BasemapThemeLayerSelectorMobile);
+  customElements.define('girafe-display-selector-button-mobile', DisplaySelectorButtonMobile);
   customElements.define('girafe-swipe-up-panel', SwipeUpPanelMobile);
 
   // To prevent the FOUC effect (flash of unstyled content),

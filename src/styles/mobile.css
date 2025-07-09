@@ -30,7 +30,7 @@ body {
 
 girafe-theme-select {
   position: fixed;
-  bottom: 1rem;
+  bottom: 10rem;
   left: 1rem;
   z-index: 9;
 }
@@ -40,18 +40,20 @@ girafe-oauth {
   height: 4rem;
 }
 
-.switch3d {
-  position: fixed;
-  bottom: 4rem;
+.bottom-button-container-mobile {
+  position: absolute;
+  width: calc(100vw - 2rem);
+  height: fit-content;
+  bottom: calc(env(safe-area-inset-bottom) + 3rem);
+  z-index: 1;
   left: 1rem;
-  z-index: 8;
-}
-
-girafe-offline {
-  position: fixed;
-  bottom: 7rem;
-  left: 1rem;
-  z-index: 8;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+  justify-items: center;
+  align-items: center;
 }
 
 girafe-search {
