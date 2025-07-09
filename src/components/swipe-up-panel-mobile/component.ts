@@ -1,25 +1,28 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import type { SwipeupPanelMode } from '../../tools/state/state';
 
-
 // Css "top" values corresponding to the above modes:
-const TOP_FULL = 'max( calc( env(safe-area-inset-top) + 2rem)';
+const TOP_FULL = 'calc( env(safe-area-inset-top) + 2rem)';
 const TOP_REDUCED = 'calc(100dvh - env(safe-area-inset-bottom) - 4rem)';
 const TOP_HALF = '50dvh';
 const TOP_CLOSED = '101dvh';
+
+// Velocity of the top sliding gesture applied to the top handle, in pixels per milliseconds,
+// to trigger a closing (if swiping down) or full opening (if swiping up) of the whole panel
+const SLIDE_VELOCITY_THRESHOLD = 1.5;
 
 export default class SwipeUpPanelMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
   private readonly container: HTMLDivElement;
+  private readonly middleContainer: HTMLDivElement;
   private pointerYOrigin = 0;
   private containerTopStart = 0;
   private isPointerDown = false;
   private pointerVelocity = 0;
   private previousPointerY = 0;
   private previousMoveTimestamp = 0;
-
 
   constructor() {
     super('swipe-up-panel-mobile');
@@ -28,6 +31,7 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
     this.render();
 
     this.container = this.shadow.getElementById('swipe-up-panel') as HTMLDivElement;
+    this.middleContainer = this.shadow.querySelector('.middle-container') as HTMLDivElement;
 
     // Toggle to dark mode when needed
     this.subscribe('interface.darkFrontendMode', (_oldValue: boolean, newValue: boolean) => {
@@ -50,7 +54,6 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
       this.animateToMode(newValue);
     });
   }
-
 
   /**
    * Update the state of the panel in an animated way
@@ -76,13 +79,34 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
         break;
     }
 
+    let shoudlUpdate = true;
+
+    // Animate the resizing of the container height to avoid
+    // a single (brutal) update at the end of the resizing
+    const refreshContainerheight = () => {
+      this.adjustMiddleContainerToContent();
+      if (shoudlUpdate) {
+        requestAnimationFrame(refreshContainerheight);
+      }
+    };
+
+    refreshContainerheight();
+
     // Keeping the easing only when folding, removing it after 350ms
     // because the CSS transition takes 300ms
     setTimeout(() => {
+      shoudlUpdate = false;
       this.container.classList.remove('easeTransition');
     }, 350);
   }
 
+  private adjustMiddleContainerToContent() {
+    if (!this.middleContainer || !this.container) {
+      return;
+    }
+
+    this.middleContainer.style.height = `calc(100dvh - max(${TOP_FULL}, ${Number.parseInt(window.getComputedStyle(this.container).top)}px) - 9vw)`;
+  }
 
   swipeHandleOnPointerDown(e: PointerEvent) {
     e.preventDefault();
@@ -91,19 +115,17 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
     this.containerTopStart = Number.parseInt(window.getComputedStyle(this.container).top) || 0;
   }
 
-
   swipeHandleOnPointerUp() {
     this.isPointerDown = false;
 
     // If the panel was dragged upwards or downwards "fast enough", then it goes
     // all the way up or down (closed).
-    if (this.pointerVelocity > 3) {
+    if (this.pointerVelocity > SLIDE_VELOCITY_THRESHOLD) {
       this.state.interface.swipeupPanelMode = 'closed';
-    } else if (this.pointerVelocity < -3) {
+    } else if (this.pointerVelocity < -SLIDE_VELOCITY_THRESHOLD) {
       this.state.interface.swipeupPanelMode = 'full';
     }
   }
-
 
   swipeHandleOnPointerMove(e: PointerEvent) {
     e.preventDefault();
@@ -118,13 +140,13 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
     const newTopValue = this.containerTopStart - deltaY;
 
     // Adjust the height of the entire panel based on the pointer movement (y-axis only)
-    this.container.style.top = this.container.style.top = `min( ${TOP_REDUCED}, max(${TOP_FULL}, ${newTopValue}px)  )`;
+    this.container.style.top = `min( ${TOP_REDUCED}, max(${TOP_FULL}, ${newTopValue}px)  )`;
+    this.middleContainer.style.height = `calc(100dvh - max(${TOP_FULL}, ${newTopValue}px) - 9vw)`;
 
-    this.pointerVelocity = (e.clientY - this.previousPointerY) / (Date.now() - this.previousMoveTimestamp)
-    this.previousPointerY = e.clientY
-    this.previousMoveTimestamp = Date.now()
+    this.pointerVelocity = (e.clientY - this.previousPointerY) / (Date.now() - this.previousMoveTimestamp);
+    this.previousPointerY = e.clientY;
+    this.previousMoveTimestamp = Date.now();
   }
-
 
   closeButtonOnPointerDown() {
     this.state.interface.swipeupPanelMode = 'closed';

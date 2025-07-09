@@ -93,6 +93,16 @@ class ThemesManager extends GirafeSingleton {
     this.state.ogcServers = this.prepareOgcServers(content['ogcServers']);
     if (this.configManager.Config.basemaps.show) {
       this.state.basemaps = this.prepareBasemaps(content['background_layers']);
+
+      // Configure default basemap (only if there is no sharedstate)
+      if (!ShareManager.getInstance().hasSharedState()) {
+        for (const basemap of Object.values(this.state.basemaps)) {
+          if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
+            this.state.activeBasemap = basemap;
+            break;
+          }
+        }
+      }
     }
     this.state.themes._allThemes = this.prepareThemes(content['themes']);
     this.customThemesManager.loadCustomThemes();

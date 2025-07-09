@@ -1,0 +1,5 @@
+<div id="theme-container" class="cover-img" onpointerup="${() => this.activate()}">
+  <div class="${this.isActive ? 'overlay overlay-active' : 'overlay overlay-inactive'}">
+    <div class="${this.isActive ? 'title title-active' : 'title title-inactive'}" i18n="${this.theme.name}"></div>
+  </div>
+</div>

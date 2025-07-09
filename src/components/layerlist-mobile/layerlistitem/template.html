@@ -1,0 +1,42 @@
+<div id="layer-button" onpointerup="${() => this.toggle()}">
+  <div class="sub-container">
+    <div class="${this.layer.active ? 'active toggle-button' : 'inactive toggle-button'}"></div>
+    <div style="width: calc(100% - 60px)">
+      <div class="title" i18n="${this.layer.name}"></div>
+      <div class="title-parent" i18n="${this.layer.parent.name}"></div>
+    </div>
+
+    <div class="floating-right">
+      <div
+        id="expand-bt"
+        class="${this.expanded ? 'faded' : ''}"
+        onpointerup="${(e: PointerEvent) => this.toggleExpand(e)}">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="${this.expanded ? 'sub-container' : 'sub-container display-none'}">
+    <input
+      id="opacity"
+      min="0"
+      max="0.99"
+      step="0.01"
+      value="${this.layer.opacity}"
+      oninput="${(e: PointerEvent) => this.setOpacity(e)}"
+      onpointerdown="${(e: PointerEvent) => e.stopPropagation()}"
+      onpointerup="${(e: PointerEvent) => e.stopPropagation()}"
+      type="range" />
+    <div class="floating-right">
+      <a
+        href="${this.layer.metadataUrl}"
+        class="no-decoration"
+        onpointerup="${(e: PointerEvent) => e.stopPropagation()}"
+        target="_blank">
+        <div class="info-bt">${"i"}</div>
+      </a>
+    </div>
+  </div>
+</div>

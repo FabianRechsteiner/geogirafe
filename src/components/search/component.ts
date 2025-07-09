@@ -243,7 +243,7 @@ class SearchComponent extends GirafeHTMLElement {
   private displayResults(results: { type: string; features: SearchResult[] }) {
     // First, group the results
     for (const result of results.features) {
-    // results.features.forEach((result) => {
+      // results.features.forEach((result) => {
       let type = 'Unknown layer type';
       if (result.properties) {
         if (result.properties.layer_name) {
@@ -269,7 +269,7 @@ class SearchComponent extends GirafeHTMLElement {
     }
 
     // Manage a flat list with all results
-    this.allResults = Object.values(this.groupedResults).flat()
+    this.allResults = Object.values(this.groupedResults).flat();
 
     // And then rerender the results
     super.render();
@@ -420,7 +420,7 @@ class SearchComponent extends GirafeHTMLElement {
         return;
       }
       default:
-        throw new Error("Geometry type of search result is not being supported.");
+        throw new Error('Geometry type of search result is not being supported.');
     }
   }
 
@@ -507,7 +507,7 @@ class SearchComponent extends GirafeHTMLElement {
   public onMouseMove() {
     // if the mouse moves, we activate the hover effect
     const results = this.shadowRoot?.querySelectorAll('.result');
-    
+
     if (!results) {
       return;
     }

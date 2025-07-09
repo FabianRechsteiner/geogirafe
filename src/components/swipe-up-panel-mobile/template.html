@@ -4,16 +4,14 @@
       class="handle-container"
       onpointerdown="${(e: PointerEvent) => this.swipeHandleOnPointerDown(e)}"
       onpointerup="${() => this.swipeHandleOnPointerUp()}"
-      onpointermove="${(e: PointerEvent) => this.swipeHandleOnPointerMove(e)}"
-    >
+      onpointermove="${(e: PointerEvent) => this.swipeHandleOnPointerMove(e)}">
       <div class="handle"></div>
     </div>
     <img
       class="close-button"
       alt="close swipe up panel"
       src="icons/sort-down-black.svg"
-      onpointerdown="${() => this.closeButtonOnPointerDown()}"
-    />
+      onpointerdown="${() => this.closeButtonOnPointerDown()}" />
   </div>
 
   <div class="middle-container">
