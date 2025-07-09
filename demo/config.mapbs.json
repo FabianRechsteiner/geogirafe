@@ -117,7 +117,7 @@
       {
         "translation": "Google Earth",
         "crs": "EPSG:4326",
-        "url": "https://earth.google.com/web/@###MAPY###,###MAPX###"
+        "url": "https://earth.google.com/web/@###MAPY###,###MAPX###,280a,200000d"
       },
       {
         "translation": "OpenStreetMap",
