@@ -1,14 +1,23 @@
 export class MapContextMenuState {
-  position: [number, number] | null = null;
+  visible: boolean = false;
+  position!: [number, number];
   projection: string | null = null;
   crs: {
     code: string;
     translation: string;
     format: 'decimal' | 'dms';
     precision: number;
+    coordinate: [number, number];
   }[] = [];
   sources: {
     id: string;
+    url: string;
+    crs: string;
+    translation: string;
+    content: string | null;
+    loading: boolean;
+  }[] = [];
+  links: {
     url: string;
     crs: string;
     translation: string;

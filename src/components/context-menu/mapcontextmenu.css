@@ -2,7 +2,12 @@
   --contextmenu-border-width: 1px;
   --contextmenu-triangle-width: 20px;
   --contextmenu-triangle-height: 10px;
-  min-width: 300px !important;
+  --popup-min: 300px;
+  --popup-max: 400px;
+
+  min-width: var(--popup-min);
+  max-width: var(--popup-max);
+  width: max-content;
   position: absolute;
   box-sizing: content-box;
   background-color: var(--bkg-color) !important;
@@ -11,7 +16,8 @@
   border-radius: 0px;
   border: var(--contextmenu-border-width) solid var(--text-color-grad1);
   bottom: var(--contextmenu-triangle-height);
-  left: -165px; /* Half popup width + padding */
+  left: 0px;
+  transform: translateX(-50%);
 }
 
 .map-info-contextmenu .tooltip-triangle {

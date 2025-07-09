@@ -127,6 +127,13 @@ class GirafeConfig {
       suffix: string;
       precision: number;
       crs: string;
+      nodata: number;
+      url: string;
+      loading: boolean;
+    }[];
+    links: {
+      translation: string;
+      crs: string;
       url: string;
     }[];
   };
@@ -590,7 +597,8 @@ class GirafeConfig {
         { code: 'EPSG:4326', translation: 'EPSG:4326', format: 'decimal', precision: 7 },
         { code: 'EPSG:4326', translation: 'EPSG:4326-DMS', format: 'dms', precision: 2 }
       ],
-      sources: config.contextmenu?.sources ?? []
+      sources: config.contextmenu?.sources ?? [],
+      links: config.contextmenu?.links ?? []
     };
     return contextMenuConfig;
   }

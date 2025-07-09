@@ -67,7 +67,7 @@ export function decimalToDMS(coordinate: number[]): string[] {
   return [convertToDMS(longitude, false), convertToDMS(latitude, true)];
 }
 
-export function printCoordinate(coordinate: number[], format: 'dms' | 'decimal', precision: number): string[] {
+export function printCoordinate(coordinate: [number, number], format: 'dms' | 'decimal', precision: number): string[] {
   let coordString: string[] = [];
   if (format === 'dms') {
     coordString = decimalToDMS(coordinate);
