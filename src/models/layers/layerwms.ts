@@ -30,6 +30,7 @@ export type LayerWmsOptions = {
   queryLayers?: string;
   time?: ITimeOptions;
   timeAttribute?: string;
+  editable?: string;
 };
 
 class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILayerWithTime {
@@ -68,6 +69,8 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
   public timeRestriction?: string;
   public timeAttribute?: string;
 
+  public editable?: string;
+
   constructor(id: number, name: string, order: number, ogcServer: ServerOgc, options?: GMFTreeItem | LayerWmsOptions) {
     let opts = options ?? {};
     opts = LayerWms.isGMFTreeItem(opts) ? LayerWms.getOptionsFromGMFTreeItem(opts) : opts;
@@ -90,11 +93,17 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     this.queryLayers = opts?.queryLayers;
     this.timeOptions = opts?.time;
     this.timeAttribute = opts?.timeAttribute;
+    this.editable = opts?.editable;
 
     if (this.queryable && (!this.ogcServer.wfsSupport || this.ogcServer.urlWfs?.length === 0)) {
       this.hasError = true;
       this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
       this.queryable = false;
+    }
+    if (this.editable && (!this.ogcServer.oapifSupport || this.ogcServer.urlOapif?.length === 0)) {
+      this.hasError = true;
+      this.errorMessage = 'This layer is defined as editable but no Url for OgcApiFeatures service has been defined.';
+      this.editable = undefined;
     }
     this.setDefaultTimeRestriction();
   }
@@ -121,7 +130,8 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       queryable: this.queryable,
       queryLayers: this.queryLayers,
       time: this.timeOptions,
-      timeAttribute: this.timeAttribute
+      timeAttribute: this.timeAttribute,
+      editable: this.editable
     };
 
     const clonedObject = new LayerWms(this.id, this.name, this.order, this.ogcServer, options);

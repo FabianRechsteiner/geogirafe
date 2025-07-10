@@ -29,6 +29,7 @@ export interface GMFMetadata {
 export interface GMFChildLayer {
   name: string;
   queryable: boolean;
+  editable?: string;
 }
 
 export interface GMFTreeItem {
@@ -74,6 +75,8 @@ export interface GMFServerOgc {
   url: string;
   wfsSupport: boolean;
   urlWfs?: string;
+  oapifSupport?: boolean;
+  urlOapif?: string;
   type: string;
   imageType: string;
   attributes?: GMFServerOgcAttributes;

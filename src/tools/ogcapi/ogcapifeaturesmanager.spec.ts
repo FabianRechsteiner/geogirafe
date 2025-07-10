@@ -3,7 +3,8 @@ import OgcApiFeaturesManager from './ogcapifeaturesmanager';
 import Feature from 'ol/Feature';
 import { Geometry } from 'ol/geom';
 import MockHelper from '../tests/mockhelper';
-import ServerOgcApi, { LayerOapif } from '../../models/serverogcapi';
+import { OapifLayer } from '../../models/serverogcapifeatures';
+import ServerOgc from '../../models/serverogc';
 
 vi.mock('./ogcapifeaturesclient');
 
@@ -15,7 +16,7 @@ describe('OgcApiFeaturesManager', () => {
     MockHelper.stopMocking();
   });
   let manager: OgcApiFeaturesManager;
-  let layer: LayerOapif = {
+  let layer: OapifLayer = {
     url: 'https://testUrl.com',
     collectionId: 'collectionId',
     crs: '',
@@ -24,7 +25,15 @@ describe('OgcApiFeaturesManager', () => {
     attributeName: '',
     attributeType: '',
     serverType: 'default',
-    server: new ServerOgcApi('test', 'https://testUrl.com', 'default')
+    server: new ServerOgc('test', {
+      url: 'https://testUrl.com',
+      wfsSupport: false,
+      urlWfs: '',
+      oapifSupport: true,
+      urlOapif: "'https://testUrl.com",
+      type: 'default',
+      imageType: ''
+    })
   };
 
   beforeEach(() => {
@@ -32,27 +41,37 @@ describe('OgcApiFeaturesManager', () => {
     manager = OgcApiFeaturesManager.getInstance();
   });
 
-  describe('getItemTemplate', () => {
-    it('should return a template object based on queryables', async () => {
-      const mockQueryables = {
-        properties: {
-          name: {},
-          age: {},
-          id: {},
-          geometry: {}
+  describe('getSchema', () => {
+    const mockSchemaResponse = {
+      properties: {
+        geometry: {
+          'format': 'geometry-any',
+          'x-ogc-role': 'primary-geometry'
+        },
+        id: {
+          'type': 'integer',
+          'x-ogc-role': 'id', // Primary key
+          'x-ogc-propertySeq': 0 // Attribute order
+        },
+        titleAttribute: {
+          'title': 'Attr Title',
+          'type': 'string',
+          'maxLength': 100,
+          'x-ogc-propertySeq': 1
+        },
+        doubleAttribute: {
+          'type': 'number',
+          'format': 'double',
+          'x-ogc-propertySeq': 3
         }
-      };
-      (manager.getClient(layer.server).getQueryables as Mock).mockResolvedValue(mockQueryables);
+      }
+    };
 
-      const result = await manager.getItemTemplate(layer);
-      expect(result).toEqual({ name: null, age: null });
-    });
+    it('should return a template object based on the schema', async () => {
+      (manager.getClient(layer.server).getSchema as Mock).mockResolvedValue(mockSchemaResponse);
 
-    it('should handle error and return an empty object', async () => {
-      (manager.getClient(layer.server).getQueryables as Mock).mockRejectedValue(new Error('Error'));
-
-      const result = await manager.getItemTemplate(layer);
-      expect(result).toEqual({});
+      const result = await manager.getSchema(layer);
+      expect(result.template).toEqual({ titleAttribute: null, doubleAttribute: null });
     });
   });
 

@@ -2,6 +2,8 @@ import ConfigManager from '../configuration/configmanager';
 import GirafeConfig from '../configuration/girafeconfig';
 import I18nManager from '../i18n/i18nmanager';
 import UserDataManager from '../userdata/userdatamanager';
+import proj4 from 'proj4';
+import { register } from 'ol/proj/proj4';
 
 class MockHelper {
   public static mockConfig = {
@@ -24,6 +26,7 @@ class MockHelper {
       SwissTopoVectorTiles: true
     },
     projections: {
+      'EPSG:2056': 'LV95',
       'EPSG:3857': 'W-M'
     },
     map: {
@@ -51,7 +54,14 @@ class MockHelper {
     },
     userdata: {
       source: 'localStorage'
-    }
+    },
+    crs: [
+      {
+        code: 'EPSG:2056',
+        definition:
+          '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs'
+      }
+    ]
   };
 
   public static startMocking() {
@@ -66,6 +76,11 @@ class MockHelper {
     userDataManager.deleteAllUserData();
 
     I18nManager.getInstance().translations = { fr: { a: 'translated_a', b: 'translated_b' } };
+
+    MockHelper.mockConfig.crs.forEach((x) => {
+      proj4.defs(x.code, x.definition);
+    });
+    register(proj4);
   }
 
   public static stopMocking() {
