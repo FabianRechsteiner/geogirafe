@@ -43,9 +43,19 @@ class ConfigManager extends GirafeSingleton {
         if (!configUrl) {
           throw new Error(`Configuration URL for '${configName}' not found in 'config-${configName}-url' meta tag.`);
         }
-        const response = await fetch(configUrl);
-        const newJsonConfig = await response.json();
-        jsonConfig = this.mergeConfigs(jsonConfig, newJsonConfig);
+        try {
+          const response = await fetch(configUrl);
+          const newJsonConfig = await response.json();
+          jsonConfig = this.mergeConfigs(jsonConfig, newJsonConfig);
+        } catch {
+          // TODO REG: Manage better the errors at the aplication start:
+          // - the window.gAlert fuction should be callable at the very beggining of the app
+          // - The ErrorManager should handled suches case, but it seems to be initialized too late.
+          // - normal alerts seems to be blocked on mobile.
+          const errorMessage = `Error while reading the configuration file ${configUrl}. Please verify your configuration.`;
+          window.alert(errorMessage);
+          throw new Error(errorMessage);
+        }
       }
       // Create a backup of the default config before applying overrides
       this.defaultConfig = new GirafeConfig(structuredClone(jsonConfig as GirafeConfig));
