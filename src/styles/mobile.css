@@ -58,7 +58,7 @@ girafe-oauth {
 
 girafe-search {
   position: fixed;
-  top: 3rem;
+  top: max(2.5em, calc(env(safe-area-inset-top) + 0.5rem));
   left: 1rem;
   right: 1rem;
   z-index: 20;
