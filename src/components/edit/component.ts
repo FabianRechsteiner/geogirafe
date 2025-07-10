@@ -9,10 +9,13 @@ import { DrawEvent } from 'ol/interaction/Draw';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { Circle, Fill, Stroke, Style } from 'ol/style';
-import ServerOgcApi, { LayerOapif } from '../../models/serverogcapi';
-import { DEMO_INSTANCES } from '../../tools/ogcapi/ogcapifeaturesclient';
 import { bbox } from 'ol/loadingstrategy';
 import { SelectEvent } from 'ol/interaction/Select';
+import EditFromComponent from './editform/component';
+import OgcApiFeaturesSchema from '../../tools/ogcapi/ogcapifeaturesschema';
+import { DEMO_LAYERS } from '../../tools/ogcapi/demolayers';
+import { OapifLayer } from '../../models/serverogcapifeatures';
+import { getSelectionBoxFromMapClick } from '../../tools/utils/olutils';
 
 const getStyle = (col = 'rgb(255,89,0)', width = 4) => {
   return new Style({
@@ -27,6 +30,7 @@ const getStyle = (col = 'rgb(255,89,0)', width = 4) => {
 
 const baseStyle = getStyle();
 const editStyle = getStyle('rgb(0,81,255)', 6);
+const newId = '-';
 
 export default class EditComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -38,7 +42,6 @@ export default class EditComponent extends GirafeHTMLElement {
   visible: boolean = false;
 
   editableLayersList: { name: string; id: string }[] = [];
-  isDrawing: boolean = false;
   private readonly map: Map;
 
   private draw?: Draw;
@@ -47,10 +50,12 @@ export default class EditComponent extends GirafeHTMLElement {
   private drawingLayer?: VectorLayer;
   private drawingSource?: VectorSource<Feature>;
   private feature?: Feature;
-  private propertiesTemplate?: Record<string, string | number | null>;
+
+  public form!: EditFromComponent;
+  private featureSchema?: OgcApiFeaturesSchema;
 
   // POC: Demo layers
-  private layer?: LayerOapif; // Layer definition / config
+  private layer?: OapifLayer; // Layer definition / config
   private demoMapLayer?: VectorLayer; // Layer in the map
 
   constructor() {
@@ -73,6 +78,10 @@ export default class EditComponent extends GirafeHTMLElement {
     this.registerInteractionListener('map.modify', true);
     this.collectEditableLayers();
     this.refreshRender();
+    if (!this.form) {
+      // The attribute form is managed in a subcomponent
+      this.form = this.getById('edit-form');
+    }
   }
 
   private renderEmptyComponent() {
@@ -86,24 +95,25 @@ export default class EditComponent extends GirafeHTMLElement {
     const isOnGMF29DemoAndLoggedIn =
       this.configManager.Config.themes.url.includes('geomapfish-demo-2-9.camptocamp') &&
       this.state.oauth.status === 'loggedIn';
-    this.editableLayersList = Object.keys(DEMO_INSTANCES)
+    this.editableLayersList = Object.keys(DEMO_LAYERS)
       .filter((layerID) => layerID !== 'GMF' || isOnGMF29DemoAndLoggedIn)
       .map((layerID) => {
-        return { id: layerID, name: DEMO_INSTANCES[layerID].name };
+        return { id: layerID, name: DEMO_LAYERS[layerID].name };
       });
+    this.loadDemoServerConfig();
     this.render();
   }
 
-  public onSelectLayer(evt: Event) {
+  public async onSelectLayer(evt: Event) {
     const layerId = (evt.target as HTMLInputElement)?.value;
-    this.layer = DEMO_INSTANCES[layerId];
+    this.layer = DEMO_LAYERS[layerId];
 
     this.removeMapInteractions();
-    this.clearForm();
+    this.unsetEditFeature();
 
     if (this.layer) {
-      this.layer.server = new ServerOgcApi(layerId, this.layer.url, this.layer.serverType);
-      this.oapifManager.getItemTemplate(this.layer).then((response) => (this.propertiesTemplate = response));
+      this.featureSchema = await this.oapifManager.getSchema(this.layer);
+      this.form.setSchema(this.featureSchema);
       this.createDemoMapLayer(); // POC
       this.createMapInteractions();
     } else {
@@ -113,51 +123,63 @@ export default class EditComponent extends GirafeHTMLElement {
   }
 
   public onStartDrawing() {
-    this.drawingSource?.clear();
-    this.select?.getFeatures().clear();
-    this.select?.setActive(false);
-    this.draw?.setActive(true);
-    this.isDrawing = true;
+    this.unsetEditFeature();
+    this.startDrawingMode();
     this.refreshRender();
   }
 
-  public onCancelEditing() {
-    this.resetComponent();
+  public onCancelDrawing() {
+    this.onDiscard();
   }
 
   public onDiscard() {
-    this.select?.getFeatures().clear();
-    this.drawingSource?.clear();
-    this.refreshDemoMapLayer();
-    this.clearForm();
-    this.select?.setActive(true);
+    this.unsetEditFeature();
+    this.startSelectionMode();
     this.refreshRender();
   }
 
+  private startDrawingMode() {
+    // Stop selection mode
+    this.select?.getFeatures().clear();
+    this.select?.setActive(false);
+    // Start drawing mode
+    this.drawingSource?.clear();
+    this.draw?.setActive(true);
+  }
+
+  private startSelectionMode() {
+    this.draw?.setActive(false);
+    this.select?.getFeatures().clear();
+    this.select?.setActive(true);
+  }
+
   public onSave() {
-    this.feature = this.drawingSource?.getFeatures()[0] ?? undefined;
-    this.readoutAttributes();
+    if (!this.feature) return;
     void this.saveFeature();
   }
 
-  public onDelete() {
-    throw new Error('Method not implemented.');
+  public async onDelete() {
+    if (!this.feature || !this.canDelete()) return;
+    const confirm = await window.gConfirm('Do you want to delete this feature?', 'Delete feature');
+    if (confirm) {
+      void this.deleteFeature(this.getFeatureId());
+    }
   }
 
-  public hasFeature() {
-    return this.drawingSource && this.drawingSource.getFeatures().length > 0;
+  public canDelete(): boolean {
+    return this.getFeatureId() !== newId;
   }
 
   private resetComponent() {
     this.removeMapInteractions();
     this.unselectLayer();
     this.removeDemoMapLayer(); // POC
-    this.clearForm();
     this.refreshRender();
   }
 
   private unselectLayer() {
     this.layer = undefined;
+    this.unsetEditFeature();
     this.getById<HTMLSelectElement>('layer-selector').value = '';
   }
 
@@ -190,12 +212,7 @@ export default class EditComponent extends GirafeHTMLElement {
       });
       this.select.on('select', (evt: SelectEvent) => {
         if (!this.canExecute('map.select')) return;
-        this.drawingSource?.clear();
-        if (evt.selected.length > 0) {
-          this.drawingSource?.addFeature(evt.selected[0].clone());
-          this.select?.getFeatures().clear();
-        }
-        this.refreshRender();
+        void this.onSelectFeature(evt);
       });
       this.map.addInteraction(this.select);
     }
@@ -210,10 +227,10 @@ export default class EditComponent extends GirafeHTMLElement {
       style: editStyle
     });
     this.draw.on('drawstart', () => {});
-    this.draw.on('drawend', (_e: DrawEvent) => {
-      this.isDrawing = false;
+    this.draw.on('drawend', (evt: DrawEvent) => {
+      if (!this.canExecute('map.draw')) return;
+      this.setEditFeature(evt.feature);
       this.draw?.setActive(false);
-      this.refreshRender();
     });
     this.draw.setActive(false);
     this.map.addInteraction(this.draw);
@@ -226,10 +243,11 @@ export default class EditComponent extends GirafeHTMLElement {
       condition: () => this.canExecute('map.modify')
     });
     this.map.addInteraction(this.modify);
+    this.modify.setActive(false);
   }
 
   private removeMapInteractions() {
-    this.clearDrawing();
+    this.drawingSource?.clear();
     if (this.select) this.map.removeInteraction(this.select);
     if (this.draw) this.map.removeInteraction(this.draw);
     if (this.modify) this.map.removeInteraction(this.modify);
@@ -239,72 +257,74 @@ export default class EditComponent extends GirafeHTMLElement {
     }
   }
 
-  private clearDrawing() {
+  private async onSelectFeature(evt: SelectEvent) {
     this.drawingSource?.clear();
-    this.feature = undefined;
-    this.draw?.setActive(false);
+    const bbox = getSelectionBoxFromMapClick(evt.mapBrowserEvent.pixel, this.map, 10);
+    const selectedFeature = await this.oapifManager.getItems(
+      this.layer!,
+      this.map.getView().getProjection().getCode(),
+      bbox,
+      1
+    );
+    if (selectedFeature.length > 0) {
+      this.setEditFeature(selectedFeature[0]);
+      if (this.feature) this.drawingSource?.addFeature(this.feature);
+    } else {
+      this.unsetEditFeature();
+    }
+    this.select?.getFeatures().clear();
   }
 
-  private clearForm() {
-    const nameInput = this.getById('attribute-name');
-    if (nameInput instanceof HTMLInputElement) {
-      nameInput.value = '';
+  private setEditFeature(feature: Feature) {
+    if (!feature) {
+      this.unsetEditFeature();
+      return;
     }
+    this.feature = feature;
+    this.form.setFeature(this.feature);
+    this.modify?.setActive(true);
+    this.refreshRender();
+  }
+
+  private unsetEditFeature() {
+    this.feature = undefined;
+    this.drawingSource?.clear();
+    this.form?.setFeature(this.feature);
+    this.modify?.setActive(false);
+    this.refreshRender();
   }
 
   public isValidForm() {
-    // POC: Only allow saving for newly created features without an ID
-    return this.getFeatureId() === '';
-  }
-
-  private readoutAttributes() {
-    if (!this.feature || !this.layer) {
-      return;
-    }
-    const nameInput = this.getById('attribute-test');
-    const properties = this.getPropertiesTemplate();
-    // Set attribute values
-    if (Object.keys(properties).includes(this.layer.attributeName)) {
-      let attrValue: number | string = (nameInput as HTMLInputElement).value;
-      if (this.layer.attributeType === 'number') {
-        attrValue = Number(attrValue);
-      }
-      properties[this.layer.attributeName] = attrValue;
-    }
-    this.feature.setProperties(properties);
-  }
-
-  private getPropertiesTemplate() {
-    let properties = { ...this.propertiesTemplate };
-    // POC: If the OAPIF service did not provide a schema, use the first feature in the source as a template
-    if (Object.keys(properties).length === 0) {
-      const randomFeature = this.demoMapLayer!.getSource()!.getFeatures()[0];
-      properties = { ...(randomFeature?.getProperties() ?? {}) };
-      properties.fid = null;
-      delete properties.geometry;
-      Object.keys(properties).forEach(function (index) {
-        properties[index] = null;
-      });
-    }
-    return properties;
+    return this.form.valid();
   }
 
   private async saveFeature() {
     if (!this.layer || !this.feature) {
       return;
     }
-    // Create the feature on the server
-    const success = await this.oapifManager.createItem(this.layer, this.feature);
 
-    if (success) {
-      this.clearDrawing();
-      this.clearForm();
-      this.refreshDemoMapLayer();
-      this.select?.setActive(true);
-      this.refreshRender();
+    const formValues = this.form.getFormValues();
+    const featureToSave = new Feature();
+    const id = this.getFeatureId();
+    featureToSave.setGeometry(this.feature.getGeometry());
+    featureToSave.setProperties(formValues);
+
+    if (id === newId) {
+      await this.oapifManager.createItem(this.layer, featureToSave);
     } else {
-      void window.gAlert('Error when saving feature', 'Error');
+      featureToSave.setId(id);
+      await this.oapifManager.updateItem(this.layer, id, featureToSave);
     }
+    this.unsetEditFeature();
+    this.refreshDemoMapLayer();
+    this.startSelectionMode();
+  }
+
+  private async deleteFeature(featureId: string) {
+    await this.oapifManager.deleteItem(this.layer!, featureId);
+    this.unsetEditFeature();
+    this.refreshDemoMapLayer();
+    this.startSelectionMode();
   }
 
   private createDemoMapLayer() {
@@ -313,8 +333,8 @@ export default class EditComponent extends GirafeHTMLElement {
       this.removeDemoMapLayer();
     }
     const vectorSource = new VectorSource({
-      loader: async (extent, _resolution, _projection) => {
-        const features = await this.oapifManager.getItems(this.layer!, extent, this.layer!.crs);
+      loader: async (extent, _resolution, projection) => {
+        const features = await this.oapifManager.getItems(this.layer!, projection.getCode(), extent);
         if (features) {
           vectorSource.addFeatures(features);
         }
@@ -376,16 +396,36 @@ export default class EditComponent extends GirafeHTMLElement {
     return text;
   }
 
-  public displayDrawingStartButton() {
-    return !this.hasFeature() && !this.isDrawing;
+  public displayDrawingCancelButton(): boolean {
+    return this.draw?.getActive() ?? false;
   }
 
-  public getFeatureId() {
-    return this.drawingSource?.getFeatures()[0]?.getId() ?? '';
+  public getFeatureId(): string {
+    if (this.feature && this.featureSchema) {
+      return this.feature.getId()?.toString() ?? newId;
+    }
+    return '';
+  }
+
+  public getFeatureProperties() {
+    return this.featureSchema?.formAttributes ?? [];
+  }
+
+  /**
+   * POC: Add ogc servers to the state and preload them.
+   */
+  private loadDemoServerConfig() {
+    this.editableLayersList.forEach((layer) => {
+      if (!this.state.ogcServers[DEMO_LAYERS[layer.id].server.name]) {
+        this.state.ogcServers[DEMO_LAYERS[layer.id].server.name] = DEMO_LAYERS[layer.id].server;
+        void OgcApiFeaturesManager.getInstance().getServer(DEMO_LAYERS[layer.id].server);
+      }
+    });
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
+      // Add ogc servers to state
       this.subscribe('interface.editPanelVisible', (_, newValue) => this.togglePanel(newValue));
       this.render();
     });

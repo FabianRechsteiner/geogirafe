@@ -2,19 +2,29 @@ import { Feature } from 'ol';
 import { Geometry } from 'ol/geom';
 import StateManager from '../state/statemanager';
 import OgcApiFeaturesClient, { OgcApiFeaturesClientOptions } from './ogcapifeaturesclient';
-import OgcApiManager from './ogcapimanager';
-import ServerOgcApi, { LayerOapif } from '../../models/serverogcapi';
 import OgcApiFeaturesClientGeorama from './ogcapifeaturesclientgeorama';
 import OgcApiFeaturesClientGmf from './ogcapifeaturesclientgmf';
+import LayerWms from '../../models/layers/layerwms';
+import ServerOgcApiFeatures, { OapifLayer } from '../../models/serverogcapifeatures';
+import OgcApiFeaturesSchema from './ogcapifeaturesschema';
+import ServerOgc from '../../models/serverogc';
+import VendorSpecificOgcServerManager from '../vendorspecificogcservermanager';
 
 /**
- * Manages interaction between the app and an OGC API Features client (Oapif).
+ * Manages interaction between the GG and an OGC API Features client (OAPIF).
  */
-export default class OgcApiFeaturesManager extends OgcApiManager<OgcApiFeaturesClient, OgcApiFeaturesClientOptions> {
+export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManager<
+  OgcApiFeaturesClient,
+  OgcApiFeaturesClientOptions
+> {
   stateManager: StateManager;
 
   get state() {
     return this.stateManager.state;
+  }
+
+  public getClientId(ogcServer: ServerOgc): string {
+    return ogcServer.urlOapif ?? '';
   }
 
   constructor(type: string) {
@@ -22,40 +32,28 @@ export default class OgcApiFeaturesManager extends OgcApiManager<OgcApiFeaturesC
 
     this.stateManager = StateManager.getInstance();
 
-    // Register the default client
+    // Register the clients
     this.registerClientClass('default', OgcApiFeaturesClient);
     this.registerClientClass('georama', OgcApiFeaturesClientGeorama);
     this.registerClientClass('gmf', OgcApiFeaturesClientGmf);
   }
 
-  public getClientId(server: ServerOgcApi): string {
-    return server.url ?? '';
-  }
-
-  async getItemTemplate(layer: LayerOapif): Promise<Record<string, string | number | null>> {
+  async getSchema(layer: OapifLayer): Promise<OgcApiFeaturesSchema> {
     this.state.loading = true;
     try {
-      const queryables = await this.getClient(layer.server).getQueryables(layer.collectionId);
-      if (queryables?.properties) {
-        return Object.fromEntries(
-          Object.entries(queryables?.properties)
-            .filter(([key]) => !['id', 'geometry'].includes(key))
-            .map(([key]) => [key, null])
-        );
-      } else {
-        return {};
-      }
-    } catch {
-      return {};
+      const schema = await this.getClient(layer.server).getSchema(layer.collectionId);
+      return new OgcApiFeaturesSchema(schema);
+    } catch (e) {
+      throw new Error(`Unable to get schema: ${e}`);
     } finally {
       this.state.loading = false;
     }
   }
 
-  async getItems(layer: LayerOapif, bbox?: number[], bboxCrs?: string): Promise<Feature<Geometry>[]> {
+  async getItems(layer: OapifLayer, crs?: string, bbox?: number[], limit?: number): Promise<Feature<Geometry>[]> {
     this.state.loading = true;
     try {
-      return await this.getClient(layer.server).getItems(layer.collectionId, bbox, bboxCrs);
+      return await this.getClient(layer.server).getItems(layer.collectionId, crs, bbox, limit);
     } catch {
       return [];
     } finally {
@@ -63,10 +61,10 @@ export default class OgcApiFeaturesManager extends OgcApiManager<OgcApiFeaturesC
     }
   }
 
-  async getItem(layer: LayerOapif, featureId: string): Promise<Feature<Geometry> | undefined> {
+  async getItem(layer: OapifLayer, featureId: string): Promise<Feature<Geometry> | undefined> {
     this.state.loading = true;
     try {
-      return await this.getClient(layer.server).getItem(layer.collectionId, featureId, layer.crs);
+      return await this.getClient(layer.server).getItem(layer.collectionId, featureId, this.state.projection);
     } catch {
       return undefined;
     } finally {
@@ -74,32 +72,52 @@ export default class OgcApiFeaturesManager extends OgcApiManager<OgcApiFeaturesC
     }
   }
 
-  async createItem(layer: LayerOapif, feature: Feature<Geometry>): Promise<boolean> {
+  async createItem(layer: OapifLayer, feature: Feature<Geometry>): Promise<boolean> {
     this.state.loading = true;
     try {
-      return await this.getClient(layer.server).createItem(layer.collectionId, feature);
+      return await this.getClient(layer.server).createItem(layer.collectionId, feature, this.state.projection);
     } catch {
+      void window.gAlert('Failed to create feature', 'Error');
       return false;
     } finally {
       this.state.loading = false;
     }
   }
 
-  async updateItem(layer: LayerOapif, featureId: string, feature: Feature<Geometry>): Promise<void> {
+  async updateItem(layer: OapifLayer, featureId: string, feature: Feature<Geometry>): Promise<boolean> {
     this.state.loading = true;
     try {
-      return await this.getClient(layer.server).updateItem(layer.collectionId, featureId, feature);
+      return await this.getClient(layer.server).updateItem(
+        layer.collectionId,
+        featureId,
+        feature,
+        this.state.projection
+      );
+    } catch {
+      void window.gAlert('Failed to update feature', 'Error');
+      return false;
     } finally {
       this.state.loading = false;
     }
   }
 
-  async deleteItem(layer: LayerOapif, featureId: string): Promise<void> {
+  async deleteItem(layer: OapifLayer, featureId: string): Promise<boolean> {
     this.state.loading = true;
     try {
-      await this.getClient(layer.server).deleteItem(layer.collectionId, featureId);
+      return await this.getClient(layer.server).deleteItem(layer.collectionId, featureId);
+    } catch {
+      void window.gAlert('Failed to delete feature', 'Error');
+      return false;
     } finally {
       this.state.loading = false;
     }
+  }
+
+  async getServer(ogcServer: ServerOgc): Promise<ServerOgcApiFeatures>;
+  async getServer(layer: LayerWms): Promise<ServerOgcApiFeatures>;
+  async getServer(object: ServerOgc | LayerWms): Promise<ServerOgcApiFeatures> {
+    const ogcServer = object instanceof LayerWms ? object.ogcServer : object;
+    const client = this.getClient(ogcServer);
+    return client.getServer();
   }
 }

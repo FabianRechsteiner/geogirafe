@@ -5,7 +5,7 @@
     <select
       id="layer-selector"
       class="gg-select"
-      disabled="${this.hasFeature()}"
+      disabled="${this.feature}"
       onchange="${(evt: Event) => this.onSelectLayer(evt)}">
       <option i18n="Choose a layer..." ?selected="true" value="">Choose a layer...</option>
       ${this.editableLayersList.map(layer => uHtmlFor(layer, layer.id)`
@@ -16,54 +16,50 @@
     ${this.layer ? uHtml`
 
     <div class="draw-btn">
-      ${this.displayDrawingStartButton() ? uHtml`
+      ${this.displayDrawingCancelButton() ? uHtml`
+
+      <button class="gg-button gg-medium-withtext btn-active" onclick="${() => this.onCancelDrawing()}">
+        <img alt="cancel-drawing-icon" src="icons/close.svg" />
+        <span i18n="Cancel editing">Cancel editing</span>
+      </button>
+
+      ` : uHtml`
 
       <button class="gg-button gg-medium-withtext" onclick="${() => this.onStartDrawing()}">
         <img alt="start-drawing-icon" src="${this.getButtonIcon()}" />
         <span i18n="${this.getButtonText()}">${this.getButtonText()}</span>
       </button>
 
-      ` : uHtml`
-
-      <button class="gg-button gg-medium-withtext btn-active" onclick="${() => this.onCancelEditing()}">
-        <img alt="cancel-drawing-icon" src="icons/close.svg" />
-        <span i18n="Cancel editing">Cancel editing</span>
-      </button>
-
       `}
     </div>
-
-    ${this.hasFeature() ? uHtml`
-
+    ` : uHtml``} ${this.feature ? uHtml`
     <div class="current-feature">
       <h3 i18n="Current Feature">Current Feature</h3>
       <div class="current-feature-row">
         <div i18n="Feature ID">Feature ID</div>
         <div>${this.getFeatureId()}</div>
-        <button class="gg-button gg-medium-withtext delete-btn" disabled onclick="${() => this.onDelete()}">
+        <button
+          class="${this.canDelete() ? 'gg-button gg-medium-withtext delete-btn' : 'hidden'}"
+          onclick="${() => this.onDelete()}">
           <img alt="delete-icon" src="icons/trash.svg" />
           <span i18n="delete">Delete</span>
         </button>
       </div>
     </div>
+    ` : uHtml``}
 
-    <div class="attribute-form">
-      <div class="attribute-form-row">
-        <label for="attribute-test">${this.layer.attributeName}</label>
-        <input id="attribute-test" type="${this.layer.attributeType}" class="gg-input" />
-      </div>
+    <girafe-edit-form id="edit-form"></girafe-edit-form>
 
-      <div class="attribute-form-btns">
-        <button class="gg-button" disabled="${!this.isValidForm()}" onclick="${() => this.onSave()}">
-          <span i18n="Save">Save</span>
-        </button>
+    ${this.feature ? uHtml`
+    <div class="attribute-form-btns">
+      <button class="gg-button" disabled="${!this.isValidForm()}" onclick="${() => this.onSave()}">
+        <span i18n="Save">Save</span>
+      </button>
 
-        <button class="gg-button" onclick="${() => this.onDiscard()}">
-          <span i18n="Discard">Discard</span>
-        </button>
-      </div>
+      <button class="gg-button" onclick="${() => this.onDiscard()}">
+        <span i18n="Discard">Discard</span>
+      </button>
     </div>
+    ` : uHtml``}
   </div>
-
-  ` : uHtml``} ` : uHtml``}
 </div>

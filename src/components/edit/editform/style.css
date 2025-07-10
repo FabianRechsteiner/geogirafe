@@ -1,0 +1,30 @@
+.current-feature {
+  border-top: var(--app-standard-border);
+  margin-top: 3rem;
+}
+.current-feature-row {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+
+.current-feature-row > button {
+  margin-left: auto;
+}
+
+.attribute-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.attribute-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-weight: bold;
+}

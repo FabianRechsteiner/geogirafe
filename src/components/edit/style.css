@@ -33,7 +33,7 @@
 
 .current-feature {
   border-top: var(--app-standard-border);
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 .current-feature-row {
   display: flex;
@@ -45,17 +45,8 @@
   margin-left: auto;
 }
 
-.attribute-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 3rem;
-}
-
-.attribute-form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.current-feature-row > div:first-child {
+  font-weight: bold;
 }
 
 .attribute-form-btns {

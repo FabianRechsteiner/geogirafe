@@ -5,6 +5,8 @@ export default class ServerOgc {
   url: string;
   wfsSupport: boolean;
   urlWfs?: string;
+  oapifSupport: boolean;
+  urlOapif?: string;
   type: string;
   imageType: string;
   aliases: Record<string, string>;
@@ -14,6 +16,8 @@ export default class ServerOgc {
     this.url = elem.url;
     this.wfsSupport = elem.wfsSupport;
     this.urlWfs = elem.urlWfs;
+    this.oapifSupport = elem.oapifSupport ?? false;
+    this.urlOapif = elem.urlOapif;
     this.type = elem.type;
     this.imageType = elem.imageType;
 

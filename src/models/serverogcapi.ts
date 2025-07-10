@@ -1,16 +1,17 @@
-import { GeometryType } from 'ol/render/webgl/MixedGeometryBatch';
+import { ConformanceLevel } from '../tools/ogcapi/ogcapiconformance';
 
 export default class ServerOgcApi {
-  name: string;
-  url: string;
-  type: string;
+  public url: string;
+  public conformsTo?: Record<ConformanceLevel, boolean>;
 
-  constructor(name: string, url: string, type: string) {
-    this.name = name;
+  constructor(url: string) {
     this.url = url;
-    this.type = type;
   }
 }
+
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS';
+
+export const OgcApiDefaultEncoding = 'application/json';
 
 export type OgcApiLinksResponse = {
   href: string;
@@ -19,38 +20,4 @@ export type OgcApiLinksResponse = {
   title?: string;
   hreflang?: string;
   length?: number;
-};
-
-export type OgcApiQueryablesResponse = {
-  $id?: string;
-  $schema?: string;
-  title?: string;
-  description?: string;
-  type?: string;
-  properties: Record<
-    string,
-    {
-      'title'?: string;
-      'description'?: string;
-      'type'?: string;
-      'format'?: string;
-      'x-ogc-role'?: string;
-      'minimum'?: number;
-      'maximum'?: number;
-      'enum'?: Array<string | number>;
-    }
-  >;
-};
-
-// POC demo layer definition
-export type LayerOapif = {
-  url: string;
-  collectionId: string;
-  crs: string;
-  credentials?: string;
-  geometryType: GeometryType;
-  attributeName: string;
-  attributeType: string;
-  serverType: string;
-  server: ServerOgcApi;
 };
