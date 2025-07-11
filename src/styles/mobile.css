@@ -43,7 +43,6 @@ girafe-oauth {
 .bottom-button-container-mobile {
   position: absolute;
   width: calc(100vw - 2rem);
-  height: fit-content;
   bottom: calc(env(safe-area-inset-bottom) + 3rem);
   z-index: 1;
   left: 1rem;
@@ -54,6 +53,11 @@ girafe-oauth {
   grid-row-gap: 5px;
   justify-items: center;
   align-items: center;
+  pointer-events: none;
+}
+
+.bottom-button-container-mobile > * {
+  pointer-events: auto;
 }
 
 girafe-search {
