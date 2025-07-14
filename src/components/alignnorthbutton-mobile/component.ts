@@ -30,7 +30,6 @@ export default class AlignNorthButtonMobile extends GirafeHTMLElement {
   }
 
   alignNorth(e: PointerEvent) {
-    console.log('compass click');
     MapManager.getInstance().getMap().getView().animate({ rotation: 0, duration: 500 });
     (e.target as HTMLButtonElement).blur();
   }
