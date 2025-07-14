@@ -14,8 +14,8 @@ export default class DisplaySelectorButtonMobile extends GirafeHTMLElement {
     });
   }
 
-  showSelector() {
-    console.log('CLICK');
+  showSelector(e: PointerEvent) {
+    (e.target as HTMLButtonElement).blur();
 
     this.state.interface.swipeupPanelContent = 'selector';
     this.state.interface.swipeupPanelMode = 'half';

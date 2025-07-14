@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="styles/common.mobile.css" />
 
-<button class="girafe-button-big" tip="Theme selection" onpointerup="${() => this.showSelector()}">
+<button class="girafe-button-big" tip="Theme selection" onpointerup="${(e: PointerEvent) => this.showSelector(e)}">
   <img alt="menu-icon" src="icons/themes.svg" />
 </button>

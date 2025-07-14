@@ -12,6 +12,7 @@ import ThemeListMobile from './components/themelist-mobile/themelist/component';
 import ThemeListItemMobile from './components/themelist-mobile/themelistitem/component';
 import BasemapThemeLayerSelectorMobile from './components/basemapthemelayerselector-mobile/component';
 import DisplaySelectorButtonMobile from './components/displayselectorbutton-mobile/component';
+import AlignNorthButtonMobile from './components/alignnorthbutton-mobile/component';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
@@ -60,6 +61,7 @@ initialize().then(() => {
   customElements.define('girafe-basemap-theme-layer-selector-mobile', BasemapThemeLayerSelectorMobile);
   customElements.define('girafe-display-selector-button-mobile', DisplaySelectorButtonMobile);
   customElements.define('girafe-swipe-up-panel', SwipeUpPanelMobile);
+  customElements.define('girafe-align-north-button-mobile', AlignNorthButtonMobile);
 
   // To prevent the FOUC effect (flash of unstyled content),
   // the html element is set to invisible when the application starts.

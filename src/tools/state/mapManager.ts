@@ -1,12 +1,15 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import Map from 'ol/Map';
-import { Extent } from 'ol/extent';
-import BaseLayer from 'ol/layer/Base';
+import MapOL from 'ol/Map';
+import type { Extent } from 'ol/extent';
+import type BaseLayer from 'ol/layer/Base';
+import { defaults as defaultControls } from 'ol/control/defaults.js';
 
 /** The singleton containing the main OpenLayers map accessible from everywhere */
 export default class MapManager extends GirafeSingleton {
-  private readonly map = new Map({ layers: [] });
-
+  private readonly map = new MapOL({
+    controls: defaultControls({ rotate: false }),
+    layers: []
+  });
   public getMap() {
     return this.map;
   }

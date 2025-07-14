@@ -1,0 +1,13 @@
+#north-button {
+  outline: none;
+  background-color: white;
+}
+
+#north-button:focus {
+  outline: none;
+  background-color: white;
+}
+
+.black-to-red {
+  filter: invert(27%) sepia(50%) saturate(3000%) brightness(95%) contrast(100%);
+}
