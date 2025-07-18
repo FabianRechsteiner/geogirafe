@@ -397,11 +397,9 @@ class CrossSectionViewComponent extends GirafeResizableElement {
     );
 
     // Delete all annotations (markers)
-    /*
     document.addEventListener('delete-markers', () => {
       this.scatterplot?.deleteAllMarkers();
     });
-    */
 
     // Listen to 'delete-measurements' event emitted by the cross-section settings component (CrossSectionSettingsComponent). Delete all measurements when event fires.
     document.addEventListener('delete-measurements', () => {
@@ -438,10 +436,30 @@ class CrossSectionViewComponent extends GirafeResizableElement {
       };
     }) as EventListener);
 
-    // Listen to 'changemarkers' event emitted by the scatterplot. Update markers array in the state manager when event fires.
+    // Listen to changes in Markers array
     this.panel?.addEventListener('changemarkers', ((e: ChangeMarkersEvent) => {
       console.debug('Cross-section viewer: changemarkers event fired');
-      this.crossSectionState.markers = e.detail.markers;
+
+      const newMarkers = e.detail.markers;
+      const current = this.crossSectionState.markers;
+      const newIdSet = new Set(newMarkers.map((m) => m.id));
+
+      // Update/add markers
+      for (const nm of newMarkers) {
+        const existing = current.find((cm) => cm.id === nm.id);
+        if (existing) {
+          Object.assign(existing, nm);
+        } else {
+          current.push(nm);
+        }
+      }
+
+      // Remove deleted markers
+      for (let i = current.length - 1; i >= 0; i--) {
+        if (!newIdSet.has(current[i].id)) {
+          current.splice(i, 1);
+        }
+      }
     }) as EventListener);
 
     // Listen to 'changemeasurements' event emitted by the scatterplot. Update measurements array in the state manager when event fires.

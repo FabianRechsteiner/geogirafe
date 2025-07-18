@@ -59,29 +59,25 @@
       <button
         class="gg-icon-button gg-big"
         tip="profile_shift_up_help"
-        onclick="${() => this.shiftLinestring([0.0, this.crossSectionState.linestringShift])}"
-        i18n="">
+        onclick="${() => this.shiftLinestring([0.0, this.crossSectionState.linestringShift])}">
         <img src="icons/arrow_up.svg" alt="${this.i18nManager.getTranslation('profile_shift_up_help')}" />
       </button>
       <button
         class="gg-icon-button gg-big"
         tip="profile_shift_down_help"
-        onclick="${() => this.shiftLinestring([0.0, -this.crossSectionState.linestringShift])}"
-        i18n="">
+        onclick="${() => this.shiftLinestring([0.0, -this.crossSectionState.linestringShift])}">
         <img src="icons/arrow_down.svg" alt="${this.i18nManager.getTranslation('profile_shift_down_help')}" />
       </button>
       <button
         class="gg-icon-button gg-big"
         tip="profile_shift_left_help"
-        onclick="${() => this.shiftLinestring([-this.crossSectionState.linestringShift, 0.0])}"
-        i18n="">
+        onclick="${() => this.shiftLinestring([-this.crossSectionState.linestringShift, 0.0])}">
         <img src="icons/arrow_left.svg" alt="${this.i18nManager.getTranslation('profile_shift_left_help')}" />
       </button>
       <button
         class="gg-icon-button gg-big"
         tip="profile_shift_right_help"
-        onclick="${() => this.shiftLinestring([this.crossSectionState.linestringShift, 0.0])}"
-        i18n="">
+        onclick="${() => this.shiftLinestring([this.crossSectionState.linestringShift, 0.0])}">
         <img src="icons/arrow_right.svg" alt="${this.i18nManager.getTranslation('profile_shift_right_help')}" />
       </button>
     </div>
@@ -325,7 +321,7 @@
         id="print-profile-format-btn"
         class="gg-select"
         oninput="${(e: Event) => this.setPrintFileFormat((e.target! as HTMLSelectElement).value as PrintFileFormat)}">
-        <option value="svg" i18n="">SVG</option>
+        <option value="svg" i18n="SVG">SVG</option>
       </select>
       <button
         id="print-profile-btn"
@@ -346,9 +342,9 @@
         id="download-markers-format-btn"
         class="gg-select"
         oninput="${(e: Event) => this.setAnnotationsFileFormat((e.target! as HTMLSelectElement).value as VectorFeatureFileFormat)}">
-        <option value="kml" i18n="">KML</option>
-        <option value="geojson" i18n="">GeoJSON</option>
-        <option value="gpx" i18n="">GPX</option>
+        <option value="kml" i18n="KML">KML</option>
+        <option value="geojson" i18n="GeoJSON">GeoJSON</option>
+        <option value="gpx" i18n="GPX">GPX</option>
       </select>
       <button
         id="download-markers-btn"
@@ -368,9 +364,9 @@
         id="download-linestring-format-btn"
         class="gg-select"
         oninput="${(e: Event) => this.setLineFileFormat((e.target! as HTMLSelectElement).value as VectorFeatureFileFormat)}">
-        <option value="kml" i18n="">KML</option>
-        <option value="geojson" i18n="">GeoJSON</option>
-        <option value="gpx" i18n="">GPX</option>
+        <option value="kml" i18n="KML">KML</option>
+        <option value="geojson" i18n="GeoJSON">GeoJSON</option>
+        <option value="gpx" i18n="GPX">GPX</option>
       </select>
       <button
         id="download-linestring-btn"
