@@ -54,13 +54,18 @@
       "coverageArea": [5.013926957923385, 45.35600133779394, 11.477436312994008, 48.27502358353741]
     },
     "tilesetsUrls": [
-      "https://uzuflycesium.s3.amazonaws.com/Blonay/Cesium/Scene/BlonaymCesium.json",
+      "https://uzuflycesium.s3.amazonaws.com/Blonay/Cesium/Blonay_Cesium_V2/Scene/Blonay_Cesium_V2.json",
       "https://uzuflycesium.s3.amazonaws.com/Chardonne/BTI/Cesium/Scene/ChardonnemCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/Corseaux/BTI/Cesium/Scene/ChardonnemCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/CorsierSurVevey/BTI/Cesium/Scene/CorsiermCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/Jongny/BTI/Cesium/Scene/JongnymCesium.json",
-      "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_lac_sans_lat/Scene/Vevey_cesium_lac_sans_lat.json",
-      "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_cesium_sans_lac/Scene/Vevey_cesium_sans_lac.json"
+      "https://uzuflycesium.s3.amazonaws.com/montreux/GrandRue/3Dtiles/Montreux_Grand_Rue_Clipped_Cesium_1_1/tileset.json",
+      "https://uzuflycesium.s3.amazonaws.com/montreux/GrandRue/3Dtiles/V2/boutiques/tileset.json",
+      "https://uzuflycesium.s3.amazonaws.com/montreux/GrandRue/3Dtiles/V3/terrasses1/tileset.json",
+      "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_Cesium_2024/Scene/Vevey_Cesium_2024.json",
+      "https://uzuflycesium.s3.amazonaws.com/Villeneuve/Cesium/Noville1_Cesium/Scene/Noville1_Cesium.json",
+      "https://uzuflycesium.s3.amazonaws.com/Villeneuve/Cesium/Noville2_Cesium/Scene/Noville2_Cesium.json",
+      "https://uzuflycesium.s3.amazonaws.com/Villeneuve/Cesium/Villeneuve_Cesium/Scene/Villeneuve_Cesium.json"
     ],
     "maximumZoomDistance": 25000
   },
