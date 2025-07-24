@@ -44,7 +44,7 @@
     "scales": [200000, 80000, 40000, 20000, 10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]
   },
   "map3d": {
-    "terrainUrl": "https://3d.geo.admin.ch/ch.swisstopo.terrain.3d/v1/",
+    "terrainUrl": "https://uzuflycesium.s3.amazonaws.com/UzuTerrain/8m/20240110/",
     "terrainImagery": {
       "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
       "minLoD": 8,
