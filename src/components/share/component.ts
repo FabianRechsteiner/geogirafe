@@ -70,13 +70,17 @@ class ShareComponent extends GirafeHTMLElement {
   }
 
   initializeShortenerService() {
-    switch (this.configManager.Config.share.service) {
-      case 'gmf':
-        this.urlShortener = new GmfManager(this.configManager.Config.share.createUrl);
-        break;
-      case 'lstu':
-        this.urlShortener = new LstuManager(this.configManager.Config.share.createUrl);
-        break;
+    const share = this.configManager.Config.share;
+
+    if (share) {
+      switch (share.service) {
+        case 'gmf':
+          this.urlShortener = new GmfManager(share.createUrl);
+          break;
+        case 'lstu':
+          this.urlShortener = new LstuManager(share.createUrl);
+          break;
+      }
     }
   }
 
