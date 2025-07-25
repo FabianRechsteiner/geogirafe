@@ -45,7 +45,7 @@ class GirafeConfig {
     defaultStrokeWidth?: number;
     paintSearchResults?: boolean;
   };
-  print: {
+  print?: {
     url: string;
     formats?: string[];
     defaultFormat?: string;
@@ -80,7 +80,7 @@ class GirafeConfig {
     defaultVertexFillColor: string;
     defaultVertexStrokeWidth: number;
   };
-  share: {
+  share?: {
     service: 'lstu' | 'gmf' | null;
     createUrl: string;
   };
@@ -257,7 +257,6 @@ class GirafeConfig {
       // The application can be started even if the search is not correctly configured
       // We just display a warning in the console
       console.warn(e);
-      this.share = { service: null, createUrl: '' };
     }
 
     try {
@@ -266,7 +265,6 @@ class GirafeConfig {
       // The application can be started even if the print is not correctly configured
       // We just display a warning in the console
       console.warn(e);
-      this.print = { url: '' };
     }
 
     try {

@@ -130,7 +130,7 @@ class PrintComponent extends GirafeHTMLElement {
    */
   onScaleChanged(event: KeyboardEvent) {
     this.printMaskManager?.setManuallySelectedScale(false);
-    if (this.configManager.Config.print.customScale) {
+    if (this.configManager.Config.print?.customScale) {
       if ((event.target as HTMLInputElement)?.value === 'custom') {
         this.showCustomScale = true;
         this.render();
@@ -480,9 +480,9 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    /*/
   private async fetchCapabilities(): Promise<MFPCapabilities | undefined> {
-    this.printUrl = this.configManager.Config.print.url;
-    if (this.printUrl.endsWith('/')) {
-      this.printUrl = this.printUrl.slice(0, -1);
+    const printUrl = this.configManager.Config.print?.url;
+    if (printUrl) {
+      this.printUrl = printUrl.endsWith('/') ? printUrl.slice(0, -1) : printUrl;
     }
     let capabilities: MFPCapabilities | undefined = undefined;
     try {
@@ -518,7 +518,7 @@ class PrintComponent extends GirafeHTMLElement {
 
     const config = this.configManager.Config.print;
     this.initLayouts();
-    const selectedLayout = this.getCapabilitiesLayout(config.defaultLayout ?? '');
+    const selectedLayout = this.getCapabilitiesLayout(config?.defaultLayout ?? '');
     this.selectedLayout = selectedLayout ?? printLayouts[0];
     this.initFormats();
     const clientInfo = this.getClientInfo();
@@ -526,7 +526,7 @@ class PrintComponent extends GirafeHTMLElement {
     this.updateDpis(clientInfo);
     this.state.print.pageSize = [clientInfo.width, clientInfo.height];
 
-    if (config.attributeNames) {
+    if (config?.attributeNames) {
       this.configAttributeNames = config.attributeNames;
     }
     this.updateAvailableAttributes();
@@ -538,9 +538,9 @@ class PrintComponent extends GirafeHTMLElement {
    */
   private initFormats() {
     const config = this.configManager.Config.print;
-    const printFormats = config.formats;
+    const printFormats = config?.formats;
     this.printFormats = PrintComponent.filterValidPrintFormats(printFormats, this.capabilities?.formats);
-    const defaultFormat = config.defaultFormat;
+    const defaultFormat = config?.defaultFormat;
     const validFormat = PrintComponent.getValidDefaultFormat(this.printFormats, defaultFormat);
     this.state.print.format = validFormat ?? this.default_format;
   }
@@ -551,7 +551,7 @@ class PrintComponent extends GirafeHTMLElement {
    */
   private initLayouts() {
     const availableLayouts = this.capabilities?.layouts;
-    const configLayouts = this.configManager.Config.print.layouts;
+    const configLayouts = this.configManager.Config.print?.layouts;
     this.layouts = PrintComponent.filterValidLayouts(availableLayouts, configLayouts);
   }
 
@@ -568,7 +568,7 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private updateScales(clientInfo: MFPCapabilitiesLayoutAttributeClientInfo) {
-    this.scales = PrintComponent.filterValidScales(clientInfo.scales, this.configManager.Config.print.scales);
+    this.scales = PrintComponent.filterValidScales(clientInfo.scales, this.configManager.Config.print?.scales);
     this.printMaskManager?.setPossibleScales(this.scales);
   }
 
@@ -676,7 +676,7 @@ class PrintComponent extends GirafeHTMLElement {
         pageSize: this.state.print.pageSize ?? [],
         dpi: this.getSelectedDpi() ?? this.default_dpi
       },
-      ...this.configManager.Config.print.printLegend
+      ...this.configManager.Config.print?.printLegend
     };
     return this.printManager?.encodeLegend(options) || null;
   }
