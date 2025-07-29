@@ -96,12 +96,17 @@ class I18nManager extends GirafeSingleton {
     return key;
   }
 
-  async translate(dom: DocumentFragment): Promise<void> {
+  async translate(dom: DocumentFragment | HTMLElement): Promise<void> {
     if (!this.stateManager.state?.language) {
       return;
     }
 
-    await this.loadTranslations(this.stateManager.state.language);
+    try {
+      await this.loadTranslations(this.stateManager.state.language);
+    } catch (err) {
+      console.warn('Skipping translation due to config error:', err);
+      return;
+    }
 
     const toTranslate = dom.querySelectorAll('[i18n]');
     toTranslate.forEach((item) => {

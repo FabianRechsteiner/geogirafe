@@ -106,11 +106,11 @@
             <girafe-scale></girafe-scale>
             <girafe-coordinate></girafe-coordinate>
             <span class="copyright">
-              <span>Information without public faith</span>
+              <span i18n="Information without public faith">Information without public faith</span>
               <span>
                 ©
                 <a href="https://doc.geomapfish.dev" target="_blank">GeoGirafe</a>,
-                <a href="https://www.swisstopo.admin.ch/fr/bases-legales" target="_blank">swisstopo</a>,
+                <a href="https://www.swisstopo.admin.ch/en/legal-basis" target="_blank">swisstopo</a>,
                 <a href="http://www.openstreetmap.org/copyright" target="_blank">OSM</a>
               </span>
             </span>
@@ -163,12 +163,14 @@
 
     <div id="buttonbar">
       <button
+        tip="drawing-panel"
         slot="menu-content"
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
         <img alt="draw-icon" src="icons/draw.svg" />
       </button>
       <button
+        tip="print-panel"
         slot="menu-content"
         class="gg-icon-button gg-big"
         plugin="config:print"
@@ -176,6 +178,7 @@
         <img alt="print-icon" src="icons/print.svg" />
       </button>
       <button
+        tip="lidar-panel"
         slot="menu-content"
         class="gg-icon-button gg-big"
         plugin="config:lidar"
@@ -183,12 +186,14 @@
         <img alt="cross-section-icon" src="icons/cross-section.svg" />
       </button>
       <button
+        tip="edit-panel"
         slot="menu-content"
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.editPanelVisible = !document.geogirafe.state.interface.editPanelVisible">
         <img alt="edit-icon" src="icons/edit.svg" />
       </button>
       <button
+        tip="share-panel"
         slot="menu-content"
         class="gg-icon-button gg-big"
         plugin="config:share"
@@ -196,32 +201,36 @@
         <img alt="share-icon" src="icons/share.svg" />
       </button>
       <button
+        tip="layout-panel"
         class="gg-icon-button gg-big"
         plugin="config:map3d"
         onclick="document.geogirafe.state.interface.layoutPanelVisible = !document.geogirafe.state.interface.layoutPanelVisible">
         <img alt="layout-icon" src="icons/layout.svg" />
       </button>
       <button
+        tip="contact-panel"
         class="gg-icon-button gg-big"
         plugin="config:contact"
         onclick="document.geogirafe.state.interface.contactPanelVisible = !document.geogirafe.state.interface.contactPanelVisible">
         <img alt="layout-icon" src="icons/mail.svg" />
       </button>
-      <button class="gg-icon-button gg-big" plugin="plugin_infra3d" onclick="alert('plugin')">
+      <button tip="infra3d" class="gg-icon-button gg-big" plugin="plugin_infra3d" onclick="alert('infra3d')">
         <img alt="help-icon" src="icons/infra3d.svg" />
       </button>
 
       <div class="filler"></div>
 
-      <button class="gg-icon-button gg-big" onclick="document.geogirafe.state.interface.helpVisible = true">
+      <button tip="help" class="gg-icon-button gg-big" onclick="document.geogirafe.state.interface.helpVisible = true">
         <img alt="help-icon" src="icons/help.svg" />
       </button>
       <button
+        tip="about-panel"
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.aboutPanelVisible = !document.geogirafe.state.interface.aboutPanelVisible">
         <img alt="info-icon" src="icons/info.svg" />
       </button>
       <button
+        tip="user-preferences-panel"
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.userPreferencesPanelVisible = !document.geogirafe.state.interface.userPreferencesPanelVisible">
         <img alt="user-preferences-icon" src="icons/config.svg" />
