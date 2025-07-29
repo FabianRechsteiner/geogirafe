@@ -3,13 +3,14 @@
 
 <div id="searchbox">
   <input
+    tip="search_tip"
     id="search"
     class="gg-input"
     length="20"
     maxlength="1000"
     autocomplete="off"
     autocorrect="off"
-    i18n="Search"
+    i18n="Search..."
     placeholder="Search..."
     oninput="${(e:Event) => this.doSearchDebounced(e)}"
     onfocusin="${() => this.onFocusIn()}"
@@ -20,7 +21,10 @@
   <button class="${this.allResults.length > 0 ? 'close-button' : 'hidden'}" onclick="${() => this.clearSearch(true)}">
     <img class="close-icon" alt="close-icon" src="icons/close.svg" />
   </button>
-  <button id="colorPickerBtn" class="${this.paintSearchResults ? 'select-color-button' : 'hidden'}">
+  <button
+    tip="change_search_result_color"
+    id="colorPickerBtn"
+    class="${this.paintSearchResults ? 'select-color-button' : 'hidden'}">
     <img class="select-color-icon" alt="select-color-icon" src="${this.paintbrushIcon}" />
   </button>
 

@@ -131,7 +131,7 @@ export async function initialize() {
   // Initialize the managers
   ErrorManager.getInstance();
   CsvManager.getInstance();
-  I18nManager.getInstance();
+  const i18nManager = I18nManager.getInstance();
   WfsManager.getInstance();
   OrderingManager.getInstance();
   PluginManager.getInstance();
@@ -156,4 +156,10 @@ export async function initialize() {
       state.interface.darkFrontendMode = false;
     }
   });
+
+  // Translate everything in body that is not a component
+  const bodyElement = document.querySelector('body');
+  if (bodyElement) {
+    document.geogirafe.stateManager.subscribe('language', () => i18nManager.translate(bodyElement));
+  }
 }
