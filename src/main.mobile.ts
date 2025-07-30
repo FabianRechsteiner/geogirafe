@@ -13,6 +13,7 @@ import ThemeListItemMobile from './components/themelist-mobile/themelistitem/com
 import BasemapThemeLayerSelectorMobile from './components/basemapthemelayerselector-mobile/component';
 import DisplaySelectorButtonMobile from './components/displayselectorbutton-mobile/component';
 import AlignNorthButtonMobile from './components/alignnorthbutton-mobile/component';
+import StateManager from './tools/state/statemanager';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
@@ -47,6 +48,9 @@ initialize().then(() => {
     // Otherwise, just do it without waiting
     OfflineManager.getInstance().initializeOfflineState(!navigator.onLine);
   }
+
+  const state = StateManager.getInstance().state;
+  state.interface.isMobile = true;
 
   // Define components names
   customElements.define('girafe-map', MapComponent);

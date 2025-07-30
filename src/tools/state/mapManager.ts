@@ -3,11 +3,12 @@ import MapOL from 'ol/Map';
 import type { Extent } from 'ol/extent';
 import type BaseLayer from 'ol/layer/Base';
 import { defaults as defaultControls } from 'ol/control/defaults.js';
+import StateManager from './statemanager';
 
 /** The singleton containing the main OpenLayers map accessible from everywhere */
 export default class MapManager extends GirafeSingleton {
   private readonly map = new MapOL({
-    controls: defaultControls({ rotate: false }),
+    controls: defaultControls({ rotate: false, zoom: StateManager.getInstance().state.interface.isMobile }),
     layers: []
   });
   public getMap() {
