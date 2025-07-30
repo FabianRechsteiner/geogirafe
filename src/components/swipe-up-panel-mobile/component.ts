@@ -2,7 +2,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import type { SwipeupPanelMode } from '../../tools/state/state';
 
 // Css "top" values corresponding to the above modes:
-const TOP_FULL = 'calc( env(safe-area-inset-top) + 2rem)';
+const TOP_FULL = 'calc( env(safe-area-inset-top) + 1rem)';
 const TOP_REDUCED = 'calc(100dvh - env(safe-area-inset-bottom) - 4rem)';
 const TOP_HALF = '50dvh';
 const TOP_CLOSED = '101dvh';
@@ -105,7 +105,7 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
       return;
     }
 
-    this.middleContainer.style.height = `calc(100dvh - max(${TOP_FULL}, ${Number.parseInt(window.getComputedStyle(this.container).top)}px) - 9vw)`;
+    this.middleContainer.style.height = `calc(100dvh - max(${TOP_FULL}, ${Number.parseInt(window.getComputedStyle(this.container).top)}px) - 35px)`;
   }
 
   swipeHandleOnPointerDown(e: PointerEvent) {
@@ -141,7 +141,7 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
 
     // Adjust the height of the entire panel based on the pointer movement (y-axis only)
     this.container.style.top = `min( ${TOP_REDUCED}, max(${TOP_FULL}, ${newTopValue}px)  )`;
-    this.middleContainer.style.height = `calc(100dvh - max(${TOP_FULL}, ${newTopValue}px) - 9vw)`;
+    this.middleContainer.style.height = `max(calc(100dvh - max(${TOP_FULL}, ${newTopValue}px) - 35px), 2rem)`;
 
     this.pointerVelocity = (e.clientY - this.previousPointerY) / (Date.now() - this.previousMoveTimestamp);
     this.previousPointerY = e.clientY;

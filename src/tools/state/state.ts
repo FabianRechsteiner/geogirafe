@@ -13,6 +13,7 @@ import type CustomTheme from '../../models/customtheme';
 import { systemIsInDarkMode } from '../utils/utils';
 
 type GraphicalInterface = {
+  isMobile: boolean;
   helpVisible: boolean;
   drawingPanelVisible: boolean;
   printPanelVisible: boolean;
@@ -179,6 +180,7 @@ export default class State {
 
   // Interface configuration (visible panels, ...)
   interface: GraphicalInterface = {
+    isMobile: false,
     helpVisible: false,
     drawingPanelVisible: false,
     printPanelVisible: false,
