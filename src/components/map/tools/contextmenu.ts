@@ -72,7 +72,11 @@ export class ContextMenu {
   }
 
   setActive(active: boolean): void {
-    active ? this.enable() : this.disable();
+    if (active) {
+      this.enable();
+    } else {
+      this.disable();
+    }
   }
 
   private enable(): void {

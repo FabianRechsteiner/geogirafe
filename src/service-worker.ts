@@ -242,7 +242,7 @@ async function loadFromIndexedDB(request: Request): Promise<Response | null> {
         reject(new Error('Error querying IndexedDB Store.'));
       };
     });
-  } catch (error) {
+  } catch {
     return null;
   }
 }

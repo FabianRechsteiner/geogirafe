@@ -494,7 +494,7 @@ class GirafeConfig {
       locale: config.general.locale ?? GirafeConfig.DEFAULT_LOCALE,
       // NOTE REG: Small hack specific to Vite: When running in debug mode, we force the logLevel to debug.
       // Otherwise we will always have to manually activate it.
-      logLevel: import.meta.env.DEV ? 'debug' : config.general.logLevel ?? 'warn'
+      logLevel: import.meta.env.DEV ? 'debug' : (config.general.logLevel ?? 'warn')
     };
   }
 

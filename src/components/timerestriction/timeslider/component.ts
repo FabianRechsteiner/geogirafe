@@ -77,7 +77,11 @@ class TimeSliderComponent extends TimeWidget {
     this.updateOutputLabel(limit);
     this.updateSliderColorRange();
     this.toggleSliderState(dateStr !== '');
-    limit === 'lower' ? this.validateLowerLimit() : this.validateUpperLimit();
+    if (limit === 'lower') {
+      this.validateLowerLimit();
+    } else {
+      this.validateUpperLimit();
+    }
     if (triggerEvent) this.dispatchTimeChangeEvent();
   }
 

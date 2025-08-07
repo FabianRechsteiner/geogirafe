@@ -85,7 +85,11 @@ class ShareComponent extends GirafeHTMLElement {
   }
 
   render() {
-    this.visible ? this.renderComponent() : this.renderEmptyComponent();
+    if (this.visible) {
+      this.renderComponent();
+    } else {
+      this.renderEmptyComponent();
+    }
     super.girafeTranslate();
   }
 

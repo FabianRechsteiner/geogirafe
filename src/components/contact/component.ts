@@ -73,7 +73,11 @@ class ContactComponent extends GirafeHTMLElement {
   }
 
   render() {
-    this.visible ? super.render() : this.hide();
+    if (this.visible) {
+      super.render();
+    } else {
+      this.hide();
+    }
     super.girafeTranslate();
   }
 

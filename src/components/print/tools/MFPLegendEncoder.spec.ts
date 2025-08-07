@@ -175,7 +175,7 @@ describe('MFPLegendEncoder', () => {
       expect(result?.name).toEqual('testWms');
       // One layer = no subclass, complete directly the current class.
       expect(result?.icons).toEqual([
-        'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000'
+        'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=TRUE&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000'
       ]);
     });
 
@@ -189,13 +189,13 @@ describe('MFPLegendEncoder', () => {
       expect(classes[0]).toEqual({
         name: 'foo',
         icons: [
-          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000'
+          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=TRUE&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000'
         ]
       });
       expect(classes[1]).toEqual({
         name: 'bar',
         icons: [
-          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000'
+          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=TRUE&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000'
         ]
       });
     });
@@ -218,13 +218,13 @@ describe('MFPLegendEncoder', () => {
       expect(classes[0]).toEqual({
         name: 'foo',
         icons: [
-          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000&filtered=houses'
+          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=TRUE&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&SCALE=10000&filtered=houses'
         ]
       });
       expect(classes[1]).toEqual({
         name: 'bar',
         icons: [
-          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000&filtered=houses'
+          'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=TRUE&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000&filtered=houses'
         ]
       });
     });

@@ -90,7 +90,11 @@ class PrintComponent extends GirafeHTMLElement {
    * Fetch the print capabilities at first rendering, then render the print mask too and register to events.
    */
   render() {
-    this.visible ? this.renderComponent() : this.renderEmptyComponent();
+    if (this.visible) {
+      this.renderComponent();
+    } else {
+      this.renderEmptyComponent();
+    }
   }
 
   /**

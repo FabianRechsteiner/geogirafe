@@ -99,7 +99,7 @@ export const rgbStrToRgbaArray = (rgbaStr: string): [number, number, number, num
       .replace(/[^\d,.-]/g, '')
       .split(',')
       .map((c, idx) => (idx < 3 ? Math.round(Number(c)) : Number(c)));
-  } catch (e) {
+  } catch {
     return null;
   }
 

@@ -13,7 +13,7 @@
 
 .modal {
   background: var(--bkg-color);
-  border: var(-app-standard-border);
+  border: var(--app-standard-border);
   min-height: 400px;
   width: 300px;
   box-shadow: 5px 5px 10px rgb(0, 0, 0, 0.2);

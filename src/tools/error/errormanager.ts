@@ -113,7 +113,7 @@ ${stack}
     try {
       const hash = ShareManager.getInstance().getStateToShare();
       return `${base}#${hash}`;
-    } catch (e) {
+    } catch {
       return base;
     }
   }

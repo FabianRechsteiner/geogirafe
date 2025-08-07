@@ -161,7 +161,7 @@ export default class MFPEncoder {
       url = window.location.protocol + url;
     }
     const url_url = new URL(url);
-    const customParams: Record<string, string> = { TRANSPARENT: 'true' };
+    const customParams: Record<string, string> = { TRANSPARENT: 'TRUE' };
     if (url_url.searchParams) {
       url_url.searchParams.forEach((value, key) => {
         customParams[key] = value;

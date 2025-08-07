@@ -64,7 +64,6 @@ export default class MapComponent extends GirafeHTMLElement {
   mapTarget!: HTMLDivElement;
   // TODO REG : Howto use the right type here without importing the whole library (it needs to be imported only on demand) ?
   // This works but needs the library: type OLCesiumType = typeof OLCesium;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map3d!: any;
   map3dTarget!: HTMLDivElement;
   map3dShadowsTimestamp!: number;
@@ -329,7 +328,7 @@ export default class MapComponent extends GirafeHTMLElement {
       // Simple click for single feature selection
       this.olMap.on('singleclick', (e) => {
         if (this.canExecute('map.select')) {
-          this.onClick(e);
+          this.onClick(e as MapBrowserEvent<PointerEvent>);
         }
       });
 
@@ -345,13 +344,13 @@ export default class MapComponent extends GirafeHTMLElement {
       // Current map position
       this.olMap.on('moveend', (e) => {
         if (this.canExecute('map.mousemove')) {
-          this.onMoveEnd(e);
+          this.onMoveEnd(e as MapBrowserEvent<PointerEvent>);
         }
       });
       // Cursor coordinates
       this.olMap.on('pointermove', (e) => {
         if (this.canExecute('map.mousemove')) {
-          this.onPointerMove(e);
+          this.onPointerMove(e as MapBrowserEvent<PointerEvent>);
         }
       });
     }
@@ -365,7 +364,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.state.loading = false;
   }
 
-  onPointerMove(e: MapBrowserEvent<UIEvent>) {
+  onPointerMove(e: MapBrowserEvent<PointerEvent>) {
     this.state.mouseCoordinates = e.coordinate;
   }
 
@@ -384,7 +383,7 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onClick(e: MapBrowserEvent<UIEvent>) {
+  onClick(e: MapBrowserEvent<PointerEvent>) {
     // Build selection box using the default tolerance.
     const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
     const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);

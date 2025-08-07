@@ -17,29 +17,24 @@ class GmfManager implements IUrlShortener {
       shorturl: longUrl
     };
 
-    try {
-      const params = new URLSearchParams();
-      params.append('url', longUrl);
-      const response = await fetch(this.serviceUrl, {
-        method: 'POST',
-        headers: new Headers({
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }),
-        body: params
-      });
+    const params = new URLSearchParams();
+    params.append('url', longUrl);
+    const response = await fetch(this.serviceUrl, {
+      method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }),
+      body: params
+    });
 
-      const response_data = (await response.json()) as GmfSuccessResponse;
-      if (response_data) {
-        return {
-          success: true,
-          shorturl: response_data.short_url
-        };
-      }
-
-      return errorResponse;
-    } catch (error) {
-      return errorResponse;
+    const response_data = (await response.json()) as GmfSuccessResponse;
+    if (response_data) {
+      return {
+        success: true,
+        shorturl: response_data.short_url
+      };
     }
+    return errorResponse;
   }
 }
 

@@ -34,7 +34,12 @@ class TimePickerComponent extends TimeWidget {
     this.getInputElement(limit).value = dateStr;
 
     // Validate and dispatch event
-    limit === 'lower' ? this.validateLowerLimit() : this.validateUpperLimit();
+    if (limit === 'lower') {
+      this.validateLowerLimit();
+    } else {
+      this.validateUpperLimit();
+    }
+
     this.dispatchTimeChangeEvent();
   }
 

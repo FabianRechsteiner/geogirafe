@@ -29,9 +29,7 @@ import { DrawEvent } from 'ol/interaction/Draw';
 import { ModifyEvent } from 'ol/interaction/Modify';
 import { KML, GeoJSON, GPX } from 'ol/format';
 import { noModifierKeys, primaryAction } from 'ol/events/condition';
-// @ts-expect-error: JSTS typing issue
 import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser.js';
-// @ts-expect-error: JSTS typing issue
 import { BufferOp, BufferParameters } from 'jsts/org/locationtech/jts/operation/buffer.js';
 import { StyleLike } from 'ol/style/Style';
 import { getDistance } from '../../../tools/utils/olutils';
@@ -67,7 +65,8 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   markersTable: HTMLTableElement | null = null; // reference to 'markers-table' shadow DOM element
   measurementsTable: HTMLTableElement | null = null; // reference to 'measurements-table' shadow DOM element
 
-  parser = new OL3Parser();
+  // @ts-expect-error: Annoying initiator
+  parser = new OL3Parser(undefined, undefined);
 
   iconStyle: Style = new Style({
     image: new Icon({
@@ -350,7 +349,8 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
     this.polygonSource.clear();
     const geometry = this.linestring.getGeometry();
-    const jstsGeom = this.parser.read(geometry);
+    // @ts-expect-error: JSTS types not clean
+    const jstsGeom = this.parser.read(geometry as Geometry);
     const bufferParams = new BufferParameters(
       BufferParameters.DEFAULT_QUADRANT_SEGMENTS,
       BufferParameters.CAP_FLAT,
@@ -360,7 +360,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
     const bo = new BufferOp(jstsGeom, bufferParams);
     const buffered = bo.getResultGeometry(this.crossSectionState.sectionWidthSettings.value);
-    const mypoly = this.parser.write(buffered) as Polygon;
+    const mypoly = this.parser.write(buffered) as unknown as Polygon;
     this.polygon.setGeometry(mypoly);
     this.polygonSource.addFeature(this.polygon);
 
@@ -878,7 +878,11 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
   // Renders the component or the empty component depending on visibility attribute
   render(): void {
-    this.visible ? this.renderComponent() : this.renderEmptyComponent();
+    if (this.visible) {
+      this.renderComponent();
+    } else {
+      this.renderEmptyComponent();
+    }
   }
 
   private renderComponent(): void {

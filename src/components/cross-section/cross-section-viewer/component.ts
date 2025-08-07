@@ -257,7 +257,11 @@ class CrossSectionViewComponent extends GirafeResizableElement {
   }
 
   render() {
-    this.visible ? this.renderComponent() : this.renderEmpty();
+    if (this.visible) {
+      this.renderComponent();
+    } else {
+      this.renderEmpty();
+    }
   }
 
   private renderComponent() {

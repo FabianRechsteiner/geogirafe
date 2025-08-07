@@ -13,7 +13,7 @@ export default class ServiceWorkerHelper {
    * @param message The message to send to the service worker.
    * @returns
    */
-  public async sendMessageToServiceWorker(message: {}) {
+  public async sendMessageToServiceWorker(message: object) {
     return new Promise<void>((resolve, reject) => {
       if (!this.serviceWorker) {
         reject(new Error('ServiceWorker is not initialized. Cannot send message.'));

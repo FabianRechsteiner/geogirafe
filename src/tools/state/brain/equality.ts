@@ -90,7 +90,8 @@ function areObjectsEqual(obj1: any, obj2: any, visitedObjects: WeakSet<any>): bo
   }
 
   for (const key of keys1) {
-    if (!obj2.hasOwnProperty(key)) {
+    // NOSONAR: Can be solved when migrating to ES2022
+    if (!Object.hasOwnProperty.call(obj2, key)) {
       return false;
     }
 

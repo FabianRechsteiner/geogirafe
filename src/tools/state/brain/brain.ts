@@ -119,7 +119,7 @@ export default class Brain<T> {
       return;
     }
 
-    let valueProxy = this.targetToProxy.get(value);
+    const valueProxy = this.targetToProxy.get(value);
     if (!valueProxy) {
       // Nothing to clean
       return;
@@ -197,12 +197,11 @@ export default class Brain<T> {
         result = result.map((r) => this.targetToProxy.get(r) ?? r);
       } else if (isIterator(result)) {
         // Iterator
-        const self = this;
         const originalIterator = result;
         result = {
           [Symbol.iterator]() {
             return {
-              next() {
+              next: () => {
                 const nextVal = originalIterator.next();
                 if (nextVal.done) {
                   return nextVal;
@@ -210,7 +209,7 @@ export default class Brain<T> {
                 return {
                   done: false,
                   // Get proxied results
-                  value: self.targetToProxy.get(nextVal.value) ?? nextVal.value
+                  value: this.targetToProxy.get(nextVal.value) ?? nextVal.value
                 };
               }
             };
