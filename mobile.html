@@ -60,17 +60,17 @@
         onclick="document.geogirafe.state.globe.display = document.geogirafe.state.globe.display==='3D'?'2D':'3D'">
         <img alt="switch-icon" src="icons/globe.svg" />
       </button>
-
       <girafe-align-north-button-mobile></girafe-align-north-button-mobile>
 
       <!-- <girafe-offline></girafe-offline> -->
-
+      <girafe-geolocation-mobile></girafe-geolocation-mobile>
       <girafe-display-selector-button-mobile></girafe-display-selector-button-mobile>
     </div>
 
     <girafe-search></girafe-search>
     <div id="content">
       <girafe-map></girafe-map>
+      <girafe-infobox></girafe-infobox>
     </div>
     <girafe-swipe-up-panel>
       <girafe-basemap-theme-layer-selector-mobile slot="main"></girafe-basemap-theme-layer-selector-mobile>
