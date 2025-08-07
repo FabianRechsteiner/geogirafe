@@ -92,7 +92,11 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   }
 
   render(): void {
-    this.visible ? this.renderComponent() : this.hide();
+    if (this.visible) {
+      this.renderComponent();
+    } else {
+      this.hide();
+    }
   }
 
   private renderComponent(): void {

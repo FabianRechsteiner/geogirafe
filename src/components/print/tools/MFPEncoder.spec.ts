@@ -114,7 +114,7 @@ describe('MFPEncoder', () => {
       expect(result).toEqual({
         baseURL: 'https://ogc.test.url/',
         customParams: {
-          TRANSPARENT: 'true'
+          TRANSPARENT: 'TRUE'
         },
         imageFormat: 'image/png',
         layers: ['tree', 'plant'],
@@ -175,7 +175,7 @@ describe('MFPEncoder', () => {
       expect(result).toEqual({
         baseURL: 'https://ogc.test.url/',
         customParams: {
-          TRANSPARENT: 'true'
+          TRANSPARENT: 'TRUE'
         },
         imageFormat: 'image/png',
         layers: ['printed-wms-replacing-wmts'],

@@ -55,13 +55,13 @@ export function replaceInFile(filename, searchPattern, replacement) {
   }
 }
 
-function getStyleCode(currentFilename, relativeCssPath) {
+async function getStyleCode(currentFilename, relativeCssPath) {
   const styleFilePath = path.join(path.dirname(currentFilename), relativeCssPath.trim());
   try {
     const styleFileContent = fs.readFileSync(styleFilePath, 'utf8');
     // Convert css notation (for ex \002a) to javascript notation (\u002a)
     let styleCode = styleFileContent.replace(/\\([0-9a-fA-F]{4})/g, '\\u$1');
-    styleCode = minify.css(styleCode);
+    styleCode = await minify.css(styleCode);
     styleCode = `<style>\n${styleCode}\n</style>`;
     return styleCode;
   } catch (error) {
@@ -69,7 +69,7 @@ function getStyleCode(currentFilename, relativeCssPath) {
   }
 }
 
-export function inlineTemplate(filename) {
+export async function inlineTemplate(filename) {
   // Read the file
   const code = fs.readFileSync(filename, 'utf8');
   const magicString = new MagicString(code);
@@ -83,7 +83,7 @@ export function inlineTemplate(filename) {
     if (styleRegex.test(code)) {
       // Read the CSS file
       const styleFound = code.match(styleRegex);
-      styleCode += getStyleCode(filename, styleFound[1]);
+      styleCode += await getStyleCode(filename, styleFound[1]);
       magicString.overwrite(styleFound.index, styleFound.index + styleFound[0].length, '');
     }
     // Verify if there are many CSS files
@@ -91,7 +91,7 @@ export function inlineTemplate(filename) {
     if (stylesRegex.test(code)) {
       const stylesFound = code.match(stylesRegex);
       for (const styleFound of stylesFound[1].replaceAll("'", '').split(',')) {
-        styleCode += getStyleCode(filename, styleFound);
+        styleCode += await getStyleCode(filename, styleFound);
       }
       magicString.overwrite(stylesFound.index, stylesFound.index + stylesFound[0].length, '');
     }

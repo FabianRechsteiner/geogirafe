@@ -69,7 +69,7 @@ export interface GMFGroup extends GMFTreeItem {
   children: GMFTreeItem[];
 }
 
-export interface GMFBackgroundLayer extends GMFTreeItem {}
+export type GMFBackgroundLayer = GMFTreeItem;
 
 export interface GMFServerOgc {
   url: string;

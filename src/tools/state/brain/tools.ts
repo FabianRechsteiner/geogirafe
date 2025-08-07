@@ -90,6 +90,7 @@ export function isPrimitive(value: any): value is Primitive {
  * @param value - The value to check.
  * @returns `true` if the value is a function, otherwise `false`.
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(value: any): value is Function {
   return typeof value === 'function';
 }

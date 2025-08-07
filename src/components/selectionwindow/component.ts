@@ -63,7 +63,11 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * Render the component regarding its visibility.
    */
   render() {
-    this.visible ? this.renderComponent() : this.renderComponentEmpty();
+    if (this.visible) {
+      this.renderComponent();
+    } else {
+      this.renderEmptyComponent();
+    }
   }
 
   /**
@@ -213,7 +217,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * Removes event registration.
    * @private
    */
-  private renderComponentEmpty() {
+  private renderEmptyComponent() {
     this.resizeWindow?.destroy();
     this.resizeWindow = null;
     this.unsubscribe(this.eventsCallbacks);

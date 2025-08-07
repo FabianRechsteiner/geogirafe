@@ -55,7 +55,11 @@ class SelectionGridComponent extends GirafeResizableElement {
    * Render the component regarding its visibility.
    */
   render() {
-    this.visible ? this.renderComponent() : this.renderComponentEmpty();
+    if (this.visible) {
+      this.renderComponent();
+    } else {
+      this.renderEmptyComponent();
+    }
   }
 
   /**
@@ -175,7 +179,7 @@ class SelectionGridComponent extends GirafeResizableElement {
    * Removes event registration.
    * @private
    */
-  private renderComponentEmpty() {
+  private renderEmptyComponent() {
     this.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
     this.isVisibleComponentSetup = false;

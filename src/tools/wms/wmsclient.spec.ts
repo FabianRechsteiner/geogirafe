@@ -102,7 +102,7 @@ describe('WMS Client tests', () => {
     wmsClientQg1L1.getFeatureInfo(selectionParam1Qg1);
     it('should have fetched the url corresponding to SelectionPara QGIS server 1 standard layers', () => {
       const url =
-        'https://qgis-wms-1.test.url?QUERY_LAYERS=qgis1-layer1%2Cqgis1-layer3&INFO_FORMAT=application%2Fvnd.ogc.gml&REQUEST=GetFeatureInfo&SERVICE=WMS&VERSION=1.3.0&FORMAT=image%2Fpng&STYLES=&TRANSPARENT=true&LAYERS=qgis1-layer1%2Cqgis1-layer3&FEATURE_COUNT=300&I=50&J=50&WIDTH=101&HEIGHT=101&CRS=EPSG%3A2056&BBOX=-5301.5%2C-5300.5%2C5303.5%2C5304.5';
+        'https://qgis-wms-1.test.url?QUERY_LAYERS=qgis1-layer1%2Cqgis1-layer3&INFO_FORMAT=application%2Fvnd.ogc.gml&REQUEST=GetFeatureInfo&SERVICE=WMS&VERSION=1.3.0&FORMAT=image%2Fpng&STYLES=&TRANSPARENT=TRUE&LAYERS=qgis1-layer1%2Cqgis1-layer3&FEATURE_COUNT=300&I=50&J=50&WIDTH=101&HEIGHT=101&CRS=EPSG%3A2056&BBOX=-5301.5%2C-5300.5%2C5303.5%2C5304.5';
       const getFeatureInfoUrlReturn: Record<string, string> = {};
       getFeatureInfoUrlReturn[url] = 'qgis1-layer1';
       expect(getFeatureInfoUrlQg1).toHaveReturnedWith(getFeatureInfoUrlReturn);
@@ -111,7 +111,7 @@ describe('WMS Client tests', () => {
     wmsClientQg1L1.getFeatureInfo(selectionParam2Qg1);
     it('should have fetched the url corresponding to SelectionPara QGIS server 1 independant layer "qgis1-layer2"', () => {
       const url =
-        'https://qgis-wms-1.test.url?QUERY_LAYERS=qgis1-layer2&INFO_FORMAT=application%2Fvnd.ogc.gml&REQUEST=GetFeatureInfo&SERVICE=WMS&VERSION=1.3.0&FORMAT=image%2Fpng&STYLES=&TRANSPARENT=true&LAYERS=qgis1-layer2&FEATURE_COUNT=300&I=50&J=50&WIDTH=101&HEIGHT=101&CRS=EPSG%3A2056&BBOX=-5301.5%2C-5300.5%2C5303.5%2C5304.5';
+        'https://qgis-wms-1.test.url?QUERY_LAYERS=qgis1-layer2&INFO_FORMAT=application%2Fvnd.ogc.gml&REQUEST=GetFeatureInfo&SERVICE=WMS&VERSION=1.3.0&FORMAT=image%2Fpng&STYLES=&TRANSPARENT=TRUE&LAYERS=qgis1-layer2&FEATURE_COUNT=300&I=50&J=50&WIDTH=101&HEIGHT=101&CRS=EPSG%3A2056&BBOX=-5301.5%2C-5300.5%2C5303.5%2C5304.5';
       const getFeatureInfoUrlReturn: Record<string, string> = {};
       getFeatureInfoUrlReturn[url] = 'qgis1-layer2';
       expect(getFeatureInfoUrlQg1).toHaveReturnedWith(getFeatureInfoUrlReturn);
@@ -120,7 +120,7 @@ describe('WMS Client tests', () => {
     wmsClientQg2L1.getFeatureInfo(selectionParam1Qg2);
     it('should have fetched the url corresponding to SelectionPara QGIS server 2 standard layers', () => {
       const url =
-        'https://qgis-wms-2.test.url?QUERY_LAYERS=qgis2-layer1&INFO_FORMAT=application%2Fvnd.ogc.gml&REQUEST=GetFeatureInfo&SERVICE=WMS&VERSION=1.3.0&FORMAT=image%2Fpng&STYLES=&TRANSPARENT=true&LAYERS=qgis2-layer1&FEATURE_COUNT=300&I=50&J=50&WIDTH=101&HEIGHT=101&CRS=EPSG%3A2056&BBOX=-5301.5%2C-5300.5%2C5303.5%2C5304.5';
+        'https://qgis-wms-2.test.url?QUERY_LAYERS=qgis2-layer1&INFO_FORMAT=application%2Fvnd.ogc.gml&REQUEST=GetFeatureInfo&SERVICE=WMS&VERSION=1.3.0&FORMAT=image%2Fpng&STYLES=&TRANSPARENT=TRUE&LAYERS=qgis2-layer1&FEATURE_COUNT=300&I=50&J=50&WIDTH=101&HEIGHT=101&CRS=EPSG%3A2056&BBOX=-5301.5%2C-5300.5%2C5303.5%2C5304.5';
       const getFeatureInfoUrlReturn: Record<string, string> = {};
       getFeatureInfoUrlReturn[url] = 'qgis2-layer1';
       expect(getFeatureInfoUrlQg2).toHaveReturnedWith(getFeatureInfoUrlReturn);

@@ -20,7 +20,7 @@ class LegendHelper {
     }
     const queryString: Record<string, unknown> = {
       FORMAT: 'image/png',
-      TRANSPARENT: true,
+      TRANSPARENT: 'TRUE',
       SERVICE: 'WMS',
       VERSION: '1.1.1',
       REQUEST: 'GetLegendGraphic',

@@ -2,7 +2,7 @@ import DrawingFeature, { DrawingShape, DrawingState } from './drawingFeature';
 import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
 import State from '../../tools/state/state';
-import { Collection, Feature } from 'ol';
+import { Collection, Feature, MapBrowserEvent } from 'ol';
 import {
   Geometry,
   LineString,
@@ -132,7 +132,10 @@ export default class OlDrawing {
       features: this.modifiableFeatures,
       // Feature editing is triggered by: 1) primary action = click or touch, 2) alternate mouse click = remove vertex
       // If another tool is exclusively modifying, this interaction will be prevented from reacting via canExecute()
-      condition: (e) => (isPrimaryPointerAction(e) || isAlternateMouseClick(e)) && this.canExecute('map.modify'),
+      condition: (e) =>
+        (isPrimaryPointerAction(e as MapBrowserEvent<PointerEvent>) ||
+          isAlternateMouseClick(e as MapBrowserEvent<PointerEvent>)) &&
+        this.canExecute('map.modify'),
       deleteCondition: never,
       insertVertexCondition: primaryAction,
       style: new DrawingFeature(1, {}, '').getVertexStyle(true),
@@ -236,7 +239,7 @@ export default class OlDrawing {
   ): [Coordinate, Feature<Geometry>] | undefined {
     const olFeature = this.drawingSource.getClosestFeatureToCoordinate(coordinate, filter);
     const geometry = olFeature?.getGeometry();
-    if (geometry) {
+    if (geometry && olFeature) {
       const vertices: MultiPoint = extractVerticesFromGeometry(geometry);
       const closestVertex: Coordinate = vertices.getClosestPoint(coordinate);
       return [closestVertex, olFeature];

@@ -222,7 +222,7 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     const getFeatureOptions = {
       srsName: selectionParam.srid,
       bbox: selectionParam.selectionBox,
-      filter: olFilter && timeFilter ? and(olFilter, timeFilter) : olFilter ?? timeFilter
+      filter: olFilter && timeFilter ? and(olFilter, timeFilter) : (olFilter ?? timeFilter)
     };
     const getFeatureRequests = Object.entries(geometryColumnNameToFeatureType).map(async ([columnName, featureTypes]) =>
       this.getFeatureRaw(featureTypes, { geometryName: columnName, ...getFeatureOptions })

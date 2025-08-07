@@ -68,7 +68,11 @@ export default class EditComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    this.visible ? this.renderComponent() : this.renderEmptyComponent();
+    if (this.visible) {
+      this.renderComponent();
+    } else {
+      this.renderEmptyComponent();
+    }
     super.girafeTranslate();
   }
 

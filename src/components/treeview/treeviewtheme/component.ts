@@ -1,8 +1,8 @@
 import ThemeLayer from '../../../models/layers/themelayer';
 import TreeViewGroupElement from '../tools/treeviewgroupelement';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore This import is not used in the typescript file but needed in the HTML Template
 // Cannot use <ts-expect-error> here because after the build-lib, the error disappear
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import GroupLayer from '../../../models/layers/grouplayer';
 
 class TreeViewThemeComponent extends TreeViewGroupElement {
