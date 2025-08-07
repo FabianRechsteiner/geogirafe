@@ -187,6 +187,7 @@
     "Login": "Login",
     "logLevel": "Log level",
     "Logout": "Logout",
+    "Longpress disable geolocation": "Press and hold the button to disable geolocation.",
     "Manual entry": "Manual entry",
     "map": "Map",
     "map.geo.admin.ch": "map.geo.admin.ch",

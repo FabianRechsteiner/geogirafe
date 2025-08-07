@@ -24,3 +24,10 @@
   height: auto;
   padding: 5%;
 }
+
+.girafe-button-big:hover,
+.girafe-button-large:hover,
+.girafe-button-small:hover,
+.girafe-button-tiny:hover {
+  background-color: var(--bkg-color);
+}

@@ -186,6 +186,7 @@
     "Login": "Anmelden",
     "logLevel": "Log Level",
     "Logout": "Abmelden",
+    "Longpress disable geolocation": "Drücke den Button und halte ihn gedrückt, um die Geolokalisierung zu deaktivieren.",
     "Manual entry": "Manuelle Eingabe",
     "map": "Karte",
     "map.geo.admin.ch": "map.geo.admin.ch",

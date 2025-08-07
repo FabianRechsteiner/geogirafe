@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="styles/common.mobile.css" />
+
+<button
+  id="geolocation-button"
+  class="girafe-button-big"
+  tip="Theme selection"
+  onpointerup="${(e: PointerEvent) => this.pointerUp(e)}"
+  onpointerdown="${(e: PointerEvent) => this.pointerDown(e)}"
+  onpointerleave="${(e: PointerEvent) => this.pointerUp(e)}"
+  oncontextmenu="${(e: PointerEvent) => this.preventContextMenu(e)}">
+  <div id="clock"></div>
+  <img alt="menu-icon" class="${this.getCssClassesForStatus()}" src="${this.getIconForStatus()}" />
+</button>

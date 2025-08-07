@@ -13,6 +13,8 @@ import ThemeListItemMobile from './components/themelist-mobile/themelistitem/com
 import BasemapThemeLayerSelectorMobile from './components/basemapthemelayerselector-mobile/component';
 import DisplaySelectorButtonMobile from './components/displayselectorbutton-mobile/component';
 import AlignNorthButtonMobile from './components/alignnorthbutton-mobile/component';
+import GeolocationMobile from './components/geolocation-mobile/component';
+import InfoboxComponent from './components/infobox/component';
 import StateManager from './tools/state/statemanager';
 
 // Redirect to desktop interface if we are NOT on mobile
@@ -53,6 +55,7 @@ initialize().then(() => {
   state.interface.isMobile = true;
 
   // Define components names
+  customElements.define('girafe-infobox', InfoboxComponent);
   customElements.define('girafe-map', MapComponent);
   customElements.define('girafe-search', MobileSearchComponent);
   customElements.define('girafe-offline', OfflineComponent);
@@ -66,6 +69,7 @@ initialize().then(() => {
   customElements.define('girafe-display-selector-button-mobile', DisplaySelectorButtonMobile);
   customElements.define('girafe-swipe-up-panel', SwipeUpPanelMobile);
   customElements.define('girafe-align-north-button-mobile', AlignNorthButtonMobile);
+  customElements.define('girafe-geolocation-mobile', GeolocationMobile);
 
   // To prevent the FOUC effect (flash of unstyled content),
   // the html element is set to invisible when the application starts.
