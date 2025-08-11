@@ -65,6 +65,8 @@ Please follow the small documentation in the Docker Hub Readme.
 
 ## Development
 
+### 1. Clone repository
+
 First, install [Node](https://nodejs.org/en/download/).
 
 Then, clone the Repository:
@@ -73,55 +75,55 @@ Then, clone the Repository:
 git clone https://gitlab.com/geogirafe/gg-viewer.git
 ```
 
-Now you can build the application, and start the development server:
+### 2. Development Certificates
+
+Certain features (e.g. service workers) require a valid HTTPS certificate for local development.  
+The project already ships with a set of pre-generated development certificates, which allow you to start developing immediately without extra setup.
+
+⚠️ However, generating your own certificates is strongly recommended for:
+- Better security and isolation between environments/developers.
+- Avoiding reuse of shared certificates.
+- Customizing certificate properties (hostname, expiration date, etc.).
+
+#### 2.1. If you want to generate your own development certificates
+
+Requirements: docker installed.  
+Run:
+
+##### On Linux
+
+*On Linux or macOS, generating your own certificates is mandatory (pre-generated ones won't work).*
+
+```bash
+npm run generate-dev-certs-nix
+```
+
+##### On Windows
+
+```bash
+npm run generate-dev-certs-win
+```
+
+#### 2.2. If you did not generate your own certificates (Windows only)
+
+If you skipped the generation step on Windows, you must trust the pre-generated certificates so they work for features like service workers.  
+Run:
+
+```bash
+npm run trust-default-dev-certs-win
+```
+
+### 3. Build and start GeoGirafe
 
 ```bash
 npm install
 npm start
 ```
 
-## Create a local development certificat
-
-In order to make some functionalities work locally (like service-workers), a valid local certificate for development is needed.
-The following command will help generate new certificates and trust them locally on your system.  
-This command needs root/admin rights, because it will trust the developments certificates at the system level.
-
-### On Linux
-
-Run as normal user. The sudo password will be asked. This command will:
-
-- Create a new certificate
-- Trust it at the system level
-- Trust it at the browser level in chrome and firefox
-
-(On linux, the browser are not using the system certificate as default store. That's why the new certificate has to be trusted at both system and browser levels.)
-
-```bash
-npm run generate-dev-certs
-```
-
-### On Windows
-
-Run in a console as administrator. This command will:
-
-- Create a new certificate
-- Trust it at the system level.
-
-(On Windows, Chrome and Firefox are using the certificate store from the system. Thus, there's not need to trust the certificated at the browser level as well.)
-
-Run
-
-```bash
-npm run generate-dev-certs-win
-```
-
-## Working locally
-
-> ❗❗ IMPORTANT ❗❗  
 > When working locally with authentication, and more generally with cookies,
 > browsers treat single-label domains (domains without any dots) differently from multi-label domains (domains with at least one dot). Cookies set on single-label domains are often considered less secure because they can be more easily spoofed or misused. As a result, many browsers restrict or do not allow cookies to be set on single-label domains like `localhost`.
 >
-> Therefore, working against https://localhost **will not work**, because the cookies cannot be correctly set.  
+> Therefore, working against https://localhost **will NOT work**, because the cookies cannot be correctly set.  
 > You'll have to use https://app.localhost, which has been defined as the default domain when working locally with GeoGirafe.
 
 Further discussions about this:
