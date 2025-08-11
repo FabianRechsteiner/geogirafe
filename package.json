@@ -147,6 +147,7 @@
     "tsc-sw": "tsc --module ESNext --target ES2021 --lib WebWorker --skipLibCheck src/service-worker.ts",
     "prepare-commit": "npm run pretty && npm run lint && npm run test && npm run build && npm run build-lib",
     "generate-dev-certs-win": "buildtools\\generate-dev-certs.cmd",
-    "generate-dev-certs": "bash -C './buildtools/generate-dev-certs.sh'"
+    "generate-dev-certs-nix": "bash -C './buildtools/generate-dev-certs.sh'",
+    "trust-default-dev-certs-win": "buildtools\\trust-dev-certs.cmd"
   }
 }

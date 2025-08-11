@@ -7,5 +7,6 @@ public/Mock
 public/*.json
 vite.config.js.timestamp-*.mjs
 .npm
-buildtools/certs
+buildtools/certs/*.pem
+buildtools/certs/default/rootCA-key.pem
 src/service-worker.js
