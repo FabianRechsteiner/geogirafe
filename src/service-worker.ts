@@ -183,7 +183,7 @@ function getRequest(request: Request): Request {
     if (audience?.includes(hostname) && !shouldExclude) {
       // Prepare headers
       const headers = new Headers(request.headers);
-      if (authMode == 'token' && isLoggedIn()) {
+      if (authMode == 'token' && isLoggedIn() && accessToken) {
         headers.set('Authorization', `Bearer ${accessToken}`);
       }
       // Prepare options
