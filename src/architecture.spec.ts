@@ -321,11 +321,13 @@ describe('Components translations', () => {
     'LOD',
     ')',
     '(',
+    '+',
     '/',
     '[',
     ']',
     '.',
-    '-'
+    '-',
+    '--'
   ];
 
   function getSupportedLanguages() {

@@ -2,46 +2,111 @@
   <div id="content">
     <div id="ext-layer-server">
       <h3 class="title" i18n="Source Type">Source Type</h3>
-      <div id=sourcetype>
-        <button id="WMS" class="${this.sourceType === this.SourceTypes.WMS ? 'gg-button active' : 'gg-button'}" onclick="${() => this.setSourceType(this.SourceTypes.WMS)}">
+      <div id="sourcetype">
+        <button
+          id="WMS"
+          class="${this.sourceType === this.SourceTypes.WMS ? 'gg-button active' : 'gg-button'}"
+          onclick="${() => this.setSourceType(this.SourceTypes.WMS)}">
           WMS
         </button>
-        <button id="WMTS" class="${this.sourceType === this.SourceTypes.WMTS ? 'gg-button active' : 'gg-button'}" onclick="${() => this.setSourceType(this.SourceTypes.WMTS)}">
+        <button
+          id="WMTS"
+          class="${this.sourceType === this.SourceTypes.WMTS ? 'gg-button active' : 'gg-button'}"
+          onclick="${() => this.setSourceType(this.SourceTypes.WMTS)}">
           WMTS
         </button>
-        <button id="predefined" tip="Predefined" i18n="Predefined" class="${this.sourceType === this.SourceTypes.predefined ? 'gg-button active' : 'gg-button'}" onclick="${() => this.setSourceType(this.SourceTypes.predefined)}">
+        <button
+          id="predefined"
+          tip="Predefined"
+          i18n="Predefined"
+          class="${this.sourceType === this.SourceTypes.predefined ? 'gg-button active' : 'gg-button'}"
+          onclick="${() => this.setSourceType(this.SourceTypes.predefined)}">
           Predefined
         </button>
       </div>
-      <div class="${((this.sourceType === this.SourceTypes.WMS) || (this.sourceType === this.SourceTypes.WMTS)) ? '' : 'hidden'}">
+      <div
+        class="${((this.sourceType === this.SourceTypes.WMS) || (this.sourceType === this.SourceTypes.WMTS)) ? '' : 'hidden'}">
         <h3 class="title">URL</h3>
         <input type="text" id="url" class="gg-input" />
-        <button id="scan" i18n="Scan Source" class="gg-button" onclick="${() => this.scanLayers()}">
-          Scan Source
-        </button>
+        <button id="scan" i18n="Scan Source" class="gg-button" onclick="${() => this.scanLayers()}">Scan Source</button>
       </div>
-
 
       <div class="${(this.sourceType === this.SourceTypes.predefined) ? '' : 'hidden'}">
         <h3 class="title" i18n="Predefined servers">Predefined servers</h3>
-        <button id="SwisstopoWMS" i18n="Swisstopo WMS" class="gg-button" onclick="${() => this.scanLayersWMS('https://wms.geo.admin.ch')}">
+        <button
+          id="SwisstopoWMS"
+          i18n="Swisstopo WMS"
+          class="gg-button"
+          onclick="${() => this.scanLayersWMS('https://wms.geo.admin.ch')}">
           Swisstopo WMS
         </button>
-        <button id="SwisstopoWMS" i18n="Swisstopo WMTS" class="gg-button" onclick="${() => this.scanLayersWMTS('https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr')}">
+        <button
+          id="SwisstopoWMS"
+          i18n="Swisstopo WMTS"
+          class="gg-button"
+          onclick="${() => this.scanLayersWMTS('https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr')}">
           Swisstopo WMTS
         </button>
-        <button id="GMFbg" i18n="GMF background WMTS" class="gg-button" onclick="${() => this.scanLayersWMTS('https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml')}">
+        <button
+          id="GMFbg"
+          i18n="GMF background WMTS"
+          class="gg-button"
+          onclick="${() => this.scanLayersWMTS('https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml')}">
           GMF background WMTS
         </button>
       </div>
 
-      <div id="layers" class="${this.layers.length > 0 ? '' : 'hidden'}">
+      <div id="layers" class="${this.allLayers.length > 0 ? '' : 'hidden'}">
         <h3 class="title" i18n="Layers">Layers</h3>
+        <div class="layer-search">
+          <img class="filter-icon" alt="filter-button-icon" src="icons/filter.svg" />
+          <input
+            id="layer-search-field"
+            class="gg-input"
+            type="text"
+            placeholder="${this.i18nManager.getTranslation('Filter external layers...')}"
+            i18n="Filter external layers..."
+            autocomplete="off"
+            autocorrect="off"
+            oninput="${(e: Event) => this.filterLayers((e.target! as HTMLInputElement).value)}" />
+          <button class="${this.isFiltered ? 'delete-button' : 'hidden'}" onclick="${() => this.clearFilter()}">
+            <img
+              class="delete-icon"
+              alt="delete-button-icon"
+              tip="Reset filter"
+              i18n="Reset filter"
+              src="icons/trash.svg" />
+          </button>
+        </div>
+        <div class="filter-buttons">
+          <span>
+            ${Object.values(this.selectedLayers).filter(selected => selected).length.toString()}
+            ${this.i18nManager.getTranslation('layers selected')}
+          </span>
+          <button class="gg-button" tip="Select all filtered layers" onclick="${() => this.selectVisible()}">+</button>
+          <button class="gg-button" tip="Unselect all filtered layers" onclick="${() => this.deselectVisible()}">
+            -
+          </button>
+          <button class="gg-button" tip="Select none" onclick="${() => this.deselectAll()}">--</button>
+        </div>
         <ul>
           <!-- prettier-ignore -->
-          ${this.layers.map(layer => uHtmlFor(layer, layer.treeItemId)`<li><button class="${this.selectedLayers[layer.id]?'gg-button active':'gg-button'}" onclick="${() => this.toggle(layer.id)}">${layer.name}</button></li>`)}
+          ${this.layers.map(layer => uHtmlFor(layer, layer.treeItemId)`
+          <li>
+            <button
+              class="${this.selectedLayers[layer.id]?'gg-button active':'gg-button'}"
+              onclick="${() => this.toggle(layer.id)}">
+              ${layer.name}
+            </button>
+          </li>
+          `)}
         </ul>
-        <button id="add" tip="Add selected" i18n="Add selected" class="gg-button" onclick="${() => this.addSelectedLayers()}">
+        <button
+          id="add"
+          tip="Add selected"
+          i18n="Add selected"
+          class="gg-button"
+          onclick="${() => this.addSelectedLayers()}">
           Add selected
         </button>
       </div>
