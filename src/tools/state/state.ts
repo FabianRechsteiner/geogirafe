@@ -52,7 +52,7 @@ export type ThemesConfig = {
 type LayersConfig = {
   // TODO REG : This should probably be changes to type ThemeLayer[], but this need a refactoring of some depending classes and tests
   layersList: BaseLayer[];
-  extLayerIds: {[layerUid: string]: number};
+  extLayerIds: { [layerUid: string]: number };
 };
 
 type TreeviewConfig = {
@@ -228,7 +228,7 @@ export default class State {
   // Current layers configuration
   layers: LayersConfig = {
     layersList: [],
-    extLayerIds: {},
+    extLayerIds: {}
   };
 
   // Current Treeview state

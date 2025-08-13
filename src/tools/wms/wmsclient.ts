@@ -410,7 +410,6 @@ export default abstract class WmsClient {
 
     return this.capabilityPromise;
   }
-
 }
 
 export class WmsClientQgis extends WmsClient {

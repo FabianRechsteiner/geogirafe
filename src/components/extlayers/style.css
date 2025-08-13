@@ -13,8 +13,8 @@
 }
 
 #ext-layer-server {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 #panel > div {
@@ -22,19 +22,72 @@
 }
 
 #layers {
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 #layers ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
 }
 
 #layers li {
-    margin-top: .3rem;
-    margin-bottom: .3rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+#layers li button {
+  text-align: left;
+  text-wrap-style: balance;
+}
+
+.layer-search {
+  flex-grow: 1;
+  background-color: var(--bkg-color);
+  width: auto;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #cfd6dd;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  margin-right: 2px;
+}
+
+.filter-buttons {
+  margin: 2px;
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-buttons span {
+  flex-grow: 1;
+  align-self: center;
+}
+
+#layer-search-field {
+  font-size: 1rem;
+  outline: none;
+  border: 0;
+  flex: 1 1 auto;
+  width: 90%;
+  background: transparent;
+  color: var(--text-color);
+  padding: 0;
+}
+
+.filter-icon,
+.delete-icon {
+  width: 16px;
+  color: var(--text-color);
+  padding: 0 0.5rem;
+}
+
+.delete-button {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
 }
