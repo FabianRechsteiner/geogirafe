@@ -1,8 +1,5 @@
 {
   "fr": {
-    "Swisstopo WMS": "Swisstopo WMS",
-    "Swisstopo WMTS": "Swisstopo WMTS",
-    "GMF background WMTS": "GMF background WMTS",
     "2D": "2D",
     "2D / 3D": "2D / 3D",
     "3D": "3D",
@@ -122,6 +119,7 @@
     "Expand / Collapse all": "Développer / Réduire tout",
     "Export": "Exporter",
     "ext-layer-panel": "Ajouter des couches externes",
+    "external-entry": "Importer une couche",
     "Failed to create feature": "Échec de la création de l'entité",
     "Failed to delete feature": "Échec de la suppression de l'entité",
     "Failed to update feature": "Échec de la mise à jour de l'entité",
@@ -144,6 +142,7 @@
     "GeoJSON": "GeoJSON",
     "GitLab": "GitLab",
     "Give feeback": "Donner un avis",
+    "GMF background WMTS": "GMF background WMTS",
     "go_to_next_view": "Aller à la vue suivante",
     "go_to_previous_view": "Revenir à la vue précédente",
     "Google Earth": "Google Earth",
@@ -330,6 +329,8 @@
     "SVG": "SVG",
     "Swipe layer to the left": "Faire glisser la couche vers la gauche",
     "Swipe layer to the right": "Faire glisser la couche vers la droite",
+    "Swisstopo WMS": "Swisstopo WMS",
+    "Swisstopo WMTS": "Swisstopo WMTS",
     "system": "Système",
     "Take measure": "Prendre une mesure",
     "Thanks for your message. If necessary, somebody will enter in contact with you as soon as possible.": "Merci pour votre message. Si nécessaire, quelqu'un prendra contact avec vous dès que possible.",

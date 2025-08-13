@@ -1,8 +1,5 @@
 {
   "it": {
-    "Swisstopo WMS": "Swisstopo WMS",
-    "Swisstopo WMTS": "Swisstopo WMTS",
-    "GMF background WMTS": "GMF background WMTS",
     "2D": "2D",
     "2D / 3D": "2D / 3D",
     "3D": "3D",
@@ -122,6 +119,7 @@
     "Expand / Collapse all": "Espandi / Contrai tutto",
     "Export": "Esporta",
     "ext-layer-panel": "Aggiungi layer esterno",
+    "external-entry": "Importa un layer",
     "Failed to create feature": "Non è stato possibile creare l'elemento",
     "Failed to delete feature": "Errore nell'eliminazione dell'elemento",
     "Failed to update feature": "Non è stato possibile aggiornare l'elemento",
@@ -144,6 +142,7 @@
     "GeoJSON": "GeoJSON",
     "GitLab": "GitLab",
     "Give feeback": "Lascia un feedback",
+    "GMF background WMTS": "GMF background WMTS",
     "go_to_next_view": "Vai alla vista successiva",
     "go_to_previous_view": "Torna alla vista precedente",
     "Google Earth": "Google Earth",
@@ -330,6 +329,8 @@
     "SVG": "SVG",
     "Swipe layer to the left": "Scorri il layer a sinistra",
     "Swipe layer to the right": "Scorri il layer a destra",
+    "Swisstopo WMS": "Swisstopo WMS",
+    "Swisstopo WMTS": "Swisstopo WMTS",
     "system": "Sistema",
     "Take measure": "Prendi misura",
     "Thanks for your message. If necessary, somebody will enter in contact with you as soon as possible.": "Grazie per il tuo messaggio. Se necessario, qualcuno ti contatterà il prima possibile.",

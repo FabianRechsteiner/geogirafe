@@ -1,8 +1,5 @@
 {
   "en": {
-    "Swisstopo WMS": "Swisstopo WMS",
-    "Swisstopo WMTS": "Swisstopo WMTS",
-    "GMF background WMTS": "GMF background WMTS",
     "2D": "2D",
     "2D / 3D": "2D / 3D",
     "3D": "3D",
@@ -123,6 +120,7 @@
     "Expand / Collapse all": "Expand / Collapse all",
     "Export": "Export",
     "ext-layer-panel": "Add external layers",
+    "external-entry": "Import layer",
     "Failed to create feature": "Failed to create feature",
     "Failed to delete feature": "Failed to delete feature",
     "Failed to update feature": "Failed to update feature",
@@ -145,6 +143,7 @@
     "GeoJSON": "GeoJSON",
     "GitLab": "GitLab",
     "Give feeback": "Give feeback",
+    "GMF background WMTS": "GMF background WMTS",
     "go_to_next_view": "Go to next view",
     "go_to_previous_view": "Go to previous view",
     "Google Earth": "Google Earth",
@@ -331,6 +330,8 @@
     "SVG": "SVG",
     "Swipe layer to the left": "Swipe layer to the left",
     "Swipe layer to the right": "Swipe layer to the right",
+    "Swisstopo WMS": "Swisstopo WMS",
+    "Swisstopo WMTS": "Swisstopo WMTS",
     "system": "System",
     "Take measure": "Take measure",
     "Thanks for your message. If necessary, somebody will enter in contact with you as soon as possible.": "Thanks for your message. If necessary, someone will get in touch with you as soon as possible.",
