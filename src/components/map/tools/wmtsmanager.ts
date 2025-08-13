@@ -214,7 +214,7 @@ class WmtsManager {
     StateManager.getInstance().state.selection.selectionParameters.push(...selectionParams);
   }
 
-  private async getWmtsCapabilities(url: string): Promise<Record<string, unknown>> {
+  public async getWmtsCapabilities(url: string): Promise<Record<string, unknown>> {
     if (url in this.wmtsPromisesByServer) {
       // Capabilities are currently loading
       const promise = this.wmtsPromisesByServer[url];

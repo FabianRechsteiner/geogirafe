@@ -1,5 +1,6 @@
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
+import WMSCapabilities from 'ol/format/WMSCapabilities.js';
 import WMSGetFeatureInfo from 'ol/format/WMSGetFeatureInfo';
 import { Map } from 'ol';
 
@@ -17,6 +18,8 @@ export default abstract class WmsClient {
   layerManager: LayerManager;
   configManager: ConfigManager;
   resolutionTolerance = 5;
+  capabilityPromise: Promise<Record<string, unknown>> | null = null;
+  capabilities: Record<string, unknown> | null = null;
 
   get state() {
     return StateManager.getInstance().state;
@@ -379,6 +382,35 @@ export default abstract class WmsClient {
       obj.olayer.setZIndex(zindex);
     }
   }
+
+  public async getWmsCapabilities(): Promise<Record<string, unknown>> {
+    if (this.capabilityPromise !== null) {
+      return this.capabilityPromise;
+    }
+
+    if (this.capabilities !== null) {
+      // Capabilities were already loaded
+      return Promise.resolve(this.capabilities);
+    }
+
+    this.capabilityPromise = (async () => {
+      // Capabilities were not loaded yet.
+      const params = new URLSearchParams();
+      params.append('REQUEST', 'GetCapabilities');
+      params.append('SERVICE', 'WMS');
+      params.append('VERSION', '1.3.0');
+      const response = await fetch(`${this.ogcServer.url}?${params}`);
+      const result = await response.text();
+
+      // Create new WMS Layer from Capabilities
+      const parser = new WMSCapabilities();
+      this.capabilities = parser.read(result) as Record<string, unknown>;
+      return this.capabilities;
+    })();
+
+    return this.capabilityPromise;
+  }
+
 }
 
 export class WmsClientQgis extends WmsClient {
