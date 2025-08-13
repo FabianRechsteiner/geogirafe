@@ -56,6 +56,21 @@
       { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
     ]
   },
+  "oauth": {
+    "issuer": {
+      "url": "https://demo-auth.georama.io/realms/ninjas",
+      "clientId": "georama-oidc",
+      "audience": ["demo.georama.io"],
+      "audienceExcludedPaths": ["^/static/", "^/tiles/"],
+      "scope": "openid profile email",
+      "checkSessionOnLoad": true,
+      "loginRequired": false
+    },
+    "geomapfish": {
+      "userInfoUrl": "https://demo-auth.georama.io/realms/ninjas/protocol/openid-connect/userinfo",
+      "authMode": "token"
+    }
+  },
   "crs": [
     {
       "code": "EPSG:2056",
