@@ -7,8 +7,11 @@
       class="gg-select"
       disabled="${this.feature}"
       onchange="${(evt: Event) => this.onSelectLayer(evt)}">
+      ${this.editableLayersList.length === 0 && this.state.oauth.status !== 'loggedIn' ? uHtml`
+      <option i18n="Please log in to edit layers..." ?selected="true" value="">Please log in to edit layers...</option>
+      ` : uHtml`
       <option i18n="Choose a layer..." ?selected="true" value="">Choose a layer...</option>
-      ${this.editableLayersList.map(layer => uHtmlFor(layer, layer.id)`
+      `} ${this.editableLayersList.map(layer => uHtmlFor(layer, layer.id)`
       <option value="${layer.id}">${layer.name}</option>
       `)}
     </select>

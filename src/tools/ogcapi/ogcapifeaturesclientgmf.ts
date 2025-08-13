@@ -2,7 +2,6 @@ import OgcApiFeaturesClient from './ogcapifeaturesclient';
 import Feature from 'ol/Feature';
 import ServerOgc from '../../models/serverogc';
 import { OapifSchemaResponse, OapifPropertySchema } from '../../models/serverogcapifeatures';
-import { HttpMethod } from '../../models/serverogcapi';
 
 export default class OgcApiFeaturesClientGmf extends OgcApiFeaturesClient {
   constructor(serverConfig: ServerOgc) {
@@ -32,11 +31,5 @@ export default class OgcApiFeaturesClientGmf extends OgcApiFeaturesClient {
     return {
       properties: properties
     };
-  }
-
-  protected getFetchOptions(method: HttpMethod = 'GET', crsIdentifier?: string): RequestInit {
-    const fetchOptions = super.getFetchOptions(method, crsIdentifier);
-    fetchOptions.mode = 'cors';
-    return fetchOptions;
   }
 }

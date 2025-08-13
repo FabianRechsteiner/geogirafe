@@ -94,13 +94,13 @@ export default class EditComponent extends GirafeHTMLElement {
   }
 
   private loginStateChanged() {
-    // List of POC demo layers
-    // The GMF demo layer is only selectable when in the experimental demo and logged in
-    const isOnGMF29DemoAndLoggedIn =
-      this.configManager.Config.themes.url.includes('geomapfish-demo-2-9.camptocamp') &&
-      this.state.oauth.status === 'loggedIn';
+    // Editable demo layers should only be available if the user is currently on the matching demo instance and is logged in
     this.editableLayersList = Object.keys(DEMO_LAYERS)
-      .filter((layerID) => layerID !== 'GMF' || isOnGMF29DemoAndLoggedIn)
+      .filter((layerID) => {
+        const oapifUrl = new URL(DEMO_LAYERS[layerID].url);
+        const themesUrl = new URL(this.configManager.Config.themes.url);
+        return oapifUrl.hostname === themesUrl.hostname && this.state.oauth.status === 'loggedIn';
+      })
       .map((layerID) => {
         return { id: layerID, name: DEMO_LAYERS[layerID].name };
       });
