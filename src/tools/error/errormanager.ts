@@ -45,10 +45,10 @@ ${stack}
 
   public pushMessage(id: string, text: string, level: 'info' | 'warning' | 'error') {
     // Remove existing message with the same id
-    this.stateManager.state.infobox.elements.splice(
-      this.stateManager.state.infobox.elements.findIndex((el) => el.id === id),
-      1
-    );
+    const msgIndex = this.stateManager.state.infobox.elements.findIndex((el) => el.id === id);
+    if (msgIndex !== -1) {
+      this.stateManager.state.infobox.elements.splice(msgIndex, 1);
+    }
 
     // Add a new one
     this.stateManager.state.infobox.elements.push({

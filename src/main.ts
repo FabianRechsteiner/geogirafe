@@ -28,6 +28,7 @@ import SearchComponent from './components/search/component';
 import SelectionGridComponent from './components/selectiongrid/component';
 import SelectionWindowComponent from './components/selectionwindow/component';
 import ShareComponent from './components/share/component';
+import ExtLayerComponent from './components/extlayers/component';
 import ThemeComponent from './components/themes/component';
 import TimeRestrictionComponent from './components/timerestriction/component';
 import TimePickerComponent from './components/timerestriction/timepicker/component';
@@ -96,6 +97,7 @@ initialize().then(() => {
   customElements.define('girafe-selection-grid', SelectionGridComponent);
   customElements.define('girafe-selection-window', SelectionWindowComponent);
   customElements.define('girafe-share', ShareComponent);
+  customElements.define('girafe-ext-layer', ExtLayerComponent);
   customElements.define('girafe-theme-select', ThemeComponent);
   customElements.define('girafe-time-restriction', TimeRestrictionComponent);
   customElements.define('girafe-time-picker', TimePickerComponent);

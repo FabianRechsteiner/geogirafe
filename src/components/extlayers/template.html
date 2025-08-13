@@ -1,0 +1,50 @@
+<div id="panel">
+  <div id="content">
+    <div id="ext-layer-server">
+      <h3 class="title" i18n="Source Type">Source Type</h3>
+      <div id=sourcetype>
+        <button id="WMS" class="${this.sourceType === this.SourceTypes.WMS ? 'gg-button active' : 'gg-button'}" onclick="${() => this.setSourceType(this.SourceTypes.WMS)}">
+          WMS
+        </button>
+        <button id="WMTS" class="${this.sourceType === this.SourceTypes.WMTS ? 'gg-button active' : 'gg-button'}" onclick="${() => this.setSourceType(this.SourceTypes.WMTS)}">
+          WMTS
+        </button>
+        <button id="predefined" tip="Predefined" i18n="Predefined" class="${this.sourceType === this.SourceTypes.predefined ? 'gg-button active' : 'gg-button'}" onclick="${() => this.setSourceType(this.SourceTypes.predefined)}">
+          Predefined
+        </button>
+      </div>
+      <div class="${((this.sourceType === this.SourceTypes.WMS) || (this.sourceType === this.SourceTypes.WMTS)) ? '' : 'hidden'}">
+        <h3 class="title">URL</h3>
+        <input type="text" id="url" class="gg-input" />
+        <button id="scan" i18n="Scan Source" class="gg-button" onclick="${() => this.scanLayers()}">
+          Scan Source
+        </button>
+      </div>
+
+
+      <div class="${(this.sourceType === this.SourceTypes.predefined) ? '' : 'hidden'}">
+        <h3 class="title" i18n="Predefined servers">Predefined servers</h3>
+        <button id="SwisstopoWMS" i18n="Swisstopo WMS" class="gg-button" onclick="${() => this.scanLayersWMS('https://wms.geo.admin.ch')}">
+          Swisstopo WMS
+        </button>
+        <button id="SwisstopoWMS" i18n="Swisstopo WMTS" class="gg-button" onclick="${() => this.scanLayersWMTS('https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr')}">
+          Swisstopo WMTS
+        </button>
+        <button id="GMFbg" i18n="GMF background WMTS" class="gg-button" onclick="${() => this.scanLayersWMTS('https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml')}">
+          GMF background WMTS
+        </button>
+      </div>
+
+      <div id="layers" class="${this.layers.length > 0 ? '' : 'hidden'}">
+        <h3 class="title" i18n="Layers">Layers</h3>
+        <ul>
+          <!-- prettier-ignore -->
+          ${this.layers.map(layer => uHtmlFor(layer, layer.treeItemId)`<li><button class="${this.selectedLayers[layer.id]?'gg-button active':'gg-button'}" onclick="${() => this.toggle(layer.id)}">${layer.name}</button></li>`)}
+        </ul>
+        <button id="add" tip="Add selected" i18n="Add selected" class="gg-button" onclick="${() => this.addSelectedLayers()}">
+          Add selected
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

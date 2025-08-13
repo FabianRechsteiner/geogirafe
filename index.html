@@ -125,6 +125,10 @@
             slot="main"
             data-toggle-path="interface.printPanelVisible"
             data-title="print-panel"></girafe-print>
+          <girafe-ext-layer
+            slot="main"
+            data-toggle-path="interface.extLayerPanelVisible"
+            data-title="ext-layer-panel"></girafe-ext-layer>
           <girafe-cross-section-settings
             slot="main"
             data-toggle-path="interface.crossSectionPanelVisible"
@@ -168,6 +172,13 @@
         class="gg-icon-button gg-big"
         onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
         <img alt="draw-icon" src="icons/draw.svg" />
+      </button>
+      <button
+        slot="menu-content"
+        class="gg-icon-button gg-big"
+        onclick="document.geogirafe.state.interface.extLayerPanelVisible = !document.geogirafe.state.interface.extLayerPanelVisible">
+        <span>X</span>
+        <!-- <img alt="ext-icon" src="icons/external.svg" /> -->
       </button>
       <button
         tip="print-panel"

@@ -1,0 +1,40 @@
+#sourcetype {
+  display: flex;
+  gap: 0.2rem;
+}
+
+#panel {
+  display: flex;
+  height: 100%;
+}
+
+#content {
+  display: flex;
+}
+
+#ext-layer-server {
+    display: flex;
+    flex-direction: column;
+}
+
+#panel > div {
+  padding: 1rem;
+}
+
+#layers {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#layers ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+}
+
+#layers li {
+    margin-top: .3rem;
+    margin-bottom: .3rem;
+}

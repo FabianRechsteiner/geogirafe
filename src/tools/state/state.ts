@@ -17,6 +17,7 @@ type GraphicalInterface = {
   helpVisible: boolean;
   drawingPanelVisible: boolean;
   printPanelVisible: boolean;
+  extLayerPanelVisible: boolean;
   lidarPanelVisible: boolean;
   crossSectionPanelVisible: boolean;
   editPanelVisible: boolean;
@@ -51,6 +52,7 @@ export type ThemesConfig = {
 type LayersConfig = {
   // TODO REG : This should probably be changes to type ThemeLayer[], but this need a refactoring of some depending classes and tests
   layersList: BaseLayer[];
+  extLayerIds: {[layerUid: string]: number};
 };
 
 type TreeviewConfig = {
@@ -184,6 +186,7 @@ export default class State {
     helpVisible: false,
     drawingPanelVisible: false,
     printPanelVisible: false,
+    extLayerPanelVisible: false,
     lidarPanelVisible: false,
     crossSectionPanelVisible: false,
     editPanelVisible: false,
@@ -224,7 +227,8 @@ export default class State {
 
   // Current layers configuration
   layers: LayersConfig = {
-    layersList: []
+    layersList: [],
+    extLayerIds: {},
   };
 
   // Current Treeview state
