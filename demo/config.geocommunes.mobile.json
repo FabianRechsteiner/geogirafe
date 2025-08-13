@@ -1,9 +1,9 @@
 {
   "themes": {
-    "url": "https://demo-ai.geocommunes.ch/themes?background=background&interface=mobile"
+    "url": "https://demo-ai.geocommunes.ch/themes?background=ai-background&interface=ai-mobile"
   },
   "search": {
-    "url": "https://demo-ai.geocommunes.ch/search?limit=90&partitionlimit=15&interface=mobile&query=###SEARCHTERM###"
+    "url": "https://demo-ai.geocommunes.ch/search?limit=90&partitionlimit=15&interface=ai-mobile&query=###SEARCHTERM###"
   },
   "map": {
     "constrainScales": false
