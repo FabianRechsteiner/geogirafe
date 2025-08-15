@@ -46,7 +46,7 @@
     "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200, 100]
   },
   "map3d": {
-    "terrainUrl": "https://3d.geo.admin.ch/ch.swisstopo.terrain.3d/v1/",
+    "terrainUrl": "https://uzuflycesium.s3.amazonaws.com/UzuTerrain/8m/20240110/",
     "terrainImagery": {
       "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
       "minLoD": 8,
@@ -59,7 +59,7 @@
       "https://uzuflycesium.s3.amazonaws.com/Corseaux/BTI/Cesium/Scene/ChardonnemCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/CorsierSurVevey/BTI/Cesium/Scene/CorsiermCesium.json",
       "https://uzuflycesium.s3.amazonaws.com/Jongny/BTI/Cesium/Scene/JongnymCesium.json",
-      "https://uzuflycesium.s3.amazonaws.com/montreux/GrandRue/3Dtiles/Montreux_Grand_Rue_Clipped_Cesium_1_1/tileset.json",
+      "https://uzuflycesium.s3.amazonaws.com/montreux/Commune/Cesium/Montreux_Cesium/Scene/Montreux_Cesium.json",
       "https://uzuflycesium.s3.amazonaws.com/montreux/GrandRue/3Dtiles/V2/boutiques/tileset.json",
       "https://uzuflycesium.s3.amazonaws.com/montreux/GrandRue/3Dtiles/V3/terrasses1/tileset.json",
       "https://uzuflycesium.s3.amazonaws.com/Vevey/Mesh/Vevey_Cesium_2024/Scene/Vevey_Cesium_2024.json",
