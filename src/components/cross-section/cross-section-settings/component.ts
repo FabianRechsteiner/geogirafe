@@ -1,4 +1,10 @@
-import type { VectorFeatureFileFormat, ColorPalette, ColorVariable, PrintFileFormat } from '../crosssectiontypes';
+import type {
+  VectorFeatureFileFormat,
+  ColorPalette,
+  ColorVariable,
+  PrintFileFormat,
+  Dataset
+} from '../crosssectiontypes';
 import type { Marker, Measurement } from '../scatterplot';
 import type { Callback } from '../../../tools/state/statemanager';
 
@@ -65,7 +71,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   markersTable: HTMLTableElement | null = null; // reference to 'markers-table' shadow DOM element
   measurementsTable: HTMLTableElement | null = null; // reference to 'measurements-table' shadow DOM element
 
-  // @ts-expect-error: Annoying initiator
+  // @ts-expect-error: initiator issue
   parser = new OL3Parser(undefined, undefined);
 
   iconStyle: Style = new Style({
@@ -359,7 +365,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     );
 
     const bo = new BufferOp(jstsGeom, bufferParams);
-    const buffered = bo.getResultGeometry(this.crossSectionState.sectionWidthSettings.value);
+    const buffered = bo.getResultGeometry(this.crossSectionState.sectionWidthSettings.value / 2);
     const mypoly = this.parser.write(buffered) as unknown as Polygon;
     this.polygon.setGeometry(mypoly);
     this.polygonSource.addFeature(this.polygon);
@@ -516,8 +522,13 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   addInteractions(): void {
-    this.map.addInteraction(this.drawInteraction);
-    this.map.addInteraction(this.modifyInteraction);
+    const arr = this.map.getInteractions().getArray();
+    if (!arr.includes(this.drawInteraction)) {
+      this.map.addInteraction(this.drawInteraction);
+    }
+    if (!arr.includes(this.modifyInteraction)) {
+      this.map.addInteraction(this.modifyInteraction);
+    }
   }
 
   removeInteractions(): void {
@@ -535,6 +546,28 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
   toggleLineDraw(): void {
     this.crossSectionState.drawProfile = !this.crossSectionState.drawProfile;
+  }
+
+  toggleVisibility(id: string): void {
+    const ds = this.crossSectionState.datasets.find((d) => d.id === id);
+    if (ds) {
+      ds.active = !ds.active;
+    }
+  }
+
+  setColor(id: string, color: string): void {
+    const ds = this.crossSectionState.datasets.find((d) => d.id === id);
+    if (ds) {
+      ds.color = color;
+      ds.colorby = 'uniform';
+    }
+  }
+
+  setColorVariable(id: string, colorby: ColorVariable): void {
+    const ds = this.crossSectionState.datasets.find((d) => d.id === id);
+    if (ds) {
+      ds.colorby = colorby;
+    }
   }
 
   setLineDrawingMode(val: boolean): void {
@@ -591,21 +624,16 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     super.render();
   }
 
+  setGridVisibility(val: boolean): void {
+    this.crossSectionState.gridVisible = val;
+  }
+
   setBackgroundColor(val: string): void {
     this.crossSectionState.backgroundColor = val;
   }
 
-  setUniformColor(val: string): void {
-    this.crossSectionState.colorUniform = val;
-  }
-
   setColorPalette(val: ColorPalette): void {
     this.crossSectionState.colorPalette = val;
-  }
-
-  setColorVariable(val: ColorVariable): void {
-    this.crossSectionState.colorVariable = val;
-    super.render();
   }
 
   exportFeature(features: Feature[], filename: string, format: VectorFeatureFileFormat): void {
@@ -763,6 +791,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
   deleteProfile(): void {
     this.crossSectionState.linestringCoordinates = [];
+    this.crossSectionState.numberOfPoints = 0;
   }
 
   deleteMarker(id: string): void {
@@ -924,6 +953,14 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
         this.darkFrontendMode = _newValue;
       }),
 
+      // Datasets
+      this.subscribe(
+        /extendedState\.crossSection\.datasets\..*\..*/,
+        (_oldVal: Dataset[], _newVal: Dataset[], _parent: CrossSectionState) => {
+          super.render();
+        }
+      ),
+
       // Line drawing mode
       this.subscribe(
         'extendedState.crossSection.drawProfile',
@@ -977,7 +1014,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
         }
       ),
 
-      // Marker array (change in size)
+      // Marker array (fires when the marker array length changes, due to adding or removing a marker)
       this.subscribe(
         'extendedState.crossSection.markers',
         (_oldVal: Marker[], _newVal: Marker[], _parent: CrossSectionState) => {
@@ -1006,7 +1043,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
         }
       ),
 
-      // Marker array (change in properties)
+      // Marker array (change in marker properties)
       this.subscribe(
         /extendedState\.crossSection\.markers\..*\..*/,
         (_oldVal: Marker[], _newVal: Marker[], _parent: CrossSectionState) => {
@@ -1025,6 +1062,16 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
           if (this.measurementsTable) {
             this.renderMeasurementsTable(this.measurementsTable, this.crossSectionState.measurements);
           }
+        }
+      ),
+
+      // Loading state changes
+      this.subscribe(
+        'extendedState.crossSection.loading',
+        (_oldVal: boolean, _newVal: boolean, _parent: CrossSectionState) => {
+          console.debug(`crossSection.loading changed from: ${_oldVal} to: ${_newVal}`);
+          this.state.loading = _newVal;
+          super.render();
         }
       ),
 
@@ -1067,6 +1114,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       // Profile width
       this.subscribe('extendedState.crossSection.sectionWidthSettings.value', (_oldVal: number, _newVal: number) => {
         console.debug(`crossSection.sectionWidthSettings.value changed from: ${_oldVal} to: ${_newVal}`);
+        this.crossSectionState.linestringShift = _newVal / 2; // set linestring shift value (when using the arrow buttons) to half the section width
         this.drawLinestringBuffer();
         super.render();
       }),
@@ -1119,7 +1167,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.unsubscribe(this.eventsCallbacks);
     this.eventsCallbacks.length = 0;
 
-    // Unregister drawing interaction events
     this.drawInteraction.un('drawstart', () => {});
     this.drawInteraction.un('drawend', () => {});
     this.modifyInteraction.un('modifystart', () => {});

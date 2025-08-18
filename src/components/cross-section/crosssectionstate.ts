@@ -1,13 +1,21 @@
-import type { PrintFileFormat, VectorFeatureFileFormat, ColorVariable, ColorPalette } from './crosssectiontypes';
+import type {
+  PrintFileFormat,
+  VectorFeatureFileFormat,
+  ColorVariable,
+  ColorPalette,
+  Dataset
+} from './crosssectiontypes';
 import type { Marker, Measurement } from './scatterplot';
 
 // Cross-section
 export class CrossSectionState {
-  loading: boolean = true;
+  loading: boolean = false;
+  datasets: Dataset[] = [];
   drawProfile: boolean = true;
-  enableAnnotation: boolean = false; // this controls the annotation button's disable property
+  enableAnnotation: boolean = false;
   drawMarker: boolean = false;
-  enableMeasurement: boolean = false; // this controls the measurement button's disable property
+  enableMeasurement: boolean = false;
+  gridVisible: boolean = true;
   drawMeasurement: boolean = false;
   backgroundColor: string = '#ffffff';
   colorVariable: ColorVariable = 'intensity';
@@ -23,7 +31,7 @@ export class CrossSectionState {
   pointSizeSettings: { default: number; min: number; max: number; step: number; value: number } = {
     default: 3.0,
     min: 0.1,
-    max: 10.0,
+    max: 20.0,
     step: 0.1,
     value: 3.0
   };
@@ -48,15 +56,29 @@ export class CrossSectionState {
   markers: Marker[] = [];
   measurements: Measurement[] = [];
   linestringCoordinates: [number, number][] = [];
-  linestringShift: number = 0.5; // distance by which the linestring coordinates are shifted when the shiftLinestring() method is called
+  linestringShift: number = 0.5;
   numberOfPoints: number = 0;
-  maxNumberOfPoints: number = 5000000;
+  maxNumberOfPoints: number = 1000000;
   zoom: { k: number; tx: number; ty: number } = { k: 1.0, tx: 0.0, ty: 0.0 };
   zoomUpdate: boolean = false;
   printProfile: boolean = false;
   printFileFormat: PrintFileFormat = 'svg';
-  enableLinestringDownload: boolean = false; // this controls the linstring download button's disable property
+  enableLinestringDownload: boolean = false;
   downloadLinestringFormat: VectorFeatureFileFormat = 'kml';
-  enableAnnotationsDownload: boolean = false; // this controls the annotation download button's disable property
+  enableAnnotationsDownload: boolean = false;
   downloadAnnotationsFormat: VectorFeatureFileFormat = 'kml';
+  qualitativeColors: string[] = [
+    '#E41A1C', // Red
+    '#377EB8', // Blue
+    '#4DAF4A', // Green
+    '#984EA3', // Purple
+    '#FF7F00', // Orange
+    '#000000ff', // Black
+    '#A65628', // Brown
+    '#F781BF', // Pink
+    '#999999', // Gray
+    '#66C2A5', // Teal
+    '#A6D854', // Lime
+    '#E78AC3' // Light Pink
+  ];
 }

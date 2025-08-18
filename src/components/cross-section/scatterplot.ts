@@ -100,6 +100,7 @@ export class Scatterplot {
   groupID: string = uuidv4();
   measure: boolean = false;
   draw: boolean = false;
+  gridVisible: boolean = true;
   backgroundColor: [number, number, number, number] = [1.0, 1.0, 1.0, 1.0];
   xGridColor: [number, number, number, number] = [0.0, 0.0, 0.0, 1.0];
   yGridColor: [number, number, number, number] = [0.0, 0.0, 0.0, 1.0];
@@ -113,6 +114,9 @@ export class Scatterplot {
   cy0: number | null = null;
   x0: number = 0.0;
   y0: number = 0.0;
+  annotationPadX: number = 8; // horizontal padding around annotation text
+  annotationPadY: number = 4; // vertical padding around annotation text
+  annotationGapY: number = 20; // space above the annotation text
 
   // Property type declarations (without default values)
   parent: HTMLDivElement;
@@ -125,9 +129,13 @@ export class Scatterplot {
   private drag: unknown;
   private measurementsSVG!: d3.Selection<SVGSVGElement, unknown, HTMLElement | null, undefined>;
   private pointsSVG!: d3.Selection<SVGSVGElement, unknown, HTMLElement | null, unknown>;
+
   private markerLabelBoxesSVG!: d3.Selection<SVGSVGElement, unknown, HTMLElement | null, unknown>;
   private markerLabelsSVG!: d3.Selection<SVGSVGElement, unknown, HTMLElement | null, unknown>;
+
+  private measurementLabelBoxesSVG!: d3.Selection<SVGSVGElement, unknown, HTMLElement | null, unknown>;
   private measurementLabelsSVG!: d3.Selection<SVGSVGElement, unknown, HTMLElement | null, unknown>;
+
   private zoom!: d3.ZoomBehavior<Element, unknown> | d3.ZoomBehavior<SVGSVGElement, unknown> | null;
   private xAxis!: d3.Axis<d3.NumberValue>;
   private yAxis!: d3.Axis<d3.NumberValue>;
@@ -148,6 +156,10 @@ export class Scatterplot {
   private matrix_uniform!: WebGLUniformLocation;
   private vertex_attrib!: GLint;
   private color_attrib!: GLint;
+  private vertexBuffer!: WebGLBuffer;
+  private colorBuffer!: WebGLBuffer;
+  private indexBuffer!: WebGLBuffer;
+  private currentIndex: Uint32Array = new Uint32Array(0);
 
   public constructor(
     parent: HTMLDivElement,
@@ -271,14 +283,20 @@ export class Scatterplot {
       .attr('clip-path', 'url(#clip)')
       .attr('transform', '');
 
-    // Measurement text labels group
+    // Measurement labels boxes
+    this.containerSVG
+      .append('g')
+      .attr('id', 'svg-measurement-label-boxes')
+      .attr('pointer-events', 'none')
+      .attr('clip-path', 'url(#clip)');
+
+    // Measurement labels
     this.containerSVG
       .append('g')
       .attr('id', 'svg-measurement-labels')
       .attr('pointer-events', 'none')
       .attr('font-family', 'sans-serif')
-      .attr('clip-path', 'url(#clip)')
-      .attr('transform', '');
+      .attr('clip-path', 'url(#clip)');
 
     // Initialize D3 axes and grids
     this.xAxis = d3.axisBottom(this.xScale);
@@ -323,6 +341,9 @@ export class Scatterplot {
     // Initialize SVG marker labels
     this.markerLabelsSVG = d3.select(this.parent).select('#svg-labels');
 
+    // Initialize SVG measurement label boxes
+    this.measurementLabelBoxesSVG = d3.select(this.parent).select('#svg-measurement-label-boxes');
+
     // Initialize SVG measurement labels
     this.measurementLabelsSVG = d3.select(this.parent).select('#svg-measurement-labels');
 
@@ -350,6 +371,11 @@ export class Scatterplot {
   private initializeWebGL(): void {
     // Set WEBGL context
     this.gl = this.canvas.node()!.getContext('webgl2')!;
+
+    // Create buffers
+    this.vertexBuffer = this.gl.createBuffer()!;
+    this.colorBuffer = this.gl.createBuffer()!;
+    this.indexBuffer = this.gl.createBuffer()!;
 
     // Initialize WEBGL shader
     this.shaderProgram = this.GLProgram(this.gl, this.vertexShaderSource, this.fragmentShaderSource);
@@ -722,6 +748,10 @@ export class Scatterplot {
 
   updatePoints(xy: Float32Array): void {
     this.xy = xy;
+    // Upload new positions into the vertex buffer
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.xy, this.gl.STATIC_DRAW);
+
     this.updateBoundingBox();
     this.xDomain = [this.boundingBox.xMin, this.boundingBox.xMax];
     this.yDomain = [this.boundingBox.yMin, this.boundingBox.yMax];
@@ -729,6 +759,25 @@ export class Scatterplot {
 
   updateColors(rgb: Uint8Array): void {
     this.rgb = rgb;
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.rgb, this.gl.STATIC_DRAW);
+  }
+
+  updateColorsSlice(slice: Uint8Array, offset: number) {
+    this.rgb.set(slice, offset * 3);
+    // Update the color buffer partially
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
+    this.gl.bufferSubData(
+      this.gl.ARRAY_BUFFER,
+      offset * 3, // byte offset
+      slice
+    );
+  }
+
+  updateIndex(index: Uint32Array) {
+    this.currentIndex = index;
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, index, this.gl.STATIC_DRAW);
   }
 
   updatePaths(): void {
@@ -817,58 +866,124 @@ export class Scatterplot {
     this.updatePaths();
   }
 
+  printMeasurementLabel(distance: number, slope: number): string {
+    let label;
+    if (Number.isFinite(slope)) {
+      label = `${distance.toFixed(2)} m | ${(100 * slope).toFixed(2)}%`;
+    } else {
+      label = `${distance.toFixed(2)} m`;
+    }
+    return label;
+  }
+
   updateLabels(): void {
     // Update SVG marker text labels
+    const markerBoxSizes = new Map<string, { w: number; h: number }>();
+
     this.markerLabelsSVG
-      .selectAll('text')
-      .data(this.markers.filter((x) => x.show))
+      .selectAll<SVGTextElement, Marker>('text')
+      .data(
+        this.markers.filter((x) => x.show),
+        (d) => d.id
+      )
       .join('text')
       .attr('id', (d) => `label-${d.id}`)
       .attr('x', (d) => this.xScale(d.x))
-      .attr('y', (d) => this.yScale(d.y))
-      .text((d) => `${d.label}`)
-      .attr('dy', '-20px')
-      .attr('pointer-events', 'none')
+      .attr('y', (d) => this.yScale(d.y) - this.annotationGapY)
       .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'text-before-edge')
+      .attr('pointer-events', 'none')
       .attr('font-family', 'sans-serif')
       .attr('font-size', 16)
-      .attr('fill', 'white');
+      .attr('fill', 'white')
+      .text((d) => `${d.label}`)
+      .each(function (d) {
+        const b = (this as SVGTextElement).getBBox();
+        markerBoxSizes.set(d.id, { w: b.width, h: b.height });
+      })
+      .attr('y', (d) => this.yScale(d.y) - this.annotationGapY - (markerBoxSizes.get(d.id)?.h ?? 0) / 2);
 
     this.markerLabelBoxesSVG
-      .selectAll('rect')
-      .data(this.markers.filter((x) => x.show))
+      .selectAll<SVGRectElement, Marker>('rect')
+      .data(
+        this.markers.filter((x) => x.show),
+        (d) => d.id
+      )
       .join('rect')
       .attr('id', (d) => `label-box-${d.id}`)
-      .attr('x', (d) => this.xScale(d.x) - 13)
-      .attr('y', (d) => this.yScale(d.y) - 38)
+      .attr('x', (d) => this.xScale(d.x) - (markerBoxSizes.get(d.id)?.w ?? 0) / 2 - this.annotationPadX)
+      .attr(
+        'y',
+        (d) => this.yScale(d.y) - this.annotationGapY - (markerBoxSizes.get(d.id)?.h ?? 0) / 2 - this.annotationPadY
+      )
+      .attr('width', (d) => (markerBoxSizes.get(d.id)?.w ?? 0) + 2 * this.annotationPadX)
+      .attr('height', (d) => (markerBoxSizes.get(d.id)?.h ?? 0) + 2 * this.annotationPadY)
+      .attr('rx', 4)
       .attr('pointer-events', 'none')
-      .attr('width', 26)
-      .attr('height', 26)
       .attr('fill', 'black')
+      .attr('fill-opacity', 0.7)
       .attr('stroke', 'white')
       .attr('stroke-width', '1px');
 
+    const measurementBoxSizes = new Map<string, { w: number; h: number }>();
+
     this.measurementLabelsSVG
-      .selectAll('text')
-      .data(this.measurements)
+      .selectAll<SVGTextElement, Measurement>('text')
+      .data(this.measurements, (d) => d.id)
       .join('text')
       .attr('id', (d) => `mlabel-${d.id}`)
       .attr('x', (d) => this.xScale(d.x))
       .attr('y', (d) => this.yScale(d.y))
-      .text((d) => `${d.distance.toFixed(2)} | ${(100 * d.slope).toFixed(2)}%`)
-      .attr('dy', '0px')
-      .attr('pointer-events', 'none')
       .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle')
+      .attr('pointer-events', 'none')
       .attr('font-family', 'sans-serif')
       .attr('font-size', 18)
       .attr('font-weight', 'bolder')
-      .attr('fill', '#FF4500');
+      .attr('fill', '#ffffffff')
+      .text((d) => this.printMeasurementLabel(d.distance, d.slope))
+      // .text((d) => `${d.distance.toFixed(2)} m | ${(100 * d.slope).toFixed(2)}%`)
+      .each(function (d) {
+        const b = (this as SVGTextElement).getBBox();
+        measurementBoxSizes.set(d.id, { w: b.width, h: b.height });
+      });
+
+    this.measurementLabelBoxesSVG
+      .selectAll<SVGRectElement, Measurement>('rect')
+      .data(this.measurements, (d) => d.id)
+      .join('rect')
+      .attr('id', (d) => `mlabel-box-${d.id}`)
+      .attr('x', (d) => this.xScale(d.x) - (measurementBoxSizes.get(d.id)?.w ?? 0) / 2 - this.annotationPadX)
+      .attr('y', (d) => this.yScale(d.y) - (measurementBoxSizes.get(d.id)?.h ?? 0) / 2 - this.annotationPadY)
+      .attr('width', (d) => (measurementBoxSizes.get(d.id)?.w ?? 0) + 2 * this.annotationPadX)
+      .attr('height', (d) => (measurementBoxSizes.get(d.id)?.h ?? 0) + 2 * this.annotationPadY)
+      .attr('rx', 0)
+      .attr('pointer-events', 'none')
+      .attr('fill', 'black')
+      .attr('fill-opacity', 0.7)
+      .attr('stroke', 'white')
+      .attr('stroke-width', '1px');
+  }
+
+  setGridVisibility(val: boolean): void {
+    this.gridVisible = val;
+    const display = val ? '' : 'none';
+    d3.select(this.parent).select<SVGGElement>('#svg-x-grid').style('display', display);
+    d3.select(this.parent).select<SVGGElement>('#svg-y-grid').style('display', display);
   }
 
   setBackgroundColor(val: string) {
     const color = d3.rgb(val);
     this.backgroundColor = [color.r / 255, color.g / 255, color.b / 255, color.opacity];
-    this.initializeGL();
+
+    this.gl.clearColor(
+      this.backgroundColor[0],
+      this.backgroundColor[1],
+      this.backgroundColor[2],
+      this.backgroundColor[3]
+    );
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
     this.updateTransform();
   }
 
@@ -1006,6 +1121,7 @@ export class Scatterplot {
 
     // Delete SVG labels
     this.measurementLabelsSVG.selectAll('*').remove();
+    this.measurementLabelBoxesSVG.selectAll('*').remove();
 
     this.updateMeasurements();
 
@@ -1097,6 +1213,9 @@ export class Scatterplot {
 
     // Delete SVG measurement labels
     this.measurementLabelsSVG.selectAll('*').remove();
+
+    // Delete SVG measurement label boxes
+    this.measurementLabelBoxesSVG.selectAll('*').remove();
 
     // Reset measurement group ID
     this.groupID = uuidv4();
@@ -1193,21 +1312,19 @@ export class Scatterplot {
     );
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    // Position (UV) buffer
-    const vertex_buffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
+    // Position buffer
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, this.xy, this.gl.STATIC_DRAW);
-
-    // Vertex attribute pointer (index, size, type, normalized, stride in bytes, offset in bytes)
     this.gl.vertexAttribPointer(this.vertex_attrib, 2, this.gl.FLOAT, false, 0, 0);
 
-    // Color (RGB) buffer
-    const color_buffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, color_buffer);
+    // Color buffer
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, this.rgb, this.gl.STATIC_DRAW);
-
-    // Vertex attribute pointer (index, size, type, normalized, stride in bytes, offset in bytes)
     this.gl.vertexAttribPointer(this.color_attrib, 3, this.gl.UNSIGNED_BYTE, true, 0, 0);
+
+    // Index buffer
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, 0, this.gl.STATIC_DRAW);
   }
 
   // Multiply two 4x4 matrices
@@ -1330,7 +1447,7 @@ export class Scatterplot {
     this.gl.uniform1f(this.pointsize_uniform, this.pointSize);
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-    this.gl.drawArrays(this.gl.POINTS, 0, this.nPoints);
+    this.gl.drawElements(this.gl.POINTS, this.currentIndex.length, this.gl.UNSIGNED_INT, 0);
   }
 
   GLShader(gl: WebGL2RenderingContext, type: GLenum, code: string): WebGLShader {

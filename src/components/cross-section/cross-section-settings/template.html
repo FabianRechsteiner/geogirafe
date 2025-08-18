@@ -142,44 +142,19 @@
       </div>
     </div>
 
-    <h3 i18n="profile_colors">Colors</h3>
-
+    <!-- SELECT BACKGROUND COLOR -->
     <div class="btn-group-flex">
-      <!-- SELECT VARIABLE USED FOR COLORING -->
-      <label for="color-variable-btn" i18n="profile_color_by" class="gg-label">Color by</label>
-      <select
-        id="color-variable-btn"
-        class="gg-select"
-        oninput="${(e: Event) => this.setColorVariable((e.target! as HTMLInputElement).value as ColorVariable)}">
-        <option
-          value="uniform"
-          i18n="color_option_uniform"
-          ?selected="${this.crossSectionState.colorVariable === 'uniform'}">
-          Single color
-        </option>
-        <option
-          value="natural"
-          i18n="color_option_natural"
-          ?selected="${this.crossSectionState.colorVariable === 'natural'}">
-          Natural
-        </option>
-        <option
-          value="intensity"
-          i18n="color_option_intensity"
-          ?selected="${this.crossSectionState.colorVariable === 'intensity'}">
-          Intensity
-        </option>
-        <option
-          value="classification"
-          i18n="color_option_classification"
-          ?selected="${this.crossSectionState.colorVariable === 'classification'}">
-          Classification
-        </option>
-      </select>
+      <label for="background-color-btn" i18n="profile_background_color" class="gg-label">Background color</label>
+      <input
+        id="background-color-btn"
+        class="gg-input"
+        type="color"
+        value="${this.crossSectionState.backgroundColor}"
+        oninput="${(e: Event) => this.setBackgroundColor((e.target! as HTMLInputElement).value)}" />
     </div>
 
-    <div class="btn-group-flex" hidden="${this.crossSectionState.colorVariable !== 'intensity'}">
-      <!-- SELECT PALETTE  -->
+    <!-- SELECT CONTINUOUS COLOR PALETTE  -->
+    <div class="btn-group-flex">
       <label for="sequential-color-btn" i18n="profile_colormap" class="gg-label">Colorscale</label>
       <select
         id="sequential-color-btn"
@@ -218,27 +193,74 @@
       </select>
     </div>
 
-    <div class="btn-group-flex" hidden="${this.crossSectionState.colorVariable !== 'uniform'}">
-      <!-- SELECT UNIFORM COLOR -->
-      <label for="uniform-color-btn" i18n="color_option_uniform" class="gg-label">Uniform color</label>
+    <!-- TOGGLE GRID VISIBILITY -->
+    <div class="option">
+      <label for="grid-btn" i18n="profile_toggle_grid" class="gg-label">Show grid</label>
       <input
-        id="uniform-color-btn"
-        class="gg-input"
-        type="color"
-        value="${this.crossSectionState.colorUniform}"
-        oninput="${(e: Event) => this.setUniformColor((e.target! as HTMLInputElement).value)}" />
+        id="grid-btn"
+        class="gg-checkbox"
+        ?checked="${this.crossSectionState.gridVisible}"
+        type="checkbox"
+        onchange="${(e: Event) => this.setGridVisibility((e.target! as HTMLInputElement).checked)}" />
     </div>
 
-    <!-- SELECT BACKGROUND COLOR -->
-    <div class="btn-group-flex">
-      <label for="background-color-btn" i18n="profile_background_color" class="gg-label">Background color</label>
-      <input
-        id="background-color-btn"
-        class="gg-input"
-        type="color"
-        value="${this.crossSectionState.backgroundColor}"
-        oninput="${(e: Event) => this.setBackgroundColor((e.target! as HTMLInputElement).value)}" />
+    <h3 i18n="profile_pointcloud">Pointclouds</h3>
+
+    <!-- NUMBER OF POINTS DISPLAYED INDICATOR -->
+    <div class="btn-group-flex loader-progress">
+      <div class="progress-wrapper" tip="profile_load_indicator_help">
+        <progress
+          id="load-progress"
+          class="gg-progress"
+          value="${this.crossSectionState.numberOfPoints}"
+          max="${this.crossSectionState.maxNumberOfPoints}"></progress>
+        <span class="progress-label">
+          ${(this.crossSectionState.loading) ? uHtml`<img
+            src="icons/progress.svg"
+            alt="Loading"
+            class="gg-spin gg-small progress-icon" />` : uHtml`` } ${this.crossSectionState.numberOfPoints} /
+          ${this.crossSectionState.maxNumberOfPoints}
+        </span>
+      </div>
     </div>
+
+    <!-- DATASET SELECTION -->
+    <div>
+      ${ this.crossSectionState.datasets.map(f => uHtml`
+      <div class="dataset-row">
+        <input
+          type="checkbox"
+          id="${f.id}"
+          class="gg-checkbox"
+          ?checked="${f.active}"
+          onchange="${() => this.toggleVisibility(f.id)}" />
+        <span class="dataset-name" i18n="${ f.id }">${ f.id }</span>
+        <select
+          class="gg-select"
+          oninput="${(e: Event) => this.setColorVariable(f.id, (e.target! as HTMLSelectElement).value as ColorVariable)}">
+          <option value="uniform" ?selected="${f.colorby === 'uniform'}" i18n="color_option_uniform">Uniform</option>
+          <option value="natural" ?selected="${f.colorby === 'natural'}" i18n="color_option_natural">Natural</option>
+          <option value="intensity" ?selected="${f.colorby === 'intensity'}" i18n="color_option_intensity">
+            Intensity
+          </option>
+          <option
+            value="classification"
+            ?selected="${f.colorby === 'classification'}"
+            i18n="color_option_classification">
+            Classification
+          </option>
+        </select>
+        <input
+          id="uniform-color-btn"
+          class=""
+          type="color"
+          value="${f.color}"
+          oninput="${(e: Event) => this.setColor(f.id, (e.target! as HTMLInputElement).value)}" />
+      </div>
+      `) }
+    </div>
+
+    <h3 i18n="profile_measure_and_annotate">Measurements and annotations</h3>
 
     <!-- MEASUREMENTS BUTTONS -->
     <div class="btn-group-flex">
