@@ -154,7 +154,7 @@ button.selected {
   grid-template-columns: 77px 70px 56px 26px;
 }
 #optionsLineLines {
-  grid-template-columns: 60px 40px 20px;
+  grid-template-columns: 60px 40px 20px auto;
 }
 #optionsExportLine {
   display: flex;

@@ -1,4 +1,4 @@
-import DrawingFeature, { DrawingShape, DrawingState } from './drawingFeature';
+import DrawingFeature, { DrawingShape, DrawingState, LineStroke } from './drawingFeature';
 import MapComponent from '../map/component';
 import StateManager from '../../tools/state/statemanager';
 import State from '../../tools/state/state';
@@ -38,6 +38,19 @@ import {
   isAlternateMouseClick,
   isPrimaryPointerAction
 } from '../../tools/state/userinteractionevent';
+
+function getLineStroke(strokeType: LineStroke, lineWidth: number) {
+  switch (strokeType) {
+    case 'full':
+    case 'double':
+      return undefined;
+    case 'dash':
+      return [3 * lineWidth, 5 * lineWidth];
+    case 'dot':
+      // minimal length creates dots with rounded lineCap
+      return [0.01, 5 * lineWidth];
+  }
+}
 
 function getHalfPoint(coordinates: Coordinate[]) {
   return new Point(new LineString(coordinates).getCoordinateAt(0.5));
@@ -481,7 +494,13 @@ export default class OlDrawing {
     const nameFont = 'Bold ' + dFeature.nameFontSize + 'px/1 ' + dFeature.font;
     const measureColor = 'rgba(0, 0, 0, 0.4)';
     const defaultStyle = new Style({
-      stroke: new Stroke({ color: dFeature.strokeColor, width: dFeature.strokeWidth }),
+      // need to explicitly mention lineCap: round, so that MapfishPrint does not use butted as default
+      stroke: new Stroke({
+        color: dFeature.strokeColor,
+        width: dFeature.strokeWidth,
+        lineCap: 'round',
+        lineDash: getLineStroke(dFeature.lineStroke, dFeature.strokeWidth)
+      }),
       fill: new Fill({ color: dFeature.fillColor }),
       image: new Circle({
         radius: dFeature.strokeWidth, // Points are using default stroke parameters
