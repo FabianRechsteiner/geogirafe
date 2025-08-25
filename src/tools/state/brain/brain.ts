@@ -61,7 +61,15 @@ export default class Brain<T> {
     }
   }
 
-  private createProxy(target: any, prop: string, parent?: TProxy) {
+  /**
+   *
+   * Creates a proxy for the given target object
+   * @param target The target object to create a proxy for
+   * @param prop The property name of this target in its parent
+   * @param parent The parent proxy (optional for root element)
+   * @returns The created proxy
+   */
+  private createProxy(target: any, prop: string, parent?: TProxy): TProxy {
     const proxy = new Proxy(target, this.objectHandler());
     this.targetToProxy.set(target, proxy);
     this.proxyToTarget.set(proxy, target);
@@ -80,6 +88,68 @@ export default class Brain<T> {
     return proxy;
   }
 
+  /**
+   * Ensure we keep only minimal unique paths for a proxy.
+   * And ensure that the selectd paths have the same prefix than the parents path
+   * Example:
+   *   existing:    ["group"]
+   *   candidates:  ["group.children.0.parent"]
+   *   => keep only ["group"]
+   * Other example if parentsPaths is defined:
+   *   existing:    ["group.inner"]
+   *   candidates:  ["group.inner", "group2.inner"]
+   *   parrents:    ["group2"]
+   *   => keep only ["group2.inner"] (Because it is the only one still linked to the right parent)
+   */
+  private mergeMinimalPaths(existingPaths: string[], candidatePaths: string[], parents: TProxy[]): string[] {
+    const minimalPaths = new Set<string>();
+
+    for (const candidate of [...existingPaths, ...candidatePaths]) {
+      // Already present
+      if (minimalPaths.has(candidate)) {
+        continue;
+      }
+
+      // If the candidate hat a minimal path as prefix
+      if ([...minimalPaths].some((path) => candidate.startsWith(`${path}.`))) {
+        continue;
+      }
+
+      // If not prefixed by any parent
+      if (!this.isRightParent(candidate, parents)) {
+        continue;
+      }
+
+      minimalPaths.add(candidate);
+    }
+
+    return Array.from(minimalPaths);
+  }
+
+  private isRightParent(candidate: string, parents: TProxy[]): boolean {
+    const parentsPaths = parents?.flatMap((p) => p.__brainFullPaths);
+    if (parentsPaths?.length > 0 && parentsPaths[0].length > 0) {
+      // Not on the root
+      let circularReference = false;
+      let rightParent = false;
+      for (const parentPath of parentsPaths) {
+        if (parentPath.includes(`${candidate}.`)) {
+          circularReference = true;
+          break;
+        } else if (candidate.startsWith(`${parentPath}.`)) {
+          rightParent = true;
+          break;
+        }
+      }
+
+      if (!circularReference && !rightParent) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   private getOrCreateProxyForValue(proxy: object, prop: string, value: any, childPaths: string[]): TProxy | undefined {
     if (isPrimitive(value)) {
       // No proxy for primitives
@@ -89,43 +159,50 @@ export default class Brain<T> {
     let valueProxy = this.targetToProxy.get(value);
     if (valueProxy) {
       // Proxy already exists
-      if (valueProxy.__brainChildren.size === 0) {
-        // Has not children yet, it means this proxy is not used in another place yet
-        // This is no circular reference, we can process with the normal workflow
-        // Otherwise, we just keep the existing infos and do not add any new child, parent or path
-        proxy.__brainChildren.set(prop, valueProxy);
-        const fullPaths = valueProxy.__brainFullPaths;
-        for (const childPath of childPaths) {
-          if (!fullPaths.includes(childPath)) {
-            fullPaths.push(childPath);
-          }
-        }
-        // TODO REG : We have to update the child paths recursively too !!
-        const parents = valueProxy.__brainParents;
-        if (!parents.includes(proxy)) {
-          parents.push(proxy);
-        }
+
+      // Link parent to child
+      proxy.__brainChildren.set(prop, valueProxy);
+
+      // Add parent if not already present
+      const parents = valueProxy.__brainParents;
+      if (!parents.includes(proxy)) {
+        parents.push(proxy);
       }
+
+      // Merge full paths (ensure minimal paths)
+      const merged = this.mergeMinimalPaths(valueProxy.__brainFullPaths, childPaths, valueProxy.__brainParents);
+      const fullPaths = valueProxy.__brainFullPaths;
+      if (merged.length !== fullPaths.length || merged.some((p: string, i: number) => p !== fullPaths[i])) {
+        fullPaths.splice(0, fullPaths.length, ...merged);
+      }
+
+      this.updateChildPathsRecursively(valueProxy, fullPaths);
     } else {
       // Create a new proxy
       valueProxy = this.createProxy(value, prop, proxy);
+      const minimal = this.mergeMinimalPaths([], childPaths, valueProxy.__brainParents);
+      this.proxyToFullPaths.set(valueProxy, minimal);
+      this.updateChildPathsRecursively(valueProxy, minimal);
     }
     return valueProxy;
   }
 
   private cleanProxyForValue(proxy: object, prop: string, value: any, childPaths: string[]) {
     if (isPrimitive(value)) {
-      // No proxy for primitives
+      // Nothing to clean for primitives
       return;
     }
 
     const valueProxy = this.targetToProxy.get(value);
     if (!valueProxy) {
-      // Nothing to clean
+      // The value was never proxied => Nothing to clean
       return;
     }
 
+    // Remove the child link for this property
     proxy.__brainChildren.delete(prop);
+
+    // Remove only the paths that were coming from this proxy
     const fullPaths = valueProxy.__brainFullPaths;
     for (const childPath of childPaths) {
       const index = fullPaths.indexOf(childPath);
@@ -133,12 +210,79 @@ export default class Brain<T> {
         fullPaths.splice(index, 1);
       }
     }
-    // TODO REG : We have to update the child paths recursively too !!
+
+    // Check if this proxy is still a parent of the child
+    // We only remove the parent if NO other child at this level points to it.
     const parents = valueProxy.__brainParents;
-    const index = parents.indexOf(proxy);
-    if (index >= 0) {
-      // TODO Remove only if another child at the same level does not have it as parent
-      parents.splice(index, 1);
+    const stillReferenced = Array.from(proxy.__brainChildren.values()).includes(valueProxy);
+    if (!stillReferenced) {
+      const index = parents.indexOf(proxy);
+      if (index >= 0) {
+        parents.splice(index, 1);
+      }
+    }
+
+    // Recursively update child paths for consistency
+    this.updateChildPathsRecursively(valueProxy, valueProxy.__brainFullPaths);
+  }
+
+  private recalculateChildrenForArray(proxy: TProxy, target: TTarget, oldValue: TTarget) {
+    if (!Array.isArray(target)) {
+      throw new Error('This method is only for arrays');
+    }
+
+    // Clean previous childs
+    proxy.__brainChildren.clear();
+
+    for (let i = 0; i < target.length; ++i) {
+      const childValue = target[i];
+      const childPaths = proxy.__brainFullPaths.map((path) => this.getFullPath(path, i.toString()));
+      const childOldValue = oldValue.find((oldChild: any) => areEqual(oldChild, childValue));
+      if (childOldValue) {
+        const oldChildIndex = oldValue.indexOf(childOldValue);
+        const oldChildPaths = proxy.__brainFullPaths.map((path) => this.getFullPath(path, oldChildIndex));
+        this.cleanProxyForValue(proxy, i.toString(), childValue, oldChildPaths);
+      }
+      const childProxy = this.getOrCreateProxyForValue(proxy, i.toString(), childValue, childPaths);
+      if (childProxy) {
+        proxy.__brainChildren.set(i.toString(), childProxy);
+      }
+
+      if (oldValue && oldValue.length > target.length) {
+        for (let i = target.length; i < oldValue.length; i++) {
+          const childPaths = proxy.__brainFullPaths.map((path) => this.getFullPath(path, i.toString()));
+          this.cleanProxyForValue(proxy, i.toString(), oldValue[i], childPaths);
+        }
+      }
+
+      for (const [key, childProxy] of proxy.__brainChildren.entries()) {
+        const childPaths = proxy.__brainFullPaths.map((path) => this.getFullPath(path, key));
+        this.proxyToFullPaths.set(childProxy, childPaths);
+        this.updateChildPathsRecursively(childProxy, childPaths);
+      }
+    }
+  }
+
+  private updateChildPathsRecursively(proxy: TProxy, parentPaths: string[], visited = new Set<TProxy>()) {
+    if (visited.has(proxy)) {
+      return;
+    }
+    visited.add(proxy);
+
+    for (const [prop, childProxy] of proxy.__brainChildren.entries()) {
+      let fullPaths = this.proxyToFullPaths.get(childProxy);
+      if (!fullPaths) {
+        fullPaths = [];
+        this.proxyToFullPaths.set(childProxy, fullPaths);
+      }
+
+      const candidatePaths = parentPaths.map((path) => this.getFullPath(path, prop));
+      const merged = this.mergeMinimalPaths(fullPaths, candidatePaths, childProxy.__brainParents);
+      const changed = merged.length !== fullPaths.length || merged.some((p, i) => p !== fullPaths[i]);
+      if (changed) {
+        fullPaths.splice(0, fullPaths.length, ...merged);
+        this.updateChildPathsRecursively(childProxy, fullPaths, visited);
+      }
     }
   }
 
@@ -221,6 +365,10 @@ export default class Brain<T> {
       }
 
       if (!areEqual(oldValue, target)) {
+        if (Array.isArray(target)) {
+          // The array has changed. We have to recalculate the children and paths for the elements
+          this.recalculateChildrenForArray(proxy, target, oldValue);
+        }
         for (const path of proxy.__brainFullPaths) {
           this.callback(path, oldValue, proxy, proxy.__brainParents);
         }
