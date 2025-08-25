@@ -28,11 +28,6 @@ replaceInFile(
   /const geogirafeSource = 'src'/gm,
   "const geogirafeSource = 'node_modules/@geogirafe/lib-geoportal'"
 );
-replaceInFile(
-  path.join(targetDir, 'vite.config.js'),
-  /const certsDirectory = 'buildtools\/certs'/gm,
-  "const certsDirectory = 'certs'"
-);
 copy('index.html', sourceDir, targetDir);
 replaceInFile(path.join(targetDir, 'index.html'), /href="src\/styles/gm, 'href="styles');
 copy('mobile.html', sourceDir, targetDir);
