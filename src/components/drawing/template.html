@@ -171,6 +171,25 @@
       </div>
     </div>
     <hr />
+    <div id="optionsLineStyle">
+      <div class="${this.isLineStyleEnabled() ? '' : 'disabled'}" id="optionsLineStyles">
+        <select id="arrow-style" class="gg-select" onchange="${() => this.onArrowsChange()}">
+          ${Object.entries(this.arrowStyles).map((entry) => uHtml`
+          <option selected="${this.selectedFeatures[0]?.arrowStyle === entry[0]}" value="${entry[0]}">
+            <span>${entry[1]}</span>
+          </option>
+          `)}
+        </select>
+        <select id="arrow-position" class="gg-select" onchange="${() => this.onArrowsChange()}">
+          ${Object.entries(this.arrowPositions).map((entry) => uHtml`
+          <option selected="${this.selectedFeatures[0]?.arrowPosition === entry[0]}" value="${entry[0]}">
+            <span>${entry[1]}</span>
+          </option>
+          `)}
+        </select>
+      </div>
+    </div>
+    <hr />
     <div id="optionsExport">
       <div id="optionsExportLine">
         <label for="export" class="gg-label" i18n="Export">Export</label>
