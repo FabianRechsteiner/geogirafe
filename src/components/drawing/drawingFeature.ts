@@ -16,6 +16,8 @@ export enum DrawingShape {
   FreehandPolygon
 }
 
+export type LineStroke = 'full' | 'dash' | 'dot' | 'double';
+
 export class DrawingState {
   activeTool: DrawingShape | null = null;
   features: DrawingFeature[] = [];
@@ -26,6 +28,7 @@ export type SerializedFeature = {
   sc: string;
   sw: number;
   fc: string;
+  ls: string;
   nfz: number;
   mfz: number;
   f: string;
@@ -45,6 +48,7 @@ export default class DrawingFeature {
   private _strokeColor: string;
   private _strokeWidth: number;
   private _fillColor: string;
+  private _lineStroke: LineStroke = 'full';
   private _nameFontSize: number;
   private _measureFontSize: number;
   private _measureColor: string;
@@ -93,6 +97,14 @@ export default class DrawingFeature {
   }
   set strokeWidth(v) {
     this._strokeWidth = v;
+    this.onChange(this);
+  }
+
+  get lineStroke() {
+    return this._lineStroke;
+  }
+  set lineStroke(v) {
+    this._lineStroke = v;
     this.onChange(this);
   }
 
@@ -182,6 +194,7 @@ export default class DrawingFeature {
       n: this._name,
       sc: this._strokeColor,
       sw: this._strokeWidth,
+      ls: this._lineStroke,
       fc: this._fillColor,
       nfz: this._nameFontSize,
       mfz: this._measureFontSize,
@@ -254,6 +267,7 @@ export default class DrawingFeature {
     const newFeature = new DrawingFeature(serializedFeature.t, serializedFeature.g, serializedFeature.n);
     newFeature.strokeColor = serializedFeature.sc;
     newFeature.strokeWidth = serializedFeature.sw;
+    newFeature.lineStroke = serializedFeature.ls as LineStroke;
     newFeature.fillColor = serializedFeature.fc;
     newFeature.nameFontSize = serializedFeature.nfz;
     newFeature.measureFontSize = serializedFeature.mfz;

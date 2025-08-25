@@ -1,6 +1,6 @@
 import { Color } from 'vanilla-picker';
 import { v4 as uuidv4 } from 'uuid';
-import DrawingFeature, { DrawingState, DrawingShape } from './drawingFeature';
+import DrawingFeature, { DrawingState, DrawingShape, LineStroke } from './drawingFeature';
 import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
 
@@ -50,6 +50,13 @@ export default class DrawingComponent extends GirafeHTMLElement {
     { id: 'freepolygon', tool: DrawingShape.FreehandPolygon }
   ];
   toolSelected: Element | null = null;
+
+  lineStyles: Record<LineStroke, string> = {
+    full: '—————',
+    dash: '- - -',
+    dot: '. . .',
+    double: '═════'
+  };
 
   olDrawing: OlDrawing;
   cesiumDrawing: CesiumDrawing;
@@ -335,9 +342,11 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const nameFontSize = parseInt(this.getById<HTMLInputElement>('optionsNameFontSize').value);
     const measureFontSize = parseInt(this.getById<HTMLInputElement>('optionsMeasuresFontSize').value);
     const strokeWidth = parseInt(this.getById<HTMLInputElement>('optionsStrokeWidth').value);
+    const lineStroke = this.getById<HTMLSelectElement>('line-style').value;
     this.selectedFeatures.forEach((f) => (f.nameFontSize = nameFontSize));
     this.selectedFeatures.forEach((f) => (f.measureFontSize = measureFontSize));
     this.selectedFeatures.forEach((f) => (f.strokeWidth = strokeWidth));
+    this.selectedFeatures.forEach((f) => (f.lineStroke = lineStroke as LineStroke));
   }
 
   toggleNameVisibility() {
