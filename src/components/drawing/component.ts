@@ -1,6 +1,6 @@
 import { Color } from 'vanilla-picker';
 import { v4 as uuidv4 } from 'uuid';
-import DrawingFeature, { DrawingState, DrawingShape, LineStroke } from './drawingFeature';
+import DrawingFeature, { DrawingState, DrawingShape, ArrowStyle, ArrowPosition, LineStroke } from './drawingFeature';
 import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
 
@@ -51,7 +51,18 @@ export default class DrawingComponent extends GirafeHTMLElement {
   ];
   toolSelected: Element | null = null;
 
-  lineStyles: Record<LineStroke, string> = {
+  arrowStyles: Record<ArrowStyle, string> = {
+    none: '-',
+    start: '<',
+    end: '>',
+    both: '<>'
+  };
+  arrowPositions: Record<ArrowPosition, string> = {
+    whole: '<>',
+    each: '<><>',
+    mid: '-<-'
+  };
+  lineStyles: Record<string, string> = {
     full: '—————',
     dash: '- - -',
     dot: '. . .',
@@ -323,6 +334,12 @@ export default class DrawingComponent extends GirafeHTMLElement {
     return this.selectedFeatures.some((f) => f.displayMeasure);
   }
 
+  isLineStyleEnabled(): boolean {
+    return this.selectedFeatures.some(
+      (f) => f.type == DrawingShape.Polyline || f.type == DrawingShape.FreehandPolyline
+    );
+  }
+
   isFillColorEnabled(): boolean {
     return !this.selectedFeatures.every((f) => f.isPointOrPolyline());
   }
@@ -347,6 +364,13 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.selectedFeatures.forEach((f) => (f.measureFontSize = measureFontSize));
     this.selectedFeatures.forEach((f) => (f.strokeWidth = strokeWidth));
     this.selectedFeatures.forEach((f) => (f.lineStroke = lineStroke as LineStroke));
+  }
+
+  onArrowsChange() {
+    const arrowStyle = this.getById<HTMLSelectElement>('arrow-style').value;
+    const arrowPosition = this.getById<HTMLSelectElement>('arrow-position').value;
+    this.selectedFeatures.forEach((f) => (f.arrowStyle = arrowStyle as ArrowStyle));
+    this.selectedFeatures.forEach((f) => (f.arrowPosition = arrowPosition as ArrowPosition));
   }
 
   toggleNameVisibility() {

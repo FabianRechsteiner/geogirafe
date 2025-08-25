@@ -16,6 +16,8 @@ export enum DrawingShape {
   FreehandPolygon
 }
 
+export type ArrowStyle = 'none' | 'start' | 'end' | 'both';
+export type ArrowPosition = 'whole' | 'each' | 'mid';
 export type LineStroke = 'full' | 'dash' | 'dot' | 'double';
 
 export class DrawingState {
@@ -29,6 +31,8 @@ export type SerializedFeature = {
   sw: number;
   fc: string;
   ls: string;
+  as: string;
+  ap: string;
   nfz: number;
   mfz: number;
   f: string;
@@ -49,6 +53,8 @@ export default class DrawingFeature {
   private _strokeWidth: number;
   private _fillColor: string;
   private _lineStroke: LineStroke = 'full';
+  private _arrowStyle: ArrowStyle = 'none';
+  private _arrowPosition: ArrowPosition = 'whole';
   private _nameFontSize: number;
   private _measureFontSize: number;
   private _measureColor: string;
@@ -113,6 +119,22 @@ export default class DrawingFeature {
   }
   set fillColor(v) {
     this._fillColor = v;
+    this.onChange(this);
+  }
+
+  get arrowStyle() {
+    return this._arrowStyle;
+  }
+  set arrowStyle(v) {
+    this._arrowStyle = v;
+    this.onChange(this);
+  }
+
+  get arrowPosition() {
+    return this._arrowPosition;
+  }
+  set arrowPosition(v) {
+    this._arrowPosition = v;
     this.onChange(this);
   }
 
@@ -195,6 +217,8 @@ export default class DrawingFeature {
       sc: this._strokeColor,
       sw: this._strokeWidth,
       ls: this._lineStroke,
+      as: this._arrowStyle,
+      ap: this._arrowPosition,
       fc: this._fillColor,
       nfz: this._nameFontSize,
       mfz: this._measureFontSize,
@@ -268,6 +292,8 @@ export default class DrawingFeature {
     newFeature.strokeColor = serializedFeature.sc;
     newFeature.strokeWidth = serializedFeature.sw;
     newFeature.lineStroke = serializedFeature.ls as LineStroke;
+    newFeature.arrowStyle = serializedFeature.as as ArrowStyle;
+    newFeature.arrowPosition = serializedFeature.ap as ArrowPosition;
     newFeature.fillColor = serializedFeature.fc;
     newFeature.nameFontSize = serializedFeature.nfz;
     newFeature.measureFontSize = serializedFeature.mfz;

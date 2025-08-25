@@ -22,7 +22,7 @@ import { Modify, Snap, Draw } from 'ol/interaction';
 import VectorSource, { VectorSourceEvent } from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
-import { Projection } from 'ol/proj';
+import { Projection, getPointResolution } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
 import { never, noModifierKeys, primaryAction } from 'ol/events/condition';
 import { Pixel } from 'ol/pixel';
@@ -544,12 +544,72 @@ export default class OlDrawing {
     };
 
     // If the shape is being constructed (ex. it is a polygon for which only two points are placed yet)
-    if (
-      geometry.getType() == 'LineString' &&
-      dFeature.type !== DrawingShape.Polyline &&
-      dFeature.type !== DrawingShape.FreehandPolyline
-    ) {
-      return [];
+    if (geometry.getType() == 'LineString') {
+      if (dFeature.type !== DrawingShape.Polyline && dFeature.type !== DrawingShape.FreehandPolyline) {
+        return [];
+      }
+
+      // arrows
+      const createArrowStyle = function (pos: number[], rot: number) {
+        const view = MapManager.getInstance().getMap().getView();
+        const proj = view.getProjection();
+        const res = view.getResolution();
+        const pointRes = getPointResolution(proj, res!, pos);
+        const arrowLength = 5 * pointRes * dFeature.strokeWidth;
+        const arrowGeom: Geometry = new LineString([
+          [pos[0] - 1.2 * arrowLength, pos[1] - arrowLength],
+          pos,
+          [pos[0] - 1.2 * arrowLength, pos[1] + arrowLength]
+        ]);
+        arrowGeom.rotate(rot, pos);
+        const stroke = defaultStyle.getStroke()?.clone();
+        stroke?.setLineDash(null);
+        return new Style({
+          geometry: arrowGeom,
+          stroke: stroke || undefined
+        });
+      };
+
+      const pushArrowStyles = function (
+        start: number[],
+        end: number[],
+        startArrow: boolean,
+        endArrow: boolean,
+        ratio: number
+      ) {
+        const dx = end[0] - start[0];
+        const dy = end[1] - start[1];
+        const p1 = [start[0] + ratio * dx, start[1] + ratio * dy];
+        const p2 = [end[0] - ratio * dx, end[1] - ratio * dy];
+
+        // arrows
+        if (startArrow) {
+          const rotation = Math.atan2(-dy, -dx);
+          styles.push(createArrowStyle(p1, rotation));
+        }
+        if (endArrow) {
+          const rotation = Math.atan2(dy, dx);
+          styles.push(createArrowStyle(p2, rotation));
+        }
+      };
+      // create arrow styles according to spec
+      if (dFeature.arrowStyle !== 'none') {
+        const doStartArrow = dFeature.arrowStyle == 'start' || dFeature.arrowStyle == 'both';
+        const doEndArrow = dFeature.arrowStyle == 'end' || dFeature.arrowStyle == 'both';
+        if (dFeature.arrowPosition === 'each') {
+          (geometry as LineString).forEachSegment(function (start, end) {
+            pushArrowStyles(start, end, doStartArrow, doEndArrow, 0);
+          });
+        } else if (dFeature.arrowPosition === 'mid') {
+          (geometry as LineString).forEachSegment(function (start, end) {
+            pushArrowStyles(start, end, doStartArrow, doEndArrow, 0.4);
+          });
+        } else if (dFeature.arrowPosition === 'whole') {
+          const coords = (geometry as LineString).getCoordinates();
+          pushArrowStyles(coords[0], coords[1], doStartArrow, false, 0);
+          pushArrowStyles(coords[coords.length - 2], coords[coords.length - 1], false, doEndArrow, 0);
+        }
+      }
     }
 
     if (dFeature.type == DrawingShape.Point || geometry.getType() === 'Point') {
