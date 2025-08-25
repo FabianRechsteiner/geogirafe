@@ -128,14 +128,16 @@ class GirafeHTMLElement extends HTMLElement {
       throw Error('Component cannot be re-rendered. Please call render() first.');
     }
 
+    // Call to uRender MUST stay synchron (no timeout)
+    // Otherwise, this cause unwanted effects like delay when updating templates
+    uRender(this.shadow, this.template);
+
     // Use a debouncing to prevent multiple execution of this method
     // If multiple refresh at the same time are called.
     if (this.timeoutId) {
       clearTimeout(this.timeoutId);
     }
-
     this.timeoutId = setTimeout(() => {
-      uRender(this.shadow, this.template);
       this.girafeTranslate();
       this.userInfoChanged();
     });

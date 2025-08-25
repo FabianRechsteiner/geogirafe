@@ -637,18 +637,17 @@ class CrossSectionViewComponent extends GirafeResizableElement {
   }
 
   connectedCallback(): void {
-    this.render();
-    this.registerVisibilityEvents();
-
     // Load pytree manager
-    (async () => {
-      try {
-        await this.initPytreeManager();
-        this.render();
-      } catch (err) {
-        console.error('PytreeManager loading failed:', err);
-      }
-    })();
+    if (ConfigManager.getInstance().Config.lidar) {
+      this.render();
+      this.registerVisibilityEvents();
+      this.initPytreeManager()
+        .then(() => this.render())
+        .catch((err) => console.error('PytreeManager loading failed:', err));
+    } else {
+      // No Lidar configuration
+      this.renderEmpty();
+    }
   }
 }
 

@@ -382,10 +382,10 @@ describe('State: base principles', () => {
   });
 
   it('Base principles: should use multiple paths for different places in the state (no circular references)', () => {
-    const group1 = { type: 'group', children: [] as any[] };
-    const group2 = { type: 'group', children: [] as any[] };
-    const group3 = { type: 'group', children: [] as any[] };
-    const layer = { type: 'layer', parent: group2, active: false };
+    const group1 = { name: 'group1', children: [] as any[] };
+    const group2 = { name: 'group2', children: [] as any[] };
+    const group3 = { name: 'group3', children: [] as any[] };
+    const layer = { name: 'layer', parent: group2, active: false };
 
     group1.children.push(group2);
     group3.children.push(group2);
@@ -403,6 +403,10 @@ describe('State: base principles', () => {
 
     expect(g1.children[0].__brainIsProxy).toBeTruthy();
     expect(g1.children[0]).toBe(g3.children[0]);
+
+    expect(g1.children[0].__brainFullPaths.length).toBe(2);
+    expect(g1.children[0].__brainFullPaths[0]).toBe('objectValue.0.children.0');
+    expect(g1.children[0].__brainFullPaths[1]).toBe('objectValue.1.children.0');
 
     g1.children[0].children[0].active = true;
     g1.children[0].children[0].parent.children[0].active = true;
@@ -504,5 +508,29 @@ describe('State: base principles', () => {
 
     (brain.getState().objectValue as any).owner.place = 'Bernwiller';
     expect(counter).toBe(2);
+  });
+
+  it('Base principles: Handles multiple parents referencing the same object', () => {
+    const shared = { id: 42 };
+    state.objectValue = { child: shared };
+    state.otherObjectValue = { child: shared };
+
+    brain = new Brain(state, () => {});
+    const proxyState = brain.getState();
+
+    const pSharedA = (proxyState.objectValue as any).child;
+    const pSharedB = (proxyState.otherObjectValue as any).child;
+
+    // Both references point to the same proxy
+    expect(pSharedA).toBe(pSharedB);
+
+    // That proxy has two parents
+    expect(pSharedA.__brainParents.length).toBe(2);
+    expect(pSharedA.__brainParents).toEqual(
+      expect.arrayContaining([proxyState.objectValue, proxyState.otherObjectValue])
+    );
+
+    // And two full paths
+    expect(pSharedA.__brainFullPaths).toEqual(expect.arrayContaining(['objectValue.child', 'otherObjectValue.child']));
   });
 });

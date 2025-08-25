@@ -216,7 +216,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       window.history.replaceState(null, '', newUrl.toString());
       await this.handleLoggedInToIssuer();
     } else if (event.data?.type === 'OAUTH_ERROR') {
-      console.error('Silent login error', event.data.error);
+      console.info('Silent login could not be done : ', event.data.error);
     }
 
     document.body.removeChild(this.silentLoginIframe!);

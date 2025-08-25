@@ -249,6 +249,75 @@ describe('State: Monitor array functions', () => {
     expect(controlValue).toBe(2);
   });
 
+  it('Monitor arrays functions: splice (remove with proxied objects)', () => {
+    const o0 = { id: 0 };
+    const o1 = { id: 1 };
+    const o2 = { id: 2 };
+    state.arrayValue = [o0, o1, o2];
+    brain = new Brain(state, () => {});
+
+    const po0 = brain.getState().arrayValue![0] as any;
+    const po1 = brain.getState().arrayValue![1] as any;
+    const po2 = brain.getState().arrayValue![2] as any;
+
+    expect(po0.__brainTarget).toBe(o0);
+    expect(po1.__brainTarget).toBe(o1);
+    expect(po2.__brainTarget).toBe(o2);
+
+    const brainChildren = brain.getState().arrayValue!.__brainChildren;
+    expect(brainChildren.size).toBe(3);
+    expect(brainChildren.get('0')).toBe(po0);
+    expect(brainChildren.get('1')).toBe(po1);
+    expect(brainChildren.get('2')).toBe(po2);
+
+    expect(brainChildren.get('0')!.__brainFullPaths.length).toBe(1);
+    expect(brainChildren.get('1')!.__brainFullPaths.length).toBe(1);
+    expect(brainChildren.get('2')!.__brainFullPaths.length).toBe(1);
+
+    expect(brainChildren.get('0')!.__brainFullPaths[0]).toBe('arrayValue.0');
+    expect(brainChildren.get('1')!.__brainFullPaths[0]).toBe('arrayValue.1');
+    expect(brainChildren.get('2')!.__brainFullPaths[0]).toBe('arrayValue.2');
+
+    brain.getState().arrayValue!.splice(0, 1);
+    expect(brain.getState().arrayValue?.length).toBe(2);
+    expect(brainChildren.size).toBe(2);
+    expect(brainChildren.get('0')).toBe(po1);
+    expect(brainChildren.get('1')).toBe(po2);
+
+    expect(brainChildren.get('0')!.__brainFullPaths.length).toBe(1);
+    expect(brainChildren.get('1')!.__brainFullPaths.length).toBe(1);
+
+    expect(brainChildren.get('0')!.__brainFullPaths[0]).toBe('arrayValue.0');
+    expect(brainChildren.get('1')!.__brainFullPaths[0]).toBe('arrayValue.1');
+  });
+
+  it('Monitor arrays functions: splice (updates children paths when array indices shift)', () => {
+    const o0 = { id: 0 };
+    const o1 = { id: 1 };
+    const o2 = { id: 2 };
+    state.arrayValue = [o0, o1, o2];
+
+    brain = new Brain(state, () => {});
+    const proxyState = brain.getState();
+
+    const po0 = proxyState.arrayValue![0] as any;
+    const po2 = proxyState.arrayValue![2] as any;
+
+    // Remove index 1 (o1)
+    proxyState.arrayValue!.splice(1, 1);
+
+    const brainChildren = proxyState.arrayValue!.__brainChildren;
+    expect(brainChildren.size).toBe(2);
+
+    // o0 stays at index 0
+    expect(brainChildren.get('0')).toBe(po0);
+    expect(po0.__brainFullPaths).toEqual(['arrayValue.0']);
+
+    // o2 shifts from index 2 to index 1
+    expect(brainChildren.get('1')).toBe(po2);
+    expect(po2.__brainFullPaths).toEqual(['arrayValue.1']);
+  });
+
   it('Monitor arrays functions: unshift', () => {
     state.arrayValue = [1, 2, 3, 4, 5];
     brain = new Brain(state, (property, oldValue, newValue, parents) =>
@@ -257,6 +326,25 @@ describe('State: Monitor array functions', () => {
 
     brain.getState().arrayValue!.unshift(0);
     expect(controlValue).toBe(2);
+  });
+
+  it('Monitor arrays functions: unshift (propagates path updates to deep nested children)', () => {
+    const nested = { inner: { id: 123 } };
+    state.arrayValue = [nested];
+
+    brain = new Brain(state, () => {});
+    const proxyState = brain.getState();
+
+    const pNested = proxyState.arrayValue![0] as any;
+    const pInner = pNested.inner as any;
+
+    expect(pInner.__brainFullPaths).toEqual(['arrayValue.0.inner']);
+
+    // Insert a new element at the beginning
+    proxyState.arrayValue!.unshift({ dummy: true });
+
+    // The deep child should now have updated paths
+    expect(pInner.__brainFullPaths).toEqual(['arrayValue.1.inner']);
   });
 
   it('Monitor arrays functions: shift', () => {
