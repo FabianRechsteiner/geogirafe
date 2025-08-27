@@ -113,6 +113,15 @@ class GirafeConfig {
   lidar?: {
     url: string;
   };
+  external_layers?: {
+    enabled_types: ('WMS' | 'WMTS' | 'auto_WMTS' | 'predefined')[];
+    default_type?: 'WMS' | 'WMTS' | 'auto_WMTS' | 'predefined';
+    predefined_sources: {
+      label: string;
+      type: 'WMS' | 'WMTS';
+      url: string;
+    }[];
+  };
   contextmenu: {
     crs: {
       code: string;
@@ -235,6 +244,7 @@ class GirafeConfig {
     this.oauth = this.initConfigOauth(config);
     this.gmfauth = this.initGmfOauth(config);
     this.userdata = this.initUserData(config);
+    this.external_layers = config.external_layers;
     this.contextmenu = this.initContextMenu(config);
     this.crs = this.initCRS(config);
     this.contact = this.initConfigContact(config);
