@@ -1,68 +1,47 @@
 <div id="panel">
   <div id="content">
     <div id="ext-layer-server">
-      <h3 class="title" i18n="Source Type">Source Type</h3>
-      <div id="sourcetype">
+      <div id="sourcetype" class="group">
+        <h3 class="title" i18n="Source Type">Source Type</h3>
+        ${this.enabled_types.map(source_type => uHtmlFor({source_type}, source_type)`
         <button
-          id="WMS"
-          class="${this.sourceType === this.SourceTypes.WMS ? 'gg-button active' : 'gg-button'}"
-          onclick="${() => this.setSourceType(this.SourceTypes.WMS)}">
-          WMS
-        </button>
-        <button
-          id="WMTS"
-          class="${this.sourceType === this.SourceTypes.WMTS ? 'gg-button active' : 'gg-button'}"
-          onclick="${() => this.setSourceType(this.SourceTypes.WMTS)}">
-          WMTS
-        </button>
-        <button
-          id="predefined"
-          tip="Predefined"
-          i18n="Predefined"
-          class="${this.sourceType === this.SourceTypes.predefined ? 'gg-button active' : 'gg-button'}"
-          onclick="${() => this.setSourceType(this.SourceTypes.predefined)}">
-          Predefined
-        </button>
+          class="${this.sourceType === source_type ? 'gg-button active' : 'gg-button'}"
+          onclick="${() => this.setSourceType(source_type as SourceType)}"
+          i18n="${source_type}"></button>
+        `)}
       </div>
-      <div
-        class="${((this.sourceType === this.SourceTypes.WMS) || (this.sourceType === this.SourceTypes.WMTS)) ? '' : 'hidden'}">
-        <h3 class="title">URL</h3>
-        <input type="text" id="url" class="gg-input" />
+      <div class="${(this.sourceType !== 'predefined') ? 'group' : 'hidden'}">
+        <h3 class="title" i18n="${'URL (' + this.sourceType + ')'}">${'URL (' + this.sourceType + ')'}</h3>
+        <div class="clearable-input">
+          <input type="text" id="url" class="gg-input clearable-input-field" oninput="${() => this.typeUrl()}" /><br />
+          <button id="clear-url" class="delete-button hidden" onclick="${() => this.clearUrl()}">
+            <img
+              class="delete-icon"
+              alt="delete-button-icon"
+              tip="Reset filter"
+              i18n="Reset filter"
+              src="icons/trash.svg" />
+          </button>
+        </div>
         <button id="scan" i18n="Scan Source" class="gg-button" onclick="${() => this.scanLayers()}">Scan Source</button>
       </div>
 
-      <div class="${(this.sourceType === this.SourceTypes.predefined) ? '' : 'hidden'}">
+      <div class="${((this.sourceType === 'predefined') && (this.enabled_types.length > 0)) ? 'group' : 'hidden'}">
         <h3 class="title" i18n="Predefined servers">Predefined servers</h3>
-        <button
-          id="SwisstopoWMS"
-          i18n="Swisstopo WMS"
-          class="gg-button"
-          onclick="${() => this.scanLayersWMS('https://wms.geo.admin.ch')}">
-          Swisstopo WMS
+        ${this.predefined_sources.map(source => uHtmlFor(source, source.label)`
+        <button class="gg-button" onclick="${() => this.scanExtLayers(source.type, source.url)}" i18n="${source.label}">
+          ${source.label}
         </button>
-        <button
-          id="SwisstopoWMS"
-          i18n="Swisstopo WMTS"
-          class="gg-button"
-          onclick="${() => this.scanLayersWMTS('https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr')}">
-          Swisstopo WMTS
-        </button>
-        <button
-          id="GMFbg"
-          i18n="GMF background WMTS"
-          class="gg-button"
-          onclick="${() => this.scanLayersWMTS('https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml')}">
-          GMF background WMTS
-        </button>
+        `)}
       </div>
 
-      <div id="layers" class="${this.allLayers.length > 0 ? '' : 'hidden'}">
+      <div id="layers" class="${(this.allLayers.length > 0) || this.loading ? 'group' : 'hidden'}">
         <h3 class="title" i18n="Layers">Layers</h3>
-        <div class="layer-search">
+        <div class="clearable-input">
           <img class="filter-icon" alt="filter-button-icon" src="icons/filter.svg" />
           <input
             id="layer-search-field"
-            class="gg-input"
+            class="gg-input clearable-input-field"
             type="text"
             placeholder="${this.i18nManager.getTranslation('Filter external layers...')}"
             i18n="Filter external layers..."
@@ -89,6 +68,11 @@
           </button>
           <button class="gg-button" tip="Select none" onclick="${() => this.deselectAll()}">--</button>
         </div>
+        <img
+          id="loading-icon"
+          alt="loading-icon"
+          src="icons/loading.svg"
+          class="${this.loading ? 'gg-spin' : 'hidden'}" />
         <ul>
           <!-- prettier-ignore -->
           ${this.layers.map(layer => uHtmlFor(layer, layer.treeItemId)`
@@ -106,6 +90,7 @@
           tip="Add selected"
           i18n="Add selected"
           class="gg-button"
+          disabled="${!Object.values(this.selectedLayers).some(selected => selected)}"
           onclick="${() => this.addSelectedLayers()}">
           Add selected
         </button>

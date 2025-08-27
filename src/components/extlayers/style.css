@@ -1,20 +1,26 @@
-#sourcetype {
-  display: flex;
-  gap: 0.2rem;
-}
-
 #panel {
   display: flex;
   height: 100%;
 }
 
 #content {
+  background: var(--bkg-color);
+  color: var(--text-color);
+  padding: 1rem;
+  margin: 0;
+  flex-grow: 1;
   display: flex;
 }
 
 #ext-layer-server {
+  width: 100%;
   display: flex;
   flex-direction: column;
+  row-gap: 2em;
+}
+
+#url {
+  width: 100%;
 }
 
 #panel > div {
@@ -41,10 +47,19 @@
 
 #layers li button {
   text-align: left;
+  overflow-wrap: anywhere;
   text-wrap-style: balance;
 }
 
-.layer-search {
+#loading-icon {
+  width: 20%;
+}
+
+.title {
+  margin-top: 0;
+}
+
+.clearable-input {
   flex-grow: 1;
   background-color: var(--bkg-color);
   width: auto;
@@ -67,7 +82,7 @@
   align-self: center;
 }
 
-#layer-search-field {
+.clearable-input-field {
   font-size: 1rem;
   outline: none;
   border: 0;

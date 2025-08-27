@@ -81,6 +81,7 @@ Certain features (e.g. service workers) require a valid HTTPS certificate for lo
 The project already ships with a set of pre-generated development certificates, which allow you to start developing immediately without extra setup.
 
 ⚠️ However, generating your own certificates is strongly recommended for:
+
 - Better security and isolation between environments/developers.
 - Avoiding reuse of shared certificates.
 - Customizing certificate properties (hostname, expiration date, etc.).
@@ -92,7 +93,7 @@ Run:
 
 ##### On Linux
 
-*On Linux or macOS, generating your own certificates is mandatory (pre-generated ones won't work).*
+_On Linux or macOS, generating your own certificates is mandatory (pre-generated ones won't work)._
 
 ```bash
 npm run generate-dev-certs-nix
