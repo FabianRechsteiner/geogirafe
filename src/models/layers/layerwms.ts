@@ -28,6 +28,7 @@ export type LayerWmsOptions = {
   printNativeAngle?: boolean;
   queryable?: boolean;
   queryLayers?: string;
+  queryLayersRanges?: {[name: string]: { minResolution?: number, maxResolution?: number }};
   time?: ITimeOptions;
   timeAttribute?: string;
   editable?: string;
@@ -63,6 +64,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
   // If the layer is queryable
   public queryable: boolean = false;
   public queryLayers?: string;
+  public queryLayersRanges: {[name: string]: { minResolution?: number, maxResolution?: number }};
   public filter?: WfsFilter;
 
   public timeOptions?: ITimeOptions;
@@ -91,6 +93,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     this.printNativeAngle = opts?.printNativeAngle;
     this.queryable = opts?.queryable ?? false;
     this.queryLayers = opts?.queryLayers;
+    this.queryLayersRanges = opts?.queryLayersRanges || {};
     this.timeOptions = opts?.time;
     this.timeAttribute = opts?.timeAttribute;
     this.editable = opts?.editable;
@@ -129,6 +132,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       printNativeAngle: this.printNativeAngle,
       queryable: this.queryable,
       queryLayers: this.queryLayers,
+      queryLayersRanges: this.queryLayersRanges,
       time: this.timeOptions,
       timeAttribute: this.timeAttribute,
       editable: this.editable
@@ -141,15 +145,23 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     return clonedObject;
   }
 
+  public static isResolutionRangeRestricted(minResolution: number | undefined, maxResolution: number | undefined) {
+    return (minResolution && minResolution !== 0) || (maxResolution && maxResolution !== 999999999);
+  }
+
   hasRestrictedResolution() {
-    return (this.minResolution && this.minResolution !== 0) || (this.maxResolution && this.maxResolution !== 999999999);
+    return LayerWms.isResolutionRangeRestricted(this.minResolution, this.maxResolution);
+  }
+
+  public static isInVisibleRange(resolution: number, minResolution: number | undefined, maxResolution: number | undefined) {
+    if (resolution === undefined || resolution === null || !LayerWms.isResolutionRangeRestricted(minResolution, maxResolution)) {
+      return true;
+    }
+    return resolution >= (minResolution ?? -1) && resolution <= (maxResolution ?? Infinity);
   }
 
   isVisibleAtResolution(resolution: number) {
-    if (resolution === undefined || resolution === null || !this.hasRestrictedResolution()) {
-      return true;
-    }
-    return resolution >= (this.minResolution ?? -1) && resolution <= (this.maxResolution ?? Infinity);
+    return LayerWms.isInVisibleRange(resolution, this.minResolution, this.maxResolution);
   }
 
   get hasFilter() {
@@ -207,6 +219,18 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
         .filter((l: GMFChildLayer) => l.queryable)
         .map((l: GMFChildLayer) => l.name)
         .join(',');
+      opts.queryLayersRanges = {};
+      options.childLayers
+        .forEach((l: GMFChildLayer) => {
+          if (!l.queryable) { return }
+          if ((l.minResolutionHint && l.minResolutionHint !== 0)
+            || (l.maxResolutionHint && l.maxResolutionHint !== 999999999)) {
+            opts.queryLayersRanges![l.name] = {
+              minResolution: l.minResolutionHint,
+              maxResolution: l.maxResolutionHint
+            }
+          }
+        });
       opts.queryable = opts.queryLayers.length > 0;
     }
 
