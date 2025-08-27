@@ -30,6 +30,8 @@ export interface GMFChildLayer {
   name: string;
   queryable: boolean;
   editable?: string;
+  minResolutionHint?: number;
+  maxResolutionHint?: number;
 }
 
 export interface GMFTreeItem {
