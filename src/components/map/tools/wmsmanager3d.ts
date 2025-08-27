@@ -100,8 +100,8 @@ export default class WmsManager3d {
         new SelectionParam(
           layerDef[0].layers.ogcServer,
           layerDef.map((l) => l.layers),
-          extent,
-          state.projection
+          state.projection,
+          extent
         )
       );
     }

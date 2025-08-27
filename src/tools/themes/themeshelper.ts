@@ -158,4 +158,37 @@ export default class ThemesHelper extends GirafeSingleton {
       console.info(`The theme ${clonedTheme.name} is already present in the treeview.`);
     }
   }
+
+  public getMinimalClonedThemeForLayer(layer: BaseLayer): ThemeLayer {
+    const hierarchy = this.getHierarchyFromLayer(layer);
+    const theme = hierarchy[0] as ThemeLayer;
+    const clone = theme.clone();
+    // Remove unnecessary clones
+    let children = clone.children;
+    for (let i = 1; i < hierarchy.length; ++i) {
+      this.removeOthers(children, hierarchy[i]);
+      (children[0] as GroupLayer).isExpanded = true;
+      children = (children[0] as GroupLayer).children;
+    }
+    return clone;
+  }
+
+  private removeOthers(layers: BaseLayer[], keep: BaseLayer) {
+    for (let i = layers.length - 1; i >= 0; --i) {
+      if (layers[i].id !== keep.id) {
+        layers.splice(i, 1);
+      }
+    }
+  }
+
+  private getHierarchyFromLayer(layer: BaseLayer): BaseLayer[] {
+    if (layer instanceof ThemeLayer) {
+      return [layer];
+    }
+    if (!layer.parent) {
+      throw new Error('A group or a layer should always have a parent.');
+    }
+    const parents = this.getHierarchyFromLayer(layer.parent);
+    return [...parents, layer];
+  }
 }

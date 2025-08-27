@@ -7,9 +7,9 @@ import { platformModifierKeyOnly } from 'ol/events/condition';
 import { DragBox } from 'ol/interaction';
 import { ScaleLine } from 'ol/control';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
-import { Geometry, Point } from 'ol/geom';
+import { Geometry, GeometryCollection, Point } from 'ol/geom';
 import { Coordinate } from 'ol/coordinate';
-import { Extent } from 'ol/extent';
+import { Extent, getCenter, getHeight, getWidth } from 'ol/extent';
 
 import { ScreenSpaceEventHandler, Cartesian2, Cesium3DTileset } from 'cesium';
 import proj4 from 'proj4';
@@ -48,6 +48,9 @@ import { debounce } from '../../tools/utils/debounce';
 import SelectionParam from '../../models/selectionparam';
 import WfsManager from '../../tools/wfs/wfsmanager';
 import { isProjectionInDegrees, isCoordinateInDegrees } from '../../tools/utils/olutils';
+import LayerManager from '../../tools/layers/layermanager';
+import ThemesHelper from '../../tools/themes/themeshelper';
+import WfsFilter from '../../tools/wfs/wfsfilter';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -99,6 +102,8 @@ export default class MapComponent extends GirafeHTMLElement {
   dragbox!: DragBox;
   focusFeature: FocusFeature;
 
+  // Initial feature selections from URL
+  private readonly featureSelectionFromUrl = this.parseSelectedFeaturesFromUrl();
   // Remember initial position configuration from URL
   private readonly initialPositionFromUrl: MapPosition | undefined = parseMapPositionFromUrl();
 
@@ -193,6 +198,21 @@ export default class MapComponent extends GirafeHTMLElement {
         this.setMapPositionFromUrlAfterInit();
       }
     });
+
+    // Only after the default theme has been added to the layer tree, we can start selecting features (and adding layers if necessary).
+    //  In the absence of a default theme, we wait for all themes to have finished loading.
+    if (this.configManager.Config.themes.defaultTheme) {
+      const subscription = this.subscribe('themes.lastSelectedTheme', () => {
+        this.unsubscribe(subscription);
+        this.setFeatureSelectionFromUrl();
+      });
+    } else {
+      this.subscribe('themes.isLoaded', (_: boolean, isLoaded: boolean) => {
+        if (isLoaded) {
+          this.setFeatureSelectionFromUrl();
+        }
+      });
+    }
   }
 
   public activateSharedLayers(layers: BaseLayer[]) {
@@ -217,7 +237,6 @@ export default class MapComponent extends GirafeHTMLElement {
 
     // Read out the default projection from config, ignoring user preferences
     this.defaultSrid = this.configManager.getDefaultConfigValue('map.srid') as string;
-    this.setMapPositionFromUrlAfterInit();
 
     // Initialize the map element
     this.mapTarget = this.shadow.getElementById('ol-map') as HTMLDivElement;
@@ -248,6 +267,8 @@ export default class MapComponent extends GirafeHTMLElement {
     // View
     const view = this.viewManager.getDefaultView();
     this.olMap.setView(view);
+
+    this.setMapPositionFromUrlAfterInit();
 
     // Create layer for highlighted features
     const highlightSource = new VectorSource({
@@ -792,7 +813,6 @@ export default class MapComponent extends GirafeHTMLElement {
 
   onChangeOrder = debounce(() => this.reorderLayers(), 0);
   private reorderLayers() {
-    console.log('ORDER CHANGED FOR MAP');
     this.wmtsManager.refreshZIndexes();
     this.wmsManager.refreshZIndexes();
   }
@@ -859,7 +879,7 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  // TODO REG: Move the 3 following methods to a dedicated manager to manage URL status globaly?
+  // TODO: Move methods dealing with perma link data to a dedicated manager
   /**
    * Add the current map position and zoom level to the URL. The coordinates are provided in
    * the default reference system or in WGS84.
@@ -888,6 +908,124 @@ export default class MapComponent extends GirafeHTMLElement {
     setUrlFromMapPosition(currentPosition);
   }
 
+  private parseSelectedFeaturesFromUrl() {
+    const param_prefix = 'wfs_';
+    const url = new URL(window.location.href);
+    const wfsLayer = url.searchParams.get('wfs_layer');
+    if (wfsLayer) {
+      const attributesQueryFromUrl: any[] = [];
+      url.searchParams.forEach((attributeValue, key) => {
+        if (key.startsWith(param_prefix) && key !== 'wfs_layer') {
+          const attributeName = key.substring(param_prefix.length);
+          if (attributeValue) {
+            attributesQueryFromUrl.push({
+              name: attributeName,
+              value: attributeValue
+            });
+          }
+        }
+      });
+      if (attributesQueryFromUrl.length > 0) {
+        return {
+          layer: wfsLayer,
+          properties: attributesQueryFromUrl
+        };
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Applies a feature selection based on the query parameters present in the URL starting with `wfs_`.
+   * If the specified layer does not exist in the current tree, it fetches the layer from the themes and adds it to the tree.
+   */
+  private setFeatureSelectionFromUrl() {
+    if (!this.featureSelectionFromUrl) {
+      return;
+    }
+    const themesHelper = ThemesHelper.getInstance();
+    const layerManager = LayerManager.getInstance();
+    let layerInTree = layerManager.getTreeItemByLayerName(this.featureSelectionFromUrl.layer);
+
+    if (!layerInTree) {
+      const layer = themesHelper.findLayerByName(this.featureSelectionFromUrl.layer);
+      const clonedTheme = themesHelper.getMinimalClonedThemeForLayer(layer);
+      clonedTheme.order = 0;
+      clonedTheme.isExpanded = true;
+      this.state.layers.layersList.push(clonedTheme);
+      // Now, get the tree item
+      layerInTree = layerManager.getTreeItemByLayerName(this.featureSelectionFromUrl.layer);
+    }
+
+    if (!(layerInTree && layerInTree instanceof LayerWms && layerInTree.wfsQueryable)) {
+      throw new Error(
+        `Can't apply feature selection from permalink, layer ${this.featureSelectionFromUrl.layer} does not exist or does not support querying`
+      );
+    }
+
+    // Create the query as a list of wfs filters that will be combined with an AND operator by the WFS client
+    const queries: WfsFilter[] = [];
+    this.featureSelectionFromUrl.properties.forEach((property) => {
+      // Note: PropertyType 'string' will result in correct WFS filters for both strings and numbers
+      queries.push(new WfsFilter(property.name, 'eq', property.value, '', 'string'));
+    });
+
+    this.selectFeaturesByQuery(layerInTree, queries);
+  }
+
+  /**
+   * Selects features based on the given list of wfs filters for a specified WMS layer
+   * and optionally moves the map to the selection.
+   * Wfs filter will be combined with an AND operator by the WFS client.
+   */
+  private selectFeaturesByQuery(layerInTree: LayerWms, queries: WfsFilter[], moveMapToSelection: boolean = true) {
+    const client = this.wmsManager.getClient(layerInTree);
+    if (!client) {
+      throw new Error(`Cannot select features: no client found for layer ${layerInTree.name}`);
+    }
+
+    // Make sure the layer is rendered in the map, otherwise WFS querying won't work
+    const currentResolution = this.olMap.getView().getResolution();
+    if (layerInTree.minResolution && currentResolution && layerInTree.minResolution > currentResolution) {
+      this.state.position.resolution = layerInTree.minResolution;
+    } else if (layerInTree.maxResolution && currentResolution && layerInTree.maxResolution < currentResolution) {
+      this.state.position.resolution = layerInTree.maxResolution;
+    }
+    if (layerInTree.activeState !== 'on') {
+      LayerManager.getInstance().toggleLayer(layerInTree, 'on');
+    }
+
+    // Listen for the completed features selection, then move the map to the selected features
+    if (moveMapToSelection) {
+      const subscribe = this.subscribe('selection.selectedFeatures', (_, newFeatures: Feature[]) => {
+        this.unsubscribe(subscribe);
+        this.centerMapOnFeatures(newFeatures);
+      });
+    }
+
+    // Trigger the selection
+    client.selectFeaturesByQuery(queries);
+  }
+
+  /**
+   * Centers the map view on the given features. If the features' extent doesn't fit in the current zoom level,
+   * the zoom level is adjusted as well.
+   */
+  private centerMapOnFeatures(features: Feature[]) {
+    const selectedGeometries = new GeometryCollection(
+      features.map((f) => f.getGeometry()).filter((f) => f != undefined)
+    );
+    const featuresExtent = selectedGeometries.getExtent();
+    const mapExtent = this.olMap.getView().calculateExtent();
+    if (getWidth(featuresExtent) <= getWidth(mapExtent) && getHeight(featuresExtent) <= getHeight(mapExtent)) {
+      // Move the map so all selected features are visible -> this won't change the zoom level
+      this.state.position.center = getCenter(featuresExtent);
+    } else {
+      // Fit the map view so all features are visible -> this will change the zoom level
+      this.zoomToExtent(featuresExtent);
+    }
+  }
+
   /**
    * Reads the map position data from the URL and applies it to the map,
    * making sure map initialization and loading of the shared state have finished beforehand.
@@ -896,8 +1034,6 @@ export default class MapComponent extends GirafeHTMLElement {
     if (!this.initialPositionFromUrl) {
       return;
     }
-
-    this.state.position = this.initialPositionFromUrl;
 
     if (!this.state.projection || !this.olMap.getView().getResolution()) {
       // Everything os not ready yet. Delay the execution of this method on rendercomplete

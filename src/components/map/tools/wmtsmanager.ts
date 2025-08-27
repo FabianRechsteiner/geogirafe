@@ -209,7 +209,7 @@ class WmtsManager {
           params: { LAYERS: queryLayers }
         })
       });
-      selectionParams.push(new SelectionParam(ogcServer, layers, extent, this.state.projection, oLayer));
+      selectionParams.push(new SelectionParam(ogcServer, layers, this.state.projection, extent, oLayer));
     });
     StateManager.getInstance().state.selection.selectionParameters.push(...selectionParams);
   }

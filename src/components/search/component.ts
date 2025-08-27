@@ -24,8 +24,6 @@ import LayerManager from '../../tools/layers/layermanager';
 import { parseCoordinates } from '../../tools/geometrytools';
 import ThemesHelper from '../../tools/themes/themeshelper';
 import ThemeLayer from '../../models/layers/themelayer';
-import type BaseLayer from '../../models/layers/baselayer';
-import type GroupLayer from '../../models/layers/grouplayer';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -332,7 +330,7 @@ class SearchComponent extends GirafeHTMLElement {
     }
     if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
-      const clonedTheme = this.getMinimalClonedThemeForLayer(layer);
+      const clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
       if (!this.isAlreadyPresent(clonedTheme)) {
         // Preview layer
         clonedTheme.order = 0;
@@ -346,39 +344,6 @@ class SearchComponent extends GirafeHTMLElement {
 
   private isAlreadyPresent(theme: ThemeLayer): boolean {
     return this.state.layers.layersList.some((t) => t.id === theme.id);
-  }
-
-  private getMinimalClonedThemeForLayer(layer: BaseLayer): ThemeLayer {
-    const hierarchy = this.getHierarchyFromLayer(layer);
-    const theme = hierarchy[0] as ThemeLayer;
-    const clone = theme.clone();
-    // Remove unnecessary clones
-    let children = clone.children;
-    for (let i = 1; i < hierarchy.length; ++i) {
-      this.removeOthers(children, hierarchy[i]);
-      (children[0] as GroupLayer).isExpanded = true;
-      children = (children[0] as GroupLayer).children;
-    }
-    return clone;
-  }
-
-  private removeOthers(layers: BaseLayer[], keep: BaseLayer) {
-    for (let i = layers.length - 1; i >= 0; --i) {
-      if (layers[i].id !== keep.id) {
-        layers.splice(i, 1);
-      }
-    }
-  }
-
-  private getHierarchyFromLayer(layer: BaseLayer): BaseLayer[] {
-    if (layer instanceof ThemeLayer) {
-      return [layer];
-    }
-    if (!layer.parent) {
-      throw new Error('A group or a layer should always have a parent.');
-    }
-    const parents = this.getHierarchyFromLayer(layer.parent);
-    return [...parents, layer];
   }
 
   private addFeatureToPreview(geometry: GeometryResult | GeometryCollectionResult) {
@@ -458,10 +423,10 @@ class SearchComponent extends GirafeHTMLElement {
         clonedTheme = theme.clone();
       } else if (result.properties?.actions[0].action === 'add_group') {
         const group = this.themesHelper.findGroupByName(result.properties?.actions[0].data);
-        clonedTheme = this.getMinimalClonedThemeForLayer(group);
+        clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(group);
       } else if (result.properties?.actions[0].action === 'add_layer') {
         const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
-        clonedTheme = this.getMinimalClonedThemeForLayer(layer);
+        clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
       } else {
         console.warn('Unsupported result type');
       }

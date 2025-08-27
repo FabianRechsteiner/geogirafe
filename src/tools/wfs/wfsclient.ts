@@ -216,13 +216,25 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     const featureTypes = queryableLayers.map((l) => l.queryLayers.split(',')).flat(1);
     const geometryColumnNameToFeatureType = serverWfs.getGeometryColumnNameToFeatureTypes(featureTypes);
 
-    const olFilter: Filter | undefined = queryableLayers[0].filter?.toOpenLayersFilter();
+    // Combine different sources of layer queries by chaining the filters with an AND operator
+    const featureSelectionFilter: Filter[] | undefined = selectionParam.queries?.map((f) => f.toOpenLayersFilter());
+    const layerFilter: Filter | undefined = queryableLayers[0].filter?.toOpenLayersFilter();
     const timeFilter: Filter | undefined = this.setTimeRestriction(queryableLayers[0]);
+    const filterList: Filter[] = [featureSelectionFilter, layerFilter, timeFilter]
+      .flat()
+      .filter((f) => f !== undefined);
+
+    let combinedFilters: Filter | undefined = undefined;
+    if (filterList.length > 1) {
+      combinedFilters = and(...filterList);
+    } else if (filterList.length === 1) {
+      combinedFilters = filterList[0];
+    }
 
     const getFeatureOptions = {
       srsName: selectionParam.srid,
       bbox: selectionParam.selectionBox,
-      filter: olFilter && timeFilter ? and(olFilter, timeFilter) : (olFilter ?? timeFilter)
+      filter: combinedFilters
     };
     const getFeatureRequests = Object.entries(geometryColumnNameToFeatureType).map(async ([columnName, featureTypes]) =>
       this.getFeatureRaw(featureTypes, { geometryName: columnName, ...getFeatureOptions })
