@@ -297,12 +297,40 @@ export default abstract class WmsClient {
 
   selectFeatures(extent: number[]) {
     const selectionParams: SelectionParam[] = [];
-    selectionParams.push(new SelectionParam(this.ogcServer, this.layers, extent, this.state.projection, this.olayer));
+    selectionParams.push(new SelectionParam(this.ogcServer, this.layers, this.state.projection, extent, this.olayer));
 
     for (const key in this.independentLayers) {
       const indepLayer = this.independentLayers[key];
       selectionParams.push(
-        new SelectionParam(this.ogcServer, [indepLayer.layerWms], extent, this.state.projection, indepLayer.olayer)
+        new SelectionParam(this.ogcServer, [indepLayer.layerWms], this.state.projection, extent, indepLayer.olayer)
+      );
+    }
+
+    this.state.selection.selectionParameters.push(...selectionParams);
+  }
+
+  /**
+   * Selects features based on the specified query and prepares selection parameters.
+   */
+  selectFeaturesByQuery(queries: WfsFilter[]) {
+    const selectionParams: SelectionParam[] = [];
+    const maxExtent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
+
+    selectionParams.push(
+      new SelectionParam(this.ogcServer, this.layers, this.state.projection, maxExtent, this.olayer, queries)
+    );
+
+    for (const key in this.independentLayers) {
+      const indepLayer = this.independentLayers[key];
+      selectionParams.push(
+        new SelectionParam(
+          this.ogcServer,
+          [indepLayer.layerWms],
+          this.state.projection,
+          maxExtent,
+          indepLayer.olayer,
+          queries
+        )
       );
     }
 
@@ -329,10 +357,13 @@ export default abstract class WmsClient {
         return;
       }
       // Layer is queryable through WMS and has an OL layer.
+      const coordinate = param.selectionBox
+        ? [(param.selectionBox[0] + param.selectionBox[2]) / 2, (param.selectionBox[1] + param.selectionBox[3]) / 2]
+        : [];
       const url = olLayer
         .getSource()
         ?.getFeatureInfoUrl(
-          [(param.selectionBox[0] + param.selectionBox[2]) / 2, (param.selectionBox[1] + param.selectionBox[3]) / 2],
+          coordinate,
           (olLayer.getMapInternal()?.getView().getResolution() ?? this.state.position.resolution) +
             this.resolutionTolerance,
           this.state.projection,

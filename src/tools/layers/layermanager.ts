@@ -67,6 +67,10 @@ class LayerManager extends GirafeSingleton {
     throw new Error(`BaseLayer ${treeItemId} not found !`);
   }
 
+  public getTreeItemByLayerName(layerName: string): BaseLayer | null {
+    return this.getFlattenedLayerTree(this.state.layers.layersList).find((l) => l.name === layerName) ?? null;
+  }
+
   private getLayerRecursive(layers: BaseLayer[], treeItemId: string): BaseLayer | null {
     for (const layer of layers) {
       if (layer.treeItemId === treeItemId) {

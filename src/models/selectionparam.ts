@@ -2,6 +2,7 @@ import LayerWms from './layers/layerwms';
 import ServerOgc from './serverogc';
 import type OLayerImage from 'ol/layer/Image';
 import type OSourceImageWMS from 'ol/source/ImageWMS';
+import WfsFilter from '../tools/wfs/wfsfilter';
 
 function sameUrlAndImageTypeForAll(layers: LayerWms[]) {
   if (layers.length === 0) {
@@ -34,22 +35,25 @@ function sameUrlAndImageTypeForAll(layers: LayerWms[]) {
 export default class SelectionParam {
   _ogcServer: ServerOgc;
   _layers: LayerWms[];
-  _oLayer?: OLayerImage<OSourceImageWMS>;
-  selectionBox: number[];
   srid: string;
+  selectionBox?: number[];
+  _oLayer?: OLayerImage<OSourceImageWMS>;
+  queries?: WfsFilter[];
 
   constructor(
     ogcServer: ServerOgc,
     layers: LayerWms[],
-    selectionBox: number[],
     srid: string,
-    _oLayer?: OLayerImage<OSourceImageWMS>
+    selectionBox?: number[],
+    _oLayer?: OLayerImage<OSourceImageWMS>,
+    queries?: WfsFilter[]
   ) {
     this._ogcServer = ogcServer;
     this._layers = layers;
-    this.selectionBox = selectionBox;
     this.srid = srid;
+    this.selectionBox = selectionBox;
     this._oLayer = _oLayer;
+    this.queries = queries;
 
     sameUrlAndImageTypeForAll(this._layers);
   }
@@ -58,9 +62,10 @@ export default class SelectionParam {
     return new SelectionParam(
       this._ogcServer,
       this._layers.filter(layerFilter),
-      this.selectionBox,
       this.srid,
-      this._oLayer
+      this.selectionBox,
+      this._oLayer,
+      this.queries
     );
   }
 }
