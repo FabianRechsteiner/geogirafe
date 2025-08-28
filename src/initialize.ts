@@ -77,14 +77,15 @@ async function initializeServiceWorker() {
   const storeVersion: number = 6;
   const dbCacheName: string = 'geogirafe-cache';
   if (!navigator?.serviceWorker) {
-    console.warn("Service worker could not be initialized. Authentication and offline maps won't work");
+    console.warn("Service worker not supported by your browser. Authentication and offline maps won't work");
     return;
   }
 
   let sw: ServiceWorker;
   try {
     sw = await waitForServiceWorkerActivation();
-  } catch {
+  } catch (err) {
+    console.error('Service worker registration failed:', err);
     console.warn("Service worker could not be initialized. Authentication and offline maps won't work");
     return;
   }
