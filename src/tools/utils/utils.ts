@@ -128,3 +128,10 @@ export const colorToRgbaArray = (color: string): [number, number, number, number
   }
   return rgbaColor;
 };
+
+/**
+ * Check whether the provided text is a matching the correct email form
+ */
+export const isValidEmail = (email: string): boolean => {
+  return /^[^\s@]+@(?:[^\s@.]+\.)+[^\s@.]+$/.test(email);
+};

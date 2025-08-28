@@ -452,7 +452,7 @@ export default class MapComponent extends GirafeHTMLElement {
 
     const gmlFeatures = [...wmsGmlFeatures, ...wfsGmlFeatures];
 
-    if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length == 0) {
+    if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length === 0) {
       this.state.interface.selectionComponentVisible = false;
     } else {
       this.state.selection.selectedFeatures.push(...gmlFeatures);

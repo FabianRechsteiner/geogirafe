@@ -32,7 +32,7 @@ type GraphicalInterface = {
   darkMapMode: boolean;
   darkFrontendMode: boolean;
   swipeupPanelMode: SwipeupPanelMode;
-  swipeupPanelContent: 'selector' | null;
+  swipeupPanelContent: 'selector' | 'features' | null;
 };
 
 type Selection = {
