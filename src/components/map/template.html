@@ -2,6 +2,13 @@
 
 <div id="container">
   <div id="ol-map"></div>
+  <div class="ol-unselectable ol-control ol-location">
+    <button
+      onclick="${()=>this.locateUser()}"
+      class="btn-location">
+      <img class="img-location" alt="location-icon" src="icons/adjust.svg" />
+    </button>
+  </div>
   <div id="cs-map">
     <div class="${this.loading ? 'loading center' : 'loading hidden'}">
       <img alt="loading-icon" src="icons/loading.svg" class="gg-spin" />

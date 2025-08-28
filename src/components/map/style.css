@@ -54,6 +54,27 @@
   right: 2rem !important;
 }
 
+.ol-location {
+  right: 2rem !important;
+  top: 0.5rem !important;
+  left: unset !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  cursor: pointer;
+  margin-top: 2px;
+  margin-right: 2px;
+}
+
+.btn-location {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.img-location{
+  width: 50%;
+  height: auto;
+}
+
 .ol-zoom-in,
 .ol-zoom-out,
 .ol-rotate-reset {
@@ -195,6 +216,9 @@ input[type='range']::-moz-range-thumb {
   .ol-rotate {
     top: 0.5rem !important;
     right: 0.5rem !important;
+  }
+  .ol-location {
+    display: none !important;
   }
 }
 
