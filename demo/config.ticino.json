@@ -11,7 +11,8 @@
   "themes": {
     "url": "Mock/themes.json",
     "defaultTheme": "Test_theme",
-    "imagesUrlPrefix": "https://map.geo.ti.ch"
+    "imagesUrlPrefix": "https://map.geo.ti.ch",
+    "selectionMode" : "add"
   },
   "basemaps": {
     "defaultBasemap": "Carta Nazionale (bianco e nero)",

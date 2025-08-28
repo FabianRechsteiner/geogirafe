@@ -48,6 +48,9 @@ import { debounce } from '../../tools/utils/debounce';
 import SelectionParam from '../../models/selectionparam';
 import WfsManager from '../../tools/wfs/wfsmanager';
 import { isProjectionInDegrees, isCoordinateInDegrees } from '../../tools/utils/olutils';
+import CircleStyle from 'ol/style/Circle';
+import { parseCoordinates } from '../../tools/geometrytools';
+import CircleGeom from 'ol/geom/Circle';
 import LayerManager from '../../tools/layers/layermanager';
 import ThemesHelper from '../../tools/themes/themeshelper';
 import WfsFilter from '../../tools/wfs/wfsfilter';
@@ -88,6 +91,7 @@ export default class MapComponent extends GirafeHTMLElement {
   crosshairLayer!: VectorLayer<VectorSource>;
   tooltipContainer!: HTMLElement;
   tooltipOverlay!: Overlay;
+  geolocationSource!: VectorSource;
 
   get projection() {
     return this.olMap.getView().getProjection();
@@ -215,6 +219,75 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
+  locateUser() {
+    if ('geolocation' in navigator) {
+      // The user's current position is utilized to show the distance to objects in the layer
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state === 'granted' || result.state === 'prompt') {
+          this.getCurrentLocation();
+        }
+      });
+
+    } else {
+      void window.gAlert("Geolocation browser error", 'Error');
+    }
+  }
+
+  getCurrentLocation(){
+    navigator.geolocation.getCurrentPosition(this.updateGeolocation, function(positionError) {
+
+      switch (positionError.code) {
+        case positionError.PERMISSION_DENIED:
+          void window.gAlert("Geolocation permission denied", 'Error');
+          break;
+        case positionError.POSITION_UNAVAILABLE:
+          void window.gAlert("Geolocation permission unavailable", 'Error');
+          break;
+        case positionError.TIMEOUT:
+          void window.gAlert("Geolocation timeout", 'Error');
+          break;
+        default:
+          void window.gAlert("Geolocation error", 'Error');
+          break;
+      }
+    }, {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    });
+  }
+
+
+  readonly updateGeolocation = (position: GeolocationPosition): void => {
+    const coords = position.coords;
+    const longitude = coords.longitude;
+    const latitude = coords.latitude;
+    const accuracy = coords.accuracy; //Accuracy radius in meters
+
+
+    const code = this.olMap.getView().getProjection().getCode();
+    const maxExtent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
+    const numbers = parseCoordinates([longitude,latitude], maxExtent, code);
+
+    this.geolocationSource.clear();
+    // point of location
+    const positionFeature = new Feature({
+      geometry: new Point(numbers),
+      type: 'position',
+    });
+    this.geolocationSource.addFeature(positionFeature);
+
+    // radius accuracy
+    const circleGeometry = new CircleGeom(numbers, accuracy);
+    const accuracyFeature = new Feature({
+      geometry: circleGeometry,
+      type: 'accuracy',
+    });
+    this.geolocationSource.addFeature(accuracyFeature);
+
+    this.olMap.getView().setCenter(numbers);
+  }
+
   public activateSharedLayers(layers: BaseLayer[]) {
     for (const layer of layers) {
       // Activate the layer by default
@@ -305,6 +378,32 @@ export default class MapComponent extends GirafeHTMLElement {
         this.olMap.addControl(scaleLine);
       }
     });
+
+    //layer user location
+    this.geolocationSource = new VectorSource();
+    const geolocationLayer = new VectorLayer({
+      source: this.geolocationSource,
+      style: new Style({
+        image: new CircleStyle({
+          radius: 7,
+          fill: new Fill({
+            color: 'rgba(225,18,18,0.48)',
+          }),
+          stroke: new Stroke({
+            color: 'rgb(225,18,18)',
+            width: 2,
+          }),
+        }),
+        fill: new Fill({
+          color: 'rgba(20,100,213,0.49)',
+        }),
+        stroke: new Stroke({
+          color: 'rgb(20,100,213)',
+          width: 1,
+        }),
+      }),
+    });
+    this.olMap.addLayer(geolocationLayer);
 
     // TODO REG: This is ugly, but I didn't find any other solution yet.
     setTimeout(() => {

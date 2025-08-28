@@ -1,0 +1,15 @@
+{
+  "themes": {
+    "url": "https://map.geo.ti.ch/themes?background=background&interface=mobile"
+  },
+  "search": {
+    "url": "https://map.geo.ti.ch/search?limit=30&partitionlimit=15&interface=mobile&query=###SEARCHTERM###"
+  },
+  "map": {
+    "constrainScales": false
+  },
+  "offline": {
+    "downloadStartZoom": 7,
+    "downloadEndZoom": 11
+  }
+}
