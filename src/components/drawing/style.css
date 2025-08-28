@@ -31,6 +31,11 @@ button.selected {
 .label-container {
   flex-grow: 1;
 }
+
+.text-end {
+  text-align: end;
+}
+
 .icon {
   width: 1.2rem;
   height: 1.2rem;
@@ -128,7 +133,7 @@ button.selected {
 }
 #options hr {
   width: 100%;
-  margin: 8px;
+  margin: 8px 0;
 }
 #optionsTextLines,
 #optionsColorLine,
@@ -140,21 +145,25 @@ button.selected {
   margin: auto;
 }
 #optionsTextLines {
-  grid-template-columns: 65px 40px 35px 40px 20px 25px;
+  grid-template-columns: 2fr 2fr 1fr 4em 1fr 1fr;
 }
 #optionsTextLines button:hover {
   border: none;
 }
 #optionsColor,
 #optionsLine,
-#optionsExport {
+#optionsExport,
+#optionsArrow {
   margin: auto;
 }
 #optionsColorLine {
-  grid-template-columns: 77px 70px 56px 26px;
+  grid-template-columns: 4fr 1fr 4fr 1fr;
 }
 #optionsLineLines {
-  grid-template-columns: 60px 40px 20px auto;
+  grid-template-columns: 3fr 4em 1fr auto;
+}
+#optionsArrowStyle {
+  grid-template-columns: 3fr 4em 1fr auto;
 }
 #optionsExportLine {
   display: flex;

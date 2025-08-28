@@ -141,9 +141,13 @@
     <hr />
     <div id="optionsColor">
       <div id="optionsColorLine">
-        <span i18n="Stroke color">Stroke color</span>
+        <span class="text-end" i18n="Stroke color">Stroke color</span>
         <div class="icon colorPicker" id="strokePicker"></div>
-        <span id="fillPickerSpan" class="${this.isFillColorEnabled() ? '' : 'disabled'}" i18n="Fill color"
+        <span
+          class="text-end"
+          id="fillPickerSpan"
+          class="${this.isFillColorEnabled() ? '' : 'disabled'}"
+          i18n="Fill color"
           >Fill color</span
         >
         <div class="${'icon colorPicker ' + (this.isFillColorEnabled() ? '' : 'disabled')}" id="fillPicker"></div>
@@ -171,8 +175,9 @@
       </div>
     </div>
     <hr />
-    <div id="optionsLineStyle">
-      <div class="${this.isLineStyleEnabled() ? '' : 'disabled'}" id="optionsLineStyles">
+    <div id="optionsArrow">
+      <div class="${this.isLineStyleEnabled() ? '' : 'disabled'}" id="optionsArrowStyles">
+        <span i18n="Arrows style">Arrows style</span>
         <select id="arrow-style" class="gg-select" onchange="${() => this.onArrowsChange()}">
           ${Object.entries(this.arrowStyles).map((entry) => uHtml`
           <option selected="${this.selectedFeatures[0]?.arrowStyle === entry[0]}" value="${entry[0]}">

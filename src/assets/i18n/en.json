@@ -18,6 +18,7 @@
     "Altitude": "Altitude",
     "An error occurred while loading the themes. This has nothing to do with GeoGirafe and is very probably a backend-configuration error (wrong content in themes.json, or CORS error). Please check the backend configuration.": "An error occurred while loading the themes. This has nothing to do with GeoGirafe and is very probably a backend-configuration error (wrong content in themes.json, or CORS error). Please check the backend configuration.",
     "Apply filter": "Apply filter",
+    "Arrows style": "Arrows style",
     "Ask a question": "Ask a question",
     "Backend error": "Backend error",
     "basemap": "Basemap",
