@@ -52,21 +52,20 @@ export default class DrawingComponent extends GirafeHTMLElement {
   toolSelected: Element | null = null;
 
   arrowStyles: Record<ArrowStyle, string> = {
-    none: '-',
-    start: '<',
-    end: '>',
-    both: '<>'
+    none: '⸻',
+    start: 'ᐸ⸺',
+    end: '⸺ᐳ',
+    both: 'ᐸ—ᐳ'
   };
   arrowPositions: Record<ArrowPosition, string> = {
-    whole: '<>',
-    each: '<><>',
-    mid: '-<-'
+    whole: 'ᐸ⸺⸺ᐳ',
+    each: 'ᐸ—ᐳᐸ—ᐳ',
+    mid: '⸺ᐸ⸺'
   };
   lineStyles: Record<string, string> = {
-    full: '—————',
-    dash: '- - -',
-    dot: '. . .',
-    double: '═════'
+    full: '————',
+    dash: '━ ━ ━',
+    dot: '• • • • • •'
   };
 
   olDrawing: OlDrawing;

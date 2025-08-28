@@ -18,6 +18,7 @@
     "Altitude": "Altitudine",
     "An error occurred while loading the themes. This has nothing to do with GeoGirafe and is very probably a backend-configuration error (wrong content in themes.json, or CORS error). Please check the backend configuration.": "Si è verificato un errore durante il caricamento dei temi. Questo non ha nulla a che fare con GeoGirafe ed è molto probabilmente un errore di configurazione del backend (contenuto errato in themes.json o errore CORS). Si prega di controllare la configurazione del backend.",
     "Apply filter": "Applica filtro",
+    "Arrows style": "Stile delle frecce",
     "Ask a question": "Fai una domanda",
     "auto_WMTS": "WMS/WMTS",
     "Backend error": "Errore del backend",
