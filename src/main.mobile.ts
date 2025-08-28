@@ -13,6 +13,7 @@ import ThemeListItemMobile from './components/themelist-mobile/themelistitem/com
 import BasemapThemeLayerSelectorMobile from './components/basemapthemelayerselector-mobile/component';
 import DisplaySelectorButtonMobile from './components/displayselectorbutton-mobile/component';
 import AlignNorthButtonMobile from './components/alignnorthbutton-mobile/component';
+import SelectionPanelMobile from './components/selectionpanel-mobile/component';
 import GeolocationMobile from './components/geolocation-mobile/component';
 import InfoboxComponent from './components/infobox/component';
 import StateManager from './tools/state/statemanager';
@@ -69,6 +70,7 @@ initialize().then(() => {
   customElements.define('girafe-display-selector-button-mobile', DisplaySelectorButtonMobile);
   customElements.define('girafe-swipe-up-panel', SwipeUpPanelMobile);
   customElements.define('girafe-align-north-button-mobile', AlignNorthButtonMobile);
+  customElements.define('girafe-selection-panel-mobile', SelectionPanelMobile);
   customElements.define('girafe-geolocation-mobile', GeolocationMobile);
 
   // To prevent the FOUC effect (flash of unstyled content),
