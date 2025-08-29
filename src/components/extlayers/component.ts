@@ -115,7 +115,7 @@ class ExtLayerComponent extends GirafeHTMLElement {
   public async scanLayersWMS(url: string) {
     this.themeName = this.parseName(url);
     const wmsManager = WmsManager.getInstance();
-    const server = new ServerOgc(this.themeName, { url, type: 'other', wfsSupport: false, imageType: 'image/png' });
+    const server = new ServerOgc(this.themeName, { url, type: 'other', wfsSupport: true, urlWfs: url, imageType: 'image/png' });
     const client = wmsManager.createClient(WmsClientDefault, server);
     this.allLayers = [];
     this.layers = [];
@@ -128,7 +128,7 @@ class ExtLayerComponent extends GirafeHTMLElement {
       this.themeName = capabilities.Service.Title;
     }
     this.allLayers = capabilities.Capability.Layer.Layer.map(
-      (l: any) => new LayerWms(this.getId(l), l.Title, 0, server, { layers: l.Name })
+      (l: any) => new LayerWms(this.getId(l), l.Title, 0, server, { layers: l.Name, queryable: true, legend: true })
     );
     this.layers = [...this.allLayers];
     this.selectedLayers = {};
