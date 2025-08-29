@@ -93,7 +93,7 @@
     }
   },
   "external_layers": {
-    "enabled_types": ["WMS", "WMTS", "predefined"],
+    "enabled_types": ["local", "WMS", "WMTS", "predefined"],
     "default_type": "predefined",
     "predefined_sources": [
       {

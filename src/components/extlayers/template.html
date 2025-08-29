@@ -10,7 +10,8 @@
           i18n="${source_type}"></button>
         `)}
       </div>
-      <div class="${(this.sourceType !== 'predefined') ? 'group' : 'hidden'}">
+      <div
+        class="${((this.sourceType === 'auto_WMTS') || (this.sourceType === 'WMS') || (this.sourceType === 'WMTS')) ? 'group' : 'hidden'}">
         <h3 class="title" i18n="${'URL (' + this.sourceType + ')'}">${'URL (' + this.sourceType + ')'}</h3>
         <div class="clearable-input">
           <input type="text" id="url" class="gg-input clearable-input-field" oninput="${() => this.typeUrl()}" /><br />
@@ -24,6 +25,18 @@
           </button>
         </div>
         <button id="scan" i18n="Scan Source" class="gg-button" onclick="${() => this.scanLayers()}">Scan Source</button>
+      </div>
+
+      <div class="${((this.sourceType === 'local')) ? 'group' : 'hidden'}">
+        <h3 class="title" i18n="Choose local file">Choose local file</h3>
+        <div id="file-selector">
+          <label for="file" id="file-label">
+            <button class="gg-button" i18n="Select File"></button>
+            <span>${this.fileDescription}</span>
+          </label>
+          <input type="file" accept=".gpx,.kml,.geojson,.json" id="file" onchange="${() => this.render()}" /><br />
+        </div>
+        <button id="load" i18n="Load File" class="gg-button" onclick="${() => this.loadFile()}"></button>
       </div>
 
       <div class="${((this.sourceType === 'predefined') && (this.enabled_types.length > 0)) ? 'group' : 'hidden'}">
