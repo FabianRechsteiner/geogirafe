@@ -1,3 +1,5 @@
+import GirafeSingleton from '../../../base/GirafeSingleton';
+import MapManager from '../../../tools/state/mapManager';
 import { Feature, Map } from 'ol';
 import DragAndDrop from 'ol/interaction/DragAndDrop.js';
 import { GPX, GeoJSON, IGC, KML, TopoJSON } from 'ol/format.js';
@@ -12,7 +14,7 @@ import I18nManager from '../../../tools/i18n/i18nmanager';
 import UserInteractionManager from '../../../tools/state/userInteractionManager';
 import { v4 as uuidv4 } from 'uuid';
 
-class LocalFileManager {
+class LocalFileManager extends GirafeSingleton {
   map: Map;
   name: string;
 
@@ -34,8 +36,9 @@ class LocalFileManager {
   layerGroup?: GroupLayer;
   layerGroupProxy?: GroupLayer;
 
-  constructor(map: Map) {
-    this.map = map;
+  constructor(type: string) {
+    super(type);
+    this.map = MapManager.getInstance().getMap();
     this.name = `localFileManager-${uuidv4()}`;
 
     this.stateManager = StateManager.getInstance();
@@ -72,39 +75,68 @@ class LocalFileManager {
     dragAndDropInteraction.on('addfeatures', (e) => {
       if (!this.userInteractionManager.canListenerExecute('map.drop', this.name)) return;
 
-      if (!this.layerGroup) {
-        this.layerGroup = new GroupLayer(0, 'Local Files', 0, { isDefaultChecked: true, isDefaultExpanded: true });
-      }
-      // Check if all features can be displayed in the current map maximum extent
-      // This will also approximately validate if the SRID is correct
-      const featureType = e.file.name.replace('.', '_');
-      const acceptableFeatures = this.validateAndCompleteFeatures(featureType, e.features as Feature<Geometry>[]);
-      // Create Layer
-      const layer = new LayerLocalFile(e.file, acceptableFeatures.features, acceptableFeatures.globalExtent!);
-      layer.parent = this.layerGroup;
-      if (e.features && e.features.length > acceptableFeatures.features.length) {
-        // Some features are outer extent
-        layer.hasError = true;
-        layer.errorMessage = `Only ${acceptableFeatures.features.length} features among ${e.features.length} could be loaded.
-        Verify that those features can be displayed within the maximal extent configured in your application.`;
-      }
-
-      if (this.layerGroupProxy) {
-        // If group is already in the treeview, add layer to the tree directly
-        this.layerGroupProxy.children.push(layer);
-      } else {
-        // Otherwise, add the layer to the group
-        this.layerGroup.children.push(layer);
-        // then add the group to the treeview
-        this.stateManager.state.layers.layersList.push(this.layerGroup);
-        // Save a reference to the proxy object in the tree for next time a file is added
-        this.layerGroupProxy = this.stateManager.state.layers.layersList.find(
-          (l) => l.treeItemId === this.layerGroup!.treeItemId
-        ) as GroupLayer;
-      }
+      this.loadLocalFileFeatures(e.file, e.features as Feature<Geometry>[]);
     });
-
     return dragAndDropInteraction;
+  }
+
+  async loadLocalFile(localFile: File) {
+    const text = await localFile.text();
+    let reader = null;
+    if (text.includes('<kml') && text.includes('</kml>')) {
+      reader = new KML({ extractStyles: true });
+    } else if (text.includes('<gpx') && text.includes('</gpx>')) {
+      reader = new GPX();
+    } else if (text.startsWith('{') && text.endsWith('}')) {
+      reader = new GeoJSON();
+    } else {
+      // dot nothing - shall we report an error ??
+      return;
+    }
+    const features = reader.readFeatures(text, { featureProjection: this.stateManager.state.projection });
+    this.loadLocalFileFeatures(localFile, features);
+  }
+
+  loadLocalFileFeatures(localFile: File, features: Feature<Geometry>[]) {
+    if (!this.layerGroup) {
+      this.layerGroup = new GroupLayer(0, 'Local Files', 0, { isDefaultChecked: true, isDefaultExpanded: true });
+    }
+    // Check if all features can be displayed in the current map maximum extent
+    // This will also approximately validate if the SRID is correct
+    const featureType = localFile.name.replace('.', '_');
+    const acceptableFeatures = this.validateAndCompleteFeatures(featureType, features);
+    // Create Layer
+    if (acceptableFeatures.globalExtent === null) {
+      const title = this.i18nManager.getTranslation('No features within map extent');
+      const msg = this.i18nManager.getTranslation(
+        'No features where found in your file that could be displayed within the maximal extent configured in your application.'
+      );
+      window.gAlert(msg, title);
+      return;
+    }
+    const layer = new LayerLocalFile(localFile, acceptableFeatures.features, acceptableFeatures.globalExtent);
+    layer.parent = this.layerGroup;
+    if (features && features.length > acceptableFeatures.features.length) {
+      // Some features are outer extent
+      layer.hasError = true;
+      layer.errorMessage = `Only ${acceptableFeatures.features.length} features among ${features.length} could be loaded.
+Verify that those features can be displayed within the maximal extent configured in your application.`;
+    }
+
+    this.layerGroupProxy = this.stateManager.state.layers.layersList.find(
+      (l) => l.treeItemId === this.layerGroup!.treeItemId
+    ) as GroupLayer;
+    if (this.layerGroupProxy) {
+      // If group is already in the treeview, add layer to the tree directly
+      this.layerGroupProxy.children.push(layer);
+    } else {
+      // Otherwise, add the layer to the group
+      this.layerGroup.children.push(layer);
+      // reset to top of tree
+      this.layerGroup.order = 0;
+      // then add the group to the treeview
+      this.stateManager.state.layers.layersList.push(this.layerGroup);
+    }
   }
 
   private handleUnsupportedFiles(dropEvent: DragEvent) {

@@ -5,6 +5,7 @@ import ConfigManager from '../../tools/configuration/configmanager';
 import MapManager from '../../tools/state/mapManager';
 import WmsManager from '../../tools/wms/wmsmanager';
 import WmtsManager from '../map/tools/wmtsmanager';
+import LocalFileManager from '../map/tools/localfilemanager';
 import ThemeLayer from '../../models/layers/themelayer';
 import BaseLayer from '../../models/layers/baselayer';
 import LayerWms from '../../models/layers/layerwms';
@@ -12,7 +13,7 @@ import LayerWmts from '../../models/layers/layerwmts';
 import ServerOgc from '../../models/serverogc';
 import { WmsClientDefault } from '../../tools/wms/wmsclient';
 
-export type SourceType = 'auto_WMTS' | 'WMS' | 'WMTS' | 'predefined';
+export type SourceType = 'local' | 'auto_WMTS' | 'WMS' | 'WMTS' | 'predefined';
 
 const MIN_EXTERNAL_ID = 999999999;
 
@@ -110,6 +111,23 @@ class ExtLayerComponent extends GirafeHTMLElement {
         Math.max(MIN_EXTERNAL_ID, ...Object.values(this.stateManager.state.layers.extLayerIds)) + 1;
     }
     return this.stateManager.state.layers.extLayerIds[uid];
+  }
+
+  public get fileDescription() {
+    const selectedFiles = this.getById<HTMLInputElement>('file')?.files;
+    if (!selectedFiles || selectedFiles.length == 0) {
+      return '';
+    }
+    return `${selectedFiles[0].name} (${selectedFiles[0].size}b)`;
+  }
+
+  public async loadFile() {
+    const selectedFiles = this.getById<HTMLInputElement>('file').files;
+    if (selectedFiles && selectedFiles.length > 0) {
+      const selectedFile = selectedFiles[0];
+      const localFileManager = LocalFileManager.getInstance();
+      await localFileManager.loadLocalFile(selectedFile);
+    }
   }
 
   public async scanLayersWMS(url: string) {

@@ -62,6 +62,27 @@
   "lidar": {
     "url": "https://pytree.geocommune.apps.openshift-ch-1.camptocamp.com"
   },
+  "external_layers": {
+    "enabled_types": ["local", "WMS", "WMTS", "predefined"],
+    "default_type": "predefined",
+    "predefined_sources": [
+      {
+        "label": "Swisstopo WMS",
+        "type": "WMS",
+        "url": "https://wms.geo.admin.ch"
+      },
+      {
+        "label": "Swisstopo WMTS",
+        "type": "WMTS",
+        "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr"
+      },
+      {
+        "label": "GMF background WMTS",
+        "type": "WMTS",
+        "url": "https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml"
+      }
+    ]
+  },
   "contextmenu": {
     "crs": [
       { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 1 },

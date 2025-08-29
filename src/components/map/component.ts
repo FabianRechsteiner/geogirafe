@@ -324,7 +324,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.xyzManager = new XyzManager(this.olMap);
     this.viewManager = new ViewManager(this.olMap);
     this.vectorTilesManager = new VectorTilesManager(this.olMap);
-    this.localFileManager = new LocalFileManager(this.olMap);
+    this.localFileManager = LocalFileManager.getInstance();
     this.wmtsManager = new WmtsManager(this.olMap);
     this.swiper = this.shadow.getElementById('swiper') as HTMLInputElement;
     this.closeSwiperButton = this.shadow.getElementById('close-swiper') as HTMLButtonElement;

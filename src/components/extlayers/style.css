@@ -51,6 +51,26 @@
   text-wrap-style: balance;
 }
 
+#file-selector {
+  display: grid;
+}
+
+#file,
+#file-label {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+#file {
+  opacity: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
+#file::file-selector-button {
+  cursor: pointer;
+}
+
 #loading-icon {
   width: 20%;
 }
