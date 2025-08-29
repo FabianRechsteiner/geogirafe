@@ -68,9 +68,17 @@ button.selected {
 .picker_arrow::before {
   box-shadow: 0 0 10px 1px var(--text-color-grad1) !important;
 }
+button:disabled,
+input:disabled,
 .disabled {
   pointer-events: none;
   opacity: 0.5;
+}
+
+fieldset.field-wrapper {
+  border: 0;
+  padding: 0;
+  margin: 0;
 }
 
 #panel {
