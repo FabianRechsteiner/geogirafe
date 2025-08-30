@@ -59,7 +59,7 @@ export default class GMFManager extends GirafeSingleton {
       logoutUrl = this.gmfConfigForOAuth.logoutUrl;
     } else if (!this.isOAuth) {
       // GMF-Auth
-      logoutUrl = `${this.gmfConfigForGmfAuth.url}/logout`;
+      logoutUrl = `${this.gmfConfigForGmfAuth.url}logout`;
     }
 
     // If logoutUrl is not set, it means we do not need to logout from backend.
@@ -76,7 +76,7 @@ export default class GMFManager extends GirafeSingleton {
 
   public async getUserInfo() {
     console.debug('Auth: 3. Get UserInfo');
-    const userInfoUrl = this.isOAuth ? this.gmfConfigForOAuth.userInfoUrl : `${this.gmfConfigForGmfAuth.url}/loginuser`;
+    const userInfoUrl = this.isOAuth ? this.gmfConfigForOAuth.userInfoUrl : `${this.gmfConfigForGmfAuth.url}loginuser`;
     this.state.oauth.userInfo = await fetch(userInfoUrl).then((r) => r.json());
   }
 }

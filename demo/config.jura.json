@@ -57,7 +57,7 @@
     "maximumZoomDistance": 25000
   },
   "gmfauth": {
-    "url": "https://geo.jura.ch",
+    "url": "https://geo.jura.ch/",
     "audience": ["geo.jura.ch"],
     "audienceExcludedPaths": ["^/tiles/", "^/pytree/"]
   },
