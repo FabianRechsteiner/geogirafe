@@ -61,7 +61,7 @@ export default class GMFConnectManager extends AbstractConnectManager {
   private redirectToIssuerLogin() {
     const state = ShareManager.getInstance().getStateToShare();
     const redirectUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=true#${state}`;
-    const authorizationUrl = new URL(`${this.authConfig.url}/login.html`);
+    const authorizationUrl = new URL(`${this.authConfig.url}login.html`);
     authorizationUrl.searchParams.set('came_from', redirectUrl);
 
     window.open(authorizationUrl, '_self');
@@ -90,7 +90,7 @@ export default class GMFConnectManager extends AbstractConnectManager {
 
   private async refreshToken() {
     console.debug('Refreshing token');
-    const userInfoUrl = `${this.authConfig.url}/loginuser`;
+    const userInfoUrl = `${this.authConfig.url}loginuser`;
     this.state.oauth.userInfo = await fetch(userInfoUrl).then((r) => r.json());
     if (!this.state.oauth.userInfo?.username) {
       this.resetUrlHistory(false);

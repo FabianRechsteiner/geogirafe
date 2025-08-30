@@ -55,7 +55,7 @@
     "maximumZoomDistance": 25000
   },
   "gmfauth": {
-    "url": "https://demo-ai.geocommunes.ch",
+    "url": "https://demo-ai.geocommunes.ch/",
     "audience": ["demo-ai.geocommunes.ch"],
     "audienceExcludedPaths": ["^/static/(.*)", "^/tiles/"]
   },

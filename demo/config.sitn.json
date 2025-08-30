@@ -3,7 +3,7 @@
     "locale": "fr-CH"
   },
   "gmfauth": {
-    "url": "https://sitn.ne.ch",
+    "url": "https://sitn.ne.ch/",
     "audience": ["sitn.ne.ch"],
     "audienceExcludedPaths": [
       "^/web_getcapabilities/",

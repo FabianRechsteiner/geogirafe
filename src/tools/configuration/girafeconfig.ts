@@ -518,6 +518,11 @@ class GirafeConfig {
       throw new Error(`Configuration for gmfauth.url is required. See https://doc.geomapfish.dev/docs/configuration.`);
     }
 
+    let gmfauthUrl = config.gmfauth.url;
+    if (!config.gmfauth.url.endsWith('/')) {
+      gmfauthUrl = `${config.gmfauth.url}/`;
+    }
+
     if (!config.gmfauth.audience) {
       throw new Error(
         `Configuration for gmfauth.audience is required. See https://doc.geomapfish.dev/docs/configuration.`
@@ -525,7 +530,7 @@ class GirafeConfig {
     }
 
     return {
-      url: config.gmfauth.url,
+      url: gmfauthUrl,
       audience: config.gmfauth.audience,
       loginRequired: config.gmfauth.loginRequired ?? false,
       checkSessionOnLoad: config.gmfauth.checkSessionOnLoad ?? true,

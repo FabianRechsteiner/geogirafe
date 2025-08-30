@@ -57,7 +57,7 @@
     "maximumZoomDistance": 25000
   },
   "gmfauth": {
-    "url": "https://map.cartolacote.ch",
+    "url": "https://map.cartolacote.ch/",
     "audience": ["map.cartolacote.ch"],
     "audienceExcludedPaths": ["^/tiles/(.*)", "^/static/(.*)"]
   },

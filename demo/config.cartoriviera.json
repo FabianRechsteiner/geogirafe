@@ -70,7 +70,7 @@
     "maximumZoomDistance": 25000
   },
   "gmfauth": {
-    "url": "https://map.cartoriviera.ch",
+    "url": "https://map.cartoriviera.ch/",
     "audience": ["map.cartoriviera.ch"],
     "audienceExcludedPaths": ["^/tiles/", "^/pytree/"]
   },
