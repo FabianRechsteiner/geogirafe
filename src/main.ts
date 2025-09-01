@@ -39,28 +39,16 @@ import TreeViewRootComponent from './components/treeview/treeviewroot/component'
 import TreeViewThemeComponent from './components/treeview/treeviewtheme/component';
 import UserPreferencesComponent from './components/userpreferences/component';
 import VideoRecordComponent from './components/videorecord/component';
-import { initialize } from './initialize';
+import { initialize, SplashScreen } from './initialize';
 
 // Redirect to mobile interface if we are on mobile
 if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
   window.location.href = 'mobile.html';
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  // At this point, the config and translations have not been loaded yet
-  // Therefore, we hardcode this simple 'loading' text and use the browser configuration
-  const language = navigator.language.toLowerCase();
-  console.log(`Navigator language: ${language}`);
-  let loading = 'Loading...';
-  if (language.startsWith('fr')) {
-    loading = 'Chargement...';
-  } else if (language.startsWith('de')) {
-    loading = 'Wird geladen...';
-  } else if (language.startsWith('it')) {
-    loading = 'Caricamento...';
-  }
-  (document.getElementById('splash-screen')?.getElementsByTagName('span')[0] as HTMLElement).innerHTML = loading;
-});
+// Display the splash-screen
+const splash = new SplashScreen();
+splash.begin();
 
 // Common initialization
 initialize().then(() => {
@@ -109,10 +97,6 @@ initialize().then(() => {
   customElements.define('girafe-user-preferences', UserPreferencesComponent);
   customElements.define('girafe-video-record', VideoRecordComponent);
 
-  // Remove the splash-screen from the DOM
-  const splash = document.getElementById('splash-screen');
-  if (splash) {
-    splash.style.opacity = '0';
-    setTimeout(() => splash.remove(), 700);
-  }
+  // Remove the splash-screen
+  splash.end();
 });

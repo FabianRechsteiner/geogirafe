@@ -2,7 +2,7 @@ import OfflineManager from './tools/offline/offlinemanager';
 import MapComponent from './components/map/component';
 import MobileSearchComponent from './components/search-mobile/component';
 import OfflineComponent from './components/offline/component';
-import { initialize } from './initialize';
+import { initialize, SplashScreen } from './initialize';
 import SwipeUpPanelMobile from './components/swipe-up-panel-mobile/component';
 import LayerListMobile from './components/layerlist-mobile/layerlist/component';
 import LayerListItemMobile from './components/layerlist-mobile/layerlistitem/component';
@@ -22,6 +22,10 @@ import StateManager from './tools/state/statemanager';
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
   window.location.href = 'index.html';
 }
+
+// Display the splash-screen
+const splash = new SplashScreen();
+splash.begin();
 
 declare const Connection: {
   UNKNOWN: string;
@@ -73,8 +77,6 @@ initialize().then(() => {
   customElements.define('girafe-selection-panel-mobile', SelectionPanelMobile);
   customElements.define('girafe-geolocation-mobile', GeolocationMobile);
 
-  // To prevent the FOUC effect (flash of unstyled content),
-  // the html element is set to invisible when the application starts.
-  // When all elements have been declared, the html element is made visible
-  document.documentElement.style.opacity = '1';
+  // Remove the splash-screen
+  splash.end();
 });

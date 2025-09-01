@@ -2,7 +2,11 @@ import tippy from 'tippy.js';
 import BasemapComponent from './components/basemap/component';
 import InfoboxComponent from './components/infobox/component';
 import MapComponent from './components/map/component';
-import { initialize } from './initialize';
+import { initialize, SplashScreen } from './initialize';
+
+// Display the splash-screen
+const splash = new SplashScreen();
+splash.begin();
 
 // Common initialization
 initialize().then(() => {
@@ -14,8 +18,6 @@ initialize().then(() => {
   customElements.define('girafe-infobox', InfoboxComponent);
   customElements.define('girafe-map', MapComponent);
 
-  // To prevent the FOUC effect (flash of unstyled content),
-  // the html element is set to invisible when the application starts.
-  // When all elements have been declared, the html element is made visible
-  document.documentElement.style.opacity = '1';
+  // Remove the splash-screen
+  splash.end();
 });

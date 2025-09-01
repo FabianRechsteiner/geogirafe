@@ -164,3 +164,43 @@ export async function initialize() {
     document.geogirafe.stateManager.subscribe('language', () => i18nManager.translate(bodyElement));
   }
 }
+
+export class SplashScreen {
+  private splash?: HTMLElement;
+
+  public begin() {
+    document.addEventListener('DOMContentLoaded', () => {
+      const element = document.getElementById('splash-screen');
+      if (!element) {
+        console.info('Nor SplashScreen found. Nothing to do.');
+        return;
+      }
+
+      this.splash = element;
+      // At this point, the config and translations have not been loaded yet
+      // Therefore, we hardcode this simple 'loading' text and use the browser configuration
+      this.setDefaultWaitingText();
+    });
+  }
+
+  private setDefaultWaitingText() {
+    const language = navigator.language.toLowerCase();
+    console.debug(`Navigator language: ${language}`);
+    let loading = 'Loading...';
+    if (language.startsWith('fr')) {
+      loading = 'Chargement...';
+    } else if (language.startsWith('de')) {
+      loading = 'Wird geladen...';
+    } else if (language.startsWith('it')) {
+      loading = 'Caricamento...';
+    }
+    (this.splash?.getElementsByTagName('span')[0] as HTMLElement).innerHTML = loading;
+  }
+
+  public end() {
+    if (this.splash) {
+      this.splash.style.opacity = '0';
+      setTimeout(() => this.splash!.remove(), 700);
+    }
+  }
+}
