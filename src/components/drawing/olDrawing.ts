@@ -161,8 +161,9 @@ export default class OlDrawing {
     this.modify.on('modifyend', (e) => {
       e.features.forEach((olFeature) => {
         const idx = this.drawingState.features.findIndex((f) => f.id === olFeature.getId());
+        const drawingFeature = this.drawingState.features[idx];
         if (idx > -1) {
-          this.drawingState.features[idx].geojson = this.getGeoJsonFromOlFeature(olFeature);
+          this.drawingState.features[idx].geojson = DrawingFeature.geojsonFromOlFeature(olFeature, drawingFeature.type);
         }
       });
     });
@@ -269,8 +270,8 @@ export default class OlDrawing {
   }
 
   /**
-   * Adds features to the drawing source if they are missing, and updates their style each time a property changes.
-   * Adding them to the source is only necessary, if the feature originates from a deserialized state and not
+   * Adds features to the drawing source if they are missing and updates their style each time a property changes.
+   * Adding them to the source is only necessary if the feature originates from a deserialized state and not
    * from a drawing action in the map.
    *
    * @param {DrawingFeature[]} dFeatures - An array of `DrawingFeature` objects to be added.
@@ -340,25 +341,8 @@ export default class OlDrawing {
 
     olFeature.setId(dFeature.id);
 
-    dFeature.geojson = this.getGeoJsonFromOlFeature(olFeature);
+    dFeature.geojson = DrawingFeature.geojsonFromOlFeature(olFeature, dFeature.type);
     dFeature.addToState();
-  }
-
-  private getGeoJsonFromOlFeature(olFeature: Feature<Geometry>) {
-    // GeoJson does not support disks, so we create our own definition
-    if (this.currentShape == DrawingShape.Disk) {
-      const disk = olFeature.getGeometry()! as CircleGeom;
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'Disk',
-          center: disk.getCenter(),
-          radius: disk.getRadius()
-        }
-      };
-    } else {
-      return JSON.parse(new GeoJSON().writeFeature(olFeature));
-    }
   }
 
   private getOlFeatureFromDrawingSource(id: string): Feature<Geometry> | null {

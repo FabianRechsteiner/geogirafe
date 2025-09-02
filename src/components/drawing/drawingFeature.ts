@@ -4,6 +4,9 @@ import ShapeNamer from './shapeNamer';
 import { v4 as uuidv4 } from 'uuid';
 import { Fill, RegularShape, Stroke, Style } from 'ol/style';
 import { toRadians } from 'ol/math';
+import { Circle as CircleGeom, Geometry } from 'ol/geom';
+import Feature from 'ol/Feature';
+import GeoJSON from 'ol/format/GeoJSON';
 
 export enum DrawingShape {
   Point,
@@ -314,5 +317,21 @@ export default class DrawingFeature {
       positions.push([center[0] + radius * Math.cos(i), center[1] + radius * Math.sin(i)]);
     }
     return [...positions, positions[0]];
+  }
+
+  static geojsonFromOlFeature(olFeature: Feature<Geometry>, shapeType: DrawingShape): object {
+    if (shapeType == DrawingShape.Disk) {
+      const disk = olFeature.getGeometry()! as CircleGeom;
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Disk',
+          center: disk.getCenter(),
+          radius: disk.getRadius()
+        }
+      };
+    } else {
+      return JSON.parse(new GeoJSON().writeFeature(olFeature));
+    }
   }
 }
