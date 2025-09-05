@@ -30,7 +30,7 @@ function sameUrlAndImageTypeForAll(layers: LayerWms[]) {
 /** Selection parameters defined by:
  * - 1 ogc Sever
  * - a list of layers
- * - a selection box
+ * - a selection box OR a WFS query
  */
 export default class SelectionParam {
   _ogcServer: ServerOgc;
@@ -38,7 +38,7 @@ export default class SelectionParam {
   srid: string;
   selectionBox?: number[];
   _oLayer?: OLayerImage<OSourceImageWMS>;
-  queries?: WfsFilter[];
+  selectionQuery?: WfsFilter[];
 
   constructor(
     ogcServer: ServerOgc,
@@ -46,14 +46,18 @@ export default class SelectionParam {
     srid: string,
     selectionBox?: number[],
     _oLayer?: OLayerImage<OSourceImageWMS>,
-    queries?: WfsFilter[]
+    selectionQuery?: WfsFilter[]
   ) {
     this._ogcServer = ogcServer;
     this._layers = layers;
     this.srid = srid;
     this.selectionBox = selectionBox;
     this._oLayer = _oLayer;
-    this.queries = queries;
+    this.selectionQuery = selectionQuery;
+
+    if (!this.selectionBox && !this.selectionQuery) {
+      throw new Error('SelectionParam needs either a `selectionBox` or a `selectionQuery` parameter.');
+    }
 
     sameUrlAndImageTypeForAll(this._layers);
   }
@@ -65,7 +69,7 @@ export default class SelectionParam {
       this.srid,
       this.selectionBox,
       this._oLayer,
-      this.queries
+      this.selectionQuery
     );
   }
 }

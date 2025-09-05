@@ -1,5 +1,5 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
-import type Basemap from '../../../models/basemap';
+import type Basemap from '../../../models/basemaps/basemap';
 
 export default class BasemapListMobile extends GirafeHTMLElement {
   templateUrl = './template.html';

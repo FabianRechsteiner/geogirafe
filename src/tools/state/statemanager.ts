@@ -1,5 +1,4 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
-
 import GirafeSingleton from '../../base/GirafeSingleton';
 import State from './state';
 import ConfigManager from '../configuration/configmanager';
@@ -11,6 +10,7 @@ export type Callback = (oldValue: any, value: any, parents?: any) => void | Prom
 class StateManager extends GirafeSingleton {
   private readonly girafeState = new State();
   private readonly stateProxy: Brain<State>;
+
   get state() {
     return this.stateProxy.getState();
   }
@@ -36,6 +36,7 @@ class StateManager extends GirafeSingleton {
     this.configManager?.loadConfig().then(() => {
       const config = this.configManager?.Config;
       if (this.state && config) {
+        this.state.application.isConfigurationLoaded = true;
         this.state.projection = config.map.srid;
         this.state.language = config.languages.defaultLanguage;
         this.state.interface.selectionComponent = config.interface.defaultSelectionComponent;

@@ -1,16 +1,17 @@
 import MapPosition from './mapposition';
-import type Feature from 'ol/Feature';
-import type Basemap from '../../models/basemap';
-import type Theme from '../../models/theme';
-import type BaseLayer from '../../models/layers/baselayer';
+import type Basemap from '../../models/basemaps/basemap';
 import type ThemeLayer from '../../models/layers/themelayer';
 import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
+import { BrainSerialize } from './brain/decorators';
+import BasemapEmpty from '../../models/basemaps/basemapempty';
+import LayersConfig from './layersConfig';
 import type { TokenEndpointResponse } from 'oauth4webapi';
-import type SelectionParam from '../../models/selectionparam';
 import type { GgUserInteractionListener } from './userInteractionManager';
 import type CustomTheme from '../../models/customtheme';
 import { systemIsInDarkMode } from '../utils/utils';
+import ObjectSelection from './objectselection';
+import Theme from '../../models/theme';
 
 type GraphicalInterface = {
   isMobile: boolean;
@@ -35,28 +36,13 @@ type GraphicalInterface = {
   swipeupPanelContent: 'selector' | 'features' | null;
 };
 
-type Selection = {
-  selectionParameters: SelectionParam[];
-  selectedFeatures: Feature[];
-  focusedFeatures: Feature[] | null;
-  highlightedFeatures?: Feature[] | null;
-  gridSelected: boolean;
-};
-
 export type ThemesConfig = {
   _allThemes: Record<number, ThemeLayer>;
   isLoaded: boolean;
   lastSelectedTheme: ThemeLayer | CustomTheme | null;
 };
 
-type LayersConfig = {
-  // TODO REG : This should probably be changes to type ThemeLayer[], but this need a refactoring of some depending classes and tests
-  layersList: BaseLayer[];
-  extLayerIds: { [layerUid: string]: number };
-};
-
 type TreeviewConfig = {
-  advanced: boolean;
   renderEnabled: boolean;
 };
 
@@ -70,11 +56,18 @@ type PrintConfig = {
 };
 
 // Current 3D-Globe state
+export type CameraConfig = {
+  heading: number;
+  pitch: number;
+  roll: number;
+};
+
 type GlobeConfig = {
   display: '2D' | '3D' | '2D/3D';
   loaded: boolean;
   shadows: boolean;
   shadowsTimestamp: number;
+  camera: CameraConfig | null;
 };
 
 export type InfoBoxContent = {
@@ -136,6 +129,8 @@ export type InfoWindow = {
   left: string | number | null;
 };
 
+export type ExtendedState = Record<string, object>;
+
 /**
  * The pannel can be:
  * - "closed": it is invisible, below screen
@@ -172,9 +167,11 @@ export default class State {
   ogcServers: Record<string, ServerOgc> = {};
 
   // Current active basemap
-  activeBasemap: Basemap | null = null;
+  @BrainSerialize
+  activeBasemap: Basemap = new BasemapEmpty();
 
   // Current projection
+  @BrainSerialize
   projection!: string;
 
   // Current mouse coordinates
@@ -216,24 +213,31 @@ export default class State {
     drawActive: false
   };
 
-  // Is the application currently loading data ?
+  // Is the application currently loading map data?
   loading = false;
 
-  // Does a shared state exist and is it loaded? null = no shared state in URL
-  sharedStateIsLoaded = false;
+  // Global variables that represent the state of the application.
+  // They can be used when waiting for big steps in the app.
+  application = {
+    isConfigurationLoaded: false,
+    // This doesn't mean that the user is authenticated, just that the authentication-processed is initialized (including silent login)
+    isAuthInitialized: false,
+    // This doesn't mean that a shared state was loaded, just that the processed is finished
+    isStateInitialized: false,
+    // Everything needed by GeoGirafe to work properly has been loaded
+    isReady: false
+  };
 
   // Current position configuration of the map
-  position: MapPosition = new MapPosition();
+  @BrainSerialize
+  position = new MapPosition();
 
   // Current layers configuration
-  layers: LayersConfig = {
-    layersList: [],
-    extLayerIds: {}
-  };
+  @BrainSerialize
+  layers = new LayersConfig();
 
   // Current Treeview state
   treeview: TreeviewConfig = {
-    advanced: false,
     renderEnabled: true
   };
 
@@ -247,23 +251,24 @@ export default class State {
   };
 
   // Current 3D-Globe state
+  @BrainSerialize
   globe: GlobeConfig = {
     // Possible values : ['3D, '2D/3D', '2D']
     display: '2D',
     loaded: false,
     shadows: false,
-    shadowsTimestamp: new Date().valueOf()
+    shadowsTimestamp: new Date().valueOf(),
+    camera: null
   };
+
+  // TODO REG : What is this used for?
+  // Is it the default theme configured in the user preferences?
+  // Do we really need this?
+  theme: Theme | null = null;
 
   // To manage selected and focused features
-  selection: Selection = {
-    selectionParameters: [],
-    selectedFeatures: [],
-    focusedFeatures: null,
-    gridSelected: false
-  };
-
-  theme: Theme | null = null;
+  @BrainSerialize
+  selection = new ObjectSelection();
 
   infobox = {
     elements: [] as InfoBoxContent[]
@@ -289,5 +294,5 @@ export default class State {
   // The State object is defined as <not extensible> by the StateManager.
   // This property can be used by third-parts components or extensions
   // to add custom attributes to the state.
-  extendedState: Record<string, object> = {};
+  extendedState: ExtendedState = {};
 }

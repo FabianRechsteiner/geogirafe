@@ -78,7 +78,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
   constructor() {
     super('drawing');
     if (!this.state.extendedState.drawing) {
-      this.state.extendedState.drawing = new DrawingState();
+      throw new Error('ExtendedState has to be defined in main typescript file.');
     }
     this.drawingState = this.state.extendedState.drawing as DrawingState;
     const map = this.componentManager.getComponents(MapComponent)[0];

@@ -1,13 +1,16 @@
 import { Coordinate } from 'ol/coordinate';
-import DOMPurify from 'dompurify';
 
 class MapPosition {
   center: Coordinate = [];
   zoom: number = 0;
-  resolution: number = 100; /* dummy default value because it should never be null. It will be recalculated when the map will be created */
+  // Dummy default value because it should never be null. It will be recalculated when the map is created
+  resolution: number = -1;
   scale: number = 0;
-  crosshair: boolean = false;
-  tooltip?: string;
+  crosshair?: Coordinate;
+  tooltip?: {
+    content: string;
+    position?: Coordinate;
+  };
 
   get isValid() {
     if (Number.isNaN(this.resolution)) {
@@ -20,44 +23,23 @@ class MapPosition {
 
     return true;
   }
+
+  public clone(): MapPosition {
+    const position = new MapPosition();
+    position.center = [...this.center];
+    position.zoom = this.zoom;
+    position.resolution = this.resolution;
+    position.scale = this.scale;
+    position.crosshair = this.crosshair ? [...this.crosshair] : undefined;
+    position.tooltip = this.tooltip
+      ? {
+          content: this.tooltip.content,
+          position: this.tooltip.position ? [...this.tooltip.position] : undefined
+        }
+      : undefined;
+
+    return position;
+  }
 }
 
 export default MapPosition;
-
-/**
- * Extracts map position details `map_x`, `map_y`, and `map_zoom` from the current URL's query parameters.
- * @returns {MapPosition | undefined} A `MapPosition` instance if valid parameters are found, otherwise undefined.
- */
-export function parseMapPositionFromUrl(): MapPosition | undefined {
-  const url = new URL(window.location.href);
-  const mapX = url.searchParams.get('map_x');
-  const mapY = url.searchParams.get('map_y');
-  const mapZoom = url.searchParams.get('map_zoom');
-  const crosshair = url.searchParams.get('map_crosshair');
-  const tooltip = url.searchParams.get('map_tooltip');
-  if (mapX && mapY && mapZoom) {
-    const newPosition = new MapPosition();
-    newPosition.center = [parseFloat(mapX), parseFloat(mapY)];
-    newPosition.zoom = parseFloat(mapZoom);
-    newPosition.crosshair = crosshair === 'true';
-    newPosition.tooltip =
-      DOMPurify.sanitize(tooltip as string, {
-        ALLOWED_TAGS: ['br', 'b', 'div', 'em', 'i', 'p', 'strong'],
-        ALLOWED_ATTR: []
-      }) ?? undefined;
-    return newPosition.isValid ? newPosition : undefined;
-  }
-  return undefined;
-}
-
-/**
- * Update the current URL according to the MapPosition object in parameter
- * @param position The MapPosition instance
- */
-export function setUrlFromMapPosition(position: MapPosition) {
-  const url = new URL(window.location.href);
-  url.searchParams.set('map_x', JSON.stringify(position.center[0]));
-  url.searchParams.set('map_y', JSON.stringify(position.center[1]));
-  url.searchParams.set('map_zoom', JSON.stringify(position.zoom));
-  window.history.replaceState({}, '', url.toString());
-}

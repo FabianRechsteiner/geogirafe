@@ -86,8 +86,7 @@ export const deletePropertyByPath = (obj: any, path: string) => {
  */
 export const mergeObjects = (obj1: Record<string, unknown>, obj2: Record<string, unknown>) => {
   for (const key in obj2) {
-    if (Object.prototype.hasOwnProperty.call(obj1, key)) {
-      // NOSONAR: Can be solved when migrating to ES2022
+    if (Object.hasOwn(obj1, key)) {
       if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
         mergeObjects(obj1[key] as Record<string, unknown>, obj2[key] as Record<string, unknown>);
       } else {

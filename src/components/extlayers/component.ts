@@ -26,8 +26,7 @@ class ExtLayerComponent extends GirafeHTMLElement {
 
   public readonly i18nManager: I18nManager;
   private readonly enabled_types: SourceType[];
-  // @ts-ignore: unused variable => used in template.html
-  private readonly predefined_sources;
+  public readonly predefined_sources;
 
   sourceType: SourceType;
   wmtsManager!: WmtsManager;
@@ -55,7 +54,11 @@ class ExtLayerComponent extends GirafeHTMLElement {
 
   render() {
     super.girafeTranslate();
-    this.visible ? super.render() : this.renderEmpty();
+    if (this.visible) {
+      super.render();
+    } else {
+      this.renderEmpty();
+    }
     const olMap = this.mapManager.getMap();
     this.wmtsManager = new WmtsManager(olMap);
   }
@@ -133,7 +136,13 @@ class ExtLayerComponent extends GirafeHTMLElement {
   public async scanLayersWMS(url: string) {
     this.themeName = this.parseName(url);
     const wmsManager = WmsManager.getInstance();
-    const server = new ServerOgc(this.themeName, { url, type: 'other', wfsSupport: true, urlWfs: url, imageType: 'image/png' });
+    const server = new ServerOgc(this.themeName, {
+      url,
+      type: 'other',
+      wfsSupport: true,
+      urlWfs: url,
+      imageType: 'image/png'
+    });
     const client = wmsManager.createClient(WmsClientDefault, server);
     this.allLayers = [];
     this.layers = [];

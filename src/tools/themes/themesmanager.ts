@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import GirafeSingleton from '../../base/GirafeSingleton';
-import Basemap from '../../models/basemap';
+import Basemap from '../../models/basemaps/basemap';
 import { GMFBackgroundLayer, GMFServerOgc, GMFTheme, GMFTreeItem } from '../../models/gmf';
 import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
@@ -12,7 +12,6 @@ import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
 import LayerManager from '../layers/layermanager';
 import ShareManager from '../share/sharemanager';
-import LayerConsts from '../../models/layers/layerconsts';
 import LayerCog from '../../models/layers/layercog';
 import LayerXYZ from '../../models/layers/layerxyz';
 import ServerOgc from '../../models/serverogc';
@@ -20,15 +19,19 @@ import ThemeLayer from '../../models/layers/themelayer';
 import WfsManager from '../wfs/wfsmanager';
 import CustomThemesManager from './customthemesmanager';
 import ErrorManager from '../error/errormanager';
+import BasemapEmpty from '../../models/basemaps/basemapempty';
+import SessionManager from '../share/sessionmanager';
+import BasemapSwisstopoVectorTiles from '../../models/basemaps/basemapswisstopovectortiles';
+import BasemapOsm from '../../models/basemaps/basemaposm';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
   layerManager: LayerManager;
   shareManager: ShareManager;
+  sessionManager: SessionManager;
   customThemesManager: CustomThemesManager;
 
-  isInitializingForUserInfo = new WeakMap<object, boolean>();
   anonymousUserInfo = { u: 'anonymous' };
 
   get state() {
@@ -42,32 +45,38 @@ class ThemesManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
     this.layerManager = LayerManager.getInstance();
     this.shareManager = ShareManager.getInstance();
+    this.sessionManager = SessionManager.getInstance();
     this.customThemesManager = CustomThemesManager.getInstance();
 
-    this.stateManager.subscribe('oauth.userInfo', () => {
-      this.initialize();
+    // We have to wait the authentication to be able to load the themes with the right user-rights
+    this.stateManager.subscribe('application.isAuthInitialized', () => {
+      if (this.state.application.isAuthInitialized) {
+        this.initialize();
+      }
     });
   }
 
   public async initialize() {
-    const userInfo = this.state.oauth.userInfo ?? this.anonymousUserInfo;
-    if (this.isInitializingForUserInfo.get(userInfo)) {
-      // Already initializing for this userinfo
-      return;
-    }
-
-    this.isInitializingForUserInfo.set(userInfo, true);
     try {
       await this.configManager.loadConfig();
       await this.loadThemes();
       console.log('Themes were loaded');
 
-      // We shouldn't set the default theme is there is any configured hash
+      // try to restore state if any
+      let stateRestored = false;
       if (this.shareManager.hasSharedState()) {
-        this.shareManager.setStateFromUrl();
-      } else {
-        this.setDefaultTheme();
+        stateRestored = await this.shareManager.setStateFromUrl();
+      } else if (this.sessionManager.hasState()) {
+        stateRestored = this.sessionManager.setStateFromSession();
       }
+      // Otherwise, apply default theme
+      if (!stateRestored) {
+        this.setDefaultTheme();
+        this.setDefaultBasemap();
+      }
+
+      this.stateManager.state.application.isStateInitialized = true;
+      this.sessionManager.beginSession();
     } catch (error) {
       // Themes could not be loaded
       console.error(error);
@@ -77,33 +86,19 @@ class ThemesManager extends GirafeSingleton {
       );
       await window.gAlert('This instance of GeoGirafe cannot be used at the moment.', 'Backend error');
       console.error(error);
-    } finally {
-      this.isInitializingForUserInfo.set(userInfo, false);
     }
   }
 
   /**
    * Load themes from backend and configures background layers if needed
    */
-  async loadThemes() {
+  private async loadThemes() {
     this.state.themes.isLoaded = false;
     const response = await fetch(this.configManager.Config.themes.url);
 
     const content = await response.json();
     this.state.ogcServers = this.prepareOgcServers(content['ogcServers']);
-    if (this.configManager.Config.basemaps.show) {
-      this.state.basemaps = this.prepareBasemaps(content['background_layers']);
-
-      // Configure default basemap (only if there is no sharedstate)
-      if (!ShareManager.getInstance().hasSharedState()) {
-        for (const basemap of Object.values(this.state.basemaps)) {
-          if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
-            this.state.activeBasemap = basemap;
-            break;
-          }
-        }
-      }
-    }
+    this.state.basemaps = this.prepareBasemaps(content['background_layers']);
     this.state.themes._allThemes = this.prepareThemes(content['themes']);
     this.customThemesManager.loadCustomThemes();
     this.state.themes.isLoaded = true;
@@ -117,7 +112,7 @@ class ThemesManager extends GirafeSingleton {
     }
   }
 
-  setDefaultTheme() {
+  private setDefaultTheme() {
     // Set default theme if any
     if (!this.isNullOrUndefinedOrBlank(this.configManager.Config.themes.defaultTheme)) {
       const themes = [
@@ -130,6 +125,15 @@ class ThemesManager extends GirafeSingleton {
       } else {
         // The default theme was not found
         console.warn(`The default theme ${this.configManager.Config.themes.defaultTheme} could not be found.`);
+      }
+    }
+  }
+
+  private setDefaultBasemap() {
+    for (const basemap of Object.values(this.state.basemaps)) {
+      if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
+        this.state.activeBasemap = basemap;
+        break;
       }
     }
   }
@@ -161,55 +165,22 @@ class ThemesManager extends GirafeSingleton {
     }
   }
 
-  prepareBasemaps(basemapJson: GMFBackgroundLayer[]) {
+  private prepareBasemaps(basemapJson: GMFBackgroundLayer[]) {
     const basemaps: { [key: number]: Basemap } = {};
 
-    const basemapMetadata = {
-      isLegendExpanded: false,
-      wasLegendExpanded: false,
-      exclusiveGroup: false,
-      isExpanded: false,
-      isChecked: false
-    };
-
     if (this.configManager.Config.basemaps.emptyBasemap) {
-      // Add an empty basemap
-      const emptyBasemap = new Basemap({
-        id: 0,
-        name: 'Empty',
-        metadata: { ...basemapMetadata, thumbnail: 'images/basemap_empty.png' }
-      });
-      basemaps[emptyBasemap.id] = emptyBasemap;
+      const basemapEmpty = new BasemapEmpty();
+      basemaps[basemapEmpty.id] = basemapEmpty;
     }
 
     if (this.configManager.Config.basemaps.OSM) {
-      // Add default OSM Option
-      const osmBasemap = new Basemap({
-        id: -1,
-        name: 'OpenStreetMap',
-        metadata: { ...basemapMetadata, thumbnail: 'images/basemap_osm.png' }
-      });
-      basemaps[osmBasemap.id] = osmBasemap;
-      osmBasemap.layersList.push(new LayerOsm(0));
+      const basemapOsm = new BasemapOsm();
+      basemaps[basemapOsm.id] = basemapOsm;
     }
 
     if (this.configManager.Config.basemaps.SwissTopoVectorTiles) {
-      // Add default Vector Tiles
-      const vectorBasemap = new Basemap({
-        id: -2,
-        name: 'Vector-Tiles',
-        metadata: { ...basemapMetadata, thumbnail: 'images/basemap_vectortiles.png' }
-      });
-      basemaps[vectorBasemap.id] = vectorBasemap;
-      const vectorTilesLayer = new LayerVectorTiles(
-        LayerConsts.LayerSwisstopoVectorTilesId,
-        'Vector-Tiles',
-        0,
-        'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
-        'leichtebasiskarte_v3.0.1',
-        { projection: 'EPSG:3857' }
-      );
-      vectorBasemap.layersList.push(vectorTilesLayer);
+      const basemapSwisstopoVectorTiles = new BasemapSwisstopoVectorTiles();
+      basemaps[basemapSwisstopoVectorTiles.id] = basemapSwisstopoVectorTiles;
     }
 
     basemapJson.forEach((elem: GMFBackgroundLayer) => {

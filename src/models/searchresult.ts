@@ -1,16 +1,21 @@
 import { Coordinate } from 'ol/coordinate';
 import { Extent } from 'ol/extent';
 
-type GeometryResult = {
+export type GeometryResult = {
   type: 'Point' | 'MultiPoint' | 'LineString' | 'MultiLineString' | 'Polygon' | 'MultiPolygon';
   coordinates: Coordinate | Coordinate[] | Coordinate[][] | Coordinate[][][];
 };
-type GeometryCollectionResult = {
+export type GeometryCollectionResult = {
   type: 'GeometryCollection';
   geometries: GeometryCollectionResult[] | GeometryResult[];
 };
 
-class SearchResult {
+export type AllSearchResults = {
+  type: string;
+  features: SearchResult[];
+};
+
+export default class SearchResult {
   bbox?: Extent;
 
   geometry?: GeometryResult | GeometryCollectionResult;
@@ -26,6 +31,3 @@ class SearchResult {
 
   selected: boolean = false;
 }
-
-export type { GeometryResult, GeometryCollectionResult };
-export default SearchResult;

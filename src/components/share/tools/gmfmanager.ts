@@ -1,10 +1,10 @@
 import { IUrlShortener, UrlShortenerResponse } from './iurlshortener';
 
-type GmfSuccessResponse = {
+export type GmfSuccessResponse = {
   short_url: string;
 };
 
-class GmfManager implements IUrlShortener {
+class GmfShareManager implements IUrlShortener {
   serviceUrl: string;
 
   constructor(serviceUrl: string) {
@@ -38,4 +38,4 @@ class GmfManager implements IUrlShortener {
   }
 }
 
-export default GmfManager;
+export default GmfShareManager;

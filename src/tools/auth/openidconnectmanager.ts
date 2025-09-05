@@ -16,6 +16,7 @@ import {
   validateAuthResponse
 } from 'oauth4webapi';
 import UserDataManager from '../userdata/userdatamanager';
+import UrlManager from '../url/urlmanager';
 
 export default class OpenIdConnectManager extends AbstractConnectManager {
   private authorizationServer?: AuthorizationServer;
@@ -213,14 +214,17 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       for (const [key, value] of params.entries()) {
         newUrl.searchParams.set(key, value);
       }
-      window.history.replaceState(null, '', newUrl.toString());
+      UrlManager.getInstance().updateUrl(newUrl);
       await this.handleLoggedInToIssuer();
     } else if (event.data?.type === 'OAUTH_ERROR') {
       console.info('Silent login could not be done : ', event.data.error);
+      this.state.application.isAuthInitialized = true;
     }
 
-    document.body.removeChild(this.silentLoginIframe!);
-    this.silentLoginIframe = undefined;
+    if (this.silentLoginIframe) {
+      document.body.removeChild(this.silentLoginIframe);
+      this.silentLoginIframe = undefined;
+    }
   }
 
   private async redirectToIssuerLogin() {
@@ -272,7 +276,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     } else {
       newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=${authentified}#${this.currentState}`;
     }
-    window.history.replaceState(null, '', newUrl);
+    UrlManager.getInstance().updateUrl(newUrl);
   }
 
   private async refreshToken() {

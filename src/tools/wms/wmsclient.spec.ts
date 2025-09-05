@@ -5,13 +5,14 @@ import Map from 'ol/Map';
 import WmsManager from './wmsmanager';
 import { mockOgcServers, mockWmsLayers } from '../tests/wmswfsmanagermocking';
 import MockHelper from '../tests/mockhelper';
-//import ConfigManager from '../configuration/configmanager';
+import StateManager from '../state/statemanager';
 
 const fetchMock = vi.fn();
 global.fetch = fetchMock;
 
 describe('WMS Client tests', () => {
   MockHelper.startMocking();
+  StateManager.getInstance().state.position.resolution = 100;
 
   const wmsManager = WmsManager.getInstance();
   wmsManager.map = new Map({ layers: [] });

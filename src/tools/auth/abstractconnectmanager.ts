@@ -33,5 +33,6 @@ export default abstract class AbstractConnectManager extends GirafeSingleton {
     this.state.oauth.tokens = undefined;
     this.state.oauth.userInfo = undefined;
     this.state.oauth.audience = [];
+    this.state.application.isAuthInitialized = true;
   }
 }

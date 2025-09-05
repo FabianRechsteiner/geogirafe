@@ -1,55 +1,24 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import Basemap from '../../models/basemap';
-import ShareManager from '../../tools/share/sharemanager';
+import Basemap from '../../models/basemaps/basemap';
 
 class BasemapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  shareManager: ShareManager;
-
-  activeBasemapName: string = '';
-
   constructor() {
     super('basemap');
-
-    this.shareManager = ShareManager.getInstance();
   }
 
-  onBasemapsLoaded(basemaps: { [key: number]: Basemap }) {
-    this.render();
-
-    // Configure default basemap (only if there is no sharedstate)
-    // TODO REG : This is now done in the ThemesManager (in order to work with Mobile as well).
-    // Should we remove the set of activeBasemap from the basemap component?
-    if (!this.shareManager.hasSharedState()) {
-      for (const basemap of Object.values(basemaps)) {
-        if (basemap.name === this.configManager.Config.basemaps.defaultBasemap) {
-          this.state.activeBasemap = basemap;
-          this.activeBasemapName = basemap.name;
-          this.render();
-          break;
-        }
-      }
-    }
-  }
-
-  changeBasemap(basemap: Basemap) {
-    if (basemap.id === this.state.activeBasemap?.id && this.activeBasemapName === basemap.name) {
-      return;
-    }
+  private changeBasemap(basemap: Basemap) {
     if (basemap.projection) {
       this.state.projection = basemap.projection;
     }
     this.state.activeBasemap = basemap;
-    this.activeBasemapName = basemap.name;
     this.refreshRender();
   }
 
   registerEvents() {
-    this.subscribe('basemaps', (_oldBasemaps: { [key: number]: Basemap }, newBasemaps: { [key: number]: Basemap }) =>
-      this.onBasemapsLoaded(newBasemaps)
-    );
+    this.subscribe('basemaps', () => this.render());
     this.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) => this.changeBasemap(newBasemap));
     this.subscribe('themes.isLoaded', () => {
       if (this.state.themes.isLoaded) {

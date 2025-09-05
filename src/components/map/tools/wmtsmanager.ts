@@ -49,11 +49,12 @@ class WmtsManager {
     this.basemapLayers = {};
   }
 
-  addLayer(layer: LayerWmts) {
-    this.addLayerInternal(layer, false);
+  public async addLayer(layer: LayerWmts) {
+    await this.addLayerInternal(layer, false);
+    this.manageLayerOptions(layer);
   }
 
-  addBasemapLayer(basemap: LayerWmts) {
+  public addBasemapLayer(basemap: LayerWmts) {
     this.addLayerInternal(basemap, true);
   }
 
@@ -176,12 +177,18 @@ class WmtsManager {
     return null;
   }
 
-  changeOpacity(layer: LayerWmts, opacity: number) {
-    if (this.layerExists(layer)) {
-      const olayer = this.wmtsLayers[layer.layerUniqueId].olayer;
-      olayer.setOpacity(opacity);
-    } else {
+  public changeOpacity(layer: LayerWmts) {
+    this.manageLayerOptions(layer);
+  }
+
+  private manageLayerOptions(layer: LayerWmts) {
+    if (!this.layerExists(layer)) {
       throw new Error('Cannot change opacity for this layer: it does not exist');
+    }
+
+    if (layer.isTransparent) {
+      const olayer = this.wmtsLayers[layer.layerUniqueId].olayer;
+      olayer.setOpacity(layer.opacity);
     }
   }
 

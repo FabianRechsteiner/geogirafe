@@ -2,15 +2,18 @@ import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import UserDataManager from './userdatamanager';
 import ConfigManager from '../configuration/configmanager';
 import CustomThemesManager from '../themes/customthemesmanager';
+import MockHelper from '../tests/mockhelper';
 
 describe('UserDataManager.getUserData', () => {
   const manager = UserDataManager.getInstance();
 
   beforeAll(() => {
+    MockHelper.startMocking();
     manager.setSource('localStorage');
   });
 
   afterAll(() => {
+    MockHelper.stopMocking();
     manager.deleteAllUserData();
   });
 
@@ -36,13 +39,14 @@ describe('UserDataManager.getUserData', () => {
 describe('UserDataManager.saveUserData', () => {
   const manager = UserDataManager.getInstance();
   const configPath = ConfigManager.getInstance()['storagePathForOverrides'];
-  const customThemesPath = CustomThemesManager.getInstance()['storagePath'];
 
   beforeAll(() => {
+    MockHelper.startMocking();
     manager.setSource('localStorage');
   });
 
   afterAll(() => {
+    MockHelper.stopMocking();
     manager.deleteAllUserData();
   });
 
@@ -76,6 +80,7 @@ describe('UserDataManager.saveUserData', () => {
   });
 
   it('should overwrite user data in storage by providing a path and object', () => {
+    const customThemesPath = CustomThemesManager.getInstance()['storagePath'];
     const customThemes = { theme1: [], theme2: [{ c: 1, e: 0, i: 2345, o: 3456 }] };
     manager.saveUserData(customThemesPath, customThemes);
 
@@ -101,10 +106,12 @@ describe('UserDataManager.deleteUserData', () => {
   const manager = UserDataManager.getInstance();
 
   beforeAll(() => {
+    MockHelper.startMocking();
     manager.setSource('localStorage');
   });
 
   afterAll(() => {
+    MockHelper.stopMocking();
     manager.deleteAllUserData();
   });
 
@@ -141,10 +148,12 @@ describe('UserDataManager.deleteAllUserData', () => {
   const manager = UserDataManager.getInstance();
 
   beforeAll(() => {
+    MockHelper.startMocking();
     manager.setSource('localStorage');
   });
 
   afterAll(() => {
+    MockHelper.stopMocking();
     manager.deleteAllUserData();
   });
 

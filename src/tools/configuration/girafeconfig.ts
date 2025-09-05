@@ -81,8 +81,9 @@ class GirafeConfig {
     defaultVertexStrokeWidth: number;
   };
   share?: {
-    service: 'lstu' | 'gmf' | null;
+    service: 'lstu' | 'gmf' | 'geogirafe' | null;
     createUrl: string;
+    getUrl?: string;
   };
   projections: {
     [key: string]: string;
@@ -348,9 +349,15 @@ class GirafeConfig {
         `Configuration for share.createUrl is required. See https://doc.geomapfish.dev/docs/configuration`
       );
     }
+    if (config.share?.service === 'geogirafe' && !config.share?.getUrl) {
+      throw new Error(
+        `Configuration for share.getUrl is required if service type is 'geogirafe'. See https://doc.geomapfish.dev/docs/configuration`
+      );
+    }
     return {
       service: config.share?.service ?? 'gmf',
-      createUrl: config.share?.createUrl
+      createUrl: config.share?.createUrl,
+      getUrl: config.share?.getUrl
     };
   }
 

@@ -2,6 +2,7 @@ import areEqual from './equality';
 import {
   deepClone,
   deepFreeze,
+  isConstructor,
   isFunction,
   isIgnoredProperty,
   isIterator,
@@ -26,7 +27,7 @@ export type TProxy = InstanceType<typeof Proxy>;
 type TTarget = any; // NOSONAR: We want a specifix type here
 type Callback = (path: string, oldValue: TTarget, newValue: TTarget | TProxy, parents: TProxy[]) => void;
 
-export default class Brain<T> {
+export default class Brain<T extends Record<string | symbol, any>> {
   private readonly initialState: object;
   private readonly stateProxy: TProxy;
   private readonly externalCallback: Callback;
@@ -385,6 +386,10 @@ export default class Brain<T> {
 
     if (isVirtualProperty(prop as string)) {
       return this.handleGetVirtualProperties(proxy, target, prop as string);
+    }
+
+    if (isConstructor(prop as string)) {
+      return target.constructor;
     }
 
     const value = target[prop];

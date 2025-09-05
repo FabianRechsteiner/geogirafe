@@ -107,6 +107,16 @@ export function isVirtualProperty(prop: string): boolean {
 }
 
 /**
+ * Checks if a function name represents a constructor.
+ *
+ * @param prop - The property name to check.
+ * @returns `true` if the property is a virtual property, otherwise `false`.
+ */
+export function isConstructor(prop: string): boolean {
+  return prop === 'constructor';
+}
+
+/**
  * Checks if a property should be ignored during certain operations.
  * Ignored properties are either symbols or start with `_` (unless they are virtual properties).
  *

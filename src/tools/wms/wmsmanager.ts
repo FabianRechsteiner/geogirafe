@@ -3,6 +3,8 @@ import { Map as OlMap } from 'ol';
 import WmsClient, { WmsClientDefault, WmsClientGeoServer, WmsClientMapServer, WmsClientQgis } from './wmsclient';
 import ServerOgc from '../../models/serverogc';
 import VendorSpecificOgcServerManager from '../vendorspecificogcservermanager';
+import LayerWms from '../../models/layers/layerwms';
+import WfsFilter from '../wfs/wfsfilter';
 
 export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient, OlMap> {
   map?: OlMap;
@@ -28,6 +30,14 @@ export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient
     for (const client of this._clients.values()) {
       client.selectFeatures(extent);
     }
+  }
+
+  selectFeaturesByQuery(query: WfsFilter[], layer: LayerWms) {
+    const client = this.getClient(layer.ogcServer);
+    if (!client) {
+      throw new Error(`Cannot select features by query: no client found for layer ${layer.name}`);
+    }
+    client.selectFeaturesByQuery(query);
   }
 
   public refreshZIndexes() {

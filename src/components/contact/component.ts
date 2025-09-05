@@ -1,5 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ShareManager from '../../tools/share/sharemanager';
+import UrlManager from '../../tools/url/urlmanager';
 
 class ContactComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -27,8 +28,7 @@ class ContactComponent extends GirafeHTMLElement {
   }
 
   private getCurrentStateUrl() {
-    const currentUrl = new URL(window.location.href);
-    const baseUrl = `${currentUrl.protocol}//${currentUrl.host}${currentUrl.pathname}`;
+    const baseUrl = UrlManager.getInstance().getBaseUrl();
     const hash = ShareManager.getInstance().getStateToShare();
     return `${baseUrl}#${hash}`;
   }

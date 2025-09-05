@@ -2,6 +2,7 @@ const { defineConfig, globalIgnores } = require('eslint/config');
 
 const tsParser = require('@typescript-eslint/parser');
 const typescriptEslint = require('@typescript-eslint/eslint-plugin');
+const esX = require('eslint-plugin-es-x');
 const globals = require('globals');
 const js = require('@eslint/js');
 
@@ -29,7 +30,8 @@ module.exports = defineConfig([
       }
     },
     plugins: {
-      '@typescript-eslint': typescriptEslint
+      '@typescript-eslint': typescriptEslint,
+      '@esX': esX
     },
     rules: {
       '@typescript-eslint/no-unused-vars': [
@@ -38,7 +40,11 @@ module.exports = defineConfig([
           varsIgnorePattern: '^_',
           argsIgnorePattern: '^_'
         }
-      ]
+      ],
+      // With ES2022, Safari does not fully support TLA (top level await)
+      // see https://caniuse.com/mdn-javascript_operators_await_top_level
+      // Therefore, we deactivate the usage of TPA for the moment.
+      '@esX/no-top-level-await': 'error'
     }
   },
   {
@@ -50,7 +56,8 @@ module.exports = defineConfig([
       'src/tools/auth/openidconnectmanager.ts',
       'src/components/drawing/**/*.ts',
       'src/components/map/component.ts',
-      'src/components/userpreferences/userPreference.ts'
+      'src/components/userpreferences/userPreference.ts',
+      'src/components/extlayers/component.ts'
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off'

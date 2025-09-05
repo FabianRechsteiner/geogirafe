@@ -16,6 +16,7 @@ header:hover .tool {
 .tool.active {
   display: flex !important;
   opacity: 1 !important;
+  order: 100;
 }
 
 .label-container {

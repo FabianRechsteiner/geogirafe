@@ -1,6 +1,6 @@
-import { GMFBackgroundLayer } from './gmf';
-import BaseLayer from './layers/baselayer';
-import LayerVectorTiles from './layers/layervectortiles';
+import { GMFBackgroundLayer } from '../gmf';
+import BaseLayer from '../layers/baselayer';
+import LayerVectorTiles from '../layers/layervectortiles';
 
 class Basemap {
   id: number;

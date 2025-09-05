@@ -28,7 +28,7 @@ export type LayerWmsOptions = {
   printNativeAngle?: boolean;
   queryable?: boolean;
   queryLayers?: string;
-  queryLayersRanges?: {[name: string]: { minResolution?: number, maxResolution?: number }};
+  queryLayersRanges?: { [name: string]: { minResolution?: number; maxResolution?: number } };
   time?: ITimeOptions;
   timeAttribute?: string;
   editable?: string;
@@ -64,7 +64,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
   // If the layer is queryable
   public queryable: boolean = false;
   public queryLayers?: string;
-  public queryLayersRanges: {[name: string]: { minResolution?: number, maxResolution?: number }};
+  public queryLayersRanges: { [name: string]: { minResolution?: number; maxResolution?: number } };
   public filter?: WfsFilter;
 
   public timeOptions?: ITimeOptions;
@@ -153,8 +153,16 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     return LayerWms.isResolutionRangeRestricted(this.minResolution, this.maxResolution);
   }
 
-  public static isInVisibleRange(resolution: number, minResolution: number | undefined, maxResolution: number | undefined) {
-    if (resolution === undefined || resolution === null || !LayerWms.isResolutionRangeRestricted(minResolution, maxResolution)) {
+  public static isInVisibleRange(
+    resolution: number,
+    minResolution: number | undefined,
+    maxResolution: number | undefined
+  ) {
+    if (
+      resolution === undefined ||
+      resolution === null ||
+      !LayerWms.isResolutionRangeRestricted(minResolution, maxResolution)
+    ) {
       return true;
     }
     return resolution >= (minResolution ?? -1) && resolution <= (maxResolution ?? Infinity);
@@ -220,17 +228,20 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
         .map((l: GMFChildLayer) => l.name)
         .join(',');
       opts.queryLayersRanges = {};
-      options.childLayers
-        .forEach((l: GMFChildLayer) => {
-          if (!l.queryable) { return }
-          if ((l.minResolutionHint && l.minResolutionHint !== 0)
-            || (l.maxResolutionHint && l.maxResolutionHint !== 999999999)) {
-            opts.queryLayersRanges![l.name] = {
-              minResolution: l.minResolutionHint,
-              maxResolution: l.maxResolutionHint
-            }
-          }
-        });
+      options.childLayers.forEach((l: GMFChildLayer) => {
+        if (!l.queryable) {
+          return;
+        }
+        if (
+          (l.minResolutionHint && l.minResolutionHint !== 0) ||
+          (l.maxResolutionHint && l.maxResolutionHint !== 999999999)
+        ) {
+          opts.queryLayersRanges![l.name] = {
+            minResolution: l.minResolutionHint,
+            maxResolution: l.maxResolutionHint
+          };
+        }
+      });
       opts.queryable = opts.queryLayers.length > 0;
     }
 

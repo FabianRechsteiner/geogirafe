@@ -1,5 +1,5 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
-import type ThemeLayer from '../../../models/theme';
+import type ThemeLayer from '../../../models/layers/themelayer';
 
 export default class ThemeListMobile extends GirafeHTMLElement {
   templateUrl = './template.html';

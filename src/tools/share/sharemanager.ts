@@ -1,25 +1,21 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import LayerManager from '../layers/layermanager';
-import StateManager from '../state/statemanager';
-import StateDeserializer from './statedeserializer';
+import ConfigManager from '../configuration/configmanager';
+import UrlManager from '../url/urlmanager';
+import SessionManager from './sessionmanager';
 import StateSerializer from './stateserializer';
 
 class ShareManager extends GirafeSingleton {
-  stateManager: StateManager;
-  layerManager: LayerManager;
-  serializer: StateSerializer;
-  deserializer: StateDeserializer;
+  private readonly configManager: ConfigManager;
+  private readonly stateSerializer: StateSerializer;
 
   constructor(type: string) {
     super(type);
-    this.stateManager = StateManager.getInstance();
-    this.layerManager = LayerManager.getInstance();
-    this.serializer = new StateSerializer();
-    this.deserializer = new StateDeserializer();
+    this.stateSerializer = StateSerializer.getInstance();
+    this.configManager = ConfigManager.getInstance();
   }
 
   public getStateToShare() {
-    const encodedState = this.serializer.getSerializedState(this.stateManager.state);
+    const encodedState = this.stateSerializer.getSerializedState();
     return encodedState;
   }
 
@@ -29,27 +25,41 @@ class ShareManager extends GirafeSingleton {
   }
 
   private getStateFromUrl(): string | null {
-    let encodedState = window.location.hash;
-    if (encodedState && encodedState.length > 0) {
-      if (encodedState.startsWith('#')) {
-        encodedState = encodedState.substring(1);
-      }
-      if (encodedState.length > 0) {
-        return encodedState;
-      }
+    if (SessionManager.getInstance().hasState()) {
+      return null;
     }
-
-    return null;
+    return UrlManager.getInstance().getHash();
   }
 
-  public setStateFromUrl() {
+  public async setStateFromUrl(): Promise<boolean> {
     // NOTE: This method should only be called when themes.json has been loaded
     // (i.e. from the ThemesManager), because it needs the themes.
-    const encodedState = this.getStateFromUrl();
+    let encodedState = this.getStateFromUrl();
+    let stateRestored = false;
     if (encodedState) {
-      this.deserializer.deserializeAndSetState(encodedState);
+      if (encodedState.startsWith('gg-')) {
+        // The hash contains a shortlink identifier.
+        // We first have to load the hash from the GMF server
+        encodedState = await this.getStateFromServer(encodedState);
+      }
+      stateRestored = this.stateSerializer.deserializeAndSetState(encodedState);
     }
-    this.stateManager.state.sharedStateIsLoaded = true;
+    return stateRestored;
+  }
+
+  private async getStateFromServer(geogirafeState: string): Promise<string> {
+    if (this.configManager.Config.share?.service !== 'geogirafe' || !this.configManager.Config.share.getUrl) {
+      throw new Error('We get a geogirafe state but the configuration is not correct.');
+    }
+    let getUrl = this.configManager.Config.share.getUrl;
+    if (!getUrl.endsWith('/')) {
+      getUrl += '/';
+    }
+    getUrl += geogirafeState.substring(3);
+    const resp = await fetch(getUrl);
+    const json = await resp.json();
+    const compressedState = json.long_url.split('#')[1];
+    return compressedState;
   }
 }
 

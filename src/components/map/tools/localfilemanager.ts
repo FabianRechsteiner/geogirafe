@@ -230,6 +230,10 @@ Verify that those features can be displayed within the maximal extent configured
       }
     }
   }
+  changeOpacity(layer: LayerLocalFile) {
+    const oLayer = this.activeLayers[layer.treeItemId].olayer;
+    oLayer.setOpacity(layer.opacity);
+  }
 }
 
 export default LocalFileManager;

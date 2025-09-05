@@ -312,7 +312,7 @@ class LayerManager extends GirafeSingleton {
     return orderedLayers ?? [];
   }
 
-  public activateDefaultLayers(layers: BaseLayer[]) {
+  private activateDefaultLayers(layers: BaseLayer[]) {
     for (const layer of layers) {
       // Activate the layer by default
       this.activateIfDefaultChecked(layer);

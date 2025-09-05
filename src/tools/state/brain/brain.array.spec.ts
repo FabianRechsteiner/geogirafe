@@ -514,6 +514,16 @@ describe('State: Monitor array functions', () => {
     expect(controlValue).toBe(1);
   });
 
+  it('Monitor arrays: constructor', () => {
+    state.arrayValue = [{ key: 'pizza1' }, { key: 'pizza2' }, { key: 'pizza3' }];
+    brain = new Brain(state, () => {});
+
+    const length = brain.getState().arrayValue!.length;
+    const array = brain.getState().arrayValue!;
+    // @ts-expect-error
+    const newArray = new array.constructor(length);
+  });
+
   // TODO Test the following functions :
   // - map(callback)	Transforme chaque élément.
   // - reduce(callback, initialValue)	Réduit à une seule valeur.

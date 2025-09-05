@@ -6,7 +6,7 @@
   <div slot="menu-content" id="container">
     ${Object.values(this.state.basemaps).map(basemap => uHtmlFor(basemap, basemap.id)`
     <button
-      class="${this.activeBasemapName === basemap.name ? 'girafe-button-large active-basemap' : 'girafe-button-large'}"
+      class="${this.state.activeBasemap === basemap ? 'girafe-button-large active-basemap' : 'girafe-button-large'}"
       onclick="${() => this.changeBasemap(basemap)}">
       <img class="basemap-icon" alt="basemap-icon" src="${basemap.thumbnail}" />
       <span i18n="${basemap.name}">${basemap.name}</span></button

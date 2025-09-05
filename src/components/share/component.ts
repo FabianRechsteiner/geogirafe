@@ -5,12 +5,14 @@ import MailLogo from './images/mail.svg';
 import ShareManager from '../../tools/share/sharemanager';
 import { IUrlShortener } from './tools/iurlshortener';
 import LstuManager from './tools/lstumanager';
-import GmfManager from './tools/gmfmanager';
+import GmfShareManager from './tools/gmfmanager';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SimpleMaskManager from '../../tools/layers/simplemaskmanager';
 import MapManager from '../../tools/state/mapManager';
 import type { Callback } from '../../tools/state/statemanager';
 import { debounce } from '../../tools/utils/debounce';
+import GeoGirafeShareManager from './tools/geogirafemanager';
+import UrlManager from '../../tools/url/urlmanager';
 
 class ShareComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -75,10 +77,13 @@ class ShareComponent extends GirafeHTMLElement {
     if (share) {
       switch (share.service) {
         case 'gmf':
-          this.urlShortener = new GmfManager(share.createUrl);
+          this.urlShortener = new GmfShareManager(share.createUrl);
           break;
         case 'lstu':
           this.urlShortener = new LstuManager(share.createUrl);
+          break;
+        case 'geogirafe':
+          this.urlShortener = new GeoGirafeShareManager(share.createUrl);
           break;
       }
     }
@@ -151,8 +156,7 @@ class ShareComponent extends GirafeHTMLElement {
     this.refreshRender();
 
     try {
-      const currentUrl = new URL(window.location.href);
-      const baseUrl = `${currentUrl.protocol}//${currentUrl.host}${currentUrl.pathname}`;
+      const baseUrl = UrlManager.getInstance().getBaseUrl();
       const hash = this.shareManager.getStateToShare();
 
       // Get short URL

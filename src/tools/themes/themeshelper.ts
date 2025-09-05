@@ -59,42 +59,47 @@ export default class ThemesHelper extends GirafeSingleton {
     return null;
   }
 
-  public findThemeByName(themename: string): ThemeLayer {
+  public findThemeByName(themename: string): ThemeLayer | null {
     for (const theme of Object.values(this.state.themes._allThemes)) {
       if (theme.name === themename) {
         return theme;
       }
     }
 
-    throw new Error(`Theme ${themename} was not found`);
+    console.warn(`Layer ${themename} was found, but is not a group`);
+    return null;
   }
 
-  public findGroupByName(groupname: string): GroupLayer {
+  public findGroupByName(groupname: string): GroupLayer | null {
     const group = this.findBaseLayerByName(groupname);
     if (group instanceof GroupLayer) {
       return group;
     }
 
-    throw new Error(`Layer ${group.name} was found, but is not a group`);
+    console.warn(`Layer ${groupname} was found, but is not a group`);
+    return null;
   }
 
-  public findLayerByName(layername: string): Layer {
+  public findLayerByName(layername: string): Layer | null {
     const layer = this.findBaseLayerByName(layername);
     if (layer instanceof Layer) {
       return layer;
     }
 
-    throw new Error(`Layer ${layer.name} was found, but is not a layer`);
+    console.warn(`Layer ${layername} was found, but is not a layer`);
+    return null;
   }
 
-  private findBaseLayerByName(layername: string): BaseLayer {
+  private findBaseLayerByName(layername: string): BaseLayer | null {
     for (const theme of Object.values(this.state.themes._allThemes)) {
       const layer = this.findLayerRecursive(theme.children, layername);
       if (layer) {
         return layer;
       }
     }
-    throw new Error(`Layer ${layername} not found !`);
+
+    console.warn(`Layer ${layername} not found !`);
+    return null;
   }
 
   private findLayerRecursive(layers: BaseLayer[], layername: string): BaseLayer | null {
