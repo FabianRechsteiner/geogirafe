@@ -1,6 +1,4 @@
 import ThemeLayer from './layers/themelayer';
-import { SharedLayer } from '../tools/share/sharedstate';
-import StateSerializer from '../tools/share/stateserializer';
 import CustomIcon from '../components/themes/images/custom.svg';
 
 export default class CustomTheme {
@@ -23,15 +21,5 @@ export default class CustomTheme {
     this.name = name;
     this.layers = [];
     this.icon = CustomIcon;
-  }
-
-  getSerialized(): SharedLayer[] {
-    return new StateSerializer().getSerializedLayerTree(this.layers);
-  }
-
-  getThemeLayer(id: number = 1000000) {
-    const theme = new ThemeLayer(id, this.name, 0);
-    theme.children.push(...this.layers);
-    return theme;
   }
 }

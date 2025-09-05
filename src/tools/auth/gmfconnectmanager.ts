@@ -1,5 +1,6 @@
 import AbstractConnectManager from './abstractconnectmanager';
 import ShareManager from '../share/sharemanager';
+import UrlManager from '../url/urlmanager';
 
 /**
  * For diverse reasons, this could NOT be done using the oAuth2 mechanisms of GMF:
@@ -85,7 +86,7 @@ export default class GMFConnectManager extends AbstractConnectManager {
 
   private resetUrlHistory(_authentified: boolean) {
     const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`;
-    window.history.replaceState(null, '', newUrl);
+    UrlManager.getInstance().updateUrl(newUrl);
   }
 
   private async refreshToken() {

@@ -76,8 +76,9 @@ class QueryBuilderComponent extends GirafeHTMLElement {
         }
         this.layerAttributes = commonAttributes;
         this.loading = false;
-        super.render();
-        super.girafeTranslate();
+
+        super.refreshRender();
+        this.initializeFilterFromLayer();
       });
   }
 
@@ -89,6 +90,19 @@ class QueryBuilderComponent extends GirafeHTMLElement {
       return 'date';
     }
     return 'string';
+  }
+
+  private initializeFilterFromLayer() {
+    if (this.layer.filter) {
+      const [attributeSelect, operatorSelect, val, val2] = this.getFilterElements();
+      attributeSelect.value = this.layer.filter.property;
+      this.attributeChanged();
+      operatorSelect.value = this.layer.filter.operator;
+      this.operatorChanged();
+
+      val.value = this.layer.filter.value;
+      val2.value = this.layer.filter.value2;
+    }
   }
 
   updateOperatorOptions() {
@@ -124,15 +138,14 @@ class QueryBuilderComponent extends GirafeHTMLElement {
 
     this.currentLayerAttribute = layerAttribute;
     this.updateOperatorOptions();
-    super.render();
-    super.girafeTranslate();
+    super.refreshRender();
   }
 
   operatorChanged() {
     const operatorSelect = this.shadow.getElementById('operator') as HTMLSelectElement;
     this.showVal = !!operatorSelect?.value && operatorSelect?.value !== 'nul' && operatorSelect?.value !== 'nnul';
     this.showVal2 = operatorSelect?.value === 'between';
-    super.render();
+    super.refreshRender();
   }
 
   onValueKeyPress(event: KeyboardEvent) {
@@ -187,7 +200,7 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     this.currentLayerAttribute = undefined;
     this.showVal = false;
     this.showVal2 = false;
-    super.render();
+    super.refreshRender();
   }
 
   connectedCallback() {

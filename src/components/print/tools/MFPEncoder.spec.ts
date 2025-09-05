@@ -5,7 +5,7 @@ import MapManager from '../../../tools/state/mapManager';
 import StateManager from '../../../tools/state/statemanager';
 import GroupLayer from '../../../models/layers/grouplayer';
 import BaseLayer from '../../../models/layers/baselayer';
-import Basemap from '../../../models/basemap';
+import Basemap from '../../../models/basemaps/basemap';
 import {
   createTestLayerWmts,
   createTestLayerWms,

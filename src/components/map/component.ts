@@ -1,6 +1,6 @@
 import { Map, Feature, MapBrowserEvent, MapEvent, Collection, Overlay } from 'ol';
 import { Style, Stroke, Fill, Circle, RegularShape } from 'ol/style';
-import { get as getProjection, ProjectionLike, transform } from 'ol/proj';
+import { ProjectionLike } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { platformModifierKeyOnly } from 'ol/events/condition';
@@ -26,7 +26,7 @@ import CogManager from './tools/cogmanager';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
-import Basemap from '../../models/basemap';
+import Basemap from '../../models/basemaps/basemap';
 import Layer from '../../models/layers/layer';
 import LayerCog from '../../models/layers/layercog';
 import LayerXYZ from '../../models/layers/layerxyz';
@@ -37,7 +37,7 @@ import LayerWms from '../../models/layers/layerwms';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
 import GeoEvents from '../../models/events';
 import MapManager from '../../tools/state/mapManager';
-import MapPosition, { parseMapPositionFromUrl, setUrlFromMapPosition } from '../../tools/state/mapposition';
+import MapPosition from '../../tools/state/mapposition';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import { FocusFeature } from './tools/focusfeature';
@@ -47,13 +47,14 @@ import { isTimeAwareLayer } from '../../models/layers/timeawarelayer';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionParam from '../../models/selectionparam';
 import WfsManager from '../../tools/wfs/wfsmanager';
-import { isProjectionInDegrees, isCoordinateInDegrees } from '../../tools/utils/olutils';
+import { CameraConfig } from '../../tools/state/state';
 import CircleStyle from 'ol/style/Circle';
 import { parseCoordinates } from '../../tools/geometrytools';
 import CircleGeom from 'ol/geom/Circle';
 import LayerManager from '../../tools/layers/layermanager';
 import ThemesHelper from '../../tools/themes/themeshelper';
 import WfsFilter from '../../tools/wfs/wfsfilter';
+import PermalinkManager from '../../tools/url/permalinkmanager';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -86,6 +87,7 @@ export default class MapComponent extends GirafeHTMLElement {
   viewManager!: ViewManager;
   vectorTilesManager!: VectorTilesManager;
   localFileManager!: LocalFileManager;
+  permalinkManager!: PermalinkManager;
   defaultSrid!: ProjectionLike;
   crosshairFeature!: Feature;
   crosshairLayer!: VectorLayer<VectorSource>;
@@ -105,11 +107,6 @@ export default class MapComponent extends GirafeHTMLElement {
   pixelTolerance = 10;
   dragbox!: DragBox;
   focusFeature: FocusFeature;
-
-  // Initial feature selections from URL
-  private readonly featureSelectionFromUrl = this.parseSelectedFeaturesFromUrl();
-  // Remember initial position configuration from URL
-  private readonly initialPositionFromUrl: MapPosition | undefined = parseMapPositionFromUrl();
 
   constructor() {
     super('map');
@@ -139,23 +136,19 @@ export default class MapComponent extends GirafeHTMLElement {
       this.resetAllSwipedLayers(this.state.layers.layersList);
     };
 
-    this.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) => this.onChangeBasemap(newBasemap));
+    this.subscribe('activeBasemap', (_: Basemap, newBasemap: Basemap) => this.onChangeBasemap(newBasemap));
     this.subscribe('projection', (oldProjection: string, newProjection: string) =>
       this.onChangeProjection(oldProjection, newProjection)
     );
-    this.subscribe('interface.darkMapMode', (_oldValue: boolean, _newValue: boolean) => this.onChangeDarkMode());
-    this.subscribe('position', (_oldPosition: MapPosition, newPosition: MapPosition) =>
-      this.onPositionChanged(newPosition)
-    );
-    this.subscribe('position.scale', (_oldScale: number, newScale: number) => this.onChangeScale(newScale));
-    this.subscribe('position.resolution', (_oldResolution: number, newResolution: number) =>
-      this.zoomToResolution(newResolution)
-    );
-    this.subscribe('position.zoom', (_oldZoom: number, newZoom: number) => this.zoomToZoom(newZoom));
-    this.subscribe('position.center', (_oldCenter: Coordinate, newCenter: Coordinate) =>
-      this.panToCoordinate(newCenter)
-    );
-    this.subscribe('selection.selectionParameters', (_oldParams: SelectionParam[], newParams: SelectionParam[]) =>
+    this.subscribe('interface.darkMapMode', () => this.onChangeDarkMode());
+    this.subscribe('position', (_: MapPosition, newPosition: MapPosition) => this.onPositionChanged(newPosition));
+    this.subscribe('position.scale', (_: number, newScale: number) => this.onChangeScale(newScale));
+    this.subscribe('position.resolution', (_: number, newResolution: number) => this.zoomToResolution(newResolution));
+    this.subscribe('position.zoom', (_: number, newZoom: number) => this.zoomToZoom(newZoom));
+    this.subscribe('position.center', (_: Coordinate, newCenter: Coordinate) => this.panToCoordinate(newCenter));
+    this.subscribe('position.crosshair', () => this.showCrosshair(this.state.position));
+    this.subscribe('position.tooltip', () => this.showTooltip(this.state.position));
+    this.subscribe('selection.selectionParameters', (_: SelectionParam[], newParams: SelectionParam[]) =>
       this.onSelectFeatures(newParams)
     );
     this.subscribe('selection.selectedFeatures', (_oldFeatures: Feature[], newFeatures: Feature[]) =>
@@ -168,14 +161,27 @@ export default class MapComponent extends GirafeHTMLElement {
       this.focusFeature.setFocusedFeatures(newFeature)
     );
 
-    this.subscribe('globe.display', () => this.onGlobeToggled());
+    this.subscribe('globe.display', async () => {
+      await this.onGlobeToggled();
+      this.onCameraChanged(this.state.globe.camera);
+    });
     this.subscribe('globe.shadows', (_oldShadows: boolean, newShadows: boolean) => this.onShadowsToggled(newShadows));
     this.subscribe('globe.shadowsTimestamp', (_oldTimestamp: number, newTimestamp: number) =>
       this.onShadowsTimestampChanged(newTimestamp)
     );
+    this.subscribe('globe.camera', async (_oldCamera: CameraConfig, newCamera: CameraConfig) => {
+      await this.onGlobeToggled();
+      this.onCameraChanged(newCamera);
+    });
 
-    this.subscribe(/layers\.layersList\..*\.activeState/, (_oldActive: boolean, _newActive: boolean, layer: Layer) =>
-      this.onLayerToggled(layer)
+    this.subscribe(
+      /layers\.layersList\..*\.activeState/,
+      async (_oldActive: boolean, _newActive: boolean, layer: Layer) => {
+        await this.onLayerToggled(layer);
+        if (layer.active) {
+          this.onChangeSwiped(layer);
+        }
+      }
     );
     this.subscribe(/layers\.layersList\..*\.opacity/, (_oldOpacity: number, _newOpacity: number, layer: Layer) =>
       this.onChangeOpacity(layer)
@@ -183,40 +189,32 @@ export default class MapComponent extends GirafeHTMLElement {
     this.subscribe(/layers\.layersList\..*\.swiped/, (_oldOpacity: number, _newOpacity: number, layer: Layer) =>
       this.onChangeSwiped(layer)
     );
-    this.subscribe(/layers\.layersList\..*\.filter/, (_oldFilter: string, _newFilter: string, layer: Layer) =>
+    this.subscribe(/layers\.layersList\..*\.filter/, (_oldFilter: string, _newFilter: string, layer: LayerWms) =>
       this.onChangeFilter(layer)
     );
-    this.subscribe(/layers\.layersList\..*\.timeRestriction/, (_oldTime: string, _newTime: string, layer: BaseLayer) =>
-      this.onChangeTime(layer)
+    this.subscribe(
+      /layers\.layersList\..*\.timeRestriction/,
+      (_oldTime: string, _newTime: string, layer: GroupLayer | LayerWms) => this.onChangeTime(layer)
     );
     this.subscribe(/layers\.layersList\..*\.order/, () => this.onChangeOrder());
 
-    this.subscribe('sharedStateIsLoaded', (_: boolean, isLoaded: boolean) => {
+    this.subscribe('application.isReady', (_: boolean, isLoaded: boolean) => {
       if (isLoaded) {
-        // The map component can be loaded after the initialization of the shared state.
-        // And then, the callbacks from previous subscribes have perhaps not be called, because this component did not exist yet.
-        // Therefore, if there is a shared state, we have to initialize all the layers and position manually.
-        // TODO REG : Find another solution for this, because this could happen in other contexts.
+        // The map component may not be full ready when other part of the application will be initialized
+        // And some operations that need a fuly loaded map need to be first done when the application is ready
+        // For example, Permalink needs redolution,
         this.onPositionChanged(this.state.position);
-        this.activateSharedLayers(this.state.layers.layersList);
-        this.setMapPositionFromUrlAfterInit();
+        this.onCameraChanged(this.state.globe.camera);
+        // If the app is opened from a permalink, prioritize this data over settings in the shared state
+        if (this.permalinkManager.hasFeatureSelectionQuery()) {
+          this.applyFeatureSelectionFromPermalink();
+        } else if (this.permalinkManager.hasMapPosition()) {
+          this.applyMapPositionFromPermalink();
+        } else {
+          this.applyFeatureSelectionFromSharedState();
+        }
       }
     });
-
-    // Only after the default theme has been added to the layer tree, we can start selecting features (and adding layers if necessary).
-    //  In the absence of a default theme, we wait for all themes to have finished loading.
-    if (this.configManager.Config.themes.defaultTheme) {
-      const subscription = this.subscribe('themes.lastSelectedTheme', () => {
-        this.unsubscribe(subscription);
-        this.setFeatureSelectionFromUrl();
-      });
-    } else {
-      this.subscribe('themes.isLoaded', (_: boolean, isLoaded: boolean) => {
-        if (isLoaded) {
-          this.setFeatureSelectionFromUrl();
-        }
-      });
-    }
   }
 
   locateUser() {
@@ -227,36 +225,37 @@ export default class MapComponent extends GirafeHTMLElement {
           this.getCurrentLocation();
         }
       });
-
     } else {
-      void window.gAlert("Geolocation browser error", 'Error');
+      void window.gAlert('Geolocation browser error', 'Error');
     }
   }
 
-  getCurrentLocation(){
-    navigator.geolocation.getCurrentPosition(this.updateGeolocation, function(positionError) {
-
-      switch (positionError.code) {
-        case positionError.PERMISSION_DENIED:
-          void window.gAlert("Geolocation permission denied", 'Error');
-          break;
-        case positionError.POSITION_UNAVAILABLE:
-          void window.gAlert("Geolocation permission unavailable", 'Error');
-          break;
-        case positionError.TIMEOUT:
-          void window.gAlert("Geolocation timeout", 'Error');
-          break;
-        default:
-          void window.gAlert("Geolocation error", 'Error');
-          break;
+  getCurrentLocation() {
+    navigator.geolocation.getCurrentPosition(
+      this.updateGeolocation,
+      function (positionError) {
+        switch (positionError.code) {
+          case positionError.PERMISSION_DENIED:
+            void window.gAlert('Geolocation permission denied', 'Error');
+            break;
+          case positionError.POSITION_UNAVAILABLE:
+            void window.gAlert('Geolocation permission unavailable', 'Error');
+            break;
+          case positionError.TIMEOUT:
+            void window.gAlert('Geolocation timeout', 'Error');
+            break;
+          default:
+            void window.gAlert('Geolocation error', 'Error');
+            break;
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
       }
-    }, {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
-    });
+    );
   }
-
 
   readonly updateGeolocation = (position: GeolocationPosition): void => {
     const coords = position.coords;
@@ -264,16 +263,15 @@ export default class MapComponent extends GirafeHTMLElement {
     const latitude = coords.latitude;
     const accuracy = coords.accuracy; //Accuracy radius in meters
 
-
     const code = this.olMap.getView().getProjection().getCode();
     const maxExtent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
-    const numbers = parseCoordinates([longitude,latitude], maxExtent, code);
+    const numbers = parseCoordinates([longitude, latitude], maxExtent, code);
 
     this.geolocationSource.clear();
     // point of location
     const positionFeature = new Feature({
       geometry: new Point(numbers),
-      type: 'position',
+      type: 'position'
     });
     this.geolocationSource.addFeature(positionFeature);
 
@@ -281,29 +279,12 @@ export default class MapComponent extends GirafeHTMLElement {
     const circleGeometry = new CircleGeom(numbers, accuracy);
     const accuracyFeature = new Feature({
       geometry: circleGeometry,
-      type: 'accuracy',
+      type: 'accuracy'
     });
     this.geolocationSource.addFeature(accuracyFeature);
 
     this.olMap.getView().setCenter(numbers);
-  }
-
-  public activateSharedLayers(layers: BaseLayer[]) {
-    for (const layer of layers) {
-      // Activate the layer by default
-      if (layer instanceof Layer && layer.isDefaultChecked) {
-        this.onLayerToggled(layer);
-        this.onChangeOpacity(layer);
-        this.onChangeFilter(layer);
-        this.onChangeTime(layer);
-      }
-
-      // Continue recursively
-      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
-        this.activateSharedLayers(layer.children);
-      }
-    }
-  }
+  };
 
   render() {
     super.render();
@@ -328,6 +309,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.wmtsManager = new WmtsManager(this.olMap);
     this.swiper = this.shadow.getElementById('swiper') as HTMLInputElement;
     this.closeSwiperButton = this.shadow.getElementById('close-swiper') as HTMLButtonElement;
+    this.permalinkManager = PermalinkManager.getInstance();
     this.swipeManager = new SwipeManager(
       this.olMap,
       this.swiper,
@@ -341,8 +323,6 @@ export default class MapComponent extends GirafeHTMLElement {
     const view = this.viewManager.getDefaultView();
     this.olMap.setView(view);
 
-    this.setMapPositionFromUrlAfterInit();
-
     // Create layer for highlighted features
     const highlightSource = new VectorSource({
       features: this.highlightedFeaturesCollection
@@ -353,31 +333,29 @@ export default class MapComponent extends GirafeHTMLElement {
       features: this.selectedFeaturesCollection
     });
 
-    this.configManager.loadConfig().then(() => {
-      this.selectionLayer = new VectorLayer({
-        properties: {
-          addToPrintedLayers: true
-        },
-        source: selectionSource
-      });
-      this.highlightLayer = new VectorLayer({
-        source: highlightSource
-      });
-      this.setSelectLayerStyle();
-      this.setHighlightLayerStyle();
-      this.olMap.addLayer(this.selectionLayer);
-      this.olMap.addLayer(this.highlightLayer);
-      this.selectionLayer.setZIndex(1002);
-      this.highlightLayer.setZIndex(1003);
-      this.selectionLayer.set('altitudeMode', 'clampToGround');
-
-      if (this.configManager.Config.map.showScaleLine) {
-        const scaleLine = new ScaleLine({
-          units: 'metric'
-        });
-        this.olMap.addControl(scaleLine);
-      }
+    this.selectionLayer = new VectorLayer({
+      properties: {
+        addToPrintedLayers: true
+      },
+      source: selectionSource
     });
+    this.highlightLayer = new VectorLayer({
+      source: highlightSource
+    });
+    this.setSelectLayerStyle();
+    this.setHighlightLayerStyle();
+    this.olMap.addLayer(this.selectionLayer);
+    this.olMap.addLayer(this.highlightLayer);
+    this.selectionLayer.setZIndex(1002);
+    this.highlightLayer.setZIndex(1003);
+    this.selectionLayer.set('altitudeMode', 'clampToGround');
+
+    if (this.configManager.Config.map.showScaleLine) {
+      const scaleLine = new ScaleLine({
+        units: 'metric'
+      });
+      this.olMap.addControl(scaleLine);
+    }
 
     //layer user location
     this.geolocationSource = new VectorSource();
@@ -387,21 +365,21 @@ export default class MapComponent extends GirafeHTMLElement {
         image: new CircleStyle({
           radius: 7,
           fill: new Fill({
-            color: 'rgba(225,18,18,0.48)',
+            color: 'rgba(225,18,18,0.48)'
           }),
           stroke: new Stroke({
             color: 'rgb(225,18,18)',
-            width: 2,
-          }),
+            width: 2
+          })
         }),
         fill: new Fill({
-          color: 'rgba(20,100,213,0.49)',
+          color: 'rgba(20,100,213,0.49)'
         }),
         stroke: new Stroke({
           color: 'rgb(20,100,213)',
-          width: 1,
-        }),
-      }),
+          width: 1
+        })
+      })
     });
     this.olMap.addLayer(geolocationLayer);
 
@@ -409,14 +387,6 @@ export default class MapComponent extends GirafeHTMLElement {
     setTimeout(() => {
       this.olMap.updateSize();
     }, 1000);
-  }
-
-  /**
-   * Add a click handler to hide the popup.
-   */
-  closePopup() {
-    this.tooltipOverlay.setPosition(undefined);
-    this.tooltipContainer.classList.add('hidden');
   }
 
   listenOpenLayersEvents() {
@@ -491,12 +461,11 @@ export default class MapComponent extends GirafeHTMLElement {
   onMoveEnd(_e: MapEvent) {
     const view = this.olMap.getView();
 
-    const newPosition = new MapPosition();
+    const newPosition = this.state.position.clone();
     newPosition.center = view.getCenter()!;
     newPosition.zoom = view.getZoom()!;
     newPosition.resolution = view.getResolution()!;
     newPosition.scale = this.viewManager.getScale();
-    newPosition.tooltip = this.state.position.tooltip;
 
     if (newPosition.isValid) {
       this.state.position = newPosition;
@@ -748,6 +717,16 @@ export default class MapComponent extends GirafeHTMLElement {
 
       this.wmsManager3d = new WmsManager3d(scene);
       this.state.layers.layersList.forEach((l) => this.addAllActiveLayers3dMap(l));
+
+      const camera = scene.camera;
+      camera.changed.addEventListener(() => {
+        console.debug('Cesium camera moved');
+        this.state.globe.camera = {
+          heading: camera.heading,
+          pitch: camera.pitch,
+          roll: camera.roll
+        } as CameraConfig;
+      }, 1);
     }
   }
 
@@ -825,10 +804,25 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onPositionChanged(position: MapPosition) {
-    this.zoomToResolution(position.resolution);
     if (position.isValid) {
+      this.zoomToResolution(position.resolution);
       this.panToCoordinate(position.center);
-      this.updateUrlWithMapPosition();
+      this.showCrosshair(position);
+      this.showTooltip(position);
+    }
+  }
+
+  onCameraChanged(camera: CameraConfig | null) {
+    if (this.map3d && camera) {
+      const scene = this.map3d.getCesiumScene();
+      scene.camera.setView({
+        destination: scene.camera.position, // Keep current position
+        orientation: {
+          heading: camera.heading,
+          pitch: camera.pitch,
+          roll: camera.roll
+        }
+      });
     }
   }
 
@@ -837,7 +831,9 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   zoomToResolution(resolution: number) {
-    this.viewManager.setResolution(resolution);
+    if (resolution >= 0) {
+      this.viewManager.setResolution(resolution);
+    }
   }
 
   zoomToZoom(zoom: number) {
@@ -864,23 +860,23 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onLayerToggled(layer: Layer) {
+  private async onLayerToggled(layer: Layer) {
     if (layer instanceof Layer) {
       if (layer.active) {
-        this.onAddLayers([layer]);
+        await this.onAddLayers([layer]);
       } else {
         this.onRemoveLayers([layer]);
       }
     }
   }
 
-  onAddLayers(layerInfos: Layer[]) {
-    layerInfos.forEach((l) => {
+  private async onAddLayers(layerInfos: Layer[]) {
+    for (const l of layerInfos) {
       if (l instanceof LayerWms) {
         this.wmsManager.getClient(l).addLayer(l);
         if (this.wmsManager3d != null) this.wmsManager3d.addLayer(l);
       } else if (l instanceof LayerWmts) {
-        this.wmtsManager.addLayer(l);
+        await this.wmtsManager.addLayer(l);
       } else if (l instanceof LayerLocalFile) {
         this.localFileManager.addLayer(l);
       } else if (l instanceof LayerCog) {
@@ -888,11 +884,11 @@ export default class MapComponent extends GirafeHTMLElement {
       } else if (l instanceof LayerXYZ) {
         this.xyzManager.addLayer(l);
       }
-    });
+    }
   }
 
   onRemoveLayers(layerInfos: Layer[]) {
-    layerInfos.forEach((l) => {
+    for (const l of layerInfos) {
       if (l instanceof LayerWms) {
         this.wmsManager.getClient(l).removeLayer(l);
         if (this.wmsManager3d != null) {
@@ -907,7 +903,7 @@ export default class MapComponent extends GirafeHTMLElement {
       } else if (l instanceof LayerXYZ) {
         this.xyzManager.removeLayer(l);
       }
-    });
+    }
   }
 
   onChangeOrder = debounce(() => this.reorderLayers(), 0);
@@ -916,25 +912,35 @@ export default class MapComponent extends GirafeHTMLElement {
     this.wmsManager.refreshZIndexes();
   }
 
-  onChangeOpacity(layerInfos: Layer) {
+  private onChangeOpacity(layerInfos: Layer) {
     if (layerInfos instanceof LayerWms) {
       this.wmsManager.getClient(layerInfos).changeOpacity(layerInfos);
       if (this.wmsManager3d != null) this.wmsManager3d.changeOpacity(layerInfos);
     } else if (layerInfos instanceof LayerWmts) {
       if (this.wmtsManager.layerExists(layerInfos)) {
-        this.wmtsManager.changeOpacity(layerInfos, layerInfos.opacity);
+        this.wmtsManager.changeOpacity(layerInfos);
       }
+    } else if (layerInfos instanceof LayerLocalFile) {
+      this.localFileManager.changeOpacity(layerInfos);
+    } else {
+      console.warn(`Changing opacity for layer ${layerInfos.name} not supported`);
     }
   }
 
-  onChangeFilter(layerInfos: Layer) {
+  /**
+   * Change filter configuration on layer (only LayerWMS are affected)
+   */
+  private onChangeFilter(layerInfos: LayerWms) {
     if (layerInfos instanceof LayerWms) {
       this.wmsManager.getClient(layerInfos).changeFilter(layerInfos);
       if (this.wmsManager3d != null) this.wmsManager3d.changeFilter(layerInfos);
     }
   }
 
-  onChangeTime(layer: BaseLayer) {
+  /**
+   * Change time configuration on layer (only LayerWMS are affected)
+   */
+  private onChangeTime(layer: GroupLayer | LayerWms) {
     if (layer instanceof LayerWms && layer.active) {
       this.wmsManager.getClient(layer).changeTimeRestriction(layer);
     } else if (layer instanceof GroupLayer) {
@@ -978,109 +984,54 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  // TODO: Move methods dealing with perma link data to a dedicated manager
   /**
-   * Add the current map position and zoom level to the URL. The coordinates are provided in
-   * the default reference system or in WGS84.
+   * This method checks for the presence of an initial selection originating from a shared state.
+   * If present, it applies the query-based or bbox-based selection to the map.
    */
-  private updateUrlWithMapPosition() {
-    let mapX = this.state.position.center[0];
-    let mapY = this.state.position.center[1];
-    if (!mapX || !mapY) {
-      return;
-    }
-    if (!isProjectionInDegrees()) {
-      // Round to meters
-      mapX = Math.round(mapX);
-      mapY = Math.round(mapY);
-    }
-
-    const currentPosition = new MapPosition();
-    currentPosition.center = [mapX, mapY];
-    currentPosition.zoom = this.state.position.zoom;
-
-    // Transform position if it's not in the default reference system or WGS84
-    if (this.state.projection !== this.defaultSrid && this.state.projection !== 'EPSG:4326') {
-      currentPosition.center = transform(currentPosition.center, this.projection, 'EPSG:4326');
-    }
-
-    setUrlFromMapPosition(currentPosition);
-  }
-
-  private parseSelectedFeaturesFromUrl() {
-    const param_prefix = 'wfs_';
-    const url = new URL(window.location.href);
-    const wfsLayer = url.searchParams.get('wfs_layer');
-    if (wfsLayer) {
-      const attributesQueryFromUrl: any[] = [];
-      url.searchParams.forEach((attributeValue, key) => {
-        if (key.startsWith(param_prefix) && key !== 'wfs_layer') {
-          const attributeName = key.substring(param_prefix.length);
-          if (attributeValue) {
-            attributesQueryFromUrl.push({
-              name: attributeName,
-              value: attributeValue
-            });
-          }
-        }
-      });
-      if (attributesQueryFromUrl.length > 0) {
-        return {
-          layer: wfsLayer,
-          properties: attributesQueryFromUrl
-        };
+  private applyFeatureSelectionFromSharedState() {
+    if (this.state.selection.initialSelectionQuery) {
+      const layerName = this.state.selection.initialSelectionQuery.layerName;
+      const query = this.state.selection.initialSelectionQuery.query;
+      const layer = LayerManager.getInstance().getTreeItemByLayerName(layerName);
+      if (layer && layer instanceof LayerWms) {
+        this.selectFeaturesByQuery(layer, query, false);
       }
+    } else if (this.state.selection.initialSelectionBox) {
+      this.select(this.state.selection.initialSelectionBox);
     }
-    return undefined;
   }
 
   /**
    * Applies a feature selection based on the query parameters present in the URL starting with `wfs_`.
-   * If the specified layer does not exist in the current tree, it fetches the layer from the themes and adds it to the tree.
+   * If the specified layer does not exist in the current tree, it's fetched from the themes and added to the tree.
+   * If the layer is resolution-restricted, the map is zoomed to a resolution where the layer is visible.
    */
-  private setFeatureSelectionFromUrl() {
-    if (!this.featureSelectionFromUrl) {
+  private applyFeatureSelectionFromPermalink() {
+    const featureSelectionFromUrl = PermalinkManager.getInstance().getFeatureSelectionQuery();
+    if (!featureSelectionFromUrl) {
       return;
     }
     const themesHelper = ThemesHelper.getInstance();
     const layerManager = LayerManager.getInstance();
-    let layerInTree = layerManager.getTreeItemByLayerName(this.featureSelectionFromUrl.layer);
+    let layerInTree = layerManager.getTreeItemByLayerName(featureSelectionFromUrl.layer);
 
     if (!layerInTree) {
-      const layer = themesHelper.findLayerByName(this.featureSelectionFromUrl.layer);
+      const layer = themesHelper.findLayerByName(featureSelectionFromUrl.layer);
+      if (!layer) {
+        throw new Error(`Layer ${featureSelectionFromUrl.layer} cannot be found`);
+      }
       const clonedTheme = themesHelper.getMinimalClonedThemeForLayer(layer);
       clonedTheme.order = 0;
       clonedTheme.isExpanded = true;
       this.state.layers.layersList.push(clonedTheme);
       // Now, get the tree item
-      layerInTree = layerManager.getTreeItemByLayerName(this.featureSelectionFromUrl.layer);
+      layerInTree = layerManager.getTreeItemByLayerName(featureSelectionFromUrl.layer);
     }
 
     if (!(layerInTree && layerInTree instanceof LayerWms && layerInTree.wfsQueryable)) {
       throw new Error(
-        `Can't apply feature selection from permalink, layer ${this.featureSelectionFromUrl.layer} does not exist or does not support querying`
+        `Can't apply feature selection from permalink, layer ${featureSelectionFromUrl.layer} does not exist or does not support querying`
       );
-    }
-
-    // Create the query as a list of wfs filters that will be combined with an AND operator by the WFS client
-    const queries: WfsFilter[] = [];
-    this.featureSelectionFromUrl.properties.forEach((property) => {
-      // Note: PropertyType 'string' will result in correct WFS filters for both strings and numbers
-      queries.push(new WfsFilter(property.name, 'eq', property.value, '', 'string'));
-    });
-
-    this.selectFeaturesByQuery(layerInTree, queries);
-  }
-
-  /**
-   * Selects features based on the given list of wfs filters for a specified WMS layer
-   * and optionally moves the map to the selection.
-   * Wfs filter will be combined with an AND operator by the WFS client.
-   */
-  private selectFeaturesByQuery(layerInTree: LayerWms, queries: WfsFilter[], moveMapToSelection: boolean = true) {
-    const client = this.wmsManager.getClient(layerInTree);
-    if (!client) {
-      throw new Error(`Cannot select features: no client found for layer ${layerInTree.name}`);
     }
 
     // Make sure the layer is rendered in the map, otherwise WFS querying won't work
@@ -1094,21 +1045,36 @@ export default class MapComponent extends GirafeHTMLElement {
       LayerManager.getInstance().toggleLayer(layerInTree, 'on');
     }
 
+    // Create the query as a list of wfs filters that will be combined with an AND operator by the WFS client
+    const queries: WfsFilter[] = [];
+    featureSelectionFromUrl.properties.forEach((property) => {
+      // Note: PropertyType 'string' will result in correct WFS filters for both strings and numbers
+      queries.push(new WfsFilter(property.name, 'eq', property.value, '', 'string'));
+    });
+
+    this.selectFeaturesByQuery(layerInTree, queries);
+  }
+
+  /**
+   * Selects features based on the given list of wfs filters for a specified WMS layer
+   * and optionally moves the map to the selection. The WFS client combines the WFS filters with an AND operator.
+   */
+  private selectFeaturesByQuery(layerInTree: LayerWms, query: WfsFilter[], moveMapToSelection: boolean = true) {
     // Listen for the completed features selection, then move the map to the selected features
     if (moveMapToSelection) {
-      const subscribe = this.subscribe('selection.selectedFeatures', (_, newFeatures: Feature[]) => {
-        this.unsubscribe(subscribe);
+      const selectSubscription = this.subscribe('selection.selectedFeatures', (_, newFeatures: Feature[]) => {
+        this.unsubscribe(selectSubscription);
         this.centerMapOnFeatures(newFeatures);
       });
     }
 
     // Trigger the selection
-    client.selectFeaturesByQuery(queries);
+    this.wmsManager.selectFeaturesByQuery(query, layerInTree);
   }
 
   /**
    * Centers the map view on the given features. If the features' extent doesn't fit in the current zoom level,
-   * the zoom level is adjusted as well.
+   * the zoom level is adjusted.
    */
   private centerMapOnFeatures(features: Feature[]) {
     const selectedGeometries = new GeometryCollection(
@@ -1126,58 +1092,66 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   /**
-   * Reads the map position data from the URL and applies it to the map,
-   * making sure map initialization and loading of the shared state have finished beforehand.
+   * Moves the map to the position defined in the permalink, making sure the map is initialized and ready to be moved.
    */
-  private setMapPositionFromUrlAfterInit() {
-    if (!this.initialPositionFromUrl) {
-      return;
-    }
-
-    if (!this.state.projection || !this.olMap.getView().getResolution()) {
-      // Everything os not ready yet. Delay the execution of this method on rendercomplete
-      this.olMap.once('rendercomplete', () => {
-        this.applyMapPositionFromUrl(this.initialPositionFromUrl!);
-      });
-    } else {
-      this.applyMapPositionFromUrl(this.initialPositionFromUrl);
+  private applyMapPositionFromPermalink() {
+    const position = PermalinkManager.getInstance().getMapPosition(this.projection);
+    if (position?.isValid) {
+      // We need the following to recalculate resolution and scale to properly update the position state
+      this.state.position.zoom = position.zoom;
+      this.state.position.center = position.center;
+      this.state.position.crosshair = position.crosshair;
+      this.state.position.tooltip = position.tooltip;
     }
   }
 
-  /**
-   * Updates the map position based on a provided position from the URL. Ensures the position is transformed
-   * to the correct map reference system and applies it to the map view if valid.
-   * @param {MapPosition} position - The map position object, including center coordinates in the default reference
-   * system or WGS84, and zoom level.
-   */
-  private applyMapPositionFromUrl(position: MapPosition) {
-    // Make sure the map has finished initializing
-    if (!this.state.projection || !this.olMap.getView().getResolution()) {
+  showCrosshair(position: MapPosition) {
+    if (!position.crosshair) {
       return;
     }
 
-    // Transform position into current map reference system
-    const projectionInUrl = getProjection(isCoordinateInDegrees(position.center) ? 'EPSG:4326' : this.defaultSrid)!;
-    if (projectionInUrl.getCode() !== this.state.projection) {
-      position.center = transform(position.center, projectionInUrl, this.projection);
+    // Remove existing crosshair first
+    if (this.crosshairFeature) {
+      this.olMap.removeLayer(this.crosshairLayer);
     }
 
-    if (position.crosshair) {
-      // Remove existing crosshair first
-      if (this.crosshairFeature) {
-        this.olMap.removeLayer(this.crosshairLayer);
+    // Set new crosshair
+    this.crosshairFeature = new Feature(new Point(position.crosshair));
+    this.crosshairLayer = new VectorLayer({ source: new VectorSource({ features: [this.crosshairFeature] }) });
+    this.setCrosshairStyle();
+    this.olMap.addLayer(this.crosshairLayer);
+  }
+
+  showTooltip(position: MapPosition) {
+    if (!position.tooltip) {
+      return;
+    }
+
+    this.tooltipContainer = this.shadow.getElementById('popup') as HTMLElement;
+    const tooltipContent = this.shadow.getElementById('popup-content') as HTMLElement;
+
+    // Remove any existing overlay first
+    if (this.tooltipOverlay) {
+      this.olMap.removeOverlay(this.tooltipOverlay);
+    }
+
+    // Create the overlay
+    this.tooltipOverlay = new Overlay({
+      element: this.tooltipContainer,
+      autoPan: {
+        animation: {
+          duration: 250
+        }
       }
+    });
+    this.olMap.addOverlay(this.tooltipOverlay);
+    tooltipContent.innerHTML = position.tooltip.content;
+    this.tooltipOverlay.setPosition(position.tooltip.position);
+    this.tooltipContainer.classList.remove('hidden');
+  }
 
-      // Set new crosshair
-      this.crosshairFeature = new Feature(new Point(position.center));
-      this.crosshairLayer = new VectorLayer({ source: new VectorSource({ features: [this.crosshairFeature] }) });
-      this.setCrosshairStyle();
-      this.olMap.addLayer(this.crosshairLayer);
-    }
-
-    if (position.isValid) {
-      this.olMap.getView().setCenter(position.center);
-      this.olMap.getView().setZoom(position.zoom);
-    }
+  hideTooltip() {
+    this.tooltipOverlay.setPosition(undefined);
+    this.tooltipContainer.classList.add('hidden');
   }
 }

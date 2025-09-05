@@ -4,14 +4,14 @@ import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
 import ThemeLayer from '../../models/layers/themelayer';
-import { SharedLayer } from '../share/sharedstate';
-import StateDeserializer from '../share/statedeserializer';
 import CustomTheme from '../../models/customtheme';
+import LayersConfigSerializer from '../share/serializers/layerconfigserializer';
 
 class CustomThemesManager extends GirafeSingleton {
   userDataManager: UserDataManager;
   customThemes: CustomTheme[] = [];
   private readonly storagePath: string = 'customThemes';
+  private readonly serializer = new LayersConfigSerializer();
 
   constructor(type: string) {
     super(type);
@@ -30,7 +30,7 @@ class CustomThemesManager extends GirafeSingleton {
     this.saveCustomThemes();
   }
 
-  manageActiveStateForClonedObject(layer: BaseLayer) {
+  private manageActiveStateForClonedObject(layer: BaseLayer) {
     /** Manage the current active state and default active state
      * 1. We set isDefaultChecked to the active state (because when the layer will be loaded, we want to activate it automatically)
      * 2. We deactivate the layer, because it was just cloned and is not active yet.
@@ -57,22 +57,19 @@ class CustomThemesManager extends GirafeSingleton {
   }
 
   private saveCustomThemes() {
-    const serializedObject: Record<string, SharedLayer[]> = {};
+    const serializedObject: Record<string, string> = {};
     for (const customTheme of this.customThemes) {
-      serializedObject[customTheme.name] = customTheme.getSerialized();
+      serializedObject[customTheme.name] = this.serializer.customThemeSerialize(customTheme);
     }
     this.userDataManager.saveUserData(this.storagePath, serializedObject);
   }
 
   public loadCustomThemes() {
-    const customThemes = this.userDataManager.getUserData(this.storagePath) as Record<string, SharedLayer[]>;
+    const customThemes = this.userDataManager.getUserData(this.storagePath) as Record<string, string>;
     if (customThemes) {
       for (const customThemeName of Object.keys(customThemes)) {
         try {
-          const customTheme = new CustomTheme(customThemeName);
-          const serializedLayerTree = customThemes[customThemeName];
-          const layerTree = new StateDeserializer().getDeserializedLayerTree(serializedLayerTree) as ThemeLayer[];
-          customTheme.layers.push(...layerTree);
+          const customTheme = this.serializer.customThemeDeserialize(customThemeName, customThemes[customThemeName]);
           this.customThemes.push(customTheme);
         } catch (error) {
           console.warn('Cannot deserialize custom themes from local storage');

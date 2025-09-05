@@ -42,9 +42,10 @@ export default class AuthManager extends GirafeSingleton {
       await this.initializeOAuth(oauthIssuerConfig);
     } else if (gmfauthConfig) {
       await this.initializeGmfAuth(gmfauthConfig);
+    } else {
+      // No auth configured
+      this.state.application.isAuthInitialized = true;
     }
-    // Else: no auth configured
-    // Nothing to do
   }
 
   private async initializeOAuth(config: any) {
@@ -67,6 +68,7 @@ export default class AuthManager extends GirafeSingleton {
     if (config.checkSessionOnLoad) {
       await this.gmfManager.getUserInfo();
       this.state.oauth.status = this.state.oauth.userInfo?.username ? 'loggedIn' : 'loggedOut';
+      this.state.application.isAuthInitialized = true;
     }
     if (config.loginRequired && this.state.oauth.status === 'loggedOut') {
       await this.login();
@@ -100,6 +102,7 @@ export default class AuthManager extends GirafeSingleton {
         } else {
           throw new Error('Login failed, no user found.');
         }
+        this.state.application.isAuthInitialized = true;
       } else if (this.state.oauth.status === 'loggedOutForcedFromBackend') {
         // The user was loggedout from the backend
         // This can happen either if the user has been loggedout from another tab in the browser

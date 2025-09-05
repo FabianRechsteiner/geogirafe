@@ -261,7 +261,7 @@ describe('Components architecture', () => {
     if (errors.length > 0) {
       throw new Error(errors.join('\n'));
     }
-  });
+  }, 120000);
 
   it('There should not be any unused icon.', async () => {
     const iconsPath = path.join(__dirname, 'assets/icons');

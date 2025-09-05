@@ -3,6 +3,7 @@ import MockHelper from '../../tools/tests/mockhelper';
 import OfflineComponent from './component';
 import { createTestBasemap, createTestLayerWmts } from '../../tools/tests/layerhelpers';
 import LayerManager from '../../tools/layers/layermanager';
+import BasemapEmpty from '../../models/basemaps/basemapempty';
 
 describe('OfflineComponent.getAllWmtsLayers', () => {
   let element: OfflineComponent;
@@ -39,7 +40,7 @@ describe('OfflineComponent.getAllWmtsLayers', () => {
     element.state.layers.layersList = [wmtsLayer1, wmtsLayer2];
     LayerManager.getInstance().toggleLayer(wmtsLayer1, 'on');
     LayerManager.getInstance().toggleLayer(wmtsLayer2, 'on');
-    element.state.activeBasemap = null;
+    element.state.activeBasemap = new BasemapEmpty();
 
     // @ts-ignore
     const result = element.getAllWmtsLayers();

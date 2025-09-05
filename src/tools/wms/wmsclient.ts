@@ -11,6 +11,7 @@ import LayerManager from '../layers/layermanager';
 import WfsFilter from '../wfs/wfsfilter';
 import ServerOgc from '../../models/serverogc';
 import ConfigManager from '../configuration/configmanager';
+import Exception from 'jsts/java/lang/Exception';
 
 export default abstract class WmsClient {
   map: Map;
@@ -70,7 +71,12 @@ export default abstract class WmsClient {
     this.basemapLayers = [];
   }
 
-  addLayer(layerWms: LayerWms) {
+  public addLayer(layerWms: LayerWms) {
+    this.addLayerInternal(layerWms);
+    this.manageLayerOptions(layerWms);
+  }
+
+  private addLayerInternal(layerWms: LayerWms) {
     this.layers.push(layerWms);
     if (!this.olayer) {
       // Create a new ol layer and add it to the right server
@@ -86,8 +92,6 @@ export default abstract class WmsClient {
 
     const source = this.createImageWMSSource();
     this.olayer.setSource(source);
-
-    this.#manageLayerOptions(layerWms);
   }
 
   public createImageWMSSource(layerList: LayerWms[] = this.layers) {
@@ -195,49 +199,55 @@ export default abstract class WmsClient {
     return null;
   }
 
-  // TODO SMS: Refactor this so it's actually a helper for the private function
-  changeOpacity(layerWms: LayerWms) {
-    this.#manageLayerOptions(layerWms);
+  public changeOpacity(layerWms: LayerWms) {
+    this.manageLayerOptions(layerWms);
   }
 
-  // TODO SMS: Refactor this so it's actually a helper for the private function
-  changeFilter(layerWms: LayerWms) {
-    this.#manageLayerOptions(layerWms);
+  public changeFilter(layerWms: LayerWms) {
+    this.manageLayerOptions(layerWms);
   }
 
-  changeTimeRestriction(layerWms: LayerWms) {
-    this.#manageLayerOptions(layerWms);
+  public changeTimeRestriction(layerWms: LayerWms) {
+    this.manageLayerOptions(layerWms);
   }
 
-  #manageLayerOptions(layerWms: LayerWms) {
+  public prepareSwipe(layerWms: LayerWms) {
+    this.manageLayerOptions(layerWms);
+  }
+
+  private manageLayerOptions(layerWms: LayerWms) {
     if (!this.layerExists(layerWms)) {
       throw new Error('Cannot change filter for this layer: it does not exist');
     }
 
-    if (!layerWms.hasFilter && !layerWms.hasTimeRestriction && !layerWms.isTransparent && layerWms.swiped === 'no') {
-      // There is no more filter or opacity => Back to normal
-      if (layerWms.treeItemId in this.independentLayers) {
-        const olayer = this.independentLayers[layerWms.treeItemId].olayer;
-        // We delete the layer from the transparent layers
-        delete this.independentLayers[layerWms.treeItemId];
-        this.map.removeLayer(olayer);
-        // And add it to the normal layer again
-        this.addLayer(layerWms);
-      }
-    } else if (layerWms.treeItemId in this.independentLayers) {
-      // The layer has already a configured filter or opacity  => We just change the opacity and/or filter
+    const isLayerIndependant = layerWms.treeItemId in this.independentLayers;
+    const mustBeIndependant =
+      layerWms.hasFilter || layerWms.hasTimeRestriction || layerWms.isTransparent || layerWms.swiped !== 'no';
+
+    if (isLayerIndependant && !mustBeIndependant) {
       const olayer = this.independentLayers[layerWms.treeItemId].olayer;
-      if (layerWms.isTransparent) {
-        olayer.setOpacity(layerWms.opacity);
-      }
-      this.updateLayerFilter(layerWms);
-      this.updateTimeRestriction(layerWms);
-    } else if (this.layerInStandardLayers(layerWms)) {
+      // We delete the layer from the transparent layers
+      delete this.independentLayers[layerWms.treeItemId];
+      this.map.removeLayer(olayer);
+      // And add it to the normal layer again
+      this.addLayerInternal(layerWms);
+    } else if (!isLayerIndependant && mustBeIndependant) {
       this.makeLayerIndependent(layerWms);
     }
+
+    const olayer = this.getOLayer(layerWms);
+    if (!olayer) {
+      throw new Exception('The layer must exist at this state!');
+    }
+
+    if (layerWms.isTransparent) {
+      olayer.setOpacity(layerWms.opacity);
+    }
+    this.updateLayerFilter(layerWms, olayer);
+    this.updateTimeRestriction(layerWms, olayer);
   }
 
-  makeLayerIndependent(layerWms: LayerWms) {
+  private makeLayerIndependent(layerWms: LayerWms) {
     if (layerWms.treeItemId in this.independentLayers) {
       // The layer is already independent. => nothing to do here.
     } else if (this.layerInStandardLayers(layerWms)) {
@@ -250,38 +260,30 @@ export default abstract class WmsClient {
         opacity: layerWms.opacity
       });
       this.independentLayers[layerWms.treeItemId] = { layerWms: layerWms, olayer: olayer };
-
-      this.updateLayerFilter(layerWms);
-      this.updateTimeRestriction(layerWms);
-
       this.map.addLayer(olayer);
     } else {
       throw new Error('A layer can be made independent only if it has already been added to the map.');
     }
   }
 
-  updateLayerFilter(layerWms: LayerWms) {
-    if (layerWms.treeItemId in this.independentLayers) {
-      const olayer = this.independentLayers[layerWms.treeItemId].olayer;
-      const source = olayer.getSource() as ImageWMS;
-      if (layerWms.hasFilter) {
-        const filterStr = this.buildFilterQuery(layerWms);
-        source.updateParams({ FILTER: filterStr });
-      } else {
-        // If present, remove the filter parameter
-        const params = source.getParams();
-        if (params.FILTER) {
-          delete params.FILTER;
-          source.updateParams(params);
-        }
+  private updateLayerFilter(layerWms: LayerWms, olayer: ImageLayer<ImageWMS>) {
+    const source = olayer.getSource() as ImageWMS;
+    if (layerWms.hasFilter) {
+      const filterStr = this.buildFilterQuery(layerWms);
+      source.updateParams({ FILTER: filterStr });
+    } else {
+      // If present, remove the filter parameter
+      const params = source.getParams();
+      if (params.FILTER) {
+        delete params.FILTER;
+        source.updateParams(params);
       }
     }
   }
 
   abstract buildFilterQuery(layerWms: LayerWms): string;
 
-  updateTimeRestriction(layerWms: LayerWms) {
-    const olayer = this.independentLayers[layerWms.treeItemId].olayer;
+  private updateTimeRestriction(layerWms: LayerWms, olayer: ImageLayer<ImageWMS>) {
     const source = olayer.getSource() as ImageWMS;
     if (layerWms.hasTimeRestriction) {
       (olayer.getSource() as ImageWMS).updateParams({ TIME: layerWms.timeRestriction });
@@ -312,12 +314,11 @@ export default abstract class WmsClient {
   /**
    * Selects features based on the specified query and prepares selection parameters.
    */
-  selectFeaturesByQuery(queries: WfsFilter[]) {
+  selectFeaturesByQuery(query: WfsFilter[]) {
     const selectionParams: SelectionParam[] = [];
-    const maxExtent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
 
     selectionParams.push(
-      new SelectionParam(this.ogcServer, this.layers, this.state.projection, maxExtent, this.olayer, queries)
+      new SelectionParam(this.ogcServer, this.layers, this.state.projection, undefined, this.olayer, query)
     );
 
     for (const key in this.independentLayers) {
@@ -327,9 +328,9 @@ export default abstract class WmsClient {
           this.ogcServer,
           [indepLayer.layerWms],
           this.state.projection,
-          maxExtent,
+          undefined,
           indepLayer.olayer,
-          queries
+          query
         )
       );
     }
@@ -350,6 +351,9 @@ export default abstract class WmsClient {
 
   private getFeatureInfoUrl(param: SelectionParam): Record<string, string> {
     /* Url-layerName (feature id) objects. */
+    if (this.state.position.resolution === -1) {
+      console.log('WMSClient called before resolution is set.');
+    }
     const urlsAndLayerNames: Record<string, string> = {};
     param._layers.forEach((layer) => {
       const olLayer = param._oLayer ?? this.getOLayer(layer);

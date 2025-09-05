@@ -39,6 +39,10 @@ import TreeViewRootComponent from './components/treeview/treeviewroot/component'
 import TreeViewThemeComponent from './components/treeview/treeviewtheme/component';
 import UserPreferencesComponent from './components/userpreferences/component';
 import VideoRecordComponent from './components/videorecord/component';
+import StateManager from './tools/state/statemanager';
+import { DrawingState } from './components/drawing/drawingFeature';
+import DrawingSerializer from './components/drawing/drawingSerializer';
+import StateSerializer from './tools/share/stateserializer';
 import { initialize, SplashScreen } from './initialize';
 
 // Redirect to mobile interface if we are on mobile
@@ -49,6 +53,10 @@ if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Andr
 // Display the splash-screen
 const splash = new SplashScreen();
 splash.begin();
+
+// Add custom state and serializers (need to be done early, because the shared state will need them)
+StateManager.getInstance().state.extendedState.drawing = new DrawingState();
+StateSerializer.getInstance().addSerializer(DrawingState, new DrawingSerializer());
 
 // Common initialization
 initialize().then(() => {

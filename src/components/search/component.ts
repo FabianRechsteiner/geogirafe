@@ -17,13 +17,14 @@ import SearchIcon from './images/search.svg';
 import PaintbrushIcon from './images/paintbrush.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import type SearchResult from '../../models/searchresult';
-import type { GeometryResult, GeometryCollectionResult } from '../../models/searchresult';
+import type { GeometryResult, GeometryCollectionResult, AllSearchResults } from '../../models/searchresult';
 import MapManager from '../../tools/state/mapManager';
 import LayerManager from '../../tools/layers/layermanager';
 import { parseCoordinates } from '../../tools/geometrytools';
 import ThemesHelper from '../../tools/themes/themeshelper';
 import ThemeLayer from '../../models/layers/themelayer';
+import PermalinkManager from '../../tools/url/permalinkmanager';
+import SearchResult from '../../models/searchresult';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -34,6 +35,7 @@ class SearchComponent extends GirafeHTMLElement {
 
   private readonly themesHelper: ThemesHelper;
   private readonly layerManager: LayerManager;
+  private readonly permalinkManager: PermalinkManager;
   private readonly map: OLMap;
   private readonly previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   private previewTheme: ThemeLayer | null = null;
@@ -69,11 +71,23 @@ class SearchComponent extends GirafeHTMLElement {
     super('search');
     this.themesHelper = ThemesHelper.getInstance();
     this.layerManager = LayerManager.getInstance();
+    this.permalinkManager = PermalinkManager.getInstance();
     this.map = MapManager.getInstance().getMap();
 
     this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor as string;
     this.defaultSearchFillColor = this.configManager.Config.search.defaultFillColor as string;
     this.createPreviewLayer();
+  }
+
+  private async initialSearch() {
+    const searchTerm = this.permalinkManager.getSearchTerm();
+    const results = await this.fetchSearch(searchTerm);
+    if (results.features.length > 0) {
+      // Apply the first search result in the list
+      const firstResult = results.features[0];
+      this.preview(firstResult);
+      this.onSelect(firstResult);
+    }
   }
 
   private createPreviewLayer() {
@@ -123,6 +137,13 @@ class SearchComponent extends GirafeHTMLElement {
     this.loadConfig().then(() => {
       this.render();
       super.girafeTranslate();
+      if (this.permalinkManager.hasSearch()) {
+        this.subscribe('application.isReady', () => {
+          if (this.state.application.isReady) {
+            this.initialSearch();
+          }
+        });
+      }
     });
   }
 
@@ -159,19 +180,13 @@ class SearchComponent extends GirafeHTMLElement {
       return;
     }
     if (term.length > 0) {
-      const url = this.configManager.Config.search.url
-        .replace(this.searchTermPlaceholder, term)
-        .replace(this.searchLangPlaceholder, this.state.language as string);
       try {
-        const response = await fetch(url, { signal: this.abortController.signal });
-        const data = await response.json();
-
+        const data = await this.fetchSearch(term);
         // If the search term is at least two charecter but yieds no result, a warning
         // box is displayed for 2 seconds and then fades out (CSS)
-        if ((data.features as SearchResult[]).length === 0 && term.length >= 2) {
+        if (data.features.length === 0 && term.length >= 2) {
           this.showNoResultWarning = true;
         }
-
         this.displayResults(data);
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
@@ -181,6 +196,15 @@ class SearchComponent extends GirafeHTMLElement {
         }
       }
     }
+  }
+
+  private async fetchSearch(term: string): Promise<AllSearchResults> {
+    const url = this.configManager.Config.search.url
+      .replace(this.searchTermPlaceholder, term)
+      .replace(this.searchLangPlaceholder, this.state.language as string);
+    const response = await fetch(url, { signal: this.abortController.signal });
+    const data = await response.json();
+    return data;
   }
 
   /**
@@ -238,7 +262,7 @@ class SearchComponent extends GirafeHTMLElement {
     super.girafeTranslate();
   }
 
-  private displayResults(results: { type: string; features: SearchResult[] }) {
+  private displayResults(results: AllSearchResults) {
     // First, group the results
     for (const result of results.features) {
       // results.features.forEach((result) => {
@@ -330,14 +354,18 @@ class SearchComponent extends GirafeHTMLElement {
     }
     if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
       const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
-      const clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
-      if (!this.isAlreadyPresent(clonedTheme)) {
-        // Preview layer
-        clonedTheme.order = 0;
-        clonedTheme.isExpanded = true;
-        this.previewTheme = clonedTheme;
-        this.state.layers.layersList.push(clonedTheme);
-        this.layerManager.toggleGroupOrTheme(clonedTheme, 'on');
+      if (layer) {
+        const clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
+        if (!this.isAlreadyPresent(clonedTheme)) {
+          // Preview layer
+          clonedTheme.order = 0;
+          clonedTheme.isExpanded = true;
+          this.previewTheme = clonedTheme;
+          this.state.layers.layersList.push(clonedTheme);
+          this.layerManager.toggleGroupOrTheme(clonedTheme, 'on');
+        }
+      } else {
+        console.error(`Layer ${result.properties?.actions[0].data} cannot be found`);
       }
     }
   }
@@ -417,24 +445,7 @@ class SearchComponent extends GirafeHTMLElement {
       // Result with geometry
       this.zoomTo(result.bbox);
     } else {
-      let clonedTheme: ThemeLayer | undefined;
-      if (result.properties?.actions[0].action === 'add_theme') {
-        const theme = this.themesHelper.findThemeByName(result.properties?.actions[0].data);
-        clonedTheme = theme.clone();
-      } else if (result.properties?.actions[0].action === 'add_group') {
-        const group = this.themesHelper.findGroupByName(result.properties?.actions[0].data);
-        clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(group);
-      } else if (result.properties?.actions[0].action === 'add_layer') {
-        const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
-        clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
-      } else {
-        console.warn('Unsupported result type');
-      }
-
-      if (clonedTheme && !this.isAlreadyPresent(clonedTheme)) {
-        clonedTheme.order = 0;
-        this.state.layers.layersList.push(clonedTheme);
-      }
+      this.addResultToTreeView(result);
     }
 
     this.onFocusOut();
@@ -442,6 +453,33 @@ class SearchComponent extends GirafeHTMLElement {
     // Update searchbox with result
     if (this.searchBox && result.properties) {
       this.searchBox.value = result.properties.label;
+    }
+  }
+
+  private addResultToTreeView(result: SearchResult) {
+    let clonedTheme: ThemeLayer | undefined;
+    if (result.properties?.actions[0].action === 'add_theme') {
+      const theme = this.themesHelper.findThemeByName(result.properties?.actions[0].data);
+      if (theme) {
+        clonedTheme = theme.clone();
+      }
+    } else if (result.properties?.actions[0].action === 'add_group') {
+      const group = this.themesHelper.findGroupByName(result.properties?.actions[0].data);
+      if (group) {
+        clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(group);
+      }
+    } else if (result.properties?.actions[0].action === 'add_layer') {
+      const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
+      if (layer) {
+        clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
+      }
+    } else {
+      console.warn('Unsupported result type');
+    }
+
+    if (clonedTheme && !this.isAlreadyPresent(clonedTheme)) {
+      clonedTheme.order = 0;
+      this.state.layers.layersList.push(clonedTheme);
     }
   }
 

@@ -2,7 +2,7 @@ import LayerWms, { LayerWmsOptions } from '../../models/layers/layerwms';
 import LayerWmts, { LayerWmtsOptions } from '../../models/layers/layerwmts';
 import GroupLayer, { GroupLayerOptions } from '../../models/layers/grouplayer';
 import ServerOgc from '../../models/serverogc';
-import Basemap from '../../models/basemap';
+import Basemap from '../../models/basemaps/basemap';
 
 export function createTestOgcServer(): ServerOgc {
   return new ServerOgc('testOgcServer', {

@@ -4,6 +4,7 @@ import ShapeNamer from './shapeNamer';
 import { v4 as uuidv4 } from 'uuid';
 import { Fill, RegularShape, Stroke, Style } from 'ol/style';
 import { toRadians } from 'ol/math';
+import { IBrainSerializable } from '../../tools/state/brain/decorators';
 import { Circle as CircleGeom, Geometry } from 'ol/geom';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -23,7 +24,8 @@ export type ArrowStyle = 'none' | 'start' | 'end' | 'both';
 export type ArrowPosition = 'whole' | 'each' | 'mid';
 export type LineStroke = 'full' | 'dash' | 'dot' | 'double';
 
-export class DrawingState {
+export class DrawingState implements IBrainSerializable {
+  isBrainSerializable = true;
   activeTool: DrawingShape | null = null;
   features: DrawingFeature[] = [];
 }

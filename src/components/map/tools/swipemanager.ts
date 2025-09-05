@@ -98,7 +98,7 @@ class SwipeManager {
 
   private toggleSwipeForWms(layer: LayerWms) {
     if (this.wmsManager.getClient(layer).layerExists(layer)) {
-      this.wmsManager.getClient(layer).makeLayerIndependent(layer);
+      this.wmsManager.getClient(layer).prepareSwipe(layer);
       const olayer = this.wmsManager.getClient(layer).getOLayer(layer);
       if (olayer) {
         if (layer.swiped === 'no') {

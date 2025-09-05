@@ -5,7 +5,7 @@ class TestHelper {
     }
 
     for (const key in obj1) {
-      if (obj2.hasOwnProperty(key)) {
+      if (Object.hasOwn(obj2, key)) {
         if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
           if (!TestHelper.obj2ContainsObj1PropertiesValues(obj1[key], obj2[key])) {
             return false;

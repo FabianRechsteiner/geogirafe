@@ -37,15 +37,15 @@ export const mapAttributeTypeToFilterOperators: Record<'string' | 'number' | 'da
   date: ['eq', 'neq', 'before', 'after', 'between', 'nnul']
 };
 
+const BeginningOfTime = '0001-01-01';
+const EndOfTime = '9999-12-31';
+
 export class WfsFilter<WfsXmlTypes extends XmlTypes = XmlTypes> {
   property: string;
   propertyType?: WfsXmlTypes;
   operator: WfsOperator;
   value: string;
   value2: string;
-
-  beginOfTime = '0001-01-01';
-  endOfTime = '9999-12-31';
 
   constructor(property: string, operator: WfsOperator, value: string, value2: string = '', propertyType?: WfsXmlTypes) {
     this.property = property;
@@ -96,9 +96,9 @@ export class WfsFilter<WfsXmlTypes extends XmlTypes = XmlTypes> {
       case 'nlike':
         return not(like(this.property, '*' + this.value + '*'));
       case 'before':
-        return during(this.property, this.beginOfTime, this.value);
+        return during(this.property, BeginningOfTime, this.value);
       case 'after':
-        return during(this.property, this.value, this.endOfTime);
+        return during(this.property, this.value, EndOfTime);
       case 'between':
         if (isDate(this.propertyType)) {
           return during(this.property, this.value, this.value2);

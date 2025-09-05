@@ -213,11 +213,25 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     // Get the geometry column name of each layer
     // TODO REG : (not sure) This could probably be simplify by initializing a property in the ServerWfs object
     // containing the name of the geometry column during the WFS initialization.
-    const featureTypes = queryableLayers.map((l) => l.queryLayers.split(',').filter((el) => LayerWms.isInVisibleRange(this.state.position.resolution, l.queryLayersRanges[el]?.minResolution, l.queryLayersRanges[el]?.maxResolution))).flat(1);
+    const featureTypes = queryableLayers
+      .map((l) =>
+        l.queryLayers
+          .split(',')
+          .filter((el) =>
+            LayerWms.isInVisibleRange(
+              this.state.position.resolution,
+              l.queryLayersRanges[el]?.minResolution,
+              l.queryLayersRanges[el]?.maxResolution
+            )
+          )
+      )
+      .flat(1);
     const geometryColumnNameToFeatureType = serverWfs.getGeometryColumnNameToFeatureTypes(featureTypes);
 
     // Combine different sources of layer queries by chaining the filters with an AND operator
-    const featureSelectionFilter: Filter[] | undefined = selectionParam.queries?.map((f) => f.toOpenLayersFilter());
+    const featureSelectionFilter: Filter[] | undefined = selectionParam.selectionQuery?.map((f) =>
+      f.toOpenLayersFilter()
+    );
     const layerFilter: Filter | undefined = queryableLayers[0].filter?.toOpenLayersFilter();
     const timeFilter: Filter | undefined = this.setTimeRestriction(queryableLayers[0]);
     const filterList: Filter[] = [featureSelectionFilter, layerFilter, timeFilter]
