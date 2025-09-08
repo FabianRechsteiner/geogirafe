@@ -43,44 +43,40 @@
   border-left: solid 3px #444;
 }
 
-.ol-zoom {
+.ol-control {
   right: 2rem !important;
-  top: 2rem !important;
   left: unset !important;
+  border: none;
+  background-color: transparent;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ol-zoom {
+  top: 2rem !important;
 }
 
 .ol-rotate {
-  top: 7rem !important;
-  right: 2rem !important;
+  top: 9.3rem !important;
 }
 
 .ol-location {
-  right: 2rem !important;
-  top: 0.5rem !important;
-  left: unset !important;
-  width: 2rem !important;
-  height: 2rem !important;
-  cursor: pointer;
-  margin-top: 2px;
-  margin-right: 2px;
-}
-
-.btn-location {
-  width: 100% !important;
-  height: 100% !important;
+  top: 7rem !important;
 }
 
 .img-location {
-  width: 50%;
+  width: 55%;
   height: auto;
 }
 
 .ol-zoom-in,
 .ol-zoom-out,
+.btn-location,
 .ol-rotate-reset {
   width: 2rem !important;
   height: 2rem !important;
   cursor: pointer;
+  font-size: 1.2rem !important;
+  background-color: white;
 }
 
 .ol-scale-line {

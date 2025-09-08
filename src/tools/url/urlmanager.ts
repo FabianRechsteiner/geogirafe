@@ -44,7 +44,8 @@ export default class UrlManager extends GirafeSingleton {
    */
   public getBaseUrl() {
     const currentUrl = new URL(window.location.href);
-    const baseUrl = `${currentUrl.protocol}//${currentUrl.host}${currentUrl.pathname}`;
+    const pathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/') + 1);
+    const baseUrl = `${currentUrl.protocol}//${currentUrl.host}${pathname}`;
     return baseUrl;
   }
 
