@@ -203,10 +203,9 @@ optimize:
       artifacts: true
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT'
       when: on_success
     - when: never
-
   before_script:
     - apt update && apt -y install brotli
 
@@ -286,11 +285,24 @@ pages:
       artifacts: true
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: on_success
+      variables:
+        PATH_PREFIX: ''
+        EXPIRE_IN: never
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+      variables:
+        PATH_PREFIX: 'mr-$CI_MERGE_REQUEST_IID'
+        EXPIRE_IN: 1 week
     - when: never
 
+  pages:
+    path_prefix: $PATH_PREFIX
+    expire_in: $EXPIRE_IN
+
   before_script:
+    - echo "Deploying $PATH_PREFIX, expires in $EXPIRE_IN"
     - apt update && apt install -y brotli curl
     - mkdir -p dist/app/Mock
     - mkdir release

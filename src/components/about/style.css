@@ -1,8 +1,8 @@
-#panel {
+.panel {
   color: var(--text-color);
 }
 
-#panel > div {
+.panel > div {
   padding: 1rem;
 }
 
@@ -10,4 +10,10 @@ img.logo {
   filter: var(--svg-filter);
   height: 4rem;
   opacity: 0.8;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
 }

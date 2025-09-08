@@ -1,15 +1,21 @@
-<div id="panel">
+<div class="panel">
   <div>
     <img class="logo" alt="geogirafe-logo" src="images/logo/horizontal_black.svg" />
-    <p>
-      <span i18n="Version">Version</span> : ${this.version}<br />
-      <span i18n="Build">Build</span> : ${this.build}<br />
-      <span i18n="Date">Date</span> : ${this.date}
-    </p>
+    <div class="list">
+      <div class="elem"><span i18n="Version">Version</span> : ${this.version}</div>
+      <div class="elem"><span i18n="Build">Build</span> : ${this.build}</div>
+      <div class="elem"><span i18n="Date">Date</span> : ${this.date}</div>
+    </div>
 
-    <p>
-      <span i18n="Source">Source</span> :
-      <a href="https://gitlab.com/geogirafe/gg-viewer" i18n="GitLab" rel="noopener" target="_blank">GitLab</a>
-    </p>
+    <div class="list">
+      <div class="elem">
+        <span i18n="Source">Source</span>:
+        <a href="https://gitlab.com/geogirafe/gg-viewer" i18n="GitLab" rel="noopener" target="_blank">GitLab</a>
+      </div>
+      <div class="elem">
+        <span i18n="Documentation">Documentation</span>:
+        <a href="https://doc.geomapfish.dev" rel="noopener" target="_blank">https://doc.geomapfish.dev</a>
+      </div>
+    </div>
   </div>
 </div>
