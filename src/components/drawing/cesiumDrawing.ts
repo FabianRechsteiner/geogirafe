@@ -120,12 +120,12 @@ export default class CesiumDrawing {
     this.toolName = toolName;
     this.state = StateManager.getInstance().state;
     this.userInteractionManager = UserInteractionManager.getInstance();
-    StateManager.getInstance().subscribe('globe.loaded', () => {
+    map.subscribe('globe.loaded', () => {
       if (this.state.globe.loaded) {
         this.scene = map.map3d.getCesiumScene();
         this.handler = new Cesium.ScreenSpaceEventHandler(this.scene!.canvas);
         this.entities = map.map3d.getDataSourceDisplay().defaultDataSource.entities;
-        map.stateManager.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
+        map.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
           newTool === null ? this.deactivateTool() : this.activateTool(newTool)
         );
       }

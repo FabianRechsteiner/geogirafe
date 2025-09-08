@@ -120,16 +120,14 @@ export default class OlDrawing {
         }
       })
     );
-    this.map.stateManager.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
+    this.map.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
       newTool === null ? this.removeDrawInteraction() : this.addDrawInteraction(newTool)
     );
 
-    this.map.stateManager.subscribe(/extendedState.drawing.features.*\.selected/, (_old, _new) =>
-      this.updateModifiableFeatures()
-    );
+    this.map.subscribe(/extendedState.drawing.features.*\.selected/, (_old, _new) => this.updateModifiableFeatures());
 
     // OlCesium duplicates drawn shapes when 3D view is open if its eventListener is not removed
-    StateManager.getInstance().subscribe('globe.loaded', () => {
+    this.map.subscribe('globe.loaded', () => {
       if (this.state.globe.loaded) {
         this.drawingSource
           .getListeners('addfeature')
