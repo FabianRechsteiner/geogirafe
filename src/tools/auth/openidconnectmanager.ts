@@ -190,13 +190,13 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
 
   private getLoginRedirectUrl(silent: boolean) {
     if (silent) {
-      return `${window.location.protocol}//${window.location.host}${window.location.pathname}silentlogincallback.html?authentified=true`;
+      return `${UrlManager.getInstance().getBaseUrl()}silentlogincallback.html?authentified=true`;
     }
-    return `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=true`;
+    return `${UrlManager.getInstance().getBaseUrl()}?authentified=true`;
   }
 
   private getLogoutRedirectUrl() {
-    return `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+    return `${UrlManager.getInstance().getBaseUrl()}`;
   }
 
   private async silentLoginViaIframe() {
@@ -272,9 +272,9 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
   private resetUrlHistory(authentified: boolean) {
     let newUrl;
     if (authentified) {
-      newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}#${this.currentState}`;
+      newUrl = `${UrlManager.getInstance().getBaseUrl()}#${this.currentState}`;
     } else {
-      newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=${authentified}#${this.currentState}`;
+      newUrl = `${UrlManager.getInstance().getBaseUrl()}?authentified=${authentified}#${this.currentState}`;
     }
     UrlManager.getInstance().updateUrl(newUrl);
   }

@@ -8,7 +8,10 @@ import StateManager from './statemanager';
 /** The singleton containing the main OpenLayers map accessible from everywhere */
 export default class MapManager extends GirafeSingleton {
   private readonly map = new MapOL({
-    controls: defaultControls({ rotate: false, zoom: StateManager.getInstance().state.interface.isMobile }),
+    controls: defaultControls({
+      rotate: !StateManager.getInstance().state.interface.isMobile,
+      zoom: !StateManager.getInstance().state.interface.isMobile
+    }),
     layers: []
   });
   public getMap() {
