@@ -13,6 +13,7 @@ class LayerManager extends GirafeSingleton {
   stateManager: StateManager;
 
   private readonly layerClones: BaseLayer[] = [];
+  private readonly layerIdToClone: Map<string, BaseLayer> = new Map<string, BaseLayer>();
 
   get state() {
     return this.stateManager.state;
@@ -45,8 +46,19 @@ class LayerManager extends GirafeSingleton {
       );
     }
     this.layerClones.push(...addedLayers);
+    this.fillLayerIdToClone(addedLayers);
     this.activateDefaultLayers(addedLayers);
   }
+
+  private fillLayerIdToClone(layers: BaseLayer[]) {
+    for (const layer of layers) {
+      this.layerIdToClone.set(layer.treeItemId, layer);
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+        this.fillLayerIdToClone(layer.children);
+      }
+    }
+  }
+
   protected onChildrenListChanged(oldChildren: BaseLayer[], newChildren: BaseLayer[]) {
     // If we added a new group to the list of layers
     // Then we activate the layers that should be activated by default
@@ -59,7 +71,7 @@ class LayerManager extends GirafeSingleton {
   public getTreeItem(treeItemId: string): BaseLayer {
     // The object is not in the list of active layers any more.
     // We look in the list of clones
-    const treeItem = this.getLayerRecursive(this.layerClones, treeItemId);
+    const treeItem = this.layerIdToClone.get(treeItemId);
     if (treeItem) {
       return treeItem;
     }
@@ -69,22 +81,6 @@ class LayerManager extends GirafeSingleton {
 
   public getTreeItemByLayerName(layerName: string): BaseLayer | null {
     return this.getFlattenedLayerTree(this.state.layers.layersList).find((l) => l.name === layerName) ?? null;
-  }
-
-  private getLayerRecursive(layers: BaseLayer[], treeItemId: string): BaseLayer | null {
-    for (const layer of layers) {
-      if (layer.treeItemId === treeItemId) {
-        return layer;
-      }
-      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
-        const child = this.getLayerRecursive(layer.children, treeItemId);
-        if (child) {
-          return child;
-        }
-      }
-    }
-
-    return null;
   }
 
   public getFlattenedLayerTree(layers: BaseLayer[]): BaseLayer[] {
