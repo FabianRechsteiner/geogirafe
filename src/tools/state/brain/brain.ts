@@ -13,6 +13,7 @@ import {
 
 declare global {
   interface Object {
+    __brainId: number;
     __brainIsProxy?: boolean;
     __brainTarget: object;
     __brainParents: TProxy[];
@@ -24,18 +25,21 @@ declare global {
 type CallbackInfos = Map<string, { oldValue: TTarget; newValue: TTarget | TProxy; parents: TProxy[] }>;
 
 export type TProxy = InstanceType<typeof Proxy>;
-type TTarget = any; // NOSONAR: We want a specifix type here
+type TTarget = any; // NOSONAR: We want a specific type here
 type Callback = (path: string, oldValue: TTarget, newValue: TTarget | TProxy, parents: TProxy[]) => void;
 
 export default class Brain<T extends Record<string | symbol, any>> {
+  private proxyCount: number = 0;
   private readonly initialState: object;
   private readonly stateProxy: TProxy;
   private readonly externalCallback: Callback;
+  private readonly proxyIds = new WeakMap<TProxy, number>();
   private readonly targetToProxy = new WeakMap<TTarget, TProxy>();
   private readonly proxyToTarget = new WeakMap<TProxy, TTarget>();
   private readonly proxyChildren = new WeakMap<TProxy, Map<string, TProxy>>();
   private readonly proxyParents = new WeakMap<TProxy, TProxy[]>();
   private readonly proxyToFullPaths = new WeakMap<TProxy, string[]>();
+  private readonly mergeMinimalPathsCache = new Map<string, string[]>();
 
   private delayed = false;
   private readonly delayedCallbacks: CallbackInfos = new Map();
@@ -72,6 +76,7 @@ export default class Brain<T extends Record<string | symbol, any>> {
    */
   private createProxy(target: any, prop: string, parent?: TProxy): TProxy {
     const proxy = new Proxy(target, this.objectHandler());
+    this.proxyIds.set(proxy, ++this.proxyCount);
     this.targetToProxy.set(target, proxy);
     this.proxyToTarget.set(proxy, target);
 
@@ -102,7 +107,22 @@ export default class Brain<T extends Record<string | symbol, any>> {
    *   parrents:    ["group2"]
    *   => keep only ["group2.inner"] (Because it is the only one still linked to the right parent)
    */
-  private mergeMinimalPaths(existingPaths: string[], candidatePaths: string[], parents: TProxy[]): string[] {
+  private mergeMinimalPaths(
+    proxyId: number,
+    existingPaths: string[],
+    candidatePaths: string[],
+    parents: TProxy[]
+  ): string[] {
+    const cacheKey = JSON.stringify({
+      proxyId,
+      existingPaths,
+      candidatePaths,
+      parents: parents.map((p) => p.__brainId).join('|')
+    });
+    if (this.mergeMinimalPathsCache.has(cacheKey)) {
+      return this.mergeMinimalPathsCache.get(cacheKey)!;
+    }
+
     const minimalPaths = new Set<string>();
 
     for (const candidate of [...existingPaths, ...candidatePaths]) {
@@ -123,12 +143,17 @@ export default class Brain<T extends Record<string | symbol, any>> {
 
       minimalPaths.add(candidate);
     }
-
-    return Array.from(minimalPaths);
+    const returnValue = Array.from(minimalPaths);
+    this.mergeMinimalPathsCache.set(cacheKey, returnValue);
+    return returnValue;
   }
 
   private isRightParent(candidate: string, parents: TProxy[]): boolean {
-    const parentsPaths = parents?.flatMap((p) => p.__brainFullPaths);
+    const parentsPaths = [];
+    for (const p of parents) {
+      parentsPaths.push(...p.__brainFullPaths);
+    }
+
     if (parentsPaths?.length > 0 && parentsPaths[0].length > 0) {
       // Not on the root
       let circularReference = false;
@@ -171,7 +196,12 @@ export default class Brain<T extends Record<string | symbol, any>> {
       }
 
       // Merge full paths (ensure minimal paths)
-      const merged = this.mergeMinimalPaths(valueProxy.__brainFullPaths, childPaths, valueProxy.__brainParents);
+      const merged = this.mergeMinimalPaths(
+        valueProxy.__brainId,
+        valueProxy.__brainFullPaths,
+        childPaths,
+        valueProxy.__brainParents
+      );
       const fullPaths = valueProxy.__brainFullPaths;
       if (merged.length !== fullPaths.length || merged.some((p: string, i: number) => p !== fullPaths[i])) {
         fullPaths.splice(0, fullPaths.length, ...merged);
@@ -181,7 +211,7 @@ export default class Brain<T extends Record<string | symbol, any>> {
     } else {
       // Create a new proxy
       valueProxy = this.createProxy(value, prop, proxy);
-      const minimal = this.mergeMinimalPaths([], childPaths, valueProxy.__brainParents);
+      const minimal = this.mergeMinimalPaths(valueProxy.__brainId, [], childPaths, valueProxy.__brainParents);
       this.proxyToFullPaths.set(valueProxy, minimal);
       this.updateChildPathsRecursively(valueProxy, minimal);
     }
@@ -278,7 +308,7 @@ export default class Brain<T extends Record<string | symbol, any>> {
       }
 
       const candidatePaths = parentPaths.map((path) => this.getFullPath(path, prop));
-      const merged = this.mergeMinimalPaths(fullPaths, candidatePaths, childProxy.__brainParents);
+      const merged = this.mergeMinimalPaths(childProxy.__brainId, fullPaths, candidatePaths, childProxy.__brainParents);
       const changed = merged.length !== fullPaths.length || merged.some((p, i) => p !== fullPaths[i]);
       if (changed) {
         fullPaths.splice(0, fullPaths.length, ...merged);
@@ -291,6 +321,8 @@ export default class Brain<T extends Record<string | symbol, any>> {
     switch (prop) {
       case '__brainIsProxy':
         return true;
+      case '__brainId':
+        return this.proxyIds.get(proxy);
       case '__brainTarget':
         return target;
       case '__brainParents':
