@@ -20,7 +20,7 @@ _(Explain shortly was was done, and what are the important things to know about 
 
 ### For the Reviewer:
 
-This Merge-Request can be tested at https://demo.geomapfish.dev/mr-{{ merge_request.iid }}/
+This Merge-Request can be tested at https://demo.geomapfish.dev/mr-{{ merge_request.id }}/
 
 - [ ] New code was reviewed.
 - [ ] If comments could be added on unclear code, the developer has been informed.
