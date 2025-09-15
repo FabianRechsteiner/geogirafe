@@ -24,9 +24,23 @@ export default class OrderingManager extends GirafeSingleton {
   }
 
   private registerEvents() {
-    this.stateManager.subscribe('layers.layersList', () => this.reorderLayers());
-    this.stateManager.subscribe(/layers\.layersList\..*\.children/, () => this.reorderLayers());
+    this.stateManager.subscribe('layers.layersList', (oldLayers: BaseLayer[], newLayers: BaseLayer[]) =>
+      this.onLayerListChanged(oldLayers, newLayers)
+    );
+    this.stateManager.subscribe(/layers\.layersList\..*\.children/, (oldLayers: BaseLayer[], newLayers: BaseLayer[]) =>
+      this.onLayerListChanged(oldLayers, newLayers)
+    );
     this.stateManager.subscribe(/layers\.layersList\..*\.order/, () => this.reorderLayers());
+  }
+
+  private onLayerListChanged(oldLayers: BaseLayer[], newLayers: BaseLayer[]) {
+    // Need to reorder only if new layers were added.
+    const addedLayers = newLayers.filter(
+      (newChild) => !oldLayers.find((oldChild) => oldChild.treeItemId === newChild.treeItemId)
+    );
+    if (addedLayers.length > 0) {
+      this.reorderLayers();
+    }
   }
 
   /**
@@ -42,9 +56,10 @@ export default class OrderingManager extends GirafeSingleton {
     }
 
     this.timeoutId = setTimeout(() => {
+      console.debug('Reordering Layers');
       const orderedLayers = this.getSortedLayers(this.state.layers.layersList);
       const counter: OrderCounter = { index: 1000 };
-      this.reorderLayersRecursively(orderedLayers, counter);
+      this.stateManager.batchChanges(() => this.reorderLayersRecursively(orderedLayers, counter));
     });
   }
 

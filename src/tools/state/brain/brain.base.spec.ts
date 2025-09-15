@@ -533,4 +533,33 @@ describe('State: base principles', () => {
     // And two full paths
     expect(pSharedA.__brainFullPaths).toEqual(expect.arrayContaining(['objectValue.child', 'otherObjectValue.child']));
   });
+
+  it('Base principles: should not create a proxy if is already a proxy)', () => {
+    /* This can happen when a proxy was added to a not proxied object
+       And then if the not proxied object is added to the state.
+       In this case, brain should not recreate a proxy but simply reuse it.
+     */
+    brain = new Brain(state, () => {
+      /* do nothing */
+    });
+    const pizza = { key: 'pizza1' };
+    brain.getState().objectValue = pizza;
+    const pizzaProxy = brain.getState().objectValue;
+    expect(pizzaProxy.__brainIsProxy).toBeTruthy();
+
+    class Pizzeria {
+      pizza: {};
+
+      constructor(pizza: {}) {
+        this.pizza = pizza;
+      }
+    }
+
+    const pizzeria = new Pizzeria(pizzaProxy);
+    brain.getState().otherObjectValue = pizzeria;
+    const otherPizzaProxy = (brain.getState().otherObjectValue as Pizzeria).pizza;
+    expect(otherPizzaProxy.__brainIsProxy).toBeTruthy();
+
+    expect(pizzaProxy).toBe(otherPizzaProxy);
+  });
 });

@@ -424,10 +424,18 @@ export default class Brain<T extends Record<string | symbol, any>> {
       return target.constructor;
     }
 
-    const value = target[prop];
+    let value = target[prop];
     if (isPrimitive(value)) {
       // No proxy for primitives
       return value;
+    }
+
+    if (value.__brainIsProxy) {
+      // Proxy already exist.
+      // This can happen when a proxy was added to a not proxied object
+      // And then if the not proxied object is added to the state.
+      // In this case, brain should not recreate a proxy but simply reuse it.
+      value = value.__brainTarget;
     }
 
     if (!isTypeSupported(value)) {

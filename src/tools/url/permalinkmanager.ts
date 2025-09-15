@@ -10,7 +10,18 @@ import ConfigManager from '../configuration/configmanager';
 export default class PermalinkManager extends GirafeSingleton {
   stateManager: StateManager;
   urlManager: UrlManager;
-  urlParamKeys: string[] = ['map_x', 'map_y', 'map_zoom', 'map_crosshair', 'map_tooltip', 'search'];
+  urlParamKeys: string[] = [
+    'map_x',
+    'map_y',
+    'map_zoom',
+    'map_crosshair',
+    'map_tooltip',
+    'search',
+    'basemap',
+    'themes',
+    'groups',
+    'layers'
+  ];
   urlParamKeysWithPrefix: string[] = ['wfs_'];
   params: Record<string, string | null> = {};
 
@@ -124,5 +135,49 @@ export default class PermalinkManager extends GirafeSingleton {
       return this.params['search']!;
     }
     throw new Error('No search param in the Permalink!');
+  }
+
+  public hasThemes() {
+    return this.params['themes'] !== null;
+  }
+
+  public getThemes(): string[] {
+    if (this.hasThemes()) {
+      return this.params['themes']!.split(',');
+    }
+    throw new Error('No themes param in the Permalink!');
+  }
+
+  public hasBasemap() {
+    return this.params['basemap'] !== null;
+  }
+
+  public getBasemap(): string {
+    if (this.hasBasemap()) {
+      return this.params['basemap']!;
+    }
+    throw new Error('No basemap param in the Permalink!');
+  }
+
+  public hasGroups() {
+    return this.params['groups'] !== null;
+  }
+
+  public getGroups(): string[] {
+    if (this.hasGroups()) {
+      return this.params['groups']!.split(',');
+    }
+    throw new Error('No groups param in the Permalink!');
+  }
+
+  public hasLayers() {
+    return this.params['layers'] !== null;
+  }
+
+  public getLayers(): string[] {
+    if (this.hasLayers()) {
+      return this.params['layers']!.split(',');
+    }
+    throw new Error('No layers param in the Permalink!');
   }
 }
