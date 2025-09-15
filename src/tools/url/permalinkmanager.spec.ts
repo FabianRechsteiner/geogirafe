@@ -12,7 +12,11 @@ const emptyUrlParameters = {
   map_zoom: null,
   map_crosshair: null,
   map_tooltip: null,
-  search: null
+  search: null,
+  basemap: null,
+  themes: null,
+  groups: null,
+  layers: null
 };
 
 const mockLocation = (url: string) => {

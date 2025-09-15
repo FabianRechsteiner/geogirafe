@@ -23,6 +23,8 @@ import BasemapEmpty from '../../models/basemaps/basemapempty';
 import SessionManager from '../share/sessionmanager';
 import BasemapSwisstopoVectorTiles from '../../models/basemaps/basemapswisstopovectortiles';
 import BasemapOsm from '../../models/basemaps/basemaposm';
+import PermalinkManager from '../url/permalinkmanager';
+import ThemesHelper from './themeshelper';
 
 class ThemesManager extends GirafeSingleton {
   configManager: ConfigManager;
@@ -31,6 +33,8 @@ class ThemesManager extends GirafeSingleton {
   shareManager: ShareManager;
   sessionManager: SessionManager;
   customThemesManager: CustomThemesManager;
+  permalinkManager: PermalinkManager;
+  themesHelper: ThemesHelper;
 
   anonymousUserInfo = { u: 'anonymous' };
 
@@ -47,6 +51,8 @@ class ThemesManager extends GirafeSingleton {
     this.shareManager = ShareManager.getInstance();
     this.sessionManager = SessionManager.getInstance();
     this.customThemesManager = CustomThemesManager.getInstance();
+    this.permalinkManager = PermalinkManager.getInstance();
+    this.themesHelper = ThemesHelper.getInstance();
 
     // We have to wait the authentication to be able to load the themes with the right user-rights
     this.stateManager.subscribe('application.isAuthInitialized', () => {
@@ -62,16 +68,16 @@ class ThemesManager extends GirafeSingleton {
       await this.loadThemes();
       console.log('Themes were loaded');
 
-      // try to restore state if any
-      let stateRestored = false;
-      if (this.shareManager.hasSharedState()) {
-        stateRestored = await this.shareManager.setStateFromUrl();
-      } else if (this.sessionManager.hasState()) {
-        stateRestored = this.sessionManager.setStateFromSession();
-      }
-      // Otherwise, apply default theme
-      if (!stateRestored) {
+      const stateRestored = await this.restoreState();
+      const themeAddedFromUrl = this.themesHelper.addThemesFromUrl();
+      const groupAddedFromUrl = this.themesHelper.addGroupsFromUrl();
+      const layersAddedFromUrl = this.themesHelper.addLayersFromUrl();
+      const basemapAddedFromUrl = this.addBasemapFromUrl();
+
+      if (!stateRestored && !themeAddedFromUrl && !groupAddedFromUrl && !layersAddedFromUrl) {
         this.setDefaultTheme();
+      }
+      if (!stateRestored && !basemapAddedFromUrl) {
         this.setDefaultBasemap();
       }
 
@@ -89,6 +95,32 @@ class ThemesManager extends GirafeSingleton {
     }
   }
 
+  private async restoreState(): Promise<boolean> {
+    // try to restore state if any
+    let stateRestored = false;
+    if (this.shareManager.hasSharedState()) {
+      stateRestored = await this.shareManager.setStateFromUrl();
+    } else if (this.sessionManager.hasState()) {
+      stateRestored = this.sessionManager.setStateFromSession();
+    }
+    return stateRestored;
+  }
+
+  private addBasemapFromUrl(): boolean {
+    if (this.permalinkManager.hasBasemap()) {
+      const bs = this.permalinkManager.getBasemap();
+      for (const basemap of Object.values(this.state.basemaps)) {
+        if (basemap.name === bs) {
+          this.state.activeBasemap = basemap;
+          return true;
+        }
+      }
+
+      // Nothing found
+      console.warn(`Basemap ${bs} cannot be found`);
+    }
+    return false;
+  }
   /**
    * Load themes from backend and configures background layers if needed
    */

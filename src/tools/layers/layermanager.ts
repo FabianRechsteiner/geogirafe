@@ -65,6 +65,7 @@ class LayerManager extends GirafeSingleton {
     const addedLayers = newChildren.filter(
       (newChild) => !oldChildren.find((oldChild) => oldChild.treeItemId === newChild.treeItemId)
     );
+    this.fillLayerIdToClone(addedLayers);
     this.activateDefaultLayers(addedLayers);
   }
 

@@ -5,7 +5,6 @@ import TreeViewGroupElement from '../tools/treeviewgroupelement';
 class TreeViewGroupComponent extends TreeViewGroupElement {
   templateUrl = './template.html';
   styleUrls = ['../style.css', '../../../styles/common.css'];
-
   override layer: GroupLayer;
 
   constructor(group: GroupLayer) {
@@ -30,20 +29,15 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
     this.subscribe(/layers\.layersList\..*\.activeState/, (_oldValue: boolean, _newValue: boolean, group: GroupLayer) =>
       this.refreshRender(group)
     );
-    this.subscribe(/layers\.layersList\..*\.children/, (_oldValue: boolean, _newValue: boolean, group: GroupLayer) =>
-      this.refreshRender(group)
-    );
-    this.subscribe(/layers\.layersList\..*\.order/, (_oldValue: boolean, _newValue: boolean, layer: ThemeLayer) => {
+    this.subscribe(/layers\.layersList\..*\.order/, (_oldValue: number, _newValue: number, layer: ThemeLayer) => {
       this.refreshRender(layer);
       this.refreshRender(layer.parent);
     });
-    this.subscribe(/layers\.layersList\..*\.timeRestriction/, (_old: boolean, _new: boolean, layer: GroupLayer) => {
-      if (layer === this.layer) this.refreshRender(this.layer);
+    this.subscribe(/layers\.layersList\..*\.timeRestriction/, (_old: string, _new: string, layer: GroupLayer) => {
+      this.refreshRender(layer);
     });
-    this.subscribe('treeview.renderEnabled', (_oldValue: boolean, enabled: boolean) => {
-      if (enabled) {
-        this.refreshRender();
-      }
+    this.subscribe('treeview.renderEnabled', () => {
+      this.refreshRender();
     });
   }
 

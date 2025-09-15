@@ -19,12 +19,12 @@ import PaintbrushIcon from './images/paintbrush.svg';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import type { GeometryResult, GeometryCollectionResult, AllSearchResults } from '../../models/searchresult';
 import MapManager from '../../tools/state/mapManager';
-import LayerManager from '../../tools/layers/layermanager';
 import { parseCoordinates } from '../../tools/geometrytools';
 import ThemesHelper from '../../tools/themes/themeshelper';
 import ThemeLayer from '../../models/layers/themelayer';
 import PermalinkManager from '../../tools/url/permalinkmanager';
 import SearchResult from '../../models/searchresult';
+import BaseLayer from '../../models/layers/baselayer';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -34,11 +34,10 @@ class SearchComponent extends GirafeHTMLElement {
   public paintbrushIcon: string = PaintbrushIcon;
 
   private readonly themesHelper: ThemesHelper;
-  private readonly layerManager: LayerManager;
   private readonly permalinkManager: PermalinkManager;
   private readonly map: OLMap;
   private readonly previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
-  private previewTheme: ThemeLayer | null = null;
+  private previewLayers: BaseLayer[] = [];
   private previewGeoLayer: VectorLayer<VectorSource> | null = null;
   private maxExtent?: number[];
 
@@ -70,7 +69,6 @@ class SearchComponent extends GirafeHTMLElement {
   constructor() {
     super('search');
     this.themesHelper = ThemesHelper.getInstance();
-    this.layerManager = LayerManager.getInstance();
     this.permalinkManager = PermalinkManager.getInstance();
     this.map = MapManager.getInstance().getMap();
 
@@ -356,22 +354,13 @@ class SearchComponent extends GirafeHTMLElement {
       const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
       if (layer) {
         const clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
-        if (!this.isAlreadyPresent(clonedTheme)) {
-          // Preview layer
-          clonedTheme.order = 0;
-          clonedTheme.isExpanded = true;
-          this.previewTheme = clonedTheme;
-          this.state.layers.layersList.push(clonedTheme);
-          this.layerManager.toggleGroupOrTheme(clonedTheme, 'on');
-        }
+        clonedTheme.order = 0;
+        clonedTheme.isExpanded = true;
+        this.previewLayers = this.themesHelper.mergeThemeInLayerTree(clonedTheme, true);
       } else {
         console.error(`Layer ${result.properties?.actions[0].data} cannot be found`);
       }
     }
-  }
-
-  private isAlreadyPresent(theme: ThemeLayer): boolean {
-    return this.state.layers.layersList.some((t) => t.id === theme.id);
   }
 
   private addFeatureToPreview(geometry: GeometryResult | GeometryCollectionResult) {
@@ -422,23 +411,15 @@ class SearchComponent extends GirafeHTMLElement {
     this.previewFeaturesCollection.clear();
 
     // Clear preview layer
-    if (this.previewTheme) {
-      this.layerManager.toggle(this.previewTheme, 'off');
-      const index = this.state.layers.layersList.findIndex((l) => l.treeItemId === this.previewTheme?.treeItemId);
-      if (index >= 0) {
-        this.state.layers.layersList.splice(index, 1);
-      } else {
-        console.warn('Error while removing preview layer.');
-      }
-      this.previewTheme = null;
-    }
+    this.themesHelper.removeLayersFromLayerTree(this.previewLayers);
+    this.previewLayers = [];
   }
 
   public onSelect(result: SearchResult) {
     this.selectedResult = result;
     this.ignoreBlur = false;
     this.forceHide = true;
-    this.previewTheme = null;
+    this.previewLayers = [];
     super.render();
 
     if (result.bbox) {
@@ -477,9 +458,9 @@ class SearchComponent extends GirafeHTMLElement {
       console.warn('Unsupported result type');
     }
 
-    if (clonedTheme && !this.isAlreadyPresent(clonedTheme)) {
+    if (clonedTheme) {
       clonedTheme.order = 0;
-      this.state.layers.layersList.push(clonedTheme);
+      this.themesHelper.mergeThemeInLayerTree(clonedTheme);
     }
   }
 

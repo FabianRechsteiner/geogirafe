@@ -5,17 +5,21 @@ import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
 import ThemeLayer from '../../models/layers/themelayer';
 import ConfigManager from '../configuration/configmanager';
+import LayerManager from '../layers/layermanager';
 import StateManager from '../state/statemanager';
+import PermalinkManager from '../url/permalinkmanager';
 
 export default class ThemesHelper extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
+  permalinkManager: PermalinkManager;
 
   constructor(type: string) {
     super(type);
 
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
+    this.permalinkManager = PermalinkManager.getInstance();
 
     this.stateManager.subscribe(
       'themes.lastSelectedTheme',
@@ -107,7 +111,7 @@ export default class ThemesHelper extends GirafeSingleton {
       if (layer.name === layername) {
         return layer;
       }
-      if (layer instanceof GroupLayer) {
+      if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
         const child = this.findLayerRecursive(layer.children, layername);
         if (child) {
           return child;
@@ -118,7 +122,7 @@ export default class ThemesHelper extends GirafeSingleton {
     return null;
   }
 
-  onSelectedThemeChanged(theme: ThemeLayer | CustomTheme | null) {
+  private onSelectedThemeChanged(theme: ThemeLayer | CustomTheme | null) {
     if (!theme) {
       // Theme is null, nothing to do here
       return;
@@ -195,5 +199,131 @@ export default class ThemesHelper extends GirafeSingleton {
     }
     const parents = this.getHierarchyFromLayer(layer.parent);
     return [...parents, layer];
+  }
+
+  public addThemesFromUrl() {
+    let themeAdded = false;
+    if (this.permalinkManager.hasThemes()) {
+      for (const themename of this.permalinkManager.getThemes()) {
+        const theme = Object.values(this.state.themes._allThemes).find((t) => t.name === themename);
+        if (theme) {
+          this.state.themes.lastSelectedTheme = theme;
+          themeAdded = true;
+        } else {
+          console.warn(`Theme ${themename} cannot be found`);
+        }
+      }
+    }
+    return themeAdded;
+  }
+
+  public addGroupsFromUrl(): boolean {
+    let added = false;
+    if (this.permalinkManager.hasGroups()) {
+      for (const groupname of this.permalinkManager.getGroups()) {
+        added = this.addLayerBaseFromUrl(groupname, 'group') || added;
+      }
+    }
+    return added;
+  }
+
+  public addLayersFromUrl(): boolean {
+    let added = false;
+    if (this.permalinkManager.hasLayers()) {
+      for (let layername of this.permalinkManager.getLayers()) {
+        added = this.addLayerBaseFromUrl(layername, 'layer') || added;
+      }
+    }
+    return added;
+  }
+
+  private addLayerBaseFromUrl(name: string, type: 'layer' | 'group'): boolean {
+    let added = false;
+    let activate = false;
+    if (name.startsWith('!')) {
+      activate = true;
+      name = name.substring(1);
+    }
+    const layerOrGroup = type === 'layer' ? this.findLayerByName(name) : this.findGroupByName(name);
+    if (layerOrGroup) {
+      const clonedTheme = this.getMinimalClonedThemeForLayer(layerOrGroup);
+      this.mergeLayerWithExistingLayerTree(clonedTheme, this.state.layers.layersList);
+      added = true;
+      if (activate) {
+        const clonedLayer = this.findLayerRecursive(clonedTheme.children, name);
+        if (clonedLayer) {
+          LayerManager.getInstance().toggle(clonedLayer, 'on');
+        }
+      }
+    } else {
+      console.warn(`Layer ${name} cannot be found`);
+    }
+    return added;
+  }
+
+  public mergeThemeInLayerTree(theme: ThemeLayer, activate: boolean = false): BaseLayer[] {
+    const insertedLayers = this.mergeLayerWithExistingLayerTree(theme, this.state.layers.layersList);
+    if (activate) {
+      for (const insertedLayer of insertedLayers) {
+        LayerManager.getInstance().toggle(insertedLayer, 'on');
+      }
+    }
+    return insertedLayers;
+  }
+
+  /**
+   * This function merges the newLayer at its right place in the LayerTree
+   * @param newLayer The layer to insert somewhere in the hierarchy
+   * @param existingList
+   * @param parent
+   * @returns
+   */
+  private mergeLayerWithExistingLayerTree(
+    newLayer: BaseLayer,
+    existingList: BaseLayer[],
+    parent?: GroupLayer | ThemeLayer
+  ): BaseLayer[] {
+    const existingLayer = existingList.find((l) => l.id === newLayer.id);
+    if (!existingLayer) {
+      // The theme is not already present. We just add the theme to the layertree
+      if (parent) {
+        newLayer.parent = parent;
+      }
+      existingList.push(newLayer);
+      return [newLayer];
+    }
+
+    // Otherwise, we have to merge the themes
+    const insertedLayers = [];
+    if (
+      (newLayer instanceof ThemeLayer || newLayer instanceof GroupLayer) &&
+      (existingLayer instanceof ThemeLayer || existingLayer instanceof GroupLayer)
+    ) {
+      for (const child of newLayer.children) {
+        insertedLayers.push(...this.mergeLayerWithExistingLayerTree(child, existingLayer.children, existingLayer));
+      }
+    }
+
+    return insertedLayers;
+  }
+
+  public removeLayersFromLayerTree(layersToRemove: BaseLayer[]) {
+    for (const layerToRemove of layersToRemove) {
+      LayerManager.getInstance().toggle(layerToRemove, 'off');
+      this.removeLayersFromExistingLayerTree(layerToRemove, this.state.layers.layersList);
+    }
+  }
+
+  private removeLayersFromExistingLayerTree(layerToRemove: BaseLayer, existingList: BaseLayer[]) {
+    const existingLayerIndex = existingList.findIndex((l) => l.id === layerToRemove.id);
+    if (existingLayerIndex >= 0) {
+      existingList.splice(existingLayerIndex, 1);
+    } else {
+      for (const element of existingList) {
+        if (element instanceof ThemeLayer || element instanceof GroupLayer) {
+          this.removeLayersFromExistingLayerTree(layerToRemove, element.children);
+        }
+      }
+    }
   }
 }
