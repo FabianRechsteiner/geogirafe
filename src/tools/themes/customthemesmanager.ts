@@ -5,13 +5,13 @@ import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
 import ThemeLayer from '../../models/layers/themelayer';
 import CustomTheme from '../../models/customtheme';
-import LayersConfigSerializer from '../share/serializers/layerconfigserializer';
+import CustomLayersSerializer from '../share/serializers/customlayersserializer';
 
 class CustomThemesManager extends GirafeSingleton {
   userDataManager: UserDataManager;
   customThemes: CustomTheme[] = [];
   private readonly storagePath: string = 'customThemes';
-  private readonly serializer = new LayersConfigSerializer();
+  private readonly serializer = new CustomLayersSerializer();
 
   constructor(type: string) {
     super(type);

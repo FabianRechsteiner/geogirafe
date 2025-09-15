@@ -10,7 +10,6 @@ import Layer from '../../../models/layers/layer';
 import BaseLayer from '../../../models/layers/baselayer';
 import { isTimeAwareLayer } from '../../../models/layers/timeawarelayer';
 import ErrorManager from '../../error/errormanager';
-import CustomTheme from '../../../models/customtheme';
 import LayerWms from '../../../models/layers/layerwms';
 import WfsFilter, { WfsOperator } from '../../wfs/wfsfilter';
 
@@ -22,7 +21,7 @@ export type SharedFilter = {
   value2: string;
 };
 
-type SharedLayer = {
+export type SharedLayer = {
   id: number;
   order: number;
   checked: number;
@@ -60,11 +59,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     return this.serialize(layersConfig.layersList);
   }
 
-  public customThemeSerialize(customTheme: CustomTheme): string {
-    return this.serialize(customTheme.layers);
-  }
-
-  private serialize(layers: BaseLayer[]) {
+  protected serialize(layers: BaseLayer[]) {
     const sharedLayers = this.getSerializedLayerTree(layers);
     return JSON.stringify(sharedLayers);
   }
@@ -79,13 +74,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     return layersConfig;
   }
 
-  public customThemeDeserialize(name: string, str: string): CustomTheme {
-    const customTheme = new CustomTheme(name);
-    customTheme.layers = this.deserialize(str) as ThemeLayer[];
-    return customTheme;
-  }
-
-  private deserialize(str: string) {
+  protected deserialize(str: string) {
     const sharedState = JSON.parse(str);
     return this.getDeserializedLayerTree(sharedState);
   }
@@ -103,7 +92,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     return sharedLayers;
   }
 
-  private getSerializedLayer(layer: BaseLayer): SharedLayer {
+  protected getSerializedLayer(layer: BaseLayer): SharedLayer {
     let isExpanded = false;
     if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       isExpanded = layer.isExpanded;
