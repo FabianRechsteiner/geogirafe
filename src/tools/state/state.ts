@@ -241,6 +241,8 @@ export default class State {
     renderEnabled: true
   };
 
+  snapActive: boolean = false;
+
   // Current Print state
   print: PrintConfig = {
     maskVisible: false,

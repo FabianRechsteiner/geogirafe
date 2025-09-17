@@ -1,4 +1,5 @@
 import ITimeOptions from '../tools/time/itimeoptions';
+import ISnappingConfig from '../tools/snap/isnapconfig';
 /**
  * These are the models for a GeoMapFish backend
  */
@@ -23,6 +24,7 @@ export interface GMFMetadata {
   printNativeAngle?: boolean;
   protected?: boolean;
   thumbnail?: string;
+  snappingConfig?: ISnappingConfig;
   timeAttribute?: string;
 }
 
