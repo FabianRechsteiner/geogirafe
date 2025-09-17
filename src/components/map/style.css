@@ -204,15 +204,9 @@ input[type='range']::-moz-range-thumb {
   white-space: nowrap;
 }
 
-@media screen and (max-width: 1000px) {
-  .ol-zoom {
-    display: none !important;
-  }
-
-  .ol-rotate {
-    top: 0.5rem !important;
-    right: 0.5rem !important;
-  }
+@media screen and (hover: none) {
+  .ol-zoom,
+  .ol-rotate,
   .ol-location {
     display: none !important;
   }
