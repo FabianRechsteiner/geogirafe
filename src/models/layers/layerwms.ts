@@ -5,6 +5,7 @@ import ILayerWithFilter from './ilayerwithfilter';
 import ILayerWithLegend from './ilayerwithlegend';
 import ILayerWithTime from './ilayerwithtime';
 import ITimeOptions from '../../tools/time/itimeoptions';
+import ISnappingConfig from '../../tools/snap/isnapconfig';
 import LayerTimeFormatter from '../../tools/time/layertimeformatter';
 import Layer from './layer';
 
@@ -30,6 +31,7 @@ export type LayerWmsOptions = {
   queryLayers?: string;
   queryLayersRanges?: { [name: string]: { minResolution?: number; maxResolution?: number } };
   time?: ITimeOptions;
+  snappingConfig?: ISnappingConfig;
   timeAttribute?: string;
   editable?: string;
 };
@@ -68,6 +70,8 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
   public filter?: WfsFilter;
 
   public timeOptions?: ITimeOptions;
+  public snapOptions?: ISnappingConfig;
+  public snapActive?: boolean;
   public timeRestriction?: string;
   public timeAttribute?: string;
 
@@ -95,6 +99,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     this.queryLayers = opts?.queryLayers;
     this.queryLayersRanges = opts?.queryLayersRanges || {};
     this.timeOptions = opts?.time;
+    this.snapOptions = opts?.snappingConfig;
     this.timeAttribute = opts?.timeAttribute;
     this.editable = opts?.editable;
 
@@ -134,6 +139,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       queryLayers: this.queryLayers,
       queryLayersRanges: this.queryLayersRanges,
       time: this.timeOptions,
+      snappingConfig: this.snapOptions,
       timeAttribute: this.timeAttribute,
       editable: this.editable
     };
@@ -219,6 +225,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       printNativeAngle: options.metadata?.printNativeAngle,
       hiDPILegendImages: options.metadata?.hiDPILegendImages,
       time: options.time,
+      snappingConfig: options.metadata?.snappingConfig,
       timeAttribute: options.metadata?.timeAttribute
     };
 

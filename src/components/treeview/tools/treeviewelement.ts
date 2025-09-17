@@ -3,6 +3,7 @@ import BaseLayer from '../../../models/layers/baselayer';
 import LayerManager from '../../../tools/layers/layermanager';
 import DragManager from './dragmanager';
 import { isTimeAwareLayer, TimeAwareLayer } from '../../../models/layers/timeawarelayer';
+import { isSnappableLayer } from '../../../models/layers/snappablelayer';
 import tippy from 'tippy.js';
 import TimeRestrictionComponent from '../../timerestriction/component';
 import LayerWms from '../../../models/layers/layerwms';
@@ -120,6 +121,11 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
       case 'timeRestriction':
         if (!this.layer.inactive && isTimeAwareLayer(this.layer)) {
           return this.layer.hasTimeRestriction ? activeButtonClasses : buttonClasses;
+        }
+        return 'hidden';
+      case 'snappable':
+        if (!this.layer.inactive && isSnappableLayer(this.layer)) {
+          return this.layer.snapActive ? activeButtonClasses : buttonClasses;
         }
         return 'hidden';
       default:

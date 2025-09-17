@@ -96,9 +96,20 @@
       </button>
     </div>
 
+    <!-- Snap -->
+    <div>
+      <button
+        id="snap"
+        class="${this.getButtonClass('snappable')}"
+        onclick="${() => this.toggleSnap()}"
+        tip="Snap to layer features">
+        <img alt="Enable snapping" src="icons/snapping.svg" />
+      </button>
+    </div>
+
     <!-- Legend icon -->
     <button
-      class="${this.hasLegend ? 'gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
+      class="${this.hasLegend ? (this.layer.isLegendExpanded ? 'gg-icon-button gg-small tool' : 'gg-icon-button gg-small gg-opacity tool') : 'hidden'}"
       tip="Toggle legend"
       onclick="${() => this.toggleLegend()}">
       <img alt="Toggle legend" src="icons/legend.svg" loading="lazy" />
@@ -108,7 +119,7 @@
     <button
       class="${this.layer.hasMetadata ? 'metadata gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
       onclick="${() => this.showMetadata()}">
-      <img alt="Remove theme" src="icons/info.svg" />
+      <img alt="Metadata" src="icons/info.svg" />
     </button>
 
     <!-- Drag -->
