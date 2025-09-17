@@ -22,6 +22,7 @@ abstract class Layer extends BaseLayer {
   public opacity: number;
   public protected: boolean;
   public swiped: 'left' | 'right' | 'no' = 'no';
+  public isLegendExpanded: boolean = false;
 
   declare parent: GroupLayer;
 

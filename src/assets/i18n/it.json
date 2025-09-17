@@ -354,6 +354,8 @@
     "sitn2023c": "LiDAR 2023c",
     "sitn2025": "LiDAR 2025",
     "Small": "Piccolo",
+    "Snap": "Snap",
+    "Snap to layer features": "Abilita l'aggancio su questo layer",
     "Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.": "Alcuni livelli non possono essere aggiunti all'albero dei livelli. Questo accade perché non si dispone dei diritti necessari o perché questo livello non esiste più.",
     "Source": "Fonte",
     "Source Type": "Tipo di layer",
