@@ -1,3 +1,4 @@
+import ConfigManager from '../../tools/configuration/configmanager';
 import { GMFBackgroundLayer } from '../gmf';
 import BaseLayer from '../layers/baselayer';
 import LayerVectorTiles from '../layers/layervectortiles';
@@ -16,13 +17,16 @@ class Basemap {
     this.thumbnail = elem.metadata?.thumbnail ?? 'images/basemap_default.png';
   }
 
-  get projection(): string | null {
+  get projection(): string {
     if (this.layersList[0] instanceof LayerVectorTiles) {
+      // Vector-tiles are only available in specific projection
       if (this.layersList[0].projection) {
         return this.layersList[0].projection;
       }
     }
-    return null;
+
+    // For all other cases, we set the default map projection
+    return ConfigManager.getInstance().Config.map.srid;
   }
 }
 

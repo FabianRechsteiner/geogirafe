@@ -285,12 +285,23 @@ class ThemesManager extends GirafeSingleton {
 
       case 'VectorTiles': {
         const options = {
-          projection: elem.projection,
+          // TODO REG : At the moment projection is hardcoded to EPSG:3857 because we don't have any other usecase.
+          // But the supported EPSG should be configurable in the backend
+          projection: 'EPSG:3857',
           isDefaultChecked: elem.metadata?.isChecked,
           disclaimer: elem.metadata?.disclaimer,
-          opacity: 1 // TODO REG : Set default opacity
+          opacity: 1
         };
-        layer = new LayerVectorTiles(elem.id, elem.name, order.value, elem.style!, elem.source!, options);
+        if (!elem.style || !elem.metadata?.layerName) {
+          // Layer is invalid : it must contain style URL and layername
+          ErrorManager.getInstance().pushMessage(
+            uuidv4(),
+            `VectorTiles-Layer ${elem.name} (id=${elem.id}) is invalid and cannot be created: missing Style Url or layername.`,
+            'error'
+          );
+        } else {
+          layer = new LayerVectorTiles(elem.id, elem.name, order.value, elem.style, elem.metadata.layerName, options);
+        }
         break;
       }
 

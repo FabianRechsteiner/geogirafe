@@ -9,7 +9,7 @@
     "defaultLanguage": "fr"
   },
   "themes": {
-    "url": "https://map.cartoriviera.ch/themes?background=background&interface=desktop",
+    "url": "https://map.cartoriviera.ch/themes?background=background&interface=geogirafe",
     "defaultTheme": "cadastre"
   },
   "basemaps": {
