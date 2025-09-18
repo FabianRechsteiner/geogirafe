@@ -73,16 +73,12 @@
     </div>
 
     <div class="bottom-button-container-mobile">
-      <button
-        class="switch3d girafe-button-big"
-        onclick="document.geogirafe.state.globe.display = document.geogirafe.state.globe.display==='3D'?'2D':'3D'">
-        <img alt="switch-icon" src="icons/globe.svg" />
-      </button>
       <girafe-align-north-button-mobile></girafe-align-north-button-mobile>
 
       <!-- <girafe-offline></girafe-offline> -->
       <girafe-geolocation-mobile></girafe-geolocation-mobile>
       <girafe-display-selector-button-mobile></girafe-display-selector-button-mobile>
+      <girafe-display-menu-button-mobile></girafe-display-menu-button-mobile>
     </div>
 
     <girafe-search></girafe-search>
@@ -93,6 +89,11 @@
     <girafe-swipe-up-panel>
       <girafe-basemap-theme-layer-selector-mobile slot="main"></girafe-basemap-theme-layer-selector-mobile>
       <girafe-selection-panel-mobile slot="main"></girafe-selection-panel-mobile>
+
+      <!-- Mobile menu and its content -->
+      <girafe-menu-mobile slot="main">
+        <girafe-menu-mobile-3d-button slot="mobile-menu-content"></girafe-menu-mobile-3d-button>
+      </girafe-menu-mobile>
     </girafe-swipe-up-panel>
   </body>
 </html>

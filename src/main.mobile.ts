@@ -17,6 +17,9 @@ import SelectionPanelMobile from './components/selectionpanel-mobile/component';
 import GeolocationMobile from './components/geolocation-mobile/component';
 import InfoboxComponent from './components/infobox/component';
 import StateManager from './tools/state/statemanager';
+import DisplayMenuButtonMobile from './components/displaymenubutton-mobile/component';
+import MenuMobile from './components/menu-mobile/component';
+import MenuMobile3dButton from './components/menu-buttons-mobile/MenuMobile3dButton';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
@@ -72,10 +75,13 @@ initialize().then(() => {
   customElements.define('girafe-layer-list-mobile', LayerListMobile);
   customElements.define('girafe-basemap-theme-layer-selector-mobile', BasemapThemeLayerSelectorMobile);
   customElements.define('girafe-display-selector-button-mobile', DisplaySelectorButtonMobile);
+  customElements.define('girafe-display-menu-button-mobile', DisplayMenuButtonMobile);
+  customElements.define('girafe-menu-mobile', MenuMobile);
   customElements.define('girafe-swipe-up-panel', SwipeUpPanelMobile);
   customElements.define('girafe-align-north-button-mobile', AlignNorthButtonMobile);
   customElements.define('girafe-selection-panel-mobile', SelectionPanelMobile);
   customElements.define('girafe-geolocation-mobile', GeolocationMobile);
+  customElements.define('girafe-menu-mobile-3d-button', MenuMobile3dButton);
 
   // Remove the splash-screen
   splash.end();

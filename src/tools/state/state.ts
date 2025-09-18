@@ -11,7 +11,7 @@ import type { GgUserInteractionListener } from './userInteractionManager';
 import type CustomTheme from '../../models/customtheme';
 import { systemIsInDarkMode } from '../utils/utils';
 import ObjectSelection from './objectselection';
-import Theme from '../../models/theme';
+import type Theme from '../../models/theme';
 
 type GraphicalInterface = {
   isMobile: boolean;
@@ -33,7 +33,7 @@ type GraphicalInterface = {
   darkMapMode: boolean;
   darkFrontendMode: boolean;
   swipeupPanelMode: SwipeupPanelMode;
-  swipeupPanelContent: 'selector' | 'features' | null;
+  swipeupPanelContent: 'selector' | 'features' | 'menu' | null;
 };
 
 export type ThemesConfig = {
