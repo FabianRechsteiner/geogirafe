@@ -10,9 +10,7 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   private changeBasemap(basemap: Basemap) {
-    if (basemap.projection) {
-      this.state.projection = basemap.projection;
-    }
+    this.state.projection = basemap.projection;
     this.state.activeBasemap = basemap;
     this.refreshRender();
   }
