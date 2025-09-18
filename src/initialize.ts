@@ -16,6 +16,7 @@ import PluginManager from './tools/auth/pluginmanager';
 import PermalinkManager from './tools/url/permalinkmanager';
 import State from './tools/state/state';
 import ApplicationLifeCycleManager from './tools/app/lifecyclemanager';
+import SnapManager from './tools/layers/snapmanager';
 
 // Extend default Document and Window interfaces
 declare global {
@@ -140,6 +141,7 @@ export async function initialize() {
   OrderingManager.getInstance();
   PluginManager.getInstance();
   PermalinkManager.getInstance();
+  SnapManager.getInstance();
 
   // Add the state to document, so that it will be accessible everywhere
   document.geogirafe = {

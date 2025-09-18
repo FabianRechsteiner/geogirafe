@@ -172,7 +172,6 @@ export default class OlDrawing {
     // Activate snapping on all existing drawing shapes
     this.snap = new Snap({ source: this.drawingSource, pixelTolerance: this.map.pixelTolerance });
     this.map.olMap.addInteraction(this.snap);
-    this.state.snapActive = true;
   }
 
   /**
@@ -208,8 +207,12 @@ export default class OlDrawing {
   }
 
   addEditInteractions() {
-    if (!this.modify) this.addModifyInteraction();
-    if (!this.editContextMenu) this.addEditContextMenu();
+    if (!this.modify) {
+      this.addModifyInteraction();
+    }
+    if (!this.editContextMenu) {
+      this.addEditContextMenu();
+    }
     // Always recreate snap interaction to get snapping behavior on latest features
     this.addSnapInteraction();
   }
@@ -217,7 +220,9 @@ export default class OlDrawing {
   removeEditInteractions() {
     this.removeModifyInteraction();
     this.removeEditContextMenu();
-    if (!this.draw) this.removeSnapInteraction();
+    if (!this.draw) {
+      this.removeSnapInteraction();
+    }
   }
 
   /**
@@ -671,7 +676,6 @@ export default class OlDrawing {
   private removeDrawInteraction() {
     if (this.draw) {
       this.map.olMap.removeInteraction(this.draw);
-      this.state.snapActive = false;
       this.draw = null;
     }
     // Reactivate feature selection by unregistering 'map.select'
@@ -690,7 +694,6 @@ export default class OlDrawing {
       this.map.olMap.removeInteraction(this.snap);
       this.snap = null;
     }
-    this.state.snapActive = false;
   }
 
   private removeEditContextMenu() {

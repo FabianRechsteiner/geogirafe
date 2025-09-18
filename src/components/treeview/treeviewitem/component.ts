@@ -9,7 +9,6 @@ import LayerWmts from '../../../models/layers/layerwmts';
 import Baselayer from '../../../models/layers/baselayer';
 import TreeViewElement from '../tools/treeviewelement';
 import { isSnappableLayer } from '../../../models/layers/snappablelayer';
-import SnapManager from '../../../tools/layers/snapmanager';
 
 class TreeViewItemComponent extends TreeViewElement {
   templateUrl = './template.html';
@@ -46,7 +45,6 @@ class TreeViewItemComponent extends TreeViewElement {
   constructor(layer: Layer) {
     super(layer, 'treeviewitem');
     this.layer = layer;
-    SnapManager.getInstance();
   }
 
   render() {

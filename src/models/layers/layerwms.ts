@@ -71,7 +71,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
 
   public timeOptions?: ITimeOptions;
   public snapOptions?: ISnappingConfig;
-  public snapActive?: boolean;
+  public snapActive: boolean;
   public timeRestriction?: string;
   public timeAttribute?: string;
 
@@ -99,9 +99,10 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     this.queryLayers = opts?.queryLayers;
     this.queryLayersRanges = opts?.queryLayersRanges || {};
     this.timeOptions = opts?.time;
-    this.snapOptions = opts?.snappingConfig;
     this.timeAttribute = opts?.timeAttribute;
     this.editable = opts?.editable;
+    this.snapOptions = opts?.snappingConfig;
+    this.snapActive = this.snapOptions !== undefined;
 
     if (this.editable && (!this.ogcServer.oapifSupport || this.ogcServer.urlOapif?.length === 0)) {
       this.hasError = true;

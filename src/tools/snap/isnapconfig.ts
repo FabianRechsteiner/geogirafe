@@ -1,6 +1,5 @@
 interface ISnappingConfig {
   tolerance?: number;
-  activated?: boolean;
   edge?: boolean;
   vertex?: boolean;
 }
