@@ -195,7 +195,6 @@ class WmtsManager {
   selectFeatures(extent: number[]) {
     const selectionParams: SelectionParam[] = [];
     const allWmtsLayers = [...Object.values(this.basemapLayers), ...Object.values(this.wmtsLayers)];
-    // TODO: Pushing 1 selectionParam per WMTS layer: efficient/meaningful? smells bad
     allWmtsLayers.forEach((wmtsItem) => {
       const wmtsLayer = wmtsItem.layerWmts;
       const queryLayers = wmtsLayer.wmsLayers ?? wmtsLayer.queryLayers;

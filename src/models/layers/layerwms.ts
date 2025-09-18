@@ -103,11 +103,6 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     this.timeAttribute = opts?.timeAttribute;
     this.editable = opts?.editable;
 
-    if (this.queryable && (!this.ogcServer.wfsSupport || this.ogcServer.urlWfs?.length === 0)) {
-      this.hasError = true;
-      this.errorMessage = 'This layer is defined as queryable but no Url for Wfs has been defined.';
-      this.queryable = false;
-    }
     if (this.editable && (!this.ogcServer.oapifSupport || this.ogcServer.urlOapif?.length === 0)) {
       this.hasError = true;
       this.errorMessage = 'This layer is defined as editable but no Url for OgcApiFeatures service has been defined.';
@@ -197,8 +192,17 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     return this.ogcServer.uniqueWmsQueryId;
   }
 
-  get wfsQueryable() {
-    return this.queryable && Boolean(this.ogcServer?.urlWfs && this.queryLayers);
+  get wfsQueryable(): boolean {
+    return (
+      this.queryable &&
+      this.ogcServer.wfsSupport &&
+      this.ogcServer.urlWfs !== undefined &&
+      this.queryLayers !== undefined
+    );
+  }
+
+  get wmsQueryableOnly(): boolean {
+    return this.queryable && !this.ogcServer.wfsSupport;
   }
 
   private static isGMFTreeItem(options: GMFTreeItem | LayerWmsOptions): options is GMFTreeItem {

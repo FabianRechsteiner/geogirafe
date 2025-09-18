@@ -3,7 +3,6 @@ import ImageWMS from 'ol/source/ImageWMS';
 import WMSCapabilities from 'ol/format/WMSCapabilities.js';
 import WMSGetFeatureInfo from 'ol/format/WMSGetFeatureInfo';
 import { Map } from 'ol';
-
 import LayerWms from '../../models/layers/layerwms';
 import StateManager from '../state/statemanager';
 import SelectionParam from '../../models/selectionparam';
@@ -298,8 +297,20 @@ export default abstract class WmsClient {
   }
 
   selectFeatures(extent: number[]) {
+    if (this.layers.length === 0) {
+      return;
+    }
+
     const selectionParams: SelectionParam[] = [];
-    selectionParams.push(new SelectionParam(this.ogcServer, this.layers, this.state.projection, extent, this.olayer));
+    if (this.ogcServer.wfsSupport) {
+      selectionParams.push(new SelectionParam(this.ogcServer, this.layers, this.state.projection, extent, this.olayer));
+    } else {
+      // This will need a WMS GetFeatureInfo.
+      // In this case multiple layers are not allowed, and we have to create 1 selection param per layer
+      for (const layer of this.layers) {
+        selectionParams.push(new SelectionParam(this.ogcServer, [layer], this.state.projection, extent, this.olayer));
+      }
+    }
 
     for (const key in this.independentLayers) {
       const indepLayer = this.independentLayers[key];
@@ -338,8 +349,7 @@ export default abstract class WmsClient {
     this.state.selection.selectionParameters.push(...selectionParams);
   }
 
-  async getFeatureInfo(selectionParam: SelectionParam) {
-    //const promises: Promise<void>[] = [];
+  public async getFeatureInfo(selectionParam: SelectionParam) {
     const urlsAndLayerNames = this.getFeatureInfoUrl(selectionParam);
     const promises = Object.keys(urlsAndLayerNames).map((url) =>
       fetch(url)
@@ -377,7 +387,6 @@ export default abstract class WmsClient {
           }
         );
       if (url !== undefined) {
-        // TODO: urlsAndLayerNames[url] points to the last layer using this URL?? inconsistent
         urlsAndLayerNames[url] = layer.name;
       } else throw new Error(`Unable to construct GetFeatureInfo URL for layer ${layer.name}`);
     });
@@ -392,7 +401,6 @@ export default abstract class WmsClient {
     // Set the feature id with the layer name.
     gmlFeatures.forEach((feature) => {
       if (!feature.getId()) {
-        // TODO: setting id to urlsAndLayerNames[url] sets id to the last layer used for the url in getFeatureInfoUrl()...?
         feature.setId(urlsAndLayerNames[url]);
       }
     });

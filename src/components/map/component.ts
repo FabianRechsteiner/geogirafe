@@ -492,41 +492,50 @@ export default class MapComponent extends GirafeHTMLElement {
     this.state.selection.selectionParameters = [];
     this.state.selection.highlightedFeatures = [];
     // Layers selectable today are WMS, WMTS (with wms layer) and Local files
-    this.wmsManager.selectFeatures(extent);
-    this.wmtsManager.selectFeatures(extent);
-    this.localFileManager.selectFeatures(extent);
+    // Use batch for changes to prevent multiple selection of objects
+    this.stateManager.batchChanges(() => {
+      this.wmsManager.selectFeatures(extent);
+      this.wmtsManager.selectFeatures(extent);
+      this.localFileManager.selectFeatures(extent);
+    });
   }
 
   async onSelectFeatures(selectionParams: SelectionParam[]) {
-    this.state.loading = true;
-
-    // WMS GetFeatureInfo
-    const wmsPromises = selectionParams.map((param) => {
-      const wmsGetFeatureInfoSelectionParam = param.clone((l) => l.queryable && !l.wfsQueryable);
-      const client = this.wmsManager.getClient(wmsGetFeatureInfoSelectionParam._ogcServer);
-      return client.getFeatureInfo(wmsGetFeatureInfoSelectionParam);
-    });
-
-    // WFS GetFeature
-    const wfsPromises = selectionParams.map((param) => {
-      const wfsGetFeatureInfoSelectionParam = param.clone((l) => l.wfsQueryable);
-      const client = WfsManager.getInstance().getClient(wfsGetFeatureInfoSelectionParam._ogcServer);
-      const features = client.getFeature(wfsGetFeatureInfoSelectionParam);
-      return features;
-    });
-
-    const wmsGmlFeatures = (await Promise.all(wmsPromises)).flat();
-    const wfsGmlFeatures = (await Promise.all(wfsPromises)).flat();
-
-    const gmlFeatures = [...wmsGmlFeatures, ...wfsGmlFeatures];
-
-    if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length === 0) {
-      this.state.interface.selectionComponentVisible = false;
-    } else {
-      this.state.selection.selectedFeatures.push(...gmlFeatures);
-      this.state.interface.selectionComponentVisible = true;
+    if (selectionParams.length === 0) {
+      return;
     }
-    this.state.loading = false;
+
+    this.state.loading = true;
+    try {
+      // WMS GetFeatureInfo
+      const wmsPromises = selectionParams.map((param) => {
+        const wmsGetFeatureInfoSelectionParam = param.clone((l) => l.queryable && l.wmsQueryableOnly);
+        const client = this.wmsManager.getClient(wmsGetFeatureInfoSelectionParam._ogcServer);
+        return client.getFeatureInfo(wmsGetFeatureInfoSelectionParam);
+      });
+
+      // WFS GetFeature
+      const wfsPromises = selectionParams.map((param) => {
+        const wfsGetFeatureInfoSelectionParam = param.clone((l) => l.wfsQueryable);
+        const client = WfsManager.getInstance().getClient(wfsGetFeatureInfoSelectionParam._ogcServer);
+        const features = client.getFeature(wfsGetFeatureInfoSelectionParam);
+        return features;
+      });
+
+      const wmsGmlFeatures = (await Promise.all(wmsPromises)).flat();
+      const wfsGmlFeatures = (await Promise.all(wfsPromises)).flat();
+
+      const gmlFeatures = [...wmsGmlFeatures, ...wfsGmlFeatures];
+
+      if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length === 0) {
+        this.state.interface.selectionComponentVisible = false;
+      } else {
+        this.state.selection.selectedFeatures.push(...gmlFeatures);
+        this.state.interface.selectionComponentVisible = true;
+      }
+    } finally {
+      this.state.loading = false;
+    }
   }
 
   connectedCallback() {
