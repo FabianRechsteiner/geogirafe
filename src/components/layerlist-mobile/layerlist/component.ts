@@ -8,7 +8,7 @@ export default class LayerListMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../../styles/common.css', './style.css'];
   public layerList: BaseLayer[] = [];
-  public collapsed = true;
+  public collapsed = false;
   public numberActiveLayer = 0;
 
   constructor() {
