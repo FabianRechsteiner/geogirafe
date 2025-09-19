@@ -29,6 +29,9 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
     this.subscribe(/layers\.layersList\..*\.activeState/, (_oldValue: boolean, _newValue: boolean, group: GroupLayer) =>
       this.refreshRender(group)
     );
+    this.subscribe(/layers\.layersList\..*\.children/, (_oldValue: boolean, _newValue: boolean, group: GroupLayer) =>
+      this.refreshRender(group)
+    );
     this.subscribe(/layers\.layersList\..*\.order/, (_oldValue: number, _newValue: number, layer: ThemeLayer) => {
       this.refreshRender(layer);
       this.refreshRender(layer.parent);
