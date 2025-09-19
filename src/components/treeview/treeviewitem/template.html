@@ -87,25 +87,20 @@
     </button>
 
     <!-- Time restriction -->
-    <div>
-      <button
-        id="timeRestriction"
-        class="${this.getButtonClass('timeRestriction')}"
-        tip="Define time restriction on layer">
-        <img alt="Define time restriction on layer" src="icons/clock.svg" />
-      </button>
-    </div>
+    <button
+      id="timeRestriction"
+      class="${this.getButtonClass('timeRestriction')}"
+      tip="Define time restriction on layer">
+      <img alt="Define time restriction on layer" src="icons/clock.svg" />
+    </button>
 
     <!-- Snap -->
-    <div>
-      <button
-        id="snap"
-        class="${this.getButtonClass('snappable')}"
-        onclick="${() => this.toggleSnap()}"
-        tip="Snap to layer features">
-        <img alt="Enable snapping" src="icons/snapping.svg" />
-      </button>
-    </div>
+    <button
+      class="${this.getButtonClass('snappable')}"
+      onclick="${() => this.toggleSnap()}"
+      tip="Snap to layer features">
+      <img alt="Enable snapping" src="icons/snapping.svg" />
+    </button>
 
     <!-- Legend icon -->
     <button
