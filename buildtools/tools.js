@@ -69,6 +69,13 @@ async function getStyleCode(currentFilename, relativeCssPath) {
   }
 }
 
+async function getHtmlCode(htmlFilePath, styleCode) {
+  let htmlCode = fs.readFileSync(htmlFilePath, 'utf8');
+  htmlCode = await minify.html(htmlCode);
+  htmlCode = `template = () => { return uHtml\`${styleCode}\n${htmlCode}\`; }`;
+  return htmlCode;
+}
+
 export async function inlineTemplate(filename) {
   // Read the file
   const code = fs.readFileSync(filename, 'utf8');
@@ -100,13 +107,12 @@ export async function inlineTemplate(filename) {
     const htmlFound = code.match(htmlRegex);
     const htmlFilePath = path.join(path.dirname(filename), htmlFound[1]);
     try {
-      const htmlFileContent = fs.readFileSync(htmlFilePath, 'utf8');
-      const htmlCode = `template = () => { return uHtml\`${styleCode}\n${htmlFileContent}\`; }`;
+      const htmlCode = await getHtmlCode(htmlFilePath, styleCode);
       magicString.overwrite(htmlFound.index, htmlFound.index + htmlFound[0].length, htmlCode);
 
       // Add missing import (uHtml)
       magicString.prepend(`import { html as uHtml } from 'uhtml';\n`);
-      if (htmlFileContent.includes('uHtmlFor')) {
+      if (htmlCode.includes('uHtmlFor')) {
         // Include uHtmlFor if it is used in the template
         magicString.prepend(`import { htmlFor as uHtmlFor } from 'uhtml/keyed';\n`);
       }

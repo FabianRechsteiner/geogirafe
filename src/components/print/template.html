@@ -64,7 +64,7 @@
         </select>
       </div>
 
-      ${ this.dpis.length < 2 ? null : uHtml`
+      ${ uHtml`
       <div class="option">
         <label for="dpi" class="gg-label">DPI</label>
         <select id="dpi" class="gg-select" onchange="${(evt:Event) => this.onDpiChanged(evt)}">

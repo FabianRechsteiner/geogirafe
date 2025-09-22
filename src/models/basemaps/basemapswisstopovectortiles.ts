@@ -10,7 +10,7 @@ export default class BasemapSwisstopoVectorTiles extends Basemap {
       exclusiveGroup: false,
       isExpanded: false,
       isChecked: false,
-      thumbnail: 'images/basemap_vectortiles.png'
+      thumbnail: 'images/basemap_vectortiles.webp'
     };
 
     super({

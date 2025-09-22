@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 
 import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
 import HtmlRebuildPlugin from './buildtools/vite-restart-plugin';
+import { createHtmlPlugin } from 'vite-plugin-html';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import dns from 'dns';
 
@@ -108,7 +109,10 @@ export default defineConfig(({ command }) => {
         ]
       }),
       InlineTemplatesPlugin(),
-      HtmlRebuildPlugin()
+      HtmlRebuildPlugin(),
+      createHtmlPlugin({
+        minify: true
+      })
     ],
     define: {
       // Define relative base path in cesium for loading assets

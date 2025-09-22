@@ -4,6 +4,11 @@ import InfoboxComponent from './components/infobox/component';
 import MapComponent from './components/map/component';
 import { initialize, SplashScreen } from './initialize';
 
+import './styles/variables.css';
+import './styles/splash.css';
+import './styles/common.css';
+import './styles/iframe.css';
+
 // Display the splash-screen
 const splash = new SplashScreen();
 splash.begin();
