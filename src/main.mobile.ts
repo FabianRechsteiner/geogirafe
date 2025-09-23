@@ -19,7 +19,14 @@ import InfoboxComponent from './components/infobox/component';
 import StateManager from './tools/state/statemanager';
 import DisplayMenuButtonMobile from './components/displaymenubutton-mobile/component';
 import MenuMobile from './components/menu-mobile/component';
+import { DrawingState } from './components/drawing/drawingFeature';
+import DrawingSerializer from './components/drawing/drawingSerializer';
+import StateSerializer from './tools/share/stateserializer';
+import DrawingContainerMobile from './components/drawing-container-mobile/component';
+import DrawingComponentMobile from './components/drawing/component-mobile';
 import MenuMobile3dButton from './components/menu-buttons-mobile/MenuMobile3dButton';
+import MenuMobileDrawingButton from './components/menu-buttons-mobile/MenuMobileDrawingButton';
+import ModalsComponent from './components/modals/component';
 
 import './styles/splash.css';
 import './styles/common.mobile.css';
@@ -29,6 +36,10 @@ import './styles/mobile.css';
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
   window.location.href = 'index.html';
 }
+
+// Add custom state and serializers (need to be done early, because the shared state will need them)
+StateManager.getInstance().state.extendedState.drawing = new DrawingState();
+StateSerializer.getInstance().addSerializer(DrawingState, new DrawingSerializer());
 
 // Display the splash-screen
 const splash = new SplashScreen();
@@ -81,11 +92,15 @@ initialize().then(() => {
   customElements.define('girafe-display-selector-button-mobile', DisplaySelectorButtonMobile);
   customElements.define('girafe-display-menu-button-mobile', DisplayMenuButtonMobile);
   customElements.define('girafe-menu-mobile', MenuMobile);
+  customElements.define('girafe-modals', ModalsComponent);
   customElements.define('girafe-swipe-up-panel', SwipeUpPanelMobile);
   customElements.define('girafe-align-north-button-mobile', AlignNorthButtonMobile);
   customElements.define('girafe-selection-panel-mobile', SelectionPanelMobile);
   customElements.define('girafe-geolocation-mobile', GeolocationMobile);
+  customElements.define('girafe-drawing-mobile', DrawingComponentMobile);
+  customElements.define('girafe-drawing-container-mobile', DrawingContainerMobile);
   customElements.define('girafe-menu-mobile-3d-button', MenuMobile3dButton);
+  customElements.define('girafe-menu-mobile-drawing-button', MenuMobileDrawingButton);
 
   // Remove the splash-screen
   splash.end();

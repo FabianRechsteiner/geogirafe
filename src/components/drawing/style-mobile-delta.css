@@ -1,0 +1,101 @@
+button.selected {
+  border: solid 1px #54a4ff !important;
+  background-color: #daebff !important;
+}
+
+#toolbar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#toolbar > button {
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 8px;
+  filter: drop-shadow(0px 4px 7px #0004382c);
+  background-color: #fff;
+}
+
+#toolbar > button > img {
+  width: 100%;
+  opacity: 0.7;
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.gg-icon-button:hover {
+  background-color: #0000;
+}
+
+#panel {
+  font-size: 1.5em;
+}
+
+#drawingList {
+  gap: 10px;
+}
+
+#drawingList .girafe {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  filter: drop-shadow(0px 4px 7px #0004381c);
+  border: none;
+}
+
+#optionsTitle {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  width: 100%;
+  border-radius: 8px;
+  padding: 10px;
+  filter: drop-shadow(0px 4px 7px #0004381c);
+  color: #4553ff;
+}
+
+.gg-input:hover {
+  background-color: #fff;
+  filter: drop-shadow(0px 4px 7px #4c58ff70);
+}
+
+#optionsColorLine {
+  display: flex;
+  flex-direction: column;
+}
+
+#optionsColorLine > div {
+  width: 100%;
+  text-align: end;
+}
+
+.selectable-label {
+  font-size: 1.3em;
+}
+
+#optionsNameFontSize,
+#optionsMeasuresFontSize,
+#optionsStrokeWidth,
+#line-style,
+#arrow-style,
+#arrow-position {
+  font-size: 1em;
+  text-align: right;
+  padding: 1px;
+  border: 1px solid #e3e3e3;
+}
+
+/* Adds an offset to the vanilla color picker so that it's better aligned with the div showing the color */
+.popup.popup_top {
+  translate: 15px -15px;
+}
+
+#optionsExportLine {
+  display: none;
+}

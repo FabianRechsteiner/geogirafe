@@ -75,8 +75,8 @@ export default class DrawingComponent extends GirafeHTMLElement {
   //  the drawing tool. It possibly will be part of advanced drawing/editing tools.
   batchCreateMode: boolean = false;
 
-  constructor() {
-    super('drawing');
+  constructor(name = 'drawing') {
+    super(name);
     if (!this.state.extendedState.drawing) {
       throw new Error('ExtendedState has to be defined in main typescript file.');
     }
@@ -110,7 +110,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
     if (!this.renderedOnce) {
       this.renderedOnce = true;
       this.buttons.forEach((b) => {
-        this.getById(b.id).addEventListener('click', () => {
+        this.getById(b.id).addEventListener('pointerup', () => {
           this.setTool(b.tool);
           if (b.tool) {
             this.deselectAllFeatures();
@@ -186,7 +186,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   addColorPicker(id: string, set: (c: Color) => unknown, get: () => string) {
     const parent = this.getById(id);
-    const picker = new GirafeColorPicker({ parent: parent, popup: 'top' }, true);
+    const picker = new GirafeColorPicker({ parent: parent, popup: 'top' }, !this.state.interface.isMobile);
     const update = (c: Color) => {
       set(c);
       parent.style.backgroundColor = c.hex;

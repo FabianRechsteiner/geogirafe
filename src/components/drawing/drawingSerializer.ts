@@ -1,6 +1,6 @@
-import { IBrainSerializer } from '../../tools/state/brain/serialize';
+import type { IBrainSerializer } from '../../tools/state/brain/serialize';
 import StateManager from '../../tools/state/statemanager';
-import DrawingFeature, { DrawingState, SerializedFeature } from './drawingFeature';
+import DrawingFeature, { DrawingState, type SerializedFeature } from './drawingFeature';
 
 export default class DrawingSerializer implements IBrainSerializer<DrawingState> {
   private readonly stateManager: StateManager;

@@ -124,6 +124,19 @@ export default class OlDrawing {
       newTool === null ? this.removeDrawInteraction() : this.addDrawInteraction(newTool)
     );
 
+    // Could be useful logic if we decide that the mobile UI should rely use a dedicated button
+    // to remove a selected vetex from a polygon/line (rather than using a longpress context menu)
+    // this.map.olMap.on("click", (e) => {
+    //   if (this.state.interface.swipeupPanelContent === "drawing" &&
+    //     this.modify?.getActive() &&
+    //     this.modifiableFeatures.getArray().length > 0
+    //   ) {
+    //     const mapCoordinate = this.map.olMap.getCoordinateFromPixel(e.pixel);
+    //     const hasEditableVertex = this.hasEditableVertexAtCoordinate(mapCoordinate)
+    //     console.log("Map Coordinate:", mapCoordinate, e.pixel, hasEditableVertex);
+    //   }
+    // })
+
     this.map.subscribe(/extendedState.drawing.features.*\.selected/, (_old, _new) => this.updateModifiableFeatures());
 
     // OlCesium duplicates drawn shapes when 3D view is open if its eventListener is not removed

@@ -1,12 +1,11 @@
 import ConfigManager from '../../tools/configuration/configmanager';
 import StateManager from '../../tools/state/statemanager';
-import ShapeNamer from './shapeNamer';
 import { v4 as uuidv4 } from 'uuid';
 import { Fill, RegularShape, Stroke, Style } from 'ol/style';
 import { toRadians } from 'ol/math';
-import { IBrainSerializable } from '../../tools/state/brain/decorators';
-import { Circle as CircleGeom, Geometry } from 'ol/geom';
-import Feature from 'ol/Feature';
+import type { IBrainSerializable } from '../../tools/state/brain/decorators';
+import type { Circle as CircleGeom, Geometry } from 'ol/geom';
+import type Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 
 export enum DrawingShape {
@@ -18,6 +17,33 @@ export enum DrawingShape {
   Disk,
   FreehandPolyline,
   FreehandPolygon
+}
+
+/**
+ * Finds an name composed of the shape type and a number.
+ * The number starts from how many shape of the same type type are already in the state +1.
+ * Then checks if such candidate name already exists and increments if so.
+ * @param geometryTypename
+ * @returns
+ */
+export function getDefaultName(geometryTypename: string): string {
+  const shapeTypeId = DrawingShape[geometryTypename as keyof typeof DrawingShape];
+  const drawingFeaturesSameType = (
+    StateManager.getInstance().state.extendedState.drawing as DrawingState
+  ).features.filter((feat) => feat.type === shapeTypeId);
+
+  const existingNames = drawingFeaturesSameType.map((f) => f.name.toLowerCase().trim());
+  let counter = existingNames.length + 1;
+
+  while (true) {
+    const nameCandidate = `${geometryTypename} ${counter}`;
+
+    if (existingNames.includes(nameCandidate.toLowerCase())) {
+      counter++;
+    } else {
+      return nameCandidate;
+    }
+  }
 }
 
 export type ArrowStyle = 'none' | 'start' | 'end' | 'both';
@@ -51,7 +77,7 @@ export type SerializedFeature = {
 };
 
 export default class DrawingFeature {
-  private _tool: DrawingShape;
+  private readonly _tool: DrawingShape;
   private _name: string;
   private _nameColor: string;
   private _strokeColor: string;
@@ -64,9 +90,9 @@ export default class DrawingFeature {
   private _measureFontSize: number;
   private _measureColor: string;
   private _font: string;
-  private _displayName: boolean = true;
-  private _displayMeasure: boolean = true;
-  private _selected: boolean = false;
+  private _displayName = true;
+  private _displayMeasure = true;
+  private _selected = false;
 
   geojson: object;
   id: string = uuidv4();
@@ -75,7 +101,7 @@ export default class DrawingFeature {
   constructor(tool: DrawingShape, geojson: object = {}, name: string | null = null) {
     const defaultConfig = ConfigManager.getInstance().Config.drawing;
     this._tool = tool;
-    this._name = name == null ? ShapeNamer.getRandomName(DrawingShape[tool]) : name;
+    this._name = name ?? getDefaultName(DrawingShape[tool]);
     this._strokeColor = defaultConfig.defaultStrokeColor;
     this._strokeWidth = defaultConfig.defaultStrokeWidth;
     this._fillColor = defaultConfig.defaultFillColor;
@@ -241,38 +267,37 @@ export default class DrawingFeature {
   getLengthText(length: number) {
     if (this.displayMeasure) {
       return length > 100 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m';
-    } else {
-      return '';
     }
+    return '';
   }
 
   getAreaText(area: number) {
     if (this.displayMeasure) {
       return area > 10000 ? (area / 1000000).toFixed(2) + ' km²' : area.toFixed(2) + ' m²';
-    } else {
-      return '';
     }
+    return '';
   }
 
   getCoordText(coord: number[]) {
     if (!this.displayMeasure) {
       return '';
-    } else if (coord.length > 2) {
-      return 'E ' + coord[0].toFixed(2) + '\nN ' + coord[1].toFixed(2) + '\nH ' + coord[2].toFixed(2);
-    } else {
-      return 'E ' + coord[0].toFixed(2) + '\nN ' + coord[1].toFixed(2);
     }
+
+    if (coord.length > 2) {
+      return 'E ' + coord[0].toFixed(2) + '\nN ' + coord[1].toFixed(2) + '\nH ' + coord[2].toFixed(2);
+    }
+    return 'E ' + coord[0].toFixed(2) + '\nN ' + coord[1].toFixed(2);
   }
 
   isPointOrPolyline() {
     return (
-      this.type == DrawingShape.Point ||
-      this.type == DrawingShape.Polyline ||
-      this.type == DrawingShape.FreehandPolyline
+      this.type === DrawingShape.Point ||
+      this.type === DrawingShape.Polyline ||
+      this.type === DrawingShape.FreehandPolyline
     );
   }
 
-  getVertexStyle(activeNode: boolean = false): Style {
+  getVertexStyle(activeNode = false): Style {
     const defaultConfig = ConfigManager.getInstance().Config.drawing;
     return new Style({
       zIndex: 1002,
@@ -293,6 +318,8 @@ export default class DrawingFeature {
   }
 
   static deserialize(serializedFeature: SerializedFeature) {
+    console.log(serializedFeature);
+
     const newFeature = new DrawingFeature(serializedFeature.t, serializedFeature.g, serializedFeature.n);
     newFeature.strokeColor = serializedFeature.sc;
     newFeature.strokeWidth = serializedFeature.sw;
@@ -313,7 +340,7 @@ export default class DrawingFeature {
     return newFeature;
   }
 
-  static circleToPolygon(center: number[], radius: number, nbEdges: number = 300) {
+  static circleToPolygon(center: number[], radius: number, nbEdges = 300) {
     const positions: number[][] = [];
     for (let i = 0; i < 2 * Math.PI; i += (2 * Math.PI) / nbEdges) {
       positions.push([center[0] + radius * Math.cos(i), center[1] + radius * Math.sin(i)]);
@@ -322,7 +349,7 @@ export default class DrawingFeature {
   }
 
   static geojsonFromOlFeature(olFeature: Feature<Geometry>, shapeType: DrawingShape): object {
-    if (shapeType == DrawingShape.Disk) {
+    if (shapeType === DrawingShape.Disk) {
       const disk = olFeature.getGeometry()! as CircleGeom;
       return {
         type: 'Feature',
@@ -332,8 +359,7 @@ export default class DrawingFeature {
           radius: disk.getRadius()
         }
       };
-    } else {
-      return JSON.parse(new GeoJSON().writeFeature(olFeature));
     }
+    return JSON.parse(new GeoJSON().writeFeature(olFeature));
   }
 }

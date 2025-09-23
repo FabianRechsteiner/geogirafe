@@ -113,3 +113,7 @@ girafe-infobox {
   margin: auto;
   width: fit-content;
 }
+
+#color-picker-container {
+  position: absolute;
+}
