@@ -90,11 +90,14 @@ sonarcloud-check:
       when: on_success
     - when: never
 
+  variables:
+    SONAR_VERSION: '11'
+
   image:
-    name: sonarsource/sonar-scanner-cli:5
+    name: sonarsource/sonar-scanner-cli:${SONAR_VERSION}
     entrypoint: ['']
   cache:
-    key: '${CI_JOB_NAME}'
+    key: '${CI_JOB_NAME}_v${SONAR_VERSION}'
     paths:
       - .sonar/cache
   script:
