@@ -14,7 +14,7 @@ class Basemap {
   constructor(elem: GMFBackgroundLayer) {
     this.id = elem.id;
     this.name = elem.name;
-    this.thumbnail = elem.metadata?.thumbnail ?? 'images/basemap_default.png';
+    this.thumbnail = elem.metadata?.thumbnail ?? 'images/basemap_default.webp';
   }
 
   get projection(): string {

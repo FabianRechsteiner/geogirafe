@@ -14,7 +14,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   }
 
   render() {
-    this.openDirection = this.hasAttribute('open') ? (this.getAttribute('open') as OpenDirection) : 'bottom';
+    this.openDirection = this.hasAttribute('direction') ? (this.getAttribute('direction') as OpenDirection) : 'bottom';
     super.render();
   }
 

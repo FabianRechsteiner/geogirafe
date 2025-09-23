@@ -21,6 +21,10 @@ import DisplayMenuButtonMobile from './components/displaymenubutton-mobile/compo
 import MenuMobile from './components/menu-mobile/component';
 import MenuMobile3dButton from './components/menu-buttons-mobile/MenuMobile3dButton';
 
+import './styles/splash.css';
+import './styles/common.mobile.css';
+import './styles/mobile.css';
+
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
   window.location.href = 'index.html';

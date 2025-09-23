@@ -10,7 +10,7 @@ export default class BasemapOsm extends Basemap {
       exclusiveGroup: false,
       isExpanded: false,
       isChecked: false,
-      thumbnail: 'images/basemap_osm.png'
+      thumbnail: 'images/basemap_osm.webp'
     };
 
     super({ id: LayerConsts.LayerOsmId, name: 'OpenStreetMap', metadata: { ...basemapMetadata } });
