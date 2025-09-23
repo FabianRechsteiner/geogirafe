@@ -165,7 +165,12 @@ fieldset.field-wrapper {
   margin: auto;
 }
 #optionsColorLine {
-  grid-template-columns: 4fr 1fr 4fr 1fr;
+  display: flex;
+}
+#optionsColorLine > div {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 #optionsLineLines {
   grid-template-columns: 3fr 4em 1fr auto;

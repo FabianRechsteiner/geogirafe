@@ -106,7 +106,11 @@ export class ContextMenu {
     }
     evt.preventDefault();
 
-    const mapCoordinate = this.map.getCoordinateFromPixel([evt.offsetX, evt.offsetY]);
+    const mapCoordinate = this.map.getCoordinateFromPixel([
+      // Pixel coordinates musbe in device independant pixels ("dips")
+      evt.offsetX / window.devicePixelRatio,
+      evt.offsetY / window.devicePixelRatio
+    ]);
 
     if (openCondition(evt, mapCoordinate)) {
       this.openMenu(mapCoordinate);

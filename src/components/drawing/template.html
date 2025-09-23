@@ -147,15 +147,19 @@
       <hr />
       <div id="optionsColor">
         <div id="optionsColorLine">
-          <span class="text-end" i18n="Stroke color">Stroke color</span>
-          <button class="icon colorPicker" id="strokePicker"></button>
-          <span
-            class="${this.isFillColorEnabled()?'text-end':'text-end disabled'}"
-            id="fillPickerSpan"
-            i18n="Fill color"
-            >Fill color</span
-          >
-          <button class="icon colorPicker" disabled="${!this.isFillColorEnabled()}" id="fillPicker"></button>
+          <div>
+            <span class="text-end" i18n="Stroke color">Stroke color</span>
+            <button class="icon colorPicker" id="strokePicker"></button>
+          </div>
+          <div>
+            <span
+              class="${this.isFillColorEnabled()?'text-end':'text-end disabled'}"
+              id="fillPickerSpan"
+              i18n="Fill color"
+              >Fill color</span
+            >
+            <button class="icon colorPicker" disabled="${!this.isFillColorEnabled()}" id="fillPicker"></button>
+          </div>
         </div>
       </div>
       <hr />

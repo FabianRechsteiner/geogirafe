@@ -33,6 +33,7 @@
   </head>
 
   <body>
+    <div id="color-picker-container"></div>
     <div id="splash-screen">
       <svg
         id="Logo_Geogirafe_vertical_black"
@@ -78,6 +79,7 @@
     </div>
 
     <girafe-search></girafe-search>
+    <girafe-modals></girafe-modals>
     <div id="content">
       <girafe-map></girafe-map>
       <girafe-infobox></girafe-infobox>
@@ -85,10 +87,12 @@
     <girafe-swipe-up-panel>
       <girafe-basemap-theme-layer-selector-mobile slot="main"></girafe-basemap-theme-layer-selector-mobile>
       <girafe-selection-panel-mobile slot="main"></girafe-selection-panel-mobile>
+      <girafe-drawing-container-mobile slot="main"></girafe-drawing-container-mobile>
 
       <!-- Mobile menu and its content -->
       <girafe-menu-mobile slot="main">
         <girafe-menu-mobile-3d-button slot="mobile-menu-content"></girafe-menu-mobile-3d-button>
+        <girafe-menu-mobile-drawing-button slot="mobile-menu-content"></girafe-menu-mobile-drawing-button>
       </girafe-menu-mobile>
     </girafe-swipe-up-panel>
   </body>
