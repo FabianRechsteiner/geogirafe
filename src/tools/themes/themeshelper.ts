@@ -239,9 +239,9 @@ export default class ThemesHelper extends GirafeSingleton {
 
   private addLayerBaseFromUrl(name: string, type: 'layer' | 'group'): boolean {
     let added = false;
-    let activate = false;
+    let activate = true;
     if (name.startsWith('!')) {
-      activate = true;
+      activate = false;
       name = name.substring(1);
     }
     const layerOrGroup = type === 'layer' ? this.findLayerByName(name) : this.findGroupByName(name);
