@@ -209,3 +209,16 @@ export class SplashScreen {
     }
   }
 }
+
+export function redirectTo(page: string) {
+  const currentUrl = new URL(globalThis.location.href);
+  const mobileUrl = new URL(page, globalThis.location.origin);
+
+  const pathParts = currentUrl.pathname.split('/');
+  pathParts[pathParts.length - 1] = page;
+  mobileUrl.pathname = pathParts.join('/');
+
+  mobileUrl.search = currentUrl.search;
+  mobileUrl.hash = currentUrl.hash;
+  globalThis.location.href = mobileUrl.toString();
+}

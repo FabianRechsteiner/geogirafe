@@ -17,7 +17,6 @@
 
 .treeview-list,
 .treeview-no-data {
-  padding-top: 0.5rem;
   overflow-y: auto;
   overflow-x: hidden;
   flex-grow: 1;

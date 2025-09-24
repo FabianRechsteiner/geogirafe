@@ -2,7 +2,7 @@ import OfflineManager from './tools/offline/offlinemanager';
 import MapComponent from './components/map/component';
 import MobileSearchComponent from './components/search-mobile/component';
 import OfflineComponent from './components/offline/component';
-import { initialize, SplashScreen } from './initialize';
+import { initialize, redirectTo, SplashScreen } from './initialize';
 import SwipeUpPanelMobile from './components/swipe-up-panel-mobile/component';
 import LayerListMobile from './components/layerlist-mobile/layerlist/component';
 import LayerListItemMobile from './components/layerlist-mobile/layerlistitem/component';
@@ -28,13 +28,9 @@ import MenuMobile3dButton from './components/menu-buttons-mobile/MenuMobile3dBut
 import MenuMobileDrawingButton from './components/menu-buttons-mobile/MenuMobileDrawingButton';
 import ModalsComponent from './components/modals/component';
 
-import './styles/splash.css';
-import './styles/common.mobile.css';
-import './styles/mobile.css';
-
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
-  window.location.href = 'index.html';
+  redirectTo('index.html');
 }
 
 // Add custom state and serializers (need to be done early, because the shared state will need them)

@@ -26,6 +26,7 @@ export interface GMFMetadata {
   thumbnail?: string;
   snappingConfig?: ISnappingConfig;
   timeAttribute?: string;
+  opacity?: number;
   layerName?: string; // TODO REG: only temporary for Vector-Tiles. Should probably be removed when the backend will support a proper configuration
 }
 
