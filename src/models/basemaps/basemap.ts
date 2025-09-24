@@ -18,15 +18,8 @@ class Basemap {
   }
 
   get projection(): string {
-    if (this.layersList[0] instanceof LayerVectorTiles) {
-      // Vector-tiles are only available in specific projection
-      if (this.layersList[0].projection) {
-        return this.layersList[0].projection;
-      }
-    }
-
-    // For all other cases, we set the default map projection
-    return ConfigManager.getInstance().Config.map.srid;
+    const layer = this.layersList.find((l) => l instanceof LayerVectorTiles);
+    return layer?.projection ?? ConfigManager.getInstance().Config.map.srid;
   }
 }
 

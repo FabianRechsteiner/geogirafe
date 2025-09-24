@@ -289,8 +289,7 @@ class ThemesManager extends GirafeSingleton {
           // But the supported EPSG should be configurable in the backend
           projection: 'EPSG:3857',
           isDefaultChecked: elem.metadata?.isChecked,
-          disclaimer: elem.metadata?.disclaimer,
-          opacity: 1
+          disclaimer: elem.metadata?.disclaimer
         };
         if (!elem.style || !elem.metadata?.layerName) {
           // Layer is invalid : it must contain style URL and layername

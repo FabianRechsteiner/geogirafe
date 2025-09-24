@@ -6,6 +6,15 @@ header {
   position: relative;
 }
 
+.theme-button {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.theme-button span {
+  margin-left: 0.5rem;
+}
+
 .theme-button:hover {
   background-color: transparent;
   cursor: default;

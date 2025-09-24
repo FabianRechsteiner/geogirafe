@@ -43,16 +43,11 @@ import StateManager from './tools/state/statemanager';
 import { DrawingState } from './components/drawing/drawingFeature';
 import DrawingSerializer from './components/drawing/drawingSerializer';
 import StateSerializer from './tools/share/stateserializer';
-import { initialize, SplashScreen } from './initialize';
-
-import './styles/variables.css';
-import './styles/splash.css';
-import './styles/common.css';
-import './styles/index.css';
+import { initialize, redirectTo, SplashScreen } from './initialize';
 
 // Redirect to mobile interface if we are on mobile
 if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
-  window.location.href = 'mobile.html';
+  redirectTo('mobile.html');
 }
 
 // Display the splash-screen

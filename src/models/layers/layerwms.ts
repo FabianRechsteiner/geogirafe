@@ -215,7 +215,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       isDefaultChecked: options.metadata?.isChecked,
       metadataUrl: options.metadata?.metadataUrl,
       disclaimer: options.metadata?.disclaimer,
-      opacity: 1, // TODO REG : Set default opacity
+      opacity: options.metadata?.opacity,
       protected: options.metadata?.protected,
       minResolution: options.minResolutionHint,
       maxResolution: options.maxResolutionHint,
