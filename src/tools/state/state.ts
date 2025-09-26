@@ -33,7 +33,7 @@ type GraphicalInterface = {
   darkMapMode: boolean;
   darkFrontendMode: boolean;
   swipeupPanelMode: SwipeupPanelMode;
-  swipeupPanelContent: 'selector' | 'features' | 'menu' | 'drawing' | null;
+  swipeupPanelContent: 'selector' | 'features' | 'menu' | 'drawing' | 'offline' | null;
 };
 
 export type ThemesConfig = {

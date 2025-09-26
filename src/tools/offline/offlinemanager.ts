@@ -12,6 +12,7 @@ import { Stroke } from 'ol/style';
 import ConfigManager from '../configuration/configmanager';
 import { TileGrid } from 'ol/tilegrid';
 import { WMTS } from 'ol/source';
+import { Projection } from 'ol/proj';
 
 class OfflineManager extends GirafeSingleton {
   private serviceWorker: ServiceWorker | null = null;
@@ -167,12 +168,15 @@ class OfflineManager extends GirafeSingleton {
 
   private getTileUrlsForWmtsLayer(tileGrid: TileGrid, bbox: Extent, layerSource: WMTS): string[] {
     const minZoom = tileGrid.getMinZoom();
-    const maxZoom = ConfigManager.getInstance().Config.offline?.downloadEndZoom;
+    const resolution = this.map.getView().getResolution() as number;
+    const currentZ = tileGrid.getZForResolution(resolution);
+
+    const maxZoom = currentZ;
     if (!maxZoom) {
       throw new Error('Offline configuration is missing. Cannot download maps for offline usage.');
     }
 
-    const projection = layerSource.getProjection()!;
+    const projection = layerSource.getProjection() as Projection;
     const tileUrls: string[] = [];
     for (let z = minZoom; z <= maxZoom; z++) {
       const tileRange = tileGrid.getTileRangeForExtentAndZ(bbox, z);
@@ -238,6 +242,71 @@ class OfflineManager extends GirafeSingleton {
         });
       }
     }
+  }
+
+  public async getTotalSizeMB(): Promise<number> {
+    return new Promise((resolve, reject) => {
+      if (!this.database) {
+        reject(new Error('Database is not initialized.'));
+        return;
+      }
+
+      const transaction = this.database.transaction([this.tilesStoreName], 'readonly');
+      const store = transaction.objectStore(this.tilesStoreName);
+      const request = store.openCursor();
+
+      let totalBytes = 0;
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          const value = cursor.value;
+          if (value && value.data instanceof Blob) {
+            totalBytes += value.data.size;
+          }
+          cursor.continue();
+        } else {
+          // No more entries
+          const totalMB = totalBytes / (1024 * 1024);
+          resolve(totalMB);
+        }
+      };
+
+      request.onerror = () => {
+        reject(new Error('Failed to iterate over store to compute size.'));
+      };
+    });
+  }
+
+  private async clearStore(storeName: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.database) {
+        reject(new Error('Database is not initialized.'));
+        return;
+      }
+
+      const transaction = this.database.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = store.clear();
+
+      request.onsuccess = () => {
+        console.debug(`Store "${storeName}" cleared successfully.`);
+        resolve();
+      };
+
+      request.onerror = () => {
+        reject(new Error(`Failed to clear store "${storeName}".`));
+      };
+    });
+  }
+
+  async clearTileStore() {
+    this.clearStore(this.tilesStoreName);
+  }
+
+  async clearBBoxStore() {
+    this.vectorLayer.setSource(null);
+    this.clearStore(this.bboxStoreName);
   }
 
   private async saveBoundingBox(bbox: Extent) {
