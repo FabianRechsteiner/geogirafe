@@ -25,6 +25,7 @@ import StateSerializer from './tools/share/stateserializer';
 import DrawingContainerMobile from './components/drawing-container-mobile/component';
 import DrawingComponentMobile from './components/drawing/component-mobile';
 import MenuMobile3dButton from './components/menu-buttons-mobile/MenuMobile3dButton';
+import MenuMobileOfflineButton from './components/menu-buttons-mobile/MenuMobileOfflineButton';
 import MenuMobileDrawingButton from './components/menu-buttons-mobile/MenuMobileDrawingButton';
 import ModalsComponent from './components/modals/component';
 
@@ -96,6 +97,7 @@ initialize().then(() => {
   customElements.define('girafe-drawing-mobile', DrawingComponentMobile);
   customElements.define('girafe-drawing-container-mobile', DrawingContainerMobile);
   customElements.define('girafe-menu-mobile-3d-button', MenuMobile3dButton);
+  customElements.define('girafe-menu-mobile-offline-button', MenuMobileOfflineButton);
   customElements.define('girafe-menu-mobile-drawing-button', MenuMobileDrawingButton);
 
   // Remove the splash-screen

@@ -7,29 +7,38 @@ class OfflineComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  protected downloadInProgress: boolean = false;
-  protected downloadProgressValue: number = 0;
+  protected downloadInProgress = false;
+  protected downloadProgressValue = 0;
   protected offlineManager: OfflineManager;
 
   protected downloadStartZoom?: number;
   protected downloadEndZoom?: number;
 
+  public totalOfflineDataSizeMB = 0;
+
   constructor() {
     super('themes-mobile');
-
     this.offlineManager = OfflineManager.getInstance();
-    this.configManager.loadConfig().then(() => {
-      this.downloadStartZoom = this.configManager.Config.offline?.downloadStartZoom;
-    });
+    console.log(this.state);
   }
 
   registerEvents() {
+    this.subscribe('interface.swipeupPanelContent', () => {
+      this.render();
+    });
     this.subscribe('isOffline', () => {
       super.render();
     });
     this.subscribe('position', () => {
       super.render();
     });
+
+    this.updateTotalSizeMB();
+  }
+
+  async updateTotalSizeMB() {
+    this.totalOfflineDataSizeMB = await this.offlineManager.getTotalSizeMB();
+    this.render();
   }
 
   exportData() {
@@ -57,9 +66,10 @@ class OfflineComponent extends GirafeHTMLElement {
   }
 
   progressCallback(progress: number) {
-    if (progress == 100) {
+    if (progress === 100) {
       // Done.
       this.downloadInProgress = false;
+      this.updateTotalSizeMB();
     } else {
       this.downloadProgressValue = progress;
     }
@@ -68,9 +78,23 @@ class OfflineComponent extends GirafeHTMLElement {
 
   connectedCallback() {
     this.loadConfig().then(() => {
+      this.downloadStartZoom = this.configManager.Config.offline?.downloadStartZoom;
       super.render();
       this.registerEvents();
     });
+  }
+
+  async clearStores() {
+    if (this.totalOfflineDataSizeMB === 0) {
+      return;
+    }
+
+    const message = 'This will remove the cartographic data locally stored on this device.';
+    if (confirm(message)) {
+      await this.offlineManager.clearBBoxStore();
+      await this.offlineManager.clearTileStore();
+      this.updateTotalSizeMB();
+    }
   }
 }
 

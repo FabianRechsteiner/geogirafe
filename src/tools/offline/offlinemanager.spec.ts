@@ -42,7 +42,7 @@ describe('OfflineManager', () => {
       // @ts-ignore
       const result = offlineManager.getAllTileUrls(bbox, [wmtsLayer]);
 
-      expect(result.length).toEqual(9);
+      expect(result.length).toEqual(10);
       const r = result[0];
       // @ts-ignore
       expect(r).toContain(wmtsLayer._olayer.getSource()!.urls[0]);
@@ -59,8 +59,7 @@ describe('OfflineManager', () => {
       const bbox: Extent = [-100, -100, 100, 100];
       // @ts-ignore
       const result = offlineManager.getAllTileUrls(bbox, [wmtsLayer1, wmtsLayer2]);
-
-      expect(result.length).toEqual(72);
+      expect(result.length).toEqual(80);
       let r = result[0];
       // @ts-ignore
       expect(r).toContain(wmtsLayer1._olayer.getSource()!.urls[0]);
