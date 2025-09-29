@@ -64,14 +64,17 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     return JSON.stringify(sharedLayers);
   }
 
-  public brainDeserialize(str: string): LayersConfig {
+  public brainDeserialize(str: string) {
     const deserializedLayers = this.deserialize(str);
-    const layersConfig = new LayersConfig();
+    // Remove all existing layers
+    for (const layer of this.stateManager.state.layers.layersList) {
+      this.layerManager.toggle(layer, 'off');
+    }
     this.state.layers.layersList = [];
+
     for (const deserializedLayer of deserializedLayers) {
       this.state.layers.layersList.push(deserializedLayer);
     }
-    return layersConfig;
   }
 
   protected deserialize(str: string) {

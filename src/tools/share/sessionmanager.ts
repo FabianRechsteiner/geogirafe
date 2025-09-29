@@ -22,7 +22,7 @@ class SessionManager extends GirafeSingleton {
     UrlManager.getInstance().updateHash(this.sessionHash);
   }
 
-  private saveStateToSession() {
+  public saveStateToSession() {
     console.debug('Saving state to sessionStorage');
     const serializedState = this.stateSerializer.getSerializedState();
     sessionStorage.setItem('geogirafe-state', serializedState);
