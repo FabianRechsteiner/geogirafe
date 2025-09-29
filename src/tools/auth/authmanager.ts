@@ -5,7 +5,6 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import ConfigManager from '../configuration/configmanager';
 import AbstractConnectManager from './abstractconnectmanager';
 import GMFConnectManager from './gmfconnectmanager';
-import { v4 as uuidv4 } from 'uuid';
 import ServiceWorkerHelper from '../utils/swhelper';
 
 export default class AuthManager extends GirafeSingleton {
@@ -66,9 +65,7 @@ export default class AuthManager extends GirafeSingleton {
     await this.issuerManager.initialize();
     // For GMF, the silent login is actually the same as checkin if the userinfos are already defined
     if (config.checkSessionOnLoad) {
-      await this.gmfManager.getUserInfo();
-      this.state.oauth.status = this.state.oauth.userInfo?.username ? 'loggedIn' : 'loggedOut';
-      this.state.application.isAuthInitialized = true;
+      await this.silentLogin();
     }
     if (config.loginRequired && this.state.oauth.status === 'loggedOut') {
       await this.login();
@@ -100,27 +97,18 @@ export default class AuthManager extends GirafeSingleton {
         if (this.state.oauth.userInfo?.username) {
           this.state.oauth.status = 'loggedIn';
         } else {
-          throw new Error('Login failed, no user found.');
+          this.state.oauth.error = 'No user found in the token';
+          this.state.oauth.status = 'loginFailed';
         }
-        this.state.application.isAuthInitialized = true;
-      } else if (this.state.oauth.status === 'loggedOutForcedFromBackend') {
-        // The user was loggedout from the backend
-        // This can happen either if the user has been loggedout from another tab in the browser
-        // Or if the user session was closed from the identity provider
-        this.userLoggedOutFromBackend();
+      } else if (this.state.oauth.status === 'loggedIn' || this.state.oauth.status === 'loggedOut') {
+        this.issuerManager.finalizeLoginWorkflow();
+      } else if (this.state.oauth.status === 'loginFailed') {
+        this.issuerManager.handleErrorFromIssuer();
       }
-    } catch (e) {
-      this.state.oauth.status = 'loginFailed';
-      throw e;
+    } catch (error) {
+      this.issuerManager.handleUnknownError(error as Error);
+      throw error;
     }
-  }
-
-  private userLoggedOutFromBackend() {
-    this.stateManager.state.infobox.elements.push({
-      id: uuidv4(),
-      text: 'User has been logged out.',
-      type: 'warning'
-    });
   }
 
   private async tokensChanged() {

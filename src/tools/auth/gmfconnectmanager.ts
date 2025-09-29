@@ -1,6 +1,5 @@
 import AbstractConnectManager from './abstractconnectmanager';
-import ShareManager from '../share/sharemanager';
-import UrlManager from '../url/urlmanager';
+import GMFManager from './gmfmanager';
 
 /**
  * For diverse reasons, this could NOT be done using the oAuth2 mechanisms of GMF:
@@ -36,7 +35,7 @@ export default class GMFConnectManager extends AbstractConnectManager {
     if (this.isAuthentified()) {
       // We are back from GMF authentication.
       // Go to the next step with the backend authentication
-      this.handleLoggedInToIssuer();
+      await this.handleLoggedInToIssuer();
     }
   }
 
@@ -46,47 +45,32 @@ export default class GMFConnectManager extends AbstractConnectManager {
   }
 
   public override async silentLogin() {
-    /**
-     * No silentLogin for GMF Legacy Authentication-Workflow
-     * The userlogin result should simply be checked
-     */
-    throw new Error('Silent-Login is not possible with the legacy login-workflow');
+    await GMFManager.getInstance().getUserInfo();
+    this.state.oauth.status = this.state.oauth.userInfo?.username ? 'loggedIn' : 'loggedOut';
   }
 
   public override async logout() {
     // Nothing more to do here, just mark as loggedOut
+    this.sessionManager.saveStateToSession();
     console.debug('Auth: 5. Issuer logout');
     this.state.oauth.status = 'loggedOut';
   }
 
   private redirectToIssuerLogin() {
-    const state = ShareManager.getInstance().getStateToShare();
-    const redirectUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?authentified=true#${state}`;
+    this.sessionManager.saveStateToSession();
+    this.redirectUrl = this.getLoginRedirectUrl(false);
     const authorizationUrl = new URL(`${this.authConfig.url}login.html`);
-    authorizationUrl.searchParams.set('came_from', redirectUrl);
-
+    authorizationUrl.searchParams.set('came_from', this.redirectUrl);
     window.open(authorizationUrl, '_self');
   }
 
-  private handleLoggedInToIssuer() {
+  private async handleLoggedInToIssuer() {
     console.debug('Auth: 2. Issuer login handle');
-    // Removing oauth URL parameters
-    this.resetUrlHistory(true);
     this.state.oauth.status = 'issuer.loggedIn';
     this.state.oauth.audience = this.authConfig.audience;
 
     // Prepare refresh login
-    this.checkConnection();
-  }
-
-  private checkConnection() {
-    const expiresInMs = 600000; // 10 min
-    setTimeout(() => this.refreshToken(), expiresInMs);
-  }
-
-  private resetUrlHistory(_authentified: boolean) {
-    const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`;
-    UrlManager.getInstance().updateUrl(newUrl);
+    await this.refreshToken();
   }
 
   private async refreshToken() {
@@ -94,10 +78,10 @@ export default class GMFConnectManager extends AbstractConnectManager {
     const userInfoUrl = `${this.authConfig.url}loginuser`;
     this.state.oauth.userInfo = await fetch(userInfoUrl).then((r) => r.json());
     if (!this.state.oauth.userInfo?.username) {
-      this.resetUrlHistory(false);
       this.loggedOutFromBackend();
     } else {
-      this.checkConnection();
+      const expiresInMs = 600000; // 10 min
+      setTimeout(() => this.refreshToken(), expiresInMs);
     }
   }
 }

@@ -60,6 +60,16 @@ class ThemesManager extends GirafeSingleton {
         this.initialize();
       }
     });
+
+    // This is for the next change in the oAuth status.
+    this.stateManager.subscribe('oauth.status', () => {
+      if (
+        this.state.themes.isLoaded &&
+        (this.state.oauth.status === 'loggedIn' || this.state.oauth.status === 'loggedOut')
+      ) {
+        this.initialize();
+      }
+    });
   }
 
   public async initialize() {

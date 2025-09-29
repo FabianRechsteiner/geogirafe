@@ -108,16 +108,17 @@ type UserInfo = {
  */
 type LoginState = {
   status:
+    | 'not-initialized'
     | 'issuer.loggedIn'
     | 'loggedIn'
     | 'loginFailed'
     | 'backend.loggedOut'
     | 'loggedOut'
-    | 'logoutFailed'
-    | 'loggedOutForcedFromBackend';
+    | 'logoutFailed';
   tokens?: TokenEndpointResponse;
   userInfo?: UserInfo;
   audience: string[];
+  error?: string;
 };
 
 export type InfoWindow = {
@@ -287,7 +288,7 @@ export default class State {
   isOffline = false;
 
   oauth: LoginState = {
-    status: 'loggedOut',
+    status: 'not-initialized',
     audience: []
   };
 

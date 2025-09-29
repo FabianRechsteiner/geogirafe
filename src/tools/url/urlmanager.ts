@@ -1,6 +1,10 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 
 export default class UrlManager extends GirafeSingleton {
+  public getParam(param: string): string | null {
+    return new URL(window.location.href).searchParams.get(param);
+  }
+
   /**
    * Read all the arguments from the current url
    */

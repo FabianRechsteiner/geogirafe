@@ -1,5 +1,4 @@
 import AbstractConnectManager from './abstractconnectmanager';
-import ShareManager from '../share/sharemanager';
 import {
   authorizationCodeGrantRequest,
   AuthorizationServer,
@@ -15,12 +14,10 @@ import {
   TokenEndpointResponse,
   validateAuthResponse
 } from 'oauth4webapi';
-import UserDataManager from '../userdata/userdatamanager';
 import UrlManager from '../url/urlmanager';
 
 export default class OpenIdConnectManager extends AbstractConnectManager {
   private authorizationServer?: AuthorizationServer;
-  private readonly storagePath = 'oAuth';
   private silentLoginIframe?: HTMLIFrameElement;
 
   private get issuerConfig() {
@@ -28,15 +25,19 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
   }
 
   private authProcessed() {
-    return new URL(window.location.href).searchParams.has('authentified');
+    return this.urlManager.getParam('authentified') !== null;
   }
 
   private isAuthentified() {
-    return new URL(window.location.href).searchParams.get('authentified') === 'true';
+    return this.urlManager.getParam('authentified') === 'true';
+  }
+
+  private isLoggedOut() {
+    return this.urlManager.getParam('authentified') === 'false';
   }
 
   private hasAuthError() {
-    return new URL(window.location.href).searchParams.has('error');
+    return this.urlManager.getParam('error') !== null;
   }
 
   public override async initialize() {
@@ -55,9 +56,11 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
         await this.handleLoggedInToIssuer();
       } else {
         // We are back but with an error.
-        this.resetUrlHistory(false);
-        this.handleErrorFromIssuer();
+        this.state.oauth.error = this.urlManager.getParam('error')!;
+        this.state.oauth.status = 'loginFailed';
       }
+    } else if (this.isLoggedOut()) {
+      this.loggedOut();
     }
   }
 
@@ -72,43 +75,6 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
 
   set codeVerifier(value: string) {
     this.saveToLocalStorage('codeVerifier', value);
-  }
-
-  /**
-   * The RedirectUrl has to be the same for all call to the issuer
-   * Because the authentication is given for a specific redirectUrl.
-   * Therefore, we keep it in localStorage.
-   */
-  get redirectUrl() {
-    return this.loadFromLocalStorage('redirectUrl') as string;
-  }
-
-  set redirectUrl(value: string) {
-    this.saveToLocalStorage('redirectUrl', value);
-  }
-
-  /**
-   * The currentState cannot just be passed as parameter in the URL
-   * Because the URL-length is limited.
-   * Therefore, we keep it in localStorage.
-   */
-  get currentState() {
-    return this.loadFromLocalStorage('currentState') as string;
-  }
-
-  set currentState(value: string) {
-    if (value.startsWith('#')) {
-      value = value.substring(1);
-    }
-    this.saveToLocalStorage('currentState', value);
-  }
-
-  private loadFromLocalStorage(path: string): unknown {
-    return UserDataManager.getInstance().getUserData(`${this.storagePath}.${path}`, true) ?? '';
-  }
-
-  private saveToLocalStorage(path: string, value: string) {
-    return UserDataManager.getInstance().saveUserData(`${this.storagePath}.${path}`, value, true);
   }
 
   private async getAuthorizationServer(): Promise<AuthorizationServer> {
@@ -134,11 +100,13 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     // Save the current state of the application before login
     // If we are in an autologin case, we use the state from the URL
     // Otherwise we use the current state of the application
-    this.currentState = silent ? window.location.hash : ShareManager.getInstance().getStateToShare();
+    if (!silent) {
+      this.sessionManager.saveStateToSession();
+    }
+    this.redirectUrl = this.getLoginRedirectUrl(silent);
 
     // Redirect user to authorizationServer.authorization_endpoint
     const authorizationUrl = new URL(authorizationServer.authorization_endpoint);
-    this.redirectUrl = this.getLoginRedirectUrl(silent);
     authorizationUrl.searchParams.set('client_id', this.issuerConfig.clientId);
     authorizationUrl.searchParams.set('redirect_uri', this.redirectUrl);
     authorizationUrl.searchParams.set('response_type', 'code');
@@ -188,17 +156,6 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     await this.logoutFromIssuer();
   }
 
-  private getLoginRedirectUrl(silent: boolean) {
-    if (silent) {
-      return `${UrlManager.getInstance().getBaseUrl()}silentlogincallback.html?authentified=true`;
-    }
-    return `${UrlManager.getInstance().getBaseUrl()}?authentified=true`;
-  }
-
-  private getLogoutRedirectUrl() {
-    return `${UrlManager.getInstance().getBaseUrl()}`;
-  }
-
   private async silentLoginViaIframe() {
     const authorizationUrl = await this.getAuthorizationUrl(true);
     this.silentLoginIframe = document.createElement('iframe');
@@ -218,7 +175,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       await this.handleLoggedInToIssuer();
     } else if (event.data?.type === 'OAUTH_ERROR') {
       console.info('Silent login could not be done : ', event.data.error);
-      this.state.application.isAuthInitialized = true;
+      this.state.oauth.status = 'loggedOut';
     }
 
     if (this.silentLoginIframe) {
@@ -252,10 +209,8 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       const openIdTokens = await processAuthorizationCodeResponse(authorizationServer, client, response);
       this.setToken(openIdTokens);
       this.state.oauth.audience = this.issuerConfig.audience;
-      // Remove oauth URL parameters
-      this.resetUrlHistory(true);
     } catch (error) {
-      this.manageError(error as Error);
+      this.handleUnknownError(error as Error);
     }
   }
 
@@ -267,16 +222,6 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       setTimeout(() => this.refreshToken(), expiresInMs);
     }
     this.state.oauth.status = 'issuer.loggedIn';
-  }
-
-  private resetUrlHistory(authentified: boolean) {
-    let newUrl;
-    if (authentified) {
-      newUrl = `${UrlManager.getInstance().getBaseUrl()}#${this.currentState}`;
-    } else {
-      newUrl = `${UrlManager.getInstance().getBaseUrl()}?authentified=${authentified}#${this.currentState}`;
-    }
-    UrlManager.getInstance().updateUrl(newUrl);
   }
 
   private async refreshToken() {
@@ -300,9 +245,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       openIdTokens = await processRefreshTokenResponse(authorizationServer, client, response);
     } catch (error) {
       // an error here means the user was logged out somehow somewhere else.
-      const errorMsg = `OAuth: Refresh token failed: ${(error as Error).message}`;
-      console.error(errorMsg);
-      this.resetUrlHistory(false);
+      this.handleUnknownError(error as Error);
       this.loggedOutFromBackend();
     }
 
@@ -311,17 +254,9 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     }
   }
 
-  private manageError(error: Error) {
-    this.state.oauth.status = 'loginFailed';
-    const errorMsg = `OAuth: Issuer login failed: ${error.message}`;
-    console.error(errorMsg);
-    this.resetUrlHistory(false);
-    this.handleErrorFromIssuer();
-  }
-
   async logoutFromIssuer() {
     // Save the current state of the application before logout
-    this.currentState = ShareManager.getInstance().getStateToShare();
+    this.sessionManager.saveStateToSession();
 
     const authorizationServer = await this.getAuthorizationServer();
     const issuerLogoutUrl = new URL(authorizationServer.end_session_endpoint as string);
