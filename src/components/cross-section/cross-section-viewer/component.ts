@@ -51,7 +51,12 @@ class CrossSectionViewComponent extends GirafeResizableElement {
 
     await this.pytreeManager.getConfig();
 
+    if (!this.pytreeManager.config!.pointclouds) {
+      this.pytreeManager.config!.pointclouds = [this.pytreeManager.config?.default_point_cloud as string];
+    }
+
     const ds = [];
+
     for (const [k, id] of this.pytreeManager.config!.pointclouds.entries()) {
       ds.push({
         id: id,
@@ -66,6 +71,7 @@ class CrossSectionViewComponent extends GirafeResizableElement {
         subsets: []
       });
     }
+
     this.crossSectionState.datasets = ds;
   }
 
