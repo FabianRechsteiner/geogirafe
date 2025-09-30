@@ -4,13 +4,11 @@ import LinkedInLogo from './images/linkedin.svg';
 import MailLogo from './images/mail.svg';
 import ShareManager from '../../tools/share/sharemanager';
 import { IUrlShortener } from './tools/iurlshortener';
-import LstuManager from './tools/lstumanager';
 import GmfShareManager from './tools/gmfmanager';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SimpleMaskManager from '../../tools/layers/simplemaskmanager';
 import MapManager from '../../tools/state/mapManager';
 import type { Callback } from '../../tools/state/statemanager';
-import { debounce } from '../../tools/utils/debounce';
 import GeoGirafeShareManager from './tools/geogirafemanager';
 import UrlManager from '../../tools/url/urlmanager';
 
@@ -19,7 +17,6 @@ class ShareComponent extends GirafeHTMLElement {
   styleUrls = ['../../styles/common.css', './style.css'];
 
   visible = false;
-  loading = true;
   shareLink?: string;
   qrCode?: string;
   success: boolean = true;
@@ -30,14 +27,15 @@ class ShareComponent extends GirafeHTMLElement {
   iframeUrl?: string;
   iframeCode?: string;
 
-  shareManager: ShareManager;
-  urlShortener?: IUrlShortener;
+  private readonly shareManager: ShareManager;
+  private urlShortener?: IUrlShortener;
   private readonly mapManager: MapManager;
   private simpleMaskManager?: SimpleMaskManager;
 
   private readonly eventsCallbacks: Callback[] = [];
 
-  iframeSize: 'small' | 'medium' | 'large' | '' = '';
+  private iframeSize: 'small' | 'medium' | 'large' | '' = '';
+
   public get iframeWidth() {
     switch (this.iframeSize) {
       case 'small':
@@ -71,16 +69,13 @@ class ShareComponent extends GirafeHTMLElement {
     this.mapManager = MapManager.getInstance();
   }
 
-  initializeShortenerService() {
+  private initializeShortenerService() {
     const share = this.configManager.Config.share;
 
     if (share) {
       switch (share.service) {
         case 'gmf':
           this.urlShortener = new GmfShareManager(share.createUrl);
-          break;
-        case 'lstu':
-          this.urlShortener = new LstuManager(share.createUrl);
           break;
         case 'geogirafe':
           this.urlShortener = new GeoGirafeShareManager(share.createUrl);
@@ -104,13 +99,9 @@ class ShareComponent extends GirafeHTMLElement {
    */
   private renderComponent() {
     super.render();
-
     this.simpleMaskManager = new SimpleMaskManager(this.mapManager.getMap());
-
     // While the component is visible, listen for changes in the state to update the shared link
     this.registerEvents();
-
-    void this.generateShareLink();
   }
 
   /**
@@ -124,19 +115,19 @@ class ShareComponent extends GirafeHTMLElement {
     this.renderEmpty();
   }
 
-  private registerEvents() {
-    // Use a debounced version of the share link generation with 500ms delay to reduce the number of times it's called
-    //  from tree view changes (can go up to 100x times).
-    const debouncedShareLinkCallback = debounce(() => {
-      void this.generateShareLink();
-    }, 500);
+  private clearLink() {
+    this.shareLink = '';
+    this.iframeUrl = '';
+    this.iframeCode = '';
+    this.qrCode = '';
+    this.refreshRender();
+  }
 
+  private registerEvents() {
     this.eventsCallbacks.push(
-      this.subscribe('position', () => debouncedShareLinkCallback()),
-      this.subscribe('layers.layersList', () => debouncedShareLinkCallback()),
-      this.subscribe(/layers\.layersList\..*\.activeState/, () => debouncedShareLinkCallback()),
-      this.subscribe(/layers\.layersList\..*\.order/, () => debouncedShareLinkCallback()),
-      this.subscribe('activeBasemap', () => debouncedShareLinkCallback())
+      this.subscribe(/position.*/, () => this.clearLink()),
+      this.subscribe(/layers\.layersList\..*/, () => this.clearLink()),
+      this.subscribe('activeBasemap', () => this.clearLink())
     );
   }
 
@@ -145,44 +136,47 @@ class ShareComponent extends GirafeHTMLElement {
     this.eventsCallbacks.length = 0;
   }
 
+  public async generateAndCopyLink() {
+    await this.generateShareLink();
+    this.copyToClipboard('short');
+    this.refreshRender();
+  }
+
+  public async generateAndCopyIframeCode() {
+    await this.generateIframeCode();
+    this.copyToClipboard('iframe');
+    this.refreshRender();
+  }
+
   private async generateShareLink() {
     if (!this.urlShortener) {
       return;
     }
-    this.loading = true;
-    this.shareLink = '';
-    this.iframeUrl = '';
-    this.iframeCode = '';
-    this.refreshRender();
 
-    try {
-      const baseUrl = UrlManager.getInstance().getBaseUrl();
-      const hash = this.shareManager.getStateToShare();
+    const baseUrl = UrlManager.getInstance().getBaseUrl();
+    const hash = this.shareManager.getStateToShare();
 
-      // Get short URL
-      const longurl = `${baseUrl}#${hash}`;
-      let response = await this.urlShortener.shortenUrl(longurl);
-      this.shareLink = response.shorturl;
-      this.success = response.success;
-      this.qrCode = response.qrcode;
-
-      // Get short URL for iframe
-      const longIframeUrl = `${baseUrl}iframe.html#${hash}`;
-      response = await this.urlShortener.shortenUrl(longIframeUrl);
-      this.iframeUrl = response.shorturl;
-      this.setIframeCode();
-    } finally {
-      this.loading = false;
-      this.refreshRender();
-    }
+    // Get short URL
+    const longurl = `${baseUrl}#${hash}`;
+    const response = await this.urlShortener.shortenUrl(longurl);
+    this.shareLink = response.shorturl;
+    this.success = response.success;
+    this.qrCode = response.qrcode;
   }
 
-  setIframeCode() {
-    if (this.iframeSize && this.iframeUrl) {
-      this.iframeCode = `<iframe title="iframe GeoGirafe" width="${this.iframeWidth}" height="${this.iframeHeight}" src="${this.iframeUrl}"></iframe>`;
-    } else {
-      this.iframeCode = '';
+  private async generateIframeCode() {
+    if (!this.urlShortener || !this.iframeSize) {
+      return;
     }
+
+    const baseUrl = UrlManager.getInstance().getBaseUrl();
+    const hash = this.shareManager.getStateToShare();
+
+    // Get short URL for iframe
+    const longIframeUrl = `${baseUrl}iframe.html#${hash}`;
+    const response = await this.urlShortener.shortenUrl(longIframeUrl);
+    this.iframeUrl = response.shorturl;
+    this.iframeCode = `<iframe title="iframe GeoGirafe" width="${this.iframeWidth}" height="${this.iframeHeight}" src="${this.iframeUrl}"></iframe>`;
   }
 
   closeWindow() {
@@ -207,7 +201,7 @@ class ShareComponent extends GirafeHTMLElement {
     window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
   }
 
-  copyToClipboard(type: 'short' | 'iframe') {
+  private copyToClipboard(type: 'short' | 'iframe') {
     let textToCopy = '';
 
     if (type === 'short') {
@@ -222,14 +216,14 @@ class ShareComponent extends GirafeHTMLElement {
     }
   }
 
-  onSizeChanged(event: Event) {
+  public onSizeChanged(event: Event) {
+    this.clearLink();
     this.iframeSize = (event.target as HTMLInputElement)?.value as 'small' | 'medium' | 'large' | '';
-    this.setIframeCode();
     this.refreshRender();
-    if (this.iframeSize) {
-      this.showMapPreview();
-    } else {
+    if (this.iframeSize === '') {
       this.hideMapPreview();
+    } else {
+      this.showMapPreview();
     }
   }
 

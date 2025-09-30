@@ -28,8 +28,8 @@
     "defaultLayout": "1 A4 portrait ai"
   },
   "share": {
-    "service": "lstu",
-    "createUrl": "https://lstu.fr/a"
+    "service": "gmf",
+    "createUrl": "https://demo-ai.geocommunes.ch/short/create"
   },
   "projections": {
     "EPSG:3857": "W-M",

@@ -30,8 +30,8 @@
     "url": "https://map.cartoriviera.ch/lidar_server/pytree"
   },
   "share": {
-    "service": "lstu",
-    "createUrl": "https://lstu.fr/a"
+    "service": "gmf",
+    "createUrl": "https://map.cartoriviera.ch/short/create"
   },
   "projections": {
     "EPSG:3857": "W-M",

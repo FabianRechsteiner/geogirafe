@@ -30,8 +30,8 @@
     "url": "https://map.cartolacote.ch/pytree"
   },
   "share": {
-    "service": "lstu",
-    "createUrl": "https://lstu.fr/a"
+    "service": "gmf",
+    "createUrl": "https://map.cartolacote.ch/short/create"
   },
   "projections": {
     "EPSG:3857": "W-M",
