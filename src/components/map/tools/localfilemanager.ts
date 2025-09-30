@@ -7,12 +7,12 @@ import { Vector as VectorLayer } from 'ol/layer.js';
 import { Vector as VectorSource } from 'ol/source.js';
 import { Geometry } from 'ol/geom';
 import LayerLocalFile from '../../../models/layers/layerlocalfile';
-import GroupLayer from '../../../models/layers/grouplayer';
 import StateManager from '../../../tools/state/statemanager';
 import { extend, intersects } from 'ol/extent';
 import I18nManager from '../../../tools/i18n/i18nmanager';
 import UserInteractionManager from '../../../tools/state/userInteractionManager';
 import { v4 as uuidv4 } from 'uuid';
+import UserLayerManager from '../../../tools/themes/userlayermanager';
 
 class LocalFileManager extends GirafeSingleton {
   map: Map;
@@ -24,6 +24,7 @@ class LocalFileManager extends GirafeSingleton {
   stateManager: StateManager;
   i18nManager: I18nManager;
   userInteractionManager: UserInteractionManager;
+  userLayerManager: UserLayerManager;
 
   activeLayers: Record<
     string,
@@ -33,9 +34,6 @@ class LocalFileManager extends GirafeSingleton {
     }
   > = {};
 
-  layerGroup?: GroupLayer;
-  layerGroupProxy?: GroupLayer;
-
   constructor(type: string) {
     super(type);
     this.map = MapManager.getInstance().getMap();
@@ -44,6 +42,7 @@ class LocalFileManager extends GirafeSingleton {
     this.stateManager = StateManager.getInstance();
     this.i18nManager = I18nManager.getInstance();
     this.userInteractionManager = UserInteractionManager.getInstance();
+    this.userLayerManager = UserLayerManager.getInstance();
     this.registerEvents();
 
     // Add drag n drop interaction to add local files
@@ -53,14 +52,6 @@ class LocalFileManager extends GirafeSingleton {
 
   private registerEvents(): void {
     this.userInteractionManager.registerListener('map.drop', false, this.name);
-
-    this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) => {
-      if (oldLayers?.includes(this.layerGroup) && !newLayers?.includes(this.layerGroup)) {
-        // Group was deleted in tree, cleanup references
-        delete this.layerGroupProxy;
-        delete this.layerGroup;
-      }
-    });
   }
 
   createInteraction() {
@@ -98,9 +89,6 @@ class LocalFileManager extends GirafeSingleton {
   }
 
   loadLocalFileFeatures(localFile: File, features: Feature<Geometry>[]) {
-    if (!this.layerGroup) {
-      this.layerGroup = new GroupLayer(0, 'Local Files', 0, { isDefaultChecked: true, isDefaultExpanded: true });
-    }
     // Check if all features can be displayed in the current map maximum extent
     // This will also approximately validate if the SRID is correct
     const featureType = localFile.name.replace('.', '_');
@@ -115,28 +103,14 @@ class LocalFileManager extends GirafeSingleton {
       return;
     }
     const layer = new LayerLocalFile(localFile, acceptableFeatures.features, acceptableFeatures.globalExtent);
-    layer.parent = this.layerGroup;
+
     if (features && features.length > acceptableFeatures.features.length) {
       // Some features are outer extent
       layer.hasError = true;
       layer.errorMessage = `Only ${acceptableFeatures.features.length} features among ${features.length} could be loaded.
 Verify that those features can be displayed within the maximal extent configured in your application.`;
     }
-
-    this.layerGroupProxy = this.stateManager.state.layers.layersList.find(
-      (l) => l.treeItemId === this.layerGroup!.treeItemId
-    ) as GroupLayer;
-    if (this.layerGroupProxy) {
-      // If group is already in the treeview, add layer to the tree directly
-      this.layerGroupProxy.children.push(layer);
-    } else {
-      // Otherwise, add the layer to the group
-      this.layerGroup.children.push(layer);
-      // reset to top of tree
-      this.layerGroup.order = 0;
-      // then add the group to the treeview
-      this.stateManager.state.layers.layersList.push(this.layerGroup);
-    }
+    this.userLayerManager.addUserLayerToTree(layer);
   }
 
   private handleUnsupportedFiles(dropEvent: DragEvent) {

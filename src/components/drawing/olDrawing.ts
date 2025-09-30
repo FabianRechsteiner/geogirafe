@@ -91,7 +91,6 @@ export default class OlDrawing {
   userInteractionManager: UserInteractionManager;
 
   drawingState: DrawingState;
-  drawingSource!: VectorSource;
   modifiableFeatures: Collection<Feature> = new Collection([]);
   draw: Draw | null = null;
   modify: Modify | null = null;
@@ -99,6 +98,8 @@ export default class OlDrawing {
   editContextMenu: ContextMenu | null = null;
   currentShape: DrawingShape | null = null;
   fixedLength: number = 0;
+  drawingSource: VectorSource;
+  drawingLayer: VectorLayer;
 
   constructor(map: MapComponent, toolName: string) {
     this.map = map;
@@ -110,16 +111,15 @@ export default class OlDrawing {
 
     this.drawingSource = new VectorSource({ features: new Collection() });
     this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
-    this.map.olMap.addLayer(
-      new VectorLayer({
-        source: this.drawingSource,
-        zIndex: 1001,
-        properties: {
-          addToPrintedLayers: true,
-          altitudeMode: 'clampToGround'
-        }
-      })
-    );
+    this.drawingLayer = new VectorLayer({
+      source: this.drawingSource,
+      zIndex: 1001,
+      properties: {
+        addToPrintedLayers: true,
+        altitudeMode: 'clampToGround'
+      }
+    });
+
     this.map.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
       newTool === null ? this.removeDrawInteraction() : this.addDrawInteraction(newTool)
     );
@@ -162,7 +162,7 @@ export default class OlDrawing {
         this.canExecute('map.modify'),
       deleteCondition: never,
       insertVertexCondition: primaryAction,
-      style: new DrawingFeature(1, {}, '').getVertexStyle(true),
+      style: new DrawingFeature(DrawingShape.Point).getVertexStyle(true),
       snapToPointer: true,
       pixelTolerance: this.map.pixelTolerance
     });
@@ -468,7 +468,7 @@ export default class OlDrawing {
       // Default condition for ol drawing is noModifierKeys(e)
       // canExecute: If another tool is exclusively drawing, this interaction will be prevented from reacting
       condition: (e) => noModifierKeys(e) && this.canExecute('map.draw'),
-      style: (f) => this.getStyle(new DrawingFeature(tool, {}, ''), f as Feature<Geometry>)
+      style: (f) => this.getStyle(new DrawingFeature(tool), f as Feature<Geometry>)
     });
     this.draw.on('drawend', () => {
       this.draw?.removeLastPoint();
