@@ -23,6 +23,7 @@ import WmtsManager from './tools/wmtsmanager';
 import ViewManager from './tools/viewmanager';
 import LocalFileManager from './tools/localfilemanager';
 import CogManager from './tools/cogmanager';
+import DrawingManager from './tools/drawingmanager';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
@@ -35,6 +36,7 @@ import LayerVectorTiles from '../../models/layers/layervectortiles';
 import LayerWmts from '../../models/layers/layerwmts';
 import LayerWms from '../../models/layers/layerwms';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
+import LayerDrawing from '../../models/layers/layerdrawing';
 import GeoEvents from '../../models/events';
 import MapManager from '../../tools/state/mapManager';
 import MapPosition from '../../tools/state/mapposition';
@@ -84,6 +86,7 @@ export default class MapComponent extends GirafeHTMLElement {
   osmManager!: OsmManager;
   cogManager!: CogManager;
   xyzManager!: XyzManager;
+  drawingManager!: DrawingManager;
   viewManager!: ViewManager;
   vectorTilesManager!: VectorTilesManager;
   localFileManager!: LocalFileManager;
@@ -303,6 +306,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.osmManager = new OsmManager(this.olMap);
     this.cogManager = new CogManager(this.olMap);
     this.xyzManager = new XyzManager(this.olMap);
+    this.drawingManager = DrawingManager.getInstance();
     this.viewManager = new ViewManager(this.olMap);
     this.vectorTilesManager = new VectorTilesManager(this.olMap);
     this.localFileManager = LocalFileManager.getInstance();
@@ -892,6 +896,8 @@ export default class MapComponent extends GirafeHTMLElement {
         this.cogManager.addLayer(l);
       } else if (l instanceof LayerXYZ) {
         this.xyzManager.addLayer(l);
+      } else if (l instanceof LayerDrawing) {
+        this.drawingManager.addLayer(l);
       }
     }
   }
@@ -911,6 +917,8 @@ export default class MapComponent extends GirafeHTMLElement {
         this.cogManager.removeLayer(l);
       } else if (l instanceof LayerXYZ) {
         this.xyzManager.removeLayer(l);
+      } else if (l instanceof LayerDrawing) {
+        this.drawingManager.removeLayer(l);
       }
     }
   }
@@ -931,6 +939,8 @@ export default class MapComponent extends GirafeHTMLElement {
       }
     } else if (layerInfos instanceof LayerLocalFile) {
       this.localFileManager.changeOpacity(layerInfos);
+    } else if (layerInfos instanceof LayerDrawing) {
+      this.drawingManager.changeOpacity(layerInfos);
     } else {
       console.warn(`Changing opacity for layer ${layerInfos.name} not supported`);
     }

@@ -42,11 +42,15 @@ class ThemeLayer extends BaseLayer {
     const clonedObject = new ThemeLayer(this.id, this.name, this.order, this.icon, options);
     clonedObject.activeState = this.activeState;
 
-    // Clone childs
+    // Clone children
     for (const child of this.children) {
-      const clonedChild = child.clone();
-      clonedChild.parent = clonedObject;
-      clonedObject.children.push(clonedChild);
+      try {
+        const clonedChild = child.clone();
+        clonedChild.parent = clonedObject;
+        clonedObject.children.push(clonedChild);
+      } catch {
+        console.warn(`Cloning child ${child.name} of theme ${this.name} ins't supported`);
+      }
     }
 
     return clonedObject;

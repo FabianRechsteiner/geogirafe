@@ -21,6 +21,8 @@ import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
 import I18nManager from '../../tools/i18n/i18nmanager';
 import ErrorManager from '../../tools/error/errormanager';
+import LayerDrawing from '../../models/layers/layerdrawing';
+import UserLayerManager from '../../tools/themes/userlayermanager';
 
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -68,6 +70,10 @@ export default class DrawingComponent extends GirafeHTMLElement {
     dot: '• • • • • •'
   };
 
+  activeDrawingLayer?: LayerDrawing;
+  defaultLayerName = 'My Drawing';
+  userLayerManager: UserLayerManager;
+
   olDrawing: OlDrawing;
   cesiumDrawing: CesiumDrawing;
   fixedLengthEnabled: boolean = false;
@@ -84,6 +90,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const map = this.componentManager.getComponents(MapComponent)[0];
     this.olDrawing = new OlDrawing(map, this.name);
     this.cesiumDrawing = new CesiumDrawing(map, this.name);
+
+    this.userLayerManager = UserLayerManager.getInstance();
+
     this.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news));
     this.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
     this.subscribe('globe.loaded', () => {
@@ -197,6 +206,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   setTool(tool: DrawingShape | null = null) {
+    if (tool) {
+      this.activateLayerInTreeAndMap();
+    }
     if (this.toolSelected !== null) {
       this.toolSelected.classList.remove('selected');
     }
@@ -228,6 +240,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.visible = visible;
     if (this.visible) {
       this.registerEvents();
+      if (this.activeDrawingLayer) {
+        this.activateLayerInTreeAndMap();
+      }
     } else {
       this.setTool(null);
       // Deselect features so the vertex symbology disappears
@@ -256,13 +271,20 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
     // Update the current feature selection
     if (!this.visible || this.batchCreateMode) {
-      // If component isn't visible (e.g. if features are added via share link)
-      // or user is in batch mode, deselect all features
+      // If the component isn't visible (e.g. if features are added via shared state), deselect all features
       this.deselectAllFeatures();
     } else if (added.length > 0) {
       // Only select the newly created feature
       this.drawingState.features.forEach((feature) => (feature.selected = added.map((f) => f.id).includes(feature.id)));
     }
+
+    // Toggle the drawing layer in the tree and map
+    if (newIds.length > 0) {
+      this.activateLayerInTreeAndMap();
+    } else {
+      this.deactivateLayerInTreeAnMap();
+    }
+
     // Update drawing source
     if (deleted.length > 0) this.olDrawing.deleteFeatures(deleted);
     if (added.length > 0) this.olDrawing.addFeatures(added);
@@ -315,6 +337,19 @@ export default class DrawingComponent extends GirafeHTMLElement {
   onToggleFeatureSelection(feature: DrawingFeature) {
     feature.selected = !feature.selected;
     this.refreshRender();
+  }
+
+  activateLayerInTreeAndMap(layerName: string = this.defaultLayerName) {
+    this.activeDrawingLayer ??= new LayerDrawing(layerName, this.olDrawing.drawingLayer);
+    // Activate the layer by adding it to the tree and making it visible in the map
+    this.userLayerManager.addUserLayerToTree(this.activeDrawingLayer);
+  }
+
+  deactivateLayerInTreeAnMap() {
+    if (this.activeDrawingLayer) {
+      this.userLayerManager.removeUserLayerFromTree(this.activeDrawingLayer);
+      this.activeDrawingLayer = undefined;
+    }
   }
 
   getOptionsTitle(): string {

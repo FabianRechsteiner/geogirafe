@@ -8,6 +8,8 @@ type OrderCounter = {
   index: number;
 };
 
+export const LayerTreeStartOrder = 1000;
+
 export default class OrderingManager extends GirafeSingleton {
   private stateManager: StateManager;
 
@@ -56,9 +58,8 @@ export default class OrderingManager extends GirafeSingleton {
     }
 
     this.timeoutId = setTimeout(() => {
-      console.debug('Reordering Layers');
       const orderedLayers = this.getSortedLayers(this.state.layers.layersList);
-      const counter: OrderCounter = { index: 1000 };
+      const counter: OrderCounter = { index: LayerTreeStartOrder };
       this.stateManager.batchChanges(() => this.reorderLayersRecursively(orderedLayers, counter));
     });
   }
