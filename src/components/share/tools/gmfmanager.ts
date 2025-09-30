@@ -1,3 +1,4 @@
+import { generateQrCode } from '../../../tools/utils/qrcode';
 import { IUrlShortener, UrlShortenerResponse } from './iurlshortener';
 
 export type GmfSuccessResponse = {
@@ -28,10 +29,13 @@ class GmfShareManager implements IUrlShortener {
     });
 
     const response_data = (await response.json()) as GmfSuccessResponse;
+    const shortUrl = response_data.short_url;
+    const qrcode = await generateQrCode(shortUrl);
     if (response_data) {
       return {
         success: true,
-        shorturl: response_data.short_url
+        shorturl: response_data.short_url,
+        qrcode: qrcode
       };
     }
     return errorResponse;

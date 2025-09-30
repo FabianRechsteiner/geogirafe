@@ -46,8 +46,8 @@
     "url": "https://sitn.ne.ch/pytree"
   },
   "share": {
-    "service": "lstu",
-    "createUrl": "https://lstu.fr/a"
+    "service": "gmf",
+    "createUrl": "https://sitn.ne.ch/short/create"
   },
   "projections": {
     "EPSG:3857": "W-M",

@@ -70,8 +70,8 @@
     }
   },
   "share": {
-    "service": "lstu",
-    "createUrl": "https://lstu.fr/a"
+    "service": "gmf",
+    "createUrl": "https://geomapfish-demo-2-8.camptocamp.com/short/create"
   },
   "projections": {
     "EPSG:3857": "W-M",

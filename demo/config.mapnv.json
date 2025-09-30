@@ -30,8 +30,8 @@
     "defaultLayout": "1 A4 Paysage"
   },
   "share": {
-    "service": "lstu",
-    "createUrl": "https://lstu.fr/a"
+    "service": "gmf",
+    "createUrl": "https://mapnv.ch/short/create"
   },
   "projections": {
     "EPSG:3857": "W-M",

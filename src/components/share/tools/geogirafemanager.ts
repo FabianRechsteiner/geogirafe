@@ -1,6 +1,7 @@
 import UrlManager from '../../../tools/url/urlmanager';
 import { GmfSuccessResponse } from './gmfmanager';
 import { IUrlShortener, UrlShortenerResponse } from './iurlshortener';
+import { generateQrCode } from '../../../tools/utils/qrcode';
 
 class GeoGirafeShareManager implements IUrlShortener {
   serviceUrl: string;
@@ -31,9 +32,11 @@ class GeoGirafeShareManager implements IUrlShortener {
         const baseUrl = UrlManager.getInstance().getBaseUrl();
         const hash = response_data.short_url.split('/').pop();
         const shortUrl = `${baseUrl}#gg-${hash}`;
+        const qrcode = await generateQrCode(shortUrl);
         return {
           success: true,
-          shorturl: shortUrl
+          shorturl: shortUrl,
+          qrcode: qrcode
         };
       }
 

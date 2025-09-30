@@ -81,7 +81,7 @@ class GirafeConfig {
     defaultVertexStrokeWidth: number;
   };
   share?: {
-    service: 'lstu' | 'gmf' | 'geogirafe' | null;
+    service: 'gmf' | 'geogirafe' | null;
     createUrl: string;
     getUrl?: string;
   };

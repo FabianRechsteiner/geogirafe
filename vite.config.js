@@ -80,6 +80,7 @@ export default defineConfig(({ command }) => {
               'file-saver',
               'tabulator-tables',
               'lz-string',
+              'qr-code-styling',
               'source-map-js',
               'tippy.js',
               'vanilla-picker'

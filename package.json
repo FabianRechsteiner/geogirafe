@@ -42,6 +42,7 @@
     "lodash-es": "4.17.21",
     "lz-string": "1.5.0",
     "oauth4webapi": "3.6.0",
+    "qr-code-styling": "1.9.2",
     "source-map-js": "1.2.1",
     "tabulator-tables": "6.3.1",
     "tippy.js": "6.3.7",
