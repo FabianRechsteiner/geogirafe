@@ -147,7 +147,6 @@ export default class MapComponent extends GirafeHTMLElement {
     this.subscribe('position.zoom', (_: number, newZoom: number) => this.zoomToZoom(newZoom));
     this.subscribe('position.center', (_: Coordinate, newCenter: Coordinate) => this.panToCoordinate(newCenter));
     this.subscribe('position.crosshair', () => this.showCrosshair(this.state.position));
-    this.subscribe('position.tooltip', () => this.showTooltip(this.state.position));
     this.subscribe('selection.selectionParameters', (_: SelectionParam[], newParams: SelectionParam[]) =>
       this.onSelectFeatures(newParams)
     );
@@ -817,7 +816,6 @@ export default class MapComponent extends GirafeHTMLElement {
       this.zoomToResolution(position.resolution);
       this.panToCoordinate(position.center);
       this.showCrosshair(position);
-      this.showTooltip(position);
     }
   }
 
@@ -1129,38 +1127,5 @@ export default class MapComponent extends GirafeHTMLElement {
     this.crosshairLayer = new VectorLayer({ source: new VectorSource({ features: [this.crosshairFeature] }) });
     this.setCrosshairStyle();
     this.olMap.addLayer(this.crosshairLayer);
-  }
-
-  showTooltip(position: MapPosition) {
-    if (!position.tooltip) {
-      return;
-    }
-
-    this.tooltipContainer = this.shadow.getElementById('popup') as HTMLElement;
-    const tooltipContent = this.shadow.getElementById('popup-content') as HTMLElement;
-
-    // Remove any existing overlay first
-    if (this.tooltipOverlay) {
-      this.olMap.removeOverlay(this.tooltipOverlay);
-    }
-
-    // Create the overlay
-    this.tooltipOverlay = new Overlay({
-      element: this.tooltipContainer,
-      autoPan: {
-        animation: {
-          duration: 250
-        }
-      }
-    });
-    this.olMap.addOverlay(this.tooltipOverlay);
-    tooltipContent.innerHTML = position.tooltip.content;
-    this.tooltipOverlay.setPosition(position.tooltip.position);
-    this.tooltipContainer.classList.remove('hidden');
-  }
-
-  hideTooltip() {
-    this.tooltipOverlay.setPosition(undefined);
-    this.tooltipContainer.classList.add('hidden');
   }
 }
