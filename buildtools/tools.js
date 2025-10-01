@@ -71,7 +71,9 @@ async function getStyleCode(currentFilename, relativeCssPath) {
 
 async function getHtmlCode(htmlFilePath, styleCode) {
   let htmlCode = fs.readFileSync(htmlFilePath, 'utf8');
-  htmlCode = await minify.html(htmlCode, { html: { minifyCSS: false } });
+  htmlCode = await minify.html(htmlCode, {
+    html: { minifyCSS: false, collapseBooleanAttributes: false, removeAttributeQuotes: false }
+  });
   htmlCode = `template = () => { return uHtml\`${styleCode}\n${htmlCode}\`; }`;
   return htmlCode;
 }
