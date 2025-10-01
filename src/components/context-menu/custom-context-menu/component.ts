@@ -1,86 +1,60 @@
-import type { Callback } from '../../../tools/state/statemanager';
-import { render } from 'uhtml';
-
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
-import I18nManager from '../../../tools/i18n/i18nmanager';
 import MapManager from '../../../tools/state/mapManager';
 import { Map, Overlay } from 'ol';
+import MapPosition from '../../../tools/state/mapposition';
+import areEqual from '../../../tools/state/brain/equality';
 
 class MapCustomContextMenuComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../../styles/common.css', '../mapcontextmenu.css'];
 
   private readonly map: Map;
-  private readonly eventsCallbacks: Callback[] = [];
-  i18nManager: I18nManager;
-  private contextMenuOverlay?: Overlay;
-  host: HTMLDivElement;
+  // We use a static property for the overlay
+  // Because OpenLayer is recreating a new object each time when we do an addOverlay()
+  private static contextMenuOverlay: Overlay;
 
   constructor() {
     super('custom-map-context-menu');
-    this.i18nManager = I18nManager.getInstance();
     this.map = MapManager.getInstance().getMap();
-    this.host = document.createElement('div');
-  }
 
-  async renderContent() {
-    render<HTMLDivElement>(this.host, this.template);
-    await this.i18nManager.translate(this.host as unknown as DocumentFragment);
-  }
-
-  showContextMenu(): void {
-    if (!this.contextMenuOverlay) {
-      this.renderContent();
-
-      this.contextMenuOverlay = new Overlay({
-        element: this.host,
+    if (!MapCustomContextMenuComponent.contextMenuOverlay) {
+      MapCustomContextMenuComponent.contextMenuOverlay = new Overlay({
+        element: this,
         autoPan: { animation: { duration: 250 } }
       });
-      this.map.addOverlay(this.contextMenuOverlay);
+      this.map.addOverlay(MapCustomContextMenuComponent.contextMenuOverlay);
+    }
+  }
+
+  render() {
+    if (this.state.position.tooltip) {
+      super.render();
+      MapCustomContextMenuComponent.contextMenuOverlay.setPosition(this.state.position.tooltip.position);
     } else {
-      this.renderContent();
-    }
-
-    this.contextMenuOverlay.setPosition(this.state.position.center);
-  }
-
-  closeMenu(): void {
-    this.unregisterEvents();
-    this.hideContextMenu();
-  }
-
-  hideContextMenu(): void {
-    if (this.contextMenuOverlay) {
-      this.contextMenuOverlay.setPosition(undefined);
+      super.renderEmpty();
     }
   }
 
-  registerEvents(): void {
-    this.eventsCallbacks.push(
-      this.subscribe('language', (_oldVal: string, _newVal: string) => {
-        console.debug(`Language changed from: ${_oldVal} to: ${_newVal}`);
-        if (this.contextMenuOverlay) {
-          this.renderContent();
-        }
-      })
-    );
+  public closeMenu() {
+    this.state.position.tooltip = undefined;
+    this.render();
+  }
 
-    // Map rendering complete event
-    this.map.once('rendercomplete', () => {
-      if (this.state.position.tooltip) {
-        this.showContextMenu();
+  private registerEvents() {
+    this.subscribe('position', (oldPos?: MapPosition, newPos?: MapPosition) => {
+      if (!areEqual(oldPos?.tooltip, newPos?.tooltip)) {
+        this.render();
       }
+    });
+    this.subscribe('position.tooltip', () => {
+      this.render();
     });
   }
 
-  unregisterEvents(): void {
-    this.unsubscribe(this.eventsCallbacks);
-    this.eventsCallbacks.length = 0;
-  }
-
-  async connectedCallback() {
-    await this.loadConfig();
-    this.registerEvents();
+  connectedCallback() {
+    this.loadConfig().then(() => {
+      this.registerEvents();
+    });
   }
 }
 

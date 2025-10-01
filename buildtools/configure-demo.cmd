@@ -20,10 +20,7 @@ if exist "demo\config.%name%.mobile.json" (
     copy /Y "demo\config.%name%.mobile.json" "%APPDIR%\config.mobile.json"
 )
 
-if "%name%"=="lausanne" (
-    curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
-    curl "https://map.lausanne.ch/static/dummy/fr.json" --output %OUTPUTDIR%\fr.json
-) else if "%name%"=="lie" (
+if "%name%"=="lie" (
     curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json
     curl "https://map.geo.llv.li/static/dummy/de.json" --output %OUTPUTDIR%\de.json
 ) else if "%name%"=="mapnv" (

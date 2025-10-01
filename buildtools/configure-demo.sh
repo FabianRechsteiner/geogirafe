@@ -26,12 +26,7 @@ if [ -f "demo/config.$name.mobile.json" ]; then
 fi
 
 # Special cases for Mocking themes and translations (still CORS errors from the backend)
-if [ "$name" = 'lausanne' ];
-then
-    curl "https://map.lausanne.ch/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
-    curl "https://map.lausanne.ch/static/dummy/fr.json" --silent --output $MOCKDIR/fr.json
-
-elif [ "$name" = 'lie' ];
+if [ "$name" = 'lie' ];
 then
     curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --silent --output $MOCKDIR/themes.json
     curl "https://map.geo.llv.li/static/dummy/de.json" --silent --output $MOCKDIR/de.json
