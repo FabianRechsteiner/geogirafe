@@ -191,13 +191,15 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     // It probably means that the layers are private ones or that the layer has been delete.
     // Add an infobox for this.
     for (const sharedChild of sharedLayer.children) {
-      const originalChild = originalLayer.children.find((c) => c.id == sharedChild.id);
-      if (!originalChild) {
-        ErrorManager.getInstance().pushMessage(
-          'unknown-layers-cannot-be-added',
-          'Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.',
-          'warning'
-        );
+      if (sharedChild.checked === 1) {
+        const originalChild = originalLayer.children.find((c) => c.id == sharedChild.id);
+        if (!originalChild) {
+          ErrorManager.getInstance().pushMessage(
+            'unknown-layers-cannot-be-added',
+            'Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.',
+            'warning'
+          );
+        }
       }
     }
   }
