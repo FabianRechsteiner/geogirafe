@@ -232,12 +232,7 @@ class TreeViewItemComponent extends TreeViewElement {
   }
 
   refreshLegends() {
-    if (
-      this.layer instanceof LayerWms &&
-      this.layer.hasRestrictedResolution() &&
-      this.layer.parent.isExpanded &&
-      this.layer.isLegendExpanded
-    ) {
+    if (this.layer instanceof LayerWms && this.layer.parent.isExpanded && this.layer.isLegendExpanded) {
       this.setWmsLegend();
       super.refreshRender();
     }
