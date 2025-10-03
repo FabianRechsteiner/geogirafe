@@ -8,7 +8,6 @@ import { DragBox } from 'ol/interaction';
 import { ScaleLine } from 'ol/control';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
 import { Geometry, GeometryCollection, Point } from 'ol/geom';
-import { Coordinate } from 'ol/coordinate';
 import { Extent, getCenter, getHeight, getWidth } from 'ol/extent';
 
 import { ScreenSpaceEventHandler, Cartesian2, Cesium3DTileset } from 'cesium';
@@ -144,12 +143,6 @@ export default class MapComponent extends GirafeHTMLElement {
       this.onChangeProjection(oldProjection, newProjection)
     );
     this.subscribe('interface.darkMapMode', () => this.onChangeDarkMode());
-    this.subscribe('position', (_: MapPosition, newPosition: MapPosition) => this.onPositionChanged(newPosition));
-    this.subscribe('position.scale', (_: number, newScale: number) => this.onChangeScale(newScale));
-    this.subscribe('position.resolution', (_: number, newResolution: number) => this.zoomToResolution(newResolution));
-    this.subscribe('position.zoom', (_: number, newZoom: number) => this.zoomToZoom(newZoom));
-    this.subscribe('position.center', (_: Coordinate, newCenter: Coordinate) => this.panToCoordinate(newCenter));
-    this.subscribe('position.crosshair', () => this.showCrosshair(this.state.position));
     this.subscribe('selection.selectionParameters', (_: SelectionParam[], newParams: SelectionParam[]) =>
       this.onSelectFeatures(newParams)
     );
@@ -202,10 +195,10 @@ export default class MapComponent extends GirafeHTMLElement {
 
     this.subscribe('application.isReady', (_: boolean, isLoaded: boolean) => {
       if (isLoaded) {
-        // The map component may not be full ready when other part of the application will be initialized
+        // The map component may not be fully ready when other part of the application will be initialized
         // And some operations that need a fuly loaded map need to be first done when the application is ready
-        // For example, Permalink needs redolution,
-        this.onPositionChanged(this.state.position);
+        // For example, Permalink needs resolution,
+        this.showCrosshair(this.state.position);
         this.onCameraChanged(this.state.globe.camera);
         // If the app is opened from a permalink, prioritize this data over settings in the shared state
         if (this.permalinkManager.hasFeatureSelectionQuery()) {
@@ -815,14 +808,6 @@ export default class MapComponent extends GirafeHTMLElement {
     this.setHighlightLayerStyle();
   }
 
-  onPositionChanged(position: MapPosition) {
-    if (position.isValid) {
-      this.zoomToResolution(position.resolution);
-      this.panToCoordinate(position.center);
-      this.showCrosshair(position);
-    }
-  }
-
   onCameraChanged(camera: CameraConfig | null) {
     if (this.map3d && camera) {
       const scene = this.map3d.getCesiumScene();
@@ -837,25 +822,8 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onChangeScale(scale: number) {
-    this.viewManager.setScale(scale);
-  }
-
-  zoomToResolution(resolution: number) {
-    if (resolution >= 0) {
-      this.viewManager.setResolution(resolution);
-    }
-  }
-
-  zoomToZoom(zoom: number) {
-    this.viewManager.setZoom(zoom);
-  }
   zoomToExtent(extent: Extent) {
     this.olMap.getView().fit(extent);
-  }
-
-  panToCoordinate(coordinate: Coordinate) {
-    this.viewManager.setCenter(coordinate);
   }
 
   onChangeProjection(_oldSrid: string, newSrid: string) {
@@ -1115,10 +1083,7 @@ export default class MapComponent extends GirafeHTMLElement {
     const position = PermalinkManager.getInstance().getMapPosition(this.projection);
     if (position?.isValid) {
       // We need the following to recalculate resolution and scale to properly update the position state
-      this.state.position.zoom = position.zoom;
-      this.state.position.center = position.center;
-      this.state.position.crosshair = position.crosshair;
-      this.state.position.tooltip = position.tooltip;
+      this.state.position = position;
     }
   }
 

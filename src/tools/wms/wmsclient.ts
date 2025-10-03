@@ -361,13 +361,15 @@ export default abstract class WmsClient {
 
   private getFeatureInfoUrl(param: SelectionParam): Record<string, string> {
     /* Url-layerName (feature id) objects. */
-    if (this.state.position.resolution === -1) {
-      console.log('WMSClient called before resolution is set.');
-    }
     const urlsAndLayerNames: Record<string, string> = {};
+    const currentResolution = this.state.position.resolution;
+    if (!currentResolution) {
+      console.log('WMSClient called before resolution is set.');
+      return urlsAndLayerNames;
+    }
     param._layers.forEach((layer) => {
       const olLayer = param._oLayer ?? this.getOLayer(layer);
-      if (!layer.queryable || !olLayer || !layer.isVisibleAtResolution(this.state.position.resolution)) {
+      if (!layer.queryable || !olLayer || !layer.isVisibleAtResolution(currentResolution)) {
         return;
       }
       // Layer is queryable through WMS and has an OL layer.
@@ -378,8 +380,7 @@ export default abstract class WmsClient {
         .getSource()
         ?.getFeatureInfoUrl(
           coordinate,
-          (olLayer.getMapInternal()?.getView().getResolution() ?? this.state.position.resolution) +
-            this.resolutionTolerance,
+          (olLayer.getMapInternal()?.getView().getResolution() ?? currentResolution) + this.resolutionTolerance,
           this.state.projection,
           {
             INFO_FORMAT: 'application/vnd.ogc.gml',

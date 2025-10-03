@@ -2,10 +2,10 @@ import { Coordinate } from 'ol/coordinate';
 
 class MapPosition {
   center: Coordinate = [];
-  zoom: number = 0;
+  zoom?: number;
   // Dummy default value because it should never be null. It will be recalculated when the map is created
-  resolution: number = -1;
-  scale: number = 0;
+  resolution?: number;
+  scale?: number;
   crosshair?: Coordinate;
   tooltip?: {
     content: string;

@@ -1,9 +1,8 @@
 import View from 'ol/View';
-import { getPointResolution, get as getProjection, transform } from 'ol/proj';
+import { get as getProjection, transform } from 'ol/proj';
 import ConfigManager from '../../../tools/configuration/configmanager';
 import GeoConsts from '../../../tools/geoconsts';
 import { Map } from 'ol';
-import { Coordinate } from 'ol/coordinate';
 import StateManager from '../../../tools/state/statemanager';
 
 class ViewManager {
@@ -19,32 +18,35 @@ class ViewManager {
 
   configManager: ConfigManager;
 
-  // Those 3 values are linked and can indicate the current zoomlevel/resolution/scale
-  zoom: number | null = null;
-  resolution: number | null = null;
-  scale: number | null = null;
-
-  defaultSrid: string;
-  center: number[];
-  extent?: number[];
   scales: number[];
   allowedResolutions: number[];
   constrainScales: boolean;
   constrainRotation: boolean | number;
+  view: View;
 
   constructor(map: Map) {
     this.map = map;
 
     this.configManager = ConfigManager.getInstance();
-    this.defaultSrid = this.configManager.getDefaultConfigValue('map.srid') as string;
-    this.center = this.configManager.Config.map.startPosition.split(',').map(Number);
-    this.state.position.zoom = Number(this.configManager.Config.map.startZoom);
     this.constrainScales = this.configManager.Config.map.constrainScales;
     this.constrainRotation = this.configManager.Config.map.constrainRotation;
-    this.extent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
 
     this.scales = this.configManager.Config.map.scales;
     this.allowedResolutions = this.scalesToResolutions(this.scales);
+
+    this.view = new View({
+      center: this.configManager.Config.map.startPosition.split(',').map(Number),
+      zoom: Number(this.configManager.Config.map.startZoom),
+      projection: this.configManager.getDefaultConfigValue('map.srid') as string,
+      extent: this.configManager.Config.map.maxExtent?.split(',').map(Number),
+      resolutions: this.allowedResolutions,
+      constrainResolution: this.constrainScales,
+      constrainRotation: this.constrainRotation
+    });
+
+    const stateManager = StateManager.getInstance();
+    this.updateStatePosition();
+    stateManager.subscribe(/position(\..*)?/, (_: unknown, _newValue: unknown) => this.onPositionChanged());
   }
 
   scalesToResolutions(scales: number[]) {
@@ -68,7 +70,7 @@ class ViewManager {
 
   getScale() {
     const unit = this.projection.getUnits();
-    const resolution = this.map.getView().getResolution()!;
+    const resolution = this.view.getResolution()!;
     const scale =
       resolution *
       (GeoConsts.METERS_PER_UNIT as Record<string, number>)[unit] *
@@ -77,21 +79,24 @@ class ViewManager {
     return scale;
   }
 
+  updateStatePosition() {
+    const mapPosition = this.state.position.clone();
+    mapPosition.center = this.view.getCenter()!;
+    const currentResolution = this.view.getResolution();
+    if (currentResolution && currentResolution > 0) {
+      mapPosition.resolution = currentResolution;
+    }
+    mapPosition.zoom = this.view.getZoom() ?? mapPosition.zoom;
+    mapPosition.scale = this.getScale();
+    this.state.position = mapPosition;
+  }
+
   getDefaultView() {
-    // Will return the default map view based on the map properties from config.json
-    return new View({
-      center: this.center,
-      zoom: this.zoom ?? undefined,
-      projection: this.defaultSrid,
-      extent: this.extent,
-      resolutions: this.allowedResolutions,
-      constrainResolution: this.constrainScales,
-      constrainRotation: this.constrainRotation
-    });
+    return this.view;
   }
 
   getViewConvertedToSrid(newSrid: string) {
-    const currentView = this.map.getView();
+    const currentView = this.view;
     const currentProjection = currentView.getProjection();
     if (currentProjection.getCode() === newSrid) {
       // Nothing to do
@@ -99,18 +104,11 @@ class ViewManager {
     }
 
     // Convert old values...
-    const currentResolution = currentView.getResolution()!;
     const currentCenter = currentView.getCenter()!;
     const currentRotation = currentView.getRotation();
 
     // ... to new ones
-    this.center = transform(currentCenter, currentProjection, this.projection);
-    const currentMPU = currentProjection.getMetersPerUnit()!;
-    const newMPU = this.projection.getMetersPerUnit()!;
-    const currentPointResolution =
-      getPointResolution(currentProjection, 1 / currentMPU, currentCenter, 'm') * currentMPU;
-    const newPointResolution = getPointResolution(this.projection, 1 / newMPU, this.center, 'm') * newMPU;
-    const newResolution = (currentResolution * currentPointResolution) / newPointResolution;
+    const newCenter = transform(currentCenter, currentProjection, this.projection);
     this.allowedResolutions = this.scalesToResolutions(this.scales);
 
     // If there is a configured max extent, convert it.
@@ -123,8 +121,8 @@ class ViewManager {
     }
 
     const newView = new View({
-      center: this.center,
-      resolution: newResolution,
+      center: newCenter,
+      zoom: currentView.getZoom(),
       rotation: currentRotation,
       projection: this.projection,
       resolutions: this.allowedResolutions,
@@ -132,33 +130,31 @@ class ViewManager {
       constrainRotation: this.constrainRotation,
       extent: newExtent
     });
-    return newView;
+
+    this.view = newView;
+    this.updateStatePosition();
+
+    return this.view;
   }
 
-  setCenter(center: Coordinate) {
-    this.center = center;
-    this.map.getView().setCenter(center);
-  }
-
-  setZoom(zoom: number) {
-    this.zoom = zoom;
-    this.map.getView().setZoom(this.zoom);
-    this.resolution = this.map.getView().getResolution() ?? null;
-    this.scale = this.getScale();
-  }
-
-  setResolution(resolution: number) {
-    this.resolution = resolution;
-    this.map.getView().setResolution(this.resolution);
-    this.zoom = this.map.getView().getZoom() ?? null;
-    this.scale = this.getScale();
+  onPositionChanged() {
+    const position = this.state.position;
+    if (position.zoom && position.zoom !== this.view.getZoom()) {
+      this.view.setZoom(position.zoom);
+    } else if (position.resolution && position.resolution !== this.view.getResolution() && position.resolution >= 0) {
+      this.view.setResolution(position.resolution);
+    } else if (position.scale && position.scale !== this.getScale()) {
+      this.setScale(position.scale);
+    }
+    if (position.center && position.center.length === 2 && position.center !== this.view.getCenter()) {
+      this.view.setCenter(position.center);
+    }
+    this.updateStatePosition();
   }
 
   setScale(scale: number) {
-    this.scale = scale;
-    this.resolution = this.scaleToResolution(scale);
-    this.map.getView().setResolution(this.resolution);
-    this.zoom = this.map.getView().getZoom() ?? null;
+    const resolution = this.scaleToResolution(scale);
+    this.view.setResolution(resolution);
   }
 }
 

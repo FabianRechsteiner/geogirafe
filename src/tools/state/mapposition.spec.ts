@@ -10,9 +10,9 @@ describe('MapPosition', () => {
 
   it('should initialize with default values', () => {
     expect(mapPosition.center).toEqual([]);
-    expect(mapPosition.zoom).toBe(0);
-    expect(mapPosition.resolution).toBe(-1);
-    expect(mapPosition.scale).toBe(0);
+    expect(mapPosition.zoom).toBeUndefined();
+    expect(mapPosition.resolution).toBeUndefined();
+    expect(mapPosition.scale).toBeUndefined();
     expect(mapPosition.crosshair).toBeUndefined();
     expect(mapPosition.tooltip).toBeUndefined();
   });
