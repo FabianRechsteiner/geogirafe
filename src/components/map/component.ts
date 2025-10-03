@@ -111,6 +111,8 @@ export default class MapComponent extends GirafeHTMLElement {
   dragbox!: DragBox;
   focusFeature: FocusFeature;
 
+  mapTargetResizeObserver!: ResizeObserver;
+
   constructor() {
     super('map');
     this.olMap = MapManager.getInstance().getMap();
@@ -390,6 +392,11 @@ export default class MapComponent extends GirafeHTMLElement {
     setTimeout(() => {
       this.olMap.updateSize();
     }, 1000);
+
+    this.mapTargetResizeObserver = new ResizeObserver(() => {
+      this.updateCloseSwiperPosition();
+    });
+    this.mapTargetResizeObserver.observe(this.mapTarget);
   }
 
   listenOpenLayersEvents() {
@@ -564,9 +571,9 @@ export default class MapComponent extends GirafeHTMLElement {
    * updates icon position when swipe is moved
    */
   updateCloseSwiperPosition() {
-    const sliderValue = parseFloat(this.swiper.value);
-    const max = parseFloat(this.swiper.max);
-    const min = parseFloat(this.swiper.min);
+    const sliderValue = Number.parseFloat(this.swiper.value);
+    const max = Number.parseFloat(this.swiper.max);
+    const min = Number.parseFloat(this.swiper.min);
     const percent = (sliderValue - min) / (max - min);
     const offset = percent * this.swiper.offsetWidth;
     this.closeSwiperButton.style.left = `${offset}px`;
@@ -643,7 +650,7 @@ export default class MapComponent extends GirafeHTMLElement {
         target: this.map3dTarget,
         time: () => {
           const date = new Date(this.map3dShadowsTimestamp);
-          return isNaN(date.getTime()) ? Cesium.JulianDate.now() : Cesium.JulianDate.fromDate(date);
+          return Number.isNaN(date.getTime()) ? Cesium.JulianDate.now() : Cesium.JulianDate.fromDate(date);
         }
       });
       const scene = this.map3d.getCesiumScene();
