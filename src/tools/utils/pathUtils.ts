@@ -11,10 +11,15 @@ export const getPropertyByPath = (obj: any, path: string) => {
     const keys = path.split('.');
 
     for (const key of keys) {
-      if (key in currentObj) {
+      const escapedKey = key.replaceAll(/[()?*\\]/g, '').trim(); // Remove regex operators
+      // When you split /position(\..*)? you might get an empty string as key.
+      if (escapedKey === '') {
+        continue;
+      }
+      if (escapedKey in currentObj) {
         parentObject = currentObj;
-        lastKey = key;
-        currentObj = currentObj[key];
+        lastKey = escapedKey;
+        currentObj = currentObj[escapedKey];
       } else {
         return { found: false, object: null, parentObject, lastKey };
       }

@@ -22,10 +22,6 @@ export default class ApplicationLifeCycleManager extends GirafeSingleton {
       this.log(newValue, 'Position is initialized');
       this.checkApplicationReady();
     });
-    this.stateManager.subscribe('position.resolution', (_, newValue) => {
-      this.log(newValue, 'Position is initialized');
-      this.checkApplicationReady();
-    });
     this.stateManager.subscribe('application.isConfigurationLoaded', (_, newValue) => {
       this.log(newValue, 'Configuration is loaded');
       this.checkApplicationReady();
@@ -60,7 +56,7 @@ export default class ApplicationLifeCycleManager extends GirafeSingleton {
       !this.state.application.isConfigurationLoaded ||
       !this.state.themes.isLoaded ||
       !this.state.projection ||
-      this.state.position.resolution < 0 ||
+      !this.state.position.resolution ||
       !this.state.application.isStateInitialized ||
       !this.state.application.isAuthInitialized
     ) {

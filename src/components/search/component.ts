@@ -350,15 +350,16 @@ class SearchComponent extends GirafeHTMLElement {
         this.updatePreviewLayerStyle();
       }
     }
-    if (result.properties?.actions[0].action === 'add_layer' && this.configManager.Config.search.layerPreview) {
-      const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
+    const firstAction = result.properties?.actions?.[0];
+    if (firstAction?.action === 'add_layer' && this.configManager.Config.search.layerPreview) {
+      const layer = this.themesHelper.findLayerByName(firstAction.data);
       if (layer) {
         const clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
         clonedTheme.order = 0;
         clonedTheme.isExpanded = true;
         this.previewLayers = this.themesHelper.mergeThemeInLayerTree(clonedTheme, true);
       } else {
-        console.error(`Layer ${result.properties?.actions[0].data} cannot be found`);
+        console.error(`Layer ${firstAction.data} cannot be found`);
       }
     }
   }

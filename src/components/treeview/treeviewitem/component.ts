@@ -270,7 +270,11 @@ class TreeViewItemComponent extends TreeViewElement {
       // Always true for not WMS/WMTS layers
       return true;
     }
-    return this.layer.isVisibleAtResolution(this.state.position.resolution);
+    const currentResolution = this.state.position.resolution;
+    if (currentResolution) {
+      return this.layer.isVisibleAtResolution(this.state.position.resolution!);
+    }
+    return false;
   }
 
   zoomToFullExtent() {

@@ -3,3 +3,7 @@ a {
   text-decoration: none;
   text-transform: uppercase;
 }
+
+a:visited {
+  color: white;
+}
