@@ -7,6 +7,8 @@ class InfoboxComponent extends GirafeHTMLElement {
 
   infos = [] as InfoBoxContent[];
 
+  urlRegExp = /(https?:\/\/[^"<]*?(?=\s|$|<\/[^a]>))/gi;
+
   constructor() {
     super('infobox');
   }
@@ -20,6 +22,13 @@ class InfoboxComponent extends GirafeHTMLElement {
       this.state.infobox.elements.findIndex((el) => el.id === info.id),
       1
     );
+  }
+
+  linkify(str: string) {
+    if (this.urlRegExp.test(str)) {
+      return str.replaceAll(this.urlRegExp, '<a href="$1" target="_blank">$1</a>');
+    }
+    return str;
   }
 
   connectedCallback() {
