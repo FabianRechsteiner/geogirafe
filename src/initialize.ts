@@ -79,18 +79,18 @@ async function waitForServiceWorkerActivation(): Promise<ServiceWorker> {
 async function initializeServiceWorker() {
   const storeVersion: number = 6;
   const dbCacheName: string = 'geogirafe-cache';
+  if (globalThis.location.protocol !== 'https:') {
+    throw new Error('Service worker registration not possible if the application is served over HTTP.');
+  }
   if (!navigator?.serviceWorker) {
-    console.warn("Service worker not supported by your browser. Authentication and offline maps won't work");
-    return;
+    throw new Error('Service worker not supported by your browser.');
   }
 
   let sw: ServiceWorker;
   try {
     sw = await waitForServiceWorkerActivation();
   } catch (err) {
-    console.error('Service worker registration failed:', err);
-    console.warn("Service worker could not be initialized. Authentication and offline maps won't work");
-    return;
+    throw new Error(`Service worker registration failed. ${err}`);
   }
 
   // Communicate logging configuration to service-worker
@@ -130,7 +130,13 @@ export async function initialize() {
   register(proj4);
 
   // Register Service Worker
-  await initializeServiceWorker();
+  try {
+    await initializeServiceWorker();
+  } catch (e) {
+    console.error("Service worker could not be initialized. Authentication and offline maps won't work.\n", e);
+    // Finish auth initialization, since without a service worker auth isn't possible
+    StateManager.getInstance().state.application.isAuthInitialized = true;
+  }
 
   // Initialize the managers
   ApplicationLifeCycleManager.getInstance();
