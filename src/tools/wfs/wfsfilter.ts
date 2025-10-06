@@ -31,6 +31,10 @@ export const wfsOperatorsStrList = [
 ] as const;
 export type WfsOperator = (typeof wfsOperatorsStrList)[number];
 
+export function isWfsOperator(value: string): value is WfsOperator {
+  return wfsOperatorsStrList.includes(value as WfsOperator);
+}
+
 export const mapAttributeTypeToFilterOperators: Record<'string' | 'number' | 'date', WfsOperator[]> = {
   string: ['eq', 'neq', 'like', 'nlike', 'nul', 'nnul'],
   number: ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'between', 'nul', 'nnul'],
