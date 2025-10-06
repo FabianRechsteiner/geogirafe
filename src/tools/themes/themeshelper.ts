@@ -2,17 +2,22 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import CustomTheme from '../../models/customtheme';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
+import ILayerWithFilter from '../../models/layers/ilayerwithfilter';
 import Layer from '../../models/layers/layer';
+import LayerWms from '../../models/layers/layerwms';
 import ThemeLayer from '../../models/layers/themelayer';
+import { isTimeAwareLayer, TimeAwareLayer } from '../../models/layers/timeawarelayer';
 import ConfigManager from '../configuration/configmanager';
 import LayerManager from '../layers/layermanager';
 import StateManager from '../state/statemanager';
 import PermalinkManager from '../url/permalinkmanager';
+import WfsFilter, { isWfsOperator } from '../wfs/wfsfilter';
 
 export default class ThemesHelper extends GirafeSingleton {
   configManager: ConfigManager;
   stateManager: StateManager;
   permalinkManager: PermalinkManager;
+  layerManager: LayerManager;
 
   constructor(type: string) {
     super(type);
@@ -20,6 +25,7 @@ export default class ThemesHelper extends GirafeSingleton {
     this.configManager = ConfigManager.getInstance();
     this.stateManager = StateManager.getInstance();
     this.permalinkManager = PermalinkManager.getInstance();
+    this.layerManager = LayerManager.getInstance();
 
     this.stateManager.subscribe(
       'themes.lastSelectedTheme',
@@ -230,42 +236,121 @@ export default class ThemesHelper extends GirafeSingleton {
   public addLayersFromUrl(): boolean {
     let added = false;
     if (this.permalinkManager.hasLayers()) {
-      for (let layername of this.permalinkManager.getLayers()) {
+      for (const layername of this.permalinkManager.getLayers()) {
         added = this.addLayerBaseFromUrl(layername, 'layer') || added;
       }
     }
     return added;
   }
 
-  private addLayerBaseFromUrl(name: string, type: 'layer' | 'group'): boolean {
+  private addLayerBaseFromUrl(layer: string, type: 'layer' | 'group'): boolean {
     let added = false;
-    let activate = true;
-    if (name.startsWith('!')) {
-      activate = false;
-      name = name.substring(1);
-    }
-    const layerOrGroup = type === 'layer' ? this.findLayerByName(name) : this.findGroupByName(name);
-    if (layerOrGroup) {
-      const clonedTheme = this.getMinimalClonedThemeForLayer(layerOrGroup);
+    const layerOptions = this.extractLayerOptions(layer, type);
+    if (layerOptions) {
+      const clonedTheme = this.getMinimalClonedThemeForLayer(layerOptions.originalLayer);
       this.mergeLayerWithExistingLayerTree(clonedTheme, this.state.layers.layersList);
       added = true;
-      if (activate) {
-        const clonedLayer = this.findLayerRecursive(clonedTheme.children, name);
+      if (layerOptions.active) {
+        const clonedLayer = this.findLayerRecursive(clonedTheme.children, layerOptions.originalLayer.name);
         if (clonedLayer) {
-          LayerManager.getInstance().toggle(clonedLayer, 'on');
+          this.layerManager.toggle(clonedLayer, 'on');
+          if (layerOptions.opacity) {
+            (clonedLayer as Layer).opacity = layerOptions.opacity;
+          }
+          if (layerOptions.filter) {
+            (clonedLayer as unknown as ILayerWithFilter).filter = layerOptions.filter;
+          }
+          if (layerOptions.timeRestriction) {
+            (clonedLayer as TimeAwareLayer).timeRestriction = layerOptions.timeRestriction;
+          }
         }
       }
     } else {
-      console.warn(`Layer ${name} cannot be found`);
+      console.warn(`Layer ${layer} cannot be found`);
     }
     return added;
+  }
+
+  private extractLayerOptions(urlParam: string, type: 'layer' | 'group') {
+    let active = true;
+    if (urlParam.startsWith('!')) {
+      active = false;
+      urlParam = urlParam.substring(1);
+    }
+
+    const layerOptions = urlParam.split('|');
+    const layername = layerOptions[0];
+    const layerOrGroup = type === 'layer' ? this.findLayerByName(layername) : this.findGroupByName(layername);
+    if (!layerOrGroup) {
+      // No layer found
+      return;
+    }
+    let opacity = undefined;
+    let filter = undefined;
+    let timeRestriction = undefined;
+    for (let i = 1; i < layerOptions.length; ++i) {
+      const option = layerOptions[i];
+      if (option.startsWith('o;')) {
+        opacity = this.extractLayerOptionOpacity(layerOrGroup, option);
+      } else if (option.startsWith('f;')) {
+        filter = this.extractLayerOptionFilter(layerOrGroup, option);
+      } else if (option.startsWith('t;')) {
+        timeRestriction = this.extractLayerOptionTime(layerOrGroup, option);
+      }
+    }
+
+    return {
+      originalLayer: layerOrGroup,
+      active: active,
+      opacity: opacity,
+      filter: filter,
+      timeRestriction: timeRestriction
+    };
+  }
+
+  private extractLayerOptionOpacity(layerOrGroup: Layer | GroupLayer, option: string): number | undefined {
+    if (!(layerOrGroup instanceof Layer)) {
+      console.warn('Permalink: opacity configuration is only allowed for layers.');
+      return;
+    }
+    return Number(option.substring(2));
+  }
+
+  private extractLayerOptionFilter(layerOrGroup: Layer | GroupLayer, option: string): WfsFilter | undefined {
+    if (!(layerOrGroup instanceof Layer)) {
+      console.warn('Permalink: filter configuration is only allowed for layers.');
+      return;
+    }
+    if (!(layerOrGroup instanceof LayerWms)) {
+      console.warn('Permalink: filter configuration is only allowed for layers that support filters.');
+      return;
+    }
+    const filterParams = option.substring(2).split(';');
+    const filterProperty = filterParams[0];
+    const filterOperator = filterParams[1];
+    if (!isWfsOperator(filterOperator)) {
+      console.warn('Permalink: filter operator is unknown.');
+      return;
+    }
+    const filterValue = filterParams[2];
+    const filterPropertyType = filterParams.length > 3 ? filterParams[3] : 'string';
+
+    return new WfsFilter(filterProperty, filterOperator, filterValue, undefined, filterPropertyType);
+  }
+
+  private extractLayerOptionTime(layerOrGroup: Layer | GroupLayer, option: string): string | undefined {
+    if (!isTimeAwareLayer(layerOrGroup)) {
+      console.warn('Permalink: time configuration is only allowed for layers that support time configuration.');
+      return;
+    }
+    return option.substring(2);
   }
 
   public mergeThemeInLayerTree(theme: ThemeLayer, activate: boolean = false): BaseLayer[] {
     const insertedLayers = this.mergeLayerWithExistingLayerTree(theme, this.state.layers.layersList);
     if (activate) {
       for (const insertedLayer of insertedLayers) {
-        LayerManager.getInstance().toggle(insertedLayer, 'on');
+        this.layerManager.toggle(insertedLayer, 'on');
       }
     }
     return insertedLayers;
@@ -309,7 +394,7 @@ export default class ThemesHelper extends GirafeSingleton {
 
   public removeLayersFromLayerTree(layersToRemove: BaseLayer[]) {
     for (const layerToRemove of layersToRemove) {
-      LayerManager.getInstance().toggle(layerToRemove, 'off');
+      this.layerManager.toggle(layerToRemove, 'off');
       this.removeLayersFromExistingLayerTree(layerToRemove, this.state.layers.layersList);
     }
   }
