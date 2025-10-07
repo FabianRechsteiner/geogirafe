@@ -1,17 +1,15 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import AuthManager from '../../tools/auth/authmanager';
 
-export class OauthComponent extends GirafeHTMLElement {
+export default class OauthComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
   public userIconUrl?: string;
+  private readonly oauthManager: AuthManager;
 
-  oauthManager: AuthManager;
-  public menuOpen: boolean = false;
-
-  constructor() {
-    super('oauth');
+  constructor(name: string = 'oauth') {
+    super(name);
     console.info('OauthComponent constructor');
     this.oauthManager = AuthManager.getInstance();
   }
@@ -81,5 +79,3 @@ export class OauthComponent extends GirafeHTMLElement {
     });
   }
 }
-
-export default OauthComponent;

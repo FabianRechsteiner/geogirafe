@@ -29,7 +29,7 @@ class GeoGirafeShareManager implements IUrlShortener {
 
       const response_data = (await response.json()) as GmfSuccessResponse;
       if (response_data) {
-        const baseUrl = UrlManager.getInstance().getBaseUrl();
+        const baseUrl = UrlManager.getInstance().getBaseUrlPath();
         const hash = response_data.short_url.split('/').pop();
         const shortUrl = `${baseUrl}#gg-${hash}`;
         const qrcode = await generateQrCode(shortUrl);

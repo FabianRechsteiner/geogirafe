@@ -153,7 +153,7 @@ class ShareComponent extends GirafeHTMLElement {
       return;
     }
 
-    const baseUrl = UrlManager.getInstance().getBaseUrl();
+    const baseUrl = UrlManager.getInstance().getBaseUrlPath();
     const hash = this.shareManager.getStateToShare();
 
     // Get short URL
@@ -169,7 +169,7 @@ class ShareComponent extends GirafeHTMLElement {
       return;
     }
 
-    const baseUrl = UrlManager.getInstance().getBaseUrl();
+    const baseUrl = UrlManager.getInstance().getRootUrl();
     const hash = this.shareManager.getStateToShare();
 
     // Get short URL for iframe
