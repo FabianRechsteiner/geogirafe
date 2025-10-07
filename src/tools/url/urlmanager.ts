@@ -2,14 +2,14 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 
 export default class UrlManager extends GirafeSingleton {
   public getParam(param: string): string | null {
-    return new URL(window.location.href).searchParams.get(param);
+    return new URL(globalThis.location.href).searchParams.get(param);
   }
 
   /**
    * Read all the arguments from the current url
    */
   public getParams(...args: string[]): Record<string, string | null> {
-    const url = new URL(window.location.href);
+    const url = new URL(globalThis.location.href);
     const result: Record<string, string | null> = {};
     for (const arg of args) {
       result[arg] = url.searchParams.get(arg);
@@ -19,7 +19,7 @@ export default class UrlManager extends GirafeSingleton {
   }
 
   public getParamsWithPrefix(...prefixList: string[]): Record<string, string | null> {
-    const url = new URL(window.location.href);
+    const url = new URL(globalThis.location.href);
     const result: Record<string, string | null> = {};
     for (const prefix of prefixList) {
       for (const [key, value] of url.searchParams) {
@@ -36,7 +36,7 @@ export default class UrlManager extends GirafeSingleton {
    * Remove the arguments from the current url
    */
   public removeParams(...args: string[]) {
-    const url = new URL(window.location.href);
+    const url = new URL(globalThis.location.href);
     for (const arg of args) {
       url.searchParams.delete(arg);
     }
@@ -44,12 +44,21 @@ export default class UrlManager extends GirafeSingleton {
   }
 
   /**
-   * Return the current url without the url parameters
+   * Return the current root URL
    */
-  public getBaseUrl() {
-    const currentUrl = new URL(window.location.href);
+  public getRootUrl() {
+    const currentUrl = new URL(globalThis.location.href);
     const pathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/') + 1);
     const baseUrl = `${currentUrl.protocol}//${currentUrl.host}${pathname}`;
+    return baseUrl;
+  }
+
+  /**
+   * Return the current url without the url parameters
+   */
+  public getBaseUrlPath() {
+    const currentUrl = new URL(globalThis.location.href);
+    const baseUrl = `${currentUrl.protocol}//${currentUrl.host}${currentUrl.pathname}`;
     return baseUrl;
   }
 
@@ -59,14 +68,14 @@ export default class UrlManager extends GirafeSingleton {
    * @param data optional data to pass to replaceState
    */
   public updateUrl(url: string | URL, data?: unknown): void {
-    window.history.replaceState(data, '', url);
+    globalThis.history.replaceState(data, '', url);
   }
 
   /**
    * Update the hash of the url
    */
   public updateHash(hash: string) {
-    const url = new URL(window.location.href);
+    const url = new URL(globalThis.location.href);
     url.hash = hash;
     this.updateUrl(url);
   }
@@ -75,7 +84,7 @@ export default class UrlManager extends GirafeSingleton {
    * Get the current hash from the url
    */
   public getHash() {
-    const url = new URL(window.location.href);
+    const url = new URL(globalThis.location.href);
     if (url.hash.length > 0 && url.hash.startsWith('#')) {
       return url.hash.substring(1);
     }

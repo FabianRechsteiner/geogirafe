@@ -73,9 +73,12 @@ export default abstract class AbstractConnectManager extends GirafeSingleton {
   }
 
   protected getLoginRedirectUrl(silent: boolean) {
-    const url = new URL(this.urlManager.getBaseUrl());
+    let url;
     if (silent) {
+      url = new URL(this.urlManager.getRootUrl());
       url.pathname += 'silentlogincallback.html';
+    } else {
+      url = new URL(this.urlManager.getBaseUrlPath());
     }
 
     url.searchParams.append('authentified', 'true');
@@ -84,7 +87,7 @@ export default abstract class AbstractConnectManager extends GirafeSingleton {
   }
 
   protected getLogoutRedirectUrl() {
-    const url = new URL(this.urlManager.getBaseUrl());
+    const url = new URL(this.urlManager.getBaseUrlPath());
     url.searchParams.append('authentified', 'false');
     url.hash = this.urlManager.getHash() ?? '';
     return url.toString();
@@ -99,7 +102,7 @@ export default abstract class AbstractConnectManager extends GirafeSingleton {
   }
 
   protected resetUrl() {
-    const url = new URL(this.urlManager.getBaseUrl());
+    const url = new URL(this.urlManager.getBaseUrlPath());
     url.hash = this.urlManager.getHash() ?? '';
     this.urlManager.updateUrl(url);
   }

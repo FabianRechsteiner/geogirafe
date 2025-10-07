@@ -28,6 +28,7 @@ import MenuMobile3dButton from './components/menu-buttons-mobile/MenuMobile3dBut
 import MenuMobileOfflineButton from './components/menu-buttons-mobile/MenuMobileOfflineButton';
 import MenuMobileDrawingButton from './components/menu-buttons-mobile/MenuMobileDrawingButton';
 import ModalsComponent from './components/modals/component';
+import MobileOauthComponent from './components/auth-mobile/component';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
@@ -99,6 +100,7 @@ initialize().then(() => {
   customElements.define('girafe-menu-mobile-3d-button', MenuMobile3dButton);
   customElements.define('girafe-menu-mobile-offline-button', MenuMobileOfflineButton);
   customElements.define('girafe-menu-mobile-drawing-button', MenuMobileDrawingButton);
+  customElements.define('girafe-oauth-mobile', MobileOauthComponent);
 
   // Remove the splash-screen
   splash.end();

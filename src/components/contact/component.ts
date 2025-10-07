@@ -28,7 +28,7 @@ class ContactComponent extends GirafeHTMLElement {
   }
 
   private getCurrentStateUrl() {
-    const baseUrl = UrlManager.getInstance().getBaseUrl();
+    const baseUrl = UrlManager.getInstance().getBaseUrlPath();
     const hash = ShareManager.getInstance().getStateToShare();
     return `${baseUrl}#${hash}`;
   }
