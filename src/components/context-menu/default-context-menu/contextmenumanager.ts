@@ -1,15 +1,9 @@
 import ConfigManager from '../../../tools/configuration/configmanager';
 import I18nManager from '../../../tools/i18n/i18nmanager';
-import GirafeConfig from '../../../tools/configuration/girafeconfig';
 import { MapContextMenuState } from './contextmenustate';
 import { GeoTIFFImage } from 'geotiff';
 import { GeoTransform, getPixelValue, getImage, extractGeoTransform } from '../../../tools/raster/rasterutils';
 import proj4 from 'proj4';
-
-type ContextmenuConfig = GirafeConfig['contextmenu'];
-type CRS = GirafeConfig['contextmenu']['crs'][0];
-type Link = GirafeConfig['contextmenu']['links'][0];
-type RasterSource = GirafeConfig['contextmenu']['sources'][0];
 
 interface Raster {
   id: string;
@@ -27,34 +21,37 @@ interface Raster {
   nodata: number;
 }
 
-export class MapContextMenuManager {
-  private readonly MapContextMenuState: MapContextMenuState;
+export default class MapContextMenuManager {
+  private readonly mapContextMenuState: MapContextMenuState;
   private readonly i18nManager: I18nManager;
   private _position!: [number, number];
-  projection: string | null = null;
-  rasters: Raster[] = [];
+  private readonly rasters: Raster[] = [];
+  public projection: string | null = null;
 
-  constructor(MapContextMenuState: MapContextMenuState) {
-    const config = ConfigManager.getInstance().Config.contextmenu;
+  constructor(mapContextMenuState: MapContextMenuState) {
     this.i18nManager = I18nManager.getInstance();
-    this.MapContextMenuState = MapContextMenuState;
-    this.init(config);
+    this.mapContextMenuState = mapContextMenuState;
   }
 
-  get position(): [number, number] {
+  public get position(): [number, number] {
     return this._position;
   }
 
-  set position(value: [number, number]) {
+  public set position(value: [number, number]) {
     this._position = value;
     this.updateCoordinates();
     this.updateRasterSamples();
     this.updateLinks();
   }
 
-  init(config: ContextmenuConfig) {
+  public async initialize() {
+    const config = ConfigManager.getInstance().Config.contextmenu;
+    if (!config) {
+      throw new Error('Context menu configuration is missing.');
+    }
+
     // Initialize positions
-    config.crs.forEach((el: CRS) => {
+    for (const el of config.crs) {
       const crs = {
         code: el.code,
         translation: el.translation,
@@ -62,22 +59,22 @@ export class MapContextMenuManager {
         precision: el.precision,
         coordinate: [0, 0] as [number, number]
       };
-      this.MapContextMenuState.crs.push(crs);
-    });
+      this.mapContextMenuState.crs.push(crs);
+    }
 
     // Initialize links
-    config.links.forEach((el: Link) => {
+    for (const el of config.links) {
       const link = {
         translation: el.translation,
         crs: el.crs,
         url: el.url,
         content: ''
       };
-      this.MapContextMenuState.links.push(link);
-    });
+      this.mapContextMenuState.links.push(link);
+    }
 
     // Initialize raster sources
-    config.sources.forEach(async (el: RasterSource) => {
+    for (const el of config.sources) {
       const raster: Raster = {
         id: el.id,
         url: el.url,
@@ -94,7 +91,7 @@ export class MapContextMenuManager {
         nodata: el.nodata
       };
       this.rasters.push(raster);
-      this.MapContextMenuState.sources.push({
+      this.mapContextMenuState.sources.push({
         id: el.id,
         url: el.url,
         crs: el.crs,
@@ -111,24 +108,24 @@ export class MapContextMenuManager {
       } catch (err) {
         console.error(`Failed to load raster ${el.id}:`, err);
       }
-    });
+    }
   }
 
-  getCoordinate(code: string): [number, number] | null {
-    const entry = this.MapContextMenuState.crs.find((c) => c.code === code);
+  private getCoordinate(code: string): [number, number] | null {
+    const entry = this.mapContextMenuState.crs.find((c) => c.code === code);
     return entry ? entry.coordinate : null;
   }
 
-  updateCoordinates(): void {
-    this.MapContextMenuState.projection = this.projection;
-    this.MapContextMenuState.position = this.position;
-    this.MapContextMenuState.crs.forEach(async (src) => {
+  private updateCoordinates(): void {
+    this.mapContextMenuState.projection = this.projection;
+    this.mapContextMenuState.position = this.position;
+    for (const src of this.mapContextMenuState.crs) {
       src.coordinate = proj4(this.projection!, src.code, this._position) as [number, number];
-    });
+    }
   }
 
-  updateLinks(): void {
-    for (const link of this.MapContextMenuState.links) {
+  private updateLinks(): void {
+    for (const link of this.mapContextMenuState.links) {
       const coord = this.getCoordinate(link.crs);
       if (coord && typeof link.url === 'string' && link.url.includes('###MAPX###') && link.url.includes('###MAPY###')) {
         const [x, y] = coord;
@@ -139,21 +136,21 @@ export class MapContextMenuManager {
     }
   }
 
-  public resetRasters(): void {
-    this.rasters.forEach((el) => {
+  private resetRasters(): void {
+    for (const el of this.rasters) {
       el.pixelvalue = null;
       el.pixelstring = null;
-    });
+    }
 
-    this.MapContextMenuState.sources.forEach((src) => {
+    for (const src of this.mapContextMenuState.sources) {
       src.content = this.i18nManager.getTranslation('Loading');
       src.loading = true;
-    });
+    }
   }
 
-  public updateRasterSamples(): void {
+  private async updateRasterSamples() {
     this.resetRasters();
-    this.rasters.forEach(async (raster) => {
+    for (const raster of this.rasters) {
       if (!raster.image || !raster.transform) return;
 
       try {
@@ -167,7 +164,7 @@ export class MapContextMenuManager {
           raster.pixelstring = `${raster.prefix}${val.toFixed(raster.precision)}${raster.suffix}`;
         }
 
-        const entry = this.MapContextMenuState.sources.find((s) => s.id === raster.id);
+        const entry = this.mapContextMenuState.sources.find((s) => s.id === raster.id);
         if (entry) {
           entry.content = raster.pixelstring;
           entry.loading = false;
@@ -175,6 +172,6 @@ export class MapContextMenuManager {
       } catch (err) {
         console.warn(`Failed to query raster source: ${raster.url}:`, err);
       }
-    });
+    }
   }
 }

@@ -20,12 +20,10 @@ _(Explain shortly was was done, and what are the important things to know about 
 
 ### For the Reviewer:
 
-This Merge-Request can be tested at https://demo.geomapfish.dev/mr-{{ merge_request.id }}/
-
 - [ ] New code was reviewed.
 - [ ] If comments could be added on unclear code, the developer has been informed.
 - [ ] If unitests could be added in certain places, the developer has been informed.
-- [ ] Merge-Request was merged on main branch.
 - [ ] All pipelines work.
-- [ ] The changes were tested on demo environment.
+- [ ] The changes were tested on demo environment: https://demo.geomapfish.dev/mr-{mergerequestid}/
 - [ ] Application performance has not been degraded by the modifications.
+- [ ] Merge-Request was merged on main branch.

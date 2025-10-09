@@ -7,7 +7,7 @@ import MapManager from '../../../tools/state/mapManager';
 import { printCoordinate } from '../../../tools/geometrytools';
 import { Map, Overlay } from 'ol';
 import { MapContextMenuState } from './contextmenustate';
-import { MapContextMenuManager } from './contextmenumanager';
+import MapContextMenuManager from './contextmenumanager';
 
 class MapDefaultContextMenuComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -15,8 +15,8 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
 
   private readonly map: Map;
   private readonly eventsCallbacks: Callback[] = [];
-  MapContextMenuState: MapContextMenuState;
-  MapContextMenuManager: MapContextMenuManager;
+  protected mapContextMenuState: MapContextMenuState;
+  protected mapContextMenuManager: MapContextMenuManager;
   i18nManager: I18nManager;
   private contextMenuOverlay?: Overlay;
   host: HTMLDivElement;
@@ -26,16 +26,16 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
     super('map-context-menu');
     this.i18nManager = I18nManager.getInstance();
     this.state.extendedState.mapcontextmenu = new MapContextMenuState();
-    this.MapContextMenuState = this.state.extendedState.mapcontextmenu as MapContextMenuState;
-    this.MapContextMenuManager = new MapContextMenuManager(this.MapContextMenuState);
+    this.mapContextMenuState = this.state.extendedState.mapcontextmenu as MapContextMenuState;
+    this.mapContextMenuManager = new MapContextMenuManager(this.mapContextMenuState);
     this.map = MapManager.getInstance().getMap();
     this.host = document.createElement('div');
   }
 
   async updateData() {
     // Important update projection before position
-    this.MapContextMenuManager.projection = this.state.projection;
-    this.MapContextMenuManager.position = this.state.mouseCoordinates as [number, number];
+    this.mapContextMenuManager.projection = this.state.projection;
+    this.mapContextMenuManager.position = this.state.mouseCoordinates as [number, number];
   }
 
   async renderContent() {
@@ -55,11 +55,11 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
     } else {
       this.renderContent();
     }
-    this.contextMenuOverlay.setPosition(this.MapContextMenuState.position);
+    this.contextMenuOverlay.setPosition(this.mapContextMenuState.position);
   }
 
   closeMenu(): void {
-    this.MapContextMenuState.visible = false;
+    this.mapContextMenuState.visible = false;
     this.unregisterEvents();
   }
 
@@ -101,9 +101,9 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
       this.map.getViewport().addEventListener('contextmenu', async (e) => {
         if (this.canExecute('map.contextmenu')) {
           e.preventDefault();
-          this.MapContextMenuState.visible = false;
+          this.mapContextMenuState.visible = false;
           await this.updateData();
-          this.MapContextMenuState.visible = true;
+          this.mapContextMenuState.visible = true;
         }
       });
     }
@@ -115,8 +115,8 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
   }
 
   async connectedCallback() {
-    console.log('connected callback - context menu');
     await this.loadConfig();
+    await this.mapContextMenuManager.initialize();
     this.registerVisibilityEvents();
     this.registerInteractions();
   }
