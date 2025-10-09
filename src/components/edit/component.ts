@@ -98,8 +98,14 @@ export default class EditComponent extends GirafeHTMLElement {
     this.editableLayersList = Object.keys(DEMO_LAYERS)
       .filter((layerID) => {
         const oapifUrl = new URL(DEMO_LAYERS[layerID].url);
-        const themesUrl = new URL(this.configManager.Config.themes.url);
-        return oapifUrl.hostname === themesUrl.hostname && this.state.oauth.status === 'loggedIn';
+        try {
+          const themesUrl = new URL(this.configManager.Config.themes.url);
+          return oapifUrl.hostname === themesUrl.hostname && this.state.oauth.status === 'loggedIn';
+        } catch {
+          // Cannot parse this.configManager.Config.themes.url as URL.
+          // TODO : This should be changed when editing is not just a demo any more
+          return false;
+        }
       })
       .map((layerID) => {
         return { id: layerID, name: DEMO_LAYERS[layerID].name };
