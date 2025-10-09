@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
     <meta name="description" content="GeoGirafe is an flexible application to build online geoportals." />
     <meta
       name="viewport"
@@ -10,6 +9,12 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
 
+    <!--
+      If redirect-url meta tag is present, a redirect will happen when the detected device is not iPhone or Android.
+      The value of content should be a relative URL to the desired endpoint or page.
+      To avoid redirection, simply remove this meta tag.
+    -->
+    <meta name="redirect-url" content="index.html" />
     <meta name="configs" content="main,mobile" />
     <link rel="config-main-url" href="config.json" />
     <link rel="config-mobile-url" href="config.mobile.json" />
