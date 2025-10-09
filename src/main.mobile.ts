@@ -32,7 +32,10 @@ import MobileOauthComponent from './components/auth-mobile/component';
 
 // Redirect to desktop interface if we are NOT on mobile
 if (!navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Android')) {
-  redirectTo('index.html');
+  const redirectUrl = document.querySelector('meta[name=redirect-url]')?.getAttribute('content');
+  if (redirectUrl) {
+    redirectTo(redirectUrl);
+  }
 }
 
 // Add custom state and serializers (need to be done early, because the shared state will need them)

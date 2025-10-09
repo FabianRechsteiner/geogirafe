@@ -47,7 +47,10 @@ import { initialize, redirectTo, SplashScreen } from './initialize';
 
 // Redirect to mobile interface if we are on mobile
 if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')) {
-  redirectTo('mobile.html');
+  const redirectUrl = document.querySelector('meta[name=redirect-url]')?.getAttribute('content');
+  if (redirectUrl) {
+    redirectTo(redirectUrl);
+  }
 }
 
 // Display the splash-screen
