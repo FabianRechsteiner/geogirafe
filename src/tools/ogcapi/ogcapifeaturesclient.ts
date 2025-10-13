@@ -43,7 +43,13 @@ export default class OgcApiFeaturesClient extends OgcApiClient<ServerOgcApiFeatu
   }
 
   public async getCollections(): Promise<OapifCollection[]> {
-    throw new Error('Not implemented yet');
+    const url = `${this.url}/collections?f=json`;
+    const response = await this.fetchAll(url, 'collections', this.getFetchOptions());
+    if (response.length > 0 && 'collections' in response[0]) {
+      return response[0]['collections'];
+    } else {
+      return [];
+    }
   }
 
   /**
@@ -145,7 +151,7 @@ export default class OgcApiFeaturesClient extends OgcApiClient<ServerOgcApiFeatu
     limit = limit ?? 9999;
     url.searchParams.append('limit', limit.toString());
 
-    const responses = await this.fetchAll(url, this.getFetchOptions());
+    const responses = await this.fetchAll(url, 'features', this.getFetchOptions());
 
     const items: Feature<Geometry>[] = [];
     const geoJsonReader = new GeoJSON();

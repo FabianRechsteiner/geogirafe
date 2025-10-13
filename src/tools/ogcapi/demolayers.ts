@@ -4,8 +4,11 @@ import ServerOgc from '../../models/serverogc';
 export const DEMO_LAYERS: Record<string, any> = {
   GEORAMA: {
     url: 'https://demo.georama.io/features',
-    name: 'Georama Rivers',
-    collectionId: 'cb14a0d9-016b-454a-84a5-475340f0a433',
+    displayName: 'Georama Rivers',
+    // To allow for changing collectionIds (uuids) while developing georama,
+    // we use an interim solution and identify the collection by title.
+    collectionId: null,
+    collectionTitle: 'Flüsse',
     geometryType: 'MultiLineString',
     serverType: 'georama',
     server: new ServerOgc('GEORAMA', {
@@ -20,8 +23,9 @@ export const DEMO_LAYERS: Record<string, any> = {
   },
   GMF: {
     url: 'https://geomapfish-demo-2-9.camptocamp.com/mapserv_proxy/QGIS_Server/wfs3',
-    name: 'GeoMapFish Points',
+    displayName: 'GeoMapFish Points',
     collectionId: 'points',
+    collectionTitle: null,
     geometryType: 'Point',
     serverType: 'gmf',
     server: new ServerOgc('gmf', {

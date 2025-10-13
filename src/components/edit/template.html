@@ -11,8 +11,8 @@
       <option i18n="Please log in to edit layers..." ?selected="true" value="">Please log in to edit layers...</option>
       ` : uHtml`
       <option i18n="Choose a layer..." ?selected="true" value="">Choose a layer...</option>
-      `} ${this.editableLayersList.map(layer => uHtmlFor(layer, layer.id)`
-      <option value="${layer.id}">${layer.name}</option>
+      `} ${this.editableLayersList.map(layer => uHtmlFor(layer, layer.collectionId)`
+      <option value="${layer.collectionId}">${layer.displayName}</option>
       `)}
     </select>
 

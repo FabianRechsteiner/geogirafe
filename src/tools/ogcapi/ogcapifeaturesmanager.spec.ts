@@ -19,6 +19,8 @@ describe('OgcApiFeaturesManager', () => {
   let layer: OapifLayer = {
     url: 'https://testUrl.com',
     collectionId: 'collectionId',
+    collectionTitle: 'collectionTitle',
+    displayName: 'OapifLayer',
     crs: '',
     credentials: '',
     geometryType: 'Point',
