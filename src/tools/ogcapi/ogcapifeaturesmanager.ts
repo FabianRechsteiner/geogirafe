@@ -5,7 +5,7 @@ import OgcApiFeaturesClient, { OgcApiFeaturesClientOptions } from './ogcapifeatu
 import OgcApiFeaturesClientGeorama from './ogcapifeaturesclientgeorama';
 import OgcApiFeaturesClientGmf from './ogcapifeaturesclientgmf';
 import LayerWms from '../../models/layers/layerwms';
-import ServerOgcApiFeatures, { OapifLayer } from '../../models/serverogcapifeatures';
+import ServerOgcApiFeatures, { OapifCollection, OapifLayer } from '../../models/serverogcapifeatures';
 import OgcApiFeaturesSchema from './ogcapifeaturesschema';
 import ServerOgc from '../../models/serverogc';
 import VendorSpecificOgcServerManager from '../vendorspecificogcservermanager';
@@ -119,5 +119,10 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
     const ogcServer = object instanceof LayerWms ? object.ogcServer : object;
     const client = this.getClient(ogcServer);
     return client.getServer();
+  }
+
+  async getCollectionByTitle(title: string, server: ServerOgc): Promise<OapifCollection | null> {
+    const collections = await this.getClient(server).getCollections();
+    return collections.find((collection: any) => collection.title === title) ?? null;
   }
 }

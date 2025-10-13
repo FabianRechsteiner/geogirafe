@@ -41,7 +41,7 @@ export default class EditComponent extends GirafeHTMLElement {
 
   visible: boolean = false;
 
-  editableLayersList: { name: string; id: string }[] = [];
+  editableLayersList: OapifLayer[] = [];
   private readonly map: Map;
 
   private draw?: Draw;
@@ -63,7 +63,11 @@ export default class EditComponent extends GirafeHTMLElement {
     this.stateManager = StateManager.getInstance();
     this.oapifManager = OgcApiFeaturesManager.getInstance();
     this.map = MapManager.getInstance().getMap();
-    this.subscribe('oauth.status', () => this.loginStateChanged());
+    this.subscribe('application.isReady', () => {
+      if (this.state.application.isReady) {
+        this.loginStateChanged();
+      }
+    });
   }
 
   render() {
@@ -95,28 +99,24 @@ export default class EditComponent extends GirafeHTMLElement {
 
   private loginStateChanged() {
     // Editable demo layers should only be available if the user is currently on the matching demo instance and is logged in
-    this.editableLayersList = Object.keys(DEMO_LAYERS)
-      .filter((layerID) => {
-        const oapifUrl = new URL(DEMO_LAYERS[layerID].url);
-        try {
-          const themesUrl = new URL(this.configManager.Config.themes.url);
-          return oapifUrl.hostname === themesUrl.hostname && this.state.oauth.status === 'loggedIn';
-        } catch {
-          // Cannot parse this.configManager.Config.themes.url as URL.
-          // TODO : This should be changed when editing is not just a demo any more
-          return false;
-        }
-      })
-      .map((layerID) => {
-        return { id: layerID, name: DEMO_LAYERS[layerID].name };
-      });
-    this.loadDemoServerConfig();
+    this.editableLayersList = Object.values(DEMO_LAYERS).filter((layer) => {
+      try {
+      const oapifUrl = new URL(layer.url);
+      const themesUrl = new URL(this.configManager.Config.themes.url);
+      return oapifUrl.hostname === themesUrl.hostname && this.state.oauth.status === 'loggedIn';
+      } catch {
+        // Cannot parse this.configManager.Config.themes.url as URL.
+        // TODO : This should be changed when editing is not just a demo any more
+        return false;
+      }
+    });
+    void this.loadDemoServerConfig();
     this.render();
   }
 
   public async onSelectLayer(evt: Event) {
     const layerId = (evt.target as HTMLInputElement)?.value;
-    this.layer = DEMO_LAYERS[layerId];
+    this.layer = this.editableLayersList.find((layer) => layer.collectionId === layerId);
 
     this.removeMapInteractions();
     this.unsetEditFeature();
@@ -424,13 +424,22 @@ export default class EditComponent extends GirafeHTMLElement {
   /**
    * POC: Add ogc servers to the state and preload them.
    */
-  private loadDemoServerConfig() {
-    this.editableLayersList.forEach((layer) => {
-      if (!this.state.ogcServers[DEMO_LAYERS[layer.id].server.name]) {
-        this.state.ogcServers[DEMO_LAYERS[layer.id].server.name] = DEMO_LAYERS[layer.id].server;
-        void OgcApiFeaturesManager.getInstance().getServer(DEMO_LAYERS[layer.id].server);
+  private async loadDemoServerConfig() {
+    for (const layer of this.editableLayersList) {
+      if (!this.state.ogcServers[layer.server.name]) {
+        this.state.ogcServers[layer.server.name] = layer.server;
+        await OgcApiFeaturesManager.getInstance().getServer(layer.server);
+
+        // A demo layer is defined either by its collection id or title. In the case of the title,
+        //  the id is requested from the server and stored in the layer definition.
+        if (!layer.collectionId) {
+          const collection = await this.oapifManager.getCollectionByTitle(layer.collectionTitle, layer.server);
+          if (collection?.title) {
+            layer.collectionId = collection.id;
+          }
+        }
       }
-    });
+    }
   }
 
   connectedCallback() {

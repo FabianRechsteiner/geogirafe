@@ -93,8 +93,10 @@ export default abstract class OgcApiClient<Server = ServerOgcApi> {
 
   /**
    * Fetches all paginated resources from the specified URL until the entire dataset is retrieved.
+   * `dataListName` is the attribute name that holds the list of data items in the response JSON.
+   * For feature items, the attribute name is 'features', for collections, it's 'collections'.
    */
-  public async fetchAll(url: string | URL, fetchOptions: RequestInit): Promise<any[]> {
+  public async fetchAll(url: string | URL, dataListName: string, fetchOptions: RequestInit): Promise<any[]> {
     const responses = [];
     let featureCount = 0;
 
@@ -110,7 +112,7 @@ export default abstract class OgcApiClient<Server = ServerOgcApi> {
 
       // Check if a request limit has been reached
       const limit = new URL(url).searchParams.get('limit');
-      featureCount += responseJson.features?.length ?? 0;
+      featureCount += responseJson[dataListName]?.length ?? 0;
       if (limit && featureCount >= Number(limit)) {
         url = '';
       } else {

@@ -62,6 +62,8 @@ export type OapifCollection = {
 export type OapifLayer = {
   url: string;
   collectionId: string;
+  collectionTitle: string;
+  displayName: string;
   crs: string;
   credentials?: string;
   geometryType: 'Point' | 'LineString' | 'Polygon' | 'MultiPoint' | 'MultiLineString' | 'MultiPolygon';
