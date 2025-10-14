@@ -3,7 +3,9 @@ import MapOL from 'ol/Map';
 import type { Extent } from 'ol/extent';
 import type BaseLayer from 'ol/layer/Base';
 import { defaults as defaultControls } from 'ol/control/defaults.js';
+import { defaults as defaultInteractions } from 'ol/interaction/defaults';
 import StateManager from './statemanager';
+import { DragPan } from 'ol/interaction';
 
 /** The singleton containing the main OpenLayers map accessible from everywhere */
 export default class MapManager extends GirafeSingleton {
@@ -12,7 +14,18 @@ export default class MapManager extends GirafeSingleton {
       rotate: !StateManager.getInstance().state.interface.isMobile,
       zoom: !StateManager.getInstance().state.interface.isMobile
     }),
-    layers: []
+    layers: [],
+    interactions: defaultInteractions({ dragPan: false }).extend([
+      /** Make Map pan on Wheel/Middle-Button Click */
+      new DragPan({
+        condition: function (mapBrowserEvent) {
+          return (
+            (mapBrowserEvent.originalEvent as PointerEvent).isPrimary &&
+            (mapBrowserEvent.originalEvent as PointerEvent).button < 2
+          );
+        }
+      })
+    ])
   });
   public getMap() {
     return this.map;
