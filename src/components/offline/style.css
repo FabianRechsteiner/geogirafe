@@ -100,9 +100,9 @@ button:disabled {
 }
 
 #offline-data-title {
-  font-size: 1.5em;
+  font-size: 1.3em;
   text-align: center;
-  line-height: 2em;
+  line-height: 1.5em;
   background: #187196;
   color: #ffffff;
 }
@@ -113,4 +113,17 @@ button:disabled {
   font-size: 2em;
   font-weight: 600;
   text-align: center;
+}
+
+
+.wmts-warning {
+  font-size: 1.5em;
+  text-align: center;
+  background: #ff9100;
+  color: white;
+  font-weight: 700;
+  padding: 3px 0;
+  border-radius: 8px;
+  margin-top: 1em;
+  filter: drop-shadow(0 4px 7px #ff910088);
 }
