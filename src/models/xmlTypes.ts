@@ -13,7 +13,8 @@ export const xmlNumberTypesStrList: string[] = [
   'unsignedInt',
   'unsignedShort',
   'unsignedByte',
-  'double'
+  'double',
+  'boolean'
 ] as const;
 
 export const xmlStringTypesStrList: string[] = ['string'] as const;
