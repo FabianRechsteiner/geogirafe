@@ -23,6 +23,7 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
   private pointerVelocity = 0;
   private previousPointerY = 0;
   private previousMoveTimestamp = 0;
+  private resizeObserver: ResizeObserver | null = null;
 
   constructor() {
     super('swipe-up-panel-mobile');
@@ -40,6 +41,9 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
       this.container.classList.remove(isDarkMode ? 'light-mode' : 'dark-mode');
     });
 
+    // Set up resize observer to handle keyboard open/close and other viewport changes
+    this.setupResizeObserver();
+
     // Placing it below
     this.container.style.top = TOP_CLOSED;
 
@@ -53,6 +57,25 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
       }
       this.animateToMode(newValue);
     });
+  }
+
+  /**
+   * Adds the capability to adjust the swipeup panel size when the mobile virtual keyboard shows up
+   */
+  private setupResizeObserver() {
+    // Use visualViewport if available (better for keyboard detection)
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => {
+        this.adjustMiddleContainerToContent();
+      });
+    }
+
+    // Fallback to ResizeObserver on document.body
+    this.resizeObserver = new ResizeObserver(() => {
+      this.adjustMiddleContainerToContent();
+    });
+
+    this.resizeObserver.observe(document.body);
   }
 
   /**
