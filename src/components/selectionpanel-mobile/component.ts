@@ -57,6 +57,7 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
     }
 
     this.render();
+
     this.refreshRender(); // For translations
   }
 
@@ -72,9 +73,24 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
       }
 
       if (currentMode === 'closed') {
-        this.state.selection.focusedFeatures = [];
+        this.state.interface.selectionComponentVisible = false;
+        this.state.selection.focusedFeatures = null;
         this.state.selection.selectedFeatures = [];
       }
+    });
+
+    this.subscribe('selection.selectedFeatures', () => {
+      this.currentIndex = 0;
+
+      if (this.state.selection.selectedFeatures.length) {
+        this.state.selection.focusedFeatures = [];
+        this.state.selection.focusedFeatures.push(this.state.selection.selectedFeatures[0]);
+      } else {
+        this.state.selection.focusedFeatures = null;
+      }
+
+      this.render();
+      this.refreshRender();
     });
 
     // Listen for scroll events to update indicators
