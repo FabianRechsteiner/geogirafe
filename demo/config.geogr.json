@@ -4,12 +4,12 @@
   },
   "languages": {
     "translations": {
-      "de": ["i18n/de.json", "https://edit.geo.gr.ch/static/X/en.json"]
+      "de": ["i18n/de.json", "https://map.geo.gr.ch/static/X/en.json"]
     },
     "defaultLanguage": "de"
   },
   "themes": {
-    "url": "https://edit.geo.gr.ch/themes?background=background&interface=desktop",
+    "url": "https://map.geo.gr.ch/themes?background=background&interface=desktop",
     "defaultTheme": "Basisinfo"
   },
   "basemaps": {
@@ -21,17 +21,17 @@
     "hideLegendWhenLayerIsDeactivated": false
   },
   "search": {
-    "url": "https://edit.geo.gr.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###",
+    "url": "https://map.geo.gr.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###",
     "objectPreview": true,
     "layerPreview": true
   },
   "print": {
-    "url": "https://edit.geo.gr.ch/printproxy/",
+    "url": "https://map.geo.gr.ch/printproxy/",
     "defaultLayout": "1 A4 portrait"
   },
   "share": {
     "service": "gmf",
-    "createUrl": "https://edit.geo.gr.ch/short/create"
+    "createUrl": "https://map.geo.gr.ch/short/create"
   },
   "projections": {
     "EPSG:3857": "W-M",
