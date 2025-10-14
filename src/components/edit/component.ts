@@ -101,9 +101,9 @@ export default class EditComponent extends GirafeHTMLElement {
     // Editable demo layers should only be available if the user is currently on the matching demo instance and is logged in
     this.editableLayersList = Object.values(DEMO_LAYERS).filter((layer) => {
       try {
-      const oapifUrl = new URL(layer.url);
-      const themesUrl = new URL(this.configManager.Config.themes.url);
-      return oapifUrl.hostname === themesUrl.hostname && this.state.oauth.status === 'loggedIn';
+        const oapifUrl = new URL(layer.url);
+        const themesUrl = new URL(this.configManager.Config.themes.url);
+        return oapifUrl.hostname === themesUrl.hostname && this.state.oauth.status === 'loggedIn';
       } catch {
         // Cannot parse this.configManager.Config.themes.url as URL.
         // TODO : This should be changed when editing is not just a demo any more
