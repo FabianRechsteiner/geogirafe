@@ -297,12 +297,12 @@ export default abstract class WmsClient {
   }
 
   selectFeatures(extent: number[]) {
-    if (this.layers.length === 0) {
+    if (this.layers.length === 0 && !this.independentLayers) {
       return;
     }
 
     const selectionParams: SelectionParam[] = [];
-    if (this.ogcServer.wfsSupport) {
+    if (this.ogcServer.wfsSupport && this.layers.length > 0) {
       selectionParams.push(new SelectionParam(this.ogcServer, this.layers, this.state.projection, extent, this.olayer));
     } else {
       // This will need a WMS GetFeatureInfo.
