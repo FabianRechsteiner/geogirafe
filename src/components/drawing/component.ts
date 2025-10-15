@@ -15,7 +15,7 @@ import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
 import checkedIcon from '../../assets/icons/checked-full.svg?raw';
 import noCheckedIcon from '../../assets/icons/checked-no.svg?raw';
-import trashIcon from '../../assets/icons/trash.svg?raw';
+import trashIcon from './assets/trash.svg?raw';
 import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
