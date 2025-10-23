@@ -27,6 +27,10 @@ abstract class BaseLayer {
   public disclaimer?: string;
   public metadataUrl?: string;
   public isVisible: boolean = true;
+  // The pinned state will bring layers to the top of their parent, independent of their order.
+  // Additionally, pinned themes will stay in the tree when switching between themes or emptying the tree.
+  public isPinned: boolean = false;
+  public isRemovable: boolean = true;
 
   public hasError: boolean = false;
   public errorMessage: string | null = null;

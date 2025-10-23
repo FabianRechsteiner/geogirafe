@@ -28,7 +28,9 @@ export default class DrawingManager extends GirafeSingleton {
       oLayer = layer._oLayer;
       this.activeLayers[layer.treeItemId] = { layer: layer, olayer: oLayer };
     }
-    this.map.addLayer(oLayer);
+    if (!this.map.getLayers().getArray().includes(oLayer)) {
+      this.map.addLayer(oLayer);
+    }
   }
 
   removeLayer(layer: LayerDrawing) {

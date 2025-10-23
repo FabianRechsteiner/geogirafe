@@ -149,4 +149,45 @@ describe('OrderingManager', () => {
     expect(layer122.order).toBe(1006);
     expect(layer11.order).toBe(1007);
   });
+
+  test('ReorderLayers, multiple groups, multiple layers, and some layers are pinned at the top', async () => {
+    const group1 = new GroupLayer(1, 'group1', 13215);
+    const layer11 = new LayerWms(11, 'layer11', 1110, ogcServer);
+    const layer12 = new LayerWms(12, 'layer12', 152, ogcServer);
+    const layer13 = new LayerWms(12, 'layer13', 13, ogcServer);
+    const layer14 = new LayerWms(12, 'layer14', 250, ogcServer);
+    const layer15 = new LayerWms(12, 'layer15', 132, ogcServer);
+    group1.children.push(...[layer11, layer12, layer13, layer14, layer15]);
+    layer11.parent = layer12.parent = layer13.parent = layer14.parent = layer15.parent = group1;
+
+    const group2 = new GroupLayer(1, 'group2', 23);
+    const layer21 = new LayerWms(11, 'layer11', 78, ogcServer);
+    const layer22 = new LayerWms(12, 'layer12', 14552, ogcServer);
+    const layer23 = new LayerWms(12, 'layer13', 113, ogcServer);
+    group2.children.push(...[layer21, layer22, layer23]);
+    layer21.parent = layer22.parent = layer23.parent = group2;
+
+    // Overwrite ordering with `isPinnedAtTheTop` property
+    group1.isPinned = true;
+    layer22.isPinned = true;
+    layer23.isPinned = true;
+
+    const counter = { index: 1000 };
+    // @ts-ignore
+    const orderedLayers = orderingManager.getSortedLayers([group1, group2]);
+    // @ts-ignore
+    orderingManager.reorderLayersRecursively(orderedLayers, counter);
+
+    expect(group1.order).toBe(1000);
+    expect(layer13.order).toBe(1001);
+    expect(layer15.order).toBe(1002);
+    expect(layer12.order).toBe(1003);
+    expect(layer14.order).toBe(1004);
+    expect(layer11.order).toBe(1005);
+
+    expect(group2.order).toBe(1006);
+    expect(layer22.order).toBe(1007);
+    expect(layer23.order).toBe(1008);
+    expect(layer21.order).toBe(1009);
+  });
 });

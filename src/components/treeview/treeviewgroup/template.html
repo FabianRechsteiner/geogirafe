@@ -73,12 +73,14 @@
     </button>
 
     <!-- Remove icon -->
+    ${this.layer.isRemovable ? uHtml`
     <button
       class="remove gg-icon-button gg-small gg-opacity tool"
       tip="Remove group"
       onclick="${() => this.deleteGroup()}">
       <img alt="Remove group" src="icons/trash.svg" />
     </button>
+    ` : ``}
   </header>
 
   <!-- Sub layers -->

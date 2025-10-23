@@ -5,6 +5,7 @@ import ThemeLayer from '../../../models/layers/themelayer';
 import LayerManager from '../../../tools/layers/layermanager';
 import LayerWms from '../../../models/layers/layerwms';
 import { filterLayerTree } from '../tools/treeviewfilter';
+import ThemesHelper from '../../../tools/themes/themeshelper';
 
 class TreeViewRootComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -79,10 +80,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   }
 
   public removeAll() {
-    for (const layer of this.stateManager.state.layers.layersList) {
-      this.layerManager.toggle(layer, 'off');
-    }
-    this.state.layers.layersList = [];
+    ThemesHelper.getInstance().emptyLayerTree();
     this.state.themes.lastSelectedTheme = null;
   }
 

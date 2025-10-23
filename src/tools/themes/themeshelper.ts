@@ -155,19 +155,11 @@ export default class ThemesHelper extends GirafeSingleton {
 
     if (this.configManager.Config.themes.selectionMode === 'replace') {
       // Mode is <replace>
-      this.stateManager.batchChanges(() => {
-        // => Deactivate all active layers
-        this.state.layers.layersList.forEach((layer) => {
-          layer.activeState = 'off';
-        });
-        // Add new selected theme
-        this.state.layers.layersList = [clonedTheme];
-      });
+      this.emptyLayerTree();
+      this.state.layers.layersList.push(clonedTheme);
     } else if (!this.state.layers.layersList.find((l) => l.id == clonedTheme.id)) {
       // Mode is <add>
-      // Add new theme to the list if is not in the list yet
-      // Set order to 0, because the theme should be added at the top of the list
-      clonedTheme.order = 0;
+      clonedTheme.order = this.getInitialOrderForNewTheme();
       this.state.layers.layersList.push(clonedTheme);
     } else {
       console.info(`The theme ${clonedTheme.name} is already present in the treeview.`);
@@ -346,7 +338,20 @@ export default class ThemesHelper extends GirafeSingleton {
     return option.substring(2);
   }
 
+  /**
+   * Calculates the initial order (=position) for a new theme in the tree.
+   * Themes are added at the top of the tree, but underneath any pinned themes. Defaults to 0.
+   * This prevents themes of visibly "jumping" around in the tree after being added due to reordering.
+   */
+  public getInitialOrderForNewTheme(): number {
+    return this.state.layers.layersList
+      .filter((l) => l.isPinned)
+      .map((l) => l.order)
+      .reduce((a, b) => Math.max(a, b), 0);
+  }
+
   public mergeThemeInLayerTree(theme: ThemeLayer, activate: boolean = false): BaseLayer[] {
+    theme.order = this.getInitialOrderForNewTheme();
     const insertedLayers = this.mergeLayerWithExistingLayerTree(theme, this.state.layers.layersList);
     if (activate) {
       for (const insertedLayer of insertedLayers) {
@@ -410,5 +415,13 @@ export default class ThemesHelper extends GirafeSingleton {
         }
       }
     }
+  }
+
+  /**
+   * Removes all layers from the layer tree except themes that are pinned.
+   */
+  public emptyLayerTree() {
+    const layersToRemove = this.state.layers.layersList.filter((l) => !l.isPinned);
+    this.stateManager.batchChanges(() => this.removeLayersFromLayerTree(layersToRemove));
   }
 }

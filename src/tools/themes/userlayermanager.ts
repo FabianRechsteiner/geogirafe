@@ -2,9 +2,16 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import StateManager from '../state/statemanager';
 import ThemeLayer from '../../models/layers/themelayer';
 import Layer from '../../models/layers/layer';
-import LayerManager from '../layers/layermanager';
 import LayerDrawing from '../../models/layers/layerdrawing';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
+import ThemesHelper from './themeshelper';
+import LayerManager from '../layers/layermanager';
+
+type UserThemeConfig = {
+  name: string;
+  isRemovable: boolean;
+  isPinned: boolean;
+};
 
 /**
  * Manages layers that hold user-derived data such as drawings or local files. Each type of user data layer is
@@ -14,8 +21,26 @@ import LayerLocalFile from '../../models/layers/layerlocalfile';
  */
 export default class UserLayerManager extends GirafeSingleton {
   stateManager: StateManager;
-  layerManager: LayerManager;
-  themeLayers: Record<string, ThemeLayer> = {};
+  themesHelper: ThemesHelper;
+  themeLayerItemIds: Record<string, string> = {};
+
+  userThemeConfig: Record<string, UserThemeConfig> = {
+    drawing: {
+      name: 'Drawings',
+      isRemovable: false,
+      isPinned: true
+    },
+    localFile: {
+      name: 'Local Files',
+      isRemovable: true,
+      isPinned: true
+    },
+    default: {
+      name: 'User data',
+      isRemovable: true,
+      isPinned: true
+    }
+  };
 
   get state() {
     return this.stateManager.state;
@@ -25,80 +50,86 @@ export default class UserLayerManager extends GirafeSingleton {
     super(type);
 
     this.stateManager = StateManager.getInstance();
-    this.layerManager = LayerManager.getInstance();
+    this.themesHelper = ThemesHelper.getInstance();
   }
 
-  private getThemeLayerInTree(userTheme: ThemeLayer): ThemeLayer | null {
+  private getThemeLayerByTreeId(treeItemId: string): ThemeLayer | null {
     try {
-      return this.stateManager.state.layers.layersList.find((l) => l.treeItemId === userTheme.treeItemId) as ThemeLayer;
+      return this.stateManager.state.layers.layersList.find((l) => l.treeItemId === treeItemId) as ThemeLayer;
     } catch {
       return null;
     }
   }
 
-  private getUserLayerInTree(userLayer: Layer): Layer | null {
-    try {
-      return LayerManager.getInstance().getTreeItem(userLayer.treeItemId) as Layer;
-    } catch {
-      return null;
+  private getUserLayerByTreeId(treeItemId: string): Layer | null {
+    for (const theme of this.state.layers.layersList) {
+      if (theme instanceof ThemeLayer) {
+        for (const layer of theme.children) {
+          if (layer.treeItemId === treeItemId) {
+            return layer as Layer;
+          }
+        }
+      }
     }
+    return null;
   }
 
-  private getOrCreateThemeLayer(themeName: string): ThemeLayer {
-    let themeLayer = this.themeLayers[themeName];
+  private getOrCreateThemeLayer(config: UserThemeConfig): ThemeLayer {
+    let themeLayer = this.getThemeLayerByTreeId(this.themeLayerItemIds[config.name]);
     if (!themeLayer) {
-      themeLayer = new ThemeLayer(0, themeName, 0, '', { isDefaultChecked: true, isDefaultExpanded: true });
-      this.themeLayers[themeName] = themeLayer;
+      themeLayer = new ThemeLayer(0, config.name, 0, '', { isDefaultChecked: true, isDefaultExpanded: true });
+      themeLayer.order = this.themesHelper.getInitialOrderForNewTheme();
+      themeLayer.isPinned = config.isPinned;
+      themeLayer.isRemovable = config.isRemovable;
     }
     return themeLayer;
   }
 
-  private getThemeNameByLayerType(layer: Layer) {
-    let themeName = '';
+  private getThemeConfig(layer: Layer): UserThemeConfig {
     if (layer instanceof LayerDrawing) {
-      themeName = 'Drawings';
+      return this.userThemeConfig.drawing;
     } else if (layer instanceof LayerLocalFile) {
-      themeName = 'Local Files';
+      return this.userThemeConfig.localFile;
     }
-    return themeName;
+    return this.userThemeConfig.default;
   }
 
-  addUserLayerToTree(layer: Layer) {
-    const themeName = this.getThemeNameByLayerType(layer);
+  /**
+   * Adds a user data layer to the layer tree. Each layer is added to the corresponding theme.
+   * If the theme layer does not exist yet, it is created according to a set of pre-defined configuration values.
+   */
+  public addUserLayerToTree(layer: Layer) {
+    const config = this.getThemeConfig(layer);
 
-    const theme = this.getOrCreateThemeLayer(themeName);
-    if (!this.getUserLayerInTree(layer)) {
-      // TODO: Fix this type error
-      // @ts-expect-error Layer is added to the theme without a group in-between
+    const theme = this.getOrCreateThemeLayer(config);
+    const userLayerInTree = this.getUserLayerByTreeId(layer.treeItemId);
+    if (userLayerInTree) {
+      LayerManager.getInstance().toggleLayer(userLayerInTree, 'on');
+    } else {
       layer.parent = theme;
       theme.children.push(layer);
-      if (!this.getThemeLayerInTree(theme)) {
-        theme.order = 0;
+      if (!this.getThemeLayerByTreeId(theme.treeItemId)) {
         this.stateManager.state.layers.layersList.push(theme);
+        this.themeLayerItemIds[config.name] = theme.treeItemId;
       }
     }
   }
 
-  removeUserLayerFromTree(layer: Layer) {
-    const themeName = this.getThemeNameByLayerType(layer);
+  /**
+   * Removes a user data layer from the layer tree.
+   * If the associated theme layer becomes empty after the user layer is removed, the theme layer is also removed.
+   */
+  public removeUserLayerFromTree(layer: Layer) {
+    const config = this.getThemeConfig(layer);
+    const theme = this.getThemeLayerByTreeId(this.themeLayerItemIds[config.name]);
+    const userLayer = this.getUserLayerByTreeId(layer.treeItemId);
 
-    const theme = this.themeLayers[themeName];
-    const userLayer = this.getUserLayerInTree(layer);
-    if (theme && userLayer) {
-      // Remove the user layer from the map
-      userLayer.activeState = 'off';
-      // Remove the user layer from the tree theme
-      const index = theme.children.findIndex((l) => l.treeItemId === userLayer.treeItemId);
-      if (index >= 0) {
-        theme.children.splice(index, 1);
-        if (theme.children.length === 0) {
-          // Remove the theme layer from the tree
-          const index = this.state.layers.layersList.findIndex((l) => l.treeItemId === theme.treeItemId);
-          if (index >= 0) {
-            this.state.layers.layersList.splice(index, 1);
-            delete this.themeLayers[themeName];
-          }
-        }
+    if (userLayer) {
+      this.themesHelper.removeLayersFromLayerTree([userLayer]);
+      if (theme?.children.length === 0) {
+        // Remove the theme layer if it's empty
+        this.themesHelper.removeLayersFromLayerTree([theme]);
+        delete this.themeLayerItemIds[config.name];
       }
     }
   }

@@ -1013,9 +1013,8 @@ export default class MapComponent extends GirafeHTMLElement {
         throw new Error(`Layer ${featureSelectionFromUrl.layer} cannot be found`);
       }
       const clonedTheme = themesHelper.getMinimalClonedThemeForLayer(layer);
-      clonedTheme.order = 0;
       clonedTheme.isExpanded = true;
-      this.state.layers.layersList.push(clonedTheme);
+      themesHelper.mergeThemeInLayerTree(clonedTheme, true);
       // Now, get the tree item
       layerInTree = layerManager.getTreeItemByLayerName(featureSelectionFromUrl.layer);
     }
