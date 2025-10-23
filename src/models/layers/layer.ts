@@ -1,5 +1,6 @@
 import BaseLayer from './baselayer';
 import GroupLayer from './grouplayer';
+import ThemeLayer from './themelayer';
 
 type LayerOptions = {
   isDefaultChecked?: boolean;
@@ -24,7 +25,7 @@ abstract class Layer extends BaseLayer {
   public swiped: 'left' | 'right' | 'no' = 'no';
   public isLegendExpanded: boolean = false;
 
-  declare parent: GroupLayer;
+  declare parent: ThemeLayer | GroupLayer;
 
   constructor(id: number, name: string, order: number, options?: LayerOptions) {
     super(id, name, order, options);

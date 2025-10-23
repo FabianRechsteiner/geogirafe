@@ -355,7 +355,6 @@ class SearchComponent extends GirafeHTMLElement {
       const layer = this.themesHelper.findLayerByName(firstAction.data);
       if (layer) {
         const clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
-        clonedTheme.order = 0;
         clonedTheme.isExpanded = true;
         this.previewLayers = this.themesHelper.mergeThemeInLayerTree(clonedTheme, true);
       } else {
@@ -460,7 +459,6 @@ class SearchComponent extends GirafeHTMLElement {
     }
 
     if (clonedTheme) {
-      clonedTheme.order = 0;
       this.themesHelper.mergeThemeInLayerTree(clonedTheme);
     }
   }

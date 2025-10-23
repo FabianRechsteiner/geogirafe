@@ -5,6 +5,8 @@ import { createTestGroupLayer, createTestLayerWms, createTestLayerWmts } from '.
 import WfsFilter from '../wfs/wfsfilter';
 import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
+import StateManager from '../state/statemanager';
+import ThemeLayer from '../../models/layers/themelayer';
 
 beforeAll(() => {
   MockHelper.startMocking();
@@ -161,5 +163,39 @@ describe('ThemesHelper.extractLayerOptions for group', () => {
     // @ts-ignore
     const result = themesHelper.extractLayerOptions('groupName', 'group');
     expect(result?.originalLayer).toBeInstanceOf(GroupLayer);
+  });
+});
+
+describe('ThemesHelper.getInitialOrderForNewTheme', () => {
+  let themesHelper: ThemesHelper;
+  let stateManager: StateManager;
+
+  beforeEach(() => {
+    themesHelper = ThemesHelper.getInstance();
+    stateManager = StateManager.getInstance();
+  });
+
+  it('returns an order value of 0 if there are no pinned themes present', () => {
+    const theme1 = new ThemeLayer(0, 'theme 1', 101);
+    const theme2 = new ThemeLayer(0, 'theme 2', 102);
+    const theme3 = new ThemeLayer(0, 'theme 3', 103);
+
+    stateManager.state.layers.layersList = [theme1, theme2, theme3];
+
+    expect(themesHelper.getInitialOrderForNewTheme()).toEqual(0);
+  });
+
+  it('returns the order value of the pinned theme with the highest order', () => {
+    const theme1 = new ThemeLayer(0, 'theme 1', 101);
+    const theme2 = new ThemeLayer(0, 'theme 2', 102);
+    const theme3 = new ThemeLayer(0, 'theme 3', 103);
+
+    stateManager.state.layers.layersList = [theme1, theme2, theme3];
+
+    theme2.isPinned = true;
+    expect(themesHelper.getInitialOrderForNewTheme()).toEqual(102);
+
+    theme3.isPinned = true;
+    expect(themesHelper.getInitialOrderForNewTheme()).toEqual(103);
   });
 });

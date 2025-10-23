@@ -78,6 +78,10 @@ export default class OrderingManager extends GirafeSingleton {
 
   private getSortedLayers(layers: BaseLayer[]): BaseLayer[] {
     const orderedLayers = layers.slice().sort((l1: BaseLayer, l2: BaseLayer) => {
+      // Make sure pinned layers are always on top
+      if (l1.isPinned && !l2.isPinned) return -1;
+      if (!l1.isPinned && l2.isPinned) return 1;
+      if (l1.isPinned && l2.isPinned) return 0;
       return l1.order - l2.order;
     });
     return orderedLayers;

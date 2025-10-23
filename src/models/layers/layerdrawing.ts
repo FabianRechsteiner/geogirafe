@@ -14,6 +14,7 @@ export default class LayerDrawing extends Layer {
 
   constructor(name: string, oLayer: VectorLayer) {
     super(0, name, 0, { isDefaultChecked: true });
+    this.isRemovable = false;
     this._oLayer = oLayer;
   }
 
