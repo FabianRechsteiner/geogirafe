@@ -3,24 +3,26 @@ import I18nManager, { TranslationsDict } from './i18nmanager';
 import MockHelper from '../tests/mockhelper';
 import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
+import IGirafeContext from '../context/icontext';
 
 describe('I18nManager.loadTranslations', () => {
   let i18nManager: I18nManager;
   let configManager: ConfigManager;
   const fetchMock = vi.fn();
+  let context: IGirafeContext;
 
   beforeEach(() => {
-    MockHelper.startMocking();
-    I18nManager.getInstance().translations = {};
-    i18nManager = I18nManager.getInstance();
+    context = MockHelper.startMocking();
+    context.i18nManager.translations = {};
+    i18nManager = context.i18nManager;
     i18nManager.loadingLanguagePromise = null;
-    configManager = ConfigManager.getInstance();
+    configManager = context.configManager;
     configManager.Config.languages.translations = {};
     global.fetch = fetchMock;
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should return cached translations if already loaded', async () => {
@@ -101,19 +103,20 @@ describe('I18nManager.loadTranslations', () => {
 describe('I18nManager.getTranslation', () => {
   let i18nManager: I18nManager;
   let stateManager: StateManager;
+  let context: IGirafeContext;
 
   beforeEach(() => {
-    MockHelper.startMocking();
-    I18nManager.getInstance().translations = {
+    context = MockHelper.startMocking();
+    context.i18nManager.translations = {
       fr: { layer: 'couche', map: 'carte' },
       en: { layer: 'layer', map: 'map' }
     };
-    i18nManager = I18nManager.getInstance();
-    stateManager = StateManager.getInstance();
+    i18nManager = context.i18nManager;
+    stateManager = context.stateManager;
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should return translation for existing key in current language', () => {
@@ -155,21 +158,22 @@ describe('I18nManager.getTranslation', () => {
 describe('I18nManager.translate', () => {
   let i18nManager: I18nManager;
   let stateManager: StateManager;
+  let context: IGirafeContext;
 
   beforeEach(() => {
-    MockHelper.startMocking();
-    I18nManager.getInstance().translations = {
+    context = MockHelper.startMocking();
+    context.i18nManager.translations = {
       fr: { layer: 'couche', map: 'carte' },
       en: { layer: 'layer', map: 'map' }
     };
-    i18nManager = I18nManager.getInstance();
+    i18nManager = context.i18nManager;
     // @ts-ignore
     i18nManager.loadingLanguagePromise = 'not-null';
-    stateManager = StateManager.getInstance();
+    stateManager = context.stateManager;
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should translate elements with i18n attribute', async () => {
@@ -231,15 +235,16 @@ describe('I18nManager.translate', () => {
 describe('I18nManager.formatNumber', () => {
   let i18nManager: I18nManager;
   let configManager: ConfigManager;
+  let context: IGirafeContext;
 
   beforeEach(() => {
-    MockHelper.startMocking();
-    i18nManager = I18nManager.getInstance();
-    configManager = ConfigManager.getInstance();
+    context = MockHelper.startMocking();
+    i18nManager = context.i18nManager;
+    configManager = context.configManager;
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should format integer number according to locale', () => {

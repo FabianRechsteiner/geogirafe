@@ -116,6 +116,70 @@ describe('Equality.areEqual', () => {
 
     expect(areEqual(layer1, layer2)).toBe(false);
   });
+
+  it('should not compare functions', () => {
+    const layer1: any = {
+      group: null,
+      val: 1,
+      id: 'toto',
+      fn: () => {
+        return true;
+      }
+    };
+    const layer2: any = {
+      group: null,
+      val: 1,
+      id: 'toto',
+      fn: () => {
+        return true;
+      }
+    };
+
+    expect(areEqual(layer1, layer2)).toBe(true);
+  });
+
+  it('should not compare functions', () => {
+    const layer1: any = {
+      group: null,
+      val: 1,
+      id: 'toto',
+      fn: () => {
+        return true;
+      }
+    };
+    const layer2: any = {
+      group: null,
+      val: 1,
+      id: 'toto',
+      fn: () => {
+        const toto = 'toto';
+        return toto;
+      }
+    };
+
+    expect(areEqual(layer1, layer2)).toBe(true);
+  });
+
+  it('should compare the function names', () => {
+    const layer1: any = {
+      group: null,
+      val: 1,
+      id: 'toto',
+      fn1: () => {
+        return true;
+      }
+    };
+    const layer2: any = {
+      group: null,
+      val: 1,
+      id: 'toto',
+      fn2: () => {
+        return true;
+      }
+    };
+
+    expect(areEqual(layer1, layer2)).toBe(false);
+  });
 });
 
 describe('areEqual Performance Tests', () => {

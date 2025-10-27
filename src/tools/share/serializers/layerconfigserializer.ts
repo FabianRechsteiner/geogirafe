@@ -3,15 +3,12 @@ import LayersConfig from '../../state/layersConfig';
 import GroupLayer from '../../../models/layers/grouplayer';
 import ThemeLayer from '../../../models/layers/themelayer';
 
-import LayerManager from '../../layers/layermanager';
-import ThemesHelper from '../../themes/themeshelper';
-import StateManager from '../../state/statemanager';
 import Layer from '../../../models/layers/layer';
 import BaseLayer from '../../../models/layers/baselayer';
 import { isTimeAwareLayer } from '../../../models/layers/timeawarelayer';
-import ErrorManager from '../../error/errormanager';
 import LayerWms from '../../../models/layers/layerwms';
 import WfsFilter, { WfsOperator } from '../../wfs/wfsfilter';
+import IGirafeContext from '../../context/icontext';
 
 export type SharedFilter = {
   property: string;
@@ -41,18 +38,14 @@ export type SharedLayer = {
 };
 
 export default class LayersConfigSerializer implements IBrainSerializer<LayersConfig> {
-  layerManager: LayerManager;
-  stateManager: StateManager;
-  themesHelper: ThemesHelper;
+  private readonly context: IGirafeContext;
 
-  constructor() {
-    this.layerManager = LayerManager.getInstance();
-    this.themesHelper = ThemesHelper.getInstance();
-    this.stateManager = StateManager.getInstance();
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public brainSerialize(layersConfig: LayersConfig): string {
@@ -67,8 +60,8 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
   public brainDeserialize(str: string) {
     const deserializedLayers = this.deserialize(str);
     // Remove all existing layers
-    for (const layer of this.stateManager.state.layers.layersList) {
-      this.layerManager.toggle(layer, 'off');
+    for (const layer of this.context.stateManager.state.layers.layersList) {
+      this.context.layerManager.toggle(layer, 'off');
     }
     this.state.layers.layersList = [];
 
@@ -99,7 +92,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     let isExpanded = false;
     if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       isExpanded = layer.isExpanded;
-    } else if (layer instanceof Layer && this.layerManager.isLayerWithLegend(layer)) {
+    } else if (layer instanceof Layer && this.context.layerManager.isLayerWithLegend(layer)) {
       isExpanded = layer.isLegendExpanded;
     }
 
@@ -108,7 +101,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     const removedChildren: number[] = [];
     if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       // First get the original version of the object
-      const originalLayer = this.themesHelper.findBaseLayerById(layer.id) as GroupLayer | ThemeLayer; // Is always of this type.
+      const originalLayer = this.context.themesHelper.findBaseLayerById(layer.id) as GroupLayer | ThemeLayer; // Is always of this type.
       for (const child of originalLayer.children) {
         const index = layer.children.findIndex((el) => el.id === child.id);
         if (index >= 0) {
@@ -129,7 +122,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
       opacity: layer instanceof Layer ? layer.opacity : undefined,
       swiped: layer instanceof Layer ? layer.swiped : undefined,
       filter:
-        layer instanceof LayerWms && this.layerManager.isLayerWithFilter(layer)
+        layer instanceof LayerWms && this.context.layerManager.isLayerWithFilter(layer)
           ? (layer.filter as SharedFilter)
           : undefined,
       timeRestriction: isTimeAwareLayer(layer) ? layer.timeRestriction : undefined,
@@ -168,7 +161,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
       if (sharedLayer.swiped) {
         originalLayer.swiped = sharedLayer.swiped;
       }
-      if (this.layerManager.isLayerWithLegend(originalLayer)) {
+      if (this.context.layerManager.isLayerWithLegend(originalLayer)) {
         originalLayer.isLegendExpanded = Boolean(sharedLayer.isExpanded);
       }
       if (originalLayer instanceof LayerWms && sharedLayer.filter) {
@@ -194,7 +187,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
       if (sharedChild.checked === 1) {
         const originalChild = originalLayer.children.find((c) => c.id == sharedChild.id);
         if (!originalChild) {
-          ErrorManager.getInstance().pushMessage(
+          this.context.errorManager.pushMessage(
             'unknown-layers-cannot-be-added',
             'Some layer could not be added to the layer-tree. This is either because you do not have the rights for it, or because this layer does not exist anymore.',
             'warning'

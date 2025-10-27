@@ -13,8 +13,6 @@ import type { Callback } from '../../tools/state/statemanager';
 import PrintManager from './tools/PrintManager';
 import PrintMaskManager from './tools/printMaskManager';
 import { toDegrees, toRadians } from 'ol/math';
-import MapManager from '../../tools/state/mapManager';
-import I18nManager from '../../tools/i18n/i18nmanager';
 import { unByKeyAll } from '../../tools/utils/olutils';
 import { padNumber } from 'ol/string';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
@@ -53,8 +51,6 @@ class PrintComponent extends GirafeHTMLElement {
   private readonly default_resolution = 100;
   private readonly default_format = 'pdf';
 
-  private readonly i18nManager: I18nManager;
-  private readonly mapManager: MapManager;
   private readonly eventsCallbacks: Callback[] = [];
   private readonly eventKeys: EventsKey[] = [];
   private printManager?: PrintManager;
@@ -76,11 +72,10 @@ class PrintComponent extends GirafeHTMLElement {
 
   constructor() {
     super('print');
-    this.mapManager = MapManager.getInstance();
-    this.i18nManager = I18nManager.getInstance();
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
     this.registerVisibilityEvents();
   }
@@ -134,7 +129,7 @@ class PrintComponent extends GirafeHTMLElement {
    */
   onScaleChanged(event: KeyboardEvent) {
     this.printMaskManager?.setManuallySelectedScale(false);
-    if (this.configManager.Config.print?.customScale) {
+    if (this.context.configManager.Config.print?.customScale) {
       if ((event.target as HTMLInputElement)?.value === 'custom') {
         this.showCustomScale = true;
         this.render();
@@ -201,7 +196,7 @@ class PrintComponent extends GirafeHTMLElement {
    * @returns {number} The rotation angle in degrees, from the map.
    */
   getRotation(): number {
-    return toDegrees(this.mapManager.getMap().getView().getRotation());
+    return toDegrees(this.context.mapManager.getMap().getView().getRotation());
   }
 
   /**
@@ -249,11 +244,11 @@ class PrintComponent extends GirafeHTMLElement {
   print() {
     const customAttributes = this.getCustomAttributes();
     const spec = this.printManager?.encode({
-      mapManager: this.mapManager,
-      i18nManager: this.i18nManager,
+      mapManager: this.context.mapManager,
+      i18nManager: this.context.i18nManager,
       state: this.state,
       scale: this.getSelectedScale() ?? this.default_scale,
-      printResolution: this.mapManager.getMap().getView().getResolution() ?? this.default_resolution,
+      printResolution: this.context.mapManager.getMap().getView().getResolution() ?? this.default_resolution,
       pageSize: this.state.print.pageSize ?? [],
       dpi: this.getSelectedDpi() ?? this.default_dpi,
       layout: this.selectedLayout?.name ?? '',
@@ -339,7 +334,7 @@ class PrintComponent extends GirafeHTMLElement {
   private setupWithCapabilitiesComponent() {
     this.updateInputRotationFromMap();
     this.state.print.maskVisible = true;
-    this.printMaskManager = new PrintMaskManager(this.mapManager.getMap());
+    this.printMaskManager = new PrintMaskManager(this.context.mapManager.getMap(), this.context.stateManager);
     this.printMaskManager?.setPossibleScales(this.scales);
     this.setupPrintManager();
     this.registerEvents();
@@ -388,7 +383,7 @@ class PrintComponent extends GirafeHTMLElement {
     // Prevent feature selection in the map
     this.registerInteractionListener('map.select', true);
 
-    const view = this.mapManager.getMap().getView();
+    const view = this.context.mapManager.getMap().getView();
     this.eventKeys.push(
       view.on('change:rotation', () => {
         this.updateInputRotationFromMap();
@@ -446,7 +441,7 @@ class PrintComponent extends GirafeHTMLElement {
     slider.value = `${rotation}`;
     number.value = `${rotation}`;
     if (!mapRotationValue) {
-      this.mapManager.getMap().getView().setRotation(toRadians(rotation));
+      this.context.mapManager.getMap().getView().setRotation(toRadians(rotation));
     }
   }
 
@@ -471,7 +466,6 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private async initComponentConfig() {
-    await this.loadConfig();
     await this.fetchCapabilities();
     this.initFromCapabilities();
     if (!this.capabilities) {
@@ -484,14 +478,14 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    /*/
   private async fetchCapabilities(): Promise<MFPCapabilities | undefined> {
-    const printUrl = this.configManager.Config.print?.url;
+    const printUrl = this.context.configManager.Config.print?.url;
     if (printUrl) {
       this.printUrl = printUrl.endsWith('/') ? printUrl.slice(0, -1) : printUrl;
     }
     let capabilities: MFPCapabilities | undefined = undefined;
     try {
       const fetchOptions = { referrer: '' } as RequestInit;
-      if (this.configManager.Config.oauth || this.state.oauth.status === 'loggedIn') {
+      if (this.context.configManager.Config.oauth || this.state.oauth.status === 'loggedIn') {
         fetchOptions.credentials = 'include';
       }
       const response = await fetch(this.getCapabilitiesUrl(), fetchOptions);
@@ -520,7 +514,7 @@ class PrintComponent extends GirafeHTMLElement {
       return;
     }
 
-    const config = this.configManager.Config.print;
+    const config = this.context.configManager.Config.print;
     this.initLayouts();
     const selectedLayout = this.getCapabilitiesLayout(config?.defaultLayout ?? '');
     this.selectedLayout = selectedLayout ?? printLayouts[0];
@@ -541,7 +535,7 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private initFormats() {
-    const config = this.configManager.Config.print;
+    const config = this.context.configManager.Config.print;
     const printFormats = config?.formats;
     this.printFormats = PrintComponent.filterValidPrintFormats(printFormats, this.capabilities?.formats);
     const defaultFormat = config?.defaultFormat;
@@ -555,7 +549,7 @@ class PrintComponent extends GirafeHTMLElement {
    */
   private initLayouts() {
     const availableLayouts = this.capabilities?.layouts;
-    const configLayouts = this.configManager.Config.print?.layouts;
+    const configLayouts = this.context.configManager.Config.print?.layouts;
     this.layouts = PrintComponent.filterValidLayouts(availableLayouts, configLayouts);
   }
 
@@ -572,7 +566,7 @@ class PrintComponent extends GirafeHTMLElement {
    * @private
    */
   private updateScales(clientInfo: MFPCapabilitiesLayoutAttributeClientInfo) {
-    this.scales = PrintComponent.filterValidScales(clientInfo.scales, this.configManager.Config.print?.scales);
+    this.scales = PrintComponent.filterValidScales(clientInfo.scales, this.context.configManager.Config.print?.scales);
     this.printMaskManager?.setPossibleScales(this.scales);
   }
 
@@ -672,15 +666,15 @@ class PrintComponent extends GirafeHTMLElement {
   private encodeLegend(): MFPLegendClass | null {
     const options: EncodeLegendOptions = {
       ...{
-        mapManager: this.mapManager,
-        i18nManager: this.i18nManager,
+        mapManager: this.context.mapManager,
+        i18nManager: this.context.i18nManager,
         state: this.state,
         scale: this.getSelectedScale() ?? this.default_scale,
-        printResolution: this.mapManager.getMap().getView().getResolution() ?? this.default_resolution,
+        printResolution: this.context.mapManager.getMap().getView().getResolution() ?? this.default_resolution,
         pageSize: this.state.print.pageSize ?? [],
         dpi: this.getSelectedDpi() ?? this.default_dpi
       },
-      ...this.configManager.Config.print?.printLegend
+      ...this.context.configManager.Config.print?.printLegend
     };
     return this.printManager?.encodeLegend(options) || null;
   }
@@ -741,12 +735,12 @@ class PrintComponent extends GirafeHTMLElement {
    * @returns An array of MFPPrintDatasource objects representing the selected features.
    */
   private selectedFeaturesToDatasource(): MFPPrintDatasource[] {
-    const center = this.mapManager.getMap().getView().getCenter() ?? [0, 0];
+    const center = this.context.mapManager.getMap().getView().getCenter() ?? [0, 0];
     const scale = this.getSelectedScale() ?? -1;
     const pageSize = this.state.print.pageSize ?? [];
     const extent = this.printManager?.getExtent(pageSize, scale, center) || [0, 0, Infinity, Infinity];
     const selectedFeatures = this.state.selection.selectedFeatures ?? [];
-    return PrintManager.getPrintDatasourceFromSelectedFeatures(selectedFeatures, extent, this.i18nManager);
+    return PrintManager.getPrintDatasourceFromSelectedFeatures(selectedFeatures, extent, this.context.i18nManager);
   }
 
   /**

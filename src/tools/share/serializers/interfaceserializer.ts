@@ -1,16 +1,16 @@
+import IGirafeContext from '../../context/icontext';
 import { IBrainSerializer } from '../../state/brain/serialize';
 import { GraphicalInterface } from '../../state/state';
-import StateManager from '../../state/statemanager';
 
 export default class InterfaceSerializer implements IBrainSerializer<GraphicalInterface> {
-  stateManager: StateManager;
+  private readonly context: IGirafeContext;
 
-  constructor() {
-    this.stateManager = StateManager.getInstance();
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public brainSerialize(graphicalInterface: GraphicalInterface): string {

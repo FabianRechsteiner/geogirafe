@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import StateManager from '../../state/statemanager';
 import MockHelper from '../../tests/mockhelper';
 import ObjectSelection from '../../state/objectselection';
 import SelectionSerializer from './selectionserializer';
@@ -7,20 +6,22 @@ import SelectionParam from '../../../models/selectionparam';
 import { mockOgcServers } from '../../tests/wmswfsmanagermocking';
 import WfsFilter from '../../wfs/wfsfilter';
 import LayerWms from '../../../models/layers/layerwms';
+import IGirafeContext from '../../context/icontext';
 
 let serializer: SelectionSerializer;
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
-  serializer = new SelectionSerializer();
+  context = MockHelper.startMocking();
+  serializer = new SelectionSerializer(context);
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 beforeEach(() => {
-  const state = StateManager.getInstance().state;
+  const state = context.stateManager.state;
   state.selection = new ObjectSelection();
 });
 
@@ -64,7 +65,7 @@ describe('SelectionSerializer.deserialize', () => {
   it('should set initialSelectionBox from JSON string', () => {
     const json = JSON.stringify({ selectionBox: [100, 200, 300, 400], selectionQuery: undefined });
     serializer.brainDeserialize(json);
-    const state = StateManager.getInstance().state;
+    const state = context.stateManager.state;
     expect(state.selection.initialSelectionBox).toEqual([100, 200, 300, 400]);
     expect(state.selection.initialSelectionQuery).toEqual(undefined);
   });
@@ -75,7 +76,7 @@ describe('SelectionSerializer.deserialize', () => {
       selectionQuery: { query: [{ property: 'attrName', value: '13', operator: 'eq' }], layerName: 'testWms2' }
     });
     serializer.brainDeserialize(json);
-    const state = StateManager.getInstance().state;
+    const state = context.stateManager.state;
     expect(state.selection.initialSelectionBox).toEqual(undefined);
     expect(state.selection.initialSelectionQuery).toEqual({
       query: [new WfsFilter('attrName', 'eq', '13')],
@@ -84,7 +85,7 @@ describe('SelectionSerializer.deserialize', () => {
   });
 
   it('should do nothing when given an empty string', () => {
-    const state = StateManager.getInstance().state;
+    const state = context.stateManager.state;
     state.selection.initialSelectionBox = undefined;
 
     serializer.brainDeserialize('');

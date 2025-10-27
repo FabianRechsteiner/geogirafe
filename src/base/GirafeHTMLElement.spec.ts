@@ -1,19 +1,21 @@
 import { describe, it, beforeAll, assert, afterAll, expect, beforeEach, afterEach } from 'vitest';
 import GirafeHTMLElement from './GirafeHTMLElement';
 import MockHelper from '../tools/tests/mockhelper';
+import IGirafeContext from '../tools/context/icontext';
 
 describe('GirafeHTMLElement.isNullOrUndefined', () => {
   let element: GirafeHTMLElement;
+  let context: IGirafeContext;
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeHTMLElement);
     }
-    element = new GirafeHTMLElement('girafe-test');
+    element = new GirafeHTMLElement('girafe-test', context);
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('isNullOrUndefined tests', () => {
@@ -30,16 +32,17 @@ describe('GirafeHTMLElement.isNullOrUndefined', () => {
 
 describe('GirafeHTMLElement.isNullOrUndefinedOrBlank', () => {
   let element: GirafeHTMLElement;
+  let context: IGirafeContext;
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeHTMLElement);
     }
-    element = new GirafeHTMLElement('girafe-test');
+    element = new GirafeHTMLElement('girafe-test', context);
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('isNullOrUndefinedOrBlank tests', () => {
@@ -56,19 +59,20 @@ describe('GirafeHTMLElement.isNullOrUndefinedOrBlank', () => {
 
 describe('GirafeHTMLElement.getParentOfType', () => {
   let element: GirafeHTMLElement;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeHTMLElement);
     }
-    element = new GirafeHTMLElement('girafe-test');
+    element = new GirafeHTMLElement('girafe-test', context);
     document.body.appendChild(element);
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
     document.body.removeChild(element);
+    MockHelper.stopMocking(context);
   });
 
   it('should return null if the element is null', () => {
@@ -116,19 +120,20 @@ describe('GirafeHTMLElement.getParentOfType', () => {
 });
 
 describe('GirafeHTMLElement.getUnsafeTemplate', () => {
+  let context: IGirafeContext;
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeHTMLElement);
     }
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should create two different templates', () => {
-    const element = new GirafeHTMLElement('girafe-test');
+    const element = new GirafeHTMLElement('girafe-test', context);
     // @ts-ignore
     const template1 = element.getUnsafeTemplate('toto');
     // @ts-ignore
@@ -138,7 +143,7 @@ describe('GirafeHTMLElement.getUnsafeTemplate', () => {
   });
 
   it('should return cached object and not create a new one', () => {
-    const element = new GirafeHTMLElement('girafe-test');
+    const element = new GirafeHTMLElement('girafe-test', context);
     const str = 'toto';
     // @ts-ignore
     const template1 = element.getUnsafeTemplate(str);
@@ -151,21 +156,22 @@ describe('GirafeHTMLElement.getUnsafeTemplate', () => {
 
 describe('GirafeHTMLElement.defineDisplayStyle', () => {
   let element: GirafeHTMLElement;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeHTMLElement);
     }
   });
 
   beforeEach(() => {
-    element = new GirafeHTMLElement('girafe-test');
+    element = new GirafeHTMLElement('girafe-test', context);
     document.body.appendChild(element);
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   afterEach(() => {
@@ -233,19 +239,20 @@ describe('GirafeHTMLElement.defineDisplayStyle', () => {
 
 describe('GirafeHTMLElement.simulateClick', () => {
   let element: GirafeHTMLElement;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeHTMLElement);
     }
-    element = new GirafeHTMLElement('girafe-test');
+    element = new GirafeHTMLElement('girafe-test', context);
     document.body.appendChild(element);
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
     document.body.removeChild(element);
+    MockHelper.stopMocking(context);
   });
 
   it('should click the target element on Enter key press', () => {

@@ -1,15 +1,12 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import MapManager from '../state/mapManager';
-import StateManager from '../state/statemanager';
 import LayerWmts from '../../models/layers/layerwmts';
-import { Feature, Map } from 'ol';
+import { Feature } from 'ol';
 import { Extent } from 'ol/extent';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { fromExtent } from 'ol/geom/Polygon';
 import Style from 'ol/style/Style';
 import { Stroke } from 'ol/style';
-import ConfigManager from '../configuration/configmanager';
 import { TileGrid } from 'ol/tilegrid';
 import { WMTS } from 'ol/source';
 import { Projection } from 'ol/proj';
@@ -18,12 +15,13 @@ class OfflineManager extends GirafeSingleton {
   private serviceWorker: ServiceWorker | null = null;
 
   private database?: IDBDatabase;
-  private map: Map;
-  private stateManager: StateManager;
-  private configManager: ConfigManager;
+
+  private get map() {
+    return this.context.mapManager.getMap();
+  }
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   private totalLength: number = 0;
@@ -44,17 +42,13 @@ class OfflineManager extends GirafeSingleton {
     })
   });
 
-  constructor(type: string) {
-    super(type);
-    this.stateManager = StateManager.getInstance();
-    this.configManager = ConfigManager.getInstance();
-    this.map = MapManager.getInstance().getMap();
+  override initializeSingleton() {
     this.map.addLayer(this.vectorLayer);
   }
 
   public initializeOfflineState(isOffline: boolean) {
     this.registerEvents();
-    this.stateManager.state.isOffline = isOffline;
+    this.context.stateManager.state.isOffline = isOffline;
   }
 
   private registerEvents() {
@@ -64,7 +58,7 @@ class OfflineManager extends GirafeSingleton {
     window.addEventListener('online', () => {
       this.state.isOffline = false;
     });
-    this.stateManager.subscribe('isOffline', () => {
+    this.context.stateManager.subscribe('isOffline', () => {
       this.switchOffline();
     });
   }
@@ -136,7 +130,6 @@ class OfflineManager extends GirafeSingleton {
     this.storeVersion = storeVersion;
     this.dbCacheName = dbCacheName;
     this.database = await this.openIndexedDB();
-    await this.configManager.loadConfig();
     this.serviceWorker.postMessage({
       storeVersion: this.storeVersion,
       dbCacheName: this.dbCacheName,
@@ -145,7 +138,7 @@ class OfflineManager extends GirafeSingleton {
   }
 
   public switchOffline() {
-    if (this.stateManager.state.isOffline) {
+    if (this.context.stateManager.state.isOffline) {
       this.displayBoundBoxes();
     } else if (this.vectorLayer) {
       this.vectorLayer.setSource(null);

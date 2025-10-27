@@ -3,16 +3,18 @@ import StateManager from './statemanager';
 import ThemeLayer from '../../models/layers/themelayer';
 import LayerOsm from '../../models/layers/layerosm';
 import MockHelper from '../tests/mockhelper';
+import IGirafeContext from '../context/icontext';
 
 let manager: StateManager;
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
-  manager = StateManager.getInstance();
+  context = MockHelper.startMocking();
+  manager = context.stateManager;
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 describe('StateManager.subscribe', () => {

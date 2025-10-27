@@ -9,6 +9,7 @@ class PrototypeBannerComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
   }
 }

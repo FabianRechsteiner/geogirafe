@@ -2,8 +2,10 @@ import { it, expect, describe, beforeAll, afterAll, vi } from 'vitest';
 import ThemesManager from './themesmanager';
 import MockHelper from '../tests/mockhelper';
 import { GMFServerOgc } from '../../models/gmf';
+import IGirafeContext from '../context/icontext';
 
 let manager: ThemesManager;
+let context: IGirafeContext;
 
 const fetchMock = vi.fn();
 const emptyTheme = {
@@ -13,15 +15,16 @@ const emptyTheme = {
 };
 
 beforeAll(async () => {
-  MockHelper.startMocking();
+  context = MockHelper.startMocking();
   global.fetch = fetchMock;
   fetchMock.mockResolvedValueOnce({ json: vi.fn().mockResolvedValue(emptyTheme) });
-  manager = ThemesManager.getInstance();
+  manager = context.themesManager;
+  // @ts-ignore
   await manager.initialize();
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 describe('ThemesManager.prepareOgcServers', () => {
@@ -48,7 +51,7 @@ describe('ThemesManager.prepareOgcServers', () => {
     };
 
     // Ignore WFS Preload
-    vi.spyOn(ThemesManager.getInstance(), 'preloadWfsServer').mockResolvedValue();
+    vi.spyOn(context.themesManager, 'preloadWfsServer').mockResolvedValue();
     const result = manager.prepareOgcServers(input);
 
     const server1 = result['WMS 1'];

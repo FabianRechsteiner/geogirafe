@@ -1,10 +1,12 @@
 import OgcApiFeaturesClient from './ogcapifeaturesclient';
 import ServerOgc from '../../models/serverogc';
 import { OapifCollection } from '../../models/serverogcapifeatures';
+import IGirafeContext from '../context/icontext';
+import { OgcApiClientOptions } from './ogcapiclient';
 
 export default class OgcApiFeaturesClientGeorama extends OgcApiFeaturesClient {
-  constructor(serverConfig: ServerOgc) {
-    super(serverConfig);
+  constructor(serverConfig: ServerOgc, opt: OgcApiClientOptions, context: IGirafeContext) {
+    super(serverConfig, opt, context);
   }
 
   /**

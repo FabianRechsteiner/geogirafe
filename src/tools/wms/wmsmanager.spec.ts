@@ -2,7 +2,6 @@ import { it, expect, describe, vi } from 'vitest';
 
 import Map from 'ol/Map';
 
-import WmsManager from './wmsmanager';
 import { mockOgcServers, mockWmsLayers } from '../tests/wmswfsmanagermocking';
 import { WmsClientMapServer, WmsClientQgis } from './wmsclient';
 import MockHelper from '../tests/mockhelper';
@@ -12,9 +11,10 @@ const fetchMock = vi.fn();
 global.fetch = fetchMock;
 
 describe('WMS Manager tests', () => {
-  MockHelper.startMocking();
+  let context = MockHelper.startMocking();
 
-  const wmsManager = WmsManager.getInstance();
+  const wmsManager = context.wmsManager;
+  // @ts-ignore
   wmsManager.map = new Map({ layers: [] });
 
   // QGIS OgcServers
@@ -67,5 +67,5 @@ describe('WMS Manager tests', () => {
     });
   });
 
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });

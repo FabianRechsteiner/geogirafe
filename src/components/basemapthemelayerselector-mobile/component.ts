@@ -9,6 +9,7 @@ export default class BasemapThemeLayerSelectorMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.subscribe('interface.swipeupPanelContent', () => {
       this.render();
     });

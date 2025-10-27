@@ -1,11 +1,7 @@
 import { render as uRender, html as uHtml, Hole } from 'uhtml';
-import I18nManager from '../tools/i18n/i18nmanager';
-import ConfigManager from '../tools/configuration/configmanager';
-import StateManager, { Callback } from '../tools/state/statemanager';
-import ComponentManager from '../tools/state/componentManager';
-import UserInteractionManager from '../tools/state/userInteractionManager';
+import { Callback } from '../tools/state/statemanager';
 import { GgUserInteractionEvent } from '../tools/state/userinteractionevent';
-import PluginManager from '../tools/auth/pluginmanager';
+import IGirafeContext from '../tools/context/icontext';
 
 class GirafeHTMLElement extends HTMLElement {
   templateUrl: string | null = null;
@@ -19,47 +15,39 @@ class GirafeHTMLElement extends HTMLElement {
 
   callbacks: Callback[] = [];
 
-  configManager: ConfigManager;
-  stateManager: StateManager;
-  componentManager: ComponentManager;
-  userInteractionManager: UserInteractionManager;
-
   private readonly unsafeCache = new Map<string, TemplateStringsArray>();
+  private _context?: IGirafeContext;
 
-  constructor(name: string) {
+  protected get context(): IGirafeContext {
+    if (!this._context) {
+      throw new Error('No context !!!');
+    }
+    return this._context;
+  }
+
+  constructor(name: string, context?: IGirafeContext) {
     super();
     this.name = name;
-
-    this.configManager = ConfigManager.getInstance();
-    this.stateManager = StateManager.getInstance();
-    this.componentManager = ComponentManager.getInstance();
-    this.userInteractionManager = UserInteractionManager.getInstance();
-    this.componentManager.registerComponent(this);
-
+    if (context) {
+      this._context = context;
+    }
     this.shadow = this.attachShadow({ mode: 'open' });
-
-    this.subscribe('language', () => this.girafeTranslate());
-    this.subscribe('oauth.userInfo', () => this.userInfoChanged());
   }
 
   get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   getById<T = HTMLElement>(id: string) {
     return this.shadow.querySelector('#' + id)! as T;
   }
 
-  async loadConfig() {
-    await this.configManager.loadConfig();
-  }
-
   girafeTranslate() {
-    I18nManager.getInstance().translate(this.shadow);
+    this.context.i18nManager.translate(this.shadow);
   }
 
   userInfoChanged() {
-    PluginManager.getInstance().filterPlugins(this.shadow);
+    this.context.pluginManager.filterPlugins(this.shadow);
   }
 
   /**
@@ -248,7 +236,7 @@ class GirafeHTMLElement extends HTMLElement {
   subscribe(path: string | RegExp, callback: Callback): Callback {
     // @ts-expect-error The call would have succeeded against this implementation,
     // but implementation signatures of overloads are not externally visible.
-    const subscription = this.stateManager.subscribe(path, callback);
+    const subscription = this.context.stateManager.subscribe(path, callback);
     this.callbacks.push(subscription);
     return subscription;
   }
@@ -263,10 +251,17 @@ class GirafeHTMLElement extends HTMLElement {
     (Array.isArray(callbacks) ? callbacks : [callbacks]).forEach((callback) => {
       const index = this.callbacks.findIndex((c) => c === callback);
       if (index >= 0) {
-        this.stateManager.unsubscribe(callback);
+        this.context.stateManager.unsubscribe(callback);
         this.callbacks.splice(index, 1);
       }
     });
+  }
+
+  connectedCallback() {
+    this._context = this.getInheritedContext();
+    this.context.componentManager.registerComponent(this);
+    this.subscribe('language', () => this.girafeTranslate());
+    this.subscribe('oauth.userInfo', () => this.userInfoChanged());
   }
 
   /**
@@ -275,28 +270,50 @@ class GirafeHTMLElement extends HTMLElement {
    */
   disconnectedCallback() {
     for (const callback of this.callbacks) {
-      this.stateManager.unsubscribe(callback);
+      this.context.stateManager.unsubscribe(callback);
     }
     this.callbacks.length = 0;
     this.unregisterInteractionListeners();
   }
 
   registerInteractionListener(eventName: GgUserInteractionEvent, isExclusive: boolean): boolean {
-    return this.userInteractionManager.registerListener(eventName, isExclusive, this.name);
+    return this.context.userInteractionManager.registerListener(eventName, isExclusive, this.name);
   }
 
   unregisterInteractionListeners(eventNames?: GgUserInteractionEvent | GgUserInteractionEvent[]): void {
     if (!eventNames) {
-      this.userInteractionManager.unregisterAllListenersOfTool(this.name);
+      this.context.userInteractionManager.unregisterAllListenersOfTool(this.name);
     }
     if (!Array.isArray(eventNames)) {
       eventNames = [eventNames!];
     }
-    eventNames.forEach((event) => this.userInteractionManager.unregisterListener(event, this.name));
+    for (const event of eventNames) {
+      this.context.userInteractionManager.unregisterListener(event, this.name);
+    }
   }
 
   canExecute(eventName: GgUserInteractionEvent) {
-    return this.userInteractionManager.canListenerExecute(eventName, this.name);
+    return this.context.userInteractionManager.canListenerExecute(eventName, this.name);
+  }
+
+  protected getInheritedContext(): IGirafeContext {
+    if (this._context) {
+      // The context was already initialized in the constructor
+      return this._context;
+    }
+
+    let parent = this.parentNode;
+    do {
+      if (parent instanceof ShadowRoot) {
+        parent = parent.host;
+      }
+      if (parent instanceof GirafeHTMLElement) {
+        return parent.context;
+      }
+      parent = parent?.parentNode ?? null;
+    } while (parent && parent !== document);
+
+    throw new Error('No context was found !');
   }
 }
 

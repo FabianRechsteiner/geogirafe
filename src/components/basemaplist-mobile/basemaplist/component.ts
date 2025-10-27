@@ -12,22 +12,21 @@ export default class BasemapListMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
 
-    this.loadConfig().then(() => {
-      this.subscribe('basemaps', (_oldValue: Record<number, Basemap>, newValue: Record<number, Basemap>) => {
-        this.basemaps = Object.values(newValue).filter((b) => b.layersList.length);
-        this.render();
+    this.subscribe('basemaps', (_oldValue: Record<number, Basemap>, newValue: Record<number, Basemap>) => {
+      this.basemaps = Object.values(newValue).filter((b) => b.layersList.length);
+      this.render();
 
-        // This is to initialize the "height" CSS prop so it actually anmates the first time
-        const grid = this.shadow.querySelector('.grid') as HTMLDivElement;
-        grid.style.setProperty('max-height', this.collapsed ? '0px' : `${grid.scrollHeight}px`);
-      });
+      // This is to initialize the "height" CSS prop so it actually anmates the first time
+      const grid = this.shadow.querySelector('.grid') as HTMLDivElement;
+      grid.style.setProperty('max-height', this.collapsed ? '0px' : `${grid.scrollHeight}px`);
+    });
 
-      this.subscribe('activeBasemap', () => {
-        // this.render()
-        this.refreshRender();
-      });
+    this.subscribe('activeBasemap', () => {
+      // this.render()
+      this.refreshRender();
     });
 
     // Toggle to dark mode when needed

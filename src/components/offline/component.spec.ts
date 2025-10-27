@@ -2,18 +2,21 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import MockHelper from '../../tools/tests/mockhelper';
 import OfflineComponent from './component';
 import { createTestBasemap, createTestLayerWmts } from '../../tools/tests/layerhelpers';
-import LayerManager from '../../tools/layers/layermanager';
 import BasemapEmpty from '../../models/basemaps/basemapempty';
+import IGirafeContext from '../../tools/context/icontext';
 
 describe('OfflineComponent.getAllWmtsLayers', () => {
   let element: OfflineComponent;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-offline')) {
       customElements.define('girafe-offline', OfflineComponent);
     }
     element = new OfflineComponent();
+    // @ts-ignore
+    element._context = context;
   });
 
   it('should return empty array if no layers are available and', () => {
@@ -38,8 +41,8 @@ describe('OfflineComponent.getAllWmtsLayers', () => {
     const wmtsLayer1 = createTestLayerWmts();
     const wmtsLayer2 = createTestLayerWmts();
     element.state.layers.layersList = [wmtsLayer1, wmtsLayer2];
-    LayerManager.getInstance().toggleLayer(wmtsLayer1, 'on');
-    LayerManager.getInstance().toggleLayer(wmtsLayer2, 'on');
+    context.layerManager.toggleLayer(wmtsLayer1, 'on');
+    context.layerManager.toggleLayer(wmtsLayer2, 'on');
     element.state.activeBasemap = new BasemapEmpty();
 
     // @ts-ignore
@@ -51,8 +54,8 @@ describe('OfflineComponent.getAllWmtsLayers', () => {
     const wmtsLayer1 = createTestLayerWmts();
     const wmtsLayer2 = createTestLayerWmts();
     element.state.layers.layersList = [wmtsLayer1, wmtsLayer2];
-    LayerManager.getInstance().toggleLayer(wmtsLayer1, 'on');
-    LayerManager.getInstance().toggleLayer(wmtsLayer2, 'off');
+    context.layerManager.toggleLayer(wmtsLayer1, 'on');
+    context.layerManager.toggleLayer(wmtsLayer2, 'off');
 
     // @ts-ignore
     const result = element.getAllWmtsLayers();
@@ -69,8 +72,8 @@ describe('OfflineComponent.getAllWmtsLayers', () => {
     const wmtsLayer3 = createTestLayerWmts();
     const wmtsLayer4 = createTestLayerWmts();
     element.state.layers.layersList = [wmtsLayer3, wmtsLayer4];
-    LayerManager.getInstance().toggleLayer(wmtsLayer3, 'on');
-    LayerManager.getInstance().toggleLayer(wmtsLayer4, 'off');
+    context.layerManager.toggleLayer(wmtsLayer3, 'on');
+    context.layerManager.toggleLayer(wmtsLayer4, 'off');
 
     // @ts-ignore
     const result = element.getAllWmtsLayers();

@@ -32,11 +32,10 @@ class InfoboxComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      super.render();
-      super.girafeTranslate();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    super.render();
+    super.girafeTranslate();
+    this.registerEvents();
   }
 }
 

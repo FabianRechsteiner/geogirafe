@@ -1,31 +1,26 @@
-import ConfigManager from '../configuration/configmanager';
-import StateManager from '../state/statemanager';
-import GirafeSingleton from '../../base/GirafeSingleton';
+import IGirafeContext from '../context/icontext';
 
-export default class GMFManager extends GirafeSingleton {
-  private readonly configManager: ConfigManager;
-  private readonly stateManager: StateManager;
+export default class GMFManager {
+  private readonly context: IGirafeContext;
 
-  private get isOAuth() {
-    return this.configManager.Config.oauth !== undefined;
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
-  constructor(type: string) {
-    super(type);
-    this.configManager = ConfigManager.getInstance();
-    this.stateManager = StateManager.getInstance();
+  private get isOAuth() {
+    return this.context.configManager.Config.oauth !== undefined;
   }
 
   get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   get gmfConfigForOAuth() {
-    return this.configManager.Config.oauth!.geomapfish;
+    return this.context.configManager.Config.oauth!.geomapfish;
   }
 
   get gmfConfigForGmfAuth() {
-    return this.configManager.Config.gmfauth!;
+    return this.context.configManager.Config.gmfauth!;
   }
 
   public async loginWithToken() {

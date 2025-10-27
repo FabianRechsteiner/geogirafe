@@ -1,16 +1,24 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import InfoWindowComponent from './component';
 import MockHelper from '../../tools/tests/mockhelper';
+import IGirafeContext from '../../tools/context/icontext';
 
 describe('InfoWindowComponent.configToCssValue', () => {
   let infoWindow: InfoWindowComponent;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-info-window')) {
       customElements.define('girafe-info-window', InfoWindowComponent);
     }
     infoWindow = new InfoWindowComponent();
+    // @ts-ignore
+    infoWindow._context = context;
+  });
+
+  afterAll(() => {
+    MockHelper.stopMocking(context);
   });
 
   it('should return a valid css value from a config setting', () => {

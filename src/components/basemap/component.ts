@@ -10,7 +10,7 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   private changeBasemap(basemap: Basemap) {
-    this.state.projection = basemap.projection;
+    this.state.projection = basemap.projection ?? this.context.configManager.Config.map.srid;
     this.state.activeBasemap = basemap;
     this.refreshRender();
   }
@@ -35,16 +35,15 @@ class BasemapComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      if (this.configManager.Config.basemaps.show && this.state.interface.basemapComponentVisible) {
-        this.render();
-        super.girafeTranslate();
-        this.registerEvents();
-      } else {
-        this.state.interface.basemapComponentVisible = false;
-        this.renderEmpty();
-      }
-    });
+    super.connectedCallback();
+    if (this.context.configManager.Config.basemaps.show && this.state.interface.basemapComponentVisible) {
+      this.render();
+      super.girafeTranslate();
+      this.registerEvents();
+    } else {
+      this.state.interface.basemapComponentVisible = false;
+      this.renderEmpty();
+    }
   }
 }
 

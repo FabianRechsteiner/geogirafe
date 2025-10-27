@@ -12,7 +12,7 @@ export default abstract class TreeViewGroupElement extends TreeViewElement {
   }
 
   public sortedChildren() {
-    return this.layerManager.getSortedLayers(this.layer.children);
+    return this.context.layerManager.getSortedLayers(this.layer.children);
   }
 
   protected deactivateThemeOrGroup(layer: BaseLayer) {
@@ -25,15 +25,15 @@ export default abstract class TreeViewGroupElement extends TreeViewElement {
   }
 
   public toggle() {
-    this.stateManager.batchChanges(() => {
-      this.layerManager.toggleGroupOrTheme(this.layer);
+    this.context.stateManager.batchChanges(() => {
+      this.context.layerManager.toggleGroupOrTheme(this.layer);
       this.toggleLayers(this.layer.children, this.layer.activeState as 'on' | 'off');
     });
   }
 
   private toggleLayers(layers: BaseLayer[], activeState: 'on' | 'off') {
     for (const layer of layers) {
-      this.layerManager.toggle(layer, activeState);
+      this.context.layerManager.toggle(layer, activeState);
       if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
         this.toggleLayers(layer.children, activeState);
       }

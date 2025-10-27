@@ -24,7 +24,7 @@
               <button
                 class="gg-icon-button gg-small"
                 onclick="${() => {navigator.clipboard.writeText(this.printCoordinate(f.coordinate, f.format,f.precision).join(', '))}}">
-                <img src="icons/content_copy.svg" alt="${this.i18nManager.getTranslation('Copy value')}" />
+                <img src="icons/content_copy.svg" alt="${this.context.i18nManager.getTranslation('Copy value')}" />
               </button>
             </div>
           </td>
@@ -37,8 +37,8 @@
               ${f.loading ? uHtml`<img
                 src="icons/progress.svg"
                 class="gg-spin gg-small"
-                alt="${this.i18nManager.getTranslation('Loading')}" />
-              ` : ''} ${f.content ? f.content : this.i18nManager.getTranslation('No data')}
+                alt="${this.context.i18nManager.getTranslation('Loading')}" />
+              ` : ''} ${f.content ? f.content : this.context.i18nManager.getTranslation('No data')}
             </div>
           </td>
           <td>
@@ -46,7 +46,7 @@
               <button
                 class="gg-icon-button gg-small"
                 onclick="${() => {navigator.clipboard.writeText(f.content ? f.content : '')}}">
-                <img src="icons/content_copy.svg" alt="${this.i18nManager.getTranslation('Copy value')}" />
+                <img src="icons/content_copy.svg" alt="${this.context.i18nManager.getTranslation('Copy value')}" />
               </button>
             </div>
           </td>
@@ -58,7 +58,7 @@
     <div>
       ${ this.mapContextMenuState.links.map(f => uHtml`
       <div class="link-div">
-        <a href="${f.content}" target="_blank">${this.i18nManager.getTranslation(f.translation)}</a>
+        <a href="${f.content}" target="_blank">${this.context.i18nManager.getTranslation(f.translation)}</a>
         <img src="icons/open_in_new.svg" alt="" />
       </div>
       `) }

@@ -11,8 +11,10 @@ import OLayerImage from 'ol/layer/Image';
 import OSourceImageWMS from 'ol/source/ImageWMS';
 import ServerOgc from '../../../models/serverogc';
 
+// TODO REG : Move to core, because we have a cross-dependency issue with the extlayers component
 class WmtsManager {
   map: Map;
+  private readonly stateManager: StateManager;
 
   wmtsCapabilitiesByServer: Record<string, Record<string, unknown>> = {};
   wmtsPromisesByServer: Record<string, Promise<Record<string, unknown>>> = {};
@@ -35,11 +37,12 @@ class WmtsManager {
   > = {};
 
   get state() {
-    return StateManager.getInstance().state;
+    return this.stateManager.state;
   }
 
-  constructor(map: Map) {
+  constructor(map: Map, stateManager: StateManager) {
     this.map = map;
+    this.stateManager = stateManager;
   }
 
   removeAllBasemapLayers() {
@@ -217,7 +220,7 @@ class WmtsManager {
       });
       selectionParams.push(new SelectionParam(ogcServer, layers, this.state.projection, extent, oLayer));
     });
-    StateManager.getInstance().state.selection.selectionParameters.push(...selectionParams);
+    this.state.selection.selectionParameters.push(...selectionParams);
   }
 
   public async getWmtsCapabilities(url: string): Promise<Record<string, unknown>> {

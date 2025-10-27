@@ -17,6 +17,7 @@ export default class ThemeListItemMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.subscribe('themes.isLoaded', () => {
       const themes = Object.values(this.state.themes._allThemes);
       const themeIdStr = this.getAttribute('themeid');

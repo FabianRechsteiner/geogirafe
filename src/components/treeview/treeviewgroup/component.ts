@@ -17,7 +17,7 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
     // And we have to set the layer using the id passed to the layerid attribute
     const groupId = this.getAttribute('groupid');
     if (groupId) {
-      this.layer = this.layerManager.getTreeItem(groupId) as GroupLayer;
+      this.layer = this.context.layerManager.getTreeItem(groupId) as GroupLayer;
     }
     super.render();
   }
@@ -45,11 +45,10 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    this.render();
+    super.girafeTranslate();
+    this.registerEvents();
   }
 
   public deleteGroup() {

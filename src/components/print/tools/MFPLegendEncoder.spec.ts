@@ -6,19 +6,18 @@ import {
   createTestLayerWmts,
   createTestOgcServer
 } from '../../../tools/tests/layerhelpers';
-import I18nManager from '../../../tools/i18n/i18nmanager';
-import MapManager from '../../../tools/state/mapManager';
-import StateManager from '../../../tools/state/statemanager';
 import MockHelper from '../../../tools/tests/mockhelper';
 import LayerWms from '../../../models/layers/layerwms';
 import LayerWmts from '../../../models/layers/layerwmts';
 import GroupLayer from '../../../models/layers/grouplayer';
 import { createOlWmtsLayer } from '../../../tools/tests/olhelpers';
+import IGirafeContext from '../../../tools/context/icontext';
 
 describe('MFPLegendEncoder', () => {
   let encoder = new MFPLegendEncoder();
   const encoderAsAny = encoder as any;
   let defaultOptions = {} as any as EncodeLegendOptions;
+  let context: IGirafeContext;
 
   const setPartialOptions = (options: Partial<EncodeLegendOptions>) => {
     encoder.setOptions({
@@ -28,12 +27,12 @@ describe('MFPLegendEncoder', () => {
   };
 
   beforeEach(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
 
     defaultOptions = {
-      mapManager: MapManager.getInstance(),
-      i18nManager: I18nManager.getInstance(),
-      state: StateManager.getInstance().state,
+      mapManager: context.mapManager,
+      i18nManager: context.i18nManager,
+      state: context.stateManager.state,
       scale: 10000,
       printResolution: 254,
       dpi: 96,
@@ -43,7 +42,7 @@ describe('MFPLegendEncoder', () => {
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   describe('encodeLegend', () => {
@@ -55,7 +54,7 @@ describe('MFPLegendEncoder', () => {
       layerWmts = createTestLayerWmts();
       layerGroup = createTestGroupLayer();
       layerGroup.children = [layerWms, layerWmts];
-      StateManager.getInstance().state.layers.layersList = [layerGroup];
+      context.stateManager.state.layers.layersList = [layerGroup];
     });
 
     it('Encode layer, with not enough info the generate legends', () => {
@@ -203,7 +202,7 @@ describe('MFPLegendEncoder', () => {
     it('should return MFPLegendClass with one class, params, and no title', () => {
       layer.layers = 'foo,bar';
       const ogcServer = createTestOgcServer();
-      StateManager.getInstance().state.ogcServers = { [ogcServer.name]: ogcServer };
+      context.stateManager.state.ogcServers = { [ogcServer.name]: ogcServer };
       setPartialOptions({
         showGroupsTitle: false,
         params: { [ogcServer.type]: { filtered: 'houses' } }

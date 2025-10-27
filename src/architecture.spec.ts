@@ -40,7 +40,7 @@ describe('Components architecture', () => {
     let components = getSubDirectories(componentsPath);
 
     // Then remove from this list the central components that are allowed to be used in other components
-    const centralComponents = ['menubutton', 'querybuilder', 'map', 'timerestriction'];
+    const centralComponents = ['querybuilder', 'map', 'timerestriction'];
     components = components.filter((component) => !centralComponents.includes(component));
 
     // Then, check if some component is using another component.
@@ -80,11 +80,13 @@ describe('Components architecture', () => {
     // Actually a cross-dependency can be legitim
     // but in this case we want to manually exclude them from the test.
     // This will ensure that the cross-dependency not created unintentionally
+    const interfaceDependencies = [path.join(__dirname, path.normalize('tools/context/icontext.ts'))];
+
     const legitimCrossDependencies = [
-      {
+      /*{
         oa: path.join(__dirname, path.normalize('components/lidar/tools/manager.ts')),
         ob: path.join(__dirname, path.normalize('components/lidar/tools/plot.ts'))
-      },
+      },*/
       {
         oa: path.join(__dirname, path.normalize('models/layers/baselayer.ts')),
         ob: path.join(__dirname, path.normalize('models/layers/grouplayer.ts'))
@@ -92,11 +94,11 @@ describe('Components architecture', () => {
       {
         oa: path.join(__dirname, path.normalize('models/layers/baselayer.ts')),
         ob: path.join(__dirname, path.normalize('models/layers/themelayer.ts'))
-      },
+      } /*
       {
         oa: path.join(__dirname, path.normalize('base/GirafeHTMLElement.ts')),
         ob: path.join(__dirname, path.normalize('tools/state/componentManager.ts'))
-      }
+      }*/
     ];
 
     // Build a list of all dependencies
@@ -132,10 +134,18 @@ describe('Components architecture', () => {
           // Cross dependency found!
           // Is it legitim?
           let isLegitim = false;
-          for (const legitim of legitimCrossDependencies) {
-            if ((legitim.oa === objA && legitim.ob === objB) || (legitim.oa === objB && legitim.ob === objA)) {
+          for (const interfaceDep of interfaceDependencies) {
+            if (objA === interfaceDep || objB === interfaceDep) {
               isLegitim = true;
               break;
+            }
+          }
+          if (!isLegitim) {
+            for (const legitim of legitimCrossDependencies) {
+              if ((legitim.oa === objA && legitim.ob === objB) || (legitim.oa === objB && legitim.ob === objA)) {
+                isLegitim = true;
+                break;
+              }
             }
           }
           if (!isLegitim) {
@@ -187,17 +197,10 @@ describe('Components architecture', () => {
       for (const match of matches) {
         const className = match[1].trim();
         // Check if this.stateManager.subscribe() is used
-        let subscribeRegex = /.*this\.stateManager\.subscribe.*/gm;
+        let subscribeRegex = /.*\.stateManager\.subscribe.*/gm;
         if (code.match(subscribeRegex)) {
           errors.push(
             `The component ${className} should use this.subscribe() instead of this.stateManager.subscribe().`
-          );
-        }
-        // Check if StateManager.getInstance().subscribe() is used
-        subscribeRegex = /.*StateManager\.getInstance\(\)\.subscribe.*/gm;
-        if (code.match(subscribeRegex)) {
-          errors.push(
-            `The component ${className} should use this.subscribe() instead of StateManager.getInstance().subscribe().`
           );
         }
       }
@@ -221,17 +224,10 @@ describe('Components architecture', () => {
       for (const match of matches) {
         const className = match[1].trim();
         // Check if this.stateManager.unsubscribe() is used
-        let subscribeRegex = /.*this\.stateManager\.unsubscribe.*/gm;
+        let subscribeRegex = /.*\.stateManager\.unsubscribe.*/gm;
         if (code.match(subscribeRegex)) {
           errors.push(
             `The component ${className} should use this.unsubscribe() instead of this.stateManager.unsubscribe().`
-          );
-        }
-        // Check if StateManager.getInstance().unsubscribe() is used
-        subscribeRegex = /.*StateManager\.getInstance\(\)\.unsubscribe.*/gm;
-        if (code.match(subscribeRegex)) {
-          errors.push(
-            `The component ${className} should use this.unsubscribe() instead of StateManager.getInstance().unsubscribe().`
           );
         }
       }

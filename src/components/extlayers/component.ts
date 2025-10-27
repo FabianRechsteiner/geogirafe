@@ -1,17 +1,12 @@
 import { getUid } from 'ol/util';
-import I18nManager from '../../tools/i18n/i18nmanager';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import ConfigManager from '../../tools/configuration/configmanager';
-import MapManager from '../../tools/state/mapManager';
-import WmsManager from '../../tools/wms/wmsmanager';
-import WmtsManager from '../map/tools/wmtsmanager';
-import LocalFileManager from '../map/tools/localfilemanager';
 import ThemeLayer from '../../models/layers/themelayer';
 import BaseLayer from '../../models/layers/baselayer';
 import LayerWms from '../../models/layers/layerwms';
 import LayerWmts from '../../models/layers/layerwmts';
 import ServerOgc from '../../models/serverogc';
 import { WmsClientDefault } from '../../tools/wms/wmsclient';
+import WmtsManager from '../map/tools/wmtsmanager';
 
 export type SourceType = 'local' | 'auto_WMTS' | 'WMS' | 'WMTS' | 'predefined';
 
@@ -24,12 +19,10 @@ class ExtLayerComponent extends GirafeHTMLElement {
   visible = false;
   loading = false;
 
-  public readonly i18nManager: I18nManager;
-  private readonly enabled_types: SourceType[];
-  public readonly predefined_sources;
-
-  sourceType: SourceType;
-  wmtsManager!: WmtsManager;
+  private enabled_types!: SourceType[];
+  public predefined_sources!: { label: string; type: 'WMS' | 'WMTS'; url: string }[];
+  private sourceType!: SourceType;
+  private wmtsManager!: WmtsManager;
 
   themeName: string | undefined = undefined;
   allLayers: BaseLayer[] = [];
@@ -38,18 +31,8 @@ class ExtLayerComponent extends GirafeHTMLElement {
 
   isFiltered: boolean = false;
 
-  private readonly mapManager: MapManager;
-
   constructor() {
     super('ext-layer');
-
-    this.i18nManager = I18nManager.getInstance();
-    this.mapManager = MapManager.getInstance();
-
-    const config = ConfigManager.getInstance().Config;
-    this.enabled_types = config.external_layers?.enabled_types || ['WMS', 'WMTS'];
-    this.predefined_sources = config.external_layers?.predefined_sources || [];
-    this.sourceType = config.external_layers?.default_type || this.enabled_types[0] || 'predefined';
   }
 
   render() {
@@ -59,8 +42,6 @@ class ExtLayerComponent extends GirafeHTMLElement {
     } else {
       this.renderEmpty();
     }
-    const olMap = this.mapManager.getMap();
-    this.wmtsManager = new WmtsManager(olMap);
   }
 
   closeWindow() {
@@ -109,11 +90,11 @@ class ExtLayerComponent extends GirafeHTMLElement {
     // generate an unused integer id greater than MIN_EXTERNAL_ID for each layer uid
     // beacause the layer model requires integer ids
     const uid = getUid(layer);
-    if (!(uid in this.stateManager.state.layers.extLayerIds)) {
-      this.stateManager.state.layers.extLayerIds[uid] =
-        Math.max(MIN_EXTERNAL_ID, ...Object.values(this.stateManager.state.layers.extLayerIds)) + 1;
+    if (!(uid in this.context.stateManager.state.layers.extLayerIds)) {
+      this.context.stateManager.state.layers.extLayerIds[uid] =
+        Math.max(MIN_EXTERNAL_ID, ...Object.values(this.context.stateManager.state.layers.extLayerIds)) + 1;
     }
-    return this.stateManager.state.layers.extLayerIds[uid];
+    return this.context.stateManager.state.layers.extLayerIds[uid];
   }
 
   public get fileDescription() {
@@ -128,14 +109,12 @@ class ExtLayerComponent extends GirafeHTMLElement {
     const selectedFiles = this.getById<HTMLInputElement>('file').files;
     if (selectedFiles && selectedFiles.length > 0) {
       const selectedFile = selectedFiles[0];
-      const localFileManager = LocalFileManager.getInstance();
-      await localFileManager.loadLocalFile(selectedFile);
+      await this.context.localFileManager.loadLocalFile(selectedFile);
     }
   }
 
   public async scanLayersWMS(url: string) {
     this.themeName = this.parseName(url);
-    const wmsManager = WmsManager.getInstance();
     const server = new ServerOgc(this.themeName, {
       url,
       type: 'other',
@@ -143,7 +122,7 @@ class ExtLayerComponent extends GirafeHTMLElement {
       urlWfs: url,
       imageType: 'image/png'
     });
-    const client = wmsManager.createClient(WmsClientDefault, server);
+    const client = this.context.wmsManager.createClient(WmsClientDefault, server);
     this.allLayers = [];
     this.layers = [];
     this.selectedLayers = {};
@@ -251,12 +230,20 @@ class ExtLayerComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
+    super.connectedCallback();
+    const olMap = this.context.mapManager.getMap();
+    // TODO REG : User context singleton for the WMTS-Manager
+    this.wmtsManager = new WmtsManager(olMap, this.context.stateManager);
+
+    const config = this.context.configManager.Config;
+    this.enabled_types = config.external_layers?.enabled_types || ['WMS', 'WMTS'];
+    this.predefined_sources = config.external_layers?.predefined_sources || [];
+    this.sourceType = config.external_layers?.default_type || this.enabled_types[0] || 'predefined';
+
+    this.render();
+    this.subscribe('interface.extLayerPanelVisible', (_, newValue) => {
+      this.visible = newValue;
       this.render();
-      this.subscribe('interface.extLayerPanelVisible', (_, newValue) => {
-        this.visible = newValue;
-        this.render();
-      });
     });
   }
 }

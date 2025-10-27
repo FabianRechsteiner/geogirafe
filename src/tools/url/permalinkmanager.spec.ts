@@ -3,9 +3,11 @@ import PermalinkManager from './permalinkmanager';
 import MockHelper from '../tests/mockhelper';
 import { get as getProjection } from 'ol/proj';
 import MapPosition from '../state/mapposition';
+import IGirafeContext from '../context/icontext';
 import StateManager from '../state/statemanager';
 import { BASEMAP_VISIBLE_PARAMETER, SEARCH_VISIBLE_PARAMETER } from './permalinkmanager-constants';
 
+let context: IGirafeContext;
 let permalinkManager: PermalinkManager;
 let stateManager: StateManager;
 
@@ -35,9 +37,9 @@ const mockLocation = (url: string) => {
 
 describe('PermalinkManager', () => {
   beforeAll(() => {
-    MockHelper.startMocking();
-    permalinkManager = PermalinkManager.getInstance();
-    stateManager = StateManager.getInstance();
+    context = MockHelper.startMocking();
+    permalinkManager = context.permalinkManager;
+    stateManager = context.stateManager;
   });
 
   afterEach(() => {
@@ -45,7 +47,7 @@ describe('PermalinkManager', () => {
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
     vi.restoreAllMocks();
   });
 

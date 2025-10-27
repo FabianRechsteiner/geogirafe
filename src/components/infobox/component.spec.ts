@@ -1,20 +1,24 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import InfoboxComponent from './component';
 import MockHelper from '../../tools/tests/mockhelper';
+import IGirafeContext from '../../tools/context/icontext';
 
 describe('InfoboxComponent.linkify', () => {
   let infobox: InfoboxComponent;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('infobox-component')) {
       customElements.define('infobox-component', InfoboxComponent);
     }
     infobox = new InfoboxComponent();
+    // @ts-ignore
+    infobox._context = context;
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should return plain link wrapped in Anchor-Element', () => {

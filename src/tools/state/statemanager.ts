@@ -1,9 +1,9 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 import GirafeSingleton from '../../base/GirafeSingleton';
 import State from './state';
-import ConfigManager from '../configuration/configmanager';
 import { getPropertyByPath } from '../utils/pathUtils';
 import Brain from './brain/brain';
+import IGirafeContext from '../context/icontext';
 
 export type Callback = (oldValue: any, value: any, parents?: any) => void | Promise<void>;
 
@@ -17,31 +17,27 @@ class StateManager extends GirafeSingleton {
 
   private readonly callbacks: Record<string, Callback[]> = {};
 
-  configManager: ConfigManager;
-
-  constructor(type: string) {
-    super(type);
-
-    this.configManager = ConfigManager.getInstance();
+  constructor(context: IGirafeContext) {
+    super(context);
 
     this.stateProxy = new Brain(this.girafeState, (path, oldValue, newValue, parents) => {
       this.onChange(path, oldValue, newValue, parents);
     });
+  }
 
+  override initializeSingleton(): void {
     this.setDefaultValues();
   }
 
   private setDefaultValues() {
     // Set default values
-    this.configManager?.loadConfig().then(() => {
-      const config = this.configManager?.Config;
-      if (this.state && config) {
-        this.state.application.isConfigurationLoaded = true;
-        this.state.projection = config.map.srid;
-        this.state.language = config.languages.defaultLanguage;
-        this.state.interface.selectionComponent = config.interface.defaultSelectionComponent;
-      }
-    });
+    const config = this.context.configManager.Config;
+    if (this.state && config) {
+      this.state.application.isConfigurationLoaded = true;
+      this.state.projection = config.map.srid;
+      this.state.language = config.languages.defaultLanguage;
+      this.state.interface.selectionComponent = config.interface.defaultSelectionComponent;
+    }
   }
 
   private onChange(property: string, oldValue: unknown, value: unknown, parents: any[]) {

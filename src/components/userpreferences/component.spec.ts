@@ -6,6 +6,7 @@ import ConfigManager from '../../tools/configuration/configmanager';
 import UserDataManager from '../../tools/userdata/userdatamanager';
 import { getPropertyByPath } from '../../tools/utils/pathUtils';
 import CustomThemesManager from '../../tools/themes/customthemesmanager';
+import IGirafeContext from '../../tools/context/icontext';
 
 describe('UserPreferencesComponent', () => {
   let stateManager: StateManager;
@@ -13,21 +14,26 @@ describe('UserPreferencesComponent', () => {
   let userDataManager: UserDataManager;
   let customThemesManager: CustomThemesManager;
   let component: UserPreferencesComponent;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
-    stateManager = StateManager.getInstance();
-    configManager = ConfigManager.getInstance();
-    userDataManager = UserDataManager.getInstance();
-    customThemesManager = CustomThemesManager.getInstance();
+    context = MockHelper.startMocking();
+    stateManager = context.stateManager;
+    configManager = context.configManager;
+    userDataManager = context.userDataManager;
+    customThemesManager = context.customThemesManager;
     if (!customElements.get('girafe-user-preferences')) {
       customElements.define('girafe-user-preferences', UserPreferencesComponent);
     }
     component = new UserPreferencesComponent();
+    // @ts-ignore
+    component._context = context;
+    // @ts-ignore
+    component.initPreferences();
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   const setRandomPreferenceValues = () => {
@@ -69,8 +75,10 @@ describe('UserPreferencesComponent', () => {
   });
 
   it('correctly updates the config after changing the preference value', () => {
-    component['initPreferenceOptions']();
-    component['initCurrentPreferenceValues']();
+    // @ts-ignore
+    component.initPreferenceOptions();
+    // @ts-ignore
+    component.initCurrentPreferenceValues();
     setRandomPreferenceValues();
 
     for (const key in component.preferences) {
@@ -85,8 +93,10 @@ describe('UserPreferencesComponent', () => {
   });
 
   it('deletes all user preferences in the user data storage when resetting the preferences', () => {
-    component['initPreferenceOptions']();
-    component['initCurrentPreferenceValues']();
+    // @ts-ignore
+    component.initPreferenceOptions();
+    // @ts-ignore
+    component.initCurrentPreferenceValues();
     setRandomPreferenceValues();
 
     for (const key in component.preferences) {
@@ -101,8 +111,10 @@ describe('UserPreferencesComponent', () => {
   });
 
   it('does not delete any other user data in the storage when resetting the preferences', () => {
-    component['initPreferenceOptions']();
-    component['initCurrentPreferenceValues']();
+    // @ts-ignore
+    component.initPreferenceOptions();
+    // @ts-ignore
+    component.initCurrentPreferenceValues();
     setRandomPreferenceValues();
 
     for (const key in component.preferences) {

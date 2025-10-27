@@ -23,6 +23,13 @@ export default function areEqual(obj1: any, obj2: any, visitedObjects = new Weak
     return true;
   }
 
+  // Functions
+  if (typeof obj1 === 'function' || typeof obj2 === 'function') {
+    // We do not want to compare the exact content of the function, because between an curretly used object and and an old one
+    // We can have callbacks différences due to the usage of onChanage() for exemple
+    return true;
+  }
+
   // Primitives
   if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {
     return obj1 === obj2;

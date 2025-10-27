@@ -1,7 +1,5 @@
 import DrawingFeature, { DrawingShape, DrawingState, LineStroke } from './drawingFeature';
 import MapComponent from '../map/component';
-import StateManager from '../../tools/state/statemanager';
-import State from '../../tools/state/state';
 import { Collection, Feature, MapBrowserEvent } from 'ol';
 import {
   Geometry,
@@ -26,9 +24,6 @@ import { Projection, getPointResolution } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
 import { never, noModifierKeys, primaryAction } from 'ol/events/condition';
 import { Pixel } from 'ol/pixel';
-import ConfigManager from '../../tools/configuration/configmanager';
-import MapManager from '../../tools/state/mapManager';
-import UserInteractionManager from '../../tools/state/userInteractionManager';
 import { getDistance, getArea } from '../../tools/utils/olutils';
 import { ContextMenu, MenuEntry } from '../map/tools/contextmenu';
 import { formatCoordinates } from '../../tools/geometrytools';
@@ -38,6 +33,7 @@ import {
   isAlternateMouseClick,
   isPrimaryPointerAction
 } from '../../tools/state/userinteractionevent';
+import IGirafeContext from '../../tools/context/icontext';
 
 function getLineStroke(strokeType: LineStroke, lineWidth: number) {
   switch (strokeType) {
@@ -54,14 +50,6 @@ function getLineStroke(strokeType: LineStroke, lineWidth: number) {
 
 function getHalfPoint(coordinates: Coordinate[]) {
   return new Point(new LineString(coordinates).getCoordinateAt(0.5));
-}
-
-function fixLastLength(length: number, coordinates: SketchCoordType, scale: number = 1) {
-  const coord = coordinates as Coordinate[];
-  if (coord.length > 1 && length > 0) {
-    const lastLine = [coord[coord.length - 2], coord[coord.length - 1]];
-    coord[coord.length - 1] = new LineString(lastLine).getCoordinateAt(length / (getDistance(lastLine) * scale));
-  }
 }
 
 function extractVerticesFromGeometry(geometry: Geometry): MultiPoint {
@@ -84,13 +72,10 @@ function extractVerticesFromGeometry(geometry: Geometry): MultiPoint {
 }
 
 export default class OlDrawing {
-  map: MapComponent;
-  toolName: string;
-  state: State;
-  configManager: ConfigManager;
-  userInteractionManager: UserInteractionManager;
+  private readonly map: MapComponent;
+  private readonly toolName: string;
+  private readonly context: IGirafeContext;
 
-  drawingState: DrawingState;
   modifiableFeatures: Collection<Feature> = new Collection([]);
   draw: Draw | null = null;
   modify: Modify | null = null;
@@ -101,13 +86,22 @@ export default class OlDrawing {
   drawingSource: VectorSource;
   drawingLayer: VectorLayer;
 
-  constructor(map: MapComponent, toolName: string) {
+  private get state() {
+    return this.context.stateManager.state;
+  }
+
+  private get drawingState() {
+    return this.state.extendedState.drawing as DrawingState;
+  }
+
+  private get config() {
+    return this.context.configManager.Config;
+  }
+
+  constructor(map: MapComponent, toolName: string, context: IGirafeContext) {
     this.map = map;
     this.toolName = toolName;
-    this.state = StateManager.getInstance().state;
-    this.configManager = ConfigManager.getInstance();
-    this.userInteractionManager = UserInteractionManager.getInstance();
-    this.drawingState = this.state.extendedState.drawing as DrawingState;
+    this.context = context;
 
     this.drawingSource = new VectorSource({ features: new Collection() });
     this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
@@ -162,7 +156,7 @@ export default class OlDrawing {
         this.canExecute('map.modify'),
       deleteCondition: never,
       insertVertexCondition: primaryAction,
-      style: new DrawingFeature(DrawingShape.Point).getVertexStyle(true),
+      style: new DrawingFeature(DrawingShape.Point, this.drawingState, this.config.drawing).getVertexStyle(true),
       snapToPointer: true,
       pixelTolerance: this.map.pixelTolerance
     });
@@ -199,7 +193,7 @@ export default class OlDrawing {
         callback: (_evt: MouseEvent, mapCoordinate: Coordinate) => {
           const successful = this.removeLastInteractedVertex();
           if (!successful) {
-            const errorMessage = `It's not possible to remove vertex at ${formatCoordinates(mapCoordinate, this.configManager.Config.general.locale)}`;
+            const errorMessage = `It's not possible to remove vertex at ${formatCoordinates(mapCoordinate, this.config.general.locale)}`;
             this.state.infobox.elements.push({
               id: uuidv4(),
               text: errorMessage,
@@ -216,7 +210,7 @@ export default class OlDrawing {
       // Only proceed if there is an editable vertex under the mouse pointer
       return this.hasEditableVertexAtCoordinate(mapCoordinate);
     };
-    this.editContextMenu = new ContextMenu(menuEntries, true, conditionToOpen);
+    this.editContextMenu = new ContextMenu(this.context, menuEntries, true, conditionToOpen);
   }
 
   addEditInteractions() {
@@ -354,7 +348,7 @@ export default class OlDrawing {
       return;
     }
     const olFeature = e.feature;
-    const dFeature = new DrawingFeature(this.currentShape);
+    const dFeature = new DrawingFeature(this.currentShape, this.drawingState, this.config.drawing);
 
     olFeature.setId(dFeature.id);
 
@@ -391,20 +385,20 @@ export default class OlDrawing {
   }
 
   createLineStringFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
-    fixLastLength(this.fixedLength, coordinates);
+    this.fixLastLength(this.fixedLength, coordinates);
     geom = geom ?? new LineString(coordinates as Coordinate[]);
     geom.setCoordinates(coordinates);
     return geom;
   }
 
   createSquareFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry, proj: Projection) {
-    fixLastLength(this.fixedLength, coordinates, Math.SQRT2);
+    this.fixLastLength(this.fixedLength, coordinates, Math.SQRT2);
     return createRegularPolygon(4)(coordinates, geom, proj);
   }
 
   createPolygonFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
     const coord = coordinates[0] as Coordinate[];
-    fixLastLength(this.fixedLength, coord);
+    this.fixLastLength(this.fixedLength, coord);
     geom = geom ?? new Polygon([coord]);
     geom.setCoordinates([coord]);
     return geom;
@@ -412,16 +406,16 @@ export default class OlDrawing {
 
   createDiskFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
     const coord = coordinates as Coordinate[];
-    fixLastLength(this.fixedLength, coord);
-    geom = geom ?? new CircleGeom(coord[0], getDistance(coord));
-    (geom as CircleGeom).setCenterAndRadius(coord[0], getDistance(coord));
+    this.fixLastLength(this.fixedLength, coord);
+    geom = geom ?? new CircleGeom(coord[0], getDistance(coord, this.state.projection));
+    (geom as CircleGeom).setCenterAndRadius(coord[0], getDistance(coord, this.state.projection));
     return geom;
   }
 
   addDrawInteraction(tool: DrawingShape) {
     this.removeDrawInteraction();
     // Block feature selection while drawing by registering 'map.select' exclusively
-    this.userInteractionManager.registerListener('map.select', true, this.toolName);
+    this.context.userInteractionManager.registerListener('map.select', true, this.toolName);
 
     this.currentShape = tool;
     let geomFunction = undefined;
@@ -468,7 +462,8 @@ export default class OlDrawing {
       // Default condition for ol drawing is noModifierKeys(e)
       // canExecute: If another tool is exclusively drawing, this interaction will be prevented from reacting
       condition: (e) => noModifierKeys(e) && this.canExecute('map.draw'),
-      style: (f) => this.getStyle(new DrawingFeature(tool), f as Feature<Geometry>)
+      style: (f) =>
+        this.getStyle(new DrawingFeature(tool, this.drawingState, this.config.drawing), f as Feature<Geometry>)
     });
     this.draw.on('drawend', () => {
       this.draw?.removeLastPoint();
@@ -483,8 +478,8 @@ export default class OlDrawing {
     const olFeature = this.getOlFeatureFromDrawingSource(drawingFeature.id);
     const extent = olFeature?.getGeometry()?.getExtent();
     if (extent) {
-      const minResolution = ConfigManager.getInstance().Config.search.minResolution;
-      MapManager.getInstance().zoomToExtent(extent, minResolution);
+      const minResolution = this.config.search.minResolution;
+      this.context.mapManager.zoomToExtent(extent, minResolution);
     }
   }
 
@@ -551,8 +546,8 @@ export default class OlDrawing {
       }
 
       // arrows
-      const createArrowStyle = function (pos: number[], rot: number) {
-        const view = MapManager.getInstance().getMap().getView();
+      const createArrowStyle = (pos: number[], rot: number) => {
+        const view = this.context.mapManager.getMap().getView();
         const proj = view.getProjection();
         const res = view.getResolution();
         const pointRes = getPointResolution(proj, res!, pos);
@@ -571,13 +566,13 @@ export default class OlDrawing {
         });
       };
 
-      const pushArrowStyles = function (
+      const pushArrowStyles = (
         start: number[],
         end: number[],
         startArrow: boolean,
         endArrow: boolean,
         ratio: number
-      ) {
+      ) => {
         const dx = end[0] - start[0];
         const dy = end[1] - start[1];
         const p1 = [start[0] + ratio * dx, start[1] + ratio * dy];
@@ -617,15 +612,15 @@ export default class OlDrawing {
       addLabel(geometry as Point, dFeature.getCoordText((geometry as Point).getCoordinates()));
     } else if (dFeature.type == DrawingShape.Polyline) {
       (geometry as LineString).forEachSegment((a, b) =>
-        addLabel(getHalfPoint([a, b]), dFeature.getLengthText(getDistance([a, b])))
+        addLabel(getHalfPoint([a, b]), dFeature.getLengthText(getDistance([a, b], this.state.projection)))
       );
     } else if (dFeature.type == DrawingShape.Polygon) {
       const polygon = geometry as Polygon;
       const segments = this.ensurePolygonIsProperlyClosed(polygon);
       new LineString(segments).forEachSegment((a, b) =>
-        addLabel(getHalfPoint([a, b]), dFeature.getLengthText(getDistance([a, b])))
+        addLabel(getHalfPoint([a, b]), dFeature.getLengthText(getDistance([a, b], this.state.projection)))
       );
-      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getArea(polygon)));
+      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getArea(polygon, this.state.projection)));
     } else if (dFeature.type == DrawingShape.Disk) {
       const radius = (geometry as CircleGeom).getRadius();
       const center = (geometry as CircleGeom).getCenter();
@@ -639,26 +634,29 @@ export default class OlDrawing {
     } else if (dFeature.type == DrawingShape.FreehandPolygon) {
       const polygon = geometry as Polygon;
       this.ensurePolygonIsProperlyClosed(polygon);
-      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getArea(polygon)));
+      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getArea(polygon, this.state.projection)));
       addLabel(
         new Point(polygon.getCoordinates()[0][0]),
-        dFeature.getLengthText(getDistance(polygon.getCoordinates()[0]))
+        dFeature.getLengthText(getDistance(polygon.getCoordinates()[0], this.state.projection))
       );
     } else if (dFeature.type == DrawingShape.FreehandPolyline) {
       const line = geometry as LineString;
-      addLabel(new Point(line.getCoordinates()[0]), dFeature.getLengthText(getDistance(line.getCoordinates())));
+      addLabel(
+        new Point(line.getCoordinates()[0]),
+        dFeature.getLengthText(getDistance(line.getCoordinates(), this.state.projection))
+      );
     } else if (dFeature.type == DrawingShape.Rectangle) {
       const rect = geometry as Polygon;
       const segment1 = [rect.getCoordinates()[0][0], rect.getCoordinates()[0][1]];
       const segment2 = [rect.getCoordinates()[0][1], rect.getCoordinates()[0][2]];
-      addLabel(getHalfPoint(segment1), dFeature.getLengthText(getDistance(segment1)));
-      addLabel(getHalfPoint(segment2), dFeature.getLengthText(getDistance(segment2)));
-      addLabel(rect.getInteriorPoint(), dFeature.getAreaText(getArea(rect)));
+      addLabel(getHalfPoint(segment1), dFeature.getLengthText(getDistance(segment1, this.state.projection)));
+      addLabel(getHalfPoint(segment2), dFeature.getLengthText(getDistance(segment2, this.state.projection)));
+      addLabel(rect.getInteriorPoint(), dFeature.getAreaText(getArea(rect, this.state.projection)));
     } else if (dFeature.type == DrawingShape.Square) {
       const square = geometry as Polygon;
       const segment = [square.getCoordinates()[0][0], square.getCoordinates()[0][1]];
-      addLabel(getHalfPoint(segment), dFeature.getLengthText(getDistance(segment)));
-      addLabel(square.getInteriorPoint(), dFeature.getAreaText(getArea(square)));
+      addLabel(getHalfPoint(segment), dFeature.getLengthText(getDistance(segment, this.state.projection)));
+      addLabel(square.getInteriorPoint(), dFeature.getAreaText(getArea(square, this.state.projection)));
     }
 
     if (dFeature.selected) {
@@ -692,7 +690,7 @@ export default class OlDrawing {
       this.draw = null;
     }
     // Reactivate feature selection by unregistering 'map.select'
-    this.userInteractionManager.unregisterListener('map.select', this.toolName);
+    this.context.userInteractionManager.unregisterListener('map.select', this.toolName);
   }
 
   private removeModifyInteraction() {
@@ -717,20 +715,30 @@ export default class OlDrawing {
   }
 
   registerInteractions() {
-    this.userInteractionManager.registerListener('map.draw', true, this.toolName);
-    this.userInteractionManager.registerListener('map.modify', true, this.toolName);
-    this.userInteractionManager.registerListener('map.snap', true, this.toolName);
+    this.context.userInteractionManager.registerListener('map.draw', true, this.toolName);
+    this.context.userInteractionManager.registerListener('map.modify', true, this.toolName);
+    this.context.userInteractionManager.registerListener('map.snap', true, this.toolName);
   }
 
   unregisterInteractions() {
     this.removeDrawInteraction();
     this.removeEditInteractions();
-    this.userInteractionManager.unregisterListener('map.draw', this.toolName);
-    this.userInteractionManager.unregisterListener('map.modify', this.toolName);
-    this.userInteractionManager.unregisterListener('map.snap', this.toolName);
+    this.context.userInteractionManager.unregisterListener('map.draw', this.toolName);
+    this.context.userInteractionManager.unregisterListener('map.modify', this.toolName);
+    this.context.userInteractionManager.unregisterListener('map.snap', this.toolName);
   }
 
   private canExecute(event: GgUserInteractionEvent): boolean {
-    return this.userInteractionManager.canListenerExecute(event, this.toolName);
+    return this.context.userInteractionManager.canListenerExecute(event, this.toolName);
+  }
+
+  private fixLastLength(length: number, coordinates: SketchCoordType, scale: number = 1) {
+    const coord = coordinates as Coordinate[];
+    if (coord.length > 1 && length > 0) {
+      const lastLine = [coord[coord.length - 2], coord[coord.length - 1]];
+      coord[coord.length - 1] = new LineString(lastLine).getCoordinateAt(
+        length / (getDistance(lastLine, this.state.projection) * scale)
+      );
+    }
   }
 }

@@ -24,6 +24,9 @@ cp "demo/config.$name.json" "$APPDIR/config.json"
 if [ -f "demo/config.$name.mobile.json" ]; then
     cp "demo/config.$name.mobile.json" "$APPDIR/config.mobile.json"
 fi
+if [ -f "demo/config.$name.api.json" ]; then
+    cp "demo/config.$name.api.json" "$APPDIR/config.api.json"
+fi
 
 # Special cases for Mocking themes and translations (still CORS errors from the backend)
 if [ "$name" = 'lie' ];

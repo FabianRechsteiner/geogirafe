@@ -21,9 +21,9 @@ class PrintMaskManager {
   private possibleScales: number[] = [];
   scaleManuallySelected = false;
 
-  constructor(map: Map) {
+  constructor(map: Map, stateManager: StateManager) {
     this.map = map;
-    this.stateManager = StateManager.getInstance();
+    this.stateManager = stateManager;
     this.printMaskLayer.setGetScaleFn(this.getScaleFn.bind(this));
     this.registerEvents();
   }

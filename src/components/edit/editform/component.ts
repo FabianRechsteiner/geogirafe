@@ -1,21 +1,16 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import Feature from 'ol/Feature';
-import OgcApiFeaturesManager from '../../../tools/ogcapi/ogcapifeaturesmanager';
 import OgcApiFeaturesSchema from '../../../tools/ogcapi/ogcapifeaturesschema';
 
 export default class EditFromComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../../styles/common.css', './style.css'];
 
-  oapifManager: OgcApiFeaturesManager;
-
   public featureSchema?: OgcApiFeaturesSchema;
   public feature?: Feature;
 
   constructor() {
     super('editform');
-    this.oapifManager = OgcApiFeaturesManager.getInstance();
-    this.render();
   }
 
   public setSchema(schema: OgcApiFeaturesSchema) {
@@ -77,5 +72,10 @@ export default class EditFromComponent extends GirafeHTMLElement {
         (formField as HTMLInputElement).value = '';
       }
     }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    super.render();
   }
 }

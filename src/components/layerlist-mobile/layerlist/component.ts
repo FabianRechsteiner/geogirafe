@@ -2,7 +2,6 @@ import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import type BaseLayer from '../../../models/layers/baselayer';
 import GroupLayer from '../../../models/layers/grouplayer';
 import ThemeLayer from '../../../models/layers/themelayer';
-import LayerManager from '../../../tools/layers/layermanager';
 
 export default class LayerListMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -16,15 +15,14 @@ export default class LayerListMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
 
     this.subscribe('layers.layersList', (_oldValue: BaseLayer[], newValue: BaseLayer[]) => {
       // Only keep actual layers (no group or theme layers)
-      this.layerList = LayerManager.getInstance()
-        .getFlattenedLayerTree(newValue)
-        .filter((l) => {
-          return !(l instanceof ThemeLayer || l instanceof GroupLayer);
-        });
+      this.layerList = this.context.layerManager.getFlattenedLayerTree(newValue).filter((l) => {
+        return !(l instanceof ThemeLayer || l instanceof GroupLayer);
+      });
 
       this.countActiveLayers();
 
@@ -57,7 +55,7 @@ export default class LayerListMobile extends GirafeHTMLElement {
   }
 
   private countActiveLayers() {
-    this.numberActiveLayer = LayerManager.getInstance()
+    this.numberActiveLayer = this.context.layerManager
       .getFlattenedLayerTree(this.state.layers.layersList)
       .filter((l) => {
         return !(l instanceof ThemeLayer || l instanceof GroupLayer);

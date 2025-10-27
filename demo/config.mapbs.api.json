@@ -1,0 +1,8 @@
+{
+  "themes": {
+    "url": "https://map.geo.bs.ch/themes?background=background&interface=api"
+  },
+  "search": {
+    "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=api&query=###SEARCHTERM###&lang=###SEARCHLANG###"
+  }
+}

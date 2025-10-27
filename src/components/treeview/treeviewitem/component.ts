@@ -4,7 +4,6 @@ import Layer from '../../../models/layers/layer';
 import LayerWms from '../../../models/layers/layerwms';
 import LayerLocalFile from '../../../models/layers/layerlocalfile';
 import QueryBuilderComponent from '../../querybuilder/component';
-import MapManager from '../../../tools/state/mapManager';
 import LayerWmts from '../../../models/layers/layerwmts';
 import Baselayer from '../../../models/layers/baselayer';
 import TreeViewElement from '../tools/treeviewelement';
@@ -20,18 +19,18 @@ class TreeViewItemComponent extends TreeViewElement {
   override layer: Layer;
 
   public get hasLegend() {
-    return this.layerManager.isLayerWithLegend(this.layer) && this.layer.legend;
+    return this.context.layerManager.isLayerWithLegend(this.layer) && this.layer.legend;
   }
 
   public get isLegendExpanded() {
-    if (this.layerManager.isLayerWithLegend(this.layer)) {
+    if (this.context.layerManager.isLayerWithLegend(this.layer)) {
       return this.layer.isLegendExpanded;
     }
     return false;
   }
 
   public toggleLegend() {
-    if (this.layerManager.isLayerWithLegend(this.layer)) {
+    if (this.context.layerManager.isLayerWithLegend(this.layer)) {
       this.layer.isLegendExpanded = !this.layer.isLegendExpanded;
     }
   }
@@ -52,7 +51,7 @@ class TreeViewItemComponent extends TreeViewElement {
     // And we have to set the layer using the id passed to the layerid attribute
     const layerId = this.getAttribute('layerid');
     if (layerId) {
-      this.layer = this.layerManager.getTreeItem(layerId) as Layer;
+      this.layer = this.context.layerManager.getTreeItem(layerId) as Layer;
       if (this.layer instanceof LayerWms) {
         // Manage Legend icons for WMS
         this.setWmsLegend();
@@ -150,8 +149,8 @@ class TreeViewItemComponent extends TreeViewElement {
         if (!this.isNullOrUndefined(this.layer.legendRule)) {
           graphicUrl += '&RULE=' + encodeURIComponent(this.layer.legendRule!);
         }
-        graphicUrl += '&HEIGHT=' + this.configManager.Config.treeview.defaultIconSize.height;
-        graphicUrl += '&WIDTH=' + this.configManager.Config.treeview.defaultIconSize.width;
+        graphicUrl += '&HEIGHT=' + this.context.configManager.Config.treeview.defaultIconSize.height;
+        graphicUrl += '&WIDTH=' + this.context.configManager.Config.treeview.defaultIconSize.width;
       }
 
       legends[l] = graphicUrl;
@@ -191,7 +190,7 @@ class TreeViewItemComponent extends TreeViewElement {
       placement: 'bottom',
       appendTo: document.body,
       content: (_reference: object) => {
-        const filterbox = new QueryBuilderComponent(this.layer as LayerWms);
+        const filterbox = new QueryBuilderComponent(this.layer as LayerWms, this.context);
         return filterbox;
       }
     });
@@ -239,7 +238,7 @@ class TreeViewItemComponent extends TreeViewElement {
   }
 
   toggle(state?: 'on' | 'off') {
-    this.layerManager.toggleLayer(this.layer, state);
+    this.context.layerManager.toggleLayer(this.layer, state);
   }
 
   zoomToVisibleResolution() {
@@ -248,9 +247,9 @@ class TreeViewItemComponent extends TreeViewElement {
     }
 
     if (this.layer.maxResolution) {
-      if (this.configManager.Config.map.constrainScales) {
+      if (this.context.configManager.Config.map.constrainScales) {
         // We have to find the right resolution
-        const allowedResolutions = MapManager.getInstance().getMap().getView().getResolutions()!;
+        const allowedResolutions = this.context.mapManager.getMap().getView().getResolutions()!;
         const maxResolution = this.layer.maxResolution;
         const newResolution = allowedResolutions.find((r) => r < maxResolution)!;
         this.state.position.resolution = newResolution;
@@ -282,19 +281,18 @@ class TreeViewItemComponent extends TreeViewElement {
       throw new Error(`${this.layer.name} is not a LocalFile layer, this method should not be called here.`);
     }
 
-    MapManager.getInstance().zoomToExtent(this.layer.extent);
+    this.context.mapManager.zoomToExtent(this.layer.extent);
   }
 
   public deleteLayer() {
-    this.layerManager.toggleLayer(this.layer, 'off');
+    this.context.layerManager.toggleLayer(this.layer, 'off');
     this.removeFromParent();
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    this.render();
+    this.registerEvents();
   }
 }
 

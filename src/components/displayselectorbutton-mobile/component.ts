@@ -9,6 +9,7 @@ export default class DisplaySelectorButtonMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.subscribe('interface.swipeupPanelContent', () => {
       this.render();
     });

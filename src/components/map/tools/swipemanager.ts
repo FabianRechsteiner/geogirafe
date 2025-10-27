@@ -10,7 +10,7 @@ import BaseEvent from 'ol/events/Event';
 import LayerWmts from '../../../models/layers/layerwmts';
 import LayerWms from '../../../models/layers/layerwms';
 import LayerLocalFile from '../../../models/layers/layerlocalfile';
-import LocalFileManager from './localfilemanager';
+import LocalFileManager from '../../../tools/localfile/localfilemanager';
 import Layer from '../../../models/layers/layer';
 
 class SwipeManager {

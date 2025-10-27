@@ -3,24 +3,25 @@ import LayersConfigSerializer from './layerconfigserializer';
 import MockHelper from '../../tests/mockhelper';
 import ThemeLayer from '../../../models/layers/themelayer';
 import GroupLayer from '../../../models/layers/grouplayer';
-import StateManager from '../../state/statemanager';
 import LayersConfig from '../../state/layersConfig';
 import LayerWmts from '../../../models/layers/layerwmts';
+import IGirafeContext from '../../context/icontext';
 
 let serializer: LayersConfigSerializer;
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
-  serializer = new LayersConfigSerializer();
+  context = MockHelper.startMocking();
+  serializer = new LayersConfigSerializer(context);
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 beforeEach(() => {
-  StateManager.getInstance().state.themes._allThemes = {};
-  StateManager.getInstance().state.layers.layersList = [];
+  context.stateManager.state.themes._allThemes = {};
+  context.stateManager.state.layers.layersList = [];
 });
 
 function getTestData(options: { [key: string]: any } = {}) {
@@ -28,7 +29,7 @@ function getTestData(options: { [key: string]: any } = {}) {
   const theme = new ThemeLayer(1, 'test-theme', 0);
   const groupLayer = new GroupLayer(11, 'Group 1', 11);
   theme.children.push(groupLayer);
-  StateManager.getInstance().state.themes._allThemes[theme.id] = theme;
+  context.stateManager.state.themes._allThemes[theme.id] = theme;
 
   if (options.addSecondMissingGroup) {
     const groupLayer2 = new GroupLayer(12, 'Group 2', 12);
@@ -166,7 +167,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   it('should return serialized data for a GroupLayer (id, order)', () => {
     const data = getTestData();
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });
@@ -174,7 +175,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   it('should return serialized data for a GroupLayer (isExpanded)', () => {
     const data = getTestData({ isGroupExpanded: true });
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });
@@ -183,7 +184,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   /*it('should return serialized data for a GroupLayer (isChecked)', () => {
     const data = getTestData({isGroupChecked: true});
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });*/
@@ -191,7 +192,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   it('should return serialized data for a GroupLayer with children', () => {
     const data = getTestData({ addWmtsLayer: true });
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });
@@ -199,7 +200,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   it('should return serialized data for a GroupLayer with children (opacity)', () => {
     const data = getTestData({ addWmtsLayer: true, opacity: 0.5 });
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });
@@ -207,7 +208,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   it('should return serialized data for a GroupLayer with children (swiped left)', () => {
     const data = getTestData({ addWmtsLayer: true, swiped: 'left' });
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });
@@ -215,7 +216,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   it('should return serialized data for a GroupLayer with children (swiped right)', () => {
     const data = getTestData({ addWmtsLayer: true, swiped: 'left' });
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });
@@ -223,7 +224,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   it('should serialize a missing original group correctly (explicitely removed)', () => {
     const data = getTestData({ addSecondMissingGroup: true });
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });
@@ -231,7 +232,7 @@ describe('LayersConfigSerializer.deserialize', () => {
   it('should serialize a missing original layer correctly (explicitely removed)', () => {
     const data = getTestData({ addWmtsLayer: true, addSecondMissingLayer: true });
     serializer.brainDeserialize(data.controlValue);
-    const layersConfig = StateManager.getInstance().state.layers;
+    const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });

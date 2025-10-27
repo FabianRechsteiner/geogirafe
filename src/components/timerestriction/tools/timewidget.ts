@@ -136,10 +136,9 @@ class TimeWidget extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-    });
+    super.connectedCallback();
+    this.render();
+    super.girafeTranslate();
   }
 }
 

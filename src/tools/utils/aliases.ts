@@ -1,11 +1,19 @@
 import StateManager from '../state/statemanager';
 
-export function getColumnAlias(idTable: string, idColumn: string) {
-  for (const ogcServer of Object.values(StateManager.getInstance().state.ogcServers)) {
-    const alias = ogcServer.getAlias(idTable, idColumn);
-    if (alias) {
-      return alias;
-    }
+export default class ColumnAliasHelper {
+  private readonly stateManager: StateManager;
+
+  constructor(stateManager: StateManager) {
+    this.stateManager = stateManager;
   }
-  return idColumn;
+
+  public getColumnAlias(idTable: string, idColumn: string) {
+    for (const ogcServer of Object.values(this.stateManager.state.ogcServers)) {
+      const alias = ogcServer.getAlias(idTable, idColumn);
+      if (alias) {
+        return alias;
+      }
+    }
+    return idColumn;
+  }
 }

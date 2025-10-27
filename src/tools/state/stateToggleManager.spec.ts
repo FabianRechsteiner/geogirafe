@@ -3,15 +3,18 @@ import StateToggleManager from './stateToggleManager';
 import MockHelper from '../tests/mockhelper';
 import StateManager from '../state/statemanager';
 import State from '../state/state';
+import IGirafeContext from '../context/icontext';
+
 let stateManager: StateManager;
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
-  stateManager = StateManager.getInstance();
+  context = MockHelper.startMocking();
+  stateManager = context.stateManager;
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 describe('StateToggleManager class', () => {

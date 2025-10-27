@@ -5,7 +5,6 @@ import { CursorMoveEvent, ChangeDomainEvent, ChangeMarkersEvent, ChangeMeasureme
 
 import GirafeResizableElement from '../../../base/GirafeResizableElement';
 import { CrossSectionState } from './../crosssectionstate';
-import ConfigManager from '../../../tools/configuration/configmanager';
 import { Scatterplot } from '../scatterplot';
 import { PytreeManager } from '../pytreemanager';
 import { computeColors } from '../utils';
@@ -15,17 +14,17 @@ class CrossSectionViewComponent extends GirafeResizableElement {
   templateUrl = './template.html';
   styleUrls = ['./style.css', '../../../styles/common.css'];
 
-  crossSectionState: CrossSectionState;
+  crossSectionState!: CrossSectionState;
   private readonly eventsCallbacks: Callback[] = [];
   darkFrontendMode: boolean = false;
   private visible: boolean = false;
   scatterplot: Scatterplot | undefined;
-  abortController: AbortController;
-  uv: Float32Array;
-  rgb: Uint8Array; // 1 byte * 3 values
-  intensity: Uint16Array;
-  classification: Uint8Array;
-  group: Uint8Array;
+  abortController!: AbortController;
+  uv!: Float32Array;
+  rgb!: Uint8Array; // 1 byte * 3 values
+  intensity!: Uint16Array;
+  classification!: Uint8Array;
+  group!: Uint8Array;
   currentRefreshId: symbol | undefined;
   panel: HTMLDivElement | null = null;
   pytreeManager: PytreeManager | null = null;
@@ -33,20 +32,10 @@ class CrossSectionViewComponent extends GirafeResizableElement {
 
   constructor() {
     super('cross-section-view');
-
-    this.crossSectionState = this.state.extendedState.crossSection as CrossSectionState;
-    this.abortController = new AbortController();
-
-    // Initialize point data attributes
-    this.uv = new Float32Array(this.crossSectionState.maxNumberOfPoints * 2); // 4 bytes * 2 values
-    this.rgb = new Uint8Array(this.crossSectionState.maxNumberOfPoints * 3); // 1 byte * 3 values
-    this.intensity = new Uint16Array(this.crossSectionState.maxNumberOfPoints); // 2 bytes * 1 value
-    this.classification = new Uint8Array(this.crossSectionState.maxNumberOfPoints); // 1 bytes * 1 value
-    this.group = new Uint8Array(this.crossSectionState.maxNumberOfPoints); // 1 bytes * 1 value
   }
 
   async initPytreeManager() {
-    const baseURL = ConfigManager.getInstance().Config.lidar?.url.replace(/\/?$/, '/') ?? '';
+    const baseURL = this.context.configManager.Config.lidar?.url.replace(/\/?$/, '/') ?? '';
     this.pytreeManager = new PytreeManager(baseURL);
 
     await this.pytreeManager.getConfig();
@@ -643,8 +632,19 @@ class CrossSectionViewComponent extends GirafeResizableElement {
   }
 
   connectedCallback(): void {
+    super.connectedCallback();
+    this.crossSectionState = this.state.extendedState.crossSection as CrossSectionState;
+    this.abortController = new AbortController();
+
+    // Initialize point data attributes
+    this.uv = new Float32Array(this.crossSectionState.maxNumberOfPoints * 2); // 4 bytes * 2 values
+    this.rgb = new Uint8Array(this.crossSectionState.maxNumberOfPoints * 3); // 1 byte * 3 values
+    this.intensity = new Uint16Array(this.crossSectionState.maxNumberOfPoints); // 2 bytes * 1 value
+    this.classification = new Uint8Array(this.crossSectionState.maxNumberOfPoints); // 1 bytes * 1 value
+    this.group = new Uint8Array(this.crossSectionState.maxNumberOfPoints); // 1 bytes * 1 value
+
     // Load pytree manager
-    if (ConfigManager.getInstance().Config.lidar) {
+    if (this.context.configManager.Config.lidar) {
       this.render();
       this.registerVisibilityEvents();
       this.initPytreeManager()

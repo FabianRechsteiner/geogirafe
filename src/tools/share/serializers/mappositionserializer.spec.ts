@@ -1,22 +1,23 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import MapPositionSerializer from './mappositionserializer';
 import MapPosition from '../../state/mapposition';
-import StateManager from '../../state/statemanager';
 import MockHelper from '../../tests/mockhelper';
+import IGirafeContext from '../../context/icontext';
 
 let serializer: MapPositionSerializer;
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
-  serializer = new MapPositionSerializer();
+  context = MockHelper.startMocking();
+  serializer = new MapPositionSerializer(context);
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 beforeEach(() => {
-  const state = StateManager.getInstance().state;
+  const state = context.stateManager.state;
   state.position = new MapPosition(); // reset position before each test
 });
 
@@ -60,7 +61,7 @@ describe('MapPositionSerializer.deserialize', () => {
 
     serializer.brainDeserialize(json);
 
-    const state = StateManager.getInstance().state;
+    const state = context.stateManager.state;
     expect(state.position).toBeInstanceOf(MapPosition);
     expect(state.position.center).toEqual([50, 60]);
     expect(state.position.resolution).toBe(2);
@@ -72,7 +73,7 @@ describe('MapPositionSerializer.deserialize', () => {
   });
 
   it('should override previous map position in state', () => {
-    const state = StateManager.getInstance().state;
+    const state = context.stateManager.state;
 
     // Set an initial position
     state.position.center = [0, 0];

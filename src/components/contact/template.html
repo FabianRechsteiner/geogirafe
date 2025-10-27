@@ -6,7 +6,7 @@
     <label for="reason" i18n="Why are you contacting us?" class="gg-label">Why are you contacting us?</label>
     <select id="reason" class="gg-select">
       <option value="" disabled selected>-</option>
-      ${this.configManager.Config.contact?.reasons.map((reason) => uHtml`
+      ${this.context.configManager.Config.contact?.reasons.map((reason) => uHtml`
       <option i18n="${reason}" value="${reason}">${reason}</option>
       `)}
     </select>
@@ -25,7 +25,9 @@
 
     <div class="mail-contact">
       <span i18n="You can also contact us directly by E-Mail at">You can also contact us directly by E-Mail at</span>
-      <a href="${'mailto:' + this.configManager.Config.contact?.email}">${this.configManager.Config.contact?.email}</a>
+      <a href="${'mailto:' + this.context.configManager.Config.contact?.email}"
+        >${this.context.configManager.Config.contact?.email}</a
+      >
     </div>
 
     <button class="gg-button" tip="Send message" i18n="Send" onclick="${() => this.sendMessage()}">Send</button>

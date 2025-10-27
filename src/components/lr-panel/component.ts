@@ -19,7 +19,7 @@ class LRPanelComponent extends GirafeResizableElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  private readonly stateToggleManager: StateToggleManager;
+  private stateToggleManager!: StateToggleManager;
   public title: string = 'Unknown panel';
   private panelTitles: Record<string, string> = {};
   public get hasMultipleChilds() {
@@ -28,6 +28,10 @@ class LRPanelComponent extends GirafeResizableElement {
 
   constructor() {
     super('lr-panel');
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
     this.render();
 
     // Add the dock mode as class on the panel to allow setting differents styles
@@ -36,7 +40,7 @@ class LRPanelComponent extends GirafeResizableElement {
     panel?.classList.add(this.dock);
 
     const togglePaths = this.retrieveTogglePaths();
-    this.stateToggleManager = new StateToggleManager(togglePaths, this.stateManager);
+    this.stateToggleManager = new StateToggleManager(togglePaths, this.context.stateManager);
     this.showOnChildChange(togglePaths);
   }
 
@@ -63,7 +67,7 @@ class LRPanelComponent extends GirafeResizableElement {
       }
     }
 
-    return StateToggleManager.filterValidTogglePaths(this.stateManager, togglePaths);
+    return StateToggleManager.filterValidTogglePaths(this.context.stateManager, togglePaths);
   }
 
   /**

@@ -2,14 +2,16 @@ import UserInteractionManager from './userInteractionManager';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import StateManager from './statemanager';
 import MockHelper from '../tests/mockhelper';
+import IGirafeContext from '../context/icontext';
 
 let manager: UserInteractionManager;
 let stateManager: StateManager;
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
-  manager = UserInteractionManager.getInstance();
-  stateManager = StateManager.getInstance();
+  context = MockHelper.startMocking();
+  manager = context.userInteractionManager;
+  stateManager = context.stateManager;
 });
 
 describe('InteractionManager.registerListener', () => {

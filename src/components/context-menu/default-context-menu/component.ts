@@ -2,10 +2,8 @@ import type { Callback } from '../../../tools/state/statemanager';
 import { render } from 'uhtml';
 
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
-import I18nManager from '../../../tools/i18n/i18nmanager';
-import MapManager from '../../../tools/state/mapManager';
 import { printCoordinate } from '../../../tools/geometrytools';
-import { Map, Overlay } from 'ol';
+import { Overlay } from 'ol';
 import { MapContextMenuState } from './contextmenustate';
 import MapContextMenuManager from './contextmenumanager';
 
@@ -13,22 +11,19 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['./style.css', '../../../styles/common.css', '../mapcontextmenu.css'];
 
-  private readonly map: Map;
+  private get map() {
+    return this.context.mapManager.getMap();
+  }
+
   private readonly eventsCallbacks: Callback[] = [];
-  protected mapContextMenuState: MapContextMenuState;
-  protected mapContextMenuManager: MapContextMenuManager;
-  i18nManager: I18nManager;
+  protected mapContextMenuState!: MapContextMenuState;
+  protected mapContextMenuManager!: MapContextMenuManager;
   private contextMenuOverlay?: Overlay;
   host: HTMLDivElement;
   printCoordinate = printCoordinate;
 
   constructor() {
     super('map-context-menu');
-    this.i18nManager = I18nManager.getInstance();
-    this.state.extendedState.mapcontextmenu = new MapContextMenuState();
-    this.mapContextMenuState = this.state.extendedState.mapcontextmenu as MapContextMenuState;
-    this.mapContextMenuManager = new MapContextMenuManager(this.mapContextMenuState);
-    this.map = MapManager.getInstance().getMap();
     this.host = document.createElement('div');
   }
 
@@ -40,7 +35,7 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
 
   async renderContent() {
     render<HTMLDivElement>(this.host, this.template);
-    await this.i18nManager.translate(this.host as unknown as DocumentFragment);
+    await this.context.i18nManager.translate(this.host as unknown as DocumentFragment);
   }
 
   showContextMenu(): void {
@@ -114,11 +109,16 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
     this.eventsCallbacks.length = 0;
   }
 
-  async connectedCallback() {
-    await this.loadConfig();
-    await this.mapContextMenuManager.initialize();
-    this.registerVisibilityEvents();
-    this.registerInteractions();
+  connectedCallback() {
+    super.connectedCallback();
+    this.state.extendedState.mapcontextmenu = new MapContextMenuState();
+    this.mapContextMenuState = this.state.extendedState.mapcontextmenu as MapContextMenuState;
+    this.mapContextMenuManager = new MapContextMenuManager(this.mapContextMenuState, this.context);
+
+    this.mapContextMenuManager.initialize().then(() => {
+      this.registerVisibilityEvents();
+      this.registerInteractions();
+    });
   }
 }
 

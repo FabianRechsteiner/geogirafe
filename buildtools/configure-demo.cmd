@@ -19,6 +19,9 @@ copy /Y "demo\config.%name%.json" "%APPDIR%\config.json"
 if exist "demo\config.%name%.mobile.json" (
     copy /Y "demo\config.%name%.mobile.json" "%APPDIR%\config.mobile.json"
 )
+if exist "demo\config.%name%.api.json" (
+    copy /Y "demo\config.%name%.api.json" "%APPDIR%\config.api.json"
+)
 
 if "%name%"=="lie" (
     curl "https://map.geo.llv.li/themes?background=background&interface=desktop" --output %OUTPUTDIR%\themes.json

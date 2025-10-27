@@ -2,10 +2,12 @@ import OgcApiFeaturesClient from './ogcapifeaturesclient';
 import Feature from 'ol/Feature';
 import ServerOgc from '../../models/serverogc';
 import { OapifSchemaResponse, OapifPropertySchema } from '../../models/serverogcapifeatures';
+import IGirafeContext from '../context/icontext';
+import { OgcApiClientOptions } from './ogcapiclient';
 
 export default class OgcApiFeaturesClientGmf extends OgcApiFeaturesClient {
-  constructor(serverConfig: ServerOgc) {
-    super(serverConfig);
+  constructor(serverConfig: ServerOgc, opt: OgcApiClientOptions, context: IGirafeContext) {
+    super(serverConfig, opt, context);
   }
 
   /**

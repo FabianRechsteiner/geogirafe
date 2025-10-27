@@ -1,6 +1,7 @@
 import GirafeSingleton from '../base/GirafeSingleton';
 import LayerWms from '../models/layers/layerwms';
 import ServerOgc from '../models/serverogc';
+import IGirafeContext from './context/icontext';
 
 export default abstract class VendorSpecificOgcServerManager<
   OgcServerClient,
@@ -8,22 +9,22 @@ export default abstract class VendorSpecificOgcServerManager<
 > extends GirafeSingleton {
   protected readonly _clientClasses: Map<
     string,
-    new (ogcServer: ServerOgc, options: OgcClientOptions) => OgcServerClient
+    new (ogcServer: ServerOgc, options: OgcClientOptions, context: IGirafeContext) => OgcServerClient
   > = new Map();
   protected readonly _clients: Map<string, OgcServerClient> = new Map();
 
   public abstract getClientId(ogcServer: ServerOgc): string;
   public createClient(
-    clientClass: new (os: ServerOgc, opt: OgcClientOptions) => OgcServerClient,
+    clientClass: new (os: ServerOgc, opt: OgcClientOptions, context: IGirafeContext) => OgcServerClient,
     ogcServer: ServerOgc
   ): OgcServerClient {
-    return new clientClass(ogcServer, {} as OgcClientOptions);
+    return new clientClass(ogcServer, {} as OgcClientOptions, this.context);
   }
 
   // Register a client with an identifier
   public registerClientClass(
     type: string,
-    clientClass: new (ogcServer: ServerOgc, opt: OgcClientOptions) => OgcServerClient
+    clientClass: new (ogcServer: ServerOgc, opt: OgcClientOptions, context: IGirafeContext) => OgcServerClient
   ) {
     this._clientClasses.set(type, clientClass);
   }

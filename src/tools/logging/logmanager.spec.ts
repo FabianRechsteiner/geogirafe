@@ -1,19 +1,20 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import MockHelper from '../tests/mockhelper';
-import LogManager from './logmanager';
 import ConfigManager from '../configuration/configmanager';
+import IGirafeContext from '../context/icontext';
 
 describe('LogManager', () => {
   let configManager: ConfigManager;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
-    configManager = ConfigManager.getInstance();
-    LogManager.getInstance().initLogging();
+    context = MockHelper.startMocking();
+    configManager = context.configManager;
+    context.logManager.initLogging();
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should output debug log at debug level only', () => {

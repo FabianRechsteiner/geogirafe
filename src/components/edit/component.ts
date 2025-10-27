@@ -1,8 +1,4 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import StateManager from '../../tools/state/statemanager';
-import OgcApiFeaturesManager from '../../tools/ogcapi/ogcapifeaturesmanager';
-import MapManager from '../../tools/state/mapManager';
-import { Map } from 'ol';
 import { Draw, Modify, Select } from 'ol/interaction';
 import Feature from 'ol/Feature';
 import { DrawEvent } from 'ol/interaction/Draw';
@@ -36,13 +32,13 @@ export default class EditComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  stateManager: StateManager;
-  oapifManager: OgcApiFeaturesManager;
-
   visible: boolean = false;
 
   editableLayersList: OapifLayer[] = [];
-  private readonly map: Map;
+
+  private get map() {
+    return this.context.mapManager.getMap();
+  }
 
   private draw?: Draw;
   private modify?: Modify;
@@ -60,14 +56,6 @@ export default class EditComponent extends GirafeHTMLElement {
 
   constructor() {
     super('edit');
-    this.stateManager = StateManager.getInstance();
-    this.oapifManager = OgcApiFeaturesManager.getInstance();
-    this.map = MapManager.getInstance().getMap();
-    this.subscribe('application.isReady', () => {
-      if (this.state.application.isReady) {
-        this.loginStateChanged();
-      }
-    });
   }
 
   render() {
@@ -102,7 +90,7 @@ export default class EditComponent extends GirafeHTMLElement {
     this.editableLayersList = Object.values(DEMO_LAYERS).filter((layer) => {
       try {
         const oapifUrl = new URL(layer.url);
-        const themesUrl = new URL(this.configManager.Config.themes.url);
+        const themesUrl = new URL(this.context.configManager.Config.themes.url);
         return oapifUrl.hostname === themesUrl.hostname && this.state.oauth.status === 'loggedIn';
       } catch {
         // Cannot parse this.configManager.Config.themes.url as URL.
@@ -122,7 +110,7 @@ export default class EditComponent extends GirafeHTMLElement {
     this.unsetEditFeature();
 
     if (this.layer) {
-      this.featureSchema = await this.oapifManager.getSchema(this.layer);
+      this.featureSchema = await this.context.ogcApiFeaturesManager.getSchema(this.layer);
       this.form.setSchema(this.featureSchema);
       this.createDemoMapLayer(); // POC
       this.createMapInteractions();
@@ -270,7 +258,7 @@ export default class EditComponent extends GirafeHTMLElement {
   private async onSelectFeature(evt: SelectEvent) {
     this.drawingSource?.clear();
     const bbox = getSelectionBoxFromMapClick(evt.mapBrowserEvent.pixel, this.map, 10);
-    const selectedFeature = await this.oapifManager.getItems(
+    const selectedFeature = await this.context.ogcApiFeaturesManager.getItems(
       this.layer!,
       this.map.getView().getProjection().getCode(),
       bbox,
@@ -320,10 +308,10 @@ export default class EditComponent extends GirafeHTMLElement {
     featureToSave.setProperties(formValues);
 
     if (id === newId) {
-      await this.oapifManager.createItem(this.layer, featureToSave);
+      await this.context.ogcApiFeaturesManager.createItem(this.layer, featureToSave);
     } else {
       featureToSave.setId(id);
-      await this.oapifManager.updateItem(this.layer, id, featureToSave);
+      await this.context.ogcApiFeaturesManager.updateItem(this.layer, id, featureToSave);
     }
     this.unsetEditFeature();
     this.refreshDemoMapLayer();
@@ -331,7 +319,7 @@ export default class EditComponent extends GirafeHTMLElement {
   }
 
   private async deleteFeature(featureId: string) {
-    await this.oapifManager.deleteItem(this.layer!, featureId);
+    await this.context.ogcApiFeaturesManager.deleteItem(this.layer!, featureId);
     this.unsetEditFeature();
     this.refreshDemoMapLayer();
     this.startSelectionMode();
@@ -344,7 +332,7 @@ export default class EditComponent extends GirafeHTMLElement {
     }
     const vectorSource = new VectorSource({
       loader: async (extent, _resolution, projection) => {
-        const features = await this.oapifManager.getItems(this.layer!, projection.getCode(), extent);
+        const features = await this.context.ogcApiFeaturesManager.getItems(this.layer!, projection.getCode(), extent);
         if (features) {
           vectorSource.addFeatures(features);
         }
@@ -428,12 +416,15 @@ export default class EditComponent extends GirafeHTMLElement {
     for (const layer of this.editableLayersList) {
       if (!this.state.ogcServers[layer.server.name]) {
         this.state.ogcServers[layer.server.name] = layer.server;
-        await OgcApiFeaturesManager.getInstance().getServer(layer.server);
+        await this.context.ogcApiFeaturesManager.getServer(layer.server);
 
         // A demo layer is defined either by its collection id or title. In the case of the title,
         //  the id is requested from the server and stored in the layer definition.
         if (!layer.collectionId) {
-          const collection = await this.oapifManager.getCollectionByTitle(layer.collectionTitle, layer.server);
+          const collection = await this.context.ogcApiFeaturesManager.getCollectionByTitle(
+            layer.collectionTitle,
+            layer.server
+          );
           if (collection?.title) {
             layer.collectionId = collection.id;
           }
@@ -443,10 +434,16 @@ export default class EditComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      // Add ogc servers to state
-      this.subscribe('interface.editPanelVisible', (_, newValue) => this.togglePanel(newValue));
-      this.render();
+    super.connectedCallback();
+    this.subscribe('oauth.status', () => this.loginStateChanged());
+    // Add ogc servers to state
+    this.subscribe('interface.editPanelVisible', (_, newValue) => this.togglePanel(newValue));
+    this.subscribe('application.isReady', () => {
+      if (this.state.application.isReady) {
+        this.loginStateChanged();
+      }
     });
+
+    this.render();
   }
 }

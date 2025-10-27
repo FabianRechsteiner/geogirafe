@@ -1,11 +1,8 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import StateManager from '../state/statemanager';
 import ThemeLayer from '../../models/layers/themelayer';
 import Layer from '../../models/layers/layer';
 import LayerDrawing from '../../models/layers/layerdrawing';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
-import ThemesHelper from './themeshelper';
-import LayerManager from '../layers/layermanager';
 
 type UserThemeConfig = {
   name: string;
@@ -20,8 +17,6 @@ type UserThemeConfig = {
  * in the layer tree.
  */
 export default class UserLayerManager extends GirafeSingleton {
-  stateManager: StateManager;
-  themesHelper: ThemesHelper;
   themeLayerItemIds: Record<string, string> = {};
 
   userThemeConfig: Record<string, UserThemeConfig> = {
@@ -43,19 +38,12 @@ export default class UserLayerManager extends GirafeSingleton {
   };
 
   get state() {
-    return this.stateManager.state;
-  }
-
-  constructor(type: string) {
-    super(type);
-
-    this.stateManager = StateManager.getInstance();
-    this.themesHelper = ThemesHelper.getInstance();
+    return this.context.stateManager.state;
   }
 
   private getThemeLayerByTreeId(treeItemId: string): ThemeLayer | null {
     try {
-      return this.stateManager.state.layers.layersList.find((l) => l.treeItemId === treeItemId) as ThemeLayer;
+      return this.context.stateManager.state.layers.layersList.find((l) => l.treeItemId === treeItemId) as ThemeLayer;
     } catch {
       return null;
     }
@@ -78,7 +66,7 @@ export default class UserLayerManager extends GirafeSingleton {
     let themeLayer = this.getThemeLayerByTreeId(this.themeLayerItemIds[config.name]);
     if (!themeLayer) {
       themeLayer = new ThemeLayer(0, config.name, 0, '', { isDefaultChecked: true, isDefaultExpanded: true });
-      themeLayer.order = this.themesHelper.getInitialOrderForNewTheme();
+      themeLayer.order = this.context.themesHelper.getInitialOrderForNewTheme();
       themeLayer.isPinned = config.isPinned;
       themeLayer.isRemovable = config.isRemovable;
     }
@@ -104,12 +92,12 @@ export default class UserLayerManager extends GirafeSingleton {
     const theme = this.getOrCreateThemeLayer(config);
     const userLayerInTree = this.getUserLayerByTreeId(layer.treeItemId);
     if (userLayerInTree) {
-      LayerManager.getInstance().toggleLayer(userLayerInTree, 'on');
+      this.context.layerManager.toggleLayer(userLayerInTree, 'on');
     } else {
       layer.parent = theme;
       theme.children.push(layer);
       if (!this.getThemeLayerByTreeId(theme.treeItemId)) {
-        this.stateManager.state.layers.layersList.push(theme);
+        this.context.stateManager.state.layers.layersList.push(theme);
         this.themeLayerItemIds[config.name] = theme.treeItemId;
       }
     }
@@ -125,10 +113,10 @@ export default class UserLayerManager extends GirafeSingleton {
     const userLayer = this.getUserLayerByTreeId(layer.treeItemId);
 
     if (userLayer) {
-      this.themesHelper.removeLayersFromLayerTree([userLayer]);
+      this.context.themesHelper.removeLayersFromLayerTree([userLayer]);
       if (theme?.children.length === 0) {
         // Remove the theme layer if it's empty
-        this.themesHelper.removeLayersFromLayerTree([theme]);
+        this.context.themesHelper.removeLayersFromLayerTree([theme]);
         delete this.themeLayerItemIds[config.name];
       }
     }

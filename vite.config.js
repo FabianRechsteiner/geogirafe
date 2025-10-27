@@ -67,7 +67,8 @@ export default defineConfig(({ command }) => {
         input: {
           desktop: resolve(__dirname, 'index.html'),
           mobile: resolve(__dirname, 'mobile.html'),
-          iframe: resolve(__dirname, 'iframe.html')
+          iframe: resolve(__dirname, 'iframe.html'),
+          api: resolve(__dirname, 'api.html')
         },
         output: {
           manualChunks: {
@@ -85,6 +86,12 @@ export default defineConfig(({ command }) => {
               'tippy.js',
               'vanilla-picker'
             ]
+          },
+          entryFileNames: (chunkInfo) => {
+            if (chunkInfo.name === 'api') {
+              return 'geogirafe-api.js';
+            }
+            return 'assets/[name].[hash].js';
           }
         }
       }
@@ -103,6 +110,7 @@ export default defineConfig(({ command }) => {
           { src: `${geogirafeSource}/styles/*.css`, dest: 'styles/' },
           { src: `${geogirafeSource}/assets/*`, dest: '' },
           { src: `${geogirafeSource}/tools/auth/silentlogincallback.html`, dest: '' },
+          //{ src: `${geogirafeSource}/api/index.html`, dest: 'api/' },
           { src: 'node_modules/ol/ol.css', dest: 'lib/ol/' },
           { src: 'node_modules/tabulator-tables/dist/css/tabulator.min.css', dest: 'lib/tabulator-tables/' },
           { src: 'node_modules/tippy.js/dist/*.css', dest: 'lib/tippy.js/' },

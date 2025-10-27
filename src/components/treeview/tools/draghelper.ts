@@ -2,24 +2,28 @@ import BaseLayer from '../../../models/layers/baselayer';
 import StateManager from '../../../tools/state/statemanager';
 
 class DragHelper {
-  static checkParents(dragged: BaseLayer, dropped: BaseLayer) {
+  private readonly stateManager: StateManager;
+
+  constructor(stateManager: StateManager) {
+    this.stateManager = stateManager;
+  }
+
+  private checkParents(dragged: BaseLayer, dropped: BaseLayer) {
     if (dragged.parent !== dropped.parent) {
       throw Error('Layers can only be reordered if the have the same parent');
     }
   }
 
-  static reorderLayers(
+  private reorderLayers(
     dragged: BaseLayer,
     dropped: BaseLayer,
     adjustOrder: (childOrder: number, draggedOrder: number) => boolean,
     increment: number
   ) {
-    DragHelper.checkParents(dragged, dropped);
+    this.checkParents(dragged, dropped);
     dragged.order = dropped.order;
 
-    const layersToReorder = dragged.parent
-      ? dragged.parent.children
-      : StateManager.getInstance().state.layers.layersList;
+    const layersToReorder = dragged.parent ? dragged.parent.children : this.stateManager.state.layers.layersList;
 
     for (const child of layersToReorder) {
       if (child.treeItemId !== dragged.treeItemId && adjustOrder(child.order, dragged.order)) {
@@ -28,9 +32,9 @@ class DragHelper {
     }
   }
 
-  static moveLayerAfter(dragged: BaseLayer, dropped: BaseLayer) {
+  public moveLayerAfter(dragged: BaseLayer, dropped: BaseLayer) {
     const minOrder = dragged.order;
-    DragHelper.reorderLayers(
+    this.reorderLayers(
       dragged,
       dropped,
       (childOrder, draggedOrder) => childOrder <= draggedOrder && childOrder >= minOrder,
@@ -38,9 +42,9 @@ class DragHelper {
     );
   }
 
-  static moveLayerBefore(dragged: BaseLayer, dropped: BaseLayer) {
+  public moveLayerBefore(dragged: BaseLayer, dropped: BaseLayer) {
     const maxOrder = dragged.order;
-    DragHelper.reorderLayers(
+    this.reorderLayers(
       dragged,
       dropped,
       (childOrder, draggedOrder) => childOrder >= draggedOrder && childOrder <= maxOrder,

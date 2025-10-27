@@ -5,15 +5,17 @@ import { Geometry } from 'ol/geom';
 import MockHelper from '../tests/mockhelper';
 import { OapifLayer } from '../../models/serverogcapifeatures';
 import ServerOgc from '../../models/serverogc';
+import IGirafeContext from '../context/icontext';
 
 vi.mock('./ogcapifeaturesclient');
 
 describe('OgcApiFeaturesManager', () => {
+  let context: IGirafeContext;
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
   });
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
   let manager: OgcApiFeaturesManager;
   let layer: OapifLayer = {
@@ -40,7 +42,7 @@ describe('OgcApiFeaturesManager', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    manager = OgcApiFeaturesManager.getInstance();
+    manager = context.ogcApiFeaturesManager;
   });
 
   describe('getSchema', () => {

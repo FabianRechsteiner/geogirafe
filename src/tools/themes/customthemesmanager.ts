@@ -1,5 +1,4 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import UserDataManager from '../userdata/userdatamanager';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
@@ -8,15 +7,9 @@ import CustomTheme from '../../models/customtheme';
 import CustomLayersSerializer from '../share/serializers/customlayersserializer';
 
 class CustomThemesManager extends GirafeSingleton {
-  userDataManager: UserDataManager;
   customThemes: CustomTheme[] = [];
   private readonly storagePath: string = 'customThemes';
-  private readonly serializer = new CustomLayersSerializer();
-
-  constructor(type: string) {
-    super(type);
-    this.userDataManager = UserDataManager.getInstance();
-  }
+  private readonly serializer = new CustomLayersSerializer(this.context);
 
   public addTheme(themeName: string, layersList: BaseLayer[]) {
     const theme = new CustomTheme(themeName);
@@ -61,11 +54,11 @@ class CustomThemesManager extends GirafeSingleton {
     for (const customTheme of this.customThemes) {
       serializedObject[customTheme.name] = this.serializer.customThemeSerialize(customTheme);
     }
-    this.userDataManager.saveUserData(this.storagePath, serializedObject);
+    this.context.userDataManager.saveUserData(this.storagePath, serializedObject);
   }
 
   public loadCustomThemes() {
-    const customThemes = this.userDataManager.getUserData(this.storagePath) as Record<string, string>;
+    const customThemes = this.context.userDataManager.getUserData(this.storagePath) as Record<string, string>;
     if (customThemes) {
       for (const customThemeName of Object.keys(customThemes)) {
         try {

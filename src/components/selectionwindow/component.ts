@@ -10,8 +10,7 @@ import IconCenter from './images/center.svg';
 import ResizeWindow from '../../tools/resizewindow';
 import DOMPurify from 'dompurify';
 import CsvManager from '../../tools/export/csvmanager';
-import { getColumnAlias } from '../../tools/utils/aliases';
-import I18nManager from '../../tools/i18n/i18nmanager';
+import ColumnAliasHelper from '../../tools/utils/aliases';
 
 /**
  * Represents a Feature displayed in the SelectionWindowComponent.
@@ -46,15 +45,19 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   focusedIndex = 0;
   maxIndex = 0;
   iconCenter = IconCenter;
-  csvManager = CsvManager.getInstance();
+  private csvManager!: CsvManager;
   displayedProperties: [string, unknown][] = [];
   showDropdown = false;
+  private columnAliasHelper!: ColumnAliasHelper;
 
   constructor() {
     super('selectionwindow');
   }
 
   connectedCallback() {
+    super.connectedCallback();
+    this.csvManager = new CsvManager(this.context);
+    this.columnAliasHelper = new ColumnAliasHelper(this.context.stateManager);
     this.render();
     this.registerVisibilityEvents();
   }
@@ -173,14 +176,16 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     });
     this.displayedProperties.forEach((keyValue) => {
       let config = {};
-      if (this.configManager.Config.query.legacy) {
+      if (this.context.configManager.Config.query.legacy) {
         config = {
           ADD_ATTR: ['onclick'],
           ADD_URI_SAFE_ATTR: ['onclick']
         };
       }
 
-      keyValue[0] = I18nManager.getInstance().getTranslation(getColumnAlias(windowFeature.id, keyValue[0]));
+      keyValue[0] = this.context.i18nManager.getTranslation(
+        this.columnAliasHelper.getColumnAlias(windowFeature.id, keyValue[0])
+      );
       keyValue[1] = DOMPurify.sanitize(keyValue[1] as string, config);
     });
     // Render and translate data.

@@ -1,4 +1,3 @@
-import ConfigManager from '../../tools/configuration/configmanager';
 import { BrainIgnoreClone } from '../../tools/state/brain/decorators';
 import GroupLayer from './grouplayer';
 import ThemeLayer from './themelayer';
@@ -53,20 +52,7 @@ abstract class BaseLayer {
     this.order = order;
     this.isDefaultChecked = options?.isDefaultChecked || false;
     this.disclaimer = options?.disclaimer;
-
-    this.metadataUrl = this.calculateMetadataUrl(options?.metadataUrl);
-  }
-
-  private calculateMetadataUrl(metadataUrl?: string) {
-    if (!metadataUrl) {
-      return undefined;
-    }
-
-    if (!metadataUrl.startsWith('http') && ConfigManager.getInstance().Config.metadata.metadataUrlPrefix) {
-      return ConfigManager.getInstance().Config.metadata.metadataUrlPrefix + metadataUrl;
-    }
-
-    return metadataUrl;
+    this.metadataUrl = options?.metadataUrl;
   }
 
   /**

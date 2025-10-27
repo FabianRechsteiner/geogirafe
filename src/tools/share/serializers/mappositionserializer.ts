@@ -1,16 +1,16 @@
+import IGirafeContext from '../../context/icontext';
 import { IBrainSerializer } from '../../state/brain/serialize';
 import MapPosition from '../../state/mapposition';
-import StateManager from '../../state/statemanager';
 
 export default class MapPositionSerializer implements IBrainSerializer<MapPosition> {
-  stateManager: StateManager;
+  private readonly context: IGirafeContext;
 
-  constructor() {
-    this.stateManager = StateManager.getInstance();
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public brainSerialize(mapPosition: MapPosition): string {

@@ -1,19 +1,21 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import GirafeResizableElement from './GirafeResizableElement';
 import MockHelper from '../tools/tests/mockhelper';
+import IGirafeContext from '../tools/context/icontext';
 
 describe('GirafeResizableElement.constructor', () => {
   let resizableElement: GirafeResizableElement;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeResizableElement);
     }
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should initialize dock property to default value (right)', () => {
@@ -46,9 +48,10 @@ describe('GirafeResizableElement.constructor', () => {
 
 describe('GirafeResizableElement.makeResizable', () => {
   let resizableElement: GirafeResizableElement;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeResizableElement);
     }
@@ -64,7 +67,7 @@ describe('GirafeResizableElement.makeResizable', () => {
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should initialize gutter element', () => {
@@ -98,9 +101,10 @@ describe('GirafeResizableElement.makeResizable', () => {
 
 describe('GirafeResizableElement.initSizeLimits', () => {
   let resizableElement: GirafeResizableElement;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
       customElements.define('girafe-test', GirafeResizableElement);
     }
@@ -116,7 +120,7 @@ describe('GirafeResizableElement.initSizeLimits', () => {
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('should initialize min/max based on CSS properties', () => {

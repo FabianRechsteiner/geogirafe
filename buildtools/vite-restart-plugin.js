@@ -2,7 +2,10 @@ const HtmlRebuildPlugin = function () {
   return {
     name: 'girafe-html-rebuild',
     handleHotUpdate({ file, server }) {
-      if (file.includes('src/components/') && (file.endsWith('.html') || file.endsWith('.css'))) {
+      if (
+        (file.includes('src/components/') || file.includes('src/api/')) &&
+        (file.endsWith('.html') || file.endsWith('.css'))
+      ) {
         // Change in component
         server.restart();
       } else if (file.includes('styles/') && !file.endsWith('index.css')) {

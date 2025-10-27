@@ -1,8 +1,6 @@
 import { expect, describe, it, beforeEach, afterAll } from 'vitest';
 import MFPEncoder, { EncodeMapOptions } from './MFPEncoder';
 import MockHelper from '../../../tools/tests/mockhelper';
-import MapManager from '../../../tools/state/mapManager';
-import StateManager from '../../../tools/state/statemanager';
 import GroupLayer from '../../../models/layers/grouplayer';
 import BaseLayer from '../../../models/layers/baselayer';
 import Basemap from '../../../models/basemaps/basemap';
@@ -14,11 +12,13 @@ import {
 } from '../../../tools/tests/layerhelpers';
 import { createOlVectorLayer, createOlWmtsLayer } from '../../../tools/tests/olhelpers';
 import { BaseCustomizer, MFPWmtsLayer } from '@geoblocks/mapfishprint';
+import IGirafeContext from '../../../tools/context/icontext';
 
 describe('MFPEncoder', () => {
   let encoder = new MFPEncoder();
   let encoderAsAny = encoder as any;
   let defaultOptions = {} as any as EncodeMapOptions;
+  let context: IGirafeContext;
 
   const setPartialOptions = (options: Partial<EncodeMapOptions>) => {
     encoder.setOptions({
@@ -28,11 +28,11 @@ describe('MFPEncoder', () => {
   };
 
   beforeEach(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
 
     defaultOptions = {
-      state: StateManager.getInstance().state,
-      mapManager: MapManager.getInstance(),
+      state: context.stateManager.state,
+      mapManager: context.mapManager,
       scale: 10000,
       printResolution: 254,
       dpi: 96,
@@ -42,7 +42,7 @@ describe('MFPEncoder', () => {
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   describe('encodeLayer', () => {
@@ -76,19 +76,22 @@ describe('MFPEncoder', () => {
     });
 
     it('encode the map', () => {
-      StateManager.getInstance().state.layers.layersList = topLevelGroup;
+      context.stateManager.state.layers.layersList = topLevelGroup;
 
       const baseMap = createTestLayerWmts();
       baseMap._olayer = createOlWmtsLayer();
       baseMap.name = 'basemap-below';
-      const activeBasemap = (StateManager.getInstance().state.activeBasemap = new Basemap({ id: 1, name: 'test' }));
+      const activeBasemap = (context.stateManager.state.activeBasemap = new Basemap({
+        id: 1,
+        name: 'test'
+      }));
       activeBasemap.layersList = [baseMap];
 
       const vectorLayer = createOlVectorLayer();
       vectorLayer.set('addToPrintedLayers', true);
-      MapManager.getInstance().getMap().addLayer(vectorLayer);
+      context.mapManager.getMap().addLayer(vectorLayer);
 
-      MapManager.getInstance().getMap().getView().setRotation(Math.PI);
+      context.mapManager.getMap().getView().setRotation(Math.PI);
 
       const result = encoder.encodeMap(encoderAsAny.options);
       expect(result.dpi).toBe(defaultOptions.dpi);
@@ -152,7 +155,7 @@ describe('MFPEncoder', () => {
       layer._olayer = createOlWmtsLayer();
       layer.wmsLayers = 'wms-print-layer';
       const ogcServer = createTestOgcServer();
-      StateManager.getInstance().state.ogcServers = { [ogcServer.name]: ogcServer };
+      context.stateManager.state.ogcServers = { [ogcServer.name]: ogcServer };
       layer.ogcServer = ogcServer;
       const result = encoder.encodeTileWmtsLayer(layer) as MFPWmtsLayer;
       // More test in the dedicated tests suits below.
@@ -169,7 +172,7 @@ describe('MFPEncoder', () => {
 
     it('should correctly encode a WMS layer from a WMTS layer', async () => {
       const ogcServer = createTestOgcServer();
-      StateManager.getInstance().state.ogcServers = { [ogcServer.name]: ogcServer };
+      context.stateManager.state.ogcServers = { [ogcServer.name]: ogcServer };
       const layer = createTestLayerWmts({ printLayers: 'printed-wms-replacing-wmts', opacity: 0.6 }, ogcServer);
       const result = encoder.encodeWmsFromWmtsLayer(layer);
       expect(result).toEqual({

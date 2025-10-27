@@ -1,19 +1,9 @@
-import StateManager from '../state/statemanager';
 import GirafeSingleton from '../../base/GirafeSingleton';
-import ConfigManager from '../configuration/configmanager';
 import GirafeConfig from '../configuration/girafeconfig';
 
 class PluginManager extends GirafeSingleton {
-  stateManager: StateManager;
-  configManager: ConfigManager;
-
-  constructor(type: string) {
-    super(type);
-
-    this.stateManager = StateManager.getInstance();
-    this.configManager = ConfigManager.getInstance();
-
-    this.stateManager.subscribe('oauth.userInfo', () => this.filterPlugins(document));
+  override initializeSingleton() {
+    this.context.stateManager.subscribe('oauth.userInfo', () => this.filterPlugins(document));
     this.filterPlugins(document);
   }
 
@@ -32,7 +22,7 @@ class PluginManager extends GirafeSingleton {
   }
 
   private filterPluginFromConfig(item: Element, configName: keyof GirafeConfig) {
-    if (this.configManager.Config[configName]) {
+    if (this.context.configManager.Config[configName]) {
       item.classList.remove('hidden');
     } else {
       item.classList.add('hidden');
@@ -40,11 +30,11 @@ class PluginManager extends GirafeSingleton {
   }
 
   private filterPlugin(item: Element, pluginName: string) {
-    if (!this.stateManager.state.oauth.userInfo?.functionalities?.authorized_plugins?.includes(pluginName)) {
+    if (this.context.stateManager.state.oauth.userInfo?.functionalities?.authorized_plugins?.includes(pluginName)) {
+      item.classList.remove('hidden');
+    } else {
       // Plugin is not activated for the user
       item.classList.add('hidden');
-    } else {
-      item.classList.remove('hidden');
     }
   }
 }

@@ -1,16 +1,17 @@
 import { expect, it, describe, beforeEach, afterAll } from 'vitest';
 import PrintManager from './PrintManager';
 import MockHelper from '../../../tools/tests/mockhelper';
-import I18nManager from '../../../tools/i18n/i18nmanager';
 import { createPointFeature } from '../../../tools/tests/olhelpers';
+import IGirafeContext from '../../../tools/context/icontext';
 
 describe('PrintManager', () => {
+  let context: IGirafeContext;
   beforeEach(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   describe('getPrintDatasourceFromSelectedFeatures', () => {
@@ -26,11 +27,7 @@ describe('PrintManager', () => {
     });
 
     it('should format the data source for printing based on selected features filtered by the given extent', () => {
-      const result = PrintManager.getPrintDatasourceFromSelectedFeatures(
-        selectedFeatures,
-        extent,
-        I18nManager.getInstance()
-      );
+      const result = PrintManager.getPrintDatasourceFromSelectedFeatures(selectedFeatures, extent, context.i18nManager);
 
       expect(result.length).toBe(2);
       expect(result[0].title).toEqual('vegetationA');

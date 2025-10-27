@@ -2,37 +2,27 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
-import ConfigManager from '../configuration/configmanager';
-import StateManager from '../state/statemanager';
 import ILayerWithLegend from '../../models/layers/ilayerwithlegend';
 import ILayerWithFilter from '../../models/layers/ilayerwithfilter';
 import ThemeLayer from '../../models/layers/themelayer';
 
 class LayerManager extends GirafeSingleton {
-  configManager: ConfigManager;
-  stateManager: StateManager;
-
   private readonly layerClones: BaseLayer[] = [];
   private readonly layerIdToClone: Map<string, BaseLayer> = new Map<string, BaseLayer>();
 
   get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
-  constructor(type: string) {
-    super(type);
-
-    this.configManager = ConfigManager.getInstance();
-    this.stateManager = StateManager.getInstance();
-
-    this.stateManager.subscribe(
+  override initializeSingleton() {
+    this.context.stateManager.subscribe(
       /layers\.layersList\..*\.activeState/,
       (_oldActive: boolean, _newActive: boolean, layer: BaseLayer) => this.onLayerToggled(layer)
     );
-    this.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) =>
+    this.context.stateManager.subscribe('layers.layersList', (oldLayers, newLayers) =>
       this.onLayersListChanged(oldLayers, newLayers)
     );
-    this.stateManager.subscribe(
+    this.context.stateManager.subscribe(
       /layers\.layersList\..*\.children/,
       (oldChildren: BaseLayer[], newChildren: BaseLayer[]) => this.onChildrenListChanged(oldChildren, newChildren)
     );
@@ -120,7 +110,10 @@ class LayerManager extends GirafeSingleton {
       }
     } else if (layer instanceof Layer) {
       // Hide the legend when the layer is deactivated (if configured so)
-      if (this.isLayerWithLegend(layer) && this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated) {
+      if (
+        this.isLayerWithLegend(layer) &&
+        this.context.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated
+      ) {
         if (layer.active) {
           layer.isLegendExpanded = layer.wasLegendExpanded;
         } else {
@@ -168,7 +161,7 @@ class LayerManager extends GirafeSingleton {
     }
 
     if (layer.activeState != newState) {
-      console.log(`Setting Layer ${layer.name} to ${newState}`);
+      console.debug(`Setting Layer ${layer.name} to ${newState}`);
       this.getTreeItem(layer.treeItemId).activeState = newState;
     }
   }
@@ -184,7 +177,7 @@ class LayerManager extends GirafeSingleton {
     }
 
     if (groupOrTheme.activeState != newState) {
-      console.log(`Setting Group ${groupOrTheme.name} to ${newState}`);
+      console.debug(`Setting Group ${groupOrTheme.name} to ${newState}`);
       this.getTreeItem(groupOrTheme.treeItemId).activeState = newState;
     }
   }
@@ -318,7 +311,7 @@ class LayerManager extends GirafeSingleton {
       if (
         layer instanceof Layer &&
         !layer.active &&
-        this.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated &&
+        this.context.configManager.Config.treeview.hideLegendWhenLayerIsDeactivated &&
         this.isLayerWithLegend(layer)
       ) {
         // Hide Legend

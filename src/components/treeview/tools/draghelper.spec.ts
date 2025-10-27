@@ -3,9 +3,12 @@ import GroupLayer from '../../../models/layers/grouplayer';
 import LayerWms from '../../../models/layers/layerwms';
 import { createTestOgcServer } from '../../../tools/tests/layerhelpers';
 import DragHelper from './draghelper';
+import MockHelper from '../../../tools/tests/mockhelper';
 
 describe('DragManager', () => {
   const ogcServer = createTestOgcServer();
+  const context = MockHelper.startMocking();
+  const dragHelper = new DragHelper(context.stateManager);
 
   test('MoveLayerAfter, only layers, very simple case', async () => {
     const group1 = new GroupLayer(1, 'group1', 1);
@@ -14,7 +17,7 @@ describe('DragManager', () => {
     group1.children.push(...[layer11, layer12]);
     layer11.parent = layer12.parent = group1;
 
-    DragHelper.moveLayerAfter(layer11, layer12);
+    dragHelper.moveLayerAfter(layer11, layer12);
 
     expect(group1.order).toBe(1);
     expect(layer11.order).toBe(12);
@@ -31,7 +34,7 @@ describe('DragManager', () => {
     group1.children.push(...[layer11, layer12, layer13, layer14, layer15]);
     layer11.parent = layer12.parent = layer13.parent = layer14.parent = layer15.parent = group1;
 
-    DragHelper.moveLayerAfter(layer11, layer13);
+    dragHelper.moveLayerAfter(layer11, layer13);
 
     expect(group1.order).toBe(1);
     expect(layer12.order).toBe(11);
@@ -51,7 +54,7 @@ describe('DragManager', () => {
     group1.children.push(...[layer11, layer12, layer13, layer14, layer15]);
     layer11.parent = layer12.parent = layer13.parent = layer14.parent = layer15.parent = group1;
 
-    DragHelper.moveLayerAfter(layer11, layer15);
+    dragHelper.moveLayerAfter(layer11, layer15);
 
     expect(group1.order).toBe(1);
     expect(layer12.order).toBe(11);
@@ -71,7 +74,7 @@ describe('DragManager', () => {
     group1.children.push(...[layer11, layer12, layer13, layer14, layer15]);
     layer11.parent = layer12.parent = layer13.parent = layer14.parent = layer15.parent = group1;
 
-    DragHelper.moveLayerAfter(layer13, layer15);
+    dragHelper.moveLayerAfter(layer13, layer15);
 
     expect(group1.order).toBe(1);
     expect(layer11.order).toBe(11);
@@ -88,7 +91,7 @@ describe('DragManager', () => {
     group1.children.push(...[layer11, layer12]);
     layer11.parent = layer12.parent = group1;
 
-    DragHelper.moveLayerBefore(layer12, layer11);
+    dragHelper.moveLayerBefore(layer12, layer11);
 
     expect(group1.order).toBe(1);
     expect(layer11.order).toBe(12);
@@ -105,7 +108,7 @@ describe('DragManager', () => {
     group1.children.push(...[layer11, layer12, layer13, layer14, layer15]);
     layer11.parent = layer12.parent = layer13.parent = layer14.parent = layer15.parent = group1;
 
-    DragHelper.moveLayerBefore(layer13, layer11);
+    dragHelper.moveLayerBefore(layer13, layer11);
 
     expect(group1.order).toBe(1);
     expect(layer13.order).toBe(11);
@@ -125,7 +128,7 @@ describe('DragManager', () => {
     group1.children.push(...[layer11, layer12, layer13, layer14, layer15]);
     layer11.parent = layer12.parent = layer13.parent = layer14.parent = layer15.parent = group1;
 
-    DragHelper.moveLayerBefore(layer15, layer11);
+    dragHelper.moveLayerBefore(layer15, layer11);
 
     expect(group1.order).toBe(1);
     expect(layer15.order).toBe(11);
@@ -145,7 +148,7 @@ describe('DragManager', () => {
     group1.children.push(...[layer11, layer12, layer13, layer14, layer15]);
     layer11.parent = layer12.parent = layer13.parent = layer14.parent = layer15.parent = group1;
 
-    DragHelper.moveLayerBefore(layer15, layer13);
+    dragHelper.moveLayerBefore(layer15, layer13);
 
     expect(group1.order).toBe(1);
     expect(layer11.order).toBe(11);

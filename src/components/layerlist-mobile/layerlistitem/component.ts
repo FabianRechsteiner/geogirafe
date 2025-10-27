@@ -1,6 +1,5 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import type Layer from '../../../models/layers/layer';
-import LayerManager from '../../../tools/layers/layermanager';
 
 export default class LayerListItemMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -13,6 +12,7 @@ export default class LayerListItemMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     // The component needs to wait for the list of layers to be available
     this.subscribe('layers.layersList', (_oldValue: Layer, _newValue: Layer) => {
       const layerId = this.getAttribute('layerid');
@@ -20,7 +20,7 @@ export default class LayerListItemMobile extends GirafeHTMLElement {
         return;
       }
 
-      this.layer = LayerManager.getInstance().getTreeItem(layerId) as Layer;
+      this.layer = this.context.layerManager.getTreeItem(layerId) as Layer;
       this.render();
     });
 
@@ -39,7 +39,7 @@ export default class LayerListItemMobile extends GirafeHTMLElement {
   toggle(state?: 'on' | 'off') {
     if (!this.layer) return;
 
-    LayerManager.getInstance().toggleLayer(this.layer, state);
+    this.context.layerManager.toggleLayer(this.layer, state);
     this.render();
   }
 

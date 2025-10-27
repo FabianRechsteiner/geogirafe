@@ -1,6 +1,5 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 import GirafeConfig from './girafeconfig';
-import UserDataManager from '../userdata/userdatamanager';
 import { getPropertyByPath, mergeObjects } from '../utils/pathUtils';
 
 class ConfigManager extends GirafeSingleton {
@@ -14,6 +13,32 @@ class ConfigManager extends GirafeSingleton {
     return this.config!;
   }
 
+  private getConfigUrls() {
+    /*
+    <meta name="configs" content="main,mobile" />
+    <link rel="config-main-url" href="config.json" />
+    <link rel="config-mobile-url" href="config.mobile.json" />
+    */
+    const configUrls = [];
+    const configNames = document
+      .querySelector('meta[name=configs]')
+      ?.getAttribute('content')
+      ?.split(',')
+      .map((name) => name.trim());
+    if (!configNames) {
+      throw new Error("No configuration names found in 'configs' meta tag.");
+    }
+    for (const configName of configNames) {
+      const configUrl = document.querySelector(`link[rel=config-${configName}-url]`)?.getAttribute('href');
+      if (!configUrl) {
+        throw new Error(`Configuration URL for '${configName}' not found in 'config-${configName}-url' meta tag.`);
+      }
+      configUrls.push(configUrl);
+    }
+
+    return configUrls;
+  }
+
   public async loadConfig(): Promise<GirafeConfig> {
     if (this.loadingPromise) {
       // There's already a promise for loading the configuration
@@ -23,53 +48,44 @@ class ConfigManager extends GirafeSingleton {
 
     if (this.config) {
       // Config was already loaded.
-      // => stop here
       return Promise.resolve(this.config);
     }
 
-    // Load config
-    this.loadingPromise = (async () => {
-      const configNames = document
-        .querySelector('meta[name=configs]')
-        ?.getAttribute('content')
-        ?.split(',')
-        .map((name) => name.trim());
-      if (!configNames) {
-        throw new Error("No configuration names found in 'configs' meta tag.");
-      }
-      let jsonConfig = {};
-      for (const configName of configNames) {
-        const configUrl = document.querySelector(`link[rel=config-${configName}-url]`)?.getAttribute('href');
-        if (!configUrl) {
-          throw new Error(`Configuration URL for '${configName}' not found in 'config-${configName}-url' meta tag.`);
-        }
-        try {
-          const response = await fetch(configUrl);
-          const newJsonConfig = await response.json();
-          jsonConfig = this.mergeConfigs(jsonConfig, newJsonConfig);
-        } catch {
-          // TODO REG: Manage better the errors at the aplication start:
-          // - the window.gAlert fuction should be callable at the very beggining of the app
-          // - The ErrorManager should handled suches case, but it seems to be initialized too late.
-          // - normal alerts seems to be blocked on mobile.
-          const errorMessage = `Error while reading the configuration file ${configUrl}. Please verify your configuration.`;
-          window.alert(errorMessage);
-          throw new Error(errorMessage);
-        }
-      }
-      // Create a backup of the default config before applying overrides
-      this.defaultConfig = new GirafeConfig(structuredClone(jsonConfig as GirafeConfig));
-
-      // Load config overrides and merge them with the default config
-      const configOverrides = this.getConfigOverrides(this.defaultConfig.userdata.source);
-      jsonConfig = this.mergeConfigs(jsonConfig, configOverrides);
-
-      this.config = new GirafeConfig(jsonConfig as GirafeConfig);
-      console.log('Application Configuration loaded.');
-      return this.config;
-    })();
-
+    this.loadingPromise = this.doLoadConfig();
     return this.loadingPromise;
+  }
+
+  private async doLoadConfig(): Promise<GirafeConfig> {
+    // Load config
+    const configUrls = this.getConfigUrls();
+    let jsonConfig = {};
+
+    for (const configUrl of configUrls) {
+      try {
+        const response = await fetch(configUrl);
+        const newJsonConfig = await response.json();
+        jsonConfig = this.mergeConfigs(jsonConfig, newJsonConfig);
+      } catch {
+        // TODO REG: Manage better the errors at the aplication start:
+        // - the window.gAlert fuction should be callable at the very beggining of the app
+        // - The ErrorManager should handled suches case, but it seems to be initialized too late.
+        // - normal alerts seems to be blocked on mobile.
+        const errorMessage = `Error while reading the configuration file ${configUrl}. Please verify your configuration.`;
+        window.alert(errorMessage);
+        throw new Error(errorMessage);
+      }
+    }
+
+    // Create a backup of the default config before applying overrides
+    this.defaultConfig = new GirafeConfig(structuredClone(jsonConfig as GirafeConfig));
+
+    // Load config overrides and merge them with the default config
+    const configOverrides = this.getConfigOverrides(this.defaultConfig.userdata.source);
+    jsonConfig = this.mergeConfigs(jsonConfig, configOverrides);
+
+    this.config = new GirafeConfig(jsonConfig as GirafeConfig);
+    console.log('Application Configuration loaded.');
+    return this.config;
   }
 
   /**
@@ -84,10 +100,9 @@ class ConfigManager extends GirafeSingleton {
    * @param userDataSource The source of user data.
    */
   private getConfigOverrides(userDataSource: string) {
-    const userDataManager = UserDataManager.getInstance();
     // Set the user data source first before requesting config overrides from the userDataManager
-    userDataManager.setSource(userDataSource);
-    return (userDataManager.getUserData(this.storagePathForOverrides) as Record<string, unknown>) || {};
+    this.context.userDataManager.setSource(userDataSource);
+    return (this.context.userDataManager.getUserData(this.storagePathForOverrides) as Record<string, unknown>) || {};
   }
 
   /**

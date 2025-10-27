@@ -1,6 +1,5 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
-import MapManager from '../../../tools/state/mapManager';
-import { Map, Overlay } from 'ol';
+import { Overlay } from 'ol';
 import MapPosition from '../../../tools/state/mapposition';
 import areEqual from '../../../tools/state/brain/equality';
 
@@ -8,22 +7,16 @@ class MapCustomContextMenuComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../../styles/common.css', '../mapcontextmenu.css'];
 
-  private readonly map: Map;
+  private get map() {
+    return this.context.mapManager.getMap();
+  }
+
   // We use a static property for the overlay
   // Because OpenLayer is recreating a new object each time when we do an addOverlay()
   private static contextMenuOverlay: Overlay;
 
   constructor() {
     super('custom-map-context-menu');
-    this.map = MapManager.getInstance().getMap();
-
-    if (!MapCustomContextMenuComponent.contextMenuOverlay) {
-      MapCustomContextMenuComponent.contextMenuOverlay = new Overlay({
-        element: this,
-        autoPan: { animation: { duration: 250 } }
-      });
-      this.map.addOverlay(MapCustomContextMenuComponent.contextMenuOverlay);
-    }
   }
 
   render() {
@@ -52,9 +45,16 @@ class MapCustomContextMenuComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    if (!MapCustomContextMenuComponent.contextMenuOverlay) {
+      MapCustomContextMenuComponent.contextMenuOverlay = new Overlay({
+        element: this,
+        autoPan: { animation: { duration: 250 } }
+      });
+      this.map.addOverlay(MapCustomContextMenuComponent.contextMenuOverlay);
+    }
+
+    this.registerEvents();
   }
 }
 

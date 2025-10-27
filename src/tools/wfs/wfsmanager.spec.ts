@@ -1,18 +1,19 @@
 import { it, expect, describe, vi } from 'vitest';
 
-import WfsManager from './wfsmanager';
 import { mockOgcServers, mockWmsLayers } from '../tests/wmswfsmanagermocking';
 import { WfsClientMapServer, WfsClientQgis } from './wfsclient';
 import MockHelper from '../tests/mockhelper';
+import IGirafeContext from '../context/icontext';
 import OlFeature from 'ol/Feature';
+import WfsManager from './wfsmanager';
 
 const fetchMock = vi.fn();
 global.fetch = fetchMock;
+let context: IGirafeContext;
 
-describe('WFS Manager tests', () => {
-  MockHelper.startMocking();
-
-  const wfsManager = WfsManager.getInstance();
+describe('WMS Manager tests', () => {
+  context = MockHelper.startMocking();
+  const wfsManager = context.wfsManager;
 
   // QGIS OgcServers
   const ogcServerQg1 = mockOgcServers['QGIS-1-has-wfs'];
@@ -57,7 +58,7 @@ describe('WFS Manager tests', () => {
     });
   });
 
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 describe('WfsManager.extractFeatureTypeFromId', () => {

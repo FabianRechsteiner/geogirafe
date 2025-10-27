@@ -1,16 +1,16 @@
 import Basemap from '../../../models/basemaps/basemap';
+import IGirafeContext from '../../context/icontext';
 import { IBrainSerializer } from '../../state/brain/serialize';
-import StateManager from '../../state/statemanager';
 
 export default class BasemapSerializer implements IBrainSerializer<Basemap> {
-  private readonly stateManager: StateManager;
+  private readonly context: IGirafeContext;
 
-  constructor() {
-    this.stateManager = StateManager.getInstance();
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public brainSerialize(basemap: Basemap): string {

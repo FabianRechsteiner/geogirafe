@@ -5,7 +5,6 @@ import type OlFeature from 'ol/Feature';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionTabulatorManager, { type TabHeader } from './tools/selectiontabulatormanager';
 import CsvManager from '../../tools/export/csvmanager';
-import MapManager from '../../tools/state/mapManager';
 
 /**
  * Represents a selection grid component based on GridJs.
@@ -18,9 +17,8 @@ class SelectionGridComponent extends GirafeResizableElement {
   styleUrls = ['../../styles/common.css', './style.css'];
 
   private readonly eventsCallbacks: Callback[] = [];
-  private readonly selectionTabulatorManager = new SelectionTabulatorManager();
-  private readonly csvManager: CsvManager;
-  private readonly mapManager: MapManager;
+  private selectionTabulatorManager!: SelectionTabulatorManager;
+  private csvManager!: CsvManager;
   private isVisibleComponentSetup = false;
   private readonly debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
   visible = false;
@@ -29,8 +27,12 @@ class SelectionGridComponent extends GirafeResizableElement {
 
   constructor() {
     super('selectiongrid');
-    this.csvManager = CsvManager.getInstance();
-    this.mapManager = MapManager.getInstance();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.csvManager = new CsvManager(this.context);
+    this.selectionTabulatorManager = new SelectionTabulatorManager(this.context);
 
     this.subscribe('selection.gridSelected', (_oldValue: boolean, newValue: boolean) => {
       this.showCsvButton = newValue;
@@ -44,9 +46,7 @@ class SelectionGridComponent extends GirafeResizableElement {
     this.addEventListener('resize-end', () => {
       this.selectionTabulatorManager.restoreRedraw();
     });
-  }
 
-  connectedCallback() {
     this.render();
     this.registerVisibilityEvents();
   }
@@ -129,7 +129,7 @@ class SelectionGridComponent extends GirafeResizableElement {
         olExtent.extend(extent, geometry.getExtent());
       }
     });
-    this.mapManager.getMap().getView().fit(extent, { duration: 300 });
+    this.context.mapManager.getMap().getView().fit(extent, { duration: 300 });
   }
 
   /**

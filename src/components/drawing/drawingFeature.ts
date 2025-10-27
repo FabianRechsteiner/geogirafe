@@ -1,5 +1,3 @@
-import ConfigManager from '../../tools/configuration/configmanager';
-import StateManager from '../../tools/state/statemanager';
 import { v4 as uuidv4 } from 'uuid';
 import { Fill, RegularShape, Stroke, Style } from 'ol/style';
 import { toRadians } from 'ol/math';
@@ -7,6 +5,7 @@ import type { IBrainSerializable } from '../../tools/state/brain/decorators';
 import type { Circle as CircleGeom, Geometry } from 'ol/geom';
 import type Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
+import IGirafeContext from '../../tools/context/icontext';
 
 export enum DrawingShape {
   Point,
@@ -17,33 +16,6 @@ export enum DrawingShape {
   Disk,
   FreehandPolyline,
   FreehandPolygon
-}
-
-/**
- * Finds an name composed of the shape type and a number.
- * The number starts from how many shape of the same type type are already in the state +1.
- * Then checks if such candidate name already exists and increments if so.
- * @param geometryTypename
- * @returns
- */
-export function getDefaultName(geometryTypename: string): string {
-  const shapeTypeId = DrawingShape[geometryTypename as keyof typeof DrawingShape];
-  const drawingFeaturesSameType = (
-    StateManager.getInstance().state.extendedState.drawing as DrawingState
-  ).features.filter((feat) => feat.type === shapeTypeId);
-
-  const existingNames = drawingFeaturesSameType.map((f) => f.name.toLowerCase().trim());
-  let counter = existingNames.length + 1;
-
-  while (true) {
-    const nameCandidate = `${geometryTypename} ${counter}`;
-
-    if (existingNames.includes(nameCandidate.toLowerCase())) {
-      counter++;
-    } else {
-      return nameCandidate;
-    }
-  }
 }
 
 export type ArrowStyle = 'none' | 'start' | 'end' | 'both';
@@ -94,21 +66,24 @@ export default class DrawingFeature {
   private _displayMeasure = true;
   private _selected = false;
 
-  geojson: object;
+  public geojson: object = {};
   id: string = uuidv4();
   onChange: (f: DrawingFeature) => void = () => {};
 
-  constructor(tool: DrawingShape, geojson: object = {}, name: string | null = null) {
-    const defaultConfig = ConfigManager.getInstance().Config.drawing;
+  private readonly drawingState: DrawingState;
+  private readonly defaultDrawingConfig: any;
+
+  constructor(tool: DrawingShape, drawingState: DrawingState, drawingConfig: any) {
+    this.defaultDrawingConfig = drawingConfig;
+    this.drawingState = drawingState;
     this._tool = tool;
-    this._name = name ?? getDefaultName(DrawingShape[tool]);
-    this._strokeColor = defaultConfig.defaultStrokeColor;
-    this._strokeWidth = defaultConfig.defaultStrokeWidth;
-    this._fillColor = defaultConfig.defaultFillColor;
-    this._nameFontSize = defaultConfig.defaultTextSize;
-    this._measureFontSize = defaultConfig.defaultTextSize;
-    this._font = defaultConfig.defaultFont;
-    this.geojson = geojson;
+    this._name = this.getDefaultName(DrawingShape[tool]);
+    this._strokeColor = this.defaultDrawingConfig.defaultStrokeColor;
+    this._strokeWidth = this.defaultDrawingConfig.defaultStrokeWidth;
+    this._fillColor = this.defaultDrawingConfig.defaultFillColor;
+    this._nameFontSize = this.defaultDrawingConfig.defaultTextSize;
+    this._measureFontSize = this.defaultDrawingConfig.defaultTextSize;
+    this._font = this.defaultDrawingConfig.defaultFont;
     this._nameColor = '#000000';
     this._measureColor = '#000000';
   }
@@ -239,7 +214,7 @@ export default class DrawingFeature {
   }
 
   addToState() {
-    (StateManager.getInstance().state.extendedState.drawing as DrawingState).features.push(this);
+    this.drawingState.features.push(this);
   }
 
   serialize(): SerializedFeature {
@@ -298,7 +273,7 @@ export default class DrawingFeature {
   }
 
   getVertexStyle(activeNode = false): Style {
-    const defaultConfig = ConfigManager.getInstance().Config.drawing;
+    const defaultConfig = this.defaultDrawingConfig;
     return new Style({
       zIndex: 1002,
       image: new RegularShape({
@@ -317,10 +292,16 @@ export default class DrawingFeature {
     });
   }
 
-  static deserialize(serializedFeature: SerializedFeature) {
+  static deserialize(serializedFeature: SerializedFeature, context: IGirafeContext) {
     console.log(serializedFeature);
 
-    const newFeature = new DrawingFeature(serializedFeature.t, serializedFeature.g, serializedFeature.n);
+    const newFeature = new DrawingFeature(
+      serializedFeature.t,
+      context.stateManager.state.extendedState.drawing as DrawingState,
+      context.configManager.Config.drawing
+    );
+    newFeature.geojson = serializedFeature.g;
+    newFeature.name = serializedFeature.n;
     newFeature.strokeColor = serializedFeature.sc;
     newFeature.strokeWidth = serializedFeature.sw;
     newFeature.lineStroke = serializedFeature.ls as LineStroke;
@@ -361,5 +342,30 @@ export default class DrawingFeature {
       };
     }
     return JSON.parse(new GeoJSON().writeFeature(olFeature));
+  }
+
+  /**
+   * Finds an name composed of the shape type and a number.
+   * The number starts from how many shape of the same type type are already in the state +1.
+   * Then checks if such candidate name already exists and increments if so.
+   * @param geometryTypename
+   * @returns
+   */
+  private getDefaultName(geometryTypename: string): string {
+    const shapeTypeId = DrawingShape[geometryTypename as keyof typeof DrawingShape];
+    const drawingFeaturesSameType = this.drawingState.features.filter((feat) => feat.type === shapeTypeId);
+
+    const existingNames = drawingFeaturesSameType.map((f) => f.name.toLowerCase().trim());
+    let counter = existingNames.length + 1;
+
+    while (true) {
+      const nameCandidate = `${geometryTypename} ${counter}`;
+
+      if (existingNames.includes(nameCandidate.toLowerCase())) {
+        counter++;
+      } else {
+        return nameCandidate;
+      }
+    }
   }
 }

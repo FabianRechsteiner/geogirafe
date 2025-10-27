@@ -1,6 +1,5 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import BaseLayer from '../../../models/layers/baselayer';
-import LayerManager from '../../../tools/layers/layermanager';
 import DragManager from './dragmanager';
 import { isTimeAwareLayer, TimeAwareLayer } from '../../../models/layers/timeawarelayer';
 import { isSnappableLayer } from '../../../models/layers/snappablelayer';
@@ -10,8 +9,7 @@ import LayerWms from '../../../models/layers/layerwms';
 import Layer from '../../../models/layers/layer';
 
 export default abstract class TreeViewElement extends GirafeHTMLElement {
-  private readonly dragManager: DragManager;
-  protected layerManager: LayerManager;
+  private dragManager!: DragManager;
   protected layer: BaseLayer;
 
   private dragButton!: HTMLButtonElement;
@@ -20,8 +18,11 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
   constructor(layer: BaseLayer, name: string) {
     super(name);
     this.layer = layer;
-    this.layerManager = LayerManager.getInstance();
-    this.dragManager = DragManager.getInstance();
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.dragManager = this.context.dragManager;
   }
 
   public render() {

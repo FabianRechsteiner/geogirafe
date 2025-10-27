@@ -8,13 +8,18 @@ import { formatCoordinates } from '../../../tools/geometrytools';
  * Generates HTML string containing icons based on the provided geometry.
  */
 export default class FormatGridGeomValue {
-  private locale: string = '';
+  private readonly locale: string;
+  private readonly projection: string;
+
+  constructor(locale: string, projection: string) {
+    this.locale = locale;
+    this.projection = projection;
+  }
 
   /**
    * @returns The generated HTML string containing the icons, based on the provided geometry.
    */
-  getGeometryIcons(geometry: OlGeomGeometry, locale: string): string | undefined {
-    this.locale = locale;
+  public getGeometryIcons(geometry: OlGeomGeometry): string | undefined {
     const info = this.getGeometryIconsInfo(geometry);
     if (!info[0]) {
       return;
@@ -86,9 +91,11 @@ export default class FormatGridGeomValue {
     let icons = '<img alt="polyline icon" src="icons/polyline.svg" />';
     let geoLength;
     if (geometry instanceof MultiLineString) {
-      geoLength = geometry.getLineStrings().reduce((length, line) => length + getDistance(line.getCoordinates()), 0);
+      geoLength = geometry
+        .getLineStrings()
+        .reduce((length, line) => length + getDistance(line.getCoordinates(), this.projection), 0);
     } else {
-      geoLength = getDistance(geometry.getCoordinates());
+      geoLength = getDistance(geometry.getCoordinates(), this.projection);
     }
     const length = (Math.round(geoLength * 100) / 100).toLocaleString(this.locale, {
       minimumFractionDigits: 2
@@ -106,9 +113,11 @@ export default class FormatGridGeomValue {
     let icons = '<img alt="polygon icon" src="icons/polygon.svg" />';
     let geoArea = 0;
     if (geometry instanceof MultiPolygon) {
-      geometry.getPolygons().forEach((polygon) => (geoArea += getArea(polygon)));
+      for (const polygon of geometry.getPolygons()) {
+        geoArea += getArea(polygon, this.projection);
+      }
     } else {
-      geoArea = getArea(geometry);
+      geoArea = getArea(geometry, this.projection);
     }
     const area = (Math.round(geoArea * 100) / 100).toLocaleString(this.locale, { minimumFractionDigits: 2 });
     icons += `<span>${area}&nbsp;m<sup>2</sup></span>`;

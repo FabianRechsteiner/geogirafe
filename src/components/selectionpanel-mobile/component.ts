@@ -62,6 +62,7 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
     this.subscribe('interface.swipeupPanelContent', this.render.bind(this));
     this.subscribe('interface.selectionComponentVisible', this.debounceOnAdjustVisible.bind(this));

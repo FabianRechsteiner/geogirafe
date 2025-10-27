@@ -2,27 +2,31 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createTestOgcServer } from '../../../tools/tests/layerhelpers';
 import GroupLayer from '../../../models/layers/grouplayer';
 import LayerWms from '../../../models/layers/layerwms';
-import { filterLayerTree, prepareTreeItemForSearch } from './treeviewfilter';
+import TreeViewFilterHelper from './treeviewfilter';
 import MockHelper from '../../../tools/tests/mockhelper';
 import ServerOgc from '../../../models/serverogc';
 import ThemeLayer from '../../../models/layers/themelayer';
 import LayerManager from '../../../tools/layers/layermanager';
+import IGirafeContext from '../../../tools/context/icontext';
 
 describe('treeviewfilter.filterLayerTree', () => {
   let ogcServer: ServerOgc;
   let layerManager: LayerManager;
+  let context: IGirafeContext;
+  let treeviewFilterHelper: TreeViewFilterHelper;
 
   beforeEach(() => {
     ogcServer = createTestOgcServer();
   });
 
   beforeAll(() => {
-    MockHelper.startMocking();
-    layerManager = LayerManager.getInstance();
+    context = MockHelper.startMocking();
+    layerManager = context.layerManager;
+    treeviewFilterHelper = new TreeViewFilterHelper(context);
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('filters items correctly if the search term is at the beginning of the layer name', () => {
@@ -31,7 +35,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     const layer3 = new LayerWms(3, 'abc-def', 3, ogcServer);
     const layerTree = [layer1, layer2, layer3];
 
-    filterLayerTree(layerTree, 'abc');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'abc');
 
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
@@ -45,7 +49,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     const layer4 = new LayerWms(3, 'def abc', 3, ogcServer);
     const layerTree = [layer1, layer2, layer3, layer4];
 
-    filterLayerTree(layerTree, 'abc');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'abc');
 
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
@@ -59,7 +63,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     const layer4 = new LayerWms(3, 'def_abc', 3, ogcServer);
     const layerTree = [layer1, layer2, layer3, layer4];
 
-    filterLayerTree(layerTree, '_');
+    treeviewFilterHelper.filterLayerTree(layerTree, '_');
 
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
@@ -72,7 +76,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     const layer3 = new LayerWms(3, '_abc42def', 3, ogcServer);
     const layerTree = [layer1, layer2, layer3];
 
-    filterLayerTree(layerTree, '42');
+    treeviewFilterHelper.filterLayerTree(layerTree, '42');
 
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
@@ -90,7 +94,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     group2.parent = group1;
     const layerTree = [group1];
 
-    filterLayerTree(layerTree, 'ent');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'ent');
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
     expect(flatLayerTree.find((l) => l.name === 'Gewässer')?.isVisible).toBe(true);
@@ -99,11 +103,11 @@ describe('treeviewfilter.filterLayerTree', () => {
     expect(flatLayerTree.find((l) => l.name === 'Rückgabestellen')?.isVisible).toBe(false);
 
     // Add a letter to the search term - every layer is filtered out
-    filterLayerTree(layerTree, 'entd');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'entd');
     expect(flatLayerTree.every((l) => l.isVisible)).toBe(false);
 
     // Go back to search term from before and make sure it filters the same layers
-    filterLayerTree(layerTree, 'ent');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'ent');
     expect(flatLayerTree.find((l) => l.name === 'Gewässer')?.isVisible).toBe(true);
     expect(flatLayerTree.find((l) => l.name === 'Grundwassernutzung')?.isVisible).toBe(true);
     expect(flatLayerTree.find((l) => l.name === 'Entnahmestellen')?.isVisible).toBe(true);
@@ -115,7 +119,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     const layer12 = new LayerWms(12, 'houses', 12, ogcServer);
     const layerTree = [layer11, layer12];
 
-    filterLayerTree(layerTree, 'trees');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'trees');
 
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
@@ -134,7 +138,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     group2.parent = group1;
     const layerTree = [group1];
 
-    filterLayerTree(layerTree, 'trees');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'trees');
 
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
@@ -155,7 +159,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     group2.parent = group1;
     const layerTree = [group1];
 
-    filterLayerTree(layerTree, 'coverage');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'coverage');
 
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
@@ -180,7 +184,7 @@ describe('treeviewfilter.filterLayerTree', () => {
     theme1.children.push(...[group2]);
     const layerTree = [theme1, layer4];
 
-    filterLayerTree(layerTree, 'map');
+    treeviewFilterHelper.filterLayerTree(layerTree, 'map');
 
     const flatLayerTree = layerManager.getFlattenedLayerTree(layerTree);
 
@@ -210,14 +214,18 @@ describe('treeviewfilter.prepareTreeItemForSearch', () => {
   theme1.children.push(...[group2]);
   const layerTree = [theme1, layer4];
   let preparedLayers: { name: string; idList: string[] }[];
+  let context: IGirafeContext;
+  let treeviewFilterHelper: TreeViewFilterHelper;
 
   beforeAll(() => {
-    MockHelper.startMocking();
-    preparedLayers = layerTree.flatMap((layer) => prepareTreeItemForSearch(layer));
+    context = MockHelper.startMocking();
+    treeviewFilterHelper = new TreeViewFilterHelper(context);
+    // @ts-ignore
+    preparedLayers = layerTree.flatMap((layer) => treeviewFilterHelper.prepareTreeItemForSearch(layer));
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('collects item ids of parents', () => {

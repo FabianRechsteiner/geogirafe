@@ -1,5 +1,4 @@
 import LZString from 'lz-string';
-import StateManager from '../state/statemanager';
 import Basemap from '../../models/basemaps/basemap';
 import MapPositionSerializer from './serializers/mappositionserializer';
 import MapPosition from '../state/mapposition';
@@ -14,20 +13,14 @@ import ObjectSelection from '../state/objectselection';
 import InterfaceSerializer from './serializers/interfaceserializer';
 
 class StateSerializer extends GirafeSingleton {
-  stateManager: StateManager;
-  private readonly brainSerializer: BrainSerializer<State | ExtendedState>;
+  private readonly brainSerializer = new BrainSerializer<State | ExtendedState>();
 
-  constructor(type: string) {
-    super(type);
-
-    this.stateManager = StateManager.getInstance();
-    this.brainSerializer = new BrainSerializer<State | ExtendedState>();
-
-    this.addSerializer(Basemap, new BasemapSerializer());
-    this.addSerializer(MapPosition, new MapPositionSerializer());
-    this.addSerializer(LayersConfig, new LayersConfigSerializer());
-    this.addSerializer(ObjectSelection, new SelectionSerializer());
-    this.addSerializer(GraphicalInterface, new InterfaceSerializer());
+  override initializeSingleton() {
+    this.addSerializer(Basemap, new BasemapSerializer(this.context));
+    this.addSerializer(MapPosition, new MapPositionSerializer(this.context));
+    this.addSerializer(LayersConfig, new LayersConfigSerializer(this.context));
+    this.addSerializer(ObjectSelection, new SelectionSerializer(this.context));
+    this.addSerializer(GraphicalInterface, new InterfaceSerializer(this.context));
   }
 
   public addSerializer(type: Constructor<object>, serializerData: IBrainSerializer<object>): void {
@@ -53,9 +46,9 @@ class StateSerializer extends GirafeSingleton {
   }
 
   private serialize(): string {
-    const currentState = this.stateManager.state;
+    const currentState = this.context.stateManager.state;
     const serializedState = this.brainSerializer.serialize(currentState);
-    const serializedExtendedState = this.brainSerializer.serialize(this.stateManager.state.extendedState);
+    const serializedExtendedState = this.brainSerializer.serialize(this.context.stateManager.state.extendedState);
 
     const compressedState = LZString.compressToBase64(serializedState);
     const compressedExtendedState = LZString.compressToBase64(serializedExtendedState);
@@ -75,10 +68,10 @@ class StateSerializer extends GirafeSingleton {
     const serializedState = LZString.decompressFromBase64(compressedState);
     const serializedExtendedState = LZString.decompressFromBase64(compressedExtendedState);
 
-    this.stateManager.batchChanges(() => {
-      this.brainSerializer.deserialize(serializedState, this.stateManager.state);
+    this.context.stateManager.batchChanges(() => {
+      this.brainSerializer.deserialize(serializedState, this.context.stateManager.state);
       if (serializedExtendedState) {
-        this.brainSerializer.deserialize(serializedExtendedState, this.stateManager.state.extendedState);
+        this.brainSerializer.deserialize(serializedExtendedState, this.context.stateManager.state.extendedState);
       }
     });
   }

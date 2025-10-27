@@ -56,7 +56,7 @@
             id="layer-search-field"
             class="gg-input clearable-input-field"
             type="text"
-            placeholder="${this.i18nManager.getTranslation('Filter external layers...')}"
+            placeholder="${this.context.i18nManager.getTranslation('Filter external layers...')}"
             i18n="Filter external layers..."
             autocomplete="off"
             autocorrect="off"
@@ -73,7 +73,7 @@
         <div class="filter-buttons">
           <span>
             ${Object.values(this.selectedLayers).filter(selected => selected).length.toString()}
-            ${this.i18nManager.getTranslation('layers selected')}
+            ${this.context.i18nManager.getTranslation('layers selected')}
           </span>
           <button class="gg-button" tip="Select all filtered layers" onclick="${() => this.selectVisible()}">+</button>
           <button class="gg-button" tip="Unselect all filtered layers" onclick="${() => this.deselectVisible()}">

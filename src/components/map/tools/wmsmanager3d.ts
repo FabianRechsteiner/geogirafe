@@ -1,22 +1,18 @@
 import LayerWms from '../../../models/layers/layerwms';
-import StateManager from '../../../tools/state/statemanager';
 import SelectionParam from '../../../models/selectionparam';
-import LayerManager from '../../../tools/layers/layermanager';
 import { Scene as CesiumScene, WebMapServiceImageryProvider, ImageryLayer } from 'cesium';
-import ConfigManager from '../../../tools/configuration/configmanager';
+import IGirafeContext from '../../../tools/context/icontext';
 
 export default class WmsManager3d {
-  layerManager: LayerManager;
+  private readonly context: IGirafeContext;
   map3d: CesiumScene;
   baseLayers: ImageryLayer[] = [];
   // Group maps from the same server into one ImageryLayer
   layersRecord: Record<string, { layers: LayerWms; imagery: ImageryLayer }[]> = {};
-  configManager: ConfigManager;
 
-  constructor(map3d: CesiumScene) {
+  constructor(map3d: CesiumScene, context: IGirafeContext) {
     this.map3d = map3d;
-    this.layerManager = LayerManager.getInstance();
-    this.configManager = ConfigManager.getInstance();
+    this.context = context;
   }
 
   removeAllBasemapLayers() {
@@ -91,7 +87,7 @@ export default class WmsManager3d {
   }
 
   selectFeatures(extent: number[]) {
-    const state = StateManager.getInstance().state;
+    const state = this.context.stateManager.state;
     const selectionParams: SelectionParam[] = [];
 
     for (const key in this.layersRecord) {

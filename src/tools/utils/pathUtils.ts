@@ -16,7 +16,7 @@ export const getPropertyByPath = (obj: any, path: string) => {
       if (escapedKey === '') {
         continue;
       }
-      if (escapedKey in currentObj) {
+      if (currentObj && escapedKey in currentObj) {
         parentObject = currentObj;
         lastKey = escapedKey;
         currentObj = currentObj[escapedKey];

@@ -1,14 +1,16 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import ITimeOptions from '../../../tools/time/itimeoptions';
 import LayerTimeFormatter from '../../../tools/time/layertimeformatter';
 import TimeSliderComponent from './component';
 import MockHelper from '../../../tools/tests/mockhelper';
+import IGirafeContext from '../../../tools/context/icontext';
 
 const MIN_DATE = '1900-01-01T00:00:00.000Z';
 const MAX_DATE = '2100-01-01T00:00:00.000Z';
 
 describe('componentComponent', () => {
   let component: TimeSliderComponent;
+  let context: IGirafeContext;
   const defaultOptions: ITimeOptions = {
     minValue: MIN_DATE,
     maxValue: MAX_DATE,
@@ -21,11 +23,15 @@ describe('componentComponent', () => {
   };
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
     if (!customElements.get('girafe-time-slider')) {
       customElements.define('girafe-time-slider', TimeSliderComponent);
     }
     component = new TimeSliderComponent();
+  });
+
+  afterAll(() => {
+    MockHelper.stopMocking(context);
   });
 
   describe('dateStringToSliderPosition', () => {

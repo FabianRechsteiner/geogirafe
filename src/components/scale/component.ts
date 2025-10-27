@@ -8,12 +8,6 @@ class ScaleComponent extends GirafeHTMLElement {
     super('scale');
   }
 
-  render() {
-    this.configManager.loadConfig().then(() => {
-      super.render();
-    });
-  }
-
   registerEvents() {
     this.subscribe('position', () => this.onScaleChanged());
   }
@@ -25,18 +19,17 @@ class ScaleComponent extends GirafeHTMLElement {
   getFormatedScale(scale?: number) {
     const scaleToFormat = scale ?? this.state.position.scale;
     if (scaleToFormat) {
-      return '1:' + Math.floor(scaleToFormat).toLocaleString(this.configManager.Config.general.locale);
+      return '1:' + Math.floor(scaleToFormat).toLocaleString(this.context.configManager.Config.general.locale);
     }
 
     return 'No scale';
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    super.render();
+    super.girafeTranslate();
+    this.registerEvents();
   }
 }
 

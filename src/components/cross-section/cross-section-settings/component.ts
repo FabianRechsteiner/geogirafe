@@ -11,9 +11,6 @@ import type { Callback } from '../../../tools/state/statemanager';
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import { CrossSectionState } from '../crosssectionstate';
 import { download } from '../../../tools/export/download';
-import MapManager from '../../../tools/state/mapManager';
-import I18nManager from '../../../tools/i18n/i18nmanager';
-import Map from 'ol/Map';
 import { Circle, Icon, Fill, Stroke, Style, Text } from 'ol/style.js';
 import VectorSource, { VectorSourceEvent } from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -44,12 +41,15 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['./style.css', '../../../styles/common.css'];
 
-  crossSectionState: CrossSectionState;
-  i18nManager: I18nManager;
+  crossSectionState!: CrossSectionState;
   private readonly eventsCallbacks: Callback[] = [];
   darkFrontendMode: boolean = false;
   visible: boolean = false;
-  private readonly map: Map;
+
+  private get map() {
+    return this.context.mapManager.getMap();
+  }
+
   linestring!: Feature<LineString>;
   linestringSource!: VectorSource<Feature<Geometry>>;
   linesLayer!: VectorLayer<VectorSource<Feature<Geometry>>>;
@@ -108,24 +108,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
   constructor() {
     super('cross-section-settings');
-    this.state.extendedState.crossSection = new CrossSectionState();
-    this.crossSectionState = this.state.extendedState.crossSection as CrossSectionState;
-    this.i18nManager = I18nManager.getInstance();
-    this.map = MapManager.getInstance().getMap();
-
-    // Initialize JSTS parser
-    this.parser.inject(
-      Point,
-      LineString,
-      LinearRing,
-      Polygon,
-      MultiPoint,
-      MultiLineString,
-      MultiPolygon,
-      GeometryCollection
-    );
-
-    this.initializeMapElements();
   }
 
   private initializeMapElements(): void {
@@ -380,7 +362,10 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
     if (this.crossSectionState.linestringCoordinates.length >= 2) {
       this.linestring!.getGeometry()!.setCoordinates(this.crossSectionState.linestringCoordinates);
-      this.linestringLength = getDistance(this.linestring!.getGeometry()!.getCoordinates());
+      this.linestringLength = getDistance(
+        this.linestring!.getGeometry()!.getCoordinates(),
+        this.context.stateManager.state.projection
+      );
       this.drawDomainLinestring();
       this.drawLinestringBuffer();
     } else {
@@ -404,7 +389,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       return;
     }
 
-    const linestringLength = getDistance(geometry.getCoordinates());
+    const linestringLength = getDistance(geometry.getCoordinates(), this.context.stateManager.state.projection);
 
     // Get map coordinates of profile domain extent
     const fStart = Math.max(0.0, this.crossSectionState.domain.xmin / linestringLength);
@@ -454,10 +439,10 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
       const intersects = segment.intersectsCoordinate(coord);
 
       if (intersects) {
-        distance += getDistance([p1, coord]);
+        distance += getDistance([p1, coord], this.context.stateManager.state.projection);
         break;
       }
-      distance += getDistance([p1, p2]);
+      distance += getDistance([p1, p2], this.context.stateManager.state.projection);
     }
 
     return distance;
@@ -1185,11 +1170,26 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
   }
 
   connectedCallback(): void {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-      this.registerVisibilityEvents();
-    });
+    super.connectedCallback();
+    this.state.extendedState.crossSection = new CrossSectionState();
+    this.crossSectionState = this.state.extendedState.crossSection as CrossSectionState;
+
+    // Initialize JSTS parser
+    this.parser.inject(
+      Point,
+      LineString,
+      LinearRing,
+      Polygon,
+      MultiPoint,
+      MultiLineString,
+      MultiPolygon,
+      GeometryCollection
+    );
+
+    this.initializeMapElements();
+    this.render();
+    super.girafeTranslate();
+    this.registerVisibilityEvents();
   }
 }
 

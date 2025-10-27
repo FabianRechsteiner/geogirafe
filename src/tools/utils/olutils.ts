@@ -9,7 +9,6 @@ import { getDistance as getSphericalDistance, getArea as getSphericalArea } from
 import { unByKey } from 'ol/Observable';
 import { Circle, Geometry, LineString, Polygon } from 'ol/geom';
 import GeoConsts from '../geoconsts';
-import StateManager from '../state/statemanager';
 import { buffer } from 'ol/extent';
 import { Pixel } from 'ol/pixel';
 
@@ -62,8 +61,8 @@ export const polygonFromCircle = (geometry: Circle) => {
  * @param coordinates ol Coordinate list
  * @returns the length between coordinates, considering the current map projection (projected or geographic)
  */
-export const getDistance = (coordinates: Coordinate[]) => {
-  if (isProjectionInDegrees()) {
+export const getDistance = (coordinates: Coordinate[], projection: string) => {
+  if (isProjectionInDegrees(projection)) {
     let totalLength = 0;
     coordinates.forEach((coordinate, idx) => {
       if (coordinates[idx + 1]) {
@@ -79,15 +78,17 @@ export const getDistance = (coordinates: Coordinate[]) => {
  * @param polygon ol Polygon
  * @returns the area of a polygon, considering the current map projection (projected or geographic)
  */
-export const getArea = (polygon: Polygon) => {
-  if (isProjectionInDegrees()) {
-    return getSphericalArea(polygon, { projection: getProjection(StateManager.getInstance().state.projection)! });
+export const getArea = (polygon: Polygon, projection: string) => {
+  if (isProjectionInDegrees(projection)) {
+    return getSphericalArea(polygon, {
+      projection: getProjection(projection)!
+    });
   }
   return polygon.getArea();
 };
 
-export const isProjectionInDegrees = (): boolean => {
-  const projection: Projection | null = getProjection(StateManager.getInstance().state.projection);
+const isProjectionInDegrees = (proj: string): boolean => {
+  const projection: Projection | null = getProjection(proj);
   return projection?.getUnits() === 'degrees';
 };
 

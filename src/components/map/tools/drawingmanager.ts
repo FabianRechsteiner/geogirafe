@@ -1,14 +1,9 @@
-import { Map } from 'ol';
 import LayerDrawing from '../../../models/layers/layerdrawing';
 import VectorLayer from 'ol/layer/Vector';
-import StateManager from '../../../tools/state/statemanager';
-import GirafeSingleton from '../../../base/GirafeSingleton';
-import MapManager from '../../../tools/state/mapManager';
+import { Map } from 'ol';
 
-export default class DrawingManager extends GirafeSingleton {
-  map: Map;
-  stateManager: StateManager;
-  activeLayers: Record<
+export default class DrawingManager {
+  private readonly activeLayers: Record<
     string,
     {
       olayer: VectorLayer;
@@ -16,10 +11,10 @@ export default class DrawingManager extends GirafeSingleton {
     }
   > = {};
 
-  constructor(type: string) {
-    super(type);
-    this.map = MapManager.getInstance().getMap();
-    this.stateManager = StateManager.getInstance();
+  private readonly map: Map;
+
+  constructor(map: Map) {
+    this.map = map;
   }
 
   addLayer(layer: LayerDrawing) {

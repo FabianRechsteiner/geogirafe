@@ -1,13 +1,15 @@
 import UrlManager from '../../../tools/url/urlmanager';
-import { GmfSuccessResponse } from './gmfmanager';
+import { GmfSuccessResponse } from './gmfsharemanager';
 import { IUrlShortener, UrlShortenerResponse } from './iurlshortener';
 import { generateQrCode } from '../../../tools/utils/qrcode';
 
 class GeoGirafeShareManager implements IUrlShortener {
-  serviceUrl: string;
+  private readonly serviceUrl: string;
+  private readonly urlManager: UrlManager;
 
-  constructor(serviceUrl: string) {
+  constructor(serviceUrl: string, urlManager: UrlManager) {
     this.serviceUrl = serviceUrl;
+    this.urlManager = urlManager;
   }
 
   async shortenUrl(longUrl: string): Promise<UrlShortenerResponse> {
@@ -29,7 +31,7 @@ class GeoGirafeShareManager implements IUrlShortener {
 
       const response_data = (await response.json()) as GmfSuccessResponse;
       if (response_data) {
-        const baseUrl = UrlManager.getInstance().getBaseUrlPath();
+        const baseUrl = this.urlManager.getBaseUrlPath();
         const hash = response_data.short_url.split('/').pop();
         const shortUrl = `${baseUrl}#gg-${hash}`;
         const qrcode = await generateQrCode(shortUrl);

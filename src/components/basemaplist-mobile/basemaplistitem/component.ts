@@ -16,6 +16,7 @@ export default class BasemapListItemMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     // The component needs to wait for the list of layers to be available
     this.subscribe('basemaps', (_oldValue: Record<number, Basemap>, newValue: Record<number, Basemap>) => {
       const basemapId = this.getAttribute('basemapid');
