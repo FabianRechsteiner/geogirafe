@@ -1,16 +1,11 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 import DOMPurify from 'dompurify';
-import StateManager from '../state/statemanager';
-import UrlManager from './urlmanager';
 import MapPosition from '../state/mapposition';
 import { get as getProjection, Projection, transform } from 'ol/proj';
 import { isCoordinateInDegrees } from '../utils/olutils';
-import ConfigManager from '../configuration/configmanager';
 import { BASEMAP_VISIBLE_PARAMETER, SEARCH_VISIBLE_PARAMETER } from './permalinkmanager-constants';
 
 export default class PermalinkManager extends GirafeSingleton {
-  stateManager: StateManager;
-  urlManager: UrlManager;
   urlParamKeys: string[] = [
     'map_x',
     'map_y',
@@ -28,29 +23,26 @@ export default class PermalinkManager extends GirafeSingleton {
   urlParamKeysWithPrefix: string[] = ['wfs_'];
   params: Record<string, string | null> = {};
 
-  constructor(type: string) {
-    super(type);
-    this.stateManager = StateManager.getInstance();
-    this.urlManager = UrlManager.getInstance();
+  override initializeSingleton() {
     this.getPermalinkParamsFromUrl();
     this.removePermalinkParamsFromUrl();
     this.setStateFromParams();
   }
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   private getPermalinkParamsFromUrl() {
     this.params = {
-      ...this.urlManager.getParams(...this.urlParamKeys),
-      ...this.urlManager.getParamsWithPrefix(...this.urlParamKeysWithPrefix)
+      ...this.context.urlManager.getParams(...this.urlParamKeys),
+      ...this.context.urlManager.getParamsWithPrefix(...this.urlParamKeysWithPrefix)
     };
   }
 
   private removePermalinkParamsFromUrl() {
     for (const key in this.params) {
-      this.urlManager.removeParams(key);
+      this.context.urlManager.removeParams(key);
     }
   }
 
@@ -104,7 +96,7 @@ export default class PermalinkManager extends GirafeSingleton {
       let center = [parseFloat(this.params['map_x']!), parseFloat(this.params['map_y']!)];
       // Transform position to the target projection by making an educated guess about the current CRS
       // of the permalink map position
-      const defaultProjection = ConfigManager.getInstance().getDefaultConfigValue('map.srid') as string;
+      const defaultProjection = this.context.configManager.getDefaultConfigValue('map.srid') as string;
       const projectionInUrl = getProjection(isCoordinateInDegrees(position.center) ? 'EPSG:4326' : defaultProjection)!;
       if (projectionInUrl.getCode() !== this.state.projection) {
         center = transform(center, projectionInUrl, targetProjection);

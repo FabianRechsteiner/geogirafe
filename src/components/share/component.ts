@@ -2,15 +2,12 @@ import TwitterLogo from './images/twitter.svg';
 import FacebookLogo from './images/facebook.svg';
 import LinkedInLogo from './images/linkedin.svg';
 import MailLogo from './images/mail.svg';
-import ShareManager from '../../tools/share/sharemanager';
 import { IUrlShortener } from './tools/iurlshortener';
-import GmfShareManager from './tools/gmfmanager';
+import GmfShareManager from './tools/gmfsharemanager';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SimpleMaskManager from '../../tools/layers/simplemaskmanager';
-import MapManager from '../../tools/state/mapManager';
 import type { Callback } from '../../tools/state/statemanager';
-import GeoGirafeShareManager from './tools/geogirafemanager';
-import UrlManager from '../../tools/url/urlmanager';
+import GeoGirafeShareManager from './tools/geogirafesharemanager';
 
 class ShareComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -27,9 +24,7 @@ class ShareComponent extends GirafeHTMLElement {
   iframeUrl?: string;
   iframeCode?: string;
 
-  private readonly shareManager: ShareManager;
   private urlShortener?: IUrlShortener;
-  private readonly mapManager: MapManager;
   private simpleMaskManager?: SimpleMaskManager;
 
   private readonly eventsCallbacks: Callback[] = [];
@@ -64,13 +59,10 @@ class ShareComponent extends GirafeHTMLElement {
 
   constructor() {
     super('share');
-
-    this.shareManager = ShareManager.getInstance();
-    this.mapManager = MapManager.getInstance();
   }
 
   private initializeShortenerService() {
-    const share = this.configManager.Config.share;
+    const share = this.context.configManager.Config.share;
 
     if (share) {
       switch (share.service) {
@@ -78,7 +70,7 @@ class ShareComponent extends GirafeHTMLElement {
           this.urlShortener = new GmfShareManager(share.createUrl);
           break;
         case 'geogirafe':
-          this.urlShortener = new GeoGirafeShareManager(share.createUrl);
+          this.urlShortener = new GeoGirafeShareManager(share.createUrl, this.context.urlManager);
           break;
       }
     }
@@ -99,7 +91,7 @@ class ShareComponent extends GirafeHTMLElement {
    */
   private renderComponent() {
     super.render();
-    this.simpleMaskManager = new SimpleMaskManager(this.mapManager.getMap());
+    this.simpleMaskManager = new SimpleMaskManager(this.context.mapManager.getMap());
     // While the component is visible, listen for changes in the state to update the shared link
     this.registerEvents();
   }
@@ -153,8 +145,8 @@ class ShareComponent extends GirafeHTMLElement {
       return;
     }
 
-    const baseUrl = UrlManager.getInstance().getBaseUrlPath();
-    const hash = this.shareManager.getStateToShare();
+    const baseUrl = this.context.urlManager.getBaseUrlPath();
+    const hash = this.context.shareManager.getStateToShare();
 
     // Get short URL
     const longurl = `${baseUrl}#${hash}`;
@@ -169,8 +161,8 @@ class ShareComponent extends GirafeHTMLElement {
       return;
     }
 
-    const baseUrl = UrlManager.getInstance().getRootUrl();
-    const hash = this.shareManager.getStateToShare();
+    const baseUrl = this.context.urlManager.getRootUrl();
+    const hash = this.context.shareManager.getStateToShare();
 
     // Get short URL for iframe
     const longIframeUrl = `${baseUrl}iframe.html#${hash}`;
@@ -246,13 +238,12 @@ class ShareComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
+    super.connectedCallback();
+    this.render();
+    this.initializeShortenerService();
+    this.subscribe('interface.sharePanelVisible', (_, newValue) => {
+      this.visible = newValue;
       this.render();
-      this.initializeShortenerService();
-      this.subscribe('interface.sharePanelVisible', (_, newValue) => {
-        this.visible = newValue;
-        this.render();
-      });
     });
   }
 }

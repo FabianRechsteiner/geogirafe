@@ -1,23 +1,24 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import BasemapSerializer from './basemapserializer';
-import StateManager from '../../state/statemanager';
 import MockHelper from '../../tests/mockhelper';
 import Basemap from '../../../models/basemaps/basemap';
 import BasemapEmpty from '../../../models/basemaps/basemapempty';
+import IGirafeContext from '../../context/icontext';
 
 let serializer: BasemapSerializer;
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
-  serializer = new BasemapSerializer();
+  context = MockHelper.startMocking();
+  serializer = new BasemapSerializer(context);
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 beforeEach(() => {
-  const state = StateManager.getInstance().state;
+  const state = context.stateManager.state;
   state.basemaps = {};
   state.activeBasemap = new BasemapEmpty();
 });
@@ -40,9 +41,9 @@ describe('BasemapSerializer.deserialize', () => {
       id: 1,
       name: 'OpenStreetMap'
     });
-    StateManager.getInstance().state.basemaps[basemap.id] = basemap;
+    context.stateManager.state.basemaps[basemap.id] = basemap;
     serializer.brainDeserialize('1');
-    const state = StateManager.getInstance().state;
+    const state = context.stateManager.state;
     expect(state.activeBasemap).toBeInstanceOf(Basemap);
     expect(state.activeBasemap.id).toBe(basemap.id);
   });

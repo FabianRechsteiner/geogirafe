@@ -5,22 +5,25 @@ import { createTestGroupLayer, createTestLayerWms, createTestLayerWmts } from '.
 import WfsFilter from '../wfs/wfsfilter';
 import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
+import IGirafeContext from '../context/icontext';
 import StateManager from '../state/statemanager';
 import ThemeLayer from '../../models/layers/themelayer';
 
+let context: IGirafeContext;
+
 beforeAll(() => {
-  MockHelper.startMocking();
+  context = MockHelper.startMocking();
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 describe('ThemesHelper.extractLayerOptions for layer (not timeaware, not filtrable)', () => {
   let themesHelper: ThemesHelper;
 
   beforeEach(() => {
-    themesHelper = ThemesHelper.getInstance();
+    themesHelper = context.themesHelper;
     themesHelper.findLayerByName = (_name: string) => {
       return createTestLayerWmts();
     };
@@ -73,7 +76,7 @@ describe('ThemesHelper.extractLayerOptions for layer (filtrable)', () => {
   let themesHelper: ThemesHelper;
 
   beforeEach(() => {
-    themesHelper = ThemesHelper.getInstance();
+    themesHelper = context.themesHelper;
     themesHelper.findLayerByName = (_name: string) => {
       return createTestLayerWms();
     };
@@ -110,7 +113,7 @@ describe('ThemesHelper.extractLayerOptions for layer (timeaware)', () => {
   let themesHelper: ThemesHelper;
 
   beforeEach(() => {
-    themesHelper = ThemesHelper.getInstance();
+    themesHelper = context.themesHelper;
     themesHelper.findLayerByName = (_name: string) => {
       const wmsLayer = createTestLayerWms();
       wmsLayer.timeOptions = {
@@ -153,7 +156,7 @@ describe('ThemesHelper.extractLayerOptions for layer (timeaware)', () => {
 describe('ThemesHelper.extractLayerOptions for group', () => {
   let themesHelper: ThemesHelper;
   beforeEach(() => {
-    themesHelper = ThemesHelper.getInstance();
+    themesHelper = context.themesHelper;
     themesHelper.findGroupByName = (_name: string) => {
       return createTestGroupLayer();
     };
@@ -171,8 +174,8 @@ describe('ThemesHelper.getInitialOrderForNewTheme', () => {
   let stateManager: StateManager;
 
   beforeEach(() => {
-    themesHelper = ThemesHelper.getInstance();
-    stateManager = StateManager.getInstance();
+    themesHelper = context.themesHelper;
+    stateManager = context.stateManager;
   });
 
   it('returns an order value of 0 if there are no pinned themes present', () => {

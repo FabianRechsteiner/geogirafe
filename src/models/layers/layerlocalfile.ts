@@ -1,7 +1,6 @@
 import Feature from 'ol/Feature';
 import Layer from './layer';
 import Geometry from 'ol/geom/Geometry';
-import ConfigManager from '../../tools/configuration/configmanager';
 import { Extent } from 'ol/extent';
 import ILayerWithLegend from './ilayerwithlegend';
 
@@ -21,13 +20,11 @@ class LayerLocalFile extends Layer implements ILayerWithLegend {
   public wasLegendExpanded: boolean;
   public extent: Extent;
 
-  constructor(file: File, features: Feature<Geometry>[], extent: Extent) {
+  constructor(file: File, features: Feature<Geometry>[], extent: Extent, locale: string) {
     super(0, file.name, 0, { isDefaultChecked: true });
     this._features = features;
     this.extent = extent;
-    this.lastModifiedDate = new Date(file.lastModified).toLocaleDateString(
-      ConfigManager.getInstance().Config.general.locale
-    );
+    this.lastModifiedDate = new Date(file.lastModified).toLocaleDateString(locale);
     this.isLegendExpanded = true;
     this.wasLegendExpanded = false;
   }

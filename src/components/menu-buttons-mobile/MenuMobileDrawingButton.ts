@@ -22,6 +22,7 @@ export default class MenuMobileDrawingButton extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
   }
 }

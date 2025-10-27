@@ -1,21 +1,8 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import ConfigManager from '../configuration/configmanager';
-import UrlManager from '../url/urlmanager';
-import SessionManager from './sessionmanager';
-import StateSerializer from './stateserializer';
 
 class ShareManager extends GirafeSingleton {
-  private readonly configManager: ConfigManager;
-  private readonly stateSerializer: StateSerializer;
-
-  constructor(type: string) {
-    super(type);
-    this.stateSerializer = StateSerializer.getInstance();
-    this.configManager = ConfigManager.getInstance();
-  }
-
   public getStateToShare() {
-    const encodedState = this.stateSerializer.getSerializedState();
+    const encodedState = this.context.stateSerializer.getSerializedState();
     return encodedState;
   }
 
@@ -25,10 +12,10 @@ class ShareManager extends GirafeSingleton {
   }
 
   private getStateFromUrl(): string | null {
-    if (SessionManager.getInstance().hasState()) {
+    if (this.context.sessionManager.hasState()) {
       return null;
     }
-    return UrlManager.getInstance().getHash();
+    return this.context.urlManager.getHash();
   }
 
   public async setStateFromUrl(): Promise<boolean> {
@@ -42,16 +29,19 @@ class ShareManager extends GirafeSingleton {
         // We first have to load the hash from the GMF server
         encodedState = await this.getStateFromServer(encodedState);
       }
-      stateRestored = this.stateSerializer.deserializeAndSetState(encodedState);
+      stateRestored = this.context.stateSerializer.deserializeAndSetState(encodedState);
     }
     return stateRestored;
   }
 
   private async getStateFromServer(geogirafeState: string): Promise<string> {
-    if (this.configManager.Config.share?.service !== 'geogirafe' || !this.configManager.Config.share.getUrl) {
+    if (
+      this.context.configManager.Config.share?.service !== 'geogirafe' ||
+      !this.context.configManager.Config.share.getUrl
+    ) {
       throw new Error('We get a geogirafe state but the configuration is not correct.');
     }
-    let getUrl = this.configManager.Config.share.getUrl;
+    let getUrl = this.context.configManager.Config.share.getUrl;
     if (!getUrl.endsWith('/')) {
       getUrl += '/';
     }

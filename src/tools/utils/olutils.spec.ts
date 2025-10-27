@@ -9,6 +9,7 @@ import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 import StateManager from '../state/statemanager';
 import MockHelper from '../tests/mockhelper';
+import IGirafeContext from '../context/icontext';
 
 describe('getOlayerByName function', () => {
   const mockLayerName = 'TestLayer';
@@ -75,10 +76,11 @@ describe('deleteFeatureOlParams', () => {
 
 describe('getDistance', () => {
   let stateManager: StateManager;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
-    stateManager = StateManager.getInstance();
+    context = MockHelper.startMocking();
+    stateManager = context.stateManager;
 
     proj4.defs(
       'EPSG:2056',
@@ -88,7 +90,7 @@ describe('getDistance', () => {
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('calculates the correct distances of coordinates in geographic and projected coordinate systems', () => {
@@ -98,7 +100,7 @@ describe('getDistance', () => {
       [2601000.0, 1200000.0]
     ];
     stateManager.state.projection = 'EPSG:2056';
-    expect(getDistance(coordinatesProjected)).toBe(1000);
+    expect(getDistance(coordinatesProjected, stateManager.state.projection)).toBe(1000);
 
     // Distance measurements in PseudoMercator are heavily distorted, they won't create the same distance as in LV95
     let coordinatesInPseudoMercator = [
@@ -110,7 +112,7 @@ describe('getDistance', () => {
         Math.pow(coordinatesInPseudoMercator[1][1] - coordinatesInPseudoMercator[0][1], 2)
     );
     stateManager.state.projection = 'EPSG:3857';
-    expect(getDistance(coordinatesInPseudoMercator)).toBe(dist);
+    expect(getDistance(coordinatesInPseudoMercator, stateManager.state.projection)).toBe(dist);
 
     // Same coordinates as projected coordinates, but transformed to WGS84 using
     //  https://www.swisstopo.admin.ch/en/coordinates-conversion-navref
@@ -120,16 +122,17 @@ describe('getDistance', () => {
     ];
     stateManager.state.projection = 'EPSG:4326';
     // Allow 2% deviation
-    expect(getDistance(coordinatesGeographic)).approximately(1000, 1000 * 0.02);
+    expect(getDistance(coordinatesGeographic, stateManager.state.projection)).approximately(1000, 1000 * 0.02);
   });
 });
 
 describe('getArea', () => {
   let stateManager: StateManager;
+  let context: IGirafeContext;
 
   beforeAll(() => {
-    MockHelper.startMocking();
-    stateManager = StateManager.getInstance();
+    context = MockHelper.startMocking();
+    stateManager = context.stateManager;
 
     proj4.defs(
       'EPSG:2056',
@@ -139,7 +142,7 @@ describe('getArea', () => {
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
   });
 
   it('calculates the correct area of a polygon in geographic and projected coordinate systems', () => {
@@ -154,7 +157,7 @@ describe('getArea', () => {
       ]
     ];
     stateManager.state.projection = 'EPSG:2056';
-    expect(getArea(new Polygon(coordinatesProjected))).toBe(1000 * 1000);
+    expect(getArea(new Polygon(coordinatesProjected), stateManager.state.projection)).toBe(1000 * 1000);
 
     // Same polygon as above, but corners are transformed to WGS84 using
     //  https://www.swisstopo.admin.ch/en/coordinates-conversion-navref
@@ -169,6 +172,9 @@ describe('getArea', () => {
     ];
     stateManager.state.projection = 'EPSG:4326';
     // Allow 2% deviation
-    expect(getArea(new Polygon(coordinatesGeographic))).approximately(1000 * 1000, 1000 * 1000 * 0.02);
+    expect(getArea(new Polygon(coordinatesGeographic), stateManager.state.projection)).approximately(
+      1000 * 1000,
+      1000 * 1000 * 0.02
+    );
   });
 });

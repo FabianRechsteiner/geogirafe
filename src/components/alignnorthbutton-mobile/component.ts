@@ -1,5 +1,4 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import MapManager from '../../tools/state/mapManager';
 
 export default class AlignNorthButtonMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -10,9 +9,10 @@ export default class AlignNorthButtonMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
     const compassIcon = this.shadow.getElementById('compass-icon') as HTMLImageElement;
-    const map = MapManager.getInstance().getMap();
+    const map = this.context.mapManager.getMap();
 
     map.once('postrender', () => {
       const view = map.getView();
@@ -30,7 +30,7 @@ export default class AlignNorthButtonMobile extends GirafeHTMLElement {
   }
 
   alignNorth(e: PointerEvent) {
-    MapManager.getInstance().getMap().getView().animate({ rotation: 0, duration: 500 });
+    this.context.mapManager.getMap().getView().animate({ rotation: 0, duration: 500 });
     (e.target as HTMLButtonElement).blur();
   }
 }

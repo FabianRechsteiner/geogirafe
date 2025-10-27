@@ -1,7 +1,6 @@
 import { Feature } from 'ol';
 import { Geometry } from 'ol/geom';
-import StateManager from '../state/statemanager';
-import OgcApiFeaturesClient, { OgcApiFeaturesClientOptions } from './ogcapifeaturesclient';
+import OgcApiFeaturesClient from './ogcapifeaturesclient';
 import OgcApiFeaturesClientGeorama from './ogcapifeaturesclientgeorama';
 import OgcApiFeaturesClientGmf from './ogcapifeaturesclientgmf';
 import LayerWms from '../../models/layers/layerwms';
@@ -9,29 +8,24 @@ import ServerOgcApiFeatures, { OapifCollection, OapifLayer } from '../../models/
 import OgcApiFeaturesSchema from './ogcapifeaturesschema';
 import ServerOgc from '../../models/serverogc';
 import VendorSpecificOgcServerManager from '../vendorspecificogcservermanager';
+import { OgcApiClientOptions } from './ogcapiclient';
 
 /**
  * Manages interaction between the GG and an OGC API Features client (OAPIF).
  */
 export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManager<
   OgcApiFeaturesClient,
-  OgcApiFeaturesClientOptions
+  OgcApiClientOptions
 > {
-  stateManager: StateManager;
-
   get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public getClientId(ogcServer: ServerOgc): string {
     return ogcServer.urlOapif ?? '';
   }
 
-  constructor(type: string) {
-    super(type);
-
-    this.stateManager = StateManager.getInstance();
-
+  override initializeSingleton() {
     // Register the clients
     this.registerClientClass('default', OgcApiFeaturesClient);
     this.registerClientClass('georama', OgcApiFeaturesClientGeorama);

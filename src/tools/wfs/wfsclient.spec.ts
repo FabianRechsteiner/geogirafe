@@ -1,28 +1,34 @@
-import { describe, expect, it, afterAll } from 'vitest';
+import { describe, expect, it, afterAll, beforeAll } from 'vitest';
 import { WfsClientMapServer } from './wfsclient';
 import ServerOgc from '../../models/serverogc';
 import MockHelper from '../tests/mockhelper';
+import IGirafeContext from '../context/icontext';
 
 describe('WfsClient', () => {
-  MockHelper.startMocking();
+  let context: IGirafeContext;
+  let client: WfsClientMapServer;
 
-  afterAll(() => {
-    MockHelper.startMocking();
+  beforeAll(() => {
+    context = MockHelper.startMocking();
+    client = new WfsClientMapServer(
+      new ServerOgc('testOgcServer', {
+        url: 'https://wms-1.test.url',
+        wfsSupport: true,
+        urlWfs: 'https://wfs-1.url',
+        type: 'mapserver',
+        imageType: 'image/png'
+      }),
+      {
+        featurePrefix: '',
+        featureNS: ''
+      },
+      context
+    );
   });
 
-  const client = new WfsClientMapServer(
-    new ServerOgc('testOgcServer', {
-      url: 'https://wms-1.test.url',
-      wfsSupport: true,
-      urlWfs: 'https://wfs-1.url',
-      type: 'mapserver',
-      imageType: 'image/png'
-    }),
-    {
-      featurePrefix: '',
-      featureNS: ''
-    }
-  );
+  afterAll(() => {
+    MockHelper.stopMocking(context);
+  });
 
   describe('checkForException', () => {
     it('catches exceptions and throws an error', () => {

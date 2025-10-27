@@ -1,7 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import UserDataManager from '../../tools/userdata/userdatamanager';
 import { PreferenceGroup, PreferenceGroups, PreferenceOption, UserPreference } from './userPreference';
-import CustomThemesManager from '../../tools/themes/customthemesmanager';
 import CustomTheme from '../../models/customtheme';
 import { getPropertyByPath, setPropertyByPath } from '../../tools/utils/pathUtils';
 import { Color } from 'vanilla-picker';
@@ -17,19 +15,17 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
 
   visible = false;
   ready: boolean = false;
-  preferences: Record<string, UserPreference>;
+  preferences!: Record<string, UserPreference>;
   preferenceGroups: PreferenceGroup[] = PreferenceGroups;
   colorPickers: Record<string, GirafeColorPicker> = {};
-
-  userDataManager: UserDataManager;
 
   private readonly storagePath = 'configOverrides';
 
   constructor() {
     super('user-preferences');
+  }
 
-    this.userDataManager = UserDataManager.getInstance();
-
+  private initPreferences() {
     // Define all settings that the user can change
     this.preferences = {
       language: new UserPreference('languages.defaultLanguage', 'language', 'system', 'select'),
@@ -83,12 +79,12 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   }
 
   connectedCallback(): void {
-    this.loadConfig().then(() => {
-      this.render();
-      this.subscribe('interface.userPreferencesPanelVisible', (_, newValue) => this.togglePanel(newValue));
-      this.subscribe('interface.darkFrontendMode', (_, newValue) => this.onChangeDarkFrontendMode(newValue));
-      this.subscribe('interface.darkMapMode', (_, newValue) => this.onChangeDarkMapMode(newValue));
-    });
+    super.connectedCallback();
+    this.initPreferences();
+    this.render();
+    this.subscribe('interface.userPreferencesPanelVisible', (_, newValue) => this.togglePanel(newValue));
+    this.subscribe('interface.darkFrontendMode', (_, newValue) => this.onChangeDarkFrontendMode(newValue));
+    this.subscribe('interface.darkMapMode', (_, newValue) => this.onChangeDarkMapMode(newValue));
   }
 
   render(): void {
@@ -133,9 +129,11 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
    For preferences that have options to choose from, readout all possible select options to show in the dropdowns
    */
   private initPreferenceOptions(): void {
-    this.preferences.language.options = Object.keys(this.configManager.Config.languages.translations).map((key) => {
-      return { label: key, value: key };
-    });
+    this.preferences.language.options = Object.keys(this.context.configManager.Config.languages.translations).map(
+      (key) => {
+        return { label: key, value: key };
+      }
+    );
 
     this.preferences.logLevel.options = [
       { label: 'debug', value: 'debug' },
@@ -144,8 +142,8 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
       { label: 'error', value: 'error' }
     ];
 
-    this.preferences.projection.options = Object.keys(this.configManager.Config.projections).map((key) => {
-      return { label: this.configManager.Config.projections[key], value: key };
+    this.preferences.projection.options = Object.keys(this.context.configManager.Config.projections).map((key) => {
+      return { label: this.context.configManager.Config.projections[key], value: key };
     });
 
     this.refreshThemeOptions();
@@ -178,7 +176,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
       defaultThemes.push({ label: themeName, value: themeName });
     });
     defaultThemes = defaultThemes.sort((a, b) => a.label.toUpperCase().localeCompare(b.label.toUpperCase()));
-    const customThemes: PreferenceOption[] = CustomThemesManager.getInstance().customThemes.map((ct: CustomTheme) => {
+    const customThemes: PreferenceOption[] = this.context.customThemesManager.customThemes.map((ct: CustomTheme) => {
       return { label: ct.name, value: ct.name };
     });
     this.preferences.theme.options = [...defaultThemes, ...customThemes];
@@ -190,7 +188,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   private initCurrentPreferenceValues(): void {
     for (const key in this.preferences) {
       const { found, parentObject, lastKey } = getPropertyByPath(
-        this.configManager.Config,
+        this.context.configManager.Config,
         this.preferences[key].configPath
       );
       this.preferences[key].currentValue = found && parentObject && lastKey ? parentObject[lastKey] : undefined;
@@ -201,9 +199,9 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
    * Initializes dark mode-related preferences with fallback logic
    */
   private initDarkModeDefaults() {
-    const config = this.configManager.Config.interface.darkFrontendMode;
+    const config = this.context.configManager.Config.interface.darkFrontendMode;
     this.state.interface.darkFrontendMode = config ?? systemIsInDarkMode();
-    this.state.interface.darkMapMode = this.configManager.Config.interface.darkMapMode;
+    this.state.interface.darkMapMode = this.context.configManager.Config.interface.darkMapMode;
   }
 
   /**
@@ -271,7 +269,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
    */
   private updatePreferenceInConfig(preferenceKey: string): void {
     const preference = this.preferences[preferenceKey];
-    setPropertyByPath(this.configManager.Config, preference.configPath, preference.currentValue);
+    setPropertyByPath(this.context.configManager.Config, preference.configPath, preference.currentValue);
   }
 
   /**
@@ -290,14 +288,14 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   private updatePreferenceInStorage(preferenceKey: string): void {
     const preference = this.preferences[preferenceKey];
     // Values are saved under 'configOverrides' in the same structure as in the config
-    this.userDataManager.saveUserData(`${this.storagePath}.${preference.configPath}`, preference.currentValue);
+    this.context.userDataManager.saveUserData(`${this.storagePath}.${preference.configPath}`, preference.currentValue);
   }
 
   /**
    Delete user preference in the local browser storage
    */
   private deletePreferenceInStorage(preferenceKey: string): void {
-    this.userDataManager.deleteUserData(`${this.storagePath}.${this.preferences[preferenceKey].configPath}`);
+    this.context.userDataManager.deleteUserData(`${this.storagePath}.${this.preferences[preferenceKey].configPath}`);
   }
 
   /**
@@ -314,7 +312,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
   private resetAll() {
     for (const preferenceKey in this.preferences) {
       this.deletePreferenceInStorage(preferenceKey);
-      this.preferences[preferenceKey].currentValue = this.configManager.getDefaultConfigValue(
+      this.preferences[preferenceKey].currentValue = this.context.configManager.getDefaultConfigValue(
         this.preferences[preferenceKey].configPath
       );
       this.updatePreferenceInState(preferenceKey);

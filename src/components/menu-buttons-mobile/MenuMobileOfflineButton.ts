@@ -22,6 +22,7 @@ export default class MenuMobileOfflineButton extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
   }
 }

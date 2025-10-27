@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import CsvManager from './csvmanager';
-import ConfigManager from '../configuration/configmanager';
 import { download } from './download';
 import MockHelper from '../tests/mockhelper';
+import IGirafeContext from '../context/icontext';
 
 vi.mock('./download', () => ({
   download: vi.fn()
@@ -10,10 +10,11 @@ vi.mock('./download', () => ({
 
 describe('CsvManager', () => {
   let csvManager: CsvManager;
+  let context: IGirafeContext;
 
   beforeEach(() => {
-    MockHelper.startMocking();
-    csvManager = CsvManager.getInstance();
+    context = MockHelper.startMocking();
+    csvManager = new CsvManager(context);
   });
 
   describe('generateCsv', () => {
@@ -35,7 +36,7 @@ describe('CsvManager', () => {
       const data = [{ a: 1, b: 2 }];
       const columnDefs = [{ name: 'a' }, { name: 'b' }];
 
-      ConfigManager.getInstance().Config.csv.includeHeader = false;
+      context.configManager.Config.csv.includeHeader = false;
 
       const expectedCsv = "'1','2'\n";
       expect(csvManager.generateCsv(data, columnDefs)).toBe(expectedCsv);

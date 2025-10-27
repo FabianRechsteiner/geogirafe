@@ -7,27 +7,11 @@ import Layer from '../../models/layers/layer';
 import LayerWms from '../../models/layers/layerwms';
 import ThemeLayer from '../../models/layers/themelayer';
 import { isTimeAwareLayer, TimeAwareLayer } from '../../models/layers/timeawarelayer';
-import ConfigManager from '../configuration/configmanager';
-import LayerManager from '../layers/layermanager';
-import StateManager from '../state/statemanager';
-import PermalinkManager from '../url/permalinkmanager';
 import WfsFilter, { isWfsOperator } from '../wfs/wfsfilter';
 
 export default class ThemesHelper extends GirafeSingleton {
-  configManager: ConfigManager;
-  stateManager: StateManager;
-  permalinkManager: PermalinkManager;
-  layerManager: LayerManager;
-
-  constructor(type: string) {
-    super(type);
-
-    this.configManager = ConfigManager.getInstance();
-    this.stateManager = StateManager.getInstance();
-    this.permalinkManager = PermalinkManager.getInstance();
-    this.layerManager = LayerManager.getInstance();
-
-    this.stateManager.subscribe(
+  override initializeSingleton() {
+    this.context.stateManager.subscribe(
       'themes.lastSelectedTheme',
       (_oldTheme: ThemeLayer | CustomTheme | null, newTheme: ThemeLayer | CustomTheme | null) =>
         this.onSelectedThemeChanged(newTheme)
@@ -35,7 +19,7 @@ export default class ThemesHelper extends GirafeSingleton {
   }
 
   get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public findBaseLayerById(layerId: number): BaseLayer {
@@ -153,7 +137,7 @@ export default class ThemesHelper extends GirafeSingleton {
     // The default configuration will have been overwritten.
     const clonedTheme = theme.clone();
 
-    if (this.configManager.Config.themes.selectionMode === 'replace') {
+    if (this.context.configManager.Config.themes.selectionMode === 'replace') {
       // Mode is <replace>
       this.emptyLayerTree();
       this.state.layers.layersList.push(clonedTheme);
@@ -201,8 +185,8 @@ export default class ThemesHelper extends GirafeSingleton {
 
   public addThemesFromUrl() {
     let themeAdded = false;
-    if (this.permalinkManager.hasThemes()) {
-      for (const themename of this.permalinkManager.getThemes()) {
+    if (this.context.permalinkManager.hasThemes()) {
+      for (const themename of this.context.permalinkManager.getThemes()) {
         const theme = Object.values(this.state.themes._allThemes).find((t) => t.name === themename);
         if (theme) {
           this.state.themes.lastSelectedTheme = theme;
@@ -217,8 +201,8 @@ export default class ThemesHelper extends GirafeSingleton {
 
   public addGroupsFromUrl(): boolean {
     let added = false;
-    if (this.permalinkManager.hasGroups()) {
-      for (const groupname of this.permalinkManager.getGroups()) {
+    if (this.context.permalinkManager.hasGroups()) {
+      for (const groupname of this.context.permalinkManager.getGroups()) {
         added = this.addLayerBaseFromUrl(groupname, 'group') || added;
       }
     }
@@ -227,8 +211,8 @@ export default class ThemesHelper extends GirafeSingleton {
 
   public addLayersFromUrl(): boolean {
     let added = false;
-    if (this.permalinkManager.hasLayers()) {
-      for (const layername of this.permalinkManager.getLayers()) {
+    if (this.context.permalinkManager.hasLayers()) {
+      for (const layername of this.context.permalinkManager.getLayers()) {
         added = this.addLayerBaseFromUrl(layername, 'layer') || added;
       }
     }
@@ -245,7 +229,7 @@ export default class ThemesHelper extends GirafeSingleton {
       if (layerOptions.active) {
         const clonedLayer = this.findLayerRecursive(clonedTheme.children, layerOptions.originalLayer.name);
         if (clonedLayer) {
-          this.layerManager.toggle(clonedLayer, 'on');
+          this.context.layerManager.toggle(clonedLayer, 'on');
           if (layerOptions.opacity) {
             (clonedLayer as Layer).opacity = layerOptions.opacity;
           }
@@ -355,7 +339,7 @@ export default class ThemesHelper extends GirafeSingleton {
     const insertedLayers = this.mergeLayerWithExistingLayerTree(theme, this.state.layers.layersList);
     if (activate) {
       for (const insertedLayer of insertedLayers) {
-        this.layerManager.toggle(insertedLayer, 'on');
+        this.context.layerManager.toggle(insertedLayer, 'on');
       }
     }
     return insertedLayers;
@@ -399,7 +383,7 @@ export default class ThemesHelper extends GirafeSingleton {
 
   public removeLayersFromLayerTree(layersToRemove: BaseLayer[]) {
     for (const layerToRemove of layersToRemove) {
-      this.layerManager.toggle(layerToRemove, 'off');
+      this.context.layerManager.toggle(layerToRemove, 'off');
       this.removeLayersFromExistingLayerTree(layerToRemove, this.state.layers.layersList);
     }
   }
@@ -422,6 +406,6 @@ export default class ThemesHelper extends GirafeSingleton {
    */
   public emptyLayerTree() {
     const layersToRemove = this.state.layers.layersList.filter((l) => !l.isPinned);
-    this.stateManager.batchChanges(() => this.removeLayersFromLayerTree(layersToRemove));
+    this.context.stateManager.batchChanges(() => this.removeLayersFromLayerTree(layersToRemove));
   }
 }

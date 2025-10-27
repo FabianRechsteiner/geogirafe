@@ -1,4 +1,3 @@
-import StateManager from '../state/statemanager';
 import SelectionParam from '../../models/selectionparam';
 import LayerWms from '../../models/layers/layerwms';
 import ServerWfs from '../../models/serverwfs';
@@ -17,9 +16,8 @@ import { isTimeAwareLayer, TimeAwareLayer } from '../../models/layers/timeawarel
 import Feature from 'ol/Feature';
 
 export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient, WfsClientOptionalOptions> {
-  stateManager: StateManager;
   get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public getClientId(ogcServer: ServerOgc): string {
@@ -28,14 +26,11 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
 
   public static readonly UnknownFeatureType: string = 'UNKNOWN';
 
-  constructor(type: string) {
-    super(type);
-
-    this.stateManager = StateManager.getInstance();
-    this.stateManager.subscribe(/layers\.layersList\..*\.filter/, (_oldFilter, newFilter) => {
+  override initializeSingleton() {
+    this.context.stateManager.subscribe(/layers\.layersList\..*\.filter/, (_oldFilter, newFilter) => {
       void this.onSelectedFeaturesFilterChange(newFilter);
     });
-    this.stateManager.subscribe(
+    this.context.stateManager.subscribe(
       /layers\.layersList\..*\.timeRestriction/,
       (_oldTime: string, _newTime: string, layer: TimeAwareLayer) => {
         if (this.isFirstChildOfTimeAwareGroupOrIndependent(layer)) {

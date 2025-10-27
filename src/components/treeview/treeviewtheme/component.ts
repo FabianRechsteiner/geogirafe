@@ -21,7 +21,7 @@ class TreeViewThemeComponent extends TreeViewGroupElement {
     // And we have to set the layer using the id passed to the layerid attribute
     const themeId = this.getAttribute('themeid');
     if (themeId) {
-      this.layer = this.layerManager.getTreeItem(themeId) as ThemeLayer;
+      this.layer = this.context.layerManager.getTreeItem(themeId) as ThemeLayer;
     }
     super.render();
   }
@@ -51,11 +51,10 @@ class TreeViewThemeComponent extends TreeViewGroupElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    this.render();
+    super.girafeTranslate();
+    this.registerEvents();
   }
 
   public deleteTheme() {

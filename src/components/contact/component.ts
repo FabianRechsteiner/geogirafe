@@ -1,6 +1,4 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import ShareManager from '../../tools/share/sharemanager';
-import UrlManager from '../../tools/url/urlmanager';
 
 class ContactComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -28,8 +26,8 @@ class ContactComponent extends GirafeHTMLElement {
   }
 
   private getCurrentStateUrl() {
-    const baseUrl = UrlManager.getInstance().getBaseUrlPath();
-    const hash = ShareManager.getInstance().getStateToShare();
+    const baseUrl = this.context.urlManager.getBaseUrlPath();
+    const hash = this.context.shareManager.getStateToShare();
     return `${baseUrl}#${hash}`;
   }
 
@@ -38,7 +36,7 @@ class ContactComponent extends GirafeHTMLElement {
     const reason = (this.shadow.getElementById('reason') as HTMLSelectElement).value;
     const message = (this.shadow.getElementById('message') as HTMLTextAreaElement).value;
 
-    if (!this.configManager.Config.contact?.reasons.includes(reason)) {
+    if (!this.context.configManager.Config.contact?.reasons.includes(reason)) {
       window.gAlert('Invalid reason', 'Cannot send message');
       return;
     }
@@ -55,7 +53,7 @@ class ContactComponent extends GirafeHTMLElement {
     data.append('reason', reason);
     data.append('feedback', message);
 
-    const response = await fetch(this.configManager.Config.contact.url, {
+    const response = await fetch(this.context.configManager.Config.contact.url, {
       method: 'POST',
       body: data
     });
@@ -66,7 +64,7 @@ class ContactComponent extends GirafeHTMLElement {
       );
     } else {
       window.gAlert(
-        `Something went wrong and your message could not be sent. Please try again or contact us directly at ${this.configManager.Config.contact.email}`,
+        `Something went wrong and your message could not be sent. Please try again or contact us directly at ${this.context.configManager.Config.contact.email}`,
         'Cannot send message'
       );
     }
@@ -82,10 +80,9 @@ class ContactComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.registerEvents();
-      this.render();
-    });
+    super.connectedCallback();
+    this.registerEvents();
+    this.render();
   }
 }
 

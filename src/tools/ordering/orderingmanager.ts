@@ -2,7 +2,6 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import BaseLayer from '../../models/layers/baselayer';
 import GroupLayer from '../../models/layers/grouplayer';
 import ThemeLayer from '../../models/layers/themelayer';
-import StateManager from '../state/statemanager';
 
 type OrderCounter = {
   index: number;
@@ -11,28 +10,25 @@ type OrderCounter = {
 export const LayerTreeStartOrder = 1000;
 
 export default class OrderingManager extends GirafeSingleton {
-  private stateManager: StateManager;
-
   private timeoutId?: NodeJS.Timeout;
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
-  constructor(type: string) {
-    super(type);
-    this.stateManager = StateManager.getInstance();
+  override initializeSingleton() {
     this.registerEvents();
   }
 
   private registerEvents() {
-    this.stateManager.subscribe('layers.layersList', (oldLayers: BaseLayer[], newLayers: BaseLayer[]) =>
+    this.context.stateManager.subscribe('layers.layersList', (oldLayers: BaseLayer[], newLayers: BaseLayer[]) =>
       this.onLayerListChanged(oldLayers, newLayers)
     );
-    this.stateManager.subscribe(/layers\.layersList\..*\.children/, (oldLayers: BaseLayer[], newLayers: BaseLayer[]) =>
-      this.onLayerListChanged(oldLayers, newLayers)
+    this.context.stateManager.subscribe(
+      /layers\.layersList\..*\.children/,
+      (oldLayers: BaseLayer[], newLayers: BaseLayer[]) => this.onLayerListChanged(oldLayers, newLayers)
     );
-    this.stateManager.subscribe(/layers\.layersList\..*\.order/, () => this.reorderLayers());
+    this.context.stateManager.subscribe(/layers\.layersList\..*\.order/, () => this.reorderLayers());
   }
 
   private onLayerListChanged(oldLayers: BaseLayer[], newLayers: BaseLayer[]) {
@@ -60,14 +56,14 @@ export default class OrderingManager extends GirafeSingleton {
     this.timeoutId = setTimeout(() => {
       const orderedLayers = this.getSortedLayers(this.state.layers.layersList);
       const counter: OrderCounter = { index: LayerTreeStartOrder };
-      this.stateManager.batchChanges(() => this.reorderLayersRecursively(orderedLayers, counter));
+      this.context.stateManager.batchChanges(() => this.reorderLayersRecursively(orderedLayers, counter));
     });
   }
 
   private reorderLayersRecursively(orderedLayers: BaseLayer[], counter: OrderCounter) {
     // Traverse the layertree in depth first to renumber all the elements
     for (const layer of orderedLayers) {
-      console.log(`Setting layer ${layer.name} to order=${counter.index}`);
+      console.debug(`Setting layer ${layer.name} to order=${counter.index}`);
       layer.order = counter.index++;
       if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
         const orderedChilds = this.getSortedLayers(layer.children);

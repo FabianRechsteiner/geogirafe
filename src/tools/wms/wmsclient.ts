@@ -4,31 +4,28 @@ import WMSCapabilities from 'ol/format/WMSCapabilities.js';
 import WMSGetFeatureInfo from 'ol/format/WMSGetFeatureInfo';
 import { Map } from 'ol';
 import LayerWms from '../../models/layers/layerwms';
-import StateManager from '../state/statemanager';
 import SelectionParam from '../../models/selectionparam';
-import LayerManager from '../layers/layermanager';
 import WfsFilter from '../wfs/wfsfilter';
 import ServerOgc from '../../models/serverogc';
-import ConfigManager from '../configuration/configmanager';
 import Exception from 'jsts/java/lang/Exception';
+import IGirafeContext from '../context/icontext';
 
 export default abstract class WmsClient {
   map: Map;
   ogcServer: ServerOgc;
-  layerManager: LayerManager;
-  configManager: ConfigManager;
+  private readonly context: IGirafeContext;
   resolutionTolerance = 5;
   capabilityPromise: Promise<Record<string, unknown>> | null = null;
   capabilities: Record<string, unknown> | null = null;
 
   get state() {
-    return StateManager.getInstance().state;
+    return this.context.stateManager.state;
   }
 
   get audienceExcludedPaths() {
     return (
-      this.configManager.Config.oauth?.issuer.audienceExcludedPaths ??
-      this.configManager.Config.gmfauth?.audienceExcludedPaths ??
+      this.context.configManager.Config.oauth?.issuer.audienceExcludedPaths ??
+      this.context.configManager.Config.gmfauth?.audienceExcludedPaths ??
       []
     );
   }
@@ -52,11 +49,10 @@ export default abstract class WmsClient {
 
   basemapLayers: ImageLayer<ImageWMS>[] = [];
 
-  constructor(ogcServer: ServerOgc, map: Map) {
+  constructor(ogcServer: ServerOgc, map: Map, context: IGirafeContext) {
     this.ogcServer = ogcServer;
     this.map = map;
-    this.layerManager = LayerManager.getInstance();
-    this.configManager = ConfigManager.getInstance();
+    this.context = context;
   }
 
   get uniqueQueryId(): string {
@@ -120,12 +116,12 @@ export default abstract class WmsClient {
     // Otherwise we do no see anything on the client.
     source.on('imageloaderror', () => {
       for (const layerWms of layerList) {
-        this.layerManager.setError(layerWms, 'Image cannot be loaded from WMS Server');
+        this.context.layerManager.setError(layerWms, 'Image cannot be loaded from WMS Server');
       }
     });
     source.on('imageloadend', () => {
       for (const layerWms of layerList) {
-        this.layerManager.unsetError(layerWms);
+        this.context.layerManager.unsetError(layerWms);
       }
     });
 

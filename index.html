@@ -82,176 +82,184 @@
       <div class="loader"></div>
       <span lang="en">Loading...</span>
     </div>
-    <header>
-      <girafe-theme-select></girafe-theme-select>
-      <img class="logo" alt="geogirafe-logo" src="images/logo/horizontal_black.svg" />
-      <girafe-search id="search"></girafe-search>
-      <girafe-oauth></girafe-oauth>
-      <girafe-nav-history></girafe-nav-history>
-      <girafe-video-record></girafe-video-record>
-    </header>
+    <girafe-app>
+      <header>
+        <girafe-theme-select></girafe-theme-select>
+        <img class="logo" alt="geogirafe-logo" src="images/logo/horizontal_black.svg" />
+        <girafe-search id="search"></girafe-search>
+        <girafe-oauth></girafe-oauth>
+        <girafe-nav-history></girafe-nav-history>
+        <girafe-video-record></girafe-video-record>
+      </header>
 
-    <girafe-help></girafe-help>
-    <girafe-modals></girafe-modals>
-    <girafe-default-context-menu></girafe-default-context-menu>
-    <girafe-custom-context-menu></girafe-custom-context-menu>
+      <girafe-help></girafe-help>
+      <girafe-modals></girafe-modals>
+      <girafe-default-context-menu></girafe-default-context-menu>
+      <girafe-custom-context-menu></girafe-custom-context-menu>
 
-    <div id="content">
-      <div id="main">
-        <girafe-lr-panel class="panel-left" dock="left">
-          <girafe-tree-view slot="main"></girafe-tree-view>
-        </girafe-lr-panel>
-        <div id="content-map">
-          <girafe-map></girafe-map>
-          <div class="info-area">
-            <girafe-basemap></girafe-basemap>
-            <girafe-infobox></girafe-infobox>
-          </div>
-          <girafe-prototype-banner></girafe-prototype-banner>
-          <footer>
-            <girafe-scale></girafe-scale>
-            <girafe-coordinate></girafe-coordinate>
-            <span class="copyright">
-              <span i18n="Information without public faith">Information without public faith</span>
-              <span>
-                ©
-                <a href="https://doc.geomapfish.dev" target="_blank">GeoGirafe</a>,
-                <a href="https://www.swisstopo.admin.ch/en/legal-basis" target="_blank">swisstopo</a>,
-                <a href="http://www.openstreetmap.org/copyright" target="_blank">OSM</a>
+      <div id="content">
+        <div id="main">
+          <girafe-lr-panel class="panel-left" dock="left">
+            <girafe-tree-view slot="main"></girafe-tree-view>
+          </girafe-lr-panel>
+          <div id="content-map">
+            <girafe-map></girafe-map>
+            <div class="info-area">
+              <girafe-basemap></girafe-basemap>
+              <girafe-infobox></girafe-infobox>
+            </div>
+            <girafe-prototype-banner></girafe-prototype-banner>
+            <footer>
+              <girafe-scale></girafe-scale>
+              <girafe-coordinate></girafe-coordinate>
+              <span class="copyright">
+                <span i18n="Information without public faith">Information without public faith</span>
+                <span>
+                  ©
+                  <a href="https://doc.geomapfish.dev" target="_blank">GeoGirafe</a>,
+                  <a href="https://www.swisstopo.admin.ch/en/legal-basis" target="_blank">swisstopo</a>,
+                  <a href="http://www.openstreetmap.org/copyright" target="_blank">OSM</a>
+                </span>
               </span>
-            </span>
-          </footer>
+            </footer>
+          </div>
+          <girafe-lr-panel class="panel-right" dock="right">
+            <girafe-drawing
+              slot="main"
+              data-toggle-path="interface.drawingPanelVisible"
+              data-title="drawing-panel"></girafe-drawing>
+            <girafe-print
+              slot="main"
+              data-toggle-path="interface.printPanelVisible"
+              data-title="print-panel"></girafe-print>
+            <girafe-ext-layer
+              slot="main"
+              data-toggle-path="interface.extLayerPanelVisible"
+              data-title="ext-layer-panel"></girafe-ext-layer>
+            <girafe-cross-section-settings
+              slot="main"
+              data-toggle-path="interface.crossSectionPanelVisible"
+              data-title="cross-section-settings"></girafe-cross-section-settings>
+            <girafe-edit
+              slot="main"
+              data-toggle-path="interface.editPanelVisible"
+              data-title="edit-panel"></girafe-edit>
+            <girafe-layout
+              slot="main"
+              data-toggle-path="interface.layoutPanelVisible"
+              data-title="layout-panel"></girafe-layout>
+            <girafe-about
+              slot="main"
+              data-toggle-path="interface.aboutPanelVisible"
+              data-title="about-panel"></girafe-about>
+            <girafe-user-preferences
+              slot="main"
+              data-toggle-path="interface.userPreferencesPanelVisible"
+              data-title="user-preferences-panel"></girafe-user-preferences>
+            <girafe-share
+              slot="main"
+              data-toggle-path="interface.sharePanelVisible"
+              data-title="share-panel"></girafe-share>
+            <girafe-contact
+              slot="main"
+              data-toggle-path="interface.contactPanelVisible"
+              data-title="contact-panel"></girafe-contact>
+          </girafe-lr-panel>
+
+          <girafe-info-window></girafe-info-window>
+          <girafe-selection-window></girafe-selection-window>
         </div>
-        <girafe-lr-panel class="panel-right" dock="right">
-          <girafe-drawing
-            slot="main"
-            data-toggle-path="interface.drawingPanelVisible"
-            data-title="drawing-panel"></girafe-drawing>
-          <girafe-print
-            slot="main"
-            data-toggle-path="interface.printPanelVisible"
-            data-title="print-panel"></girafe-print>
-          <girafe-ext-layer
-            slot="main"
-            data-toggle-path="interface.extLayerPanelVisible"
-            data-title="ext-layer-panel"></girafe-ext-layer>
-          <girafe-cross-section-settings
-            slot="main"
-            data-toggle-path="interface.crossSectionPanelVisible"
-            data-title="cross-section-settings"></girafe-cross-section-settings>
-          <girafe-edit slot="main" data-toggle-path="interface.editPanelVisible" data-title="edit-panel"></girafe-edit>
-          <girafe-layout
-            slot="main"
-            data-toggle-path="interface.layoutPanelVisible"
-            data-title="layout-panel"></girafe-layout>
-          <girafe-about
-            slot="main"
-            data-toggle-path="interface.aboutPanelVisible"
-            data-title="about-panel"></girafe-about>
-          <girafe-user-preferences
-            slot="main"
-            data-toggle-path="interface.userPreferencesPanelVisible"
-            data-title="user-preferences-panel"></girafe-user-preferences>
-          <girafe-share
-            slot="main"
-            data-toggle-path="interface.sharePanelVisible"
-            data-title="share-panel"></girafe-share>
-          <girafe-contact
-            slot="main"
-            data-toggle-path="interface.contactPanelVisible"
-            data-title="contact-panel"></girafe-contact>
-        </girafe-lr-panel>
-
-        <girafe-info-window></girafe-info-window>
-        <girafe-selection-window></girafe-selection-window>
+        <div id="content-bottom">
+          <girafe-selection-grid dock="bottom"></girafe-selection-grid>
+          <girafe-cross-section-view id="cross-section-footer" dock="bottom"></girafe-cross-section-view>
+        </div>
       </div>
-      <div id="content-bottom">
-        <girafe-selection-grid dock="bottom"></girafe-selection-grid>
-        <girafe-cross-section-view id="cross-section-footer" dock="bottom"></girafe-cross-section-view>
+
+      <div id="buttonbar">
+        <button
+          tip="drawing-panel"
+          slot="menu-content"
+          class="gg-icon-button gg-big"
+          onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
+          <img alt="draw-icon" src="icons/draw.svg" />
+        </button>
+        <button
+          tip="external-entry"
+          slot="menu-content"
+          class="gg-icon-button gg-big"
+          onclick="document.geogirafe.state.interface.extLayerPanelVisible = !document.geogirafe.state.interface.extLayerPanelVisible">
+          <img alt="ext-icon" src="icons/external-entry.svg" />
+        </button>
+        <button
+          tip="print-panel"
+          slot="menu-content"
+          class="gg-icon-button gg-big"
+          plugin="config:print"
+          onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
+          <img alt="print-icon" src="icons/print.svg" />
+        </button>
+        <button
+          tip="lidar-panel"
+          slot="menu-content"
+          class="gg-icon-button gg-big"
+          plugin="config:lidar"
+          onclick="document.geogirafe.state.interface.crossSectionPanelVisible = !document.geogirafe.state.interface.crossSectionPanelVisible">
+          <img alt="cross-section-icon" src="icons/cross-section.svg" />
+        </button>
+        <button
+          tip="edit-panel"
+          slot="menu-content"
+          class="gg-icon-button gg-big"
+          onclick="document.geogirafe.state.interface.editPanelVisible = !document.geogirafe.state.interface.editPanelVisible">
+          <img alt="edit-icon" src="icons/edit.svg" />
+        </button>
+        <button
+          tip="share-panel"
+          slot="menu-content"
+          class="gg-icon-button gg-big"
+          plugin="config:share"
+          onclick="document.geogirafe.state.interface.sharePanelVisible = !document.geogirafe.state.interface.sharePanelVisible">
+          <img alt="share-icon" src="icons/share.svg" />
+        </button>
+        <button
+          tip="layout-panel"
+          class="gg-icon-button gg-big"
+          plugin="config:map3d"
+          onclick="document.geogirafe.state.interface.layoutPanelVisible = !document.geogirafe.state.interface.layoutPanelVisible">
+          <img alt="layout-icon" src="icons/layout.svg" />
+        </button>
+        <button
+          tip="contact-panel"
+          class="gg-icon-button gg-big"
+          plugin="config:contact"
+          onclick="document.geogirafe.state.interface.contactPanelVisible = !document.geogirafe.state.interface.contactPanelVisible">
+          <img alt="layout-icon" src="icons/mail.svg" />
+        </button>
+        <button tip="infra3d" class="gg-icon-button gg-big" plugin="plugin_infra3d" onclick="alert('infra3d')">
+          <img alt="help-icon" src="icons/infra3d.svg" />
+        </button>
+
+        <div class="filler"></div>
+
+        <button
+          tip="help"
+          class="gg-icon-button gg-big"
+          onclick="document.geogirafe.state.interface.helpVisible = true">
+          <img alt="help-icon" src="icons/help.svg" />
+        </button>
+        <button
+          tip="about-panel"
+          class="gg-icon-button gg-big"
+          onclick="document.geogirafe.state.interface.aboutPanelVisible = !document.geogirafe.state.interface.aboutPanelVisible">
+          <img alt="info-icon" src="icons/info.svg" />
+        </button>
+        <button
+          tip="user-preferences-panel"
+          class="gg-icon-button gg-big"
+          onclick="document.geogirafe.state.interface.userPreferencesPanelVisible = !document.geogirafe.state.interface.userPreferencesPanelVisible">
+          <img alt="user-preferences-icon" src="icons/config.svg" />
+        </button>
       </div>
-    </div>
-
-    <div id="buttonbar">
-      <button
-        tip="drawing-panel"
-        slot="menu-content"
-        class="gg-icon-button gg-big"
-        onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
-        <img alt="draw-icon" src="icons/draw.svg" />
-      </button>
-      <button
-        tip="external-entry"
-        slot="menu-content"
-        class="gg-icon-button gg-big"
-        onclick="document.geogirafe.state.interface.extLayerPanelVisible = !document.geogirafe.state.interface.extLayerPanelVisible">
-        <img alt="ext-icon" src="icons/external-entry.svg" />
-      </button>
-      <button
-        tip="print-panel"
-        slot="menu-content"
-        class="gg-icon-button gg-big"
-        plugin="config:print"
-        onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
-        <img alt="print-icon" src="icons/print.svg" />
-      </button>
-      <button
-        tip="lidar-panel"
-        slot="menu-content"
-        class="gg-icon-button gg-big"
-        plugin="config:lidar"
-        onclick="document.geogirafe.state.interface.crossSectionPanelVisible = !document.geogirafe.state.interface.crossSectionPanelVisible">
-        <img alt="cross-section-icon" src="icons/cross-section.svg" />
-      </button>
-      <button
-        tip="edit-panel"
-        slot="menu-content"
-        class="gg-icon-button gg-big"
-        onclick="document.geogirafe.state.interface.editPanelVisible = !document.geogirafe.state.interface.editPanelVisible">
-        <img alt="edit-icon" src="icons/edit.svg" />
-      </button>
-      <button
-        tip="share-panel"
-        slot="menu-content"
-        class="gg-icon-button gg-big"
-        plugin="config:share"
-        onclick="document.geogirafe.state.interface.sharePanelVisible = !document.geogirafe.state.interface.sharePanelVisible">
-        <img alt="share-icon" src="icons/share.svg" />
-      </button>
-      <button
-        tip="layout-panel"
-        class="gg-icon-button gg-big"
-        plugin="config:map3d"
-        onclick="document.geogirafe.state.interface.layoutPanelVisible = !document.geogirafe.state.interface.layoutPanelVisible">
-        <img alt="layout-icon" src="icons/layout.svg" />
-      </button>
-      <button
-        tip="contact-panel"
-        class="gg-icon-button gg-big"
-        plugin="config:contact"
-        onclick="document.geogirafe.state.interface.contactPanelVisible = !document.geogirafe.state.interface.contactPanelVisible">
-        <img alt="layout-icon" src="icons/mail.svg" />
-      </button>
-      <button tip="infra3d" class="gg-icon-button gg-big" plugin="plugin_infra3d" onclick="alert('infra3d')">
-        <img alt="help-icon" src="icons/infra3d.svg" />
-      </button>
-
-      <div class="filler"></div>
-
-      <button tip="help" class="gg-icon-button gg-big" onclick="document.geogirafe.state.interface.helpVisible = true">
-        <img alt="help-icon" src="icons/help.svg" />
-      </button>
-      <button
-        tip="about-panel"
-        class="gg-icon-button gg-big"
-        onclick="document.geogirafe.state.interface.aboutPanelVisible = !document.geogirafe.state.interface.aboutPanelVisible">
-        <img alt="info-icon" src="icons/info.svg" />
-      </button>
-      <button
-        tip="user-preferences-panel"
-        class="gg-icon-button gg-big"
-        onclick="document.geogirafe.state.interface.userPreferencesPanelVisible = !document.geogirafe.state.interface.userPreferencesPanelVisible">
-        <img alt="user-preferences-icon" src="icons/config.svg" />
-      </button>
-    </div>
+    </girafe-app>
   </body>
 </html>

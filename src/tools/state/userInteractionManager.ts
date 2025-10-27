@@ -1,5 +1,4 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import StateManager from './statemanager';
 import { gGEventDependencies, GgUserInteractionEvent } from './userinteractionevent';
 
 /**
@@ -18,7 +17,7 @@ export interface GgUserInteractionListener {
  * providing logic for exclusive listeners, and reverting back to defaults when tools are closed.
  */
 class UserInteractionManager extends GirafeSingleton {
-  private readonly state = StateManager.getInstance().state;
+  private readonly state = this.context.stateManager.state;
 
   private get listenersInState() {
     return this.state.userInteractionListeners;

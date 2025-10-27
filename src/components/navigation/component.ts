@@ -1,7 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MapPosition from '../../tools/state/mapposition';
 import { Bookmark } from './Bookmark';
-import UserDataManager from '../../tools/userdata/userdatamanager';
 
 class NavigationComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -13,8 +12,6 @@ class NavigationComponent extends GirafeHTMLElement {
   public bookmarks: Bookmark[] = [];
   private readonly storagePath: string = 'bookmarks';
 
-  private readonly userDataManager: UserDataManager;
-
   public get hasBookmark() {
     return this.bookmarks.length > 0;
   }
@@ -23,7 +20,6 @@ class NavigationComponent extends GirafeHTMLElement {
 
   constructor() {
     super('navigation');
-    this.userDataManager = UserDataManager.getInstance();
   }
 
   render() {
@@ -55,12 +51,12 @@ class NavigationComponent extends GirafeHTMLElement {
   }
 
   saveBookmarks() {
-    this.userDataManager.saveUserData(this.storagePath, this.bookmarks);
+    this.context.userDataManager.saveUserData(this.storagePath, this.bookmarks);
   }
 
   loadBookmarks() {
     this.bookmarks = [];
-    const storedBookmarks = this.userDataManager.getUserData(this.storagePath) as Bookmark[];
+    const storedBookmarks = this.context.userDataManager.getUserData(this.storagePath) as Bookmark[];
     if (storedBookmarks) {
       for (const bookmark of storedBookmarks) {
         try {
@@ -131,12 +127,11 @@ class NavigationComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.loadBookmarks();
-      this.render();
-      super.girafeTranslate();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    this.loadBookmarks();
+    this.render();
+    super.girafeTranslate();
+    this.registerEvents();
   }
 }
 

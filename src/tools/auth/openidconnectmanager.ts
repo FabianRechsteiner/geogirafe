@@ -14,30 +14,29 @@ import {
   TokenEndpointResponse,
   validateAuthResponse
 } from 'oauth4webapi';
-import UrlManager from '../url/urlmanager';
 
 export default class OpenIdConnectManager extends AbstractConnectManager {
   private authorizationServer?: AuthorizationServer;
   private silentLoginIframe?: HTMLIFrameElement;
 
   private get issuerConfig() {
-    return this.configManager.Config.oauth!.issuer;
+    return this.context.configManager.Config.oauth!.issuer;
   }
 
   private authProcessed() {
-    return this.urlManager.getParam('authentified') !== null;
+    return this.context.urlManager.getParam('authentified') !== null;
   }
 
   private isAuthentified() {
-    return this.urlManager.getParam('authentified') === 'true';
+    return this.context.urlManager.getParam('authentified') === 'true';
   }
 
   private isLoggedOut() {
-    return this.urlManager.getParam('authentified') === 'false';
+    return this.context.urlManager.getParam('authentified') === 'false';
   }
 
   private hasAuthError() {
-    return this.urlManager.getParam('error') !== null;
+    return this.context.urlManager.getParam('error') !== null;
   }
 
   public override async initialize() {
@@ -56,7 +55,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
         await this.handleLoggedInToIssuer();
       } else {
         // We are back but with an error.
-        this.state.oauth.error = this.urlManager.getParam('error')!;
+        this.state.oauth.error = this.context.urlManager.getParam('error')!;
         this.state.oauth.status = 'loginFailed';
       }
     } else if (this.isLoggedOut()) {
@@ -101,7 +100,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     // If we are in an autologin case, we use the state from the URL
     // Otherwise we use the current state of the application
     if (!silent) {
-      this.sessionManager.saveStateToSession();
+      this.context.sessionManager.saveStateToSession();
     }
     this.redirectUrl = this.getLoginRedirectUrl(silent);
 
@@ -171,7 +170,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
       for (const [key, value] of params.entries()) {
         newUrl.searchParams.set(key, value);
       }
-      UrlManager.getInstance().updateUrl(newUrl);
+      this.context.urlManager.updateUrl(newUrl);
       await this.handleLoggedInToIssuer();
     } else if (event.data?.type === 'OAUTH_ERROR') {
       console.info('Silent login could not be done : ', event.data.error);
@@ -256,7 +255,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
 
   async logoutFromIssuer() {
     // Save the current state of the application before logout
-    this.sessionManager.saveStateToSession();
+    this.context.sessionManager.saveStateToSession();
 
     const authorizationServer = await this.getAuthorizationServer();
     const issuerLogoutUrl = new URL(authorizationServer.end_session_endpoint as string);

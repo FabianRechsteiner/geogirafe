@@ -1,9 +1,6 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 import { isSnappableLayer, SnappableLayer } from '../../models/layers/snappablelayer';
 import SelectionParam from '../../models/selectionparam';
-import StateManager from '../state/statemanager';
-import MapManager from '../../tools/state/mapManager';
-import WfsManager from '../../tools/wfs/wfsmanager';
 import Snap from 'ol/interaction/Snap';
 import { Collection, Feature, Map as OlMap } from 'ol';
 import Layer from '../../models/layers/layer';
@@ -16,23 +13,19 @@ type SnapOptions = {
 
 class SnapManager extends GirafeSingleton {
   private readonly snapLayers = new Map<SnappableLayer, SnapOptions>();
-  private readonly stateManager: StateManager;
 
   private get olMap(): OlMap {
-    return MapManager.getInstance().getMap();
+    return this.context.mapManager.getMap();
   }
 
-  constructor(type: string) {
-    super(type);
-
-    this.stateManager = StateManager.getInstance();
-    this.stateManager.subscribe(
+  override initializeSingleton() {
+    this.context.stateManager.subscribe(
       /layers\.layersList\..*\.activeState/,
       (_oldActive: string, _newActive: string, layer: Layer) => {
         this.layerUpdated(layer);
       }
     );
-    this.stateManager.subscribe(
+    this.context.stateManager.subscribe(
       /layers\.layersList\..*\.snapActive/,
       (_oldSnap: boolean, _newSnap: boolean, layer: SnappableLayer) => {
         this.layerUpdated(layer);
@@ -116,9 +109,14 @@ class SnapManager extends GirafeSingleton {
   }
 
   private async loadFeaturesForLayer(layer: SnappableLayer, options: SnapOptions) {
-    const client = WfsManager.getInstance().getClient(layer.ogcServer);
+    const client = this.context.wfsManager.getClient(layer.ogcServer);
     const extent = this.olMap.getView().getViewStateAndExtent().extent;
-    const selectionParam = new SelectionParam(layer.ogcServer, [layer], this.stateManager.state.projection, extent);
+    const selectionParam = new SelectionParam(
+      layer.ogcServer,
+      [layer],
+      this.context.stateManager.state.projection,
+      extent
+    );
     const features = await client.getFeature(selectionParam);
     options.snapFeatures.extend(features);
   }

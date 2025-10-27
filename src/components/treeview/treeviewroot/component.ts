@@ -2,16 +2,14 @@ import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import BaseLayer from '../../../models/layers/baselayer';
 import GroupLayer from '../../../models/layers/grouplayer';
 import ThemeLayer from '../../../models/layers/themelayer';
-import LayerManager from '../../../tools/layers/layermanager';
 import LayerWms from '../../../models/layers/layerwms';
-import { filterLayerTree } from '../tools/treeviewfilter';
-import ThemesHelper from '../../../tools/themes/themeshelper';
+import TreeViewFilterHelper from '../tools/treeviewfilter';
 
 class TreeViewRootComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['./style.css', '../../../styles/common.css'];
 
-  private readonly layerManager: LayerManager;
+  private filterHelper!: TreeViewFilterHelper;
 
   private isAllExpanded: boolean = false;
   private areAllLegendExpanded: boolean = true;
@@ -19,11 +17,10 @@ class TreeViewRootComponent extends GirafeHTMLElement {
 
   constructor() {
     super('treeviewroot');
-    this.layerManager = LayerManager.getInstance();
   }
 
   public sortedLayers() {
-    return this.layerManager.getSortedLayers(this.state.layers.layersList);
+    return this.context.layerManager.getSortedLayers(this.state.layers.layersList);
   }
 
   public render() {
@@ -41,11 +38,11 @@ class TreeViewRootComponent extends GirafeHTMLElement {
     this.subscribe(/layers\.layersList\..*\.order/, () => this.refreshRender());
   }
 
-  protected connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      this.registerEvents();
-    });
+  connectedCallback() {
+    super.connectedCallback();
+    this.filterHelper = new TreeViewFilterHelper(this.context);
+    this.render();
+    this.registerEvents();
   }
 
   public expandAll() {
@@ -80,7 +77,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   }
 
   public removeAll() {
-    ThemesHelper.getInstance().emptyLayerTree();
+    this.context.themesHelper.emptyLayerTree();
     this.state.themes.lastSelectedTheme = null;
   }
 
@@ -92,7 +89,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
     // Pause rendering during filtering to improve performance
     this.state.treeview.renderEnabled = false;
     try {
-      filterLayerTree(this.state.layers.layersList, searchText);
+      this.filterHelper.filterLayerTree(this.state.layers.layersList, searchText);
       this.isTreeFiltered = true;
     } finally {
       this.state.treeview.renderEnabled = true;
@@ -109,7 +106,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
       filterField.value = '';
 
       // Set all layers back to being visible
-      const allLayers = LayerManager.getInstance().getFlattenedLayerTree(this.state.layers.layersList);
+      const allLayers = this.context.layerManager.getFlattenedLayerTree(this.state.layers.layersList);
       allLayers.forEach((layer) => {
         if (!layer.isVisible) {
           layer.isVisible = true;

@@ -42,10 +42,9 @@ class AboutComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    this.render();
+    this.registerEvents();
   }
 
   render() {

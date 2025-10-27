@@ -15,10 +15,9 @@ class VideoRecordComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      super.render();
-      super.girafeTranslate();
-    });
+    super.connectedCallback();
+    super.render();
+    super.girafeTranslate();
   }
 
   async startRecording() {

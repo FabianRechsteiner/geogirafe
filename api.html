@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, shrink-to-fit=no" />
+
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>GeoGirafe API</title>
+    <style>
+      body {
+        font-family: Arial, Verdana, Tahoma, sans-serif;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      ::-webkit-scrollbar {
+        width: 3px;
+        z-index: 0;
+        height: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        z-index: 0;
+        background: #888;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        z-index: 0;
+      }
+
+      pre {
+        border: 1px solid gray;
+        background-color: black;
+        color: white;
+        padding: 8px;
+        border-radius: 6px;
+        font-size: 14px;
+        overflow: auto;
+        box-sizing: border-box;
+        width: 100%;
+        resize: vertical;
+        margin: 0;
+      }
+
+      section {
+        width: 100%;
+        padding: 8px;
+        max-width: 1440px;
+        height: 20rem;
+      }
+
+      .row {
+        display: flex;
+        align-items: start;
+        gap: 8px;
+        height: 100%;
+      }
+
+      .left {
+        width: 50%;
+        height: 100%;
+      }
+
+      .right {
+        width: 50%;
+        height: 100%;
+      }
+
+      girafe-map {
+        display: block;
+        width: 100%;
+        height: 100%;
+        resize: both;
+      }
+
+      ::-webkit-resizer {
+        border-top: 20px solid transparent;
+        border-right: 20px solid gray;
+      }
+
+      #resultOnChange {
+        height: 150px;
+      }
+
+      .main {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        padding: 8px;
+        border: solid 1px #aaa;
+        max-width: 1440px;
+        margin: auto;
+        margin-top: 5rem;
+      }
+      h2 {
+        border-bottom: solid 1px #aaa;
+        padding-bottom: 0.5rem;
+        width: 100%;
+      }
+    </style>
+    <script type="module" src="./src/api/api.ts"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const apiOrigin = `${window.location.origin}${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}`;
+        const elem = document.getElementById('include-code');
+
+        elem.textContent = elem.textContent.replace('src="/geogirafe-api.js"', `src="${apiOrigin}/geogirafe-api.js"`);
+
+        const sections = document.querySelectorAll('section');
+        sections.forEach((section) => {
+          const leftDiv = section.querySelector('.left');
+          const rightDiv = section.querySelector('.right');
+          if (leftDiv && rightDiv) {
+            let content = leftDiv.innerHTML;
+            content = content.replace(/\s+/g, ' ').replace(/>\s+/g, '>').replace(/\s+</g, '<').trim();
+            const pre = document.createElement('pre');
+            pre.textContent = content;
+            rightDiv.appendChild(pre);
+          }
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div class="main">
+      <h1>GeoGirafe-API</h1>
+
+      <section>
+        <p>
+          This page describes how to use the GeoGirafe API. The API provides a modern web component that enables easy
+          integration into websites. <br />
+          Technically, the API is a lightweight GeoGirafe application that already includes predefined components and
+          services.
+          <br /><br />
+          Examples are provided below.
+        </p>
+
+        <h2>Basics</h2>
+
+        <p>To use the API, simply add the following code on your website:</p>
+
+        <pre id="include-code">
+&lt;head&gt;
+  &lt;script type="module" crossorigin src="/geogirafe-api.js"&gt;&lt;/script&gt;
+&lt;/head&gt;</pre
+        >
+      </section>
+
+      <!-- Simple map -->
+      <h2>Add a simple map view</h2>
+      <section>
+        <div class="row">
+          <div class="left">
+            <geogirafe-map />
+          </div>
+          <div class="right"></div>
+        </div>
+      </section>
+
+      <!-- With center -->
+      <h2>Add a map with center coordinates</h2>
+      <section>
+        <div class="row">
+          <div class="left">
+            <geogirafe-map center="2614484, 1267592" />
+          </div>
+          <div class="right"></div>
+        </div>
+      </section>
+
+      <!-- Custom zoom level -->
+      <h2>Add a map with a custom zoomlevel</h2>
+      <section>
+        <div class="row">
+          <div class="left">
+            <geogirafe-map zoom="11" />
+          </div>
+          <div class="right"></div>
+        </div>
+      </section>
+
+      <!-- Custom basemap -->
+      <h2>Add a map with a custom basemap</h2>
+      <section>
+        <div class="row">
+          <div class="left">
+            <geogirafe-map basemap="OF_Orthofoto2023Mai" />
+          </div>
+          <div class="right"></div>
+        </div>
+      </section>
+
+      <!-- Basemap selector  -->
+      <!-- <h2>Add a map with a basemap selector</h2>
+      <section>
+        <div class="row">
+          <div class="left">
+            <geogirafe-map basemapselector />
+          </div>
+          <div class="right"></div>
+        </div>
+      </section> -->
+    </div>
+  </body>
+</html>

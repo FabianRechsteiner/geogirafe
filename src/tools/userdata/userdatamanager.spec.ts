@@ -1,19 +1,20 @@
 import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
-import UserDataManager from './userdatamanager';
-import ConfigManager from '../configuration/configmanager';
-import CustomThemesManager from '../themes/customthemesmanager';
 import MockHelper from '../tests/mockhelper';
+import IGirafeContext from '../context/icontext';
+import UserDataManager from './userdatamanager';
 
 describe('UserDataManager.getUserData', () => {
-  const manager = UserDataManager.getInstance();
+  let context: IGirafeContext;
+  let manager: UserDataManager;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
+    manager = context.userDataManager;
     manager.setSource('localStorage');
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
     manager.deleteAllUserData();
   });
 
@@ -37,16 +38,19 @@ describe('UserDataManager.getUserData', () => {
 });
 
 describe('UserDataManager.saveUserData', () => {
-  const manager = UserDataManager.getInstance();
-  const configPath = ConfigManager.getInstance()['storagePathForOverrides'];
+  let context: IGirafeContext;
+  let manager: UserDataManager;
+  let configPath: string;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
+    manager = context.userDataManager;
+    configPath = context.configManager['storagePathForOverrides'];
     manager.setSource('localStorage');
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
     manager.deleteAllUserData();
   });
 
@@ -80,7 +84,7 @@ describe('UserDataManager.saveUserData', () => {
   });
 
   it('should overwrite user data in storage by providing a path and object', () => {
-    const customThemesPath = CustomThemesManager.getInstance()['storagePath'];
+    const customThemesPath = context.customThemesManager['storagePath'];
     const customThemes = { theme1: [], theme2: [{ c: 1, e: 0, i: 2345, o: 3456 }] };
     manager.saveUserData(customThemesPath, customThemes);
 
@@ -103,15 +107,17 @@ describe('UserDataManager.saveUserData', () => {
 });
 
 describe('UserDataManager.deleteUserData', () => {
-  const manager = UserDataManager.getInstance();
+  let context: IGirafeContext;
+  let manager: UserDataManager;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
+    manager = context.userDataManager;
     manager.setSource('localStorage');
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
     manager.deleteAllUserData();
   });
 
@@ -145,15 +151,17 @@ describe('UserDataManager.deleteUserData', () => {
 });
 
 describe('UserDataManager.deleteAllUserData', () => {
-  const manager = UserDataManager.getInstance();
+  let context: IGirafeContext;
+  let manager: UserDataManager;
 
   beforeAll(() => {
-    MockHelper.startMocking();
+    context = MockHelper.startMocking();
+    manager = context.userDataManager;
     manager.setSource('localStorage');
   });
 
   afterAll(() => {
-    MockHelper.stopMocking();
+    MockHelper.stopMocking(context);
     manager.deleteAllUserData();
   });
 

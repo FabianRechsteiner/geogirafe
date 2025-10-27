@@ -1,13 +1,11 @@
 import type OlFeature from 'ol/Feature';
 import OlGeomGeometry from 'ol/geom/Geometry';
-import ConfigManager from '../../../tools/configuration/configmanager';
 import FeatureToGridDataById, { GridData, GridDataById } from '../../../tools/featuretogriddatabyid';
-import I18nManager from '../../../tools/i18n/i18nmanager';
 import FormatGridGeomValue from './formatgridgeomvalue';
 import { ColumnDefinition, TabulatorFull as Tabulator } from 'tabulator-tables';
-import StateManager from '../../../tools/state/statemanager';
 import { getUid } from 'ol/util';
-import { getColumnAlias } from '../../../tools/utils/aliases';
+import ColumnAliasHelper from '../../../tools/utils/aliases';
+import IGirafeContext from '../../../tools/context/icontext';
 
 /**
  * Represents the header text and state of a tab.
@@ -36,19 +34,24 @@ export interface TabContent {
 }
 
 export default class SelectionTabulatorManager {
-  private readonly formatGridGeomValue = new FormatGridGeomValue();
-  private readonly configManager: ConfigManager;
-  private readonly featureToGridData = new FeatureToGridDataById({ keepGeomProperty: true });
-  private readonly stateManager: StateManager;
+  private readonly formatGridGeomValue: FormatGridGeomValue;
+  private readonly featureToGridData: FeatureToGridDataById;
   idTab: Record<string, TabContent> = {};
   tabHeaders: TabHeader[] = [];
   table: Tabulator | null = null;
   element: string | HTMLElement = '';
   data: GridDataById = {};
+  private readonly context: IGirafeContext;
+  private readonly columnAliasHelper: ColumnAliasHelper;
 
-  constructor() {
-    this.configManager = ConfigManager.getInstance();
-    this.stateManager = StateManager.getInstance();
+  constructor(context: IGirafeContext) {
+    this.context = context;
+    this.columnAliasHelper = new ColumnAliasHelper(context.stateManager);
+    this.formatGridGeomValue = new FormatGridGeomValue(
+      this.context.configManager.Config.general.locale,
+      this.context.stateManager.state.projection
+    );
+    this.featureToGridData = new FeatureToGridDataById({ keepGeomProperty: true });
   }
 
   /**
@@ -108,7 +111,7 @@ export default class SelectionTabulatorManager {
 
     this.table?.on('rowSelectionChanged', (selection) => {
       // True if at least one row is selected.
-      this.stateManager.state.selection.gridSelected = selection.length > 0;
+      this.context.stateManager.state.selection.gridSelected = selection.length > 0;
 
       // Create a Map of features by their UIDs
       const featureMap = new Map<string, OlFeature<OlGeomGeometry>>();
@@ -122,7 +125,7 @@ export default class SelectionTabulatorManager {
         .map((row) => featureMap.get(getUid(row.geom ?? row.the_geom ?? row.geometry)))
         .filter((feature): feature is OlFeature => feature !== undefined);
 
-      this.stateManager.state.selection.highlightedFeatures = highlightedGeometries;
+      this.context.stateManager.state.selection.highlightedFeatures = highlightedGeometries;
     });
   }
 
@@ -141,7 +144,7 @@ export default class SelectionTabulatorManager {
     this.tabHeaders = Object.keys(this.idTab).map((key) => {
       return {
         id: key,
-        text: I18nManager.getInstance().getTranslation(key),
+        text: this.context.i18nManager.getTranslation(key),
         active: false
       };
     });
@@ -168,9 +171,9 @@ export default class SelectionTabulatorManager {
   columnsToGridColumns(idTable: string, columns: string[]): ColumnDefinition[] {
     const columnDefinition: ColumnDefinition[] = [];
     columns.forEach((column) => {
-      const columnAlias = getColumnAlias(idTable, column);
+      const columnAlias = this.columnAliasHelper.getColumnAlias(idTable, column);
       columnDefinition.push({
-        title: I18nManager.getInstance().getTranslation(columnAlias),
+        title: this.context.i18nManager.getTranslation(columnAlias),
         field: column,
         formatter: 'html'
       });
@@ -179,7 +182,7 @@ export default class SelectionTabulatorManager {
     columnDefinition.forEach((column) => {
       if (column.field === 'the_geom' || column.field === 'geom' || column.field === 'geometry') {
         column.formatter = (cell) => {
-          return this.formatGridGeomValue.getGeometryIcons(cell.getValue(), this.getLocale()) ?? cell.getValue();
+          return this.formatGridGeomValue.getGeometryIcons(cell.getValue()) ?? cell.getValue();
         };
       }
     });
@@ -207,10 +210,10 @@ export default class SelectionTabulatorManager {
    * @private
    */
   private createGridColumn(idTable: string, idColumn: string): Column {
-    const columnAlias = getColumnAlias(idTable, idColumn);
+    const columnAlias = this.columnAliasHelper.getColumnAlias(idTable, idColumn);
     return {
       id: idColumn,
-      name: I18nManager.getInstance().getTranslation(columnAlias)
+      name: this.context.i18nManager.getTranslation(columnAlias)
     };
   }
 
@@ -221,16 +224,8 @@ export default class SelectionTabulatorManager {
    */
   private createGridData(values: unknown[]): unknown[] {
     return values.map((value) =>
-      value instanceof OlGeomGeometry ? this.formatGridGeomValue.getGeometryIcons(value, this.getLocale()) : value
+      value instanceof OlGeomGeometry ? this.formatGridGeomValue.getGeometryIcons(value) : value
     );
-  }
-
-  /**
-   * @returns The locale specified in the configuration.
-   * @private
-   */
-  private getLocale(): string {
-    return this.configManager.Config.general.locale;
   }
 
   blockRedraw(): void {

@@ -1,12 +1,13 @@
-import GirafeSingleton from '../../../base/GirafeSingleton';
 import BaseLayer from '../../../models/layers/baselayer';
 import DragHelper from './draghelper';
+import GirafeSingleton from '../../../base/GirafeSingleton';
 
 class DragManager extends GirafeSingleton {
   private layer?: BaseLayer;
   private destination?: BaseLayer;
   public dragAfter: boolean = false;
   public dragBefore: boolean = false;
+  private readonly dragHelper: DragHelper = new DragHelper(this.context.stateManager);
 
   public dragStart(layer: BaseLayer) {
     this.layer = layer;
@@ -15,9 +16,9 @@ class DragManager extends GirafeSingleton {
   public dragEnd() {
     if (this.layer && this.destination && this.layer.parent === this.destination.parent) {
       if (this.layer.order < this.destination.order) {
-        DragHelper.moveLayerAfter(this.layer, this.destination);
+        this.dragHelper.moveLayerAfter(this.layer, this.destination);
       } else if (this.layer.order > this.destination.order) {
-        DragHelper.moveLayerBefore(this.layer, this.destination);
+        this.dragHelper.moveLayerBefore(this.layer, this.destination);
       } else {
         throw Error('Orders are equal. Not managed yet');
       }

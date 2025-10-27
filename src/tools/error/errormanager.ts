@@ -1,24 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import GirafeSingleton from '../../base/GirafeSingleton';
-import ConfigManager from '../configuration/configmanager';
-import StateManager from '../state/statemanager';
 import ErrorStackParser from 'error-stack-parser';
 import { SourceMapConsumer } from 'source-map-js';
-import ShareManager from '../share/sharemanager';
-import I18nManager from '../i18n/i18nmanager';
 
 class ErrorManager extends GirafeSingleton {
-  configManager: ConfigManager;
-  stateManager: StateManager;
-  i18nManager: I18nManager;
-
   private sourceMaps: { [key: string]: SourceMapConsumer } = {};
 
-  constructor(type: string) {
-    super(type);
-    this.configManager = ConfigManager.getInstance();
-    this.stateManager = StateManager.getInstance();
-    this.i18nManager = I18nManager.getInstance();
+  initializeSingleton() {
     this.listenToAllErrors();
   }
 
@@ -45,13 +33,13 @@ ${stack}
 
   public pushMessage(id: string, text: string, level: 'info' | 'warning' | 'error') {
     // Remove existing message with the same id
-    const msgIndex = this.stateManager.state.infobox.elements.findIndex((el) => el.id === id);
+    const msgIndex = this.context.stateManager.state.infobox.elements.findIndex((el) => el.id === id);
     if (msgIndex !== -1) {
-      this.stateManager.state.infobox.elements.splice(msgIndex, 1);
+      this.context.stateManager.state.infobox.elements.splice(msgIndex, 1);
     }
 
     // Add a new one
-    this.stateManager.state.infobox.elements.push({
+    this.context.stateManager.state.infobox.elements.push({
       id: id,
       text: text,
       type: level
@@ -96,11 +84,11 @@ ${stack}
 
   private pushErrorMessageWithStack(title: string, stack: string) {
     // Add new errormessage only if not already present
-    const pendingMessages = this.stateManager.state.infobox.elements.map((ele) => ele.text);
+    const pendingMessages = this.context.stateManager.state.infobox.elements.map((ele) => ele.text);
     const contextUrl = this.getContextUrl();
     const errorMessage = this.getErrorMessage(title, stack, contextUrl);
     if (!pendingMessages.includes(errorMessage)) {
-      this.stateManager.state.infobox.elements.push({
+      this.context.stateManager.state.infobox.elements.push({
         id: uuidv4(),
         text: errorMessage,
         type: 'error'
@@ -111,7 +99,7 @@ ${stack}
   private getContextUrl() {
     const base = window.location.href.split('#')[0];
     try {
-      const hash = ShareManager.getInstance().getStateToShare();
+      const hash = this.context.shareManager.getStateToShare();
       return `${base}#${hash}`;
     } catch {
       return base;

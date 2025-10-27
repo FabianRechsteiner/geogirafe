@@ -1,5 +1,4 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import I18nManager from '../../tools/i18n/i18nmanager';
 
 type ModalType = 'alert' | 'confirm' | 'prompt';
 
@@ -15,27 +14,18 @@ class ModalsComponent extends GirafeHTMLElement {
   resolveAlertConfirm!: (value: boolean) => void;
   resolvePrompt!: (value: string | false) => void;
 
-  i18nManager: I18nManager = I18nManager.getInstance();
-
   constructor() {
     super('native-modals');
-
-    window.gConfirm = (message: string, title?: string): Promise<boolean> =>
-      this.alertConfirmBox('confirm', message, title);
-    window.gAlert = (message: string, title?: string): Promise<boolean> =>
-      this.alertConfirmBox('alert', message, title);
-    window.gPrompt = (message: string, title?: string, placeholder?: string): Promise<string | false> =>
-      this.promptBox(message, title, placeholder);
   }
 
   private initBox(type: ModalType, message: string, title?: string, placeholder?: string) {
     this.boxType = type;
-    this.boxMessage = this.i18nManager.getTranslation(message);
+    this.boxMessage = this.context.i18nManager.getTranslation(message);
     if (title) {
-      this.boxTitle = this.i18nManager.getTranslation(title);
+      this.boxTitle = this.context.i18nManager.getTranslation(title);
     }
     if (placeholder) {
-      this.boxPlaceholder = this.i18nManager.getTranslation(placeholder);
+      this.boxPlaceholder = this.context.i18nManager.getTranslation(placeholder);
     }
 
     this.visible = true;
@@ -95,10 +85,16 @@ class ModalsComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-    });
+    super.connectedCallback();
+    window.gConfirm = (message: string, title?: string): Promise<boolean> =>
+      this.alertConfirmBox('confirm', message, title);
+    window.gAlert = (message: string, title?: string): Promise<boolean> =>
+      this.alertConfirmBox('alert', message, title);
+    window.gPrompt = (message: string, title?: string, placeholder?: string): Promise<string | false> =>
+      this.promptBox(message, title, placeholder);
+
+    this.render();
+    super.girafeTranslate();
   }
 }
 

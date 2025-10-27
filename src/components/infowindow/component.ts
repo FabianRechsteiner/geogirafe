@@ -10,28 +10,6 @@ class InfoWindowComponent extends GirafeDraggableElement {
 
   constructor() {
     super('infowindow');
-
-    // Initialize floating window
-    window.gOpenWindow = (
-      title: string,
-      url: string,
-      width?: string | number,
-      height?: string | number,
-      top?: string | number,
-      left?: string | number
-    ): void => {
-      // Update infoWindow state
-      this.state.infoWindow.title = title;
-      this.state.infoWindow.url = url;
-      this.state.infoWindow.width = width ?? null;
-      this.state.infoWindow.height = height ?? null;
-      this.state.infoWindow.top = top ?? null;
-      this.state.infoWindow.left = left ?? null;
-      // Trigger window to appear
-      this.state.interface.infoWindowVisible = true;
-    };
-
-    this.updateWindowSizeAndPosition();
   }
 
   registerEvents() {
@@ -71,7 +49,7 @@ class InfoWindowComponent extends GirafeDraggableElement {
   }
 
   private updateWindowSizeAndPosition() {
-    const windowConfig = this.configManager.Config.infoWindow;
+    const windowConfig = this.context.configManager.Config.infoWindow;
     const host = (this.shadow.getRootNode() as ShadowRoot).host as HTMLElement;
     host.style.width = this.configToCssValue(this.state.infoWindow.width) ?? windowConfig.defaultWindowWidth;
     host.style.height = this.configToCssValue(this.state.infoWindow.height) ?? windowConfig.defaultWindowHeight;
@@ -84,10 +62,30 @@ class InfoWindowComponent extends GirafeDraggableElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    // Initialize floating window
+    window.gOpenWindow = (
+      title: string,
+      url: string,
+      width?: string | number,
+      height?: string | number,
+      top?: string | number,
+      left?: string | number
+    ): void => {
+      // Update infoWindow state
+      this.state.infoWindow.title = title;
+      this.state.infoWindow.url = url;
+      this.state.infoWindow.width = width ?? null;
+      this.state.infoWindow.height = height ?? null;
+      this.state.infoWindow.top = top ?? null;
+      this.state.infoWindow.left = left ?? null;
+      // Trigger window to appear
+      this.state.interface.infoWindowVisible = true;
+    };
+
+    this.updateWindowSizeAndPosition();
+    this.render();
+    this.registerEvents();
   }
 
   private configToCssValue(value: string | number | null): string | null {

@@ -1,15 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import ConfigManager from './configmanager';
 import GirafeConfig from './girafeconfig';
 import MockHelper from '../tests/mockhelper';
 import TestHelper from '../tests/testhelper';
+import { MockConfig } from '../tests/mockconfig';
 
 describe('ConfigManager.loadConfig', () => {
-  const manager = ConfigManager.getInstance();
+  const context = MockHelper.startMocking();
+  const manager = context.configManager;
 
   it('should return config if config is already loaded', async () => {
     // @ts-ignore
-    manager.config = new GirafeConfig(MockHelper.mockConfig);
+    manager.config = new GirafeConfig(MockConfig);
     manager.loadConfig().then((config) => {
       // No promise should have been created here, because the config is already given.
       // @ts-ignore
@@ -20,15 +21,15 @@ describe('ConfigManager.loadConfig', () => {
 
   it('the given configuration entries should be present in the final configuration', async () => {
     // @ts-ignore (use of private member for testing purpose only)
-    manager.config = new GirafeConfig(MockHelper.mockConfig);
+    manager.config = new GirafeConfig(MockConfig);
     manager.loadConfig().then((config) => {
-      expect(TestHelper.obj2ContainsObj1PropertiesValues(MockHelper.mockConfig, config)).toBeTruthy();
+      expect(TestHelper.obj2ContainsObj1PropertiesValues(MockConfig, config)).toBeTruthy();
     });
   });
 
   it('the default configuration values should be present in the final configuration', async () => {
     // @ts-ignore
-    manager.config = new GirafeConfig(MockHelper.mockConfig);
+    manager.config = new GirafeConfig(MockConfig);
     manager.loadConfig().then((config) => {
       expect(config.themes.imagesUrlPrefix).toEqual('');
       expect(config.general.locale).toEqual(GirafeConfig.DEFAULT_LOCALE);
@@ -40,7 +41,7 @@ describe('ConfigManager.loadConfig', () => {
   });
 
   it('the overridden configuration entries should be present in the final configuration', async () => {
-    const myConfig = { ...MockHelper.mockConfig };
+    const myConfig = { ...MockConfig };
     myConfig.themes.url = 'https://www.my-custom-themes-url.reg';
     myConfig.map.srid = 'EPSG:2222';
     // @ts-ignore (use of private member for testing purpose only)
@@ -51,7 +52,7 @@ describe('ConfigManager.loadConfig', () => {
   });
 
   it('the new configuration entries should be present in the final configuration', async () => {
-    const myConfig = { ...MockHelper.mockConfig };
+    const myConfig = { ...MockConfig };
     // @ts-ignore
     myConfig.languages.translations = { de: 'https://www.my-custom-language-url.reg' };
     // @ts-ignore
@@ -65,7 +66,7 @@ describe('ConfigManager.loadConfig', () => {
 
   it('should ignore invalid keys in user preferences when loading the config', () => {
     const invalidKey = 'thisIsAnInvalidKey';
-    const myConfig = { ...MockHelper.mockConfig };
+    const myConfig = { ...MockConfig };
     // @ts-ignore
     myConfig.basemaps[invalidKey] = 'someValue';
     // @ts-ignore
@@ -77,7 +78,7 @@ describe('ConfigManager.loadConfig', () => {
 
   it('should manage if there is no third-party config in the extended configuration', () => {
     // @ts-ignore
-    manager.config = new GirafeConfig(MockHelper.mockConfig);
+    manager.config = new GirafeConfig(MockConfig);
     manager.loadConfig().then((config) => {
       expect(Object.keys(config)).toContain('extendedConfig');
       expect(config.extendedConfig).toBeUndefined();
@@ -92,7 +93,7 @@ describe('ConfigManager.loadConfig', () => {
         someThirdConfig: ['someThirdValue']
       }
     };
-    const myConfig = { ...MockHelper.mockConfig };
+    const myConfig = { ...MockConfig };
     // @ts-ignore
     myConfig.extendedConfig = thirdPartyConfig;
     // @ts-ignore

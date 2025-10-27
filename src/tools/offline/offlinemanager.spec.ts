@@ -5,6 +5,7 @@ import LayerWmts from '../../models/layers/layerwmts';
 import { createTestLayerWmts } from '../tests/layerhelpers';
 import MockHelper from '../tests/mockhelper';
 import { createOlWmtsLayer } from '../tests/olhelpers';
+import IGirafeContext from '../context/icontext';
 
 vi.mock('./download', () => ({
   download: vi.fn()
@@ -12,10 +13,11 @@ vi.mock('./download', () => ({
 
 describe('OfflineManager', () => {
   let offlineManager: OfflineManager;
+  let context: IGirafeContext;
 
   beforeEach(() => {
-    MockHelper.startMocking();
-    offlineManager = OfflineManager.getInstance();
+    context = MockHelper.startMocking();
+    offlineManager = context.offlineManager;
   });
 
   describe('OfflineManager.getAllTileUrls', () => {

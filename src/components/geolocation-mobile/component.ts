@@ -10,13 +10,11 @@ import Style from 'ol/style/Style.js';
 import { RegularShape } from 'ol/style';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import MapManager from '../../tools/state/mapManager';
 import locationDisabledIcon from '../../assets/icons/location_disabled.svg';
 import locationSearchingIcon from '../../assets/icons/location_searching.svg';
 import locationHeadingIcon from '../../assets/icons/location_heading.svg';
 import myLocationIcon from '../../assets/icons/my_location.svg';
 import type { Coordinate } from 'ol/coordinate';
-import I18nManager from '../../tools/i18n/i18nmanager';
 
 type GeolocationStatus = 'off' | 'error' | 'searching' | 'tracking' | 'headlock';
 
@@ -104,9 +102,10 @@ export default class GeolocationMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.registerInteractionListener('map.contextmenu', false);
 
-    const map = MapManager.getInstance().getMap();
+    const map = this.context.mapManager.getMap();
 
     const onMapInteract = () => {
       if (this.status === 'headlock') {
@@ -444,19 +443,19 @@ export default class GeolocationMobile extends GirafeHTMLElement {
     // When the geolocalization is activated, a toast message is displayed to
     // inform how to disable it
     const infoMessageId = crypto.randomUUID();
-    this.stateManager.state.infobox.elements.push({
+    this.context.stateManager.state.infobox.elements.push({
       id: infoMessageId,
-      text: I18nManager.getInstance().getTranslation('Longpress disable geolocation'),
+      text: this.context.i18nManager.getTranslation('Longpress disable geolocation'),
       type: 'info'
     });
 
     // The message is shown for a few seconds and then is removed without the need
     // for the user to close it
     setTimeout(() => {
-      for (let i = 0; i < this.stateManager.state.infobox.elements.length; i += 1) {
-        const infoMessage = this.stateManager.state.infobox.elements[i];
+      for (let i = 0; i < this.context.stateManager.state.infobox.elements.length; i += 1) {
+        const infoMessage = this.context.stateManager.state.infobox.elements[i];
         if (infoMessage.id === infoMessageId) {
-          this.stateManager.state.infobox.elements.splice(i, 1);
+          this.context.stateManager.state.infobox.elements.splice(i, 1);
           break;
         }
       }
@@ -488,7 +487,7 @@ export default class GeolocationMobile extends GirafeHTMLElement {
       return;
     }
 
-    MapManager.getInstance().getMap().getView().animate({
+    this.context.mapManager.getMap().getView().animate({
       center: coordinates,
       duration
     });
@@ -505,7 +504,7 @@ export default class GeolocationMobile extends GirafeHTMLElement {
       return false;
     }
 
-    const map = MapManager.getInstance().getMap();
+    const map = this.context.mapManager.getMap();
 
     // Get the pixel for the geolocation coordinates
     const pixel = map.getPixelFromCoordinate(coordinates);
@@ -528,9 +527,9 @@ export default class GeolocationMobile extends GirafeHTMLElement {
       const animationDuration = 300;
       const arrowRotationStart = ((this.headingFeature.getStyle() as Style).getImage() as RegularShape).getRotation();
       const arrowRotationTarget = 0;
-      const mapRotationStart = MapManager.getInstance().getMap().getView().getRotation();
+      const mapRotationStart = this.context.mapManager.getMap().getView().getRotation();
       const mapRotationTarget = -(this.geolocation?.getHeading() as number);
-      const mapCenterStart = MapManager.getInstance().getMap().getView().getCenter() as Coordinate;
+      const mapCenterStart = this.context.mapManager.getMap().getView().getCenter() as Coordinate;
       const mapCenterTarget = this.geolocation.getPosition() as Coordinate;
 
       // Finding the shortest rotation between CW and CCW
@@ -544,7 +543,7 @@ export default class GeolocationMobile extends GirafeHTMLElement {
           ? arrowRotationTarget + Math.PI * 2
           : arrowRotationTarget;
 
-      // To animate the different components, we cannot use MapManager.getInstance().getMap().getView().animate() because
+      // To animate the different components, we cannot use this.context.mapManager.getMap().getView().animate() because
       // it appears that it's locking non-map view update (such as the arrow icon) during the animation.
       // Due to this limitation, the animation is done with a lower level
 
@@ -560,7 +559,7 @@ export default class GeolocationMobile extends GirafeHTMLElement {
         );
 
         // Animating the map view to rotate it to alight with geolocation heading
-        MapManager.getInstance()
+        this.context.mapManager
           .getMap()
           .getView()
           .setRotation(mapRotationTargetShortest * easedOutProgress + mapRotationStart * (1 - easedOutProgress));
@@ -571,7 +570,7 @@ export default class GeolocationMobile extends GirafeHTMLElement {
           mapCenterTarget[1] * easedOutProgress + mapCenterStart[1] * (1 - easedOutProgress)
         ] as Coordinate;
 
-        MapManager.getInstance().getMap().getView().setCenter(intermediateCoord);
+        this.context.mapManager.getMap().getView().setCenter(intermediateCoord);
 
         if (progress < 1) {
           requestAnimationFrame(updateHeadingArrow);

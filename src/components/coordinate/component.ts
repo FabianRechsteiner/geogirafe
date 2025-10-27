@@ -22,7 +22,7 @@ class CoordinateComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    this.#locale = this.configManager.Config.general.locale;
+    this.#locale = this.context.configManager.Config.general.locale;
   }
 
   registerEvents() {
@@ -37,11 +37,10 @@ class CoordinateComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    this.render();
+    super.girafeTranslate();
+    this.registerEvents();
   }
 }
 

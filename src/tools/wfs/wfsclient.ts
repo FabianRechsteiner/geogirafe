@@ -2,8 +2,6 @@ import { Feature } from 'ol';
 import { Geometry } from 'ol/geom';
 import WfsParser from './wfsparser';
 import { WriteGetFeatureOptions } from 'ol/format/WFS';
-import ConfigManager from '../configuration/configmanager';
-import StateManager from '../state/statemanager';
 import SelectionParam from '../../models/selectionparam';
 import LayerWms from '../../models/layers/layerwms';
 import ServerWfs from '../../models/serverwfs';
@@ -12,6 +10,7 @@ import ServerOgc from '../../models/serverogc';
 import LayerTimeFormatter from '../time/layertimeformatter';
 import Filter from 'ol/format/filter/Filter';
 import { and } from 'ol/format/filter';
+import IGirafeContext from '../context/icontext';
 
 export type WfsClientOptions = {
   featurePrefix: string;
@@ -23,10 +22,11 @@ export type WfsClientOptionalOptions = {
 };
 
 export default class WfsClient<WfsXmlTypes = XmlTypes> {
+  private readonly context: IGirafeContext;
   version: string = '1.1.0';
-  stateManager: StateManager;
+
   get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   ogcServer: ServerOgc;
@@ -39,14 +39,14 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
   private readonly urlParameters: URLSearchParams = new URLSearchParams();
   private serverWfs: Promise<ServerWfs<WfsXmlTypes>> | undefined;
 
-  constructor(ogcServer: ServerOgc, options: WfsClientOptions) {
+  constructor(ogcServer: ServerOgc, options: WfsClientOptions, context: IGirafeContext) {
     this.ogcServer = ogcServer;
     this.featureNS = options.featureNS;
     this.featurePrefix = options.featurePrefix;
     this.featureNsWithPrefix[this.featurePrefix] = this.featureNS;
+    this.context = context;
     this.configMaxFeatures();
     this.version = this.extractVersionFromUrl(this.wfsUrl);
-    this.stateManager = StateManager.getInstance();
   }
 
   get wfsUrl(): string {
@@ -64,11 +64,7 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
   }
 
   configMaxFeatures() {
-    ConfigManager.getInstance()
-      .loadConfig()
-      .then((config) => {
-        this.maxFeatures = config.selection.maxFeature ?? this.maxFeatures;
-      });
+    this.maxFeatures = this.context.configManager.Config.selection.maxFeature ?? this.maxFeatures;
   }
 
   getServerWfs(): Promise<ServerWfs<WfsXmlTypes>> {
@@ -378,8 +374,8 @@ export type GetFeatureOptionalOptions = Omit<WriteGetFeatureOptions, 'featureNS'
 };
 
 export class WfsClientMapServer extends WfsClient {
-  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
-    super(ogcServer, { featurePrefix: 'ms', featureNS: 'http://mapserver.gis.umn.edu/mapserver', ...options }); // NOSONAR
+  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions, context: IGirafeContext) {
+    super(ogcServer, { featurePrefix: 'ms', featureNS: 'http://mapserver.gis.umn.edu/mapserver', ...options }, context); // NOSONAR
   }
   async getFeatureRaw(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions) {
     return super.getFeatureRaw(featureTypes, getFeatureOptions);
@@ -387,8 +383,8 @@ export class WfsClientMapServer extends WfsClient {
 }
 
 export class WfsClientQgis extends WfsClient {
-  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
-    super(ogcServer, { featurePrefix: 'qgs', featureNS: 'http://www.qgis.org/gml', ...options }); // NOSONAR
+  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions, context: IGirafeContext) {
+    super(ogcServer, { featurePrefix: 'qgs', featureNS: 'http://www.qgis.org/gml', ...options }, context); // NOSONAR
   }
   async getFeatureRaw(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions) {
     return super.getFeatureRaw(featureTypes, getFeatureOptions);
@@ -397,8 +393,8 @@ export class WfsClientQgis extends WfsClient {
 
 export class WfsClientGeorama extends WfsClient {
   version = '2.0.0';
-  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
-    super(ogcServer, { featurePrefix: 'georama', featureNS: 'https://www.opengis.ch/georama', ...options });
+  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions, context: IGirafeContext) {
+    super(ogcServer, { featurePrefix: 'georama', featureNS: 'https://www.opengis.ch/georama', ...options }, context);
   }
   async getFeatureRaw(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions) {
     return super.getFeatureRaw(featureTypes, getFeatureOptions);

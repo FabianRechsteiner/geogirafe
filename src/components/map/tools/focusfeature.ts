@@ -10,9 +10,8 @@ import { unByKey } from 'ol/Observable';
 import { asString } from 'ol/color';
 import { getVectorContext } from 'ol/render';
 import { easeOut } from 'ol/easing';
-import MapManager from '../../../tools/state/mapManager';
-import ConfigManager from '../../../tools/configuration/configmanager';
 import { colorToRgbaArray } from '../../../tools/utils/utils';
+import ConfigManager from '../../../tools/configuration/configmanager';
 
 /**
  * Helps to highlight features on the map by adding an animated
@@ -29,12 +28,10 @@ export class FocusFeature {
   private focusAnimation: EventsKey | null = null;
   private strokeColor!: number[] | null;
 
-  constructor() {
-    this.olMap = MapManager.getInstance().getMap();
-    this.configManager = ConfigManager.getInstance();
-    this.configManager.loadConfig().then(() => {
-      this.createFocusLayer();
-    });
+  constructor(map: Map, configManager: ConfigManager) {
+    this.olMap = map;
+    this.configManager = configManager;
+    this.createFocusLayer();
   }
 
   setFocusedFeatures(features: Feature[] | null) {

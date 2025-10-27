@@ -19,10 +19,7 @@ import trashIcon from './assets/trash.svg?raw';
 import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
-import I18nManager from '../../tools/i18n/i18nmanager';
-import ErrorManager from '../../tools/error/errormanager';
 import LayerDrawing from '../../models/layers/layerdrawing';
-import UserLayerManager from '../../tools/themes/userlayermanager';
 
 export default class DrawingComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -37,7 +34,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   visible = false;
   renderedOnce = false;
-  drawingState: DrawingState;
+  drawingState!: DrawingState;
   colorPickers: [GirafeColorPicker, () => string][] = [];
 
   buttons: { id: string; tool: DrawingShape | null }[] = [
@@ -72,10 +69,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   activeDrawingLayer?: LayerDrawing;
   defaultLayerName = 'My Drawing';
-  userLayerManager: UserLayerManager;
 
-  olDrawing: OlDrawing;
-  cesiumDrawing: CesiumDrawing;
+  olDrawing!: OlDrawing;
+  cesiumDrawing!: CesiumDrawing;
   fixedLengthEnabled: boolean = false;
   // Batch Create mode is currently not used. Batch mode allows the user to create multiple shapes without re-selecting
   //  the drawing tool. It possibly will be part of advanced drawing/editing tools.
@@ -83,25 +79,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   constructor(name = 'drawing') {
     super(name);
-    if (!this.state.extendedState.drawing) {
-      throw new Error('ExtendedState has to be defined in main typescript file.');
-    }
-    this.drawingState = this.state.extendedState.drawing as DrawingState;
-    const map = this.componentManager.getComponents(MapComponent)[0];
-    this.olDrawing = new OlDrawing(map, this.name);
-    this.cesiumDrawing = new CesiumDrawing(map, this.name);
-
-    this.userLayerManager = UserLayerManager.getInstance();
-
-    this.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news));
-    this.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
-    this.subscribe('globe.loaded', () => {
-      if (this.state.globe.loaded && this.visible) {
-        this.cesiumDrawing.registerInteractions();
-      } else {
-        this.cesiumDrawing.unregisterInteractions();
-      }
-    });
   }
 
   render() {
@@ -229,14 +206,34 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      this.subscribe('interface.drawingPanelVisible', (_, newValue) => this.togglePanel(newValue));
-      this.subscribe('projection', (_, newProjection) => this.warnWhenInWebMercator(newProjection));
+    super.connectedCallback();
+    if (!this.state.extendedState.drawing) {
+      throw new Error('ExtendedState has to be defined in main typescript file.');
+    }
+    this.drawingState = this.state.extendedState.drawing as DrawingState;
+    const map = this.context.componentManager.getComponents(MapComponent)[0];
+    this.olDrawing = new OlDrawing(map, this.name, this.context);
+    this.cesiumDrawing = new CesiumDrawing(map, this.name, this.context);
+
+    this.render();
+
+    this.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news));
+    this.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
+    this.subscribe('globe.loaded', () => {
+      if (this.state.globe.loaded && this.visible) {
+        this.cesiumDrawing.registerInteractions();
+      } else {
+        this.cesiumDrawing.unregisterInteractions();
+      }
     });
+
+    this.subscribe('interface.drawingPanelVisible', (_, newValue) => this.togglePanel(newValue));
+    this.subscribe('projection', (_, newProjection) => this.warnWhenInWebMercator(newProjection));
   }
 
   togglePanel(visible: boolean) {
+    if (this.visible == visible) return;
+
     this.visible = visible;
     if (this.visible) {
       this.registerEvents();
@@ -342,12 +339,12 @@ export default class DrawingComponent extends GirafeHTMLElement {
   activateLayerInTreeAndMap(layerName: string = this.defaultLayerName) {
     this.activeDrawingLayer ??= new LayerDrawing(layerName, this.olDrawing.drawingLayer);
     // Activate the layer by adding it to the tree and making it visible in the map
-    this.userLayerManager.addUserLayerToTree(this.activeDrawingLayer);
+    this.context.userLayerManager.addUserLayerToTree(this.activeDrawingLayer);
   }
 
   deactivateLayerInTreeAnMap() {
     if (this.activeDrawingLayer) {
-      this.userLayerManager.removeUserLayerFromTree(this.activeDrawingLayer);
+      this.context.userLayerManager.removeUserLayerFromTree(this.activeDrawingLayer);
       this.activeDrawingLayer = undefined;
     }
   }
@@ -422,9 +419,9 @@ export default class DrawingComponent extends GirafeHTMLElement {
   private warnWhenInWebMercator(projection: string = this.state.projection) {
     if (this.visible && projection === 'EPSG:3857') {
       const errorMessage = 'Web Mercator projection distorts distances and areas';
-      this.stateManager.state.infobox.elements.push({
+      this.context.stateManager.state.infobox.elements.push({
         id: uuidv4(),
-        text: I18nManager.getInstance().getTranslation(errorMessage),
+        text: this.context.i18nManager.getTranslation(errorMessage),
         type: 'warning'
       });
     }
@@ -462,7 +459,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
         );
       case 'gpx':
         if (this.selectedFeatures.some((f) => !f.isPointOrPolyline())) {
-          ErrorManager.getInstance().pushMessage(
+          this.context.errorManager.pushMessage(
             'export-gpx-error',
             'The GPX format only supports points and polylines',
             'warning'

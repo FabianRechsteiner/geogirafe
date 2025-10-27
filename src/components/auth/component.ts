@@ -1,17 +1,13 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import AuthManager from '../../tools/auth/authmanager';
 
 export default class OauthComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
   public userIconUrl?: string;
-  private readonly oauthManager: AuthManager;
 
   constructor(name: string = 'oauth') {
     super(name);
-    console.info('OauthComponent constructor');
-    this.oauthManager = AuthManager.getInstance();
   }
 
   private registerEvents() {
@@ -36,17 +32,17 @@ export default class OauthComponent extends GirafeHTMLElement {
   }
 
   public onLoginClick() {
-    if (!this.configManager.Config.oauth && !this.configManager.Config.gmfauth) {
+    if (!this.context.configManager.Config.oauth && !this.context.configManager.Config.gmfauth) {
       throw new Error('Authentication is not configured on this instance. Login cannot be done.');
     } else {
-      this.oauthManager.login();
+      this.context.authManager.login();
     }
   }
 
   public async onLogoutClick() {
     const logout = await window.gConfirm('Do you want to logout ?', 'Logout');
     if (logout) {
-      this.oauthManager.logout();
+      this.context.authManager.logout();
     }
   }
 
@@ -72,10 +68,9 @@ export default class OauthComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      super.render();
-      this.registerEvents();
-      super.girafeTranslate();
-    });
+    super.connectedCallback();
+    super.render();
+    this.registerEvents();
+    super.girafeTranslate();
   }
 }

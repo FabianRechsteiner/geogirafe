@@ -2,15 +2,20 @@ import StateManager from '../state/statemanager';
 import ServerOgcApi, { OgcApiDefaultEncoding, HttpMethod, OgcApiLinksResponse } from '../../models/serverogcapi';
 import ServerOgc from '../../models/serverogc';
 
+export type OgcApiClientOptions = {
+  crs?: string;
+};
+
 /**
  * This class covers the common part of the OGC API standard described in https://docs.ogc.org/is/19-072/19-072.html.
  * It contains shared methods between clients of different OGC API standards.
  * Any OGC API (Maps, Records, Features, STAC...) shall extend this class.
  */
 export default abstract class OgcApiClient<Server = ServerOgcApi> {
-  protected readonly serverConfig: ServerOgc;
+  protected readonly serverOgc: ServerOgc;
   private server?: Promise<Server>;
   private readonly stateManager: StateManager;
+  protected readonly options: OgcApiClientOptions;
   public initialized: boolean;
 
   get state() {
@@ -21,9 +26,10 @@ export default abstract class OgcApiClient<Server = ServerOgcApi> {
     return this.getUrl();
   }
 
-  protected constructor(serverConfig: ServerOgc) {
-    this.serverConfig = serverConfig;
-    this.stateManager = StateManager.getInstance();
+  protected constructor(serverOgc: ServerOgc, opt: OgcApiClientOptions, stateManager: StateManager) {
+    this.serverOgc = serverOgc;
+    this.options = opt;
+    this.stateManager = stateManager;
     this.initialized = false;
   }
 

@@ -1,4 +1,3 @@
-import ConfigManager from '../../tools/configuration/configmanager';
 import { GMFBackgroundLayer } from '../gmf';
 import BaseLayer from '../layers/baselayer';
 import LayerVectorTiles from '../layers/layervectortiles';
@@ -17,9 +16,9 @@ class Basemap {
     this.thumbnail = elem.metadata?.thumbnail ?? 'images/basemap_default.webp';
   }
 
-  get projection(): string {
+  get projection(): string | undefined {
     const layer = this.layersList.find((l) => l instanceof LayerVectorTiles);
-    return layer?.projection ?? ConfigManager.getInstance().Config.map.srid;
+    return layer?.projection;
   }
 }
 

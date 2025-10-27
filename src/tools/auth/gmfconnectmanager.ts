@@ -1,3 +1,4 @@
+import IGirafeContext from '../context/icontext';
 import AbstractConnectManager from './abstractconnectmanager';
 import GMFManager from './gmfmanager';
 
@@ -23,8 +24,15 @@ import GMFManager from './gmfmanager';
  * There is no need for any oAuth2 configuration in the admin tool.
  */
 export default class GMFConnectManager extends AbstractConnectManager {
+  private readonly gmfManager: GMFManager;
+
+  constructor(context: IGirafeContext, gmfManager: GMFManager) {
+    super(context);
+    this.gmfManager = gmfManager;
+  }
+
   private get authConfig() {
-    return this.configManager.Config.gmfauth!;
+    return this.context.configManager.Config.gmfauth!;
   }
 
   private isAuthentified() {
@@ -45,19 +53,19 @@ export default class GMFConnectManager extends AbstractConnectManager {
   }
 
   public override async silentLogin() {
-    await GMFManager.getInstance().getUserInfo();
+    await this.gmfManager.getUserInfo();
     this.state.oauth.status = this.state.oauth.userInfo?.username ? 'loggedIn' : 'loggedOut';
   }
 
   public override async logout() {
     // Nothing more to do here, just mark as loggedOut
-    this.sessionManager.saveStateToSession();
+    this.context.sessionManager.saveStateToSession();
     console.debug('Auth: 5. Issuer logout');
     this.state.oauth.status = 'loggedOut';
   }
 
   private redirectToIssuerLogin() {
-    this.sessionManager.saveStateToSession();
+    this.context.sessionManager.saveStateToSession();
     this.redirectUrl = this.getLoginRedirectUrl(false);
     const authorizationUrl = new URL(`${this.authConfig.url}login.html`);
     authorizationUrl.searchParams.set('came_from', this.redirectUrl);

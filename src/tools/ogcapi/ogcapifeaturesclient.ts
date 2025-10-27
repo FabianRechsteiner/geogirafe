@@ -1,7 +1,7 @@
 import { Feature } from 'ol';
 import { Geometry } from 'ol/geom';
 import { GeoJSON } from 'ol/format';
-import OgcApiClient from './ogcapiclient';
+import OgcApiClient, { OgcApiClientOptions } from './ogcapiclient';
 import ServerOgcApiFeatures, { OapifCollection, OapifSchemaResponse } from '../../models/serverogcapifeatures';
 import ServerOgc from '../../models/serverogc';
 import { transformExtent } from 'ol/proj';
@@ -9,10 +9,7 @@ import { Extent } from 'ol/extent';
 import { HttpMethod, OgcApiDefaultEncoding, OgcApiLinksResponse } from '../../models/serverogcapi';
 import { serverConformsTo } from './ogcapiconformance';
 import { reprojectGeometry } from '../utils/olutils';
-
-export type OgcApiFeaturesClientOptions = {
-  crs?: string;
-};
+import IGirafeContext from '../context/icontext';
 
 // Default coordinate reference system used by OAPIF and GeoJson: WGS84 in lon / lat
 const default_crs = 'EPSG:4326';
@@ -27,12 +24,12 @@ const default_crs = 'EPSG:4326';
 export default class OgcApiFeaturesClient extends OgcApiClient<ServerOgcApiFeatures> {
   private collections: Record<string, OapifCollection> = {};
 
-  constructor(serverConfig: ServerOgc) {
-    super(serverConfig);
+  constructor(serverConfig: ServerOgc, opt: OgcApiClientOptions, context: IGirafeContext) {
+    super(serverConfig, opt, context.stateManager);
   }
 
   protected getUrl(): string {
-    return this.serverConfig.urlOapif ?? '';
+    return this.serverOgc.urlOapif ?? '';
   }
 
   protected async loadDescribeServer(): Promise<ServerOgcApiFeatures> {

@@ -1,22 +1,23 @@
 import View from 'ol/View';
 import { get as getProjection, transform } from 'ol/proj';
-import ConfigManager from '../../../tools/configuration/configmanager';
 import GeoConsts from '../../../tools/geoconsts';
 import { Map } from 'ol';
+import ConfigManager from '../../../tools/configuration/configmanager';
 import StateManager from '../../../tools/state/statemanager';
 
 class ViewManager {
   map: Map;
 
   get state() {
-    return StateManager.getInstance().state;
+    return this.stateManager.state;
   }
 
   get projection() {
     return getProjection(this.state.projection)!;
   }
 
-  configManager: ConfigManager;
+  private readonly configManager: ConfigManager;
+  private readonly stateManager: StateManager;
 
   scales: number[];
   allowedResolutions: number[];
@@ -24,10 +25,11 @@ class ViewManager {
   constrainRotation: boolean | number;
   view: View;
 
-  constructor(map: Map) {
+  constructor(map: Map, configManager: ConfigManager, stateManager: StateManager) {
     this.map = map;
+    this.configManager = configManager;
+    this.stateManager = stateManager;
 
-    this.configManager = ConfigManager.getInstance();
     this.constrainScales = this.configManager.Config.map.constrainScales;
     this.constrainRotation = this.configManager.Config.map.constrainRotation;
 
@@ -44,9 +46,8 @@ class ViewManager {
       constrainRotation: this.constrainRotation
     });
 
-    const stateManager = StateManager.getInstance();
     this.updateStatePosition();
-    stateManager.subscribe(/position(\..*)?/, (_: unknown, _newValue: unknown) => this.onPositionChanged());
+    this.stateManager.subscribe(/position(\..*)?/, (_: unknown, _newValue: unknown) => this.onPositionChanged());
   }
 
   scalesToResolutions(scales: number[]) {

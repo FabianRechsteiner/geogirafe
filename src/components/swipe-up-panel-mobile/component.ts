@@ -15,8 +15,8 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  private readonly container: HTMLDivElement;
-  private readonly middleContainer: HTMLDivElement;
+  private container!: HTMLDivElement;
+  private middleContainer!: HTMLDivElement;
   private pointerYOrigin = 0;
   private containerTopStart = 0;
   private isPointerDown = false;
@@ -27,6 +27,10 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
 
   constructor() {
     super('swipe-up-panel-mobile');
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
 
     // Render the panel for the first time, as hidden so that we can make references to the DOM elements
     this.render();

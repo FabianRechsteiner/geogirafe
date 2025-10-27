@@ -16,6 +16,7 @@ export default class MenuMobile3dButton extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.render();
   }
 }

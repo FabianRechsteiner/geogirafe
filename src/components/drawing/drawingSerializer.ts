@@ -1,16 +1,16 @@
+import IGirafeContext from '../../tools/context/icontext';
 import type { IBrainSerializer } from '../../tools/state/brain/serialize';
-import StateManager from '../../tools/state/statemanager';
 import DrawingFeature, { DrawingState, type SerializedFeature } from './drawingFeature';
 
 export default class DrawingSerializer implements IBrainSerializer<DrawingState> {
-  private readonly stateManager: StateManager;
+  private readonly context: IGirafeContext;
 
-  constructor() {
-    this.stateManager = StateManager.getInstance();
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public brainSerialize(drawingState: DrawingState): string {
@@ -32,7 +32,7 @@ export default class DrawingSerializer implements IBrainSerializer<DrawingState>
       } else {
         this.state.extendedState.drawing = new DrawingState();
       }
-      serializedFeatures.forEach((f: SerializedFeature) => DrawingFeature.deserialize(f));
+      serializedFeatures.forEach((f: SerializedFeature) => DrawingFeature.deserialize(f, this.context));
     } else {
       throw new Error(`Cannot deserialize drawings`);
     }

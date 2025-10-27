@@ -1,9 +1,8 @@
-import ConfigManager from '../../../tools/configuration/configmanager';
-import I18nManager from '../../../tools/i18n/i18nmanager';
 import { MapContextMenuState } from './contextmenustate';
 import { GeoTIFFImage } from 'geotiff';
 import { GeoTransform, getPixelValue, getImage, extractGeoTransform } from '../../../tools/raster/rasterutils';
 import proj4 from 'proj4';
+import IGirafeContext from '../../../tools/context/icontext';
 
 interface Raster {
   id: string;
@@ -23,14 +22,14 @@ interface Raster {
 
 export default class MapContextMenuManager {
   private readonly mapContextMenuState: MapContextMenuState;
-  private readonly i18nManager: I18nManager;
+  private readonly context: IGirafeContext;
   private _position!: [number, number];
   private readonly rasters: Raster[] = [];
   public projection: string | null = null;
 
-  constructor(mapContextMenuState: MapContextMenuState) {
-    this.i18nManager = I18nManager.getInstance();
+  constructor(mapContextMenuState: MapContextMenuState, context: IGirafeContext) {
     this.mapContextMenuState = mapContextMenuState;
+    this.context = context;
   }
 
   public get position(): [number, number] {
@@ -45,7 +44,7 @@ export default class MapContextMenuManager {
   }
 
   public async initialize() {
-    const config = ConfigManager.getInstance().Config.contextmenu;
+    const config = this.context.configManager.Config.contextmenu;
     if (!config) {
       throw new Error('Context menu configuration is missing.');
     }
@@ -143,7 +142,7 @@ export default class MapContextMenuManager {
     }
 
     for (const src of this.mapContextMenuState.sources) {
-      src.content = this.i18nManager.getTranslation('Loading');
+      src.content = this.context.i18nManager.getTranslation('Loading');
       src.loading = true;
     }
   }

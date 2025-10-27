@@ -12,35 +12,34 @@ export default class ThemeListMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    (async () => {
-      await this.loadConfig();
+    super.connectedCallback();
+
+    this.render();
+
+    this.subscribe('themes.isLoaded', () => {
+      this.themes = Object.values(this.state.themes._allThemes);
       this.render();
 
-      this.subscribe('themes.isLoaded', () => {
-        this.themes = Object.values(this.state.themes._allThemes);
-        this.render();
+      // This is to initialize the "height" CSS prop so it actually anmates the first time
+      const grid = this.shadow.querySelector('.grid') as HTMLDivElement;
+      grid.style.setProperty('max-height', this.collapsed ? '0px' : `${grid.scrollHeight}px`);
+    });
 
-        // This is to initialize the "height" CSS prop so it actually anmates the first time
-        const grid = this.shadow.querySelector('.grid') as HTMLDivElement;
-        grid.style.setProperty('max-height', this.collapsed ? '0px' : `${grid.scrollHeight}px`);
-      });
+    this.subscribe('themes.lastSelectedTheme', () => {
+      this.collapse();
+      this.refreshRender();
+    });
 
-      this.subscribe('themes.lastSelectedTheme', () => {
-        this.collapse();
-        this.refreshRender();
-      });
+    // Toggle to dark mode when needed
+    this.subscribe('interface.darkFrontendMode', (_waDarkMode: boolean, isDarkMode: boolean) => {
+      const container = this.shadow.querySelector('.title-container') as HTMLDivElement;
 
-      // Toggle to dark mode when needed
-      this.subscribe('interface.darkFrontendMode', (_waDarkMode: boolean, isDarkMode: boolean) => {
-        const container = this.shadow.querySelector('.title-container') as HTMLDivElement;
-
-        if (isDarkMode) {
-          container.classList.add('dark-mode');
-        } else {
-          container.classList.remove('dark-mode');
-        }
-      });
-    })();
+      if (isDarkMode) {
+        container.classList.add('dark-mode');
+      } else {
+        container.classList.remove('dark-mode');
+      }
+    });
   }
 
   toggleCollapse(e: PointerEvent) {

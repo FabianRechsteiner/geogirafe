@@ -5,6 +5,7 @@ import MockHelper from '../tests/mockhelper';
 import { OapifCollection } from '../../models/serverogcapifeatures';
 import { Point } from 'ol/geom';
 import Feature from 'ol/Feature';
+import IGirafeContext from '../context/icontext';
 
 let client: OgcApiFeaturesClient;
 const mockUrl = 'https://example.com';
@@ -42,19 +43,20 @@ const mockCollection = {
     }
   ]
 };
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
+  context = MockHelper.startMocking();
 });
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 describe('OgcApiFeaturesClient.getCollectionRelation', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     global.fetch = vi.fn();
-    client = new OgcApiFeaturesClient(server);
+    client = new OgcApiFeaturesClient(server, {}, context);
 
     // Mock getCollection to provide fake collection data for tests
     vi.spyOn(client, 'getCollection').mockResolvedValue(mockCollection);
@@ -122,7 +124,7 @@ describe('OgcApiFeaturesClient.getCrsIdentifier', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     global.fetch = vi.fn();
-    client = new OgcApiFeaturesClient(server);
+    client = new OgcApiFeaturesClient(server, {}, context);
     vi.spyOn(client, 'getCollection').mockResolvedValue(mockCollection);
   });
 
@@ -153,7 +155,7 @@ describe('OgcApiFeaturesClient.getStorageCrs', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     global.fetch = vi.fn();
-    client = new OgcApiFeaturesClient(server);
+    client = new OgcApiFeaturesClient(server, {}, context);
     vi.spyOn(client, 'getCollection').mockResolvedValue(mockCollection);
   });
 
@@ -199,7 +201,7 @@ describe('OgcApiFeaturesClient.reprojectItemToStorageCrs', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     global.fetch = vi.fn();
-    client = new OgcApiFeaturesClient(server);
+    client = new OgcApiFeaturesClient(server, {}, context);
     vi.spyOn(client, 'getCollection').mockResolvedValue(mockCollection);
   });
 

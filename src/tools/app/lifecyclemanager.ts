@@ -1,37 +1,33 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import StateManager from '../state/statemanager';
 
 export default class ApplicationLifeCycleManager extends GirafeSingleton {
-  private readonly stateManager: StateManager = StateManager.getInstance();
-
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
-  constructor(type: string) {
-    super(type);
 
-    this.stateManager.subscribe('themes.isLoaded', (_, newValue) => {
-      this.log(newValue, 'Themes are loaded');
+  override initializeSingleton() {
+    this.context.stateManager.subscribe('themes.isLoaded', (_, isThemesLoaded) => {
+      this.log(isThemesLoaded, 'Themes are loaded');
       this.checkApplicationReady();
     });
-    this.stateManager.subscribe('projection', (_, newValue) => {
-      this.log(newValue, 'Projection is initialized');
+    this.context.stateManager.subscribe('projection', (_, projection) => {
+      this.log(projection, 'Projection is initialized');
       this.checkApplicationReady();
     });
-    this.stateManager.subscribe('position', (_, newValue) => {
-      this.log(newValue, 'Position is initialized');
+    this.context.stateManager.subscribe('position', (_, position) => {
+      this.log(position, 'Position is initialized');
       this.checkApplicationReady();
     });
-    this.stateManager.subscribe('application.isConfigurationLoaded', (_, newValue) => {
-      this.log(newValue, 'Configuration is loaded');
+    this.context.stateManager.subscribe('application.isConfigurationLoaded', (_, isConfigurationLoaded) => {
+      this.log(isConfigurationLoaded, 'Configuration is loaded');
       this.checkApplicationReady();
     });
-    this.stateManager.subscribe('application.isStateInitialized', (_, newValue) => {
-      this.log(newValue, 'Initial state has been initialized');
+    this.context.stateManager.subscribe('application.isStateInitialized', (_, isStateInitialized) => {
+      this.log(isStateInitialized, 'Initial state has been initialized');
       this.checkApplicationReady();
     });
-    this.stateManager.subscribe('application.isAuthInitialized', (_, newValue) => {
-      this.log(newValue, 'Authentication has been initialized');
+    this.context.stateManager.subscribe('application.isAuthInitialized', (_, isAuthInitialized) => {
+      this.log(isAuthInitialized, 'Authentication has been initialized');
       this.checkApplicationReady();
     });
   }

@@ -1,4 +1,3 @@
-import type OLMap from 'ol/Map';
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import VectorSource from 'ol/source/Vector';
@@ -18,11 +17,8 @@ import PaintbrushIcon from './images/paintbrush.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import type { GeometryResult, GeometryCollectionResult, AllSearchResults } from '../../models/searchresult';
-import MapManager from '../../tools/state/mapManager';
 import { parseCoordinates } from '../../tools/geometrytools';
-import ThemesHelper from '../../tools/themes/themeshelper';
 import ThemeLayer from '../../models/layers/themelayer';
-import PermalinkManager from '../../tools/url/permalinkmanager';
 import SearchResult from '../../models/searchresult';
 import BaseLayer from '../../models/layers/baselayer';
 
@@ -33,9 +29,10 @@ class SearchComponent extends GirafeHTMLElement {
   public searchIcon: string = SearchIcon;
   public paintbrushIcon: string = PaintbrushIcon;
 
-  private readonly themesHelper: ThemesHelper;
-  private readonly permalinkManager: PermalinkManager;
-  private readonly map: OLMap;
+  private get map() {
+    return this.context.mapManager.getMap();
+  }
+
   private readonly previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   private previewLayers: BaseLayer[] = [];
   private previewGeoLayer: VectorLayer<VectorSource> | null = null;
@@ -58,8 +55,8 @@ class SearchComponent extends GirafeHTMLElement {
   private searchInput?: HTMLInputElement;
 
   public paintSearchResults?: boolean;
-  public defaultSearchStrokeColor: string;
-  public defaultSearchFillColor: string;
+  public defaultSearchStrokeColor!: string;
+  public defaultSearchFillColor!: string;
 
   private abortController = new AbortController();
   public showNoResultWarning = false;
@@ -69,17 +66,10 @@ class SearchComponent extends GirafeHTMLElement {
 
   constructor() {
     super('search');
-    this.themesHelper = ThemesHelper.getInstance();
-    this.permalinkManager = PermalinkManager.getInstance();
-    this.map = MapManager.getInstance().getMap();
-
-    this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor as string;
-    this.defaultSearchFillColor = this.configManager.Config.search.defaultFillColor as string;
-    this.createPreviewLayer();
   }
 
   private async initialSearch() {
-    const searchTerm = this.permalinkManager.getSearchTerm();
+    const searchTerm = this.context.permalinkManager.getSearchTerm();
     const results = await this.fetchSearch(searchTerm);
     if (results.features.length > 0) {
       // Apply the first search result in the list
@@ -90,24 +80,22 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   private createPreviewLayer() {
-    this.configManager.loadConfig().then(() => {
-      this.paintSearchResults = this.configManager.Config.search.paintSearchResults;
-      this.maxExtent = this.configManager.Config.map.maxExtent?.split(',').map(Number);
+    this.paintSearchResults = this.context.configManager.Config.search.paintSearchResults;
+    this.maxExtent = this.context.configManager.Config.map.maxExtent?.split(',').map(Number);
 
-      this.previewGeoLayer = new VectorLayer({
-        properties: {
-          addToPrintedLayers: true
-        },
-        source: new VectorSource({
-          features: this.previewFeaturesCollection
-        })
-      });
-      this.updatePreviewLayerStyle(this.defaultSearchFillColor, this.defaultSearchStrokeColor);
-      this.map.addLayer(this.previewGeoLayer);
-      this.previewGeoLayer.setZIndex(1010);
-
-      this.initColorPicker();
+    this.previewGeoLayer = new VectorLayer({
+      properties: {
+        addToPrintedLayers: true
+      },
+      source: new VectorSource({
+        features: this.previewFeaturesCollection
+      })
     });
+    this.updatePreviewLayerStyle(this.defaultSearchFillColor, this.defaultSearchStrokeColor);
+    this.map.addLayer(this.previewGeoLayer);
+    this.previewGeoLayer.setZIndex(1010);
+
+    this.initColorPicker();
   }
 
   toggleVisibility(visible: boolean) {
@@ -144,18 +132,22 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-      this.registerEvents();
-      if (this.permalinkManager.hasSearch()) {
-        this.subscribe('application.isReady', () => {
-          if (this.state.application.isReady) {
-            this.initialSearch();
-          }
-        });
-      }
-    });
+    super.connectedCallback();
+
+    this.defaultSearchStrokeColor = this.context.configManager.Config.search.defaultStrokeColor as string;
+    this.defaultSearchFillColor = this.context.configManager.Config.search.defaultFillColor as string;
+    this.createPreviewLayer();
+
+    this.render();
+    super.girafeTranslate();
+    this.registerEvents();
+    if (this.context.permalinkManager.hasSearch()) {
+      this.subscribe('application.isReady', () => {
+        if (this.state.application.isReady) {
+          this.initialSearch();
+        }
+      });
+    }
   }
 
   protected clearSearch(purge = false) {
@@ -210,7 +202,7 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   private async fetchSearch(term: string): Promise<AllSearchResults> {
-    const url = this.configManager.Config.search.url
+    const url = this.context.configManager.Config.search.url
       .replace(this.searchTermPlaceholder, term)
       .replace(this.searchLangPlaceholder, this.state.language as string);
     const response = await fetch(url, { signal: this.abortController.signal });
@@ -356,7 +348,7 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   private preview(result: SearchResult) {
-    if (result.bbox && this.configManager.Config.search.objectPreview) {
+    if (result.bbox && this.context.configManager.Config.search.objectPreview) {
       // Result with geometry
       if (result.geometry) {
         this.addFeatureToPreview(result.geometry);
@@ -364,12 +356,12 @@ class SearchComponent extends GirafeHTMLElement {
       }
     }
     const firstAction = result.properties?.actions?.[0];
-    if (firstAction?.action === 'add_layer' && this.configManager.Config.search.layerPreview) {
-      const layer = this.themesHelper.findLayerByName(firstAction.data);
+    if (firstAction?.action === 'add_layer' && this.context.configManager.Config.search.layerPreview) {
+      const layer = this.context.themesHelper.findLayerByName(firstAction.data);
       if (layer) {
-        const clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
+        const clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(layer);
         clonedTheme.isExpanded = true;
-        this.previewLayers = this.themesHelper.mergeThemeInLayerTree(clonedTheme, true);
+        this.previewLayers = this.context.themesHelper.mergeThemeInLayerTree(clonedTheme, true);
       } else {
         console.error(`Layer ${firstAction.data} cannot be found`);
       }
@@ -424,7 +416,7 @@ class SearchComponent extends GirafeHTMLElement {
     this.previewFeaturesCollection.clear();
 
     // Clear preview layer
-    this.themesHelper.removeLayersFromLayerTree(this.previewLayers);
+    this.context.themesHelper.removeLayersFromLayerTree(this.previewLayers);
     this.previewLayers = [];
   }
 
@@ -453,26 +445,26 @@ class SearchComponent extends GirafeHTMLElement {
   private addResultToTreeView(result: SearchResult) {
     let clonedTheme: ThemeLayer | undefined;
     if (result.properties?.actions[0].action === 'add_theme') {
-      const theme = this.themesHelper.findThemeByName(result.properties?.actions[0].data);
+      const theme = this.context.themesHelper.findThemeByName(result.properties?.actions[0].data);
       if (theme) {
         clonedTheme = theme.clone();
       }
     } else if (result.properties?.actions[0].action === 'add_group') {
-      const group = this.themesHelper.findGroupByName(result.properties?.actions[0].data);
+      const group = this.context.themesHelper.findGroupByName(result.properties?.actions[0].data);
       if (group) {
-        clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(group);
+        clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(group);
       }
     } else if (result.properties?.actions[0].action === 'add_layer') {
-      const layer = this.themesHelper.findLayerByName(result.properties?.actions[0].data);
+      const layer = this.context.themesHelper.findLayerByName(result.properties?.actions[0].data);
       if (layer) {
-        clonedTheme = this.themesHelper.getMinimalClonedThemeForLayer(layer);
+        clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(layer);
       }
     } else {
       console.warn('Unsupported result type');
     }
 
     if (clonedTheme) {
-      this.themesHelper.mergeThemeInLayerTree(clonedTheme);
+      this.context.themesHelper.mergeThemeInLayerTree(clonedTheme);
     }
   }
 
@@ -481,7 +473,7 @@ class SearchComponent extends GirafeHTMLElement {
     const bufferValue = Math.max((getWidth(extent) * 50) / 100, (getHeight(extent) * 50) / 100);
     const bufferedExtent = buffer(extent, bufferValue);
 
-    const minResolution = this.configManager.Config.search.minResolution;
+    const minResolution = this.context.configManager.Config.search.minResolution;
     const currentResolution = this.map.getView().getResolution() as number;
     const currentExtent = this.map.getView().calculateExtent();
 
@@ -489,7 +481,7 @@ class SearchComponent extends GirafeHTMLElement {
       if (currentResolution > minResolution) {
         // If we are in a bigger resolution as the minimal one,
         // Zoom to object with minResolution
-        MapManager.getInstance().zoomToExtent(bufferedExtent, minResolution);
+        this.context.mapManager.zoomToExtent(bufferedExtent, minResolution);
       } else if (!containsExtent(currentExtent, extent)) {
         // Else, if the extent is NOT already within the current extent of the map
         // We keep the current resolution, and just pan to object
@@ -564,7 +556,7 @@ class SearchComponent extends GirafeHTMLElement {
     if (colorPicker) {
       const fillPicker = new GirafeColorPicker({
         parent: colorPicker,
-        color: this.configManager.Config.search.defaultStrokeColor,
+        color: this.context.configManager.Config.search.defaultStrokeColor,
         popup: 'right'
       });
       fillPicker.onChange = (color: Color) => {
@@ -582,8 +574,8 @@ class SearchComponent extends GirafeHTMLElement {
 
     // Only update style if new colors were provided via color picker or default colors have changed
     if (this.defaultColorHasChanged()) {
-      this.defaultSearchFillColor = this.configManager.Config.search.defaultFillColor as string;
-      this.defaultSearchStrokeColor = this.configManager.Config.search.defaultStrokeColor as string;
+      this.defaultSearchFillColor = this.context.configManager.Config.search.defaultFillColor as string;
+      this.defaultSearchStrokeColor = this.context.configManager.Config.search.defaultStrokeColor as string;
     }
     const strokeColorWithFallback = strokeColor ?? this.defaultSearchStrokeColor;
 
@@ -591,7 +583,7 @@ class SearchComponent extends GirafeHTMLElement {
       new Style({
         stroke: new Stroke({
           color: strokeColorWithFallback,
-          width: this.configManager.Config.search.defaultStrokeWidth
+          width: this.context.configManager.Config.search.defaultStrokeWidth
         }),
         fill: new Fill({ color: fillColor ?? this.defaultSearchFillColor }),
         image: new Icon({
@@ -607,8 +599,8 @@ class SearchComponent extends GirafeHTMLElement {
 
   private defaultColorHasChanged(): boolean {
     return (
-      this.defaultSearchFillColor !== this.configManager.Config.search.defaultFillColor ||
-      this.defaultSearchStrokeColor !== this.configManager.Config.search.defaultStrokeColor
+      this.defaultSearchFillColor !== this.context.configManager.Config.search.defaultFillColor ||
+      this.defaultSearchStrokeColor !== this.context.configManager.Config.search.defaultStrokeColor
     );
   }
 

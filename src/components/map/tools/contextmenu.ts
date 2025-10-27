@@ -1,8 +1,7 @@
-import { Map, Overlay } from 'ol';
+import { Overlay } from 'ol';
 import { Coordinate } from 'ol/coordinate';
-import UserInteractionManager from '../../../tools/state/userInteractionManager';
-import MapManager from '../../../tools/state/mapManager';
 import { v4 as uuidv4 } from 'uuid';
+import IGirafeContext from '../../../tools/context/icontext';
 
 export type MenuEntry = {
   entry: string;
@@ -17,21 +16,24 @@ export class ContextMenu {
   name: string;
   private _active: boolean = false;
   private readonly isExclusive: boolean;
-  private readonly map: Map;
   private readonly overlay: Overlay;
   private readonly container: HTMLDivElement;
-  private readonly userInteractionManager;
   private readonly openEventListener: (evt: PointerEvent | MouseEvent) => void;
   private readonly closeEventListener: (evt: PointerEvent | MouseEvent) => void;
+  private readonly context;
+
+  private get map() {
+    return this.context.mapManager.getMap();
+  }
 
   constructor(
+    context: IGirafeContext,
     menuEntries: MenuEntry[] = [],
     isExclusive: boolean = false,
     openCondition: (evt: PointerEvent | MouseEvent, mapCoordinate: Coordinate) => boolean = () => true
   ) {
     this.name = `contextmenu-${uuidv4()}`;
-    this.map = MapManager.getInstance().getMap();
-    this.userInteractionManager = UserInteractionManager.getInstance();
+    this.context = context;
     this.isExclusive = isExclusive;
 
     this.container = document.createElement('div');
@@ -46,7 +48,7 @@ export class ContextMenu {
     this.map.addOverlay(this.overlay);
 
     this.openEventListener = (evt: PointerEvent | MouseEvent): void => {
-      if (this.userInteractionManager.canListenerExecute('map.contextmenu', this.name)) {
+      if (this.context.userInteractionManager.canListenerExecute('map.contextmenu', this.name)) {
         this.handleContextmenuEvent(evt, openCondition);
       }
     };
@@ -80,7 +82,7 @@ export class ContextMenu {
   }
 
   private enable(): void {
-    if (this.userInteractionManager.registerListener('map.contextmenu', this.isExclusive, this.name)) {
+    if (this.context.userInteractionManager.registerListener('map.contextmenu', this.isExclusive, this.name)) {
       this.map.getViewport().addEventListener('contextmenu', this.openEventListener);
     }
     this.map.getViewport().addEventListener('click', this.closeEventListener);
@@ -89,7 +91,7 @@ export class ContextMenu {
 
   private disable(): void {
     this._active = false;
-    this.userInteractionManager.unregisterAllListenersOfTool(this.name);
+    this.context.userInteractionManager.unregisterAllListenersOfTool(this.name);
     this.map.getViewport().removeEventListener('contextmenu', this.openEventListener);
     this.map.getViewport().removeEventListener('click', this.closeEventListener);
   }

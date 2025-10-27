@@ -1,35 +1,25 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import StateManager from '../state/statemanager';
-import UrlManager from '../url/urlmanager';
-import StateSerializer from './stateserializer';
+import ISessionManager from './isessionmanager';
 
-class SessionManager extends GirafeSingleton {
-  stateSerializer: StateSerializer;
-  stateManager: StateManager;
-
+class SessionManager extends GirafeSingleton implements ISessionManager {
   private readonly sessionHash = 'session';
 
-  constructor(type: string) {
-    super(type);
-
-    this.stateSerializer = StateSerializer.getInstance();
-    this.stateManager = StateManager.getInstance();
-
+  override initializeSingleton() {
     window.addEventListener('pagehide', () => this.saveStateToSession());
   }
 
   public beginSession() {
-    UrlManager.getInstance().updateHash(this.sessionHash);
+    this.context.urlManager.updateHash(this.sessionHash);
   }
 
   public saveStateToSession() {
     console.debug('Saving state to sessionStorage');
-    const serializedState = this.stateSerializer.getSerializedState();
+    const serializedState = this.context.stateSerializer.getSerializedState();
     sessionStorage.setItem('geogirafe-state', serializedState);
   }
 
   public hasState() {
-    if (UrlManager.getInstance().hasHash(this.sessionHash)) {
+    if (this.context.urlManager.hasHash(this.sessionHash)) {
       const serializedState = sessionStorage.getItem('geogirafe-state');
       return serializedState !== null;
     }
@@ -41,7 +31,7 @@ class SessionManager extends GirafeSingleton {
     const serializedState = sessionStorage.getItem('geogirafe-state');
     if (serializedState) {
       console.debug('Restoring state from sessionStorage');
-      stateRestored = this.stateSerializer.deserializeAndSetState(serializedState);
+      stateRestored = this.context.stateSerializer.deserializeAndSetState(serializedState);
     }
     return stateRestored;
   }

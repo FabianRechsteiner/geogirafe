@@ -1,45 +1,18 @@
-// List of singletons already created
-type GirafeSingletonInstances = {
-  [type: string]: GirafeSingleton;
-};
+import IGirafeContext from '../tools/context/icontext';
 
-// List of singletons currently being created
-type GirafeSingletonInitializing = {
-  [type: string]: boolean;
-};
-
-type Constructor<T> = new (type: string) => T;
-
+// TODO REG: Transform to interface
 class GirafeSingleton {
-  private static instances: GirafeSingletonInstances = {};
-  private static initializingSingletons: GirafeSingletonInitializing = {};
+  protected readonly context;
 
-  constructor(type: string) {
-    if (!(type in GirafeSingleton.initializingSingletons) || !GirafeSingleton.initializingSingletons[type]) {
-      throw new Error('This is a singleton. Please use the getInstance() method.');
-    }
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
-  static getInstance<T>(this: Constructor<T>): T {
-    const type = this.name;
-    if (!(type in GirafeSingleton.instances)) {
-      // Singleton do not exists
-      // => create it
-      GirafeSingleton.initializingSingletons[type] = true;
-      try {
-        // Get the child constructor, and create and instance of the child
-        const singleton = new this(type);
-        GirafeSingleton.instances[type] = singleton as GirafeSingleton;
-      } finally {
-        GirafeSingleton.initializingSingletons[type] = false;
-      }
-    }
-
-    return GirafeSingleton.instances[type] as T;
-  }
-
-  isNullOrUndefined(val: unknown) {
-    return val === undefined || val === null;
+  public initializeSingleton(): void {
+    /*
+     * This method does nothing by default, but will be called by the context when creating the singleton
+     * (This prevent overriding the constructor in every songleton and creating a strong dependency to the context object)
+     */
   }
 
   isNullOrUndefinedOrBlank(val: unknown) {

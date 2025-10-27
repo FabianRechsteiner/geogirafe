@@ -4,15 +4,14 @@ import type { Extent } from 'ol/extent';
 import type BaseLayer from 'ol/layer/Base';
 import { defaults as defaultControls } from 'ol/control/defaults.js';
 import { defaults as defaultInteractions } from 'ol/interaction/defaults';
-import StateManager from './statemanager';
 import { DragPan } from 'ol/interaction';
 
 /** The singleton containing the main OpenLayers map accessible from everywhere */
 export default class MapManager extends GirafeSingleton {
   private readonly map = new MapOL({
     controls: defaultControls({
-      rotate: !StateManager.getInstance().state.interface.isMobile,
-      zoom: !StateManager.getInstance().state.interface.isMobile
+      rotate: !this.context.stateManager.state.interface.isMobile,
+      zoom: !this.context.stateManager.state.interface.isMobile
     }),
     layers: [],
     interactions: defaultInteractions({ dragPan: false }).extend([

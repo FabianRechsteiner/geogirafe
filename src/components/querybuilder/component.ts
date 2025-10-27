@@ -1,9 +1,9 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import LayerWms from '../../models/layers/layerwms';
-import WfsManager from '../../tools/wfs/wfsmanager';
 import { LayerAttribute } from '../../models/serverwfs';
 import { mapAttributeTypeToFilterOperators, WfsFilter, WfsOperator } from '../../tools/wfs/wfsfilter';
 import { isString, isNumber, isDate } from '../../models/xmlTypes';
+import IGirafeContext from '../../tools/context/icontext';
 
 class QueryBuilderComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -34,8 +34,8 @@ class QueryBuilderComponent extends GirafeHTMLElement {
   ];
   operatorOptions: { operator: WfsOperator; displayName: string }[] = [];
 
-  constructor(layer: LayerWms) {
-    super('querybuilder');
+  constructor(layer: LayerWms, context: IGirafeContext) {
+    super('querybuilder', context);
     this.layer = layer;
   }
 
@@ -46,40 +46,38 @@ class QueryBuilderComponent extends GirafeHTMLElement {
 
     super.render();
 
-    WfsManager.getInstance()
-      .getServerWfs(this.layer)
-      .then((serverWfs) => {
-        const queryLayers = this.layer.queryLayers!.split(',');
+    this.context.wfsManager.getServerWfs(this.layer).then((serverWfs) => {
+      const queryLayers = this.layer.queryLayers!.split(',');
 
-        const stackedLayerAttributes = queryLayers.map((l: string) => serverWfs.layers[l]);
-        const layerAttributesCount: Record<string, number> = {};
-        for (const la of stackedLayerAttributes.flat()) {
-          if (layerAttributesCount[la.name] === undefined) {
-            layerAttributesCount[la.name] = 0;
-          }
-          layerAttributesCount[la.name]++;
+      const stackedLayerAttributes = queryLayers.map((l: string) => serverWfs.layers[l]);
+      const layerAttributesCount: Record<string, number> = {};
+      for (const la of stackedLayerAttributes.flat()) {
+        if (layerAttributesCount[la.name] === undefined) {
+          layerAttributesCount[la.name] = 0;
         }
-        const commonAttributesNames = Object.keys(layerAttributesCount).filter(
-          (k) => layerAttributesCount[k] === queryLayers.length
+        layerAttributesCount[la.name]++;
+      }
+      const commonAttributesNames = Object.keys(layerAttributesCount).filter(
+        (k) => layerAttributesCount[k] === queryLayers.length
+      );
+      const commonAttributes = stackedLayerAttributes[0]
+        ? stackedLayerAttributes[0].filter((la) => commonAttributesNames.includes(la.name))
+        : [];
+
+      this.deactivated = commonAttributes.length === 0;
+      if (this.deactivated) {
+        console.log(
+          'Filtering for layer group ' +
+            this.layer.name +
+            " is deactivated because the queryLayers don't have common attributes."
         );
-        const commonAttributes = stackedLayerAttributes[0]
-          ? stackedLayerAttributes[0].filter((la) => commonAttributesNames.includes(la.name))
-          : [];
+      }
+      this.layerAttributes = commonAttributes;
+      this.loading = false;
 
-        this.deactivated = commonAttributes.length === 0;
-        if (this.deactivated) {
-          console.log(
-            'Filtering for layer group ' +
-              this.layer.name +
-              " is deactivated because the queryLayers don't have common attributes."
-          );
-        }
-        this.layerAttributes = commonAttributes;
-        this.loading = false;
-
-        super.refreshRender();
-        this.initializeFilterFromLayer();
-      });
+      super.refreshRender();
+      this.initializeFilterFromLayer();
+    });
   }
 
   get inputTypeForFilterValue(): string {
@@ -204,9 +202,8 @@ class QueryBuilderComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-    });
+    super.connectedCallback();
+    this.render();
   }
 }
 

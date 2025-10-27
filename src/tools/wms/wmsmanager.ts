@@ -5,13 +5,17 @@ import ServerOgc from '../../models/serverogc';
 import VendorSpecificOgcServerManager from '../vendorspecificogcservermanager';
 import LayerWms from '../../models/layers/layerwms';
 import WfsFilter from '../wfs/wfsfilter';
+import IGirafeContext from '../context/icontext';
 
 export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient, OlMap> {
-  map?: OlMap;
+  private readonly map: OlMap;
 
-  constructor(type: string) {
-    super(type);
+  constructor(context: IGirafeContext) {
+    super(context);
+    this.map = this.context.mapManager.getMap();
+  }
 
+  override initializeSingleton() {
     // Register the default client
     this.registerClientClass('default', WmsClientDefault);
     this.registerClientClass('geoserver', WmsClientGeoServer);
@@ -23,8 +27,11 @@ export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient
   public getClientId(ogcServer: ServerOgc): string {
     return ogcServer.uniqueWmsQueryId;
   }
-  public createClient(clientClass: new (os: ServerOgc, map: OlMap) => WmsClient, ogcServer: ServerOgc): WmsClient {
-    return new clientClass(ogcServer, this.map as OlMap);
+  public createClient(
+    clientClass: new (os: ServerOgc, map: OlMap, context: IGirafeContext) => WmsClient,
+    ogcServer: ServerOgc
+  ): WmsClient {
+    return new clientClass(ogcServer, this.map, this.context);
   }
 
   selectFeatures(extent: number[]) {

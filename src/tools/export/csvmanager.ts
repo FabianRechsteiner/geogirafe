@@ -1,8 +1,5 @@
 import { download } from './download';
-import GirafeSingleton from '../../base/GirafeSingleton';
-import ConfigManager from '../configuration/configmanager';
-import I18nManager from '../i18n/i18nmanager';
-import GirafeConfig from '../configuration/girafeconfig';
+import IGirafeContext from '../context/icontext';
 
 /**
  * Definition for grid columns.
@@ -14,18 +11,14 @@ type GridColumnDef = {
   name: string;
 };
 
-export default class CsvManager extends GirafeSingleton {
-  private configManager: ConfigManager;
-  private i18nManager: I18nManager;
-
-  constructor(type: string) {
-    super(type);
-    this.i18nManager = I18nManager.getInstance();
-    this.configManager = ConfigManager.getInstance();
+export default class CsvManager {
+  private readonly context: IGirafeContext;
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
-  get config(): GirafeConfig {
-    return this.configManager.Config;
+  private get config() {
+    return this.context.configManager.Config;
   }
 
   /**
@@ -40,7 +33,7 @@ export default class CsvManager extends GirafeSingleton {
     }
 
     const translatedColumnHeaders: unknown[] = columnDefs.map((columnHeader: GridColumnDef) =>
-      this.i18nManager.getTranslation(columnHeader.name)
+      this.context.i18nManager.getTranslation(columnHeader.name)
     );
 
     const header = this.getRow(translatedColumnHeaders);

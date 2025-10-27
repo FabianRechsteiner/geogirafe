@@ -4,16 +4,18 @@ import GroupLayer from '../../models/layers/grouplayer';
 import LayerWms from '../../models/layers/layerwms';
 import OrderingManager from './orderingmanager';
 import MockHelper from '../tests/mockhelper';
+import IGirafeContext from '../context/icontext';
 
 let orderingManager: OrderingManager;
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
-  orderingManager = OrderingManager.getInstance();
+  context = MockHelper.startMocking();
+  orderingManager = context.orderingManager;
 });
 
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 
 describe('OrderingManager', () => {

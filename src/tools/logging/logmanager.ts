@@ -1,22 +1,13 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
-import ConfigManager from '../configuration/configmanager';
 
 export default class LogManager extends GirafeSingleton {
-  configManager: ConfigManager;
-
   defaultDebug: typeof console.debug = console.debug;
   defaultLog: typeof console.log = console.log;
   defaultInfo: typeof console.info = console.info;
   defaultWarn: typeof console.warn = console.warn;
   defaultError: typeof console.error = console.error;
 
-  constructor(type: string) {
-    super(type);
-    this.configManager = ConfigManager.getInstance();
-  }
-
-  async initLogging() {
-    await this.configManager.loadConfig();
+  initLogging() {
     console.debug = this.debug.bind(this);
     console.log = this.log.bind(this);
     console.info = this.info.bind(this);
@@ -29,7 +20,7 @@ export default class LogManager extends GirafeSingleton {
    * @returns true if the log was written, false instead
    */
   private debug(message: unknown, ...optionalParams: unknown[]) {
-    if (this.configManager.Config.general.logLevel === 'debug') {
+    if (this.context.configManager.Config.general.logLevel === 'debug') {
       this.defaultDebug(message, ...optionalParams);
       return true;
     }
@@ -42,8 +33,8 @@ export default class LogManager extends GirafeSingleton {
    */
   private log(message: unknown, ...optionalParams: unknown[]) {
     if (
-      this.configManager.Config.general.logLevel === 'debug' ||
-      this.configManager.Config.general.logLevel === 'info'
+      this.context.configManager.Config.general.logLevel === 'debug' ||
+      this.context.configManager.Config.general.logLevel === 'info'
     ) {
       this.defaultLog(message, ...optionalParams);
       return true;
@@ -57,8 +48,8 @@ export default class LogManager extends GirafeSingleton {
    */
   private info(message: unknown, ...optionalParams: unknown[]) {
     if (
-      this.configManager.Config.general.logLevel === 'debug' ||
-      this.configManager.Config.general.logLevel === 'info'
+      this.context.configManager.Config.general.logLevel === 'debug' ||
+      this.context.configManager.Config.general.logLevel === 'info'
     ) {
       this.defaultInfo(message, ...optionalParams);
       return true;
@@ -72,9 +63,9 @@ export default class LogManager extends GirafeSingleton {
    */
   private warn(message: unknown, ...optionalParams: unknown[]) {
     if (
-      this.configManager.Config.general.logLevel === 'debug' ||
-      this.configManager.Config.general.logLevel === 'info' ||
-      this.configManager.Config.general.logLevel === 'warn'
+      this.context.configManager.Config.general.logLevel === 'debug' ||
+      this.context.configManager.Config.general.logLevel === 'info' ||
+      this.context.configManager.Config.general.logLevel === 'warn'
     ) {
       this.defaultWarn(message, ...optionalParams);
       return true;

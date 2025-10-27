@@ -60,7 +60,7 @@ class HelpComponent extends GirafeHTMLElement {
 
   changeArrowColor() {
     // change the arrow color depending on the darkFrontendMode state
-    this.darkFrontendMode = this.stateManager.state.interface.darkFrontendMode ?? systemIsInDarkMode();
+    this.darkFrontendMode = this.context.stateManager.state.interface.darkFrontendMode ?? systemIsInDarkMode();
     this.currentArrow = this.darkFrontendMode ? this.arrowBlack : this.arrowWhite;
 
     this.themes.style.backgroundImage = `url(${this.currentArrow})`;
@@ -82,11 +82,10 @@ class HelpComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.render();
-      super.girafeTranslate();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    this.render();
+    super.girafeTranslate();
+    this.registerEvents();
   }
 }
 

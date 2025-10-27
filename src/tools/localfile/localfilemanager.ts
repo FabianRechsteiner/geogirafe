@@ -1,30 +1,20 @@
-import GirafeSingleton from '../../../base/GirafeSingleton';
-import MapManager from '../../../tools/state/mapManager';
+import GirafeSingleton from '../../base/GirafeSingleton';
 import { Feature, Map } from 'ol';
 import DragAndDrop from 'ol/interaction/DragAndDrop.js';
 import { GPX, GeoJSON, IGC, KML, TopoJSON } from 'ol/format.js';
 import { Vector as VectorLayer } from 'ol/layer.js';
 import { Vector as VectorSource } from 'ol/source.js';
 import { Geometry } from 'ol/geom';
-import LayerLocalFile from '../../../models/layers/layerlocalfile';
-import StateManager from '../../../tools/state/statemanager';
+import LayerLocalFile from '../../models/layers/layerlocalfile';
 import { extend, intersects } from 'ol/extent';
-import I18nManager from '../../../tools/i18n/i18nmanager';
-import UserInteractionManager from '../../../tools/state/userInteractionManager';
-import { v4 as uuidv4 } from 'uuid';
-import UserLayerManager from '../../../tools/themes/userlayermanager';
+import IGirafeContext from '../context/icontext';
 
 class LocalFileManager extends GirafeSingleton {
-  map: Map;
+  private readonly map: Map;
   name: string;
 
   private readonly supportedFileFormats = [GPX, GeoJSON, IGC, new KML({ extractStyles: true }), TopoJSON];
   private readonly supportedFileExtensions = ['gpx', 'geojson', 'igc', 'kml', 'topojson', 'json'];
-
-  stateManager: StateManager;
-  i18nManager: I18nManager;
-  userInteractionManager: UserInteractionManager;
-  userLayerManager: UserLayerManager;
 
   activeLayers: Record<
     string,
@@ -34,24 +24,21 @@ class LocalFileManager extends GirafeSingleton {
     }
   > = {};
 
-  constructor(type: string) {
-    super(type);
-    this.map = MapManager.getInstance().getMap();
-    this.name = `localFileManager-${uuidv4()}`;
+  constructor(context: IGirafeContext) {
+    super(context);
+    this.map = this.context.mapManager.getMap();
+    this.name = `localFileManager`;
+  }
 
-    this.stateManager = StateManager.getInstance();
-    this.i18nManager = I18nManager.getInstance();
-    this.userInteractionManager = UserInteractionManager.getInstance();
-    this.userLayerManager = UserLayerManager.getInstance();
+  override initializeSingleton(): void {
     this.registerEvents();
-
     // Add drag n drop interaction to add local files
     const dragAndDropInteraction = this.createInteraction();
     this.map.addInteraction(dragAndDropInteraction);
   }
 
   private registerEvents(): void {
-    this.userInteractionManager.registerListener('map.drop', false, this.name);
+    this.context.userInteractionManager.registerListener('map.drop', false, this.name);
   }
 
   createInteraction() {
@@ -64,7 +51,7 @@ class LocalFileManager extends GirafeSingleton {
     });
 
     dragAndDropInteraction.on('addfeatures', (e) => {
-      if (!this.userInteractionManager.canListenerExecute('map.drop', this.name)) return;
+      if (!this.context.userInteractionManager.canListenerExecute('map.drop', this.name)) return;
 
       this.loadLocalFileFeatures(e.file, e.features as Feature<Geometry>[]);
     });
@@ -84,7 +71,7 @@ class LocalFileManager extends GirafeSingleton {
       // dot nothing - shall we report an error ??
       return;
     }
-    const features = reader.readFeatures(text, { featureProjection: this.stateManager.state.projection });
+    const features = reader.readFeatures(text, { featureProjection: this.context.stateManager.state.projection });
     this.loadLocalFileFeatures(localFile, features);
   }
 
@@ -95,14 +82,19 @@ class LocalFileManager extends GirafeSingleton {
     const acceptableFeatures = this.validateAndCompleteFeatures(featureType, features);
     // Create Layer
     if (acceptableFeatures.globalExtent === null) {
-      const title = this.i18nManager.getTranslation('No features within map extent');
-      const msg = this.i18nManager.getTranslation(
+      const title = this.context.i18nManager.getTranslation('No features within map extent');
+      const msg = this.context.i18nManager.getTranslation(
         'No features where found in your file that could be displayed within the maximal extent configured in your application.'
       );
       window.gAlert(msg, title);
       return;
     }
-    const layer = new LayerLocalFile(localFile, acceptableFeatures.features, acceptableFeatures.globalExtent);
+    const layer = new LayerLocalFile(
+      localFile,
+      acceptableFeatures.features,
+      acceptableFeatures.globalExtent,
+      this.context.configManager.Config.general.locale
+    );
 
     if (features && features.length > acceptableFeatures.features.length) {
       // Some features are outer extent
@@ -110,28 +102,28 @@ class LocalFileManager extends GirafeSingleton {
       layer.errorMessage = `Only ${acceptableFeatures.features.length} features among ${features.length} could be loaded.
 Verify that those features can be displayed within the maximal extent configured in your application.`;
     }
-    this.userLayerManager.addUserLayerToTree(layer);
+    this.context.userLayerManager.addUserLayerToTree(layer);
   }
 
   private handleUnsupportedFiles(dropEvent: DragEvent) {
-    if (!this.userInteractionManager.canListenerExecute('map.drop', this.name)) return;
+    if (!this.context.userInteractionManager.canListenerExecute('map.drop', this.name)) return;
 
     const files: FileList | undefined = dropEvent.dataTransfer?.files;
     if (!files?.length) {
       return;
     }
     const unsupportedFiles = Array.from(files).filter(
-      (file) => !this.supportedFileExtensions.includes(file.name.split('.').slice(-1)[0].toLowerCase())
+      (file) => !this.supportedFileExtensions.includes(file.name.split('.').at(-1)!.toLowerCase())
     );
     if (!unsupportedFiles?.length) {
       return;
     }
     let msg;
     if (unsupportedFiles.length > 1) {
-      msg = this.i18nManager.getTranslation('Files _fileNames_ are not supported');
+      msg = this.context.i18nManager.getTranslation('Files _fileNames_ are not supported');
       msg = msg.replace('_fileNames_', unsupportedFiles.map((f) => `"${f.name}"`).join(', '));
     } else {
-      msg = this.i18nManager.getTranslation('File _fileName_ is not supported');
+      msg = this.context.i18nManager.getTranslation('File _fileName_ is not supported');
       msg = msg.replace('_fileName_', `"${unsupportedFiles[0].name}"`);
     }
     void window.gAlert(msg, 'Unsupported file format');
@@ -199,8 +191,8 @@ Verify that those features can be displayed within the maximal extent configured
     for (const activeLayer of Object.values(this.activeLayers)) {
       const features = activeLayer.olayer.getSource()?.getFeaturesInExtent(extent);
       if (features && features.length > 0) {
-        this.stateManager.state.selection.selectedFeatures.push(...features);
-        this.stateManager.state.interface.selectionComponentVisible = true;
+        this.context.stateManager.state.selection.selectedFeatures.push(...features);
+        this.context.stateManager.state.interface.selectionComponentVisible = true;
       }
     }
   }

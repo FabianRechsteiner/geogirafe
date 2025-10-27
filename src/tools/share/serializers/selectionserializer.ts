@@ -1,9 +1,9 @@
 import { IBrainSerializer } from '../../state/brain/serialize';
 import ObjectSelection, { InitialSelectionQuery } from '../../state/objectselection';
-import StateManager from '../../state/statemanager';
 import WfsFilter from '../../wfs/wfsfilter';
 import { SharedFilter } from './layerconfigserializer';
 import SelectionParam from '../../../models/selectionparam';
+import IGirafeContext from '../../context/icontext';
 
 export type SharedInitialSelection = {
   selectionBox?: number[];
@@ -14,14 +14,14 @@ export type SharedInitialSelection = {
 };
 
 export default class SelectionSerializer implements IBrainSerializer<ObjectSelection> {
-  private readonly stateManager: StateManager;
+  private readonly context: IGirafeContext;
 
-  constructor() {
-    this.stateManager = StateManager.getInstance();
+  constructor(context: IGirafeContext) {
+    this.context = context;
   }
 
   private get state() {
-    return this.stateManager.state;
+    return this.context.stateManager.state;
   }
 
   public brainSerialize(selection: ObjectSelection): string {

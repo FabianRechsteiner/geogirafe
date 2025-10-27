@@ -1,7 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import LayerWmts from '../../models/layers/layerwmts';
-import OfflineManager from '../../tools/offline/offlinemanager';
-import MapManager from '../../tools/state/mapManager';
 
 class OfflineComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -9,7 +7,6 @@ class OfflineComponent extends GirafeHTMLElement {
 
   protected downloadInProgress = false;
   protected downloadProgressValue = 0;
-  protected offlineManager: OfflineManager;
 
   protected downloadStartZoom?: number;
   protected downloadEndZoom?: number;
@@ -17,9 +14,7 @@ class OfflineComponent extends GirafeHTMLElement {
   public totalOfflineDataSizeMB = 0;
 
   constructor() {
-    super('themes-mobile');
-    this.offlineManager = OfflineManager.getInstance();
-    console.log(this.state);
+    super('offline-mobile');
   }
 
   registerEvents() {
@@ -37,7 +32,7 @@ class OfflineComponent extends GirafeHTMLElement {
   }
 
   async updateTotalSizeMB() {
-    this.totalOfflineDataSizeMB = await this.offlineManager.getTotalSizeMB();
+    this.totalOfflineDataSizeMB = await this.context.offlineManager.getTotalSizeMB();
     this.render();
   }
 
@@ -49,9 +44,9 @@ class OfflineComponent extends GirafeHTMLElement {
       this.downloadInProgress = true;
       this.downloadProgressValue = 0;
       super.render();
-      const map = MapManager.getInstance().getMap();
+      const map = this.context.mapManager.getMap();
       const bbox = map.getView().calculateExtent(map.getSize());
-      this.offlineManager.exportWMTSTiles(bbox, allWmtsLayers, this.progressCallback.bind(this));
+      this.context.offlineManager.exportWMTSTiles(bbox, allWmtsLayers, this.progressCallback.bind(this));
     }
   }
 
@@ -59,7 +54,8 @@ class OfflineComponent extends GirafeHTMLElement {
    * Gets the list of all active WMTS layers
    */
   private getAllWmtsLayers() {
-    const basemapLayers = this.stateManager.state.activeBasemap?.layersList.filter((l) => l instanceof LayerWmts) || [];
+    const basemapLayers =
+      this.context.stateManager.state.activeBasemap?.layersList.filter((l) => l instanceof LayerWmts) || [];
     const activeLayers = this.state.layers.layersList.filter((l) => l instanceof LayerWmts && l.active) as LayerWmts[];
     const allWmtsLayers = [...basemapLayers, ...activeLayers];
     return allWmtsLayers;
@@ -77,11 +73,10 @@ class OfflineComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.downloadStartZoom = this.configManager.Config.offline?.downloadStartZoom;
-      super.render();
-      this.registerEvents();
-    });
+    super.connectedCallback();
+    this.downloadStartZoom = this.context.configManager.Config.offline?.downloadStartZoom;
+    super.render();
+    this.registerEvents();
   }
 
   async clearStores() {
@@ -91,8 +86,8 @@ class OfflineComponent extends GirafeHTMLElement {
 
     const message = 'This will remove the cartographic data locally stored on this device.';
     if (confirm(message)) {
-      await this.offlineManager.clearBBoxStore();
-      await this.offlineManager.clearTileStore();
+      await this.context.offlineManager.clearBBoxStore();
+      await this.context.offlineManager.clearTileStore();
       this.updateTotalSizeMB();
     }
   }

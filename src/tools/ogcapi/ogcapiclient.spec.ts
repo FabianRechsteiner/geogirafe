@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import MockHelper from '../tests/mockhelper';
 import OgcApiFeaturesClient from './ogcapifeaturesclient';
 import ServerOgc from '../../models/serverogc';
+import IGirafeContext from '../context/icontext';
 
 // Since OgcApiClient is an abstract class, it's methods are tested with an instance of OgcApiFeaturesClient
 let client: OgcApiFeaturesClient;
@@ -15,17 +16,18 @@ const server: ServerOgc = new ServerOgc('test', {
   type: 'default',
   imageType: ''
 });
+let context: IGirafeContext;
 
 beforeAll(() => {
-  MockHelper.startMocking();
+  context = MockHelper.startMocking();
 });
 afterAll(() => {
-  MockHelper.stopMocking();
+  MockHelper.stopMocking(context);
 });
 beforeEach(() => {
   vi.resetAllMocks();
   global.fetch = vi.fn();
-  client = new OgcApiFeaturesClient(server);
+  client = new OgcApiFeaturesClient(server, {}, context);
 });
 
 describe('OgcApiClient.loadConformance', () => {

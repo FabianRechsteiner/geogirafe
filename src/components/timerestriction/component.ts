@@ -78,9 +78,8 @@ class TimeRestrictionComponent extends GirafeHTMLElement {
   }
 
   connectedCallback() {
-    this.loadConfig().then(() => {
-      this.renderComponent();
-    });
+    super.connectedCallback();
+    this.renderComponent();
   }
 }
 

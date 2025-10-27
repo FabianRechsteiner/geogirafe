@@ -1,6 +1,5 @@
-import ConfigManager from '../configuration/configmanager';
-import StateManager from '../state/statemanager';
 import GirafeSingleton from '../../base/GirafeSingleton';
+import IGirafeContext from '../context/icontext';
 
 /**
  * A dictionary that holds translation strings.
@@ -30,21 +29,17 @@ class I18nManager extends GirafeSingleton {
   translations: AvailableLanguages = {};
   loadingLanguagePromise: Promise<TranslationsDict> | null = null;
 
-  configManager: ConfigManager;
-  stateManager: StateManager;
+  constructor(context: IGirafeContext) {
+    super(context);
+  }
 
-  constructor(type: string) {
-    super(type);
-
-    this.configManager = ConfigManager.getInstance();
-    this.stateManager = StateManager.getInstance();
-
-    this.stateManager.subscribe('language', () => this.handleLanguageChange());
+  override initializeSingleton(): void {
+    this.context.stateManager.subscribe('language', () => this.handleLanguageChange());
     this.handleLanguageChange();
   }
 
   formatNumber(number: string | number): string {
-    return parseFloat(`${number}`).toLocaleString(this.configManager.Config.general.locale);
+    return Number.parseFloat(`${number}`).toLocaleString(this.context.configManager.Config.general.locale);
   }
 
   private async loadTranslations(language: string): Promise<TranslationsDict> {
@@ -61,15 +56,15 @@ class I18nManager extends GirafeSingleton {
     }
 
     // Load translations
-    this.loadingLanguagePromise = this.configManager.loadConfig().then(async () => {
+    this.loadingLanguagePromise = this.context.configManager.loadConfig().then(async () => {
       if (
-        this.configManager.Config?.languages.translations &&
-        language in this.configManager.Config.languages.translations
+        this.context.configManager.Config?.languages.translations &&
+        language in this.context.configManager.Config.languages.translations
       ) {
         let mergedTranslations: TranslationsDict = {};
         // Translations are loaded in the order defined in the list of files
         // If an element is present in both results, the last value overwrite all the others
-        for (const url of this.configManager.Config.languages.translations[language]) {
+        for (const url of this.context.configManager.Config.languages.translations[language]) {
           const response = await fetch(url);
           const content = await response.json();
           mergedTranslations = { ...mergedTranslations, ...content[language] };
@@ -87,7 +82,7 @@ class I18nManager extends GirafeSingleton {
   }
 
   getTranslation(key: string) {
-    const currentLanguage = this.stateManager?.state?.language ?? 'en';
+    const currentLanguage = this.context.stateManager?.state?.language ?? 'en';
     const translationDict = this.translations[currentLanguage];
     const translation = translationDict ? translationDict[key] : null;
     if (translation !== undefined && translation !== null) {
@@ -97,12 +92,12 @@ class I18nManager extends GirafeSingleton {
   }
 
   async translate(dom: DocumentFragment | HTMLElement): Promise<void> {
-    if (!this.stateManager.state?.language) {
+    if (!this.context.stateManager.state?.language) {
       return;
     }
 
     try {
-      await this.loadTranslations(this.stateManager.state.language);
+      await this.loadTranslations(this.context.stateManager.state.language);
     } catch (err) {
       console.warn('Skipping translation due to config error:', err);
       return;
@@ -134,7 +129,7 @@ class I18nManager extends GirafeSingleton {
   }
 
   handleLanguageChange() {
-    const newLanguage = this.stateManager.state.language;
+    const newLanguage = this.context.stateManager.state.language;
     if (!newLanguage) {
       return;
     }

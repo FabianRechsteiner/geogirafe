@@ -9,6 +9,7 @@ export default class DrawingContainerMobile extends GirafeHTMLElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.subscribe('interface.swipeupPanelContent', () => {
       // Disable the drawing mode if the swipeup panel were to host anything else than
       // the drawing toolbox
