@@ -19,8 +19,10 @@ export const filterLayerTree = (layerTree: BaseLayer[], searchText: string) => {
     prepareTreeItemForSearch(layer)
   );
 
-  // Filter the prepared tree items based on the query
-  const filteredTree = preparedLayers.filter((l) => l.name.includes(query));
+  const translatedNameOfDrawingLayer = I18nManager.getInstance().getTranslation('Drawings').toLowerCase();
+
+  // Filter the prepared tree items based on the query but keep the drawings layer
+  const filteredTree = preparedLayers.filter((l) => l.name.includes(query) || l.name == translatedNameOfDrawingLayer);
 
   // Remove duplicate ids in filter result
   const matchingLayerIds = Array.from(new Set(filteredTree.map((l) => l.idList).flat()));
