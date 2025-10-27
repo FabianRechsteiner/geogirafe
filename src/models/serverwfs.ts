@@ -39,12 +39,7 @@ class ServerWfs<WfsXmlTypes = XmlTypes> {
     for (const featureType of featureTypes) {
       if (!(featureType in this.layers)) {
         console.warn(
-          'featureType ' +
-            featureType +
-            ' is unknown to WFS server ' +
-            this.url +
-            '\n- available featureTypes: ' +
-            Object.keys(this.layers).join(', ')
+          `featureType ${featureType} is unknown to WFS server ${this.url}\navailable featureTypes: ${Object.keys(this.layers).join(',')}`
         );
       }
       const geometryColumnName = this.featureTypeToGeometryColumnName[featureType];

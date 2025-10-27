@@ -1,9 +1,7 @@
 import { Feature } from 'ol';
 import { Geometry } from 'ol/geom';
-import { WFS } from 'ol/format';
-import GML3 from 'ol/format/GML3';
+import WfsParser from './wfsparser';
 import { WriteGetFeatureOptions } from 'ol/format/WFS';
-
 import ConfigManager from '../configuration/configmanager';
 import StateManager from '../state/statemanager';
 import SelectionParam from '../../models/selectionparam';
@@ -25,6 +23,7 @@ export type WfsClientOptionalOptions = {
 };
 
 export default class WfsClient<WfsXmlTypes = XmlTypes> {
+  version: string = '1.1.0';
   stateManager: StateManager;
   get state() {
     return this.stateManager.state;
@@ -32,25 +31,36 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
 
   ogcServer: ServerOgc;
 
-  //TODO: make this configurable
-  maxFeatures: number = 300;
+  maxFeatures!: number;
   featurePrefix: string;
   featureNS: string;
+  featureNsWithPrefix: Record<string, string> = {};
 
   private readonly urlParameters: URLSearchParams = new URLSearchParams();
-  serverWfs: Promise<ServerWfs<WfsXmlTypes>> | undefined;
+  private serverWfs: Promise<ServerWfs<WfsXmlTypes>> | undefined;
 
   constructor(ogcServer: ServerOgc, options: WfsClientOptions) {
     this.ogcServer = ogcServer;
     this.featureNS = options.featureNS;
     this.featurePrefix = options.featurePrefix;
-
+    this.featureNsWithPrefix[this.featurePrefix] = this.featureNS;
     this.configMaxFeatures();
+    this.version = this.extractVersionFromUrl(this.wfsUrl);
     this.stateManager = StateManager.getInstance();
   }
 
   get wfsUrl(): string {
     return this.ogcServer.urlWfs ?? '';
+  }
+
+  private extractVersionFromUrl(url: string): string {
+    const urlObj = new URL(url);
+    const version = urlObj.searchParams.get('version');
+    if (version) {
+      return version;
+    } else {
+      return this.version;
+    }
   }
 
   configMaxFeatures() {
@@ -69,8 +79,8 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     if (!this.serverWfs) {
       this.serverWfs = this.#describeFeatureType();
       this.serverWfs.catch((error) => {
-        const msg = 'WFS server with URL ' + this.wfsUrl + ' could not be initialized.';
-        console.error(msg + ' Error:', error);
+        const msg = `WFS server with URL ${this.wfsUrl} could not be initialized. Error: `;
+        console.error(msg, error);
         this.serverWfs = undefined;
       });
     }
@@ -85,7 +95,7 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     const content = await response.text();
     const xml = new DOMParser().parseFromString(content, 'text/xml');
 
-    // First find all direct "element" childs
+    // First, find all direct "element" children
     const elementTypeToName = this.getElementToTypeName(xml);
 
     // Then, find all "complexType" elements
@@ -104,8 +114,8 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     serverWfs: ServerWfs<WfsXmlTypes>,
     elementTypeToName: Record<string, string>
   ) {
-    // takes an xml element, extract the attribute's type and name
-    // adds it to the serverWfs featureType
+    // Takes an XML element, extract the attribute's type and name
+    // Adds it to the serverWfs featureType
     const typeName = tag.getAttribute('name');
     if (!typeName) {
       throw new Error('Could not find a name for the complex type');
@@ -142,8 +152,8 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
         throw new Error('Why is geometryAttributeName null here ?');
       }
     } else {
-      // We are not on an geometry attribute, but on a normal attribute
-      // We update the WMS Layer with its attributes informations
+      // We are not on a geometry attribute, but on a normal attribute
+      // We update the WMS Layer with its attribute information
       const attrName = element.getAttribute('name');
       const attrType = element.getAttribute('type');
       if (!attrName || !attrType) {
@@ -191,15 +201,13 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     const url = new URL(this.wfsUrl);
     url.searchParams.set('service', 'WFS');
     url.searchParams.set('request', 'DescribeFeatureType');
-    // TODO REG: Manage different WFS versions
-    url.searchParams.set('version', '1.1.0');
+    url.searchParams.set('version', this.version);
 
     return url.href;
   }
 
   async getFeature(selectionParam: SelectionParam): Promise<Feature<Geometry>[]> {
-    // First, keep only queryable and visible layers
-    // And verify that all layers have the same WFS URL
+    // First, keep only queryable and visible layers and verify that all layers have the same WFS URL
     const currentResolution = this.state.position.resolution;
     if (!currentResolution) {
       console.log('WFSClient called before resolution is set.');
@@ -215,9 +223,6 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     // Ensure the WFS server is initialized
     const serverWfs = await this.getServerWfs();
 
-    // Get the geometry column name of each layer
-    // TODO REG : (not sure) This could probably be simplify by initializing a property in the ServerWfs object
-    // containing the name of the geometry column during the WFS initialization.
     const featureTypes = queryableLayers
       .map((l) =>
         l.queryLayers
@@ -231,6 +236,8 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
           )
       )
       .flat(1);
+
+    // Get the geometry column name of each layer containing the name of the geometry column
     const geometryColumnNameToFeatureType = serverWfs.getGeometryColumnNameToFeatureTypes(featureTypes);
 
     // Combine different sources of layer queries by chaining the filters with an AND operator
@@ -260,8 +267,7 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     );
 
     const getFeatureResponses = await Promise.all(getFeatureRequests);
-    const selectedFeatures = getFeatureResponses.flat();
-    return selectedFeatures;
+    return getFeatureResponses.flat();
   }
 
   completeGetFeatureOptions(featureTypes: string[], options: GetFeatureOptionalOptions): WriteGetFeatureOptions {
@@ -269,7 +275,8 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
       featurePrefix: this.featurePrefix,
       featureNS: this.featureNS,
       ...options,
-      featureTypes: featureTypes
+      featureTypes: featureTypes,
+      maxFeatures: options.maxFeatures ?? this.maxFeatures
     } as WriteGetFeatureOptions;
   }
 
@@ -283,25 +290,30 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
       );
     }
     const options = this.completeGetFeatureOptions(featureTypes, getFeatureOptions);
-    options.maxFeatures = options.maxFeatures ? options.maxFeatures : this.maxFeatures;
 
-    // WFS GetFeature
-    const featureRequest = new WFS().writeGetFeature(options);
+    const wfs = new WfsParser({
+      version: this.version,
+      featureNS: this.featureNsWithPrefix,
+      featureType: featureTypes.map((ft) => `${this.featurePrefix}:${ft}`)
+    });
+    const featureRequest = wfs.writeGetFeature(options);
 
-    // If URL parameters have been specified, add them to the URL (e.g. TIME parameter)
     const url = new URL(this.wfsUrl);
+    // If URL parameters have been specified, add them to the URL (e.g. TIME parameter)
     for (const [key, value] of this.urlParameters.entries()) {
       url.searchParams.set(key, value);
     }
+
     const response = await fetch(url, {
       method: 'POST',
       body: new XMLSerializer().serializeToString(featureRequest)
     });
 
     const gml = await response.text();
-    // TODO REG: Do we always want to use the format GML3 here ?
-    const features = new GML3().readFeatures(gml);
-    return features;
+
+    this.checkForExceptions(gml);
+
+    return wfs.readFeatures(gml);
   }
 
   /**
@@ -338,6 +350,20 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
       this.urlParameters.delete('TIME');
     }
   }
+
+  private checkForExceptions(source: string): void {
+    const domParser = new DOMParser();
+    const doc = domParser.parseFromString(source, 'application/xml');
+    const ns = 'http://www.opengis.net/ows'; // NOSONAR
+
+    const exceptionReport = doc.getElementsByTagNameNS(ns, 'ExceptionReport')[0];
+    if (exceptionReport) {
+      const exception = exceptionReport.getElementsByTagNameNS(ns, 'Exception')[0];
+      const message = exception?.getElementsByTagNameNS(ns, 'ExceptionText')[0]?.textContent;
+      console.error(`WFS Exception: ${message || 'Unknown error'}`);
+      throw new Error(`Feature Selection not possible due to a WFS Exception`);
+    }
+  }
 }
 
 // QueryableLayerWms: a LayerWms where (queryable=true and) urlWfs and are strings (and not null as is possible in LayerWms)
@@ -353,20 +379,28 @@ export type GetFeatureOptionalOptions = Omit<WriteGetFeatureOptions, 'featureNS'
 
 export class WfsClientMapServer extends WfsClient {
   constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
-    super(ogcServer, { featurePrefix: 'feature', featureNS: 'https://mapserver.gis.umn.edu/mapserver', ...options });
+    super(ogcServer, { featurePrefix: 'ms', featureNS: 'http://mapserver.gis.umn.edu/mapserver', ...options }); // NOSONAR
   }
   async getFeatureRaw(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions) {
-    console.debug('WFS CLIENT MAPSERVER getFeatureRaw() featureTypes:', featureTypes);
     return super.getFeatureRaw(featureTypes, getFeatureOptions);
   }
 }
 
 export class WfsClientQgis extends WfsClient {
   constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
-    super(ogcServer, { featurePrefix: 'feature', featureNS: 'https://www.qgis.org/gml', ...options });
+    super(ogcServer, { featurePrefix: 'qgs', featureNS: 'http://www.qgis.org/gml', ...options }); // NOSONAR
   }
   async getFeatureRaw(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions) {
-    console.debug('WFS CLIENT QGIS getFeatureRaw() featureTypes:', featureTypes);
+    return super.getFeatureRaw(featureTypes, getFeatureOptions);
+  }
+}
+
+export class WfsClientGeorama extends WfsClient {
+  version = '2.0.0';
+  constructor(ogcServer: ServerOgc, options: WfsClientOptionalOptions) {
+    super(ogcServer, { featurePrefix: 'georama', featureNS: 'https://www.opengis.ch/georama', ...options });
+  }
+  async getFeatureRaw(featureTypes: string[], getFeatureOptions: GetFeatureOptionalOptions) {
     return super.getFeatureRaw(featureTypes, getFeatureOptions);
   }
 }
