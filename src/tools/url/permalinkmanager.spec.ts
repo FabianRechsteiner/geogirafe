@@ -3,8 +3,11 @@ import PermalinkManager from './permalinkmanager';
 import MockHelper from '../tests/mockhelper';
 import { get as getProjection } from 'ol/proj';
 import MapPosition from '../state/mapposition';
+import StateManager from '../state/statemanager';
+import { BASEMAP_VISIBLE_PARAMETER, SEARCH_VISIBLE_PARAMETER } from './permalinkmanager-constants';
 
 let permalinkManager: PermalinkManager;
+let stateManager: StateManager;
 
 const emptyUrlParameters = {
   map_x: null,
@@ -16,7 +19,9 @@ const emptyUrlParameters = {
   basemap: null,
   themes: null,
   groups: null,
-  layers: null
+  layers: null,
+  searchVisible: null,
+  basemapVisible: null
 };
 
 const mockLocation = (url: string) => {
@@ -32,6 +37,7 @@ describe('PermalinkManager', () => {
   beforeAll(() => {
     MockHelper.startMocking();
     permalinkManager = PermalinkManager.getInstance();
+    stateManager = StateManager.getInstance();
   });
 
   afterEach(() => {
@@ -127,5 +133,77 @@ describe('PermalinkManager', () => {
     expect(permalinkManager.hasFeatureSelectionQuery()).toEqual(true);
     expect(permalinkManager.hasMapPosition()).toEqual(false);
     expect(permalinkManager.getMapPosition(getProjection('EPSG:2056')!)).toEqual(undefined);
+  });
+
+  it('should set visibility of search to true when parameter is missing', () => {
+    mockLocation('http://example.com?');
+    permalinkManager['getPermalinkParamsFromUrl']();
+    permalinkManager['setStateFromParams']();
+
+    expect(permalinkManager.hasSearchVisible()).toEqual(false);
+    expect(stateManager.state.interface.searchComponentVisible).toEqual(true);
+  });
+  it('should set visibility of search to true when parameter contains no valid boolean', () => {
+    mockLocation(`http://example.com?${SEARCH_VISIBLE_PARAMETER}=katze`);
+    permalinkManager['getPermalinkParamsFromUrl']();
+    permalinkManager['setStateFromParams']();
+
+    expect(permalinkManager.hasSearchVisible()).toEqual(true);
+    expect(permalinkManager.getSearchVisible()).toEqual(undefined);
+    expect(stateManager.state.interface.searchComponentVisible).toEqual(true);
+  });
+  it('should set visibility of search to false when parameter contains 0', () => {
+    mockLocation(`http://example.com?${SEARCH_VISIBLE_PARAMETER}=0`);
+    permalinkManager['getPermalinkParamsFromUrl']();
+    permalinkManager['setStateFromParams']();
+
+    expect(permalinkManager.hasSearchVisible()).toEqual(true);
+    expect(permalinkManager.getSearchVisible()).toEqual(false);
+    expect(stateManager.state.interface.searchComponentVisible).toEqual(false);
+  });
+  it('should set visibility of search to true when parameter contains true', () => {
+    mockLocation(`http://example.com?${SEARCH_VISIBLE_PARAMETER}=true`);
+    permalinkManager['getPermalinkParamsFromUrl']();
+    permalinkManager['setStateFromParams']();
+
+    expect(permalinkManager.hasSearchVisible()).toEqual(true);
+    expect(permalinkManager.getSearchVisible()).toEqual(true);
+    expect(stateManager.state.interface.searchComponentVisible).toEqual(true);
+  });
+
+  it('should set visibility of basemap menu to true when parameter is missing', () => {
+    mockLocation('http://example.com?');
+    permalinkManager['getPermalinkParamsFromUrl']();
+    permalinkManager['setStateFromParams']();
+
+    expect(permalinkManager.hasBasemapVisible()).toEqual(false);
+    expect(stateManager.state.interface.basemapComponentVisible).toEqual(true);
+  });
+  it('should set visibility of basemap menu to true when parameter contains no valid boolean', () => {
+    mockLocation(`http://example.com?${BASEMAP_VISIBLE_PARAMETER}=falsch`);
+    permalinkManager['getPermalinkParamsFromUrl']();
+    permalinkManager['setStateFromParams']();
+
+    expect(permalinkManager.hasBasemapVisible()).toEqual(true);
+    expect(permalinkManager.getBasemapVisible()).toEqual(undefined);
+    expect(stateManager.state.interface.basemapComponentVisible).toEqual(true);
+  });
+  it('should set visibility of basemap menu to false when parameter contains 0', () => {
+    mockLocation(`http://example.com?${BASEMAP_VISIBLE_PARAMETER}=0`);
+    permalinkManager['getPermalinkParamsFromUrl']();
+    permalinkManager['setStateFromParams']();
+
+    expect(permalinkManager.hasBasemapVisible()).toEqual(true);
+    expect(permalinkManager.getBasemapVisible()).toEqual(false);
+    expect(stateManager.state.interface.basemapComponentVisible).toEqual(false);
+  });
+  it('should set visibility of basemap menu to true when parameter contains true', () => {
+    mockLocation(`http://example.com?${BASEMAP_VISIBLE_PARAMETER}=true`);
+    permalinkManager['getPermalinkParamsFromUrl']();
+    permalinkManager['setStateFromParams']();
+
+    expect(permalinkManager.hasBasemapVisible()).toEqual(true);
+    expect(permalinkManager.getBasemapVisible()).toEqual(true);
+    expect(stateManager.state.interface.basemapComponentVisible).toEqual(true);
   });
 });

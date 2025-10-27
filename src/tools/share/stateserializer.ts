@@ -6,11 +6,12 @@ import MapPosition from '../state/mapposition';
 import LayersConfig from '../state/layersConfig';
 import LayersConfigSerializer from './serializers/layerconfigserializer';
 import BasemapSerializer from './serializers/basemapserializer';
-import State, { ExtendedState } from '../state/state';
+import State, { ExtendedState, GraphicalInterface } from '../state/state';
 import GirafeSingleton from '../../base/GirafeSingleton';
 import BrainSerializer, { Constructor, IBrainSerializer } from '../state/brain/serialize';
 import SelectionSerializer from './serializers/selectionserializer';
 import ObjectSelection from '../state/objectselection';
+import InterfaceSerializer from './serializers/interfaceserializer';
 
 class StateSerializer extends GirafeSingleton {
   stateManager: StateManager;
@@ -26,6 +27,7 @@ class StateSerializer extends GirafeSingleton {
     this.addSerializer(MapPosition, new MapPositionSerializer());
     this.addSerializer(LayersConfig, new LayersConfigSerializer());
     this.addSerializer(ObjectSelection, new SelectionSerializer());
+    this.addSerializer(GraphicalInterface, new InterfaceSerializer());
   }
 
   public addSerializer(type: Constructor<object>, serializerData: IBrainSerializer<object>): void {

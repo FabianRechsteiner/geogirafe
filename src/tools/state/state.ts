@@ -13,28 +13,31 @@ import { systemIsInDarkMode } from '../utils/utils';
 import ObjectSelection from './objectselection';
 import type Theme from '../../models/theme';
 
-type GraphicalInterface = {
-  isMobile: boolean;
-  helpVisible: boolean;
-  drawingPanelVisible: boolean;
-  printPanelVisible: boolean;
-  extLayerPanelVisible: boolean;
-  lidarPanelVisible: boolean;
-  crossSectionPanelVisible: boolean;
-  editPanelVisible: boolean;
-  sharePanelVisible: boolean;
-  selectionComponentVisible: boolean;
-  selectionComponent: string;
-  layoutPanelVisible: boolean;
-  aboutPanelVisible: boolean;
-  userPreferencesPanelVisible: boolean;
-  contactPanelVisible: boolean;
-  infoWindowVisible: boolean;
-  darkMapMode: boolean;
-  darkFrontendMode: boolean;
-  swipeupPanelMode: SwipeupPanelMode;
-  swipeupPanelContent: 'selector' | 'features' | 'menu' | 'drawing' | 'offline' | null;
-};
+export class GraphicalInterface {
+  isMobile = false;
+  helpVisible = false;
+  drawingPanelVisible = false;
+  printPanelVisible = false;
+  extLayerPanelVisible = false;
+  lidarPanelVisible = false;
+  crossSectionPanelVisible = false;
+  editPanelVisible = false;
+  sharePanelVisible = false;
+  selectionComponentVisible = false;
+  selectionComponent = '';
+  layoutPanelVisible = false;
+  aboutPanelVisible = false;
+  userPreferencesPanelVisible = false;
+  infoWindowVisible = false;
+  searchComponentVisible = true;
+  basemapComponentVisible = true;
+  darkMapMode = false;
+  // TODO: remove of adjust this when the component UserDataManager is monted on mobile UI
+  darkFrontendMode = systemIsInDarkMode() ?? false;
+  swipeupPanelMode = 'closed';
+  contactPanelVisible = false;
+  swipeupPanelContent: 'selector' | 'features' | 'menu' | 'drawing' | 'offline' | null = 'selector';
+}
 
 export type ThemesConfig = {
   _allThemes: Record<number, ThemeLayer>;
@@ -179,29 +182,8 @@ export default class State {
   mouseCoordinates: number[] = [];
 
   // Interface configuration (visible panels, ...)
-  interface: GraphicalInterface = {
-    isMobile: false,
-    helpVisible: false,
-    drawingPanelVisible: false,
-    printPanelVisible: false,
-    extLayerPanelVisible: false,
-    lidarPanelVisible: false,
-    crossSectionPanelVisible: false,
-    editPanelVisible: false,
-    sharePanelVisible: false,
-    selectionComponentVisible: false,
-    selectionComponent: '',
-    layoutPanelVisible: false,
-    aboutPanelVisible: false,
-    userPreferencesPanelVisible: false,
-    infoWindowVisible: false,
-    darkMapMode: false,
-    // TODO: remove of adjust this when the component UserDataManager is monted on mobile UI
-    darkFrontendMode: systemIsInDarkMode() ?? false,
-    swipeupPanelMode: 'closed',
-    contactPanelVisible: false,
-    swipeupPanelContent: 'selector'
-  };
+  @BrainSerialize
+  interface = new GraphicalInterface();
 
   userInteractionListeners: GgUserInteractionListener[] = [];
 

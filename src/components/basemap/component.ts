@@ -15,6 +15,10 @@ class BasemapComponent extends GirafeHTMLElement {
     this.refreshRender();
   }
 
+  toggleVisibility(visible: boolean) {
+    (this.shadowRoot?.host as HTMLElement).style.display = visible ? 'block' : 'none';
+  }
+
   registerEvents() {
     this.subscribe('basemaps', () => this.render());
     this.subscribe('activeBasemap', (_oldBasemap: Basemap, newBasemap: Basemap) => this.changeBasemap(newBasemap));
@@ -25,15 +29,19 @@ class BasemapComponent extends GirafeHTMLElement {
         }
       }
     });
+    this.subscribe('interface.basemapComponentVisible', (_oldValue: boolean, newValue: boolean) =>
+      this.toggleVisibility(newValue)
+    );
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
-      if (this.configManager.Config.basemaps.show) {
+      if (this.configManager.Config.basemaps.show && this.state.interface.basemapComponentVisible) {
         this.render();
         super.girafeTranslate();
         this.registerEvents();
       } else {
+        this.state.interface.basemapComponentVisible = false;
         this.renderEmpty();
       }
     });

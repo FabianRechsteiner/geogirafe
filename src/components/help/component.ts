@@ -34,11 +34,18 @@ class HelpComponent extends GirafeHTMLElement {
     this.basemap = this.shadow.querySelector('#basemap') as HTMLElement;
     this.userPreferences = this.shadow.querySelector('#user-preferences') as HTMLElement;
 
-    // hide and show help content depending on state
-    if (!this.configManager.Config.basemaps.show) {
-      (this.shadow.querySelector('#basemap') as HTMLElement).style.display = 'none';
-      (this.shadow.querySelector('#basemap-description') as HTMLElement).style.display = 'none';
+    // hide help for hideable Parts of the UI
+    if (!this.state.interface.basemapComponentVisible) {
+      this.hideHelpFor('basemap');
     }
+    if (!this.state.interface.searchComponentVisible) {
+      this.hideHelpFor('search');
+    }
+  }
+
+  private hideHelpFor(elementId: string): void {
+    (this.shadow.querySelector(`#${elementId}`) as HTMLElement).style.display = 'none';
+    (this.shadow.querySelector(`#${elementId}-description`) as HTMLElement).style.display = 'none';
   }
 
   registerEvents() {

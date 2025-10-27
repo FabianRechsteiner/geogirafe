@@ -54,7 +54,8 @@ class SearchComponent extends GirafeHTMLElement {
   private focusedResult: SearchResult | null = null;
   private selectedResult: SearchResult | null = null;
 
-  private searchBox?: HTMLInputElement;
+  private searchBox?: HTMLDivElement;
+  private searchInput?: HTMLInputElement;
 
   public paintSearchResults?: boolean;
   public defaultSearchStrokeColor: string;
@@ -109,6 +110,10 @@ class SearchComponent extends GirafeHTMLElement {
     });
   }
 
+  toggleVisibility(visible: boolean) {
+    this.searchBox!.style.display = visible ? 'flex' : 'none';
+  }
+
   public onMouseDown() {
     this.ignoreBlur = true;
   }
@@ -128,13 +133,21 @@ class SearchComponent extends GirafeHTMLElement {
 
   public render() {
     super.render();
-    this.searchBox = this.shadowRoot?.getElementById('search') as HTMLInputElement;
+    this.searchInput = this.shadowRoot?.getElementById('search') as HTMLInputElement;
+    this.searchBox = this.shadowRoot?.getElementById('searchbox') as HTMLDivElement;
+  }
+
+  registerEvents(): void {
+    this.subscribe('interface.searchComponentVisible', (_oldValue: boolean, newValue: boolean) =>
+      this.toggleVisibility(newValue)
+    );
   }
 
   connectedCallback() {
     this.loadConfig().then(() => {
       this.render();
       super.girafeTranslate();
+      this.registerEvents();
       if (this.permalinkManager.hasSearch()) {
         this.subscribe('application.isReady', () => {
           if (this.state.application.isReady) {
@@ -147,8 +160,8 @@ class SearchComponent extends GirafeHTMLElement {
 
   protected clearSearch(purge = false) {
     if (purge) {
-      if (this.searchBox) {
-        this.searchBox.value = '';
+      if (this.searchInput) {
+        this.searchInput.value = '';
       }
     }
     this.forceHide = false;
@@ -432,8 +445,8 @@ class SearchComponent extends GirafeHTMLElement {
     this.onFocusOut();
 
     // Update searchbox with result
-    if (this.searchBox && result.properties) {
-      this.searchBox.value = result.properties.label;
+    if (this.searchInput && result.properties) {
+      this.searchInput.value = result.properties.label;
     }
   }
 
