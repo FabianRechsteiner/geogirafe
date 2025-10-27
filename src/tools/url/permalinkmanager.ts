@@ -6,6 +6,7 @@ import MapPosition from '../state/mapposition';
 import { get as getProjection, Projection, transform } from 'ol/proj';
 import { isCoordinateInDegrees } from '../utils/olutils';
 import ConfigManager from '../configuration/configmanager';
+import { BASEMAP_VISIBLE_PARAMETER, SEARCH_VISIBLE_PARAMETER } from './permalinkmanager-constants';
 
 export default class PermalinkManager extends GirafeSingleton {
   stateManager: StateManager;
@@ -20,7 +21,9 @@ export default class PermalinkManager extends GirafeSingleton {
     'basemap',
     'themes',
     'groups',
-    'layers'
+    'layers',
+    SEARCH_VISIBLE_PARAMETER,
+    BASEMAP_VISIBLE_PARAMETER
   ];
   urlParamKeysWithPrefix: string[] = ['wfs_'];
   params: Record<string, string | null> = {};
@@ -31,6 +34,7 @@ export default class PermalinkManager extends GirafeSingleton {
     this.urlManager = UrlManager.getInstance();
     this.getPermalinkParamsFromUrl();
     this.removePermalinkParamsFromUrl();
+    this.setStateFromParams();
   }
 
   private get state() {
@@ -48,6 +52,11 @@ export default class PermalinkManager extends GirafeSingleton {
     for (const key in this.params) {
       this.urlManager.removeParams(key);
     }
+  }
+
+  private setStateFromParams() {
+    this.state.interface.searchComponentVisible = this.getSearchVisible() ?? true;
+    this.state.interface.basemapComponentVisible = this.getBasemapVisible() ?? true;
   }
 
   public hasFeatureSelectionQuery() {
@@ -179,5 +188,37 @@ export default class PermalinkManager extends GirafeSingleton {
       return this.params['layers']!.split(',');
     }
     throw new Error('No layers param in the Permalink!');
+  }
+
+  public hasSearchVisible() {
+    return this.params[SEARCH_VISIBLE_PARAMETER] !== null;
+  }
+
+  public getSearchVisible() {
+    if (this.hasSearchVisible()) {
+      try {
+        return Boolean(JSON.parse(this.params[SEARCH_VISIBLE_PARAMETER]!));
+      } catch (e) {
+        console.warn(`Could not parse param ${SEARCH_VISIBLE_PARAMETER}: ${e}`);
+        return undefined;
+      }
+    }
+    return undefined;
+  }
+
+  public hasBasemapVisible() {
+    return this.params[BASEMAP_VISIBLE_PARAMETER] !== null;
+  }
+
+  public getBasemapVisible() {
+    if (this.hasBasemapVisible()) {
+      try {
+        return Boolean(JSON.parse(this.params[BASEMAP_VISIBLE_PARAMETER]!));
+      } catch (e) {
+        console.warn(`Could not parse param ${BASEMAP_VISIBLE_PARAMETER}: ${e}`);
+        return undefined;
+      }
+    }
+    return undefined;
   }
 }
