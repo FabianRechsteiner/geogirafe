@@ -1,5 +1,6 @@
 import type OlFeature from 'ol/Feature';
 import { removeUnwantedOlParams } from './utils/olutils';
+import WfsManager from './wfs/wfsmanager';
 
 /**
  * Represents a grid data organized by unique ids.
@@ -141,24 +142,7 @@ export default class FeatureToGridDataById {
     return emptyColumnIndexes;
   }
 
-  /**
-   * @return The ID of the feature or 'UNKNOWN' if undefined.
-   * @static
-   */
-  static getUserFeatureId(feature: OlFeature): string {
-    const id = feature.getId();
-    return id === undefined ? 'UNKNOWN' : `${id}`;
-  }
   static getUserFeatureType(feature: OlFeature): string {
-    const id = feature.getId();
-    if (!id) {
-      return 'UNKNOWN';
-    }
-    const splitId = `${id}`.split('.');
-    if (splitId.length <= 1) {
-      return `${id}`;
-    }
-    splitId.pop();
-    return splitId.join('.');
+    return WfsManager.extractFeatureTypeFromId(feature);
   }
 }

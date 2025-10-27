@@ -17,6 +17,7 @@ export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient
     this.registerClientClass('geoserver', WmsClientGeoServer);
     this.registerClientClass('mapserver', WmsClientMapServer);
     this.registerClientClass('qgisserver', WmsClientQgis);
+    this.registerClientClass('georama.webgis', WmsClientQgis);
   }
 
   public getClientId(ogcServer: ServerOgc): string {

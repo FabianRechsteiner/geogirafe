@@ -19,6 +19,7 @@ import { MFPLegendEncoder } from './MFPLegendEncoder';
 import MFPEncoder from './MFPEncoder';
 import { removeUnwantedOlParams } from '../../../tools/utils/olutils';
 import { intersects } from 'ol/extent';
+import WfsManager from '../../../tools/wfs/wfsmanager';
 
 /**
  * Represents encoding options to print the map.
@@ -142,8 +143,7 @@ export default class PrintManager {
         if (!intersects(featureExtent, extent)) {
           return datasources;
         }
-        const id = feature.getId();
-        const rawTitle = id === undefined ? 'UNKNOWN' : `${id}`.split('.')[0];
+        const rawTitle = WfsManager.extractFeatureTypeFromId(feature);
         const title = i18nManager.getTranslation(rawTitle);
         const properties = removeUnwantedOlParams(feature);
         const datasource = datasources.find((datasource) => datasource.title === title);

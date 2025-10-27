@@ -4,12 +4,12 @@ import WfsManager from './wfsmanager';
 import { mockOgcServers, mockWmsLayers } from '../tests/wmswfsmanagermocking';
 import { WfsClientMapServer, WfsClientQgis } from './wfsclient';
 import MockHelper from '../tests/mockhelper';
-//import ConfigManager from '../configuration/configmanager';
+import OlFeature from 'ol/Feature';
 
 const fetchMock = vi.fn();
 global.fetch = fetchMock;
 
-describe('WMS Manager tests', () => {
+describe('WFS Manager tests', () => {
   MockHelper.startMocking();
 
   const wfsManager = WfsManager.getInstance();
@@ -33,13 +33,6 @@ describe('WMS Manager tests', () => {
   const wfsClientQg1L2 = wfsManager.getClient(layerQg1L2);
   const wfsClientQg1L3 = wfsManager.getClient(layerQg1L3);
   const wfsClientQg2L1 = wfsManager.getClient(layerQg2L1);
-
-  // MapServer layers
-  /*
-  const wfsClientMsL1 = wfsManager.getClient(mockWmsLayers[x])
-  const wfsClientMsL2 = wfsManager.getClient(mockWmsLayers[x])
-  const wfsClientMsL3 = wfsManager.getClient(mockWmsLayers[x])
-  */
 
   describe('WfsManager.getClient()', () => {
     it('should return a WfsClientQGis for a layerWms of type qgisserver', () => {
@@ -65,4 +58,37 @@ describe('WMS Manager tests', () => {
   });
 
   MockHelper.stopMocking();
+});
+
+describe('WfsManager.extractFeatureTypeFromId', () => {
+  it('correctly extracts the feature type', () => {
+    const feature = new OlFeature();
+    feature.setId('featureType.1234');
+
+    let featureType = WfsManager.extractFeatureTypeFromId(feature);
+    expect(featureType).toEqual('featureType');
+  });
+
+  it('correctly extracts the feature type if a prefix is present', () => {
+    const feature = new OlFeature();
+    feature.setId('myPrefix:Layername.1234');
+
+    let featureType = WfsManager.extractFeatureTypeFromId(feature);
+    expect(featureType).toEqual('Layername');
+  });
+
+  it('returns UNKNOWN if the features does not have an id', () => {
+    const feature = new OlFeature();
+
+    let featureType = WfsManager.extractFeatureTypeFromId(feature);
+    expect(featureType).toEqual(WfsManager.UnknownFeatureType);
+  });
+
+  it('correctly extracts the feature type if multiple "." and ":" are present', () => {
+    const feature = new OlFeature();
+    feature.setId('myPrefix:Layername-that:has.strange.Characters.0000');
+
+    let featureType = WfsManager.extractFeatureTypeFromId(feature);
+    expect(featureType).toEqual('Layername-that:has.strange.Characters');
+  });
 });

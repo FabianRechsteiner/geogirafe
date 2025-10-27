@@ -2,6 +2,7 @@ import { test, expect, describe, beforeEach } from 'vitest';
 import FeatureToGridDataById from './featuretogriddatabyid';
 import type { FeatureToGridDataOptions, GridDataById, GridData } from './featuretogriddatabyid';
 import OlFeature from 'ol/Feature';
+import WfsManager from './wfs/wfsmanager';
 
 let featureToGridDataById: FeatureToGridDataById;
 let features: OlFeature[];
@@ -55,7 +56,7 @@ describe('FeatureToGridDataById', () => {
         { col1: 'value5', col2: 'value6', col3: undefined }
       ]
     });
-    expect(gridDataById['UNKNOWN']).toStrictEqual({
+    expect(gridDataById[WfsManager.UnknownFeatureType]).toStrictEqual({
       columns: ['col1', 'col2'],
       data: [['value7', 'value8']],
       features: [features[2]],
@@ -131,16 +132,5 @@ describe('FeatureToGridDataById', () => {
     ];
     const emptyColumnIndices = FeatureToGridDataById.findEmptyColumnIndexOf(data);
     expect(emptyColumnIndices).toStrictEqual([2]);
-  });
-
-  test('getUserFeatureType', () => {
-    let id = FeatureToGridDataById.getUserFeatureType(features[0]);
-    expect(id).toEqual('f.oo');
-
-    id = FeatureToGridDataById.getUserFeatureType(features[1]);
-    expect(id).toEqual('bar');
-
-    id = FeatureToGridDataById.getUserFeatureType(features[2]);
-    expect(id).toEqual('UNKNOWN');
   });
 });

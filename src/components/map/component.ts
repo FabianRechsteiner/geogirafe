@@ -476,12 +476,14 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   onClick(e: MapBrowserEvent<PointerEvent>) {
-    // Build selection box using the default tolerance.
-    const topLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
-    const topLeftCoord = this.olMap.getCoordinateFromPixel(topLeftPixel);
-    const bottomRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
-    const bottomRightCoord = this.olMap.getCoordinateFromPixel(bottomRightPixel);
-    this.select([topLeftCoord[0], topLeftCoord[1], bottomRightCoord[0], bottomRightCoord[1]]);
+    // Build the selection box using the default tolerance. Note that the origin of the pixel coordinates is in
+    // the top left corner, whereas the origin of the map coordinates is in the bottom left corner.
+    // To get a valid bounding box [xMin, yMin, xMax, yMax] is needed.
+    const lowerLeftPixel = [e.pixel[0] - this.pixelTolerance, e.pixel[1] + this.pixelTolerance];
+    const lowerLeftCoord = this.olMap.getCoordinateFromPixel(lowerLeftPixel);
+    const topRightPixel = [e.pixel[0] + this.pixelTolerance, e.pixel[1] - this.pixelTolerance];
+    const topRightCoord = this.olMap.getCoordinateFromPixel(topRightPixel);
+    this.select([lowerLeftCoord[0], lowerLeftCoord[1], topRightCoord[0], topRightCoord[1]]);
   }
 
   onDragSelection(_e: DragBoxEvent) {

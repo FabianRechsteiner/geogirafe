@@ -8,9 +8,12 @@
     },
     "defaultLanguage": "de"
   },
+  "interface": {
+    "defaultSelectionComponent": "grid"
+  },
   "themes": {
     "url": "https://demo.georama.io/webgis/themes.json",
-    "defaultTheme": "forest_fires"
+    "defaultTheme": "bees_pg"
   },
   "basemaps": {
     "defaultBasemap": "OpenStreetMap",
@@ -28,11 +31,13 @@
     "EPSG:2056": "LV95"
   },
   "map": {
-    "srid": "EPSG:2056",
-    "startZoom": "0",
-    "startPosition": "2690600,1213375",
-    "maxExtent": "2459308,1069751,2859959,1301450",
-    "scales": [200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000, 500, 200]
+    "srid": "EPSG:3857",
+    "startZoom": "9",
+    "startPosition": "1030515,5910919",
+    "scales": [
+      10000000, 5000000, 2000000, 1000000, 500000, 200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000,
+      500, 200
+    ]
   },
   "map3d": {
     "terrainUrl": "https://3d.geo.admin.ch/ch.swisstopo.terrain.3d/v1/",

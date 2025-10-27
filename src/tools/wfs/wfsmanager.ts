@@ -7,12 +7,14 @@ import WfsClient, {
   WfsClientGeoServer,
   WfsClientMapServer,
   WfsClientOptionalOptions,
-  WfsClientQgis
+  WfsClientQgis,
+  WfsClientGeorama
 } from './wfsclient';
 import WfsFilter from './wfsfilter';
 import ServerOgc from '../../models/serverogc';
 import VendorSpecificOgcServerManager from '../vendorspecificogcservermanager';
 import { isTimeAwareLayer, TimeAwareLayer } from '../../models/layers/timeawarelayer';
+import Feature from 'ol/Feature';
 
 export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient, WfsClientOptionalOptions> {
   stateManager: StateManager;
@@ -23,6 +25,8 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
   public getClientId(ogcServer: ServerOgc): string {
     return ogcServer.urlWfs ?? '';
   }
+
+  public static readonly UnknownFeatureType: string = 'UNKNOWN';
 
   constructor(type: string) {
     super(type);
@@ -45,6 +49,7 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
     this.registerClientClass('geoserver', WfsClientGeoServer);
     this.registerClientClass('mapserver', WfsClientMapServer);
     this.registerClientClass('qgisserver', WfsClientQgis);
+    this.registerClientClass('georama.webgis', WfsClientGeorama);
   }
 
   async onSelectedFeaturesFilterChange(filter: WfsFilter | undefined) {
@@ -70,9 +75,8 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
 
     // keep only the selected features that are not in the filtered layers
     const selectedFeatures = this.state.selection.selectedFeatures.filter((feature) => {
-      const id = feature.getId();
-      const featureId = id === undefined ? 'UNKNOWN' : `${id}`.split('.')[0];
-      return !filteredLayersId.includes(featureId) && featureId !== 'UNKNOWN';
+      const featureType = WfsManager.extractFeatureTypeFromId(feature);
+      return !filteredLayersId.includes(featureType) && featureType === WfsManager.UnknownFeatureType;
     });
     // add the newly filtered selected features
     selectedFeatures.push(...filteredSelectedFeatures);
@@ -109,5 +113,30 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
     const ogcServer = object instanceof LayerWms ? object.ogcServer : object;
     const client = this.getClient(ogcServer);
     return client.getServerWfs();
+  }
+
+  /**
+   * Extracts the feature type from the feature's ID. A feature ID may contain a prefix,
+   * the feature type and a feature-specific ID. It returns "UNKNOWN" if the ID is absent.
+   */
+  static extractFeatureTypeFromId(feature: Feature): string {
+    let id = feature.getId();
+    if (!id) {
+      return WfsManager.UnknownFeatureType;
+    }
+    id = `${id}`;
+    // First, remove the feature prefix if present, e.g. "my_prefix:my_feature_type.123"
+    const idWithPrefix = id.split(':');
+    if (idWithPrefix.length > 1) {
+      idWithPrefix.shift();
+      id = idWithPrefix.join(':');
+    }
+    const splitId = id.split('.');
+    if (splitId.length <= 1) {
+      return id;
+    }
+    // Remove the feature ID from the type
+    splitId.pop();
+    return splitId.join('.');
   }
 }
