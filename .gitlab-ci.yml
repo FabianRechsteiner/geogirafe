@@ -122,7 +122,7 @@ versioning:
   before_script:
     - apt update && apt -y install jq
   script:
-    - jq ".version |= . + \"-$CI_PIPELINE_ID\"" package.json > package-temp.json
+    - jq --arg build "$CI_PIPELINE_ID" '.version = (.version | split(".") | .[0] + "." + .[1] + "." + $build)' package.json > package-temp.json
     - rm package.json && mv package-temp.json package.json
 
   artifacts:
