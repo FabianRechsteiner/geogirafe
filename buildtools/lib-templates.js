@@ -1,4 +1,5 @@
 import path from 'path';
+import { EOL } from 'os';
 import { copy, replaceInFile } from './tools.js';
 
 // Generate template files
@@ -33,12 +34,18 @@ replaceInFile(
   /const certsDirectory = 'buildtools\/certs'/gm,
   "const certsDirectory = 'certs'"
 );
+replaceInFile(
+  path.join(targetDir, 'vite.config.js'),
+  /desktop: resolve\(__dirname, 'index.html'\)/gm,
+  `desktop: resolve(__dirname, 'index.html'),${EOL}          custom: resolve(__dirname, 'custom.html')`
+);
 copy('index.html', sourceDir, targetDir);
 replaceInFile(path.join(targetDir, 'index.html'), /href="src\/styles/gm, 'href="styles');
 copy('mobile.html', sourceDir, targetDir);
 replaceInFile(path.join(targetDir, 'mobile.html'), /href="src\/styles/gm, 'href="styles');
 copy('iframe.html', sourceDir, targetDir);
 replaceInFile(path.join(targetDir, 'iframe.html'), /href="src\/styles/gm, 'href="styles');
+copy('api.html', sourceDir, targetDir);
 
 // Copy public assets (images, favicon, ...)
 sourceDir = './public';

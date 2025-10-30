@@ -116,8 +116,11 @@
     "./models": {
       "import": "./models/main.js"
     },
-    "./tools": {
+    "./core": {
       "import": "./tools/main.js"
+    },
+    "./tools": {
+      "import": "./main.tools.js"
     },
     "./buildtools": {
       "import": "./buildtools/main.js"
