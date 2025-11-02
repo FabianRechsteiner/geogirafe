@@ -4,12 +4,37 @@
   </button>
 
   <div slot="menu-content" id="container">
-    ${Object.values(this.state.basemaps).map(basemap => uHtmlFor(basemap, basemap.id)`
-    <button
-      class="${this.state.activeBasemap === basemap ? 'girafe-button-large active-basemap' : 'girafe-button-large'}"
-      onclick="${() => this.changeBasemap(basemap)}">
-      <img class="basemap-icon" alt="basemap-icon" src="${basemap.thumbnail}" />
-      <span i18n="${basemap.name}">${basemap.name}</span></button
-    >` )}
+    ${Object.values(this.state.basemaps).filter(basemap => basemap.opacity == -1).map(basemap => uHtmlFor(basemap,
+    basemap.id)`
+    <div class="${this.determineClassnames(basemap)}">
+      <button onclick="${() => this.changeBasemap(basemap)}">
+        <img class="basemap-icon" alt="basemap-icon" src="${basemap.thumbnail}" />
+        <span i18n="${basemap.name}">${basemap.name}</span>
+      </button>
+    </div>
+    `)}
+    <div class="basemaps-with-opacity-separator"></div>
+    ${Object.values(this.state.basemaps).filter(basemap => basemap.opacity != -1).map(basemap => uHtmlFor(basemap,
+    basemap.id)`
+    <div class="${this.determineClassnames(basemap)}">
+      <button onclick="${() => this.changeBasemap(basemap)}">
+        <img class="basemap-icon" alt="basemap-icon" src="${basemap.thumbnail}" />
+        <span i18n="${basemap.name}">${basemap.name}</span>
+      </button>
+      <div class="opacity-slider">
+        <img alt="Control opacity" src="icons/opacity.svg" />
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          class="slider"
+          value="${basemap.opacity}"
+          onkeydown="${(e: KeyboardEvent) => { e.preventDefault(); e.stopPropagation(); }}"
+          onclick="${(e: PointerEvent) => { e.preventDefault(); e.stopPropagation(); }}"
+          onchange="${(e: PointerEvent) => this.changeBasemapOpacity(basemap, e)}" />
+      </div>
+    </div>
+    `)}
   </div>
 </girafe-menu-button>

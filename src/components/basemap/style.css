@@ -27,3 +27,50 @@
 .active-basemap {
   background-color: var(--bkg-color-grad2) !important;
 }
+
+.opacity-slider {
+  padding: 0 5px;
+  display: flex;
+  flex-direction: row;
+  height: 20px;
+  img {
+    height: 16px;
+    top: 2px;
+    position: relative;
+  }
+  input[type='range'] {
+    flex-grow: 1;
+  }
+}
+
+.basemap-container {
+  display: flex;
+  flex-direction: column;
+  button {
+    border: none;
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    color: var(--text-color);
+    flex-grow: 1;
+
+    img {
+      margin: 0.3rem;
+      height: 2rem;
+    }
+    span {
+      line-height: 2rem;
+      height: 2rem;
+      margin: 0.3rem;
+    }
+  }
+}
+.basemap-container:hover {
+  background-color: var(--bkg-color-grad1);
+}
+
+.basemaps-with-opacity-separator {
+  border-top: 1px solid var(--bkg-color-grad2);
+  height: 1px;
+  margin: 6px 8px;
+}

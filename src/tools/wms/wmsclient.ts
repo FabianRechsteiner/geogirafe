@@ -47,7 +47,13 @@ export default abstract class WmsClient {
     }
   > = {};
 
-  basemapLayers: ImageLayer<ImageWMS>[] = [];
+  basemapLayers: Record<
+    string,
+    {
+      layerWms: LayerWms;
+      olayer: ImageLayer<ImageWMS>;
+    }
+  > = {};
 
   constructor(ogcServer: ServerOgc, map: Map, context: IGirafeContext) {
     this.ogcServer = ogcServer;
@@ -60,10 +66,10 @@ export default abstract class WmsClient {
   }
 
   removeAllBasemapLayers() {
-    this.basemapLayers.forEach((basemap) => {
-      this.map.removeLayer(basemap);
-    });
-    this.basemapLayers = [];
+    for (const basmapLayer of Object.values(this.basemapLayers)) {
+      this.map.removeLayer(basmapLayer.olayer);
+    }
+    this.basemapLayers = {};
   }
 
   public addLayer(layerWms: LayerWms) {
@@ -140,7 +146,10 @@ export default abstract class WmsClient {
     // For basemap, set a minimal number (arbitrary defined to less than -5000)
     olayer.setZIndex(-5000 - layerWms.order);
 
-    this.basemapLayers.push(olayer);
+    this.basemapLayers[layerWms.treeItemId] = {
+      layerWms: layerWms,
+      olayer: olayer
+    };
     this.map.addLayer(olayer);
   }
 
@@ -173,20 +182,31 @@ export default abstract class WmsClient {
   }
 
   layerExists(layerWms: LayerWms) {
-    return this.layerInStandardLayers(layerWms) || this.layerIsIndependantLayer(layerWms);
+    return (
+      this.layerInStandardLayers(layerWms) ||
+      this.layerIsIndependentLayer(layerWms) ||
+      this.layerIsBasemapLayer(layerWms)
+    );
   }
 
   layerInStandardLayers(layerWms: LayerWms) {
     return this.layers.some((l) => l.treeItemId === layerWms.treeItemId);
   }
 
-  layerIsIndependantLayer(layerWms: LayerWms) {
+  layerIsIndependentLayer(layerWms: LayerWms) {
     return layerWms.treeItemId in this.independentLayers;
+  }
+
+  layerIsBasemapLayer(layerWms: LayerWms) {
+    return layerWms.treeItemId in this.basemapLayers;
   }
 
   getOLayer(layerWms: LayerWms): ImageLayer<ImageWMS> | null {
     if (layerWms.treeItemId in this.independentLayers) {
       return this.independentLayers[layerWms.treeItemId].olayer;
+    }
+    if (layerWms.treeItemId in this.basemapLayers) {
+      return this.basemapLayers[layerWms.treeItemId].olayer;
     }
     if (this.layerInStandardLayers(layerWms)) {
       return this.olayer!;
@@ -215,19 +235,22 @@ export default abstract class WmsClient {
       throw new Error('Cannot change filter for this layer: it does not exist');
     }
 
-    const isLayerIndependant = layerWms.treeItemId in this.independentLayers;
-    const mustBeIndependant =
+    const isBasemapLayer = layerWms.treeItemId in this.basemapLayers;
+    const isLayerIndependent = layerWms.treeItemId in this.independentLayers;
+    const mustBeIndependent =
       layerWms.hasFilter || layerWms.hasTimeRestriction || layerWms.isTransparent || layerWms.swiped !== 'no';
 
-    if (isLayerIndependant && !mustBeIndependant) {
-      const olayer = this.independentLayers[layerWms.treeItemId].olayer;
-      // We delete the layer from the transparent layers
-      delete this.independentLayers[layerWms.treeItemId];
-      this.map.removeLayer(olayer);
-      // And add it to the normal layer again
-      this.addLayerInternal(layerWms);
-    } else if (!isLayerIndependant && mustBeIndependant) {
-      this.makeLayerIndependent(layerWms);
+    if (!isBasemapLayer) {
+      if (isLayerIndependent && !mustBeIndependent) {
+        const olayer = this.independentLayers[layerWms.treeItemId].olayer;
+        // We delete the layer from the transparent layers
+        delete this.independentLayers[layerWms.treeItemId];
+        this.map.removeLayer(olayer);
+        // And add it to the normal layer again
+        this.addLayerInternal(layerWms);
+      } else if (!isLayerIndependent && mustBeIndependent) {
+        this.makeLayerIndependent(layerWms);
+      }
     }
 
     const olayer = this.getOLayer(layerWms);
@@ -235,7 +258,7 @@ export default abstract class WmsClient {
       throw new Exception('The layer must exist at this state!');
     }
 
-    if (layerWms.isTransparent) {
+    if (layerWms.hasValidOpacity) {
       olayer.setOpacity(layerWms.opacity);
     }
     this.updateLayerFilter(layerWms, olayer);
@@ -459,7 +482,7 @@ export class WmsClientQgis extends WmsClient {
   getOpenLayerLayerNames(layerList: LayerWms[]) {
     const hasFilter = layerList.some((layerWms) => layerWms.hasFilter);
     if (hasFilter) {
-      const layerNames = layerList.map((l: LayerWms) => l.queryLayers?.split(',')).flat();
+      const layerNames = layerList.flatMap((l: LayerWms) => l.queryLayers?.split(','));
       return layerNames as string[];
     } else {
       const layerNames = layerList.map((l: LayerWms) => l.layers ?? l.name);

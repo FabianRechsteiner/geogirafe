@@ -37,6 +37,10 @@ abstract class Layer extends BaseLayer {
     return this.opacity !== 1;
   }
 
+  get hasValidOpacity() {
+    return this.opacity >= 0 && this.opacity <= 1;
+  }
+
   get active() {
     return this.activeState === 'on';
   }

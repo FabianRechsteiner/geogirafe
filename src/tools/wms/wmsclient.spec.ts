@@ -66,8 +66,8 @@ describe('WmsClient.addLayer()', () => {
 
     expect(wmsClientQg1L1.layerInStandardLayers(layerQg1L1)).toEqual(true);
     expect(wmsClientQg1L1.layerInStandardLayers(layerQg1L3)).toEqual(true);
-    expect(wmsClientQg1L1.layerIsIndependantLayer(layerQg1L1)).toEqual(false);
-    expect(wmsClientQg1L1.layerIsIndependantLayer(layerQg1L3)).toEqual(false);
+    expect(wmsClientQg1L1.layerIsIndependentLayer(layerQg1L1)).toEqual(false);
+    expect(wmsClientQg1L1.layerIsIndependentLayer(layerQg1L3)).toEqual(false);
   });
 
   it('Layer QG1L2 has opacity and should be an independantLayer, not a standard Layer', () => {
@@ -76,7 +76,7 @@ describe('WmsClient.addLayer()', () => {
     wmsClientQg1L1.addLayer(layerQg1L3);
     wmsClientQg2L1.addLayer(layerQg2L1);
 
-    expect(wmsClientQg1L1.layerIsIndependantLayer(layerQg1L2)).toEqual(true);
+    expect(wmsClientQg1L1.layerIsIndependentLayer(layerQg1L2)).toEqual(true);
     expect(wmsClientQg1L1.layerInStandardLayers(layerQg1L2)).toEqual(false);
   });
 });

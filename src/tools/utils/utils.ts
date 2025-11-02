@@ -1,3 +1,5 @@
+import BaseLayer from '../../models/layers/baselayer';
+
 /**
  * Checks if the system prefers dark mode.
  * Falls back safely if matchMedia is not supported.
@@ -134,4 +136,19 @@ export const colorToRgbaArray = (color: string): [number, number, number, number
  */
 export const isValidEmail = (email: string): boolean => {
   return /^[^\s@]+@(?:[^\s@.]+\.)+[^\s@.]+$/.test(email);
+};
+
+/**
+ * Applies the given Opacity to the given Layers (if they have such a Property).
+ * @param opacity Value of Opacity
+ * @param layers Layers to apply it
+ * @param callback Optional Callback after Opacity has been applied
+ */
+export const applyOpacityToLayers = (opacity: number, layers: BaseLayer[], callback?: (layer: BaseLayer) => void) => {
+  for (const layer of layers) {
+    if (Object.keys(layer).includes('opacity')) {
+      (layer as any as { opacity: number }).opacity = opacity;
+      callback?.(layer);
+    }
+  }
 };

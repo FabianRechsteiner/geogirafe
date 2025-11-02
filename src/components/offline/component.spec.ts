@@ -30,7 +30,7 @@ describe('OfflineComponent.getAllWmtsLayers', () => {
     const wmtsLayer2 = createTestLayerWmts();
     const basemap = createTestBasemap();
     basemap.layersList = [wmtsLayer1, wmtsLayer2];
-    element.state.activeBasemap = basemap;
+    element.state.activeBasemaps = [basemap];
 
     // @ts-ignore
     const result = element.getAllWmtsLayers();
@@ -43,7 +43,7 @@ describe('OfflineComponent.getAllWmtsLayers', () => {
     element.state.layers.layersList = [wmtsLayer1, wmtsLayer2];
     context.layerManager.toggleLayer(wmtsLayer1, 'on');
     context.layerManager.toggleLayer(wmtsLayer2, 'on');
-    element.state.activeBasemap = new BasemapEmpty();
+    element.state.activeBasemaps = [new BasemapEmpty()];
 
     // @ts-ignore
     const result = element.getAllWmtsLayers();
@@ -67,7 +67,7 @@ describe('OfflineComponent.getAllWmtsLayers', () => {
     const wmtsLayer2 = createTestLayerWmts();
     const basemap = createTestBasemap();
     basemap.layersList = [wmtsLayer1, wmtsLayer2];
-    element.state.activeBasemap = basemap;
+    element.state.activeBasemaps = [basemap];
 
     const wmtsLayer3 = createTestLayerWmts();
     const wmtsLayer4 = createTestLayerWmts();

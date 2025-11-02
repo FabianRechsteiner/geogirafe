@@ -12,7 +12,7 @@ export default class BasemapListItemMobile extends GirafeHTMLElement {
   }
 
   activate() {
-    this.state.activeBasemap = this.basemap;
+    this.state.activeBasemaps = [this.basemap];
   }
 
   connectedCallback() {
@@ -30,15 +30,15 @@ export default class BasemapListItemMobile extends GirafeHTMLElement {
         return;
       }
 
-      this.isActive = this.state.activeBasemap === this.basemap;
+      this.isActive = this.state.activeBasemaps.some((basemap) => basemap.id == this.basemap.id);
       this.render();
 
       const container = this.shadow.getElementById('basemap-container') as HTMLDivElement;
       container.style.setProperty('background-image', `url(${this.basemap.thumbnail})`);
     });
 
-    this.subscribe('activeBasemap', (_oldValue: Basemap, newValue: Basemap) => {
-      this.isActive = newValue === this.basemap && newValue !== null;
+    this.subscribe('activeBasemaps', (_oldValue: Basemap[], newValue: Basemap[]) => {
+      this.isActive = newValue.some((activeBasemap) => activeBasemap.id == this.basemap.id);
       this.render();
     });
   }
