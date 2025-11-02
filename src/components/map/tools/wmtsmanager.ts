@@ -170,7 +170,7 @@ class WmtsManager {
   }
 
   layerExists(layer: LayerWmts) {
-    return layer.layerUniqueId in this.wmtsLayers;
+    return layer.layerUniqueId in this.wmtsLayers || layer.layerUniqueId in this.basemapLayers;
   }
 
   getLayer(layer: LayerWmts) {
@@ -189,8 +189,11 @@ class WmtsManager {
       throw new Error('Cannot change opacity for this layer: it does not exist');
     }
 
-    if (layer.isTransparent) {
-      const olayer = this.wmtsLayers[layer.layerUniqueId].olayer;
+    const isBasemapLayer = layer.layerUniqueId in this.basemapLayers;
+    if (layer.hasValidOpacity) {
+      const olayer = isBasemapLayer
+        ? this.basemapLayers[layer.layerUniqueId].olayer
+        : this.wmtsLayers[layer.layerUniqueId].olayer;
       olayer.setOpacity(layer.opacity);
     }
   }

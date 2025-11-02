@@ -4,7 +4,7 @@ import MapPositionSerializer from './serializers/mappositionserializer';
 import MapPosition from '../state/mapposition';
 import LayersConfig from '../state/layersConfig';
 import LayersConfigSerializer from './serializers/layerconfigserializer';
-import BasemapSerializer from './serializers/basemapserializer';
+import ActiveBasemapsSerializer from './serializers/activebasemapsserializer';
 import State, { ExtendedState, GraphicalInterface } from '../state/state';
 import GirafeSingleton from '../../base/GirafeSingleton';
 import BrainSerializer, { Constructor, IBrainSerializer } from '../state/brain/serialize';
@@ -16,7 +16,7 @@ class StateSerializer extends GirafeSingleton {
   private readonly brainSerializer = new BrainSerializer<State | ExtendedState>();
 
   override initializeSingleton() {
-    this.addSerializer(Basemap, new BasemapSerializer(this.context));
+    this.addSerializer(Array<Basemap>, new ActiveBasemapsSerializer(this.context));
     this.addSerializer(MapPosition, new MapPositionSerializer(this.context));
     this.addSerializer(LayersConfig, new LayersConfigSerializer(this.context));
     this.addSerializer(ObjectSelection, new SelectionSerializer(this.context));

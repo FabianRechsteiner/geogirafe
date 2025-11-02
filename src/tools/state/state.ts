@@ -4,7 +4,6 @@ import type ThemeLayer from '../../models/layers/themelayer';
 import type OlGeomLineString from 'ol/geom/LineString';
 import type ServerOgc from '../../models/serverogc';
 import { BrainSerialize } from './brain/decorators';
-import BasemapEmpty from '../../models/basemaps/basemapempty';
 import LayersConfig from './layersConfig';
 import type { TokenEndpointResponse } from 'oauth4webapi';
 import type { GgUserInteractionListener } from './userInteractionManager';
@@ -170,9 +169,9 @@ export default class State {
   // Dictionary where the key is the name of the server
   ogcServers: Record<string, ServerOgc> = {};
 
-  // Current active basemap
+  // Current active basemaps
   @BrainSerialize
-  activeBasemap: Basemap = new BasemapEmpty();
+  activeBasemaps: Basemap[] = [];
 
   // Current projection
   @BrainSerialize

@@ -27,6 +27,7 @@ class GirafeConfig {
     OSM: boolean;
     SwissTopoVectorTiles: boolean;
     emptyBasemap: boolean;
+    opacityBasemaps: string[];
   };
   treeview: {
     hideLegendWhenLayerIsDeactivated: boolean;
@@ -420,7 +421,8 @@ class GirafeConfig {
       defaultBasemap: config.basemaps?.defaultBasemap ?? 'Empty',
       OSM: config.basemaps?.OSM ?? false,
       SwissTopoVectorTiles: config.basemaps?.SwissTopoVectorTiles ?? false,
-      emptyBasemap: config.basemaps?.emptyBasemap ?? true
+      emptyBasemap: config.basemaps?.emptyBasemap ?? true,
+      opacityBasemaps: config.basemaps?.opacityBasemaps ?? ([] as string[])
     };
   }
 

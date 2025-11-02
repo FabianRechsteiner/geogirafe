@@ -49,6 +49,7 @@ import CircleStyle from 'ol/style/Circle';
 import { parseCoordinates } from '../../tools/geometrytools';
 import CircleGeom from 'ol/geom/Circle';
 import WfsFilter from '../../tools/wfs/wfsfilter';
+import { applyOpacityToLayers } from '../../tools/utils/utils';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -130,7 +131,10 @@ export default class MapComponent extends GirafeHTMLElement {
       this.resetAllSwipedLayers(this.state.layers.layersList);
     };
 
-    this.subscribe('activeBasemap', (_: Basemap, newBasemap: Basemap) => this.onChangeBasemap(newBasemap));
+    this.subscribe('activeBasemaps', (_: Basemap[], newBasemaps: Basemap[]) => this.onChangeBasemaps(newBasemaps));
+    this.subscribe(/activeBasemaps\.\d\.opacity/, (_oldOpacity: number, _newOpacity: number, basemap: Basemap) =>
+      this.onChangeBasemapOpacity(basemap)
+    );
     this.subscribe('projection', (oldProjection: string, newProjection: string) =>
       this.onChangeProjection(oldProjection, newProjection)
     );
@@ -171,7 +175,7 @@ export default class MapComponent extends GirafeHTMLElement {
       }
     );
     this.subscribe(/layers\.layersList\..*\.opacity/, (_oldOpacity: number, _newOpacity: number, layer: Layer) =>
-      this.onChangeOpacity(layer)
+      this.onChangeLayerOpacity(layer)
     );
     this.subscribe(/layers\.layersList\..*\.swiped/, (_oldOpacity: number, _newOpacity: number, layer: Layer) =>
       this.onChangeSwiped(layer)
@@ -891,7 +895,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.context.wmsManager.refreshZIndexes();
   }
 
-  private onChangeOpacity(layerInfos: Layer) {
+  private onChangeLayerOpacity(layerInfos: BaseLayer) {
     if (layerInfos instanceof LayerWms) {
       this.context.wmsManager.getClient(layerInfos).changeOpacity(layerInfos);
       if (this.wmsManager3d != null) this.wmsManager3d.changeOpacity(layerInfos);
@@ -903,19 +907,23 @@ export default class MapComponent extends GirafeHTMLElement {
       this.context.localFileManager.changeOpacity(layerInfos);
     } else if (layerInfos instanceof LayerDrawing) {
       this.drawingManager.changeOpacity(layerInfos);
+    } else if (layerInfos instanceof LayerOsm) {
+      this.osmManager.changeOpacity(layerInfos);
     } else {
-      console.warn(`Changing opacity for layer ${layerInfos.name} not supported`);
+      console.warn(`Changing opacity for layer ${layerInfos.name} of type ${typeof layerInfos} not supported`);
     }
+  }
+
+  private onChangeBasemapOpacity(basemap: Basemap) {
+    applyOpacityToLayers(basemap.opacity, basemap.layersList, (layer: BaseLayer) => this.onChangeLayerOpacity(layer));
   }
 
   /**
    * Change filter configuration on layer (only LayerWMS are affected)
    */
   private onChangeFilter(layerInfos: LayerWms) {
-    if (layerInfos instanceof LayerWms) {
-      this.context.wmsManager.getClient(layerInfos).changeFilter(layerInfos);
-      if (this.wmsManager3d != null) this.wmsManager3d.changeFilter(layerInfos);
-    }
+    this.context.wmsManager.getClient(layerInfos).changeFilter(layerInfos);
+    if (this.wmsManager3d != null) this.wmsManager3d.changeFilter(layerInfos);
   }
 
   /**
@@ -934,8 +942,7 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  onChangeBasemap(basemap: Basemap) {
-    // First, remove all existing basemaps
+  removeAllBasemapLayers() {
     this.wmtsManager.removeAllBasemapLayers();
     this.context.wmsManager.removeAllBasemapLayers();
     if (this.wmsManager3d != null) this.wmsManager3d.removeAllBasemapLayers();
@@ -943,9 +950,12 @@ export default class MapComponent extends GirafeHTMLElement {
     this.cogManager.removeAllBasemapLayers();
     this.xyzManager.removeAllBasemapLayers();
     this.vectorTilesManager.removeAllBasemapLayers();
+  }
 
-    // Then, add the selected basemaps
-    for (const layer of basemap.layersList) {
+  onChangeBasemaps(basemaps: Basemap[]) {
+    this.removeAllBasemapLayers();
+
+    for (const layer of basemaps.flatMap((basemap) => basemap.layersList)) {
       if (layer instanceof LayerOsm) {
         this.osmManager.addBasemapLayer(layer);
       } else if (layer instanceof LayerVectorTiles) {
@@ -960,7 +970,7 @@ export default class MapComponent extends GirafeHTMLElement {
         this.context.wmsManager.getClient(layer).addBasemapLayer(layer);
         if (this.wmsManager3d != null) this.wmsManager3d.addBasemapLayer(layer);
       } else {
-        throw new Error('Unknown basemap type');
+        throw new TypeError('Unknown basemap type');
       }
     }
   }

@@ -36,7 +36,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
         );
         return this.state.themes._allThemes[Number(themeId)];
       }),
-      basemap: new UserPreference('basemaps.defaultBasemap', 'activeBasemap', 'map', 'select', (bsName: string) => {
+      basemaps: new UserPreference('basemaps.defaultBasemap', 'activeBasemaps', 'map', 'select', (bsName: string) => {
         const bsId = Object.keys(this.state.basemaps).find(
           (bsKey) => this.state.basemaps[Number(bsKey)].name === bsName
         );
@@ -148,7 +148,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
 
     this.refreshThemeOptions();
 
-    this.preferences.basemap.options = Object.keys(this.state.basemaps).map((key: string) => {
+    this.preferences.basemaps.options = Object.keys(this.state.basemaps).map((key: string) => {
       const baseMapName = this.state.basemaps[Number(key)].name;
       return { label: baseMapName, value: baseMapName };
     });

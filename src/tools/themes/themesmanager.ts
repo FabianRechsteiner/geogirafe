@@ -15,6 +15,7 @@ import ThemeLayer from '../../models/layers/themelayer';
 import BasemapEmpty from '../../models/basemaps/basemapempty';
 import BasemapSwisstopoVectorTiles from '../../models/basemaps/basemapswisstopovectortiles';
 import BasemapOsm from '../../models/basemaps/basemaposm';
+import { DEFAULT_OPACITY, OPACITY_FOR_DEFAULT_BASEMAP } from './themes-config';
 
 class ThemesManager extends GirafeSingleton {
   anonymousUserInfo = { u: 'anonymous' };
@@ -90,7 +91,7 @@ class ThemesManager extends GirafeSingleton {
       const bs = this.context.permalinkManager.getBasemap();
       for (const basemap of Object.values(this.state.basemaps)) {
         if (basemap.name === bs) {
-          this.state.activeBasemap = basemap;
+          this.state.activeBasemaps = [basemap];
           return true;
         }
       }
@@ -143,7 +144,7 @@ class ThemesManager extends GirafeSingleton {
   private setDefaultBasemap() {
     for (const basemap of Object.values(this.state.basemaps)) {
       if (basemap.name === this.context.configManager.Config.basemaps.defaultBasemap) {
-        this.state.activeBasemap = basemap;
+        this.state.activeBasemaps = [basemap];
         break;
       }
     }
@@ -217,6 +218,20 @@ class ThemesManager extends GirafeSingleton {
         }
       }
     });
+
+    // Apply Opacity
+    for (const basemap of Object.values(basemaps)) {
+      if (this.context.configManager.Config.basemaps.opacityBasemaps.includes(basemap.name)) {
+        // If it is the default Basemap the Opacity should NOT be 0 as otherwise the User would end up seeing nothing
+        const isDefaultBasemap = this.context.configManager.Config.basemaps.defaultBasemap == basemap.name;
+        basemap.opacity = isDefaultBasemap ? OPACITY_FOR_DEFAULT_BASEMAP : DEFAULT_OPACITY;
+        for (const basemapLayer of basemap.layersList) {
+          if (Object.keys(basemapLayer).includes('opacity')) {
+            (basemapLayer as unknown as { opacity: number }).opacity = basemap.opacity;
+          }
+        }
+      }
+    }
 
     return basemaps;
   }
@@ -325,7 +340,7 @@ class ThemesManager extends GirafeSingleton {
 
     // Append children
     if (elem.children) {
-      elem.children.forEach((child: GMFTreeItem) => {
+      for (const child of elem.children) {
         // Append time options to child
         if (options.time) {
           child.time = { ...options.time };
@@ -335,7 +350,7 @@ class ThemesManager extends GirafeSingleton {
           childLayer.parent = group;
           group.children.push(childLayer);
         }
-      });
+      }
     }
     return group;
   }

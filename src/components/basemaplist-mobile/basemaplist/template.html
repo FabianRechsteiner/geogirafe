@@ -9,7 +9,9 @@
       <span class="title" i18n="Basemaps"></span> <span class="counter">${"(" + this.basemaps.length + ")"}</span>
     </div>
     <div>
-      <span class="selection" i18n="${this.state.activeBasemap && this.state.activeBasemap.name}"></span>
+      <span
+        class="selection"
+        i18n="${this.state.activeBasemaps && this.state.activeBasemaps.map(activeBasemap => activeBasemap.name).join(',')}"></span>
     </div>
   </div>
 

@@ -24,7 +24,7 @@ export default class BasemapListMobile extends GirafeHTMLElement {
       grid.style.setProperty('max-height', this.collapsed ? '0px' : `${grid.scrollHeight}px`);
     });
 
-    this.subscribe('activeBasemap', () => {
+    this.subscribe('activeBasemaps', () => {
       // this.render()
       this.refreshRender();
     });

@@ -80,7 +80,7 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
           (b) => b.name === basemapName
         );
         if (availableBasemap) {
-          this.context.stateManager.state.activeBasemap = availableBasemap;
+          this.context.stateManager.state.activeBasemaps = [availableBasemap];
         } else {
           console.warn(`Basemap '${basemapName}' not found in configuration`);
         }

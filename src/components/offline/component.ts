@@ -54,11 +54,11 @@ class OfflineComponent extends GirafeHTMLElement {
    * Gets the list of all active WMTS layers
    */
   private getAllWmtsLayers() {
-    const basemapLayers =
-      this.context.stateManager.state.activeBasemap?.layersList.filter((l) => l instanceof LayerWmts) || [];
+    const basemapLayers = this.context.stateManager.state.activeBasemaps?.flatMap((activeBasemap) =>
+      activeBasemap.layersList.filter((l) => l instanceof LayerWmts)
+    );
     const activeLayers = this.state.layers.layersList.filter((l) => l instanceof LayerWmts && l.active) as LayerWmts[];
-    const allWmtsLayers = [...basemapLayers, ...activeLayers];
-    return allWmtsLayers;
+    return [...basemapLayers, ...activeLayers];
   }
 
   progressCallback(progress: number) {

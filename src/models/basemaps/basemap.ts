@@ -6,14 +6,16 @@ class Basemap {
   id: number;
   name: string;
   thumbnail: string;
+  opacity: number;
 
   // Layers
   layersList: BaseLayer[] = [];
 
-  constructor(elem: GMFBackgroundLayer) {
+  constructor(elem: GMFBackgroundLayer, opacity?: number) {
     this.id = elem.id;
     this.name = elem.name;
     this.thumbnail = elem.metadata?.thumbnail ?? 'images/basemap_default.webp';
+    this.opacity = opacity ?? -1;
   }
 
   get projection(): string | undefined {

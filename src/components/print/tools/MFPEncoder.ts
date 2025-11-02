@@ -72,7 +72,7 @@ export default class MFPEncoder {
     const treeLayers = this.getFlatLayers(state.layers.layersList).filter((layer) => layer.active);
     const sortedLayers = [...treeLayers].sort((a, b) => a.order - b.order);
     // But basemaps are always at the bottom
-    const baseMap = state.activeBasemap?.layersList ?? [];
+    const baseMap = state.activeBasemaps?.flatMap((activeBasemap) => activeBasemap.layersList) ?? [];
     return [...sortedLayers, ...baseMap];
   }
 
@@ -178,9 +178,7 @@ export default class MFPEncoder {
 
     // Add empty styles if needed
     let styles = layerWms.style?.split(',');
-    if (!styles) {
-      styles = [''];
-    }
+    styles ??= [''];
     // Get the same amount of styles than layers to print
     while (layers.length > styles.length) {
       styles.push('');
