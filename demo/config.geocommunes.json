@@ -16,7 +16,8 @@
   "basemaps": {
     "defaultBasemap": "ai-asitvd.fond_cadastral_grp",
     "OSM": true,
-    "SwissTopoVectorTiles": true
+    "SwissTopoVectorTiles": true,
+    "opacityBasemaps": ["ai-ortho_grp"]
   },
   "search": {
     "url": "https://demo-ai.geocommunes.ch/search?limit=30&partitionlimit=5&interface=ai-desktop&query=###SEARCHTERM###&lang=fr",

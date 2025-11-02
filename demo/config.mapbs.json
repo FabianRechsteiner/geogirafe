@@ -22,7 +22,8 @@
   "basemaps": {
     "defaultBasemap": "Grundkarte farbig",
     "OSM": true,
-    "SwissTopoVectorTiles": true
+    "SwissTopoVectorTiles": true,
+    "opacityBasemaps": ["OF_Orthofoto2023Mai"]
   },
   "treeview": {
     "hideLegendWhenLayerIsDeactivated": false,

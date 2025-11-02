@@ -15,7 +15,8 @@
   "basemaps": {
     "defaultBasemap": "plan_ville",
     "OSM": true,
-    "SwissTopoVectorTiles": true
+    "SwissTopoVectorTiles": true,
+    "opacityBasemaps": ["ch.swisstopo.swissimage-product"]
   },
   "search": {
     "url": "https://map.cartolacote.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###",

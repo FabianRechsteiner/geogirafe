@@ -15,7 +15,8 @@
   "basemaps": {
     "defaultBasemap": "Plan-couleur",
     "OSM": true,
-    "SwissTopoVectorTiles": true
+    "SwissTopoVectorTiles": true,
+    "opacityBasemaps": ["ch.swisstopo.swissimage"]
   },
   "search": {
     "url": "https://mapnv.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###",

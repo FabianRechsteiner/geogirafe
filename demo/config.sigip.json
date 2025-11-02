@@ -16,7 +16,8 @@
   "basemaps": {
     "defaultBasemap": "grp_background_asitvd.fond_couleur",
     "OSM": true,
-    "SwissTopoVectorTiles": true
+    "SwissTopoVectorTiles": true,
+    "opacityBasemaps": ["grp_background_ch.swisstopo.swissimage-product"]
   },
   "search": {
     "url": "https://www.sigip.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr",

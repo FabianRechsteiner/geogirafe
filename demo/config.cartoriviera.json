@@ -15,7 +15,8 @@
   "basemaps": {
     "defaultBasemap": "plan_cadastral",
     "OSM": true,
-    "SwissTopoVectorTiles": true
+    "SwissTopoVectorTiles": true,
+    "opacityBasemaps": ["orthos_last"]
   },
   "search": {
     "url": "https://map.cartoriviera.ch/search?limit=90&partitionlimit=15&interface=desktop&query=###SEARCHTERM###",
