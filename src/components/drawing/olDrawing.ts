@@ -507,7 +507,8 @@ export default class OlDrawing {
         font: nameFont,
         textBaseline: 'bottom',
         offsetY: dFeature.type == DrawingShape.Point ? 2 * dFeature.nameFontSize : 1.2 * dFeature.nameFontSize,
-        fill: new Fill({ color: dFeature.nameColor })
+        fill: new Fill({ color: dFeature.nameColor }),
+        overflow: true
       })
     });
 
