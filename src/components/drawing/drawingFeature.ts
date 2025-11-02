@@ -311,7 +311,6 @@ export default class DrawingFeature {
     newFeature.nameFontSize = serializedFeature.nfz;
     newFeature.measureFontSize = serializedFeature.mfz;
     newFeature.font = serializedFeature.f;
-    newFeature.geojson = serializedFeature.g;
     newFeature.displayName = serializedFeature.dn;
     newFeature.displayMeasure = serializedFeature.dm;
     newFeature.nameColor = serializedFeature.nc;
