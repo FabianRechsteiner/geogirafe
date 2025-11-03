@@ -53,7 +53,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     window.gOpenWindow(this.layer.name, this.layer.metadataUrl!);
   }
 
-  private initializeDrag() {
+  protected initializeDrag() {
     this.dragButton.draggable = true;
     this.dragButton.ondragstart = (e: DragEvent) => this.dragStart(e);
     this.dragButton.ondragend = (e: DragEvent) => this.dragEnd(e);
@@ -134,7 +134,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     }
   }
 
-  private createTimeRestrictionTooltip(layer: TimeAwareLayer) {
+  protected createTimeRestrictionTooltip(layer: TimeAwareLayer) {
     const el = this.shadow.getElementById('timeRestriction');
     if (!el) return;
     tippy(el, {

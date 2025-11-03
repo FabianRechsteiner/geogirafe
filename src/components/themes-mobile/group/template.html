@@ -1,0 +1,6 @@
+<h3 i18n="${this.group?.name}">${this.group?.name}</h3>
+<div class="children">
+  ${(this.childLayers ?? []).map(layer => uHtmlFor(layer, layer.treeItemId)`
+  <girafe-layer layerid="${layer.treeItemId}"></girafe-layer>
+  `)}
+</div>

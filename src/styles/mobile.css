@@ -28,13 +28,6 @@ body {
   --warning-color: #ffa500;
 }
 
-girafe-theme-select {
-  position: fixed;
-  bottom: 10rem;
-  left: 1rem;
-  z-index: 9;
-}
-
 girafe-oauth {
   width: 4rem;
   height: 4rem;

@@ -1,0 +1,60 @@
+<div class="container">
+  <header>
+    <!-- Checkbox -->
+    <button
+      class="${this.layer?.active ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small'}"
+      tip="Activate / Deactivate"
+      onclick="${() => this.toggle()}">
+      <img
+        class="${this.layer?.active ? 'gg-checkbox' : 'hidden'}"
+        alt="Expand/Collapse button"
+        src="icons/checked-full.svg" />
+      <img
+        class="${!this.layer?.active ? 'gg-checkbox' : 'hidden'}"
+        alt="Expand/Collapse button"
+        src="icons/checked-no.svg" />
+    </button>
+
+    <!-- Label -->
+    <div class="label-container">
+      <button
+        class="${this.layer?.active ? 'gg-button gg-small gg-selected' : 'gg-button gg-small'}"
+        onclick="${() => this.toggle()}">
+        <span i18n="${this.layer?.name}" class="gg-tree-label"> ${this.layer?.name} </span>
+      </button>
+    </div>
+
+    <!-- layer icon -->
+    <img
+      class="${this.layer?.active && this.iconUrl ? 'legend-icon' : 'hidden'}"
+      alt="${'Icon for ' + this.layer?.name}"
+      src="${this.iconUrl}"
+      crossorigin="${this.getCrossOrigin(this.iconUrl)}" />
+  </header>
+
+  <section class="options">
+    <!-- opacity slider -->
+    <input
+      type="range"
+      class="slider"
+      min="0"
+      max="20"
+      value="${((this.layer?.opacity ?? 1) * 20).toString()}"
+      oninput="${(event: Event) => this.layer!.opacity = parseInt((event.target as HTMLInputElement).value) / 20}" />
+    <!-- Metadata icon -->
+    <a href="${this.layer?.metadataUrl}" target="_blank" class="${this.layer?.hasMetadata ? 'tool' : 'hidden'}">
+      <img alt="Metadata" src="icons/info.svg" />
+    </a>
+    <!-- swipe icons -->
+    <a href="#" onclick="${() => this.layer!.swiped = (this.layer?.swiped === 'left') ? 'no' : 'left'}">
+      <img alt="Swipe layer to the left" src="icons/swipe-left.svg" />
+    </a>
+    <a href="#" onclick="${() => this.layer!.swiped = (this.layer?.swiped === 'right') ? 'no' : 'right'}">
+      <img alt="Swipe layer to the right" src="icons/swipe-right.svg" />
+    </a>
+    <!-- Legend -->
+    <a href="${this.firstLegendUrl ?? '#'}" target="_blank" class="${this.firstLegendUrl ? 'tool' : 'hidden'}">
+      <img alt="Metadata" src="icons/legend.svg" />
+    </a>
+  </section>
+</div>

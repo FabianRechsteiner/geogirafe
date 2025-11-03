@@ -1,0 +1,64 @@
+<div class="${this.state.interface.swipeupPanelContent === 'selector' ? '' : 'hidden'}">
+  <header class="gg-tabs">
+    <button
+      class="${this.activeTab === 'themes' ? 'gg-tab active' : 'gg-tab'}"
+      i18n="Themes"
+      onclick="${() => this.changeTab('themes')}"></button>
+    <button
+      class="${this.activeTab === 'selected' ? 'gg-tab active' : 'gg-tab'}"
+      onclick="${() => this.changeTab('selected')}">
+      <span i18n="My selection"></span>
+      <span id="counter" class="counter"></span>
+    </button>
+    <button
+      id="basemap-button"
+      class="${this.activeTab === 'basemaps' ? 'gg-tab active' : 'gg-tab'}"
+      i18n="Basemaps"
+      onclick="${() => this.changeTab('basemaps')}"></button>
+  </header>
+
+  <!-- all themes -->
+  <div class="${this.activeTab === 'themes' ? 'container' : 'hidden'}">
+    <div class="${this.state.themes.lastSelectedTheme !== null ? 'hidden' : 'tiles'}">
+      ${Object.values(this.state.themes._allThemes).map((theme: ThemeLayer) => uHtmlFor(theme, theme.id)`
+      <button onclick="${() => this.changeTheme(theme)}" class="item">
+        <img alt="Theme icon" src="${theme.icon}" />
+        <span i18n="${theme.name}"></span>
+      </button>
+      `)}
+    </div>
+
+    <!-- current theme -->
+    <div class="${this.state.themes.lastSelectedTheme === null ? 'hidden' : 'layers'}">
+      <girafe-theme themeid="${this.state.themes.lastSelectedTheme?.id}"></girafe-theme>
+    </div>
+  </div>
+
+  <!-- selection -->
+  <div class="${this.activeTab === 'selected' ? 'container' : 'hidden'}">
+    <div class="layers">
+      ${Array.from(this.activeLayersByGroup.keys()).map(group => uHtmlFor(group, group.treeItemId)`
+      <h3 i18n="${group.name}">${group.name}</h3>
+      <div class="children">
+        ${this.activeLayersByGroup.get(group)!.map(layer => uHtmlFor(layer, layer.treeItemId)`
+        <girafe-layer-selected layerid="${layer.treeItemId}"></girafe-layer-selected>
+        `)}
+      </div>
+      `)}
+    </div>
+  </div>
+
+  <!-- basemaps -->
+  <div class="${this.activeTab === 'basemaps' ? 'container' : 'hidden'}">
+    <div class="tiles">
+      ${Object.values(this.state.basemaps).map(basemap => uHtmlFor(basemap, basemap.id)`
+      <button
+        onclick="${() => this.changeBasemap(basemap)}"
+        class="${this.state.activeBasemaps.length > 0 && this.state.activeBasemaps[0] === basemap ? 'item active' : 'item'}">
+        <img alt="Basemap thumbnail" src="${basemap.thumbnail}" />
+        <span i18n="${basemap.name}"></span>
+      </button>
+      `)}
+    </div>
+  </div>
+</div>

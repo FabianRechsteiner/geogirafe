@@ -1,0 +1,6 @@
+.container {
+  border-bottom: solid 1px #ddd;
+  display: flex;
+  align-items: center;
+  height: 3rem;
+}

@@ -1,4 +1,3 @@
-import ImageWMS from 'ol/source/ImageWMS';
 import tippy from 'tippy.js';
 import Layer from '../../../models/layers/layer';
 import LayerWms from '../../../models/layers/layerwms';
@@ -8,6 +7,7 @@ import LayerWmts from '../../../models/layers/layerwmts';
 import Baselayer from '../../../models/layers/baselayer';
 import TreeViewElement from '../tools/treeviewelement';
 import { isSnappableLayer } from '../../../models/layers/snappablelayer';
+import WmsLegendHelper from '../../../tools/wms/wmslegendhelper';
 
 class TreeViewItemComponent extends TreeViewElement {
   templateUrl = './template.html';
@@ -15,6 +15,7 @@ class TreeViewItemComponent extends TreeViewElement {
 
   iconUrl: string | null = null;
   legendUrls: Record<string, string> = {};
+  wmsLegendHelper!: WmsLegendHelper;
 
   override layer: Layer;
 
@@ -65,33 +66,14 @@ class TreeViewItemComponent extends TreeViewElement {
     this.createFilterTooltip();
   }
 
-  setWmsLegend() {
+  private setWmsLegend() {
     if (!(this.layer instanceof LayerWms)) {
       // nothing to do if it's not a WMS
       return;
     }
 
-    // Manage Icon URL
-    if (this.layer.iconUrl) {
-      // A custom legend icon has been defined and can be displayed
-      this.iconUrl = this.layer.iconUrl;
-    } else if (this.layer.legendRule) {
-      // We need to get the legend icon URL from WMS
-      this.iconUrl = Object.values(this.getLegendImageUrlFromWms(true))[0];
-    } else {
-      // All other cases, we do not have any icon for the layer
-      // => A simple selection icon will be rendered
-      this.iconUrl = null;
-    }
-
-    // Manage Legend
-    if (this.layer.legend) {
-      if (this.layer.legendImage) {
-        this.legendUrls[this.layer.layers!] = this.layer.legendImage;
-      } else {
-        this.legendUrls = this.getLegendImageUrlFromWms(false);
-      }
-    }
+    this.iconUrl = this.wmsLegendHelper.getIconUrl(this.layer);
+    this.legendUrls = this.wmsLegendHelper.getLegendUrls(this.layer);
   }
 
   setWmtsLegend() {
@@ -116,47 +98,6 @@ class TreeViewItemComponent extends TreeViewElement {
 
     const hostname = new URL(url).hostname;
     return this.state.oauth.audience.includes(hostname) ? 'use-credentials' : 'anonymous';
-  }
-
-  getLegendImageUrlFromWms(iconOnly: boolean): Record<string, string> {
-    if (!(this.layer instanceof LayerWms)) {
-      throw new Error(`${this.layer.name} is not a WMS layer, this method should not be called.`);
-    }
-
-    const legends: Record<string, string> = {};
-    for (const l of this.layer.layers!.split(',')) {
-      const hostname = new URL(this.layer.ogcServer.url).hostname;
-      const wmsSource = new ImageWMS({
-        url: this.layer.ogcServer.url,
-        params: { LAYERS: l },
-        ratio: 1,
-        crossOrigin: this.state.oauth.audience.includes(hostname) ? 'use-credentials' : 'anonymous'
-      });
-
-      let graphicUrl = wmsSource.getLegendUrl(this.state.position.resolution);
-      if (!graphicUrl) {
-        console.error(`The URL for legend of layer ${l} could not be calculated.`);
-        legends[l] = '';
-        continue;
-      }
-
-      if (!graphicUrl.toLowerCase().includes('sld_version')) {
-        // Add SLD_Version (it is mandatory, but openlayers do not seems to set it in the URL)
-        graphicUrl += '&SLD_Version=1.1.0';
-      }
-
-      if (iconOnly) {
-        if (!this.isNullOrUndefined(this.layer.legendRule)) {
-          graphicUrl += '&RULE=' + encodeURIComponent(this.layer.legendRule!);
-        }
-        graphicUrl += '&HEIGHT=' + this.context.configManager.Config.treeview.defaultIconSize.height;
-        graphicUrl += '&WIDTH=' + this.context.configManager.Config.treeview.defaultIconSize.width;
-      }
-
-      legends[l] = graphicUrl;
-    }
-
-    return legends;
   }
 
   createOpacityTooltip() {
@@ -291,6 +232,7 @@ class TreeViewItemComponent extends TreeViewElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.wmsLegendHelper = new WmsLegendHelper(this.context);
     this.render();
     this.registerEvents();
   }

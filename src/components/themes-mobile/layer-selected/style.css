@@ -1,0 +1,31 @@
+.container {
+  border-bottom: solid 1px #ddd;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+header {
+  display: flex;
+  align-items: center;
+}
+
+section.options {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.slider {
+  flex-grow: 1;
+}
+
+.legend-icon {
+  max-height: 1.5rem;
+  margin-left: 0.5rem;
+  background: var(--svg-legend-bkg);
+  filter: var(--svg-map-filter);
+}
