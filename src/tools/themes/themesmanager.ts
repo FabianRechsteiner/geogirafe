@@ -26,19 +26,19 @@ class ThemesManager extends GirafeSingleton {
 
   override initializeSingleton() {
     // We have to wait the authentication to be able to load the themes with the right user-rights
-    this.context.stateManager.subscribe('application.isAuthInitialized', () => {
+    this.context.stateManager.subscribe('application.isAuthInitialized', async () => {
       if (this.state.application.isAuthInitialized) {
-        this.initialize();
+        await this.initialize();
       }
     });
 
     // This is for the next change in the oAuth status.
-    this.context.stateManager.subscribe('oauth.status', () => {
+    this.context.stateManager.subscribe('oauth.status', async () => {
       if (
         this.state.themes.isLoaded &&
         (this.state.oauth.status === 'loggedIn' || this.state.oauth.status === 'loggedOut')
       ) {
-        this.initialize();
+        await this.initialize();
       }
     });
   }

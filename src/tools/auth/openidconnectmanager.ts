@@ -18,6 +18,7 @@ import {
 export default class OpenIdConnectManager extends AbstractConnectManager {
   private authorizationServer?: AuthorizationServer;
   private silentLoginIframe?: HTMLIFrameElement;
+  private sendTimeoutErrorCallbackTimeoutId: number = -1;
 
   private get issuerConfig() {
     return this.context.configManager.Config.oauth!.issuer;
@@ -161,6 +162,12 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     this.silentLoginIframe.style.display = 'none';
     this.silentLoginIframe.src = authorizationUrl.toString();
     document.body.appendChild(this.silentLoginIframe);
+    this.sendTimeoutErrorCallbackTimeoutId = window.setTimeout(() => {
+      window.postMessage(
+        { type: 'OAUTH_ERROR', error: `Timeout: Looks like we did not get any Response within 5s` },
+        window.location.origin
+      );
+    }, 5000);
   }
 
   private async handleSilentLoggedInViaIframe(event: MessageEvent<any>) {
@@ -178,8 +185,12 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     }
 
     if (this.silentLoginIframe) {
-      document.body.removeChild(this.silentLoginIframe);
+      this.silentLoginIframe.remove();
       this.silentLoginIframe = undefined;
+    }
+
+    if (this.sendTimeoutErrorCallbackTimeoutId > -1) {
+      window.clearTimeout(this.sendTimeoutErrorCallbackTimeoutId);
     }
   }
 
