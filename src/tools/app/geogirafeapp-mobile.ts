@@ -1,16 +1,12 @@
 import AlignNorthButtonMobile from '../../components/alignnorthbutton-mobile/component';
 import MobileOauthComponent from '../../components/auth-mobile/component';
-import BasemapListMobile from '../../components/basemaplist-mobile/basemaplist/component';
-import BasemapListItemMobile from '../../components/basemaplist-mobile/basemaplistitem/component';
-import BasemapThemeLayerSelectorMobile from '../../components/basemapthemelayerselector-mobile/component';
+import MobileThemeComponent from '../../components/themes-mobile/themes-select/component';
 import DisplayMenuButtonMobile from '../../components/displaymenubutton-mobile/component';
 import DisplaySelectorButtonMobile from '../../components/displayselectorbutton-mobile/component';
 import DrawingContainerMobile from '../../components/drawing-container-mobile/component';
 import DrawingComponentMobile from '../../components/drawing/component-mobile';
 import GeolocationMobile from '../../components/geolocation-mobile/component';
 import InfoboxComponent from '../../components/infobox/component';
-import LayerListMobile from '../../components/layerlist-mobile/layerlist/component';
-import LayerListItemMobile from '../../components/layerlist-mobile/layerlistitem/component';
 import MapComponent from '../../components/map/component';
 import MenuMobile3dButton from '../../components/menu-buttons-mobile/MenuMobile3dButton';
 import MenuMobileDrawingButton from '../../components/menu-buttons-mobile/MenuMobileDrawingButton';
@@ -21,9 +17,11 @@ import OfflineComponent from '../../components/offline/component';
 import MobileSearchComponent from '../../components/search-mobile/component';
 import SelectionPanelMobile from '../../components/selectionpanel-mobile/component';
 import SwipeUpPanelMobile from '../../components/swipe-up-panel-mobile/component';
-import ThemeListMobile from '../../components/themelist-mobile/themelist/component';
-import ThemeListItemMobile from '../../components/themelist-mobile/themelistitem/component';
 import GeoGirafeApp from './geogirafeapp';
+import MobileThemeElementComponent from '../../components/themes-mobile/theme/component';
+import MobileGroupElementComponent from '../../components/themes-mobile/group/component';
+import MobileLayerElementComponent from '../../components/themes-mobile/layer/component';
+import MobileSelectedLayerElementComponent from '../../components/themes-mobile/layer-selected/component';
 
 declare const Connection: {
   UNKNOWN: string;
@@ -62,13 +60,7 @@ export default class GeoGirafeAppMobile extends GeoGirafeApp {
     customElements.define('girafe-map', MapComponent);
     customElements.define('girafe-search', MobileSearchComponent);
     customElements.define('girafe-offline', OfflineComponent);
-    customElements.define('girafe-basemap-list-item-mobile', BasemapListItemMobile);
-    customElements.define('girafe-basemap-list-mobile', BasemapListMobile);
-    customElements.define('girafe-theme-list-item-mobile', ThemeListItemMobile);
-    customElements.define('girafe-theme-list-mobile', ThemeListMobile);
-    customElements.define('girafe-layer-list-item-mobile', LayerListItemMobile);
-    customElements.define('girafe-layer-list-mobile', LayerListMobile);
-    customElements.define('girafe-basemap-theme-layer-selector-mobile', BasemapThemeLayerSelectorMobile);
+    customElements.define('girafe-theme-select', MobileThemeComponent);
     customElements.define('girafe-display-selector-button-mobile', DisplaySelectorButtonMobile);
     customElements.define('girafe-display-menu-button-mobile', DisplayMenuButtonMobile);
     customElements.define('girafe-menu-mobile', MenuMobile);
@@ -83,5 +75,9 @@ export default class GeoGirafeAppMobile extends GeoGirafeApp {
     customElements.define('girafe-menu-mobile-offline-button', MenuMobileOfflineButton);
     customElements.define('girafe-menu-mobile-drawing-button', MenuMobileDrawingButton);
     customElements.define('girafe-oauth-mobile', MobileOauthComponent);
+    customElements.define('girafe-theme', MobileThemeElementComponent);
+    customElements.define('girafe-group', MobileGroupElementComponent);
+    customElements.define('girafe-layer', MobileLayerElementComponent);
+    customElements.define('girafe-layer-selected', MobileSelectedLayerElementComponent);
   }
 }

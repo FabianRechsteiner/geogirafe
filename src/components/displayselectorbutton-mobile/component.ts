@@ -32,6 +32,6 @@ export default class DisplaySelectorButtonMobile extends GirafeHTMLElement {
     }
 
     this.state.interface.swipeupPanelContent = 'selector';
-    this.state.interface.swipeupPanelMode = 'full';
+    this.state.interface.swipeupPanelMode = 'half';
   }
 }

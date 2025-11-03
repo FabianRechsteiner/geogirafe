@@ -3,6 +3,59 @@
   display: none;
 }
 
+/* Tabs */
+.gg-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  font-size: 1rem;
+  padding-bottom: 1rem;
+  cursor: pointer;
+}
+
+.gg-tab {
+  border: none;
+  border-bottom: var(--app-standard-border);
+  background: transparent;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--text-color);
+}
+
+.gg-tab.active {
+  border-bottom: solid 1px var(--text-color);
+}
+
+/* Icon buttons */
+.gg-icon-button,
+.gg-button {
+  border: none;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.gg-button {
+  text-align: left;
+}
+
+.gg-small {
+  flex-direction: row;
+}
+
+.gg-small img {
+  margin: 0;
+  width: calc(var(--app-standard-height) / 2.5);
+}
+
+.gg-small span {
+  margin-left: 0.5rem;
+  font-size: 1rem;
+}
+
 /* Big button (icon only) */
 .girafe-button-big {
   width: 3.5rem;

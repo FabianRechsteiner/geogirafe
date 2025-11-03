@@ -81,10 +81,12 @@ describe('MFPEncoder', () => {
       const baseMap = createTestLayerWmts();
       baseMap._olayer = createOlWmtsLayer();
       baseMap.name = 'basemap-below';
-      const activeBasemaps = (context.stateManager.state.activeBasemaps = [new Basemap({
-        id: 1,
-        name: 'test'
-      })]);
+      const activeBasemaps = (context.stateManager.state.activeBasemaps = [
+        new Basemap({
+          id: 1,
+          name: 'test'
+        })
+      ]);
       activeBasemaps[0].layersList = [baseMap];
 
       const vectorLayer = createOlVectorLayer();
