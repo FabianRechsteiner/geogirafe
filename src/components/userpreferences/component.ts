@@ -40,7 +40,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
         const bsId = Object.keys(this.state.basemaps).find(
           (bsKey) => this.state.basemaps[Number(bsKey)].name === bsName
         );
-        return this.state.basemaps[Number(bsId)];
+        return [this.state.basemaps[Number(bsId)]];
       }),
       projection: new UserPreference('map.srid', 'projection', 'map', 'select'),
       darkFrontendMode: new UserPreference(
