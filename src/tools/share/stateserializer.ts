@@ -5,11 +5,12 @@ import MapPosition from '../state/mapposition';
 import LayersConfig from '../state/layersConfig';
 import LayersConfigSerializer from './serializers/layerconfigserializer';
 import ActiveBasemapsSerializer from './serializers/activebasemapsserializer';
-import State, { ExtendedState, GraphicalInterface } from '../state/state';
+import State, { ExtendedState } from '../state/state';
 import GirafeSingleton from '../../base/GirafeSingleton';
 import BrainSerializer, { Constructor, IBrainSerializer } from '../state/brain/serialize';
 import SelectionSerializer from './serializers/selectionserializer';
 import ObjectSelection from '../state/objectselection';
+import GraphicalInterface from '../state/graphicalInterface';
 import InterfaceSerializer from './serializers/interfaceserializer';
 
 class StateSerializer extends GirafeSingleton {

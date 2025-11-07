@@ -8,6 +8,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import SimpleMaskManager from '../../tools/layers/simplemaskmanager';
 import type { Callback } from '../../tools/state/statemanager';
 import GeoGirafeShareManager from './tools/geogirafesharemanager';
+import { ShareState } from './sharestate';
 
 class ShareComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -30,6 +31,10 @@ class ShareComponent extends GirafeHTMLElement {
   private readonly eventsCallbacks: Callback[] = [];
 
   private iframeSize: 'small' | 'medium' | 'large' | '' = '';
+
+  get shareState(): ShareState {
+    return this.state.extendedState.share as ShareState;
+  }
 
   public get iframeWidth() {
     switch (this.iframeSize) {
@@ -165,8 +170,9 @@ class ShareComponent extends GirafeHTMLElement {
     const hash = this.context.shareManager.getStateToShare();
 
     // Get short URL for iframe
-    const longIframeUrl = `${baseUrl}iframe.html#${hash}`;
-    const response = await this.urlShortener.shortenUrl(longIframeUrl);
+    const indexDocument = `iframe.html`;
+    const longIframeUrl = `${baseUrl}${indexDocument}#${hash}`;
+    const response = await this.urlShortener.shortenUrl(longIframeUrl, indexDocument);
     this.iframeUrl = response.shorturl;
     this.iframeCode = `<iframe title="iframe GeoGirafe" width="${this.iframeWidth}" height="${this.iframeHeight}" src="${this.iframeUrl}"></iframe>`;
   }

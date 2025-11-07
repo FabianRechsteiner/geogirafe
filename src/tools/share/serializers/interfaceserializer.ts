@@ -1,6 +1,6 @@
 import IGirafeContext from '../../context/icontext';
 import { IBrainSerializer } from '../../state/brain/serialize';
-import { GraphicalInterface } from '../../state/state';
+import GraphicalInterface from '../../state/graphicalInterface';
 
 export default class InterfaceSerializer implements IBrainSerializer<GraphicalInterface> {
   private readonly context: IGirafeContext;

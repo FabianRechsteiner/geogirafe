@@ -42,17 +42,20 @@ import UserPreferencesComponent from '../../components/userpreferences/component
 import VideoRecordComponent from '../../components/videorecord/component';
 import { DrawingState } from '../../components/drawing/drawingFeature';
 import DrawingSerializer from '../../components/drawing/drawingSerializer';
+import { ShareState, ShareStateSerializer } from '../../components/share/sharestate';
 
 export default class GeoGirafeApp {
   private readonly readyPromise: Promise<void>;
   private resolveReady!: (value: void | PromiseLike<void>) => void;
   private mainComponent!: GeoGirafeAppComponent;
+  private readonly isIframe: boolean;
 
   protected get context() {
     return this.mainComponent.getContext();
   }
 
-  constructor() {
+  constructor(isIframe: boolean = false) {
+    this.isIframe = isIframe;
     this.readyPromise = new Promise((resolve) => {
       this.resolveReady = resolve;
     });
@@ -93,6 +96,8 @@ export default class GeoGirafeApp {
     // TODO REG : Is this not done too late ? We need to check this, perhaps it shouol dbe done before the intialization of the share
     this.context.stateManager.state.extendedState.drawing = new DrawingState();
     this.context.stateSerializer.addSerializer(DrawingState, new DrawingSerializer(this.context));
+    this.context.stateManager.state.extendedState.share = new ShareState();
+    this.context.stateSerializer.addSerializer(ShareState, new ShareStateSerializer(this.context, this.isIframe));
   }
 
   protected defineCoreComponents() {

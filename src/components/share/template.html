@@ -58,6 +58,24 @@
           <option ?selected="${this.iframeSize === 'medium'}" i18n="Medium" value="medium">Medium</option>
           <option ?selected="${this.iframeSize === 'large'}" i18n="Large" value="large">Large</option>
         </select>
+        <div class="checkbox-wrapper">
+          <label for="iframe-search-visible" i18n="Search visible">Search visible</label>
+          <input
+            type="checkbox"
+            class="gg-checkbox"
+            id="iframe-search-visible"
+            value="${this.shareState.searchComponentVisible}"
+            onchange="${(e: Event) => this.shareState.searchComponentVisible = (e.target! as HTMLInputElement).checked}" />
+        </div>
+        <div class="checkbox-wrapper">
+          <label for="iframe-basemap-visible" i18n="Basemap visible">Basemap visible</label>
+          <input
+            type="checkbox"
+            class="gg-checkbox"
+            id="iframe-basemap-visible"
+            value="${this.shareState.basemapComponentVisible}"
+            onchange="${(e: Event) => this.shareState.basemapComponentVisible = (e.target! as HTMLInputElement).checked}" />
+        </div>
         <textarea value="${this.iframeCode}" class="gg-input gg-textarea textarea-for-code" disabled></textarea>
         <button
           id="btn-copy-iframe"

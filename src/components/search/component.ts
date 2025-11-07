@@ -51,7 +51,6 @@ class SearchComponent extends GirafeHTMLElement {
   private focusedResult: SearchResult | null = null;
   private selectedResult: SearchResult | null = null;
 
-  private searchBox?: HTMLDivElement;
   private searchInput?: HTMLInputElement;
 
   public paintSearchResults?: boolean;
@@ -99,7 +98,7 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   toggleVisibility(visible: boolean) {
-    this.searchBox!.style.display = visible ? 'flex' : 'none';
+    (this.shadowRoot?.host as HTMLElement).style.display = visible ? 'flex' : 'none';
   }
 
   public onMouseDown() {
@@ -122,7 +121,6 @@ class SearchComponent extends GirafeHTMLElement {
   public render() {
     super.render();
     this.searchInput = this.shadowRoot?.getElementById('search') as HTMLInputElement;
-    this.searchBox = this.shadowRoot?.getElementById('searchbox') as HTMLDivElement;
   }
 
   registerEvents(): void {

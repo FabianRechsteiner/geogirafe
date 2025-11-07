@@ -45,5 +45,19 @@ girafe-map {
 }
 
 girafe-basemap {
-  display: none !important;
+  display: block;
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+}
+
+girafe-search {
+  display: block;
+  width: 25vw;
+  height: 2.25rem;
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+  box-shadow: 0 1px 4px #0000004d;
 }

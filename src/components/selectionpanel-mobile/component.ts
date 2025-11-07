@@ -3,7 +3,8 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import FeatureToGridDataById from '../../tools/featuretogriddatabyid';
 import { debounce } from '../../tools/utils/debounce';
 import { isValidEmail } from '../../tools/utils/utils';
-import { SwipeupPanelMode } from '../../tools/state/state';
+
+import { SwipeupPanelMode } from '../../tools/state/swipeuppanelmode';
 
 /**
  * Create a link to a page or an email if the pattern matches
