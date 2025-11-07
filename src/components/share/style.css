@@ -72,3 +72,15 @@ input {
 .copy-success:hover {
   background-color: var(--success-color);
 }
+
+.checkbox-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 2rem;
+
+  input[type='checkbox'] {
+    flex-grow: unset;
+  }
+}

@@ -8,35 +8,9 @@ import LayersConfig from './layersConfig';
 import type { TokenEndpointResponse } from 'oauth4webapi';
 import type { GgUserInteractionListener } from './userInteractionManager';
 import type CustomTheme from '../../models/customtheme';
-import { systemIsInDarkMode } from '../utils/utils';
 import ObjectSelection from './objectselection';
 import type Theme from '../../models/theme';
-
-export class GraphicalInterface {
-  isMobile = false;
-  helpVisible = false;
-  drawingPanelVisible = false;
-  printPanelVisible = false;
-  extLayerPanelVisible = false;
-  lidarPanelVisible = false;
-  crossSectionPanelVisible = false;
-  editPanelVisible = false;
-  sharePanelVisible = false;
-  selectionComponentVisible = false;
-  selectionComponent = '';
-  layoutPanelVisible = false;
-  aboutPanelVisible = false;
-  userPreferencesPanelVisible = false;
-  infoWindowVisible = false;
-  searchComponentVisible = true;
-  basemapComponentVisible = true;
-  darkMapMode = false;
-  // TODO: remove of adjust this when the component UserDataManager is monted on mobile UI
-  darkFrontendMode = systemIsInDarkMode() ?? false;
-  swipeupPanelMode = 'closed';
-  contactPanelVisible = false;
-  swipeupPanelContent: 'selector' | 'features' | 'menu' | 'drawing' | 'offline' | null = 'selector';
-}
+import GraphicalInterface from './graphicalInterface';
 
 export type ThemesConfig = {
   _allThemes: Record<number, ThemeLayer>;
@@ -134,16 +108,6 @@ export type InfoWindow = {
 
 export type ExtendedState = Record<string, object>;
 
-/**
- * The pannel can be:
- * - "closed": it is invisible, below screen
- * - "reduced": only a small tray is visible at the bottom of the screen
- * - "half": about half of the screen
- * - "full": the pannel is fully open, covering up to almost the top of the screen
- * - "manual": a state reserved for when the panel handle was used to manually adjust the panel height
- */
-export type SwipeupPanelMode = 'closed' | 'reduced' | 'half' | 'full' | 'manual';
-
 export default class State {
   /**
    * This class is a used as the state of the application, which will be accessed behind a javascript proxy.
@@ -182,7 +146,7 @@ export default class State {
 
   // Interface configuration (visible panels, ...)
   @BrainSerialize
-  interface = new GraphicalInterface();
+  interface: GraphicalInterface = new GraphicalInterface();
 
   userInteractionListeners: GgUserInteractionListener[] = [];
 

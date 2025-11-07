@@ -5,7 +5,7 @@ import GeoGirafeApp from './tools/app/geogirafeapp';
 const splash = new SplashScreen();
 splash.begin();
 
-const girafeApp = new GeoGirafeApp();
+const girafeApp = new GeoGirafeApp(true);
 girafeApp.isReady().then(() => {
   // Remove the splash-screen
   splash.end();

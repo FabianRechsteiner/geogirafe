@@ -1,5 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import type { SwipeupPanelMode } from '../../tools/state/state';
+
+import { SwipeupPanelMode } from '../../tools/state/swipeuppanelmode';
 
 // Css "top" values corresponding to the above modes:
 const TOP_FULL = 'calc( env(safe-area-inset-top) + 1rem)';

@@ -5,5 +5,5 @@ export type UrlShortenerResponse = {
 };
 
 export interface IUrlShortener {
-  shortenUrl(longUrl: string): Promise<UrlShortenerResponse>;
+  shortenUrl(longUrl: string, indexDocument?: string): Promise<UrlShortenerResponse>;
 }

@@ -12,7 +12,7 @@ class GeoGirafeShareManager implements IUrlShortener {
     this.urlManager = urlManager;
   }
 
-  async shortenUrl(longUrl: string): Promise<UrlShortenerResponse> {
+  async shortenUrl(longUrl: string, indexDocument?: string): Promise<UrlShortenerResponse> {
     const errorResponse = {
       success: false,
       shorturl: longUrl
@@ -33,7 +33,7 @@ class GeoGirafeShareManager implements IUrlShortener {
       if (response_data) {
         const baseUrl = this.urlManager.getBaseUrlPath();
         const hash = response_data.short_url.split('/').pop();
-        const shortUrl = `${baseUrl}#gg-${hash}`;
+        const shortUrl = `${baseUrl}${indexDocument ?? ''}#gg-${hash}`;
         const qrcode = await generateQrCode(shortUrl);
         return {
           success: true,
