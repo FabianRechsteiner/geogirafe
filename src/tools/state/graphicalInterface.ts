@@ -7,7 +7,6 @@ export default class GraphicalInterface {
   drawingPanelVisible = false;
   printPanelVisible = false;
   extLayerPanelVisible = false;
-  lidarPanelVisible = false;
   crossSectionPanelVisible = false;
   editPanelVisible = false;
   sharePanelVisible = false;
