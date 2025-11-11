@@ -212,7 +212,12 @@ export default class DrawingComponent extends GirafeHTMLElement {
     }
     this.drawingState = this.state.extendedState.drawing as DrawingState;
     const map = this.context.componentManager.getComponents(MapComponent)[0];
-    this.olDrawing = new OlDrawing(map, this.name, this.context);
+    this.olDrawing = new OlDrawing(map, this.name, this.context, (featureId: string) => {
+      const drawingFeature = this.drawingState.features.find((drawingFeature) => drawingFeature.id === featureId);
+      if (drawingFeature) {
+        this.deleteFeature(drawingFeature);
+      }
+    });
     this.cesiumDrawing = new CesiumDrawing(map, this.name, this.context);
 
     this.render();
@@ -332,6 +337,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   onToggleFeatureSelection(feature: DrawingFeature) {
+    this.setTool(null);
     feature.selected = !feature.selected;
     this.refreshRender();
   }
@@ -376,7 +382,13 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   async deleteFeature(feature: DrawingFeature) {
-    const confirm = await window.gConfirm(`Do you want to remove "${feature.name}" ?`, 'Delete Feature');
+    const confirm = await window.gConfirm(
+      'Do you want to remove "${feature.name}" ?',
+      'Delete Feature',
+      (translatedMessage: string) => {
+        return translatedMessage.replace('${feature.name}', feature.name);
+      }
+    );
     if (confirm) {
       const idx = this.drawingState.features.findIndex((f) => f.id === feature.id);
       if (idx > -1) {

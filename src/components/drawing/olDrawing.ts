@@ -2,30 +2,30 @@ import DrawingFeature, { DrawingShape, DrawingState, LineStroke } from './drawin
 import MapComponent from '../map/component';
 import { Collection, Feature, MapBrowserEvent } from 'ol';
 import {
+  Circle as CircleGeom,
   Geometry,
+  LinearRing,
   LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
   Point,
   Polygon,
-  Circle as CircleGeom,
-  SimpleGeometry,
-  MultiPoint,
-  MultiLineString,
-  LinearRing,
-  MultiPolygon
+  SimpleGeometry
 } from 'ol/geom';
 import { createBox, createRegularPolygon, SketchCoordType } from 'ol/interaction/Draw';
 import { Type } from 'ol/geom/Geometry';
-import { Style, Stroke, Text, Fill, RegularShape, Circle } from 'ol/style';
-import { Modify, Snap, Draw } from 'ol/interaction';
+import { Circle, Fill, RegularShape, Stroke, Style, Text } from 'ol/style';
+import { Draw, Modify, Snap, Translate } from 'ol/interaction';
 import VectorSource, { VectorSourceEvent } from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
-import { Projection, getPointResolution } from 'ol/proj';
+import { getPointResolution, Projection } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
-import { never, noModifierKeys, primaryAction } from 'ol/events/condition';
+import { never, primaryAction } from 'ol/events/condition';
 import { Pixel } from 'ol/pixel';
-import { getDistance, getArea } from '../../tools/utils/olutils';
-import { ContextMenu, MenuEntry } from '../map/tools/contextmenu';
+import { getArea, getDistance } from '../../tools/utils/olutils';
+import { ContextMenu, EntryInteractionType, MenuEntry } from '../map/tools/contextmenu';
 import { formatCoordinates } from '../../tools/geometrytools';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -34,6 +34,10 @@ import {
   isPrimaryPointerAction
 } from '../../tools/state/userinteractionevent';
 import IGirafeContext from '../../tools/context/icontext';
+import { getCenter, getHeight, getWidth } from 'ol/extent';
+import { StyleFunction } from 'ol/style/Style';
+import { FeatureLike } from 'ol/Feature';
+import CircleStyle from 'ol/style/Circle';
 
 function getLineStroke(strokeType: LineStroke, lineWidth: number) {
   switch (strokeType) {
@@ -71,10 +75,49 @@ function extractVerticesFromGeometry(geometry: Geometry): MultiPoint {
   return new MultiPoint(vertices);
 }
 
+function calculateCenter(geometry: Geometry) {
+  let center, coordinates, minRadius;
+  if (geometry instanceof Polygon) {
+    let x = 0;
+    let y = 0;
+    let i = 0;
+    coordinates = geometry.getCoordinates()[0].slice();
+    for (const coordinate of coordinates) {
+      x += coordinate[0];
+      y += coordinate[1];
+      i++;
+    }
+    center = [x / i, y / i];
+  } else if (geometry instanceof LineString) {
+    center = geometry.getCoordinateAt(0.5);
+    coordinates = geometry.getCoordinates();
+  } else {
+    center = getCenter(geometry.getExtent());
+  }
+  let sqDistances;
+  if (coordinates) {
+    sqDistances = coordinates.map(function (coordinate: Coordinate) {
+      const dx = coordinate[0] - center[0];
+      const dy = coordinate[1] - center[1];
+      return dx * dx + dy * dy;
+    });
+    minRadius = Math.sqrt(Math.max(...sqDistances)) / 3;
+  } else {
+    minRadius = Math.max(getWidth(geometry.getExtent()), getHeight(geometry.getExtent())) / 3;
+  }
+  return {
+    center: center,
+    coordinates: coordinates,
+    minRadius: minRadius,
+    sqDistances: sqDistances
+  };
+}
+
 export default class OlDrawing {
   private readonly map: MapComponent;
   private readonly toolName: string;
   private readonly context: IGirafeContext;
+  private readonly deleteHandler: (featureId: string) => void;
 
   modifiableFeatures: Collection<Feature> = new Collection([]);
   draw: Draw | null = null;
@@ -85,6 +128,20 @@ export default class OlDrawing {
   fixedLength: number = 0;
   drawingSource: VectorSource;
   drawingLayer: VectorLayer;
+
+  lastClosestFeature: Feature | null = null;
+  translate: Translate | null = null;
+  rotateAndScale: Modify | null = null;
+
+  defaultStyle: StyleFunction | undefined;
+
+  private readonly updateGeometryInState = (olFeature: Feature) => {
+    const idx = this.drawingState.features.findIndex((f) => f.id === olFeature.getId());
+    const drawingFeature = this.drawingState.features[idx];
+    if (idx > -1) {
+      this.drawingState.features[idx].geojson = DrawingFeature.geojsonFromOlFeature(olFeature, drawingFeature.type);
+    }
+  };
 
   private get state() {
     return this.context.stateManager.state;
@@ -98,13 +155,20 @@ export default class OlDrawing {
     return this.context.configManager.Config;
   }
 
-  constructor(map: MapComponent, toolName: string, context: IGirafeContext) {
+  constructor(
+    map: MapComponent,
+    toolName: string,
+    context: IGirafeContext,
+    deleteHandler: (featureId: string) => void
+  ) {
     this.map = map;
     this.toolName = toolName;
     this.context = context;
+    this.deleteHandler = deleteHandler;
 
     this.drawingSource = new VectorSource({ features: new Collection() });
     this.drawingSource.on('addfeature', (e) => this.onFeatureAdded(e));
+
     this.drawingLayer = new VectorLayer({
       source: this.drawingSource,
       zIndex: 1001,
@@ -113,6 +177,8 @@ export default class OlDrawing {
         altitudeMode: 'clampToGround'
       }
     });
+
+    this.defaultStyle = new Modify({ source: this.drawingSource }).getOverlay().getStyleFunction();
 
     this.map.subscribe('extendedState.drawing.activeTool', (_oldTool, newTool) =>
       newTool === null ? this.removeDrawInteraction() : this.addDrawInteraction(newTool)
@@ -164,13 +230,7 @@ export default class OlDrawing {
 
     // Update the modified geometries in the state
     this.modify.on('modifyend', (e) => {
-      e.features.forEach((olFeature) => {
-        const idx = this.drawingState.features.findIndex((f) => f.id === olFeature.getId());
-        const drawingFeature = this.drawingState.features[idx];
-        if (idx > -1) {
-          this.drawingState.features[idx].geojson = DrawingFeature.geojsonFromOlFeature(olFeature, drawingFeature.type);
-        }
-      });
+      e.features.forEach((olFeature) => this.updateGeometryInState(olFeature)); //NOSONAR(typescript:S7728) Collection<?> is a custom Implementation with custom forEach
     });
   }
 
@@ -181,6 +241,119 @@ export default class OlDrawing {
     this.map.olMap.addInteraction(this.snap);
   }
 
+  private addTranslateInteraction() {
+    this.removeTranslateInteraction();
+
+    this.translate = new Translate({
+      condition: (event) => {
+        return this.translate != null && primaryAction(event);
+      },
+      layers: [this.drawingLayer]
+    });
+    this.map.olMap.addInteraction(this.translate);
+  }
+
+  private removeTranslateInteraction() {
+    if (this.translate) {
+      this.map.olMap.removeInteraction(this.translate);
+      this.translate = null;
+    }
+  }
+
+  private addRotateAndScaleInteraction() {
+    this.removeRotateAndScaleInteraction();
+
+    const defaultStyle = this.defaultStyle!;
+    const getCoordinates = (feature: FeatureLike) => {
+      const geometry = feature.getGeometry();
+      if (geometry instanceof Point) {
+        return geometry.getCoordinates();
+      } else if (geometry instanceof LineString) {
+        return geometry.getCoordinates()[0];
+      } else if (geometry instanceof Polygon) {
+        return geometry.getCoordinates()[0][0];
+      }
+      return [];
+    };
+
+    this.rotateAndScale = new Modify({
+      features: this.modifiableFeatures,
+      condition: (event) => {
+        return this.rotateAndScale != null && primaryAction(event);
+      },
+      deleteCondition: never,
+      insertVertexCondition: never,
+      style: function (feature: FeatureLike, resolution: number) {
+        feature.get('features').forEach(function (modifyFeature: Feature) {
+          const modifyGeometry = modifyFeature.get('modifyGeometry');
+          if (modifyGeometry) {
+            const point = getCoordinates(feature);
+            let modifyPoint = modifyGeometry.point;
+            if (!modifyPoint) {
+              // save the initial geometry and vertex position
+              modifyPoint = point;
+              modifyGeometry.point = modifyPoint;
+              modifyGeometry.geometry0 = modifyGeometry.geometry;
+              // get anchor and minimum radius of vertices to be used
+              const result = calculateCenter(modifyGeometry.geometry0);
+              modifyGeometry.center = result.center;
+              modifyGeometry.minRadius = result.minRadius;
+            }
+
+            const center = modifyGeometry.center;
+            const minRadius = modifyGeometry.minRadius;
+            let dx, dy;
+            dx = modifyPoint[0] - center[0];
+            dy = modifyPoint[1] - center[1];
+            const initialRadius = Math.hypot(dx, dy);
+            if (initialRadius > minRadius) {
+              const initialAngle = Math.atan2(dy, dx);
+              dx = point[0] - center[0];
+              dy = point[1] - center[1];
+              const currentRadius = Math.hypot(dx, dy);
+              if (currentRadius > 0) {
+                const currentAngle = Math.atan2(dy, dx);
+                const geometry = modifyGeometry.geometry0.clone();
+                geometry.scale(currentRadius / initialRadius, undefined, center);
+                geometry.rotate(currentAngle - initialAngle, center);
+                modifyGeometry.geometry = geometry;
+              }
+            }
+          }
+        });
+        return defaultStyle(feature, resolution);
+      }
+    });
+
+    this.rotateAndScale.on('modifystart', function (event) {
+      // prettier-ignore
+      event.features.forEach(function (feature) {//NOSONAR(typescript:S7728) Collection<?> is a custom Implementation with custom forEach
+        feature.set('modifyGeometry', { geometry: feature.getGeometry()!.clone() }, true);
+      });
+    });
+
+    this.rotateAndScale.on('modifyend', (event) => {
+      // prettier-ignore
+      event.features.forEach((olFeature) => {//NOSONAR(typescript:S7728) Collection<?> is a custom Implementation with custom forEach
+        const modifyGeometry = olFeature.get('modifyGeometry');
+        if (modifyGeometry) {
+          olFeature.setGeometry(modifyGeometry.geometry);
+          olFeature.unset('modifyGeometry', true);
+          this.updateGeometryInState(olFeature);
+        }
+      });
+    });
+
+    this.map.olMap.addInteraction(this.rotateAndScale);
+  }
+
+  private removeRotateAndScaleInteraction() {
+    if (this.rotateAndScale) {
+      this.map.olMap.removeInteraction(this.rotateAndScale);
+      this.rotateAndScale = null;
+    }
+  }
+
   /**
    * Adds a context menu to the map with a single entry 'remove vertex'. The menu is configured to open
    * when the user does an alternate click ( = context event) on or near a vertex of a modifiable feature.
@@ -189,7 +362,7 @@ export default class OlDrawing {
     this.removeEditContextMenu();
     const menuEntries: MenuEntry[] = [
       {
-        entry: 'Remove vertex',
+        entry: 'Remove Vertex',
         callback: (_evt: MouseEvent, mapCoordinate: Coordinate) => {
           const successful = this.removeLastInteractedVertex();
           if (!successful) {
@@ -200,7 +373,43 @@ export default class OlDrawing {
               type: 'warning'
             });
           }
-        }
+        },
+        prepare: this.prepareMenuEntriesForVertex
+      },
+      {
+        entry: 'Move Shape',
+        callback: (_evt: MouseEvent, _mapCoordinate: Coordinate) => {
+          if (this.lastClosestFeature) {
+            this.removeModifyInteraction();
+            this.addTranslateInteraction();
+            this.map.olMap.on('singleclick', () => {
+              this.removeTranslateInteraction();
+              this.addModifyInteraction();
+            });
+          }
+        },
+        prepare: this.prepareMenuEntriesForShape
+      },
+      {
+        entry: 'Rotate/Scale Shape',
+        callback: (_evt: MouseEvent, _mapCoordinate: Coordinate) => {
+          if (this.lastClosestFeature) {
+            this.removeModifyInteraction();
+            this.addRotateAndScaleInteraction();
+            this.map.olMap.on('singleclick', () => {
+              this.removeRotateAndScaleInteraction();
+              this.addModifyInteraction();
+            });
+          }
+        },
+        prepare: this.prepareMenuEntriesForShape
+      },
+      {
+        entry: 'Remove Shape',
+        callback: (_evt: MouseEvent, _mapCoordinate: Coordinate) => {
+          this.removeLastInteractedShape();
+        },
+        prepare: this.prepareMenuEntriesForShape
       }
     ];
     const conditionToOpen = (_evt: MouseEvent, mapCoordinate: Coordinate) => {
@@ -208,7 +417,7 @@ export default class OlDrawing {
         return false;
       }
       // Only proceed if there is an editable vertex under the mouse pointer
-      return this.hasEditableVertexAtCoordinate(mapCoordinate);
+      return this.hasEditableShapeAtCoordinate(mapCoordinate) || this.hasEditableVertexAtCoordinate(mapCoordinate);
     };
     this.editContextMenu = new ContextMenu(this.context, menuEntries, true, conditionToOpen);
   }
@@ -232,6 +441,18 @@ export default class OlDrawing {
     }
   }
 
+  private readonly prepareMenuEntriesForVertex = (_e: MouseEvent, mapCoordinate: Coordinate): EntryInteractionType => {
+    return this.hasEditableVertexAtCoordinate(mapCoordinate)
+      ? EntryInteractionType.ENABLED
+      : EntryInteractionType.NOT_SHOWN;
+  };
+
+  private readonly prepareMenuEntriesForShape = (_e: MouseEvent, mapCoordinate: Coordinate): EntryInteractionType => {
+    return this.hasEditableShapeAtCoordinate(mapCoordinate)
+      ? EntryInteractionType.ENABLED
+      : EntryInteractionType.NOT_SHOWN;
+  };
+
   /**
    Check if there is a vertex of a selected (=editable) feature within the pixel tolerance of the clicked coordinates.
    */
@@ -246,10 +467,22 @@ export default class OlDrawing {
       const clickAsPixel: Pixel = this.map.olMap.getPixelFromCoordinate(coordinate);
       const dx = vertexAsPixel[0] - clickAsPixel[0];
       const dy = vertexAsPixel[1] - clickAsPixel[1];
-      const distanceToVertex: number = Math.sqrt(dx * dx + dy * dy);
+      const distanceToVertex: number = Math.hypot(dx, dy);
       if (distanceToVertex < this.map.pixelTolerance) {
         return true;
       }
+    }
+    return false;
+  }
+
+  hasEditableShapeAtCoordinate(coordinate: Coordinate): boolean {
+    const filter = (olFeature: Feature) =>
+      this.modifiableFeatures.getArray().some((editFeature: Feature<Geometry>) => olFeature == editFeature);
+    // Use filter to only query currently selected features
+    const closestElements = this.getClosestVertexAndFeature(coordinate, filter);
+    if (closestElements) {
+      const closestFeature = closestElements[1];
+      return closestFeature.getGeometry()?.containsXY(coordinate[0], coordinate[1]) ?? false;
     }
     return false;
   }
@@ -265,10 +498,12 @@ export default class OlDrawing {
     const olFeature = this.drawingSource.getClosestFeatureToCoordinate(coordinate, filter);
     const geometry = olFeature?.getGeometry();
     if (geometry && olFeature) {
+      this.lastClosestFeature = olFeature;
       const vertices: MultiPoint = extractVerticesFromGeometry(geometry);
       const closestVertex: Coordinate = vertices.getClosestPoint(coordinate);
       return [closestVertex, olFeature];
     }
+    this.lastClosestFeature = null;
     return undefined;
   }
 
@@ -280,6 +515,15 @@ export default class OlDrawing {
     return this.modify?.removePoint();
   }
 
+  private removeLastInteractedShape(): boolean {
+    if (this.lastClosestFeature) {
+      this.deleteHandler(this.lastClosestFeature.getId() as string);
+      this.lastClosestFeature = null;
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Adds features to the drawing source if they are missing and updates their style each time a property changes.
    * Adding them to the source is only necessary if the feature originates from a deserialized state and not
@@ -288,15 +532,15 @@ export default class OlDrawing {
    * @param {DrawingFeature[]} dFeatures - An array of `DrawingFeature` objects to be added.
    */
   addFeatures(dFeatures: DrawingFeature[]) {
-    dFeatures.forEach((df) => {
+    for (const df of dFeatures) {
       let olFeature = this.getOlFeatureFromDrawingSource(df.id);
       if (olFeature === null) {
         olFeature = this.createOlFeature(df);
         this.drawingSource.addFeature(olFeature);
       }
-      df.onChange = (df: DrawingFeature) => olFeature!.setStyle((f) => this.getStyle(df, f as Feature<Geometry>));
+      df.onChange = (df: DrawingFeature) => olFeature.setStyle((f) => this.getStyle(df, f as Feature<Geometry>));
       df.onChange(df);
-    });
+    }
   }
 
   /**
@@ -305,12 +549,12 @@ export default class OlDrawing {
    * @param {DrawingFeature[]} dFeatures - The list of features to be deleted.
    */
   deleteFeatures(dFeatures: DrawingFeature[]) {
-    dFeatures.forEach((df) => {
+    for (const df of dFeatures) {
       const toRemove = this.getOlFeatureFromDrawingSource(df.id);
       if (toRemove !== null) {
         this.drawingSource.removeFeature(toRemove);
       }
-    });
+    }
     this.updateModifiableFeatures();
   }
 
@@ -320,12 +564,12 @@ export default class OlDrawing {
   private updateModifiableFeatures() {
     const selectedDrawingFeatures = this.drawingState.features.filter((f) => f.selected);
     this.modifiableFeatures.clear();
-    selectedDrawingFeatures.forEach((df: DrawingFeature) => {
+    for (const df of selectedDrawingFeatures) {
       const olFeature = this.getOlFeatureFromDrawingSource(df.id);
       if (olFeature) {
         this.modifiableFeatures.push(olFeature);
       }
-    });
+    }
     // Only activate interaction if there are features to modify
     if (this.modifiableFeatures.getLength() > 0) {
       this.addEditInteractions();
@@ -461,7 +705,7 @@ export default class OlDrawing {
       geometryFunction: geomFunction,
       // Default condition for ol drawing is noModifierKeys(e)
       // canExecute: If another tool is exclusively drawing, this interaction will be prevented from reacting
-      condition: (e) => noModifierKeys(e) && this.canExecute('map.draw'),
+      condition: (e) => primaryAction(e) && this.canExecute('map.draw'),
       style: (f) =>
         this.getStyle(new DrawingFeature(tool, this.drawingState, this.config.drawing), f as Feature<Geometry>)
     });
@@ -485,11 +729,13 @@ export default class OlDrawing {
 
   // TODO Move as much parameters as possible into DrawingFeature
   getStyle(dFeature: DrawingFeature, olFeature: Feature<Geometry>) {
-    const geometry = olFeature.getGeometry() as Geometry;
+    const modifyGeometry = olFeature.get('modifyGeometry');
+    const geometry = modifyGeometry ? modifyGeometry.geometry : olFeature.getGeometry();
     const measureFont = 'Bold ' + dFeature.measureFontSize + 'px/1 ' + dFeature.font;
     const nameFont = 'Bold ' + dFeature.nameFontSize + 'px/1 ' + dFeature.font;
     const measureColor = 'rgba(0, 0, 0, 0.4)';
     const defaultStyle = new Style({
+      geometry: geometry,
       // need to explicitly mention lineCap: round, so that MapfishPrint does not use butted as default
       stroke: new Stroke({
         color: dFeature.strokeColor,
@@ -660,7 +906,7 @@ export default class OlDrawing {
       addLabel(square.getInteriorPoint(), dFeature.getAreaText(getArea(square, this.state.projection)));
     }
 
-    if (dFeature.selected) {
+    if (dFeature.selected && this.rotateAndScale == null) {
       const vertexStyle = dFeature.getVertexStyle();
       // Add a node style to every vertex of the geometry
       vertexStyle.setGeometry(function (f) {
@@ -670,6 +916,38 @@ export default class OlDrawing {
         }
       });
       styles.push(vertexStyle);
+    }
+
+    // Draw Point/Circle for Center of Geometry if rotating/scaling
+    if (this.rotateAndScale != null) {
+      const result = calculateCenter(geometry);
+      const center = result.center;
+      if (center) {
+        styles.push(
+          new Style({
+            geometry: new Point(center),
+            image: new CircleStyle({
+              radius: 4,
+              fill: new Fill({
+                color: '#ff3333'
+              })
+            })
+          })
+        );
+        const coordinates = result.coordinates;
+        if (coordinates) {
+          const minRadius = result.minRadius;
+          const sqDistances = result.sqDistances!;
+          const rsq = minRadius * minRadius;
+          const points = coordinates.filter(function (_c, index) {
+            return sqDistances[index] > rsq;
+          });
+          const vertexStyle = dFeature.getVertexStyle();
+          // Add a node style to every vertex of the geometry
+          vertexStyle.setGeometry(new MultiPoint(points));
+          styles.push(vertexStyle);
+        }
+      }
     }
 
     return styles;

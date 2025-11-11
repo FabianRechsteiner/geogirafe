@@ -3,9 +3,16 @@ import { Coordinate } from 'ol/coordinate';
 import { v4 as uuidv4 } from 'uuid';
 import IGirafeContext from '../../../tools/context/icontext';
 
+export enum EntryInteractionType {
+  ENABLED,
+  DISABLED,
+  NOT_SHOWN
+}
+
 export type MenuEntry = {
   entry: string;
   callback: (e: MouseEvent, mapCoordinate: Coordinate) => void;
+  prepare?: (e: MouseEvent, mapCoordinate: Coordinate) => EntryInteractionType;
 };
 
 /**
@@ -21,6 +28,8 @@ export class ContextMenu {
   private readonly openEventListener: (evt: PointerEvent | MouseEvent) => void;
   private readonly closeEventListener: (evt: PointerEvent | MouseEvent) => void;
   private readonly context;
+  private readonly menuEntries: MenuEntry[];
+  private menuEntryDivs: Record<string, HTMLDivElement> = {};
 
   private get map() {
     return this.context.mapManager.getMap();
@@ -34,12 +43,13 @@ export class ContextMenu {
   ) {
     this.name = `contextmenu-${uuidv4()}`;
     this.context = context;
+    this.menuEntries = menuEntries;
     this.isExclusive = isExclusive;
 
     this.container = document.createElement('div');
     this.container.classList.add('contextmenu');
     this.container.classList.add('hidden');
-    this.updateMenuEntries(menuEntries);
+    this.updateMenuEntries();
 
     this.overlay = new Overlay({
       element: this.container,
@@ -115,22 +125,46 @@ export class ContextMenu {
     ]);
 
     if (openCondition(evt, mapCoordinate)) {
+      this.prepareMenuEntries(evt, mapCoordinate);
       this.openMenu(mapCoordinate);
     } else {
       evt.stopPropagation();
     }
   }
 
-  updateMenuEntries(menuEntries: MenuEntry[]): void {
+  updateMenuEntries(): void {
     this.container.replaceChildren('');
+    this.menuEntryDivs = {};
 
-    menuEntries.forEach((entry) => {
+    for (const entry of this.menuEntries) {
       const div = document.createElement('div');
       div.classList.add('menu-entry');
-      div.innerHTML = entry.entry;
+      div.innerHTML = this.context.i18nManager.getTranslation(entry.entry);
       div.addEventListener('click', (evt: PointerEvent | MouseEvent) => this.onClickMenuEntry(evt, entry.callback));
       this.container.appendChild(div);
-    });
+      this.menuEntryDivs[entry.entry] = div;
+    }
+  }
+
+  prepareMenuEntries(evt: PointerEvent | MouseEvent, mapCoordinate: Coordinate): void {
+    for (const entry of this.menuEntries) {
+      const interactionType = entry.prepare?.(evt, mapCoordinate) ?? EntryInteractionType.ENABLED;
+      const menuEntryDiv = this.menuEntryDivs[entry.entry];
+      switch (interactionType) {
+        case EntryInteractionType.ENABLED:
+          menuEntryDiv.ariaDisabled = 'false';
+          menuEntryDiv.style.display = 'block';
+          break;
+        case EntryInteractionType.DISABLED:
+          menuEntryDiv.ariaDisabled = 'true';
+          menuEntryDiv.style.display = 'block';
+          break;
+        case EntryInteractionType.NOT_SHOWN:
+          menuEntryDiv.ariaDisabled = 'true';
+          menuEntryDiv.style.display = 'none';
+          break;
+      }
+    }
   }
 
   openMenu(mapCoordinates: Coordinate): void {

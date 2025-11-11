@@ -229,4 +229,11 @@ input[type='range']::-moz-range-thumb {
     cursor: pointer;
     padding: 10px;
   }
+  .menu-entry:hover {
+    background-color: var(--bkg-color-grad1);
+  }
+  .menu-entry[aria-disabled='true'] {
+    pointer-events: none;
+    color: var(--text-color-grad1);
+  }
 }
