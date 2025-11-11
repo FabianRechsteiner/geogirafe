@@ -13,7 +13,7 @@ declare global {
     CESIUM_BASE_URL: string;
     Cesium: unknown;
     cordova: unknown;
-    gConfirm(message: string, title?: string): Promise<boolean>;
+    gConfirm(message: string, title: string, messageHandler?: (translatedMessage: string) => string): Promise<boolean>;
     gAlert(message: string, title?: string): Promise<boolean>;
     gPrompt(message: string, title?: string, placeholder?: string): Promise<string | false>;
     gOpenWindow(

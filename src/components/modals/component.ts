@@ -18,9 +18,15 @@ class ModalsComponent extends GirafeHTMLElement {
     super('native-modals');
   }
 
-  private initBox(type: ModalType, message: string, title?: string, placeholder?: string) {
+  private initBox(
+    type: ModalType,
+    message: string,
+    messageHandler: (translatedMessage: string) => string,
+    title?: string,
+    placeholder?: string
+  ) {
     this.boxType = type;
-    this.boxMessage = this.context.i18nManager.getTranslation(message);
+    this.boxMessage = messageHandler(this.context.i18nManager.getTranslation(message));
     if (title) {
       this.boxTitle = this.context.i18nManager.getTranslation(title);
     }
@@ -42,15 +48,20 @@ class ModalsComponent extends GirafeHTMLElement {
   }
 
   private async promptBox(message: string, title?: string, placeholder?: string): Promise<string | false> {
-    this.initBox('prompt', message, title, placeholder);
+    this.initBox('prompt', message, (message: string) => message, title, placeholder);
 
     return new Promise((resolve) => {
       this.resolvePrompt = resolve;
     });
   }
 
-  private async alertConfirmBox(type: ModalType, message: string, title?: string): Promise<boolean> {
-    this.initBox(type, message, title);
+  private async alertConfirmBox(
+    type: ModalType,
+    message: string,
+    title: string,
+    messageHandler: (translatedMessage: string) => string
+  ): Promise<boolean> {
+    this.initBox(type, message, messageHandler, title);
 
     return new Promise((resolve) => {
       this.resolveAlertConfirm = resolve;
@@ -86,10 +97,14 @@ class ModalsComponent extends GirafeHTMLElement {
 
   connectedCallback() {
     super.connectedCallback();
-    window.gConfirm = (message: string, title?: string): Promise<boolean> =>
-      this.alertConfirmBox('confirm', message, title);
+    const defaultMessageHandler = (translatedMessage: string) => translatedMessage;
+    window.gConfirm = (
+      message: string,
+      title: string,
+      messageHandler?: (translatedMessage: string) => string
+    ): Promise<boolean> => this.alertConfirmBox('confirm', message, title, messageHandler ?? defaultMessageHandler);
     window.gAlert = (message: string, title?: string): Promise<boolean> =>
-      this.alertConfirmBox('alert', message, title);
+      this.alertConfirmBox('alert', message, title ?? '', defaultMessageHandler);
     window.gPrompt = (message: string, title?: string, placeholder?: string): Promise<string | false> =>
       this.promptBox(message, title, placeholder);
 
