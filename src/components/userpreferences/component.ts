@@ -4,7 +4,7 @@ import CustomTheme from '../../models/customtheme';
 import { getPropertyByPath, setPropertyByPath } from '../../tools/utils/pathUtils';
 import { Color } from 'vanilla-picker';
 import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
-import { systemIsInDarkMode } from '../../tools/utils/utils';
+import { applyOpacityToLayers, systemIsInDarkMode } from '../../tools/utils/utils';
 
 /**
  Lets the user override default configuration values and saves them as user data.
@@ -36,11 +36,13 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
         );
         return this.state.themes._allThemes[Number(themeId)];
       }),
-      basemaps: new UserPreference('basemaps.defaultBasemap', 'activeBasemaps', 'map', 'select', (bsName: string) => {
-        const bsId = Object.keys(this.state.basemaps).find(
-          (bsKey) => this.state.basemaps[Number(bsKey)].name === bsName
-        );
-        return [this.state.basemaps[Number(bsId)]];
+      basemap: new UserPreference('basemaps.defaultBasemap', 'activeBasemaps', 'map', 'select', (bsName: string) => {
+        const newDefaultBasemap = Object.values(this.state.basemaps).find((basemap) => basemap.name === bsName);
+        if (newDefaultBasemap?.opacity == 0) {
+          newDefaultBasemap.opacity = 1;
+          applyOpacityToLayers(1, newDefaultBasemap.layersList);
+        }
+        return [newDefaultBasemap];
       }),
       projection: new UserPreference('map.srid', 'projection', 'map', 'select'),
       darkFrontendMode: new UserPreference(
@@ -148,7 +150,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
 
     this.refreshThemeOptions();
 
-    this.preferences.basemaps.options = Object.keys(this.state.basemaps).map((key: string) => {
+    this.preferences.basemap.options = Object.keys(this.state.basemaps).map((key: string) => {
       const baseMapName = this.state.basemaps[Number(key)].name;
       return { label: baseMapName, value: baseMapName };
     });

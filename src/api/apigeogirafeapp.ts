@@ -6,6 +6,7 @@ import IGirafeContext from '../tools/context/icontext';
 import GirafeApiContext from './apicontext';
 import BasemapComponent from '../components/basemap/component';
 import MenuButtonComponent from '../components/menubutton/component';
+import { applyOpacityToLayers } from '../tools/utils/utils';
 
 export default class GeoGirafeApi extends GirafeHTMLElement {
   constructor() {
@@ -80,6 +81,7 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
           (b) => b.name === basemapName
         );
         if (availableBasemap) {
+          applyOpacityToLayers(1, availableBasemap.layersList);
           this.context.stateManager.state.activeBasemaps = [availableBasemap];
         } else {
           console.warn(`Basemap '${basemapName}' not found in configuration`);
@@ -126,6 +128,9 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
 
   private injectConfigMetaTags() {
     const location = new URL(import.meta.url);
+    if (import.meta.env.DEV) {
+      location.pathname = location.pathname.replace('/src/api', '');
+    }
     const origin = `${location.origin}${location.pathname.substring(0, location.pathname.lastIndexOf('/'))}`;
     const baseConfigUrl = `${origin}/config.json`;
     const apiConfigUrl = `${origin}/config.api.json`;
