@@ -7,35 +7,21 @@ import Layer from '../../../models/layers/layer';
 import BaseLayer from '../../../models/layers/baselayer';
 import { isTimeAwareLayer } from '../../../models/layers/timeawarelayer';
 import LayerWms from '../../../models/layers/layerwms';
-import WfsFilter, { WfsOperator } from '../../wfs/wfsfilter';
+import WfsFilter from '../../wfs/wfsfilter';
 import IGirafeContext from '../../context/icontext';
-
-export type SharedFilter = {
-  property: string;
-  propertyType?: string;
-  operator: WfsOperator;
-  value: string;
-  value2: string;
-};
-
-export type SharedLayer = {
-  id: number;
-  order: number;
-  checked: number;
-  isExpanded: number;
-  timeRestriction?: string;
-  opacity?: number;
-  swiped?: 'left' | 'right' | 'no';
-  filter?: SharedFilter;
-  children: SharedLayer[];
-  /**
-   * The following attribute will be useful to know which children were explicitly deleted from the view.
-   * Without this, we are not able to know if the layer is new in the server configuration
-   * And should forcefully be added to the layer tree because the user just didn't know this layer when he has created this shared state
-   * Or if it was explicitly removed from the user, and then we won't have to display it again
-   */
-  excludedChildrenIds: number[];
-};
+import ThemeLayerExternal from '../../../models/layers/themelayerexternal';
+import LayerWmsExternal from '../../../models/layers/layerwmsexternal';
+import LayerWmtsExternal from '../../../models/layers/layerwmtsexternal';
+import {
+  SharedExternalLayer,
+  SharedExternalTheme,
+  SharedFilter,
+  SharedInternalGroup,
+  SharedInternalLayer,
+  SharedInternalTheme,
+  SharedLayer
+} from './sharedtypes';
+import ServerOgc from '../../../models/serverogc';
 
 export default class LayersConfigSerializer implements IBrainSerializer<LayersConfig> {
   private readonly context: IGirafeContext;
@@ -89,97 +75,191 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
   }
 
   protected getSerializedLayer(layer: BaseLayer): SharedLayer {
-    let isExpanded = false;
-    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
-      isExpanded = layer.isExpanded;
-    } else if (layer instanceof Layer && this.context.layerManager.isLayerWithLegend(layer)) {
-      isExpanded = layer.isLegendExpanded;
+    if (layer instanceof ThemeLayerExternal) {
+      return this.getExternalSerializedTheme(layer);
+    }
+    if (layer instanceof LayerWmsExternal || layer instanceof LayerWmtsExternal) {
+      return this.getExternalSerializedLayer(layer);
     }
 
-    // Manage children
+    if (layer instanceof ThemeLayer || layer instanceof GroupLayer) {
+      return this.getInternalSerializedGroupOrTheme(layer);
+    }
+
+    return this.getInternalSerializedLayer(layer as Layer);
+  }
+
+  private getExternalSerializedTheme(theme: ThemeLayerExternal): SharedExternalTheme {
     const sharedChildren = [];
-    const removedChildren: number[] = [];
-    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
-      // First get the original version of the object
-      const originalLayer = this.context.themesHelper.findBaseLayerById(layer.id) as GroupLayer | ThemeLayer; // Is always of this type.
-      for (const child of originalLayer.children) {
-        const index = layer.children.findIndex((el) => el.id === child.id);
-        if (index >= 0) {
-          // Element was found => it is still in the list
-          const sharedChild = this.getSerializedLayer(layer.children[index]);
-          sharedChildren.push(sharedChild);
-        } else {
-          removedChildren.push(child.id);
-        }
+    for (const child of theme.children) {
+      const sharedChild = this.getSerializedLayer(child);
+      sharedChildren.push(sharedChild);
+    }
+
+    return {
+      name: theme.name,
+      order: theme.order,
+      checked: Number(theme.active),
+      isExpanded: Number(theme.isExpanded),
+      children: sharedChildren
+    };
+  }
+
+  private getExternalSerializedLayer(layer: LayerWmsExternal | LayerWmtsExternal): SharedExternalLayer {
+    const sharedLayer: SharedExternalLayer = {
+      order: layer.order,
+      checked: Number(layer.active),
+      isExpanded: Number(layer.isLegendExpanded),
+      opacity: layer.opacity,
+      swiped: layer.swiped
+    };
+
+    if (layer instanceof LayerWmtsExternal) {
+      sharedLayer.wmts = {
+        name: layer.name,
+        url: layer.url,
+        layer: layer.layer
+      };
+    } else if (layer instanceof LayerWmsExternal) {
+      sharedLayer.wms = {
+        name: layer.layers!,
+        title: layer.name,
+        url: layer.ogcServer.url
+      };
+    }
+
+    return sharedLayer;
+  }
+
+  private getInternalSerializedGroupOrTheme(group: ThemeLayer | GroupLayer): SharedInternalTheme | SharedInternalGroup {
+    const originalTheme = this.context.themesHelper.findBaseLayerById(group.id) as ThemeLayer;
+    const sharedChildren: SharedInternalLayer[] = [];
+    const removedChildrenIds: number[] = [];
+    for (const originalChild of originalTheme.children) {
+      const index = group.children.findIndex((el) => el.id === originalChild.id);
+      if (index >= 0) {
+        // Element was found => it is still in the list
+        const sharedChild = this.getSerializedLayer(group.children[index]) as SharedInternalLayer;
+        sharedChildren.push(sharedChild);
+      } else {
+        // Element is not in the list any more, and therefore should not be shared or restored
+        removedChildrenIds.push(originalChild.id);
       }
     }
 
     return {
+      id: group.id,
+      order: group.order,
+      checked: Number(group.active),
+      isExpanded: Number(group.isExpanded),
+      timeRestriction: isTimeAwareLayer(group) ? group.timeRestriction : undefined,
+      children: sharedChildren,
+      excludedChildrenIds: removedChildrenIds
+    };
+  }
+
+  private getInternalSerializedLayer(layer: Layer): SharedInternalLayer {
+    return {
       id: layer.id,
       order: layer.order,
       checked: Number(layer.active),
-      isExpanded: Number(isExpanded),
-      opacity: layer instanceof Layer ? layer.opacity : undefined,
-      swiped: layer instanceof Layer ? layer.swiped : undefined,
+      isExpanded: Number(layer.isLegendExpanded),
+      opacity: layer.opacity,
+      swiped: layer.swiped,
       filter:
         layer instanceof LayerWms && this.context.layerManager.isLayerWithFilter(layer)
           ? (layer.filter as SharedFilter)
           : undefined,
-      timeRestriction: isTimeAwareLayer(layer) ? layer.timeRestriction : undefined,
-      children: sharedChildren,
-      excludedChildrenIds: removedChildren
+      timeRestriction: isTimeAwareLayer(layer) ? layer.timeRestriction : undefined
     };
   }
 
-  public getDeserializedLayerTree(sharedLayers: SharedLayer[]) {
+  private getDeserializedLayerTree(sharedLayers: SharedLayer[]): BaseLayer[] {
     const layersList: BaseLayer[] = [];
     for (const sharedLayer of sharedLayers) {
-      const layer = this.findBaseLayerById(sharedLayer.id);
-      if (layer) {
-        this.deserializeLayer(layer, sharedLayer);
-        layersList.push(layer);
+      let layer;
+      if ('id' in sharedLayer) {
+        // Id attribute found => we are on an internal layer
+        layer = this.findBaseLayerById(sharedLayer.id);
+        if (layer) {
+          this.deserializeInternalObject(layer, sharedLayer);
+        } else {
+          console.warn(`Cannot find layer with id ${sharedLayer.id} in the available layers`);
+        }
       } else {
-        console.warn(`Cannot find layer with id ${sharedLayer.id} in the available layers`);
+        layer = this.deserializeExternalObject(sharedLayer);
+      }
+      if (layer) {
+        layersList.push(layer);
       }
     }
-
     return layersList;
   }
 
-  private deserializeLayer(originalLayer: BaseLayer, sharedLayer: SharedLayer) {
-    originalLayer.order = sharedLayer.order;
-    originalLayer.isDefaultChecked = Boolean(sharedLayer.checked);
-    if (originalLayer instanceof GroupLayer || originalLayer instanceof ThemeLayer) {
-      originalLayer.isExpanded = Boolean(sharedLayer.isExpanded);
-      // Manage children
-      this.removeUnnecessaryChilds(originalLayer, sharedLayer);
-      this.checkUnknownLayers(sharedLayer, originalLayer);
-    } else if (originalLayer instanceof Layer) {
-      if (sharedLayer.opacity) {
-        originalLayer.opacity = sharedLayer.opacity;
-      }
-      if (sharedLayer.swiped) {
-        originalLayer.swiped = sharedLayer.swiped;
-      }
-      if (this.context.layerManager.isLayerWithLegend(originalLayer)) {
-        originalLayer.isLegendExpanded = Boolean(sharedLayer.isExpanded);
-      }
-      if (originalLayer instanceof LayerWms && sharedLayer.filter) {
-        originalLayer.filter = new WfsFilter(
-          sharedLayer.filter.property,
-          sharedLayer.filter.operator,
-          sharedLayer.filter.value,
-          sharedLayer.filter.value2,
-          sharedLayer.filter.propertyType
-        );
-      }
+  private deserializeInternalObject(
+    layer: BaseLayer,
+    sharedLayer: SharedInternalTheme | SharedInternalGroup | SharedInternalLayer
+  ): BaseLayer | null {
+    if (layer instanceof ThemeLayer) {
+      this.deserializeInternalTheme(layer, sharedLayer as SharedInternalTheme);
+    } else if (layer instanceof GroupLayer) {
+      this.deserializeInternalGroup(layer, sharedLayer as SharedInternalGroup);
+    } else {
+      this.deserializeInternalLayer(layer as Layer, sharedLayer as SharedInternalLayer);
     }
-    if (isTimeAwareLayer(originalLayer)) {
-      originalLayer.timeRestriction = sharedLayer.timeRestriction;
+
+    return layer;
+  }
+
+  private deserializeInternalTheme(theme: ThemeLayer, sharedTheme: SharedInternalTheme) {
+    theme.order = sharedTheme.order;
+    theme.isDefaultChecked = Boolean(sharedTheme.checked);
+    theme.isExpanded = Boolean(sharedTheme.isExpanded);
+    this.removeUnnecessaryChilds(theme, sharedTheme);
+    this.checkUnknownLayers(sharedTheme, theme);
+  }
+
+  private deserializeInternalGroup(group: GroupLayer, sharedGroup: SharedInternalGroup) {
+    group.order = sharedGroup.order;
+    group.isDefaultChecked = Boolean(sharedGroup.checked);
+    group.isExpanded = Boolean(sharedGroup.isExpanded);
+    this.removeUnnecessaryChilds(group, sharedGroup);
+    this.checkUnknownLayers(sharedGroup, group);
+    if (isTimeAwareLayer(group)) {
+      group.timeRestriction = sharedGroup.timeRestriction;
     }
   }
 
-  private checkUnknownLayers(sharedLayer: SharedLayer, originalLayer: GroupLayer | ThemeLayer) {
+  private deserializeInternalLayer(layer: Layer, sharedLayer: SharedInternalLayer) {
+    layer.order = sharedLayer.order;
+    layer.isDefaultChecked = Boolean(sharedLayer.checked);
+    if (sharedLayer.opacity) {
+      layer.opacity = sharedLayer.opacity;
+    }
+    if (sharedLayer.swiped) {
+      layer.swiped = sharedLayer.swiped;
+    }
+    if (this.context.layerManager.isLayerWithLegend(layer)) {
+      layer.isLegendExpanded = Boolean(sharedLayer.isExpanded);
+    }
+    if (layer instanceof LayerWms && sharedLayer.filter) {
+      layer.filter = new WfsFilter(
+        sharedLayer.filter.property,
+        sharedLayer.filter.operator,
+        sharedLayer.filter.value,
+        sharedLayer.filter.value2,
+        sharedLayer.filter.propertyType
+      );
+    }
+    if (isTimeAwareLayer(layer)) {
+      layer.timeRestriction = sharedLayer.timeRestriction;
+    }
+  }
+
+  private checkUnknownLayers(
+    sharedLayer: SharedInternalTheme | SharedInternalGroup,
+    originalLayer: GroupLayer | ThemeLayer
+  ) {
     // If some layers are present in the shared state but cannot be found in the current list of available layers
     // It probably means that the layers are private ones or that the layer has been delete.
     // Add an infobox for this.
@@ -197,13 +277,16 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     }
   }
 
-  private removeUnnecessaryChilds(originalLayer: GroupLayer | ThemeLayer, sharedLayer: SharedLayer) {
+  private removeUnnecessaryChilds(
+    originalLayer: GroupLayer | ThemeLayer,
+    sharedLayer: SharedInternalTheme | SharedInternalGroup
+  ) {
     let reorder = false;
     for (let i = originalLayer.children.length - 1; i >= 0; i--) {
       const child = originalLayer.children[i];
       const serializedChild = sharedLayer.children.find((l) => l.id == child.id);
       if (serializedChild) {
-        this.deserializeLayer(child, serializedChild);
+        this.deserializeInternalObject(child, serializedChild);
       } else {
         // This child exists in the original layer, but not in the shared state.
         // => If it is present in the x list, it was explicitely removed
@@ -262,5 +345,78 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
       }
     }
     return null;
+  }
+
+  private deserializeExternalObject(
+    sharedLayer: SharedExternalTheme | SharedExternalLayer
+  ): ThemeLayerExternal | LayerWmsExternal | LayerWmtsExternal {
+    let layer: ThemeLayerExternal | LayerWmsExternal | LayerWmtsExternal;
+    if ('children' in sharedLayer) {
+      layer = this.deserializeExternalTheme(sharedLayer);
+    } else if ('wms' in sharedLayer) {
+      layer = this.deserializeExternalWmsLayer(sharedLayer);
+    } else if ('wmts' in sharedLayer) {
+      layer = this.deserializeExternalWmtsLayer(sharedLayer);
+    } else {
+      throw new Error('Unsupport external layer type');
+    }
+    return layer;
+  }
+
+  private deserializeExternalTheme(sharedTheme: SharedExternalTheme): ThemeLayerExternal {
+    const theme = new ThemeLayerExternal(sharedTheme.name);
+    theme.order = sharedTheme.order;
+    theme.isDefaultChecked = Boolean(sharedTheme.checked);
+    theme.isExpanded = Boolean(sharedTheme.isExpanded);
+    for (const sharedChild of sharedTheme.children) {
+      const child = this.deserializeExternalObject(sharedChild) as LayerWmsExternal | LayerWmtsExternal;
+      child.parent = theme;
+      theme.children.push(child);
+    }
+    return theme;
+  }
+
+  private deserializeExternalWmsLayer(sharedLayer: SharedExternalLayer): LayerWmsExternal {
+    if (!sharedLayer.wms) {
+      throw new Error('Some informations are missing to deserialize this WMS Layer');
+    }
+
+    const server = new ServerOgc('external', {
+      url: sharedLayer.wms.url,
+      type: 'other',
+      wfsSupport: true,
+      urlWfs: sharedLayer.wms.url,
+      imageType: 'image/png'
+    });
+
+    const layer = new LayerWmsExternal(sharedLayer.wms.title, sharedLayer.wms.name, server);
+    layer.order = sharedLayer.order;
+    layer.isDefaultChecked = Boolean(sharedLayer.checked);
+    layer.isLegendExpanded = Boolean(sharedLayer.isExpanded);
+    if (sharedLayer.opacity) {
+      layer.opacity = sharedLayer.opacity;
+    }
+    if (sharedLayer.swiped) {
+      layer.swiped = sharedLayer.swiped;
+    }
+    return layer;
+  }
+
+  private deserializeExternalWmtsLayer(sharedLayer: SharedExternalLayer): LayerWmtsExternal {
+    if (!sharedLayer.wmts) {
+      throw new Error('Some informations are missing to deserialize this WMTS Layer');
+    }
+
+    const layer = new LayerWmtsExternal(sharedLayer.wmts.name, sharedLayer.wmts.url, sharedLayer.wmts.layer);
+    layer.order = sharedLayer.order;
+    layer.isDefaultChecked = Boolean(sharedLayer.checked);
+    layer.isLegendExpanded = Boolean(sharedLayer.isExpanded);
+    if (sharedLayer.opacity) {
+      layer.opacity = sharedLayer.opacity;
+    }
+    if (sharedLayer.swiped) {
+      layer.swiped = sharedLayer.swiped;
+    }
+    return layer;
   }
 }

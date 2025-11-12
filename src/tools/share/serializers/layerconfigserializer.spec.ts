@@ -6,6 +6,11 @@ import GroupLayer from '../../../models/layers/grouplayer';
 import LayersConfig from '../../state/layersConfig';
 import LayerWmts from '../../../models/layers/layerwmts';
 import IGirafeContext from '../../context/icontext';
+import ThemeLayerExternal from '../../../models/layers/themelayerexternal';
+import LayerWmtsExternal from '../../../models/layers/layerwmtsexternal';
+import LayerWmsExternal from '../../../models/layers/layerwmsexternal';
+import ServerOgc from '../../../models/serverogc';
+import { SharedExternalLayer } from './sharedtypes';
 
 let serializer: LayersConfigSerializer;
 let context: IGirafeContext;
@@ -95,9 +100,84 @@ function getTestData(options: { [key: string]: any } = {}) {
       checked: 0,
       isExpanded: 0,
       opacity: options.opacity ?? 1,
+      swiped: options.swiped ?? 'no'
+    });
+  }
+
+  return {
+    layersConfig: layersConfig,
+    controlValue: JSON.stringify(controlValue)
+  };
+}
+
+function getExternalTestData(options: { [key: string]: any } = {}) {
+  const layersConfig = new LayersConfig();
+  const theme = new ThemeLayerExternal('external-test-theme');
+
+  if (options.addWmtsLayer) {
+    const wmtsLayer = new LayerWmtsExternal('Layer WMTS 1', 'https://test.wmts.url/', 'test_wmts_layer');
+    wmtsLayer.activeState = 'on';
+    theme.children.push(wmtsLayer);
+  }
+  if (options.addWmsLayer) {
+    const server = new ServerOgc('test-ogc-server', {
+      url: 'https://test.wms.url/',
+      type: 'other',
+      wfsSupport: true,
+      urlWfs: 'https://test.wms.url/',
+      imageType: 'image/png'
+    });
+    const wmsLayer = new LayerWmsExternal('Layer WMS 1', 'test_wms_layer', server);
+    wmsLayer.activeState = 'on';
+    theme.children.push(wmsLayer);
+  }
+
+  layersConfig.layersList.push(theme);
+
+  if (options.opacity) {
+    theme.children[0].opacity = options.opacity;
+  }
+  if (options.swiped) {
+    theme.children[0].swiped = options.swiped;
+  }
+
+  const controlValue = [
+    {
+      name: theme.name,
+      order: 0,
+      checked: 0,
+      isExpanded: 1, // Always expanded
+      children: [] as SharedExternalLayer[]
+    }
+  ];
+
+  if (options.addWmtsLayer) {
+    controlValue[0].children.push({
+      order: 0,
+      checked: 1,
+      isExpanded: 0,
+      opacity: options.opacity ?? 1,
       swiped: options.swiped ?? 'no',
-      children: [],
-      excludedChildrenIds: []
+      wmts: {
+        name: 'Layer WMTS 1',
+        url: 'https://test.wmts.url/',
+        layer: 'test_wmts_layer'
+      }
+    });
+  }
+
+  if (options.addWmsLayer) {
+    controlValue[0].children.push({
+      order: 0,
+      checked: 1,
+      isExpanded: 0,
+      opacity: options.opacity ?? 1,
+      swiped: options.swiped ?? 'no',
+      wms: {
+        name: 'test_wms_layer',
+        title: 'Layer WMS 1',
+        url: 'https://test.wms.url/'
+      }
     });
   }
 
@@ -180,15 +260,6 @@ describe('LayersConfigSerializer.deserialize', () => {
     expect(serialized).toEqual(data.controlValue);
   });
 
-  // TODO REG : This Test still has an eror with the active state (isChecked) for ThemeLayer
-  /*it('should return serialized data for a GroupLayer (isChecked)', () => {
-    const data = getTestData({isGroupChecked: true});
-    serializer.brainDeserialize(data.controlValue);
-    const layersConfig = context.stateManager.state.layers;
-    const serialized = serializer.brainSerialize(layersConfig);
-    expect(serialized).toEqual(data.controlValue);
-  });*/
-
   it('should return serialized data for a GroupLayer with children', () => {
     const data = getTestData({ addWmtsLayer: true });
     serializer.brainDeserialize(data.controlValue);
@@ -234,6 +305,62 @@ describe('LayersConfigSerializer.deserialize', () => {
     serializer.brainDeserialize(data.controlValue);
     const layersConfig = context.stateManager.state.layers;
     const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+});
+
+describe('LayersConfigSerializer.serialize external', () => {
+  it('should return serialized data for an external theme', () => {
+    const data = getExternalTestData();
+    const serialized = serializer.brainSerialize(data.layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a external theme with a WMTS Layer', () => {
+    const data = getExternalTestData({ addWmtsLayer: true });
+    const serialized = serializer.brainSerialize(data.layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a external theme with a WMTS Layer (opacity)', () => {
+    const data = getExternalTestData({ addWmtsLayer: true, opacity: 0.5 });
+    const serialized = serializer.brainSerialize(data.layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a external theme with a WMTS Layer (swiped left)', () => {
+    const data = getExternalTestData({ addWmtsLayer: true, swiped: 'left' });
+    const serialized = serializer.brainSerialize(data.layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a external theme with a WMTS Layer (swiped right)', () => {
+    const data = getExternalTestData({ addWmtsLayer: true, swiped: 'left' });
+    const serialized = serializer.brainSerialize(data.layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a external theme with a WMS Layer', () => {
+    const data = getExternalTestData({ addWmsLayer: true });
+    const serialized = serializer.brainSerialize(data.layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a external theme with a WMS Layer (opacity)', () => {
+    const data = getExternalTestData({ addWmsLayer: true, opacity: 0.5 });
+    const serialized = serializer.brainSerialize(data.layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a external theme with a WMS Layer (swiped left)', () => {
+    const data = getExternalTestData({ addWmsLayer: true, swiped: 'left' });
+    const serialized = serializer.brainSerialize(data.layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a external theme with a WMS Layer (swiped right)', () => {
+    const data = getExternalTestData({ addWmsLayer: true, swiped: 'left' });
+    const serialized = serializer.brainSerialize(data.layersConfig);
     expect(serialized).toEqual(data.controlValue);
   });
 });

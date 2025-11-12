@@ -1,7 +1,8 @@
 import CustomTheme from '../../../models/customtheme';
 import BaseLayer from '../../../models/layers/baselayer';
 import ThemeLayer from '../../../models/layers/themelayer';
-import LayersConfigSerializer, { SharedLayer } from './layerconfigserializer';
+import LayersConfigSerializer from './layerconfigserializer';
+import { SharedLayer } from './sharedtypes';
 
 export default class CustomLayersSerializer extends LayersConfigSerializer {
   public customThemeSerialize(customTheme: CustomTheme): string {

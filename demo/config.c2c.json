@@ -7,10 +7,8 @@
     "audience": ["geomapfish-demo-2-8.camptocamp.com"],
     "audienceExcludedPaths": ["^/tiles/", "^/pytree/"]
   },
-  "external_layers": {
-    "enabled_types": ["local", "WMS", "WMTS", "predefined"],
-    "default_type": "predefined",
-    "predefined_sources": [
+  "externalLayers": {
+    "predefinedSources": [
       {
         "label": "Swisstopo WMS",
         "type": "WMS",

@@ -1,44 +1,54 @@
-import { getUid } from 'ol/util';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import ThemeLayer from '../../models/layers/themelayer';
-import BaseLayer from '../../models/layers/baselayer';
-import LayerWms from '../../models/layers/layerwms';
-import LayerWmts from '../../models/layers/layerwmts';
 import ServerOgc from '../../models/serverogc';
 import { WmsClientDefault } from '../../tools/wms/wmsclient';
 import WmtsManager from '../map/tools/wmtsmanager';
+import LayerWmsExternal from '../../models/layers/layerwmsexternal';
+import LayerWmtsExternal from '../../models/layers/layerwmtsexternal';
+import ThemeLayerExternal from '../../models/layers/themelayerexternal';
 
-export type SourceType = 'local' | 'auto_WMTS' | 'WMS' | 'WMTS' | 'predefined';
+type SourceType = 'WMS' | 'WMTS' | 'local';
+type ExternalLayer = LayerWmsExternal | LayerWmtsExternal;
 
-const MIN_EXTERNAL_ID = 999999999;
+const MaxLayers = 50;
 
-class ExtLayerComponent extends GirafeHTMLElement {
+type PredefinedSource = {
+  label: string;
+  type: 'WMS' | 'WMTS';
+  url: string;
+};
+
+class ExternalLayersComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
   visible = false;
   loading = false;
 
-  private enabled_types!: SourceType[];
-  public predefined_sources!: { label: string; type: 'WMS' | 'WMTS'; url: string }[];
-  private sourceType!: SourceType;
+  public predefinedSources: PredefinedSource[] = [];
+
+  public get predefinedWmsWmtsSources() {
+    return this.predefinedSources.filter((source) => source.type === 'WMS' || source.type === 'WMTS');
+  }
+
+  public selectedTab: 'wms_wmts' | 'file' = 'wms_wmts';
   private wmtsManager!: WmtsManager;
 
-  themeName: string | undefined = undefined;
-  allLayers: BaseLayer[] = [];
-  layers: BaseLayer[] = [];
-  selectedLayers: { [key: number]: boolean } = {};
+  private themeName?: string;
+  private externalLayers: ExternalLayer[] = [];
+  public filteredLayers: ExternalLayer[] = [];
 
-  isFiltered: boolean = false;
+  public get isFiltered() {
+    return this.externalLayers.length > this.filteredLayers.length;
+  }
 
   constructor() {
-    super('ext-layer');
+    super('external-layers');
   }
 
   render() {
-    super.girafeTranslate();
     if (this.visible) {
       super.render();
+      super.girafeTranslate();
     } else {
       this.renderEmpty();
     }
@@ -48,33 +58,87 @@ class ExtLayerComponent extends GirafeHTMLElement {
     this.state.interface.extLayerPanelVisible = false;
   }
 
-  public scanLayers() {
-    const url = this.getById<HTMLInputElement>('url').value;
-    this.scanExtLayers(this.sourceType, url);
+  public setSelectedTab(selectedTab: 'wms_wmts' | 'file') {
+    this.selectedTab = selectedTab;
+    this.refreshRender();
   }
 
-  public scanExtLayers(source_type: SourceType, url: string) {
-    if (source_type === 'auto_WMTS') {
-      if (url.includes('WMTS')) {
-        source_type = 'WMTS';
-      } else {
-        source_type = 'WMS';
+  public async scanSource(url?: string, sourceType?: SourceType) {
+    this.externalLayers = [];
+    this.filteredLayers = [];
+    this.loading = true;
+    this.refreshRender();
+
+    if (!url) {
+      url = (this.shadow.getElementById('url') as HTMLInputElement).value;
+      if (url.trim().length === 0) {
+        return;
       }
     }
-    if (source_type === 'WMS') {
-      this.scanLayersWMS(url);
-    } else if (source_type === 'WMTS') {
-      this.scanLayersWMTS(url);
+
+    try {
+      if (sourceType === 'WMS') {
+        await this.scanLayersWMS(url);
+      } else if (sourceType === 'WMTS') {
+        await this.scanLayersWMTS(url);
+      } else {
+        // Don't know the type, we try both
+        try {
+          await this.scanLayersWMS(url);
+        } catch {
+          await this.scanLayersWMTS(url);
+        }
+      }
+      this.clearFilter();
+    } finally {
+      this.loading = false;
+      this.refreshRender();
     }
   }
 
-  public toggle(id: number) {
-    if (this.selectedLayers[id]) {
-      this.selectedLayers[id] = false;
-    } else {
-      this.selectedLayers[id] = true;
+  private async scanLayersWMS(url: string) {
+    this.themeName = this.parseName(url);
+    const server = new ServerOgc(this.themeName, {
+      url,
+      type: 'other',
+      wfsSupport: true,
+      urlWfs: url,
+      imageType: 'image/png'
+    });
+    const client = this.context.wmsManager.createClient(WmsClientDefault, server);
+    const capabilities: any = await client.getWmsCapabilities();
+    if (capabilities?.Service?.Title) {
+      this.themeName = capabilities.Service.Title;
     }
-    this.render();
+    this.externalLayers = capabilities.Capability.Layer.Layer.map(
+      (l: any) => new LayerWmsExternal(l.Title, l.Name, server)
+    );
+  }
+
+  private async scanLayersWMTS(url: string) {
+    this.themeName = this.parseName(url);
+    const capabilities: any = await this.wmtsManager.getWmtsCapabilities(url);
+    this.loading = false;
+    if (capabilities?.ServiceIdentification?.Title) {
+      this.themeName = capabilities.ServiceIdentification.Title;
+    }
+    this.externalLayers = capabilities.Contents.Layer.map(
+      (l: any) => new LayerWmtsExternal(l.Title, url, l.Identifier)
+    );
+  }
+
+  public selectLayer(layer: ExternalLayer, forceSelect?: boolean): boolean {
+    layer.isSelected = forceSelect ?? !layer.isSelected;
+    this.refreshRender();
+    if (this.externalLayers.filter((l) => l.isSelected).length > MaxLayers) {
+      layer.isSelected = false;
+      window.gAlert(
+        `For performance reasons, they cannot all be added to the treeview. Please limit the selection to ${MaxLayers} objects.`,
+        'Too many layers selected!'
+      );
+      return false;
+    }
+    return true;
   }
 
   private parseName(url: string) {
@@ -86,95 +150,19 @@ class ExtLayerComponent extends GirafeHTMLElement {
     return `${host}${basePath}`;
   }
 
-  private getId(layer: BaseLayer) {
-    // generate an unused integer id greater than MIN_EXTERNAL_ID for each layer uid
-    // beacause the layer model requires integer ids
-    const uid = getUid(layer);
-    if (!(uid in this.context.stateManager.state.layers.extLayerIds)) {
-      this.context.stateManager.state.layers.extLayerIds[uid] =
-        Math.max(MIN_EXTERNAL_ID, ...Object.values(this.context.stateManager.state.layers.extLayerIds)) + 1;
-    }
-    return this.context.stateManager.state.layers.extLayerIds[uid];
-  }
-
-  public get fileDescription() {
-    const selectedFiles = this.getById<HTMLInputElement>('file')?.files;
-    if (!selectedFiles || selectedFiles.length == 0) {
-      return '';
-    }
-    return `${selectedFiles[0].name} (${selectedFiles[0].size}b)`;
-  }
-
-  public async loadFile() {
-    const selectedFiles = this.getById<HTMLInputElement>('file').files;
-    if (selectedFiles && selectedFiles.length > 0) {
-      const selectedFile = selectedFiles[0];
-      await this.context.localFileManager.loadLocalFile(selectedFile);
-    }
-  }
-
-  public async scanLayersWMS(url: string) {
-    this.themeName = this.parseName(url);
-    const server = new ServerOgc(this.themeName, {
-      url,
-      type: 'other',
-      wfsSupport: true,
-      urlWfs: url,
-      imageType: 'image/png'
-    });
-    const client = this.context.wmsManager.createClient(WmsClientDefault, server);
-    this.allLayers = [];
-    this.layers = [];
-    this.selectedLayers = {};
-    this.loading = true;
-    this.render();
-    const capabilities: any = await client.getWmsCapabilities();
-    this.loading = false;
-    if (capabilities?.Service?.Title) {
-      this.themeName = capabilities.Service.Title;
-    }
-    this.allLayers = capabilities.Capability.Layer.Layer.map(
-      (l: any) => new LayerWms(this.getId(l), l.Title, 0, server, { layers: l.Name, queryable: true, legend: true })
-    );
-    this.layers = [...this.allLayers];
-    this.selectedLayers = {};
-    if (this.isFiltered) this.clearFilter();
-    this.render();
-  }
-
-  public async scanLayersWMTS(url: string) {
-    this.themeName = this.parseName(url);
-    this.allLayers = [];
-    this.layers = [];
-    this.selectedLayers = {};
-    this.loading = true;
-    this.render();
-    const capabilities: any = await this.wmtsManager.getWmtsCapabilities(url);
-    this.loading = false;
-    if (capabilities?.ServiceIdentification?.Title) {
-      this.themeName = capabilities.ServiceIdentification.Title;
-    }
-    this.allLayers = capabilities.Contents.Layer.map(
-      (l: any) => new LayerWmts(this.getId(l), l.Title, 0, url, l.Identifier)
-    );
-    this.layers = [...this.allLayers];
-    this.selectedLayers = {};
-    if (this.isFiltered) this.clearFilter();
-    this.render();
-  }
-
   public filterLayers(filter: string) {
-    this.layers = this.allLayers.filter((l) => l.name.toLowerCase().includes(filter.toLowerCase()));
-    this.isFiltered = true;
-    this.render();
+    this.filteredLayers = this.externalLayers
+      .filter((l) => l.name.toLowerCase().includes(filter.toLowerCase()))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    this.refreshRender();
   }
 
   public clearFilter() {
     const filterField = this.shadow.getElementById('layer-search-field') as HTMLInputElement;
     filterField.value = '';
-    this.layers = [...this.allLayers];
-    this.isFiltered = false;
-    this.render();
+    // Order the layers by name
+    this.filteredLayers = [...this.externalLayers].sort((a, b) => a.name.localeCompare(b.name));
+    this.refreshRender();
   }
 
   public typeUrl() {
@@ -196,37 +184,60 @@ class ExtLayerComponent extends GirafeHTMLElement {
   }
 
   public selectVisible() {
-    this.layers.forEach((l) => (this.selectedLayers[l.id] = true));
-    this.render();
+    for (const layer of this.filteredLayers) {
+      if (!this.selectLayer(layer, true)) {
+        break;
+      }
+    }
+    this.refreshRender();
   }
 
   public deselectVisible() {
-    this.layers.forEach((l) => (this.selectedLayers[l.id] = false));
-    this.render();
+    for (const layer of this.filteredLayers) {
+      this.selectLayer(layer, false);
+    }
+    this.refreshRender();
   }
 
   public deselectAll() {
-    this.selectedLayers = {};
-    this.render();
+    for (const layer of this.externalLayers) {
+      this.selectLayer(layer, false);
+    }
+    this.refreshRender();
   }
 
   public addSelectedLayers() {
-    const extTheme = new ThemeLayer(99999, this.themeName || 'ThemeExterne', 0);
-    extTheme.children = this.allLayers.filter((l) => this.selectedLayers[l.id]);
-    extTheme.children.forEach((l) => {
-      l.parent = extTheme;
-      l.isDefaultChecked = true;
+    const selectedLayers = this.externalLayers.filter((layer) => layer.isSelected).map((l) => l.clone());
+    if (selectedLayers.length === 0) {
+      // Nothing to add
+      return;
+    }
+
+    const theme = new ThemeLayerExternal(this.themeName);
+    theme.children = selectedLayers;
+    (theme.children as ExternalLayer[]).forEach((l) => {
+      l.parent = theme;
     });
-    const themeToAdd = extTheme.clone();
-    this.state.layers.layersList.push(themeToAdd);
+
+    this.context.stateManager.batchChanges(() => {
+      this.state.layers.layersList.push(theme);
+    });
   }
 
-  public setSourceType(newSourceType: SourceType) {
-    this.sourceType = newSourceType;
-    this.allLayers = [];
-    this.layers = [];
-    this.selectedLayers = {};
-    this.render();
+  public get fileDescription() {
+    const selectedFiles = this.getById<HTMLInputElement>('file')?.files;
+    if (!selectedFiles || selectedFiles.length == 0) {
+      return '';
+    }
+    return `${selectedFiles[0].name} (${selectedFiles[0].size}b)`;
+  }
+
+  public async loadFile() {
+    const selectedFiles = this.getById<HTMLInputElement>('file').files;
+    if (selectedFiles && selectedFiles.length > 0) {
+      const selectedFile = selectedFiles[0];
+      await this.context.localFileManager.loadLocalFile(selectedFile);
+    }
   }
 
   connectedCallback() {
@@ -236,10 +247,7 @@ class ExtLayerComponent extends GirafeHTMLElement {
     this.wmtsManager = new WmtsManager(olMap, this.context.stateManager);
 
     const config = this.context.configManager.Config;
-    this.enabled_types = config.external_layers?.enabled_types || ['WMS', 'WMTS'];
-    this.predefined_sources = config.external_layers?.predefined_sources || [];
-    this.sourceType = config.external_layers?.default_type || this.enabled_types[0] || 'predefined';
-
+    this.predefinedSources = config.externalLayers?.predefinedSources || [];
     this.render();
     this.subscribe('interface.extLayerPanelVisible', (_, newValue) => {
       this.visible = newValue;
@@ -248,4 +256,4 @@ class ExtLayerComponent extends GirafeHTMLElement {
   }
 }
 
-export default ExtLayerComponent;
+export default ExternalLayersComponent;

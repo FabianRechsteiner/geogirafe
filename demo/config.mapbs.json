@@ -148,17 +148,15 @@
     "reasons": ["Give feeback", "Ask a question", "Report an error", "Request secure access"],
     "email": "geo@bs.ch"
   },
-  "external_layers": {
-    "enabled_types": ["WMS", "WMTS", "predefined"],
-    "default_type": "predefined",
-    "predefined_sources": [
+  "externalLayers": {
+    "predefinedSources": [
       {
-        "label": "WMS Bundes Geodaten-Infrastruktur (BGDI)",
+        "label": "WMS Bundes Geodaten-Infrastruktur",
         "type": "WMS",
         "url": "https://wms.geo.admin.ch"
       },
       {
-        "label": "WMTS Bundes Geodaten-Infrastruktur (BGDI)",
+        "label": "WMTS Bundes Geodaten-Infrastruktur",
         "type": "WMTS",
         "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=de"
       },
@@ -170,7 +168,7 @@
       {
         "label": "WMS GeoRhena",
         "type": "WMS",
-        "url": "https://geoportal.georhena.eu/geoserver/ows?service=wms&version=1.3.0&request=GetCapabilities"
+        "url": "https://geoportal.georhena.eu/geoserver/ows"
       },
       {
         "label": "WMS Kanton Solothurn",
