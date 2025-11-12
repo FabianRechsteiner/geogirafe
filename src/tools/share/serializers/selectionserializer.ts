@@ -1,9 +1,9 @@
 import { IBrainSerializer } from '../../state/brain/serialize';
 import ObjectSelection, { InitialSelectionQuery } from '../../state/objectselection';
 import WfsFilter from '../../wfs/wfsfilter';
-import { SharedFilter } from './layerconfigserializer';
 import SelectionParam from '../../../models/selectionparam';
 import IGirafeContext from '../../context/icontext';
+import { SharedFilter } from './sharedtypes';
 
 export type SharedInitialSelection = {
   selectionBox?: number[];

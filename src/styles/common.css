@@ -236,26 +236,24 @@ a:visited {
 
 /* Tabs */
 .gg-tabs {
-  display: flex;
-  justify-content: left;
-  margin: 0.5rem auto 0;
-  border-bottom: 1px solid grey;
+  display: grid;
+  grid-auto-flow: column;
+  font-size: 1rem;
+  padding-bottom: 1rem;
   cursor: pointer;
-  height: 2rem;
-  align-items: end;
-  gap: 1rem;
-  margin-bottom: 1rem;
 }
+
 .gg-tab {
   border: none;
+  border-bottom: var(--app-standard-border);
   background: transparent;
   cursor: pointer;
   padding: 0.5rem;
   color: var(--text-color);
 }
+
 .gg-tab.active {
-  border-bottom: solid 2px var(--text-color-grad2);
-  font-weight: 600;
+  border-bottom: solid 1px var(--text-color);
 }
 
 /* TODO REG : Suppress all the following styles. */

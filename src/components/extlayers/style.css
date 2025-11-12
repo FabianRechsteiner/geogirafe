@@ -1,43 +1,83 @@
 #panel {
   display: flex;
   height: 100%;
+  flex-direction: column;
+  background: var(--bkg-color);
+  color: var(--text-color);
+  padding: 0 1rem;
 }
 
 #content {
-  background: var(--bkg-color);
-  color: var(--text-color);
-  padding: 1rem;
   margin: 0;
   flex-grow: 1;
   display: flex;
-}
-
-#ext-layer-server {
-  width: 100%;
-  display: flex;
   flex-direction: column;
-  row-gap: 2em;
 }
 
-#url {
-  width: 100%;
+header {
+  margin: 0;
+  position: sticky;
+  top: -5px;
+  background: #fff;
+}
+
+h4 {
+  margin-bottom: 0.5rem;
+}
+
+ul {
+  margin-left: 0;
+  padding-left: 2rem;
+  list-style-type: disc;
+  line-height: 1.3rem;
+  margin-top: 0;
+}
+
+.clearable-input {
+  background-color: var(--bkg-color);
+  border: 1px solid #cfd6dd;
+  border-radius: 4px;
+  flex-direction: row;
+  margin-bottom: 0.1rem;
+  display: flex;
+}
+
+.scan-button {
+  float: right;
+}
+
+.layers {
+  border-top: 1px solid #ccc;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  display: flex;
+  overflow: hidden;
+}
+
+ul.results {
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  border: none;
+  margin-bottom: 0.5rem;
+}
+
+.result {
+  display: flex;
+  height: 1.6rem;
+}
+
+.result > button > span {
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 #panel > div {
   padding: 1rem;
-}
-
-#layers {
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-#layers ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  overflow-y: auto;
 }
 
 #layers li {
@@ -72,23 +112,13 @@
 }
 
 #loading-icon {
-  width: 20%;
+  width: 3rem;
+  flex-grow: 1;
+  align-self: center;
 }
 
 .title {
   margin-top: 0;
-}
-
-.clearable-input {
-  flex-grow: 1;
-  background-color: var(--bkg-color);
-  width: auto;
-  display: flex;
-  flex-direction: row;
-  border: 1px solid #cfd6dd;
-  border-radius: 4px;
-  margin-bottom: 2px;
-  margin-right: 2px;
 }
 
 .filter-buttons {
