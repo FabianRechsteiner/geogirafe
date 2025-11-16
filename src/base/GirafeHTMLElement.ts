@@ -312,6 +312,9 @@ class GirafeHTMLElement extends HTMLElement {
       }
       parent = parent?.parentNode ?? null;
     } while (parent && parent !== document);
+    if (parent === document) {
+      return (parent as Document).geogirafe.context;
+    }
 
     throw new Error('No context was found !');
   }
