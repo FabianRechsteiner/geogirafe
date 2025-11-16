@@ -34,9 +34,8 @@ class TimeRestrictionComponent extends GirafeHTMLElement {
     this.render();
     super.girafeTranslate();
 
-    if (!this.timeWidget) {
-      this.initTimeWidget();
-    }
+    this.initTimeWidget();
+
     // Wait for the time widget to be rendered, then set the time
     setTimeout(() => {
       this.onOutsideTimeChange(this.layer.timeRestriction);
@@ -48,7 +47,7 @@ class TimeRestrictionComponent extends GirafeHTMLElement {
       // The type of time widget component in the template is dependent on the timeOptions > widget value
       this.timeWidget = this.getById('time-widget');
       this.timeWidget.initialize(this.timeOptions);
-      this.render();
+      this.timeWidget.render();
 
       // Connect change event of widget
       this.timeWidget.addEventListener(TimeChangeEvent, ((evt: CustomEvent) =>
