@@ -2,7 +2,7 @@ import type OlFeature from 'ol/Feature';
 import OlGeomGeometry from 'ol/geom/Geometry';
 import FeatureToGridDataById, { GridData, GridDataById } from '../../../tools/featuretogriddatabyid';
 import FormatGridGeomValue from './formatgridgeomvalue';
-import { ColumnDefinition, TabulatorFull as Tabulator } from 'tabulator-tables';
+import { ColumnDefinition, RowComponent, TabulatorFull as Tabulator } from 'tabulator-tables';
 import { getUid } from 'ol/util';
 import ColumnAliasHelper from '../../../tools/utils/aliases';
 import IGirafeContext from '../../../tools/context/icontext';
@@ -33,14 +33,16 @@ export interface TabContent {
   features: OlFeature[];
 }
 
+const geometryColumns = new Set<string>(['geom', 'the_geom', 'geometry']);
+
 export default class SelectionTabulatorManager {
   private readonly formatGridGeomValue: FormatGridGeomValue;
   private readonly featureToGridData: FeatureToGridDataById;
-  idTab: Record<string, TabContent> = {};
-  tabHeaders: TabHeader[] = [];
-  table: Tabulator | null = null;
-  element: string | HTMLElement = '';
-  data: GridDataById = {};
+  private idTab: Record<string, TabContent> = {};
+  private tabHeaders: TabHeader[] = [];
+  private table: Tabulator | null = null;
+  private element: string | HTMLElement = '';
+  private data: GridDataById = {};
   private readonly context: IGirafeContext;
   private readonly columnAliasHelper: ColumnAliasHelper;
 
@@ -74,7 +76,9 @@ export default class SelectionTabulatorManager {
    * Activates a tab matching the given id.
    */
   activateTab(id: string): void {
-    this.tabHeaders?.forEach((tabHeader) => (tabHeader.active = false));
+    for (const tabHeader of this.tabHeaders) {
+      tabHeader.active = false;
+    }
     const visibleTabHeader = this.tabHeaders?.find((tabHeader) => tabHeader.id === id);
     if (!visibleTabHeader) {
       return;
@@ -100,11 +104,11 @@ export default class SelectionTabulatorManager {
       headerSortElement: function (_, dir) {
         switch (dir) {
           case 'asc':
-            return '<img alt="sort-up-icon" src="icons/sort-up.svg" />';
+            return '<img alt="sort-up-icon" src="icons/sort-up.svg" class="sort-icon" />';
           case 'desc':
-            return '<img alt="sort-down-icon" src="icons/sort-down.svg" />';
+            return '<img alt="sort-down-icon" src="icons/sort-down.svg" class="sort-icon" />';
           default:
-            return '<img alt="sort-icon" src="icons/sort.svg" />';
+            return '<img alt="sort-icon" src="icons/sort.svg" class="sort-icon default" />';
         }
       }
     });
@@ -115,17 +119,14 @@ export default class SelectionTabulatorManager {
 
       // Create a Map of features by their UIDs
       const featureMap = new Map<string, OlFeature<OlGeomGeometry>>();
-      this.data[id].features.forEach((feature) => {
-        const uid = getUid(feature.getGeometry());
-        featureMap.set(uid, feature);
-      });
+      for (const feature of this.data[id].features) {
+        featureMap.set(getUid(feature.getGeometry()), feature);
+      }
 
       // Highlight selected features on the map.
-      const highlightedGeometries = selection
+      this.context.stateManager.state.selection.highlightedFeatures = selection
         .map((row) => featureMap.get(getUid(row.geom ?? row.the_geom ?? row.geometry)))
         .filter((feature): feature is OlFeature => feature !== undefined);
-
-      this.context.stateManager.state.selection.highlightedFeatures = highlightedGeometries;
     });
   }
 
@@ -138,7 +139,9 @@ export default class SelectionTabulatorManager {
     const gridDataById = this.featureToGridData.toGridDataById(features);
 
     // Create tabs and collect data.
-    Object.keys(gridDataById).forEach((id) => this.gridDataToGridTab(id, gridDataById[id]));
+    for (const id of Object.keys(gridDataById)) {
+      this.gridDataToGridTab(id, gridDataById[id]);
+    }
 
     // Create tabs headers
     this.tabHeaders = Object.keys(this.idTab).map((key) => {
@@ -170,22 +173,23 @@ export default class SelectionTabulatorManager {
 
   columnsToGridColumns(idTable: string, columns: string[]): ColumnDefinition[] {
     const columnDefinition: ColumnDefinition[] = [];
-    columns.forEach((column) => {
+    for (const column of columns) {
       const columnAlias = this.columnAliasHelper.getColumnAlias(idTable, column);
       columnDefinition.push({
         title: this.context.i18nManager.getTranslation(columnAlias),
         field: column,
-        formatter: 'html'
+        formatter: 'html',
+        sorter: 'string'
       });
-    });
+    }
 
-    columnDefinition.forEach((column) => {
-      if (column.field === 'the_geom' || column.field === 'geom' || column.field === 'geometry') {
+    for (const column of columnDefinition) {
+      if (column.field && geometryColumns.has(column.field)) {
         column.formatter = (cell) => {
           return this.formatGridGeomValue.getGeometryIcons(cell.getValue()) ?? cell.getValue();
         };
       }
-    });
+    }
 
     return columnDefinition;
   }
@@ -196,7 +200,7 @@ export default class SelectionTabulatorManager {
       const notOlProperties = entry.notOlProperties;
       for (const [_, row] of Object.entries(notOlProperties)) {
         for (const [key, _] of Object.entries(row)) {
-          if (!columns.some((column) => column === key)) {
+          if (!columns.includes(key)) {
             delete row[key];
           }
         }
@@ -234,5 +238,48 @@ export default class SelectionTabulatorManager {
 
   restoreRedraw(): void {
     this.table?.restoreRedraw();
+  }
+
+  selectAll(): void {
+    this.table?.selectRow();
+  }
+
+  selectNone(): void {
+    this.table?.deselectRow();
+  }
+
+  invertSelection(): void {
+    for (const row of this.table!.getRows()) {
+      row.toggleSelect();
+    }
+  }
+
+  getSelectedRows(): RowComponent[] {
+    return this.table?.getRows('selected') ?? [];
+  }
+
+  getSelectedData() {
+    return this.table?.getSelectedData() ?? [];
+  }
+
+  getNonGeometryColumnFields(): string[] {
+    return (
+      this.table
+        ?.getColumns(false)
+        .map((columnComponent) => columnComponent.getField())
+        .filter((column) => !geometryColumns.has(column)) ?? []
+    );
+  }
+
+  getTabHeaders(): TabHeader[] {
+    return this.tabHeaders;
+  }
+
+  clearTabHeaders(): void {
+    this.tabHeaders = [];
+  }
+
+  getTabIds() {
+    return Object.keys(this.idTab);
   }
 }
