@@ -1,38 +1,50 @@
-<link rel="stylesheet" href="styles/common.css" />
-<link rel="stylesheet" href="lib/tabulator-tables/tabulator.min.css" />
-<link rel="stylesheet" href="../../../node_modules/tabulator-tables/dist/css/tabulator.css" />
-
 <div id="panel">
   <div id="content">
     <div id="header">
-      <div class="tab-panel">
+      <div class="gg-tabs">
         ${this.getTabHeaders().map((th) => uHtml`
         <button
           id="${th.id}"
           i18n="${th.text}"
-          class="${th.active ? 'tab active' : 'tab'}"
+          class="${th.active ? 'gg-tab active' : 'gg-tab'}"
           .active="${th.active}"
           onclick="${() => this.displayGrid(th.id, true)}"></button>
         `)}
       </div>
       <div class="selection-panel">
+        <span class="label" i18n="Selection"></span>
+        <button class="gg-icon-button gg-medium" onclick="${() => this.selectAll()}" tip="Select all">
+          <img alt="select all icon" src="icons/select-all-on.svg" />
+        </button>
+        <button class="gg-icon-button gg-medium" onclick="${() => this.selectNone()}" tip="Select none">
+          <img alt="select none icon" src="icons/select-all-off.svg" />
+        </button>
+        <button class="gg-icon-button gg-medium" onclick="${() => this.invertSelection()}" tip="Invert selection">
+          <img alt="invert selection icon" src="icons/select-invert.svg" />
+        </button>
         <button
-          class="${this.showCsvButton ? 'gg-button' : 'hidden'}"
+          class="${this.resultsSelected ? 'gg-icon-button gg-medium' : 'gg-icon-button gg-medium disabled'}"
+          ?disabled="${!this.resultsSelected}"
           onclick="${() => this.zoomToSelection()}"
-          i18n="Zoom to"></button>
-        <button class="gg-button" onclick="${() => this.selectAll()}" i18n="Select all"></button>
-        <button class="gg-button" onclick="${() => this.selectNone()}" i18n="Select none"></button>
-        <button class="gg-button" onclick="${() => this.invertSelection()}" i18n="Invert selection"></button>
+          tip="Zoom to">
+          <img alt="zoom to selection icon" src="icons/zoom-to-selection.svg" />
+        </button>
         <button
-          class="${this.showCsvButton ? 'gg-button' : 'hidden'}"
+          class="${this.resultsSelected ? 'gg-icon-button gg-medium' : 'gg-icon-button gg-medium disabled'}"
+          ?disabled="${!this.resultsSelected}"
           onclick="${() => this.generateCSV()}"
-          i18n="Generate CSV"></button>
+          tip="Generate CSV">
+          <img alt="download csv icon" src="icons/arrow-download.svg" />
+        </button>
+        <button
+          class="gg-icon-button gg-medium"
+          onclick="${() => this.closePanel()}"
+          tip="Clear Results and close Panel">
+          <img alt="close-icon" src="icons/trash.svg" />
+        </button>
       </div>
     </div>
     <div id="tabulator"></div>
   </div>
   <div id="gutter"></div>
-  <button id="close" onclick="this.closePanel()">
-    <img id="close" alt="close-icon" src="icons/close.svg" />
-  </button>
 </div>

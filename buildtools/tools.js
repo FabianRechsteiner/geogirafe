@@ -66,50 +66,116 @@ async function getStyleCode(currentFilename, relativeCssPath) {
     return styleCode;
   } catch (error) {
     console.error(`Error reading style file for ${currentFilename}: ${error}`);
+    throw error;
   }
 }
 
-async function getHtmlCode(htmlFilePath, styleCode) {
-  let htmlCode = fs.readFileSync(htmlFilePath, 'utf8');
-  htmlCode = await minify.html(htmlCode, {
-    html: { minifyCSS: false, collapseBooleanAttributes: false, removeAttributeQuotes: false }
-  });
-  htmlCode = `template = () => { return uHtml\`${styleCode}\n${htmlCode}\`; }`;
-  return htmlCode;
+async function getHtmlCode(currentFilename, relativeHtmlPath, styleCode) {
+  const htmlFilePath = path.join(path.dirname(currentFilename), relativeHtmlPath.trim());
+  try {
+    let htmlCode = fs.readFileSync(htmlFilePath, 'utf8');
+    htmlCode = await minify.html(htmlCode, {
+      html: {
+        minifyCSS: false,
+        collapseBooleanAttributes: false,
+        removeAttributeQuotes: false
+      }
+    });
+    htmlCode = `template = () => { return uHtml\`${styleCode}\n${htmlCode}\`; }`;
+    return htmlCode;
+  } catch (error) {
+    console.error(`Error reading html file for ${currentFilename}: ${error}`);
+    throw error;
+  }
 }
+
+export function isLineCommented(regExpMatch, code) {
+  if (!regExpMatch) {
+    return false;
+  }
+
+  const lineStart = code.substring(0, regExpMatch.index);
+  const lastNewlineIndex = lineStart.lastIndexOf('\n');
+  const lineBeforeMatch = lineStart.substring(lastNewlineIndex + 1);
+
+  // The line is commented
+  if (lineBeforeMatch.trim().startsWith('//')) {
+    return true;
+  }
+
+  // Test if we are in a commented block
+  let commentedBlock = 0;
+  for (let i = 0; i < regExpMatch.index; i++) {
+    if (code[i] === '/' && code[i + 1] === '*') {
+      commentedBlock++;
+      i++;
+    } else if (code[i] === '*' && code[i + 1] === '/') {
+      commentedBlock--;
+      i++;
+    }
+  }
+  if (commentedBlock > 0) {
+    return true;
+  }
+
+  return false;
+}
+
+function isStringCommented(line) {
+  if (!line) {
+    return false;
+  }
+  if (line.trim().startsWith('//')) {
+    return true;
+  }
+  if (line.trim().startsWith('/*')) {
+    return true;
+  }
+  return false;
+}
+
+// Regex definitions
+export const styleRegex = /styleUrl *= *['"](.*)['"] *;?/g;
+export const stylesRegex = /styleUrls *= *\[([\s\S]*?)\] *;?/gs;
+export const htmlRegex = /templateUrl *= *['"](.*)['"] *;?/g;
 
 export async function inlineTemplate(filename) {
   // Read the file
   const code = fs.readFileSync(filename, 'utf8');
   const magicString = new MagicString(code);
 
-  // Find the HTML template
-  const htmlRegex = /templateUrl *= *['"](.*)['"] *;?/;
-  if (htmlRegex.test(code)) {
-    // Verify if there is a CSS file
-    let styleCode = '';
-    const styleRegex = /styleUrl *= *['"](.*)['"] *;?/;
-    if (styleRegex.test(code)) {
-      // Read the CSS file
-      const styleFound = code.match(styleRegex);
-      styleCode += await getStyleCode(filename, styleFound[1]);
-      magicString.overwrite(styleFound.index, styleFound.index + styleFound[0].length, '');
-    }
-    // Verify if there are many CSS files
-    const stylesRegex = /styleUrls *= *\[(['"].*['"],? ?)+\] *;?/;
-    if (stylesRegex.test(code)) {
-      const stylesFound = code.match(stylesRegex);
-      for (const styleFound of stylesFound[1].replaceAll("'", '').split(',')) {
-        styleCode += await getStyleCode(filename, styleFound);
-      }
-      magicString.overwrite(stylesFound.index, stylesFound.index + stylesFound[0].length, '');
-    }
+  // We integrate HTML and CSS only if there is an HTML Template
+  const htmlFounds = code.matchAll(htmlRegex);
+  for (const htmlFound of htmlFounds) {
+    if (htmlFound && !isLineCommented(htmlFound, code) && htmlFound[1]) {
+      let styleCode = '';
 
-    // Read HTML template
-    const htmlFound = code.match(htmlRegex);
-    const htmlFilePath = path.join(path.dirname(filename), htmlFound[1]);
-    try {
-      const htmlCode = await getHtmlCode(htmlFilePath, styleCode);
+      // Unique style Url
+      const styleFounds = code.matchAll(styleRegex);
+      for (const styleFound of styleFounds) {
+        if (styleFound && !isLineCommented(styleFound, code) && styleFound[1]) {
+          styleCode += await getStyleCode(filename, styleFound[1]);
+          magicString.overwrite(styleFound.index, styleFound.index + styleFound[0].length, '');
+        }
+      }
+
+      // Multiple style Urls
+      const stylesFounds = code.matchAll(stylesRegex);
+      for (const stylesFound of stylesFounds) {
+        if (stylesFound && !isLineCommented(stylesFound, code) && stylesFound[1]) {
+          const stylePaths = stylesFound[1]
+            .split(',')
+            .map((p) => p.trim().replace(/['"]/g, ''))
+            .filter((p) => p.length > 0 && !isStringCommented(p));
+          for (const stylePath of stylePaths) {
+            styleCode += await getStyleCode(filename, stylePath);
+          }
+          magicString.overwrite(stylesFound.index, stylesFound.index + stylesFound[0].length, '');
+        }
+      }
+
+      // HTML template
+      const htmlCode = await getHtmlCode(filename, htmlFound[1], styleCode);
       magicString.overwrite(htmlFound.index, htmlFound.index + htmlFound[0].length, htmlCode);
 
       // Add missing import (uHtml)
@@ -118,8 +184,6 @@ export async function inlineTemplate(filename) {
         // Include uHtmlFor if it is used in the template
         magicString.prepend(`import { htmlFor as uHtmlFor } from 'uhtml/keyed';\n`);
       }
-    } catch (error) {
-      console.error(`Error reading HTML file for ${filename}: ${error}`);
     }
   }
 

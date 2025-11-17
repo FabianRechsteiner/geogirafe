@@ -73,16 +73,16 @@ class GirafeResizableElement extends GirafeHTMLElement {
   private initSizeLimits() {
     // If there is a configured minWidth or maxWidth, we have to take care of it
     const css = getComputedStyle(this);
-    const minWidth = parseFloat(css.minWidth);
+    const minWidth = Number.parseFloat(css.minWidth);
     this.minWidth = isNaN(minWidth) ? undefined : minWidth;
 
-    const maxWidth = parseFloat(css.maxWidth);
+    const maxWidth = Number.parseFloat(css.maxWidth);
     this.maxWidth = isNaN(maxWidth) ? undefined : maxWidth;
 
-    const minHeight = parseFloat(css.minHeight);
+    const minHeight = Number.parseFloat(css.minHeight);
     this.minHeight = isNaN(minHeight) ? undefined : minHeight;
 
-    const maxHeight = parseFloat(css.maxHeight);
+    const maxHeight = Number.parseFloat(css.maxHeight);
     this.maxHeight = isNaN(maxHeight) ? undefined : maxHeight;
   }
 
@@ -95,8 +95,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.prevX = e.x;
     this.prevY = e.y;
 
-    this.lastWidth = parseFloat(getComputedStyle(this).width);
-    this.lastHeight = parseFloat(getComputedStyle(this).height);
+    this.lastWidth = Number.parseFloat(getComputedStyle(this).width);
+    this.lastHeight = Number.parseFloat(getComputedStyle(this).height);
   }
 
   private mousemove(e: MouseEvent) {
@@ -117,6 +117,8 @@ class GirafeResizableElement extends GirafeHTMLElement {
     // stop moving when mouse button is released
     document.onmouseup = null;
     document.onmousemove = null;
+    this.lastWidth = Number.parseFloat(getComputedStyle(this).width);
+    this.lastHeight = Number.parseFloat(getComputedStyle(this).height);
     this.dispatchEvent(new CustomEvent('resize-end'));
   }
 

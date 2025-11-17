@@ -14,7 +14,12 @@ import CsvManager from '../../tools/export/csvmanager';
  */
 class SelectionGridComponent extends GirafeResizableElement {
   templateUrl = './template.html';
-  styleUrls = ['../../styles/common.css', './style.css'];
+
+  styleUrls = [
+    '../../styles/common.css',
+    '../../../node_modules/tabulator-tables/dist/css/tabulator.min.css',
+    './style.css'
+  ];
 
   private readonly eventsCallbacks: Callback[] = [];
   private selectionTabulatorManager!: SelectionTabulatorManager;
@@ -23,7 +28,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   private readonly debounceOnFeaturesSelected = debounce(this.onFeaturesSelected.bind(this), 200);
   visible = false;
   currentTabId: string = '';
-  showCsvButton = false;
+  resultsSelected = false;
 
   constructor() {
     super('selectiongrid');
@@ -35,7 +40,7 @@ class SelectionGridComponent extends GirafeResizableElement {
     this.selectionTabulatorManager = new SelectionTabulatorManager(this.context);
 
     this.subscribe('selection.gridSelected', (_oldValue: boolean, newValue: boolean) => {
-      this.showCsvButton = newValue;
+      this.resultsSelected = newValue;
       this.render();
     });
 
@@ -66,7 +71,7 @@ class SelectionGridComponent extends GirafeResizableElement {
    * @returns The current array of TabHeader objects.
    */
   getTabHeaders(): TabHeader[] {
-    return this.selectionTabulatorManager.tabHeaders;
+    return this.selectionTabulatorManager.getTabHeaders();
   }
 
   /**
@@ -89,7 +94,8 @@ class SelectionGridComponent extends GirafeResizableElement {
   closePanel() {
     this.state.interface.selectionComponentVisible = false;
     this.state.selection.selectedFeatures = [];
-    this.showCsvButton = false;
+    this.state.selection.highlightedFeatures = [];
+    this.resultsSelected = false;
     this.state.selection.gridSelected = false;
     super.clean();
   }
@@ -98,23 +104,21 @@ class SelectionGridComponent extends GirafeResizableElement {
    * Selects all rows in the grid.
    */
   selectAll() {
-    this.selectionTabulatorManager.table?.selectRow();
+    this.selectionTabulatorManager.selectAll();
   }
 
   /**
    * Deselects all rows in the grid.
    */
   selectNone() {
-    this.selectionTabulatorManager.table?.deselectRow();
+    this.selectionTabulatorManager.selectNone();
   }
 
   /**
    * Inverts the selection of all rows in the grid.
    */
   invertSelection() {
-    this.selectionTabulatorManager.table?.getRows().forEach((row) => {
-      row.toggleSelect();
-    });
+    this.selectionTabulatorManager.invertSelection();
   }
 
   /**
@@ -122,13 +126,11 @@ class SelectionGridComponent extends GirafeResizableElement {
    */
   zoomToSelection() {
     const extent = olExtent.createEmpty();
-    this.selectionTabulatorManager.table?.getRows().forEach((row) => {
-      if (row.isSelected()) {
-        const data = row.getData();
-        const geometry = data.geom ?? data.the_geom ?? data.geometry;
-        olExtent.extend(extent, geometry.getExtent());
-      }
-    });
+    for (const row of this.selectionTabulatorManager.getSelectedRows()) {
+      const data = row.getData();
+      const geometry = data.geom ?? data.the_geom ?? data.geometry;
+      olExtent.extend(extent, geometry.getExtent());
+    }
     this.context.mapManager.getMap().getView().fit(extent, { duration: 300 });
   }
 
@@ -136,17 +138,11 @@ class SelectionGridComponent extends GirafeResizableElement {
    * Generates a CSV file from the selected rows in the grid.
    */
   generateCSV() {
-    const columns = this.selectionTabulatorManager.data[this.currentTabId].columns.map((column) => {
+    const columnDefs = this.selectionTabulatorManager.getNonGeometryColumnFields().map((column) => {
       return { name: column };
     });
-    const excludedColumns = ['geom', 'the_geom', 'geometry'];
-    const filteredColumns = columns.filter((column) => !excludedColumns.includes(column.name));
 
-    this.csvManager.startDownload(
-      this.selectionTabulatorManager.table?.getSelectedData() ?? [],
-      filteredColumns,
-      'query-results.csv'
-    );
+    this.csvManager.startDownload(this.selectionTabulatorManager.getSelectedData(), columnDefs, 'query-results.csv');
   }
 
   /**
@@ -167,7 +163,7 @@ class SelectionGridComponent extends GirafeResizableElement {
    * @private
    */
   private setupVisibleComponent() {
-    this.showCsvButton = false;
+    this.resultsSelected = false;
     this.state.selection.gridSelected = false;
 
     this.isVisibleComponentSetup = true;
@@ -213,7 +209,7 @@ class SelectionGridComponent extends GirafeResizableElement {
    * @private
    */
   private onFeaturesSelected(features: OlFeature[] | null) {
-    this.selectionTabulatorManager.tabHeaders = [];
+    this.selectionTabulatorManager.clearTabHeaders();
     // No feature ? Close.
     if (this.isNullOrUndefined(features) || features!.length <= 0) {
       this.closePanel();
@@ -221,7 +217,7 @@ class SelectionGridComponent extends GirafeResizableElement {
     }
 
     this.selectionTabulatorManager.featuresToGridData(features!);
-    const tabIds = Object.keys(this.selectionTabulatorManager.idTab);
+    const tabIds = this.selectionTabulatorManager.getTabIds();
 
     //define table element
     this.selectionTabulatorManager.setElement(this.shadow.querySelector('#tabulator') as HTMLElement);
