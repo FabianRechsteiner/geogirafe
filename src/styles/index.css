@@ -95,7 +95,7 @@ girafe-search {
 }
 
 .panel-right {
-  width: 20rem;
+  width: fit-content;
   min-width: 20rem;
   max-width: 40rem;
   border-left: var(--app-standard-border);
