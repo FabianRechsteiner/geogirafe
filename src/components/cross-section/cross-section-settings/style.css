@@ -1,7 +1,7 @@
 #panel {
   height: 100%;
   overflow: auto;
-  min-width: 20rem;
+  min-width: 25rem;
 }
 
 #content {
