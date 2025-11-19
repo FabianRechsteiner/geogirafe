@@ -44,7 +44,7 @@ import ThemeLayer from '../../models/layers/themelayer';
 import { isTimeAwareLayer } from '../../models/layers/timeawarelayer';
 import { debounce } from '../../tools/utils/debounce';
 import SelectionParam from '../../models/selectionparam';
-import { CameraConfig } from '../../tools/state/state';
+import { CameraConfig } from '../../tools/state/globe';
 import CircleStyle from 'ol/style/Circle';
 import { parseCoordinates } from '../../tools/geometrytools';
 import CircleGeom from 'ol/geom/Circle';
@@ -540,6 +540,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.render();
     this.listenOpenLayersEvents();
     this.registerEvents();
+    this.onGlobeToggled();
   }
 
   onCustomGirafeEvent(details: { action: string; layer: Layer; extent: Extent }) {

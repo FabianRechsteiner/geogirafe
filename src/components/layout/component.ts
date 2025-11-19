@@ -17,14 +17,21 @@ class LayoutComponent extends GirafeHTMLElement {
 
   private registerEvents() {
     this.subscribe('interface.layoutPanelVisible', (_oldValue: boolean, newValue: boolean) =>
-      this.togglePanel(newValue)
+      this.onPanelVisibilityChanged(newValue)
     );
-    this.subscribe('globe.display', (_oldValue: string, newValue: string) => this.onLayoutChanged(newValue));
+    this.subscribe('globe.display', (_oldValue: string, newValue: string) =>
+      this.onLayoutChanged(newValue as LayoutType)
+    );
   }
 
-  private togglePanel(visible: boolean) {
+  private onPanelVisibilityChanged(visible: boolean) {
     this.visible = visible;
     this.render();
+    if (visible) {
+      const currentLayout = this.state.globe.display as LayoutType;
+      this.syncLayoutSelect(currentLayout);
+      this.updateShadowsVisibility(currentLayout);
+    }
   }
 
   private onLayoutSelect(event: Event) {
@@ -36,16 +43,28 @@ class LayoutComponent extends GirafeHTMLElement {
     console.error(`${selectedLayout} is not a valid layout!`);
   }
 
-  private onLayoutChanged(globe: string) {
+  private onLayoutChanged(globe: LayoutType) {
+    this.syncLayoutSelect(globe);
     if (this.visible) {
-      const shadowsGroup = this.shadowRoot?.querySelector('.shadows-group') as HTMLElement;
-      const shadowsDate = this.shadowRoot?.querySelector('.shadows-date') as HTMLElement;
-      const shadowsCheckbox = this.shadowRoot?.querySelector('#shadowsCheckbox') as HTMLInputElement;
-      const has3Dlayout = globe === '2D/3D' || globe === '3D';
-
-      shadowsGroup?.classList.toggle('hidden', !has3Dlayout);
-      shadowsDate?.classList.toggle('hidden', !has3Dlayout || !shadowsCheckbox?.checked);
+      this.updateShadowsVisibility(globe);
     }
+  }
+
+  private syncLayoutSelect(layout: LayoutType) {
+    const layoutSelect = this.shadowRoot?.querySelector('#layout') as HTMLSelectElement | null;
+    if (layoutSelect) {
+      layoutSelect.value = layout;
+    }
+  }
+
+  private updateShadowsVisibility(globe: LayoutType) {
+    const shadowsGroup = this.shadowRoot?.querySelector('.shadows-group') as HTMLElement;
+    const shadowsDate = this.shadowRoot?.querySelector('.shadows-date') as HTMLElement;
+    const shadowsCheckbox = this.shadowRoot?.querySelector('#shadowsCheckbox') as HTMLInputElement;
+    const has3Dlayout = globe === '2D/3D' || globe === '3D';
+
+    shadowsGroup?.classList.toggle('hidden', !has3Dlayout);
+    shadowsDate?.classList.toggle('hidden', !has3Dlayout || !shadowsCheckbox?.checked);
   }
 
   private onShadowsToggle(event: Event) {
