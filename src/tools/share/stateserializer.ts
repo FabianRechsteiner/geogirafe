@@ -2,6 +2,7 @@ import LZString from 'lz-string';
 import Basemap from '../../models/basemaps/basemap';
 import MapPositionSerializer from './serializers/mappositionserializer';
 import MapPosition from '../state/mapposition';
+import GlobeState from '../state/globe';
 import LayersConfig from '../state/layersConfig';
 import LayersConfigSerializer from './serializers/layerconfigserializer';
 import ActiveBasemapsSerializer from './serializers/activebasemapsserializer';
@@ -12,6 +13,7 @@ import SelectionSerializer from './serializers/selectionserializer';
 import ObjectSelection from '../state/objectselection';
 import GraphicalInterface from '../state/graphicalInterface';
 import InterfaceSerializer from './serializers/interfaceserializer';
+import GlobeSerializer from './serializers/globeserializer';
 
 class StateSerializer extends GirafeSingleton {
   private readonly brainSerializer = new BrainSerializer<State | ExtendedState>();
@@ -22,6 +24,7 @@ class StateSerializer extends GirafeSingleton {
     this.addSerializer(LayersConfig, new LayersConfigSerializer(this.context));
     this.addSerializer(ObjectSelection, new SelectionSerializer(this.context));
     this.addSerializer(GraphicalInterface, new InterfaceSerializer(this.context));
+    this.addSerializer(GlobeState, new GlobeSerializer(this.context));
   }
 
   public addSerializer(type: Constructor<object>, serializerData: IBrainSerializer<object>): void {

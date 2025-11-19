@@ -1,4 +1,5 @@
 import MapPosition from './mapposition';
+import GlobeState from './globe';
 import type Basemap from '../../models/basemaps/basemap';
 import type ThemeLayer from '../../models/layers/themelayer';
 import type OlGeomLineString from 'ol/geom/LineString';
@@ -29,21 +30,6 @@ type PrintConfig = {
   format: string | null;
   scale: number | null;
   dpi: number | null;
-};
-
-// Current 3D-Globe state
-export type CameraConfig = {
-  heading: number;
-  pitch: number;
-  roll: number;
-};
-
-type GlobeConfig = {
-  display: '2D' | '3D' | '2D/3D';
-  loaded: boolean;
-  shadows: boolean;
-  shadowsTimestamp: number;
-  camera: CameraConfig | null;
 };
 
 export type InfoBoxContent = {
@@ -198,14 +184,7 @@ export default class State {
 
   // Current 3D-Globe state
   @BrainSerialize
-  globe: GlobeConfig = {
-    // Possible values : ['3D, '2D/3D', '2D']
-    display: '2D',
-    loaded: false,
-    shadows: false,
-    shadowsTimestamp: new Date().valueOf(),
-    camera: null
-  };
+  globe: GlobeState = new GlobeState();
 
   // TODO REG : What is this used for?
   // Is it the default theme configured in the user preferences?
