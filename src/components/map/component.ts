@@ -682,11 +682,12 @@ export default class MapComponent extends GirafeHTMLElement {
         Cesium3DTileset.fromUrl(tilesetUrl, tilesetOptions).then((t: Cesium3DTileset) => scene.primitives.add(t));
       });
 
-      const ambientOcclusion = scene.postProcessStages.ambientOcclusion;
-      ambientOcclusion.enabled = true;
-      ambientOcclusion.uniforms.bias = 0.5;
-      ambientOcclusion.uniforms.stepSize = 1;
-      ambientOcclusion.uniforms.blurStepSize = 1;
+      // REG: ambientOcclusion was temporary deactivated because of performance impact and horizontal lines artefacts
+      // const ambientOcclusion = scene.postProcessStages.ambientOcclusion;
+      // ambientOcclusion.enabled = true;
+      // ambientOcclusion.uniforms.bias = 0.5;
+      // ambientOcclusion.uniforms.stepSize = 1;
+      // ambientOcclusion.uniforms.blurStepSize = 1;
 
       this.loading = false;
       this.state.globe.loaded = true;
