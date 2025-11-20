@@ -1,0 +1,8 @@
+{
+  "themes": {
+    "url": "https://map.cjl.ch/themes?background=background&interface=mobile"
+  },
+  "search": {
+    "url": "https://map.cjl.ch/search?limit=30&partitionlimit=5&interface=mobile&query=###SEARCHTERM###"
+  }
+}

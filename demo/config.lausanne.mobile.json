@@ -1,0 +1,8 @@
+{
+  "themes": {
+    "url": "https://map.lausanne.ch/themes?background=background&interface=mobile"
+  },
+  "search": {
+    "url": "https://map.lausanne.ch/search?limit=30&partitionlimit=5&interface=mobile&query=###SEARCHTERM###&lang=fr"
+  }
+}
