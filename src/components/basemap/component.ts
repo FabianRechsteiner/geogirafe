@@ -1,6 +1,5 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Basemap from '../../models/basemaps/basemap';
-import BasemapEmpty from '../../models/basemaps/basemapempty';
 import { applyOpacityToLayers } from '../../tools/utils/utils';
 
 class BasemapComponent extends GirafeHTMLElement {
@@ -14,30 +13,20 @@ class BasemapComponent extends GirafeHTMLElement {
   changeBasemap(basemap: Basemap) {
     if (basemap.opacity == 0) return;
 
-    const basemapProjection = basemap.projection ?? this.context.configManager.Config.map.srid;
-    const hasSameProjection = this.state.projection == basemapProjection;
-    if (!hasSameProjection) {
-      if (this.state.activeBasemaps.length > 0 && !(this.state.activeBasemaps[0] instanceof BasemapEmpty)) {
-        throw new Error(
-          "Can't add a Basemap with a different Projection (" +
-            basemap.projection +
-            ') than existing Basemaps (' +
-            this.state.projection +
-            ').'
-        );
-      }
-    }
-    this.state.projection = basemapProjection;
-
+    const newBasemapProjection = basemap.projection ?? this.context.configManager.Config.map.srid;
     const opacityDisabled = basemap.opacity == -1;
     const activeBasemaps = [...this.state.activeBasemaps];
     if (opacityDisabled) {
+      // Normal basemap change (no opacity basemap)
+      this.state.projection = newBasemapProjection;
       const idx = activeBasemaps.findIndex((activeBasemap: Basemap) => activeBasemap.opacity == -1);
       if (idx >= 0) {
         activeBasemaps.splice(idx, 1);
       }
       activeBasemaps.unshift(basemap);
     } else {
+      // We try to add a basemap with opacity => we do not change the current projection
+      // It should adapt to the main selected basemap
       const idx = activeBasemaps.findIndex((activeBasemap) => activeBasemap.id == basemap.id);
       if (idx > -1) {
         activeBasemaps.splice(idx, 1);
