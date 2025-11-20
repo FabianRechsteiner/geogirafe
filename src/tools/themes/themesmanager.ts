@@ -16,6 +16,7 @@ import BasemapEmpty from '../../models/basemaps/basemapempty';
 import BasemapSwisstopoVectorTiles from '../../models/basemaps/basemapswisstopovectortiles';
 import BasemapOsm from '../../models/basemaps/basemaposm';
 import { DEFAULT_OPACITY, OPACITY_FOR_DEFAULT_BASEMAP } from './themes-config';
+import Layer from '../../models/layers/layer';
 
 class ThemesManager extends GirafeSingleton {
   anonymousUserInfo = { u: 'anonymous' };
@@ -226,8 +227,14 @@ class ThemesManager extends GirafeSingleton {
         const isDefaultBasemap = this.context.configManager.Config.basemaps.defaultBasemap == basemap.name;
         basemap.opacity = isDefaultBasemap ? OPACITY_FOR_DEFAULT_BASEMAP : DEFAULT_OPACITY;
         for (const basemapLayer of basemap.layersList) {
-          if (Object.keys(basemapLayer).includes('opacity')) {
-            (basemapLayer as unknown as { opacity: number }).opacity = basemap.opacity;
+          if (basemapLayer instanceof LayerVectorTiles) {
+            // Vector tiles layers are not supported as opacitybasemap, because the tiles cannot reprojected on the fly
+            // And displaying a basemap from some SRID with an VT from another SRID won't work
+            // So for the moment we do not allow VT configured as opacitybasemaps
+            // (But the opposite will still work : a VT basemap with a WMTS opacitybasemap)
+          }
+          if (basemapLayer instanceof Layer) {
+            basemapLayer.opacity = basemap.opacity;
           }
         }
       }
