@@ -1,7 +1,6 @@
 import type OlFeature from 'ol/Feature';
 import OlGeomGeometry from 'ol/geom/Geometry';
 import FeatureToGridDataById, { GridData, GridDataById } from '../../../tools/featuretogriddatabyid';
-import FormatGridGeomValue from './formatgridgeomvalue';
 import { ColumnDefinition, RowComponent, TabulatorFull as Tabulator } from 'tabulator-tables';
 import { getUid } from 'ol/util';
 import ColumnAliasHelper from '../../../tools/utils/aliases';
@@ -36,7 +35,6 @@ export interface TabContent {
 const geometryColumns = new Set<string>(['geom', 'the_geom', 'geometry']);
 
 export default class SelectionTabulatorManager {
-  private readonly formatGridGeomValue: FormatGridGeomValue;
   private readonly featureToGridData: FeatureToGridDataById;
   private idTab: Record<string, TabContent> = {};
   private tabHeaders: TabHeader[] = [];
@@ -49,10 +47,6 @@ export default class SelectionTabulatorManager {
   constructor(context: IGirafeContext) {
     this.context = context;
     this.columnAliasHelper = new ColumnAliasHelper(context.stateManager);
-    this.formatGridGeomValue = new FormatGridGeomValue(
-      this.context.configManager.Config.general.locale,
-      this.context.stateManager.state.projection
-    );
     this.featureToGridData = new FeatureToGridDataById({ keepGeomProperty: true });
   }
 
@@ -166,7 +160,7 @@ export default class SelectionTabulatorManager {
     }
     this.idTab[id] = {
       columns: gridData.columns.map((column) => this.createGridColumn(id, column)),
-      data: gridData.data.map((data) => this.createGridData(data)),
+      data: gridData.data,
       features: gridData.features
     };
   }
@@ -174,6 +168,9 @@ export default class SelectionTabulatorManager {
   columnsToGridColumns(idTable: string, columns: string[]): ColumnDefinition[] {
     const columnDefinition: ColumnDefinition[] = [];
     for (const column of columns) {
+      if (geometryColumns.has(column)) {
+        continue;
+      }
       const columnAlias = this.columnAliasHelper.getColumnAlias(idTable, column);
       columnDefinition.push({
         title: this.context.i18nManager.getTranslation(columnAlias),
@@ -181,14 +178,6 @@ export default class SelectionTabulatorManager {
         formatter: 'html',
         sorter: 'string'
       });
-    }
-
-    for (const column of columnDefinition) {
-      if (column.field && geometryColumns.has(column.field)) {
-        column.formatter = (cell) => {
-          return this.formatGridGeomValue.getGeometryIcons(cell.getValue()) ?? cell.getValue();
-        };
-      }
     }
 
     return columnDefinition;
@@ -221,17 +210,6 @@ export default class SelectionTabulatorManager {
     };
   }
 
-  /**
-   * Creates grid data by mapping values (simple values, or transformed values in case of HTML).
-   * @returns The grid data array.
-   * @private
-   */
-  private createGridData(values: unknown[]): unknown[] {
-    return values.map((value) =>
-      value instanceof OlGeomGeometry ? this.formatGridGeomValue.getGeometryIcons(value) : value
-    );
-  }
-
   blockRedraw(): void {
     this.table?.blockRedraw();
   }
@@ -262,13 +240,8 @@ export default class SelectionTabulatorManager {
     return this.table?.getSelectedData() ?? [];
   }
 
-  getNonGeometryColumnFields(): string[] {
-    return (
-      this.table
-        ?.getColumns(false)
-        .map((columnComponent) => columnComponent.getField())
-        .filter((column) => !geometryColumns.has(column)) ?? []
-    );
+  getColumnFields(): string[] {
+    return this.table?.getColumns(false).map((columnComponent) => columnComponent.getField()) ?? [];
   }
 
   getTabHeaders(): TabHeader[] {
