@@ -36,6 +36,7 @@ export type InfoBoxContent = {
   id: string;
   text: string;
   type: 'info' | 'warning' | 'error';
+  duration?: number;
 };
 
 export type Lidar = {
