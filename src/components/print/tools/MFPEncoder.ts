@@ -1,5 +1,5 @@
-import type { BaseCustomizer, MFPLayer, MFPImageLayer, MFPMap, MFPWmtsLayer } from '@geoblocks/mapfishprint';
-import type GroupLayer from '../../../models/layers/grouplayer';
+import type { BaseCustomizer, MFPLayer, MFPMap, MFPWmtsLayer, MFPWmsLayer } from '@geoblocks/mapfishprint';
+import GroupLayer from '../../../models/layers/grouplayer';
 import type BaseLayer from '../../../models/layers/baselayer';
 import MapManager from '../../../tools/state/mapManager';
 import State from '../../../tools/state/state';
@@ -81,9 +81,17 @@ export default class MFPEncoder {
    */
   getFlatLayers(baseLayers: BaseLayer[]): BaseLayer[] {
     return baseLayers.reduce((layers, layer) => {
-      if ((layer as GroupLayer).children) {
-        const resultLayers = this.getFlatLayers((layer as GroupLayer).children);
-        layers.push(...resultLayers);
+      const children = (layer as GroupLayer).children;
+      if (children) {
+        const group = layer as GroupLayer;
+        // If all the children have the same ogcServer and the group
+        // has no grandchildren, we keep the layers together
+        if (group.isMixed === false && group.hasGrandChildren === false) {
+          layers.push(group);
+        } else {
+          const resultLayers = this.getFlatLayers(group.children);
+          layers.push(...resultLayers);
+        }
       } else {
         layers.push(layer);
       }
@@ -117,7 +125,7 @@ export default class MFPEncoder {
    * @returns a list of Mapfish print layer specs for the given layers.
    */
   encodeLayers(baseLayers: BaseLayer[]): MFPLayer[] {
-    const mfpLayers = [];
+    const mfpLayers: MFPLayer[] = [];
     for (const layer of baseLayers) {
       const spec = this.encodeLayer(layer);
       if (spec) {
@@ -136,23 +144,54 @@ export default class MFPEncoder {
    * @returns A promise that resolves to an array of MFP layers, a single MFP layer, or null.
    */
   encodeLayer(layer: BaseLayer): MFPLayer[] | MFPLayer | null {
-    if (layer.className === LayerWms.name) {
-      return this.encodeImageLayer(layer as LayerWms);
+    switch (layer.className) {
+      case GroupLayer.name:
+        return this.encodeGroupLayer(layer as GroupLayer);
+      case LayerWms.name:
+        return this.encodeWmsLayer(layer as LayerWms);
+      case LayerWmts.name:
+        return this.encodeTileWmtsLayer(layer as LayerWmts);
+      case LayerLocalFile.name:
+        return this.encodeLocalFileLayer(layer as LayerLocalFile);
+      default:
+        console.warn('Unsupported layer type for encoding:', layer.className);
+        return null;
     }
-    if (layer.className === LayerWmts.name) {
-      return this.encodeTileWmtsLayer(layer as LayerWmts);
+  }
+
+  /**
+   * Only non mixed groups of WMS layers are supported.
+   *
+   * Will convert a group of WMS layers sharing the same OGC server into a single MFPWmsLayer
+   * where its 'layers' property is a concatenation of all child layers' 'layers' property.
+   *
+   * @param groupLayer
+   */
+  encodeGroupLayer(groupLayer: GroupLayer): MFPWmsLayer | null {
+    if (groupLayer.isMixed) {
+      console.error("A mixed group layer is passed to print and shouldn't", groupLayer);
+      return null;
     }
-    if (layer.className === LayerLocalFile.name) {
-      return this.encodeLocalFileLayer(layer as LayerLocalFile);
+    if (groupLayer.hasGrandChildren) {
+      console.error("A group layer that has grandchildren is passed to print and shouldn't", groupLayer);
+      return null;
     }
-    return null;
+    const firstWmsLayer = groupLayer.children.shift() as LayerWms;
+    const spec = this.encodeWmsLayer(firstWmsLayer);
+    if (!spec) {
+      return this.encodeGroupLayer(groupLayer);
+    }
+    for (const childLayer of groupLayer.children as LayerWms[]) {
+      spec.layers.push(childLayer.layers || '');
+    }
+    return spec;
   }
 
   /**
    * Encodes an image layer from a WMS layer object.
    * @returns The encoded image layer or null if the layer is not visible.
    */
-  encodeImageLayer(layerWms: LayerWms): MFPImageLayer | null {
+  encodeWmsLayer(layerWms: LayerWms): MFPWmsLayer | null {
     if (!isLayerVisible(layerWms, this.options?.printResolution)) {
       return null;
     }
@@ -195,14 +234,14 @@ export default class MFPEncoder {
       useNativeAngle: layerWms.printNativeAngle,
       styles: styles
     };
-    return object as unknown as MFPImageLayer;
+    return object as unknown as MFPWmsLayer;
   }
 
   /**
-   * Encodes a WMTS layer into a MFPWmtsLayer or MFPImageLayer object.
+   * Encodes a WMTS layer into a MFPWmtsLayer or MFPWmsLayer object.
    * @returns The encoded layer object, or null if the layer is not visible.
    */
-  encodeTileWmtsLayer(layerWmts: LayerWmts): MFPWmtsLayer | MFPImageLayer | null {
+  encodeTileWmtsLayer(layerWmts: LayerWmts): MFPWmtsLayer | MFPWmsLayer | null {
     if (!isLayerVisible(layerWmts, this.options?.printResolution)) {
       return null;
     }
@@ -267,7 +306,7 @@ export default class MFPEncoder {
    * Encodes a WMS layer from a WMTS layer.
    * @returns The encoded WMS layer or null if the ogcServer is missing.
    */
-  encodeWmsFromWmtsLayer(layerWmts: LayerWmts): MFPImageLayer | null {
+  encodeWmsFromWmtsLayer(layerWmts: LayerWmts): MFPWmsLayer | null {
     if (!layerWmts.ogcServer) {
       console.error('Missing ogcServer');
       return null;
@@ -276,6 +315,6 @@ export default class MFPEncoder {
     const printLayers = layerWmts.printLayers ?? layerWmts.wmsLayers ?? '';
     const layerWms = new LayerWms(0, printLayers, 0, layerWmts.ogcServer, { layers: printLayers });
     layerWms.opacity = layerWmts.opacity;
-    return this.encodeImageLayer(layerWms);
+    return this.encodeWmsLayer(layerWms);
   }
 }

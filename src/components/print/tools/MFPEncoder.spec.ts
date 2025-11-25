@@ -68,11 +68,21 @@ describe('MFPEncoder', () => {
       groupLayers[2].children = [layers[3], groupLayers[0]];
       groupLayers[3].children = [groupLayers[1], groupLayers[2]];
       topLevelGroup = [groupLayers[3]];
+      // Structure:
+      // topLevelGroup
+      //  └─ groupLayers[3]
+      //      ├─ groupLayers[1]
+      //      │   └─ layers[2] (wms-2)
+      //      └─ groupLayers[2]
+      //          ├─ layers[3] (wmts)
+      //          └─ groupLayers[0]
+      //              ├─ layers[0] (wms-0)
+      //              └─ layers[1] (wms-1)
     });
 
     it('getFlatLayersGroupLayers', () => {
       const result = encoder.getFlatLayers(topLevelGroup);
-      expect(result.length).toBe(4); // 4 wms layers
+      expect(result.length).toBe(4);
     });
 
     it('encode the map', () => {
@@ -99,23 +109,23 @@ describe('MFPEncoder', () => {
       expect(result.dpi).toBe(defaultOptions.dpi);
       expect(result.scale).toBe(defaultOptions.scale);
       expect(result.rotation).toBe(180);
-      expect(result.layers.length).toBe(6);
+      expect(result.layers.length).toBe(5);
       // Test order
       expect(result.layers[0].name).toBe('Test Vector layer');
-      expect(result.layers[5].name).toBe('basemap-below');
+      expect(result.layers[4].name).toBe('basemap-below');
     });
   });
 
-  describe('encodeImageLayer method', () => {
+  describe('encodeWmsLayer method', () => {
     it('should return null for not visible layer', () => {
       const layer = createTestLayerWms({ opacity: 0 });
-      const result = encoder.encodeImageLayer(layer);
+      const result = encoder.encodeWmsLayer(layer);
       expect(result).toEqual(null);
     });
 
     it('should encode a wms layer', () => {
       const layer = createTestLayerWms({ layers: 'tree,plant', opacity: 0.6 });
-      const result = encoder.encodeImageLayer(layer);
+      const result = encoder.encodeWmsLayer(layer);
       expect(result).toEqual({
         baseURL: 'https://ogc.test.url/',
         customParams: {
@@ -126,6 +136,33 @@ describe('MFPEncoder', () => {
         opacity: 0.6,
         serverType: undefined,
         styles: ['', ''],
+        type: 'wms',
+        useNativeAngle: undefined
+      });
+    });
+  });
+
+  describe('encodeGroupLayer with same ogcServer', () => {
+    it('should encode a group layer', () => {
+      const ogcServer = createTestOgcServer();
+      context.stateManager.state.ogcServers = { [ogcServer.name]: ogcServer };
+      const layer1 = createTestLayerWms({ layers: 'tree', opacity: 0.6 });
+      const layer2 = createTestLayerWms({ layers: 'plant', opacity: 0.6 });
+      layer1.ogcServer = ogcServer;
+      layer2.ogcServer = ogcServer;
+      const groupLayer = createTestGroupLayer();
+      groupLayer.children = [layer1, layer2];
+      const result = encoder.encodeGroupLayer(groupLayer);
+      expect(result).toEqual({
+        baseURL: 'https://ogc.test.url/',
+        customParams: {
+          TRANSPARENT: 'TRUE'
+        },
+        imageFormat: 'image/png',
+        layers: ['tree', 'plant'],
+        opacity: 0.6,
+        serverType: 'mapserver',
+        styles: [''],
         type: 'wms',
         useNativeAngle: undefined
       });
