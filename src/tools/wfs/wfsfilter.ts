@@ -44,7 +44,7 @@ export const mapAttributeTypeToFilterOperators: Record<'string' | 'number' | 'da
 const BeginningOfTime = '0001-01-01';
 const EndOfTime = '9999-12-31';
 
-export class WfsFilter<WfsXmlTypes extends XmlTypes = XmlTypes> {
+class WfsFilter<WfsXmlTypes extends XmlTypes = XmlTypes> {
   property: string;
   propertyType?: WfsXmlTypes;
   operator: WfsOperator;
