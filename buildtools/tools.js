@@ -200,3 +200,70 @@ export async function inlineTemplate(filename) {
     map: sourcemap.toString()
   };
 }
+
+export function extractDefaultExportTypeName(code) {
+  const regex = /(?:^|\n)\s*export\s+default\s+(interface|type|enum)\s+(\w+)/;
+  const match = code.match(regex);
+  if (match) {
+    return match[2];
+  }
+  return null;
+}
+
+export function extractDefaultExportValueName(code) {
+  const regex = /(?:^|\n)\s*export\s+default\s+(?:async\s+)?(?:abstract\s+)?(class|function|const)\s+(\w+)/;
+  const match = code.match(regex);
+  if (match) {
+    return match[2];
+  }
+  return null;
+}
+
+export function extractDefaultGlobalExportName(code) {
+  let regex = /(?:^|\n)\s*export\s+default\s+(?!async|abstract|class|function|const|interface|type|enum\b)(\w+)/;
+  let match = code.match(regex);
+  if (match) {
+    const name = match[1];
+    regex = new RegExp(`\\b(class|function|const|interface|type|enum)\\s+${name}\\b`);
+    match = code.match(regex);
+    if (!match) {
+      throw new Error(`Cannot export : Unable to identify the object type of ${name}`);
+    }
+
+    const objectType = match[0].split(' ')[0].trim();
+    return {
+      objectType: objectType,
+      objectName: name
+    };
+  }
+
+  // No default export found
+  return null;
+}
+
+export function extractNotDefaultExportTypeNames(code) {
+  const regex = /(?:^|\n)\s*export\s+(?!default\b)(interface|type|enum)\s+(\w+)/g;
+  const exportNames = [];
+  const matches = code.matchAll(regex);
+  for (const match of matches) {
+    exportNames.push(match[2]);
+  }
+  return exportNames;
+}
+
+export function extractNotDefaultExportValueNames(code) {
+  const exportNames = [];
+
+  let regex = /(?:^|\n)\s*export\s+(?!default\b)(?:async\s+)?(?:abstract\s+)?(class|function|const)\s+(\w+)/g;
+  let matches = code.matchAll(regex);
+  for (const match of matches) {
+    exportNames.push(match[2]);
+  }
+
+  regex = /(?:^|\n)\s*export\s+(?!default\b)(?!abstract|async|class|function|const|interface|type|enum\b)(\w+)/g;
+  matches = code.matchAll(regex);
+  for (const match of matches) {
+    exportNames.push(match[1]);
+  }
+  return exportNames;
+}

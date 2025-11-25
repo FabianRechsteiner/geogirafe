@@ -1,7 +1,7 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import LayerWms from '../../models/layers/layerwms';
 import { LayerAttribute } from '../../models/serverwfs';
-import { mapAttributeTypeToFilterOperators, WfsFilter, WfsOperator } from '../../tools/wfs/wfsfilter';
+import WfsFilter, { mapAttributeTypeToFilterOperators, WfsOperator } from '../../tools/wfs/wfsfilter';
 import { isString, isNumber, isDate } from '../../models/xmlTypes';
 import IGirafeContext from '../../tools/context/icontext';
 

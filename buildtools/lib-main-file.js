@@ -1,19 +1,67 @@
 import fs from 'node:fs';
 import path from 'path';
-import { findFilesRecursive } from './tools.js';
+import {
+  extractDefaultGlobalExportName,
+  extractDefaultExportTypeName,
+  extractDefaultExportValueName,
+  extractNotDefaultExportTypeNames,
+  extractNotDefaultExportValueNames,
+  findFilesRecursive
+} from './tools.js';
 
-const extractClassName = (filePath) => {
-  const content = fs.readFileSync(filePath, 'utf-8');
+function generateValueExports(code) {
+  const exports = [];
 
-  const classMatch = content.match(/class\s+([A-Z]\w+)\s/);
-
-  if (!classMatch) {
-    console.log(`Class definition not found in ${filePath}`);
+  // Default global export
+  const defaultExport = extractDefaultGlobalExportName(code);
+  if (defaultExport) {
+    if (['class', 'function', 'const'].includes(defaultExport.objectType)) {
+      exports.push(`default as ${defaultExport.objectName}`);
+    }
   }
-  return classMatch ? classMatch[1] : null;
-};
 
-const generateExportStatements = (mainFilePath, componentsPath) => {
+  // Default export
+  const defaultExportName = extractDefaultExportValueName(code);
+  if (defaultExportName) {
+    exports.push(`default as ${defaultExportName}`);
+  }
+
+  // Manage all non-default exports
+  const exportNames = extractNotDefaultExportValueNames(code);
+  for (const exportName of exportNames) {
+    exports.push(exportName);
+  }
+
+  return exports;
+}
+
+function generateTypeExports(code) {
+  const exports = [];
+
+  // Default global export
+  const defaultExport = extractDefaultGlobalExportName(code);
+  if (defaultExport) {
+    if (['type', 'interface'].includes(defaultExport.objectType)) {
+      exports.push(`default as ${defaultExport.objectName}`);
+    }
+  }
+
+  // Default export
+  const defaultExportTypeName = extractDefaultExportTypeName(code);
+  if (defaultExportTypeName) {
+    exports.push(`default as ${defaultExportTypeName}`);
+  }
+
+  // Non-Default exports
+  const typeExportNames = extractNotDefaultExportTypeNames(code);
+  for (const exportName of typeExportNames) {
+    exports.push(exportName);
+  }
+
+  return exports;
+}
+
+function generateExportStatements(mainFilePath, componentsPath) {
   const exportStatements = [];
 
   for (const filePath of componentsPath) {
@@ -21,34 +69,41 @@ const generateExportStatements = (mainFilePath, componentsPath) => {
       // Do not manage test files
       continue;
     }
-    console.log(`Handling ${filePath}`);
-    const className = extractClassName(filePath);
-    if (className) {
-      const relativePath = path.relative(mainFilePath, filePath);
 
-      // Convert backslashes to forward slashes
-      // Remove .js/.ts suffixs
-      const cleanPath = relativePath
-        .replace(/\\/g, '/')
-        .replace('../', './')
-        .replace(/\.[tj]s$/, '');
+    console.log(`Generating exports for ${filePath}`);
 
-      exportStatements.push(`export { default as ${className} } from '${cleanPath}';`);
+    const relativePath = path.relative(mainFilePath, filePath);
+    // Convert backslashes to forward slashes, remove .js/.ts suffixs
+    const cleanPath = relativePath
+      .replace(/\\/g, '/')
+      .replace('../', './')
+      .replace(/\.[tj]s$/, '');
+
+    const code = fs.readFileSync(filePath, 'utf-8');
+    const valueExports = generateValueExports(code);
+    const typeExports = generateTypeExports(code);
+
+    if (typeExports.length > 0) {
+      console.log(`  - Type exports: ${typeExports.join(', ')}`);
+      exportStatements.push(`export type { ${typeExports.join(', ')} } from '${cleanPath}';`);
+    }
+    if (valueExports.length > 0) {
+      console.log(`  - Value exports: ${valueExports.join(', ')}`);
+      exportStatements.push(`export { ${valueExports.join(', ')} } from '${cleanPath}';`);
     }
   }
 
   const outputFileContent = exportStatements.join('\n');
-
   const newFilePath = mainFilePath.replace('src', path.join('dist', 'lib-src-inline'));
-
   fs.writeFileSync(newFilePath, outputFileContent);
-};
+}
 
 // base main.ts
 const basePath = path.resolve('src', 'base');
 const fileListBase = findFilesRecursive(basePath, ['.ts', '.js']);
+const fileListBaseFilter = fileListBase.filter((filepath) => !filepath.match(/.*(test|\.spec).*/i));
 const mainBasePath = path.join(basePath, 'main.ts');
-generateExportStatements(mainBasePath, fileListBase);
+generateExportStatements(mainBasePath, fileListBaseFilter);
 
 // components main.ts
 const componentPath = path.resolve('src', 'components');
@@ -64,9 +119,16 @@ const fileListToolsFilter = fileListTools.filter((filepath) => !filepath.match(/
 const mainToolsPath = path.join(toolsPath, 'main.ts');
 generateExportStatements(mainToolsPath, fileListToolsFilter);
 
-//models main.ts
+// models main.ts
 const modelsPath = path.resolve('src', 'models');
 const fileListModels = findFilesRecursive(modelsPath, ['.ts', '.js']);
 const fileListModelsFilter = fileListModels.filter((filepath) => !filepath.match(/.*(test|\.spec).*/i));
 const mainModelsPath = path.join(modelsPath, 'main.ts');
 generateExportStatements(mainModelsPath, fileListModelsFilter);
+
+// api main.ts
+const apiPath = path.resolve('src', 'api');
+const fileListApi = findFilesRecursive(apiPath, ['.ts', '.js']);
+const fileListApiFilter = fileListApi.filter((filepath) => !filepath.match(/.*(test|\.spec).*/i));
+const mainApiPath = path.join(apiPath, 'main.ts');
+generateExportStatements(mainApiPath, fileListApiFilter);

@@ -7,6 +7,7 @@ const filecontent = `/// <reference path="./components/main.d.ts" />
 /// <reference path="./base/main.d.ts" />
 /// <reference path="./models/main.d.ts" />
 /// <reference path="./tools/main.d.ts" />
+/// <reference path="./api/main.d.ts" />
 /// <reference path="./decs.d.ts" />
   `;
 const filepath = path.resolve('dist', 'lib', 'main.d.ts');
@@ -43,7 +44,6 @@ sourceDir = path.join('dist', 'lib-src-inline');
 targetDir = path.join('dist', 'lib');
 copy('typings', sourceDir, targetDir);
 copy('decs.d.ts', sourceDir, targetDir);
-copy('main.d.ts', sourceDir, targetDir);
 
 // Copy assets
 console.info(`Copying the Assets...`);
@@ -61,6 +61,11 @@ for (const filepath of fileList) {
   targetDir = sourceDir.replace('src', path.join('dist', 'lib'));
   copy(filename, sourceDir, targetDir);
 }
+
+// Copy oauth ressources
+sourceDir = path.join('src', 'tools', 'auth');
+targetDir = path.join('dist', 'lib', 'tools', 'auth');
+copy('silentlogincallback.html', sourceDir, targetDir);
 
 // Remove temporary build directory
 deleteDirectory('./dist/lib-src-inline');
