@@ -338,6 +338,7 @@ class ThemesManager extends GirafeSingleton {
       disclaimer: elem.metadata?.disclaimer,
       isDefaultExpanded: elem.metadata?.isExpanded,
       isExclusiveGroup: elem.metadata?.exclusiveGroup,
+      isMixed: elem.mixed,
       time: elem.time
     };
     if (options.metadataUrl) {

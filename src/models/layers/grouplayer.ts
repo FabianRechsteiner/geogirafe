@@ -2,6 +2,7 @@ import BaseLayer from './baselayer';
 import ILayerWithTime from './ilayerwithtime';
 import ITimeOptions from '../../tools/time/itimeoptions';
 import LayerTimeFormatter from '../../tools/time/layertimeformatter';
+import LayerWms from './layerwms';
 
 export type GroupLayerOptions = {
   isDefaultChecked?: boolean;
@@ -9,6 +10,7 @@ export type GroupLayerOptions = {
   metadataUrl?: string;
   isDefaultExpanded?: boolean;
   isExclusiveGroup?: boolean;
+  isMixed?: boolean;
   time?: ITimeOptions;
   timeAttribute?: string;
 };
@@ -24,6 +26,7 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
 
   public isExclusiveGroup: boolean;
   public isExpanded: boolean;
+  public _isMixed?: boolean;
   public activeState: 'on' | 'off' | 'semi' = 'off';
 
   public timeOptions?: ITimeOptions;
@@ -36,6 +39,7 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
     super(id, name, order, options);
     this.isExpanded = options?.isDefaultExpanded || false;
     this.isExclusiveGroup = options?.isExclusiveGroup ?? false;
+    this._isMixed = options?.isMixed;
     this.timeOptions = options?.time;
     this.timeAttribute = options?.timeAttribute;
 
@@ -49,6 +53,7 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
       disclaimer: this.disclaimer,
       isDefaultExpanded: this.isExpanded,
       isExclusiveGroup: this.isExclusiveGroup,
+      isMixed: this._isMixed,
       time: this.timeOptions,
       timeAttribute: this.timeAttribute
     };
@@ -82,11 +87,69 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
     return !!this.timeRestriction;
   }
 
+  get hasGrandChildren(): boolean {
+    for (const child of this.children) {
+      if ((child as GroupLayer).children?.length) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   setDefaultTimeRestriction() {
     if (this.timeOptions) {
       const timeFormatter = new LayerTimeFormatter(this.timeOptions);
       this.timeRestriction = timeFormatter.getFormattedDefault();
     }
+  }
+
+  /**
+   * Checks if all the children are LayerWms with the same ogcServer, opacity
+   * time
+   */
+  get isMixed(): boolean {
+    // It was explicitly set to true, it can't be unmixed
+    if (this._isMixed) {
+      return this._isMixed;
+    }
+
+    // If any child is not a GroupLayer or LayerWms, return true immediately
+    for (const child of this.children) {
+      if (!(child instanceof GroupLayer) && !(child instanceof LayerWms)) {
+        return true;
+      }
+    }
+
+    // Collect all LayerWms children and grandchildren recursively
+    const layerWmsList: LayerWms[] = [];
+    function collectLayerWms(layer: BaseLayer) {
+      if (layer instanceof LayerWms) {
+        layerWmsList.push(layer);
+      } else if (layer instanceof GroupLayer) {
+        for (const child of layer.children) {
+          collectLayerWms(child);
+        }
+      }
+    }
+    for (const child of this.children) {
+      collectLayerWms(child);
+    }
+
+    // Check if all LayerWms have the same properties
+    if (layerWmsList.length > 0) {
+      const first = layerWmsList[0];
+      const allSame = layerWmsList.every(
+        (lw) =>
+          lw.opacity === first.opacity &&
+          lw.ogcServer === first.ogcServer &&
+          lw.filter === first.filter &&
+          lw.timeRestriction === first.timeRestriction
+      );
+      if (allSame) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 

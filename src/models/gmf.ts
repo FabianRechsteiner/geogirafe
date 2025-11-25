@@ -42,6 +42,7 @@ export interface GMFTreeItem {
   id: number;
   name: string;
   metadata?: GMFMetadata;
+  mixed?: boolean;
   ogcServer?: string;
   children?: GMFTreeItem[];
   type?: 'OSM' | 'WMS' | 'WMTS' | 'VectorTiles' | 'COG' | 'XYZ';

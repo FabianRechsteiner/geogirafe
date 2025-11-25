@@ -237,6 +237,8 @@ export default abstract class WmsClient {
 
     const isBasemapLayer = layerWms.treeItemId in this.basemapLayers;
     const isLayerIndependent = layerWms.treeItemId in this.independentLayers;
+    // TODO SMS: if all layers share the same opacity, then mustBeIndependent can be false even if isTransparent is true.
+    // This will be changed in the future.
     const mustBeIndependent =
       layerWms.hasFilter || layerWms.hasTimeRestriction || layerWms.isTransparent || layerWms.swiped !== 'no';
 
