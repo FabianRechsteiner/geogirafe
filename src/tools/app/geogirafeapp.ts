@@ -47,7 +47,7 @@ import { ShareState, ShareStateSerializer } from '../../components/share/sharest
 export default class GeoGirafeApp {
   private readonly readyPromise: Promise<void>;
   private resolveReady!: (value: void | PromiseLike<void>) => void;
-  private mainComponent!: GeoGirafeAppComponent;
+  protected mainComponent!: GeoGirafeAppComponent;
   private readonly isIframe: boolean;
 
   protected get context() {
