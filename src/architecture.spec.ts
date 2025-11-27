@@ -637,3 +637,27 @@ describe('Manage User Interactions', () => {
     }
   });
 });
+
+describe('Session management', () => {
+  it('empty href should not break session management', async () => {
+    const parentPath = path.join(__dirname, 'components');
+    const htmlFiles = getAllHtmlFiles(parentPath);
+
+    const errors: string[] = [];
+    for (const htmlFile of htmlFiles) {
+      let code = fs.readFileSync(htmlFile, 'utf8');
+      const regex = /href="#/;
+      const match = code.match(regex);
+      if (match) {
+        errors.push(
+          `${htmlFile}: Using href="#" will break the session management. Please use href="javascript:void(0)" instead.`
+        );
+      }
+    }
+
+    // Raise exception if any error was found
+    if (errors.length > 0) {
+      throw new Error(errors.join('\n'));
+    }
+  });
+});
