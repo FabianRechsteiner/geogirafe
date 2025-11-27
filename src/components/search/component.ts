@@ -199,7 +199,7 @@ class SearchComponent extends GirafeHTMLElement {
     }
   }
 
-  private async fetchSearch(term: string): Promise<AllSearchResults> {
+  protected async fetchSearch(term: string): Promise<AllSearchResults> {
     const url = this.context.configManager.Config.search.url
       .replace(this.searchTermPlaceholder, term)
       .replace(this.searchLangPlaceholder, this.state.language as string);
@@ -271,11 +271,11 @@ class SearchComponent extends GirafeHTMLElement {
       if (result.properties) {
         if (result.properties.layer_name) {
           type = result.properties.layer_name;
-        } else if (result.properties.actions[0].action === 'add_theme') {
+        } else if (result.properties.actions[0].action.startsWith('add_theme')) {
           type = 'add_theme';
-        } else if (result.properties.actions[0].action === 'add_group') {
+        } else if (result.properties.actions[0].action.startsWith('add_group')) {
           type = 'add_group';
-        } else if (result.properties.actions[0].action === 'add_layer') {
+        } else if (result.properties.actions[0].action.startsWith('add_layer')) {
           type = 'add_layer';
         }
       }
@@ -354,7 +354,7 @@ class SearchComponent extends GirafeHTMLElement {
       }
     }
     const firstAction = result.properties?.actions?.[0];
-    if (firstAction?.action === 'add_layer' && this.context.configManager.Config.search.layerPreview) {
+    if (firstAction?.action.startsWith('add_layer') && this.context.configManager.Config.search.layerPreview) {
       const layer = this.context.themesHelper.findLayerByName(firstAction.data);
       if (layer) {
         const clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(layer);
@@ -442,27 +442,34 @@ class SearchComponent extends GirafeHTMLElement {
 
   private addResultToTreeView(result: SearchResult) {
     let clonedTheme: ThemeLayer | undefined;
-    if (result.properties?.actions[0].action === 'add_theme') {
-      const theme = this.context.themesHelper.findThemeByName(result.properties?.actions[0].data);
+    if (!result.properties || result.properties.actions.length === 0) {
+      // Nothing to add
+      return;
+    }
+
+    let activate = false;
+    if (result.properties.actions[0].action.startsWith('add_theme')) {
+      const theme = this.context.themesHelper.findThemeByName(result.properties.actions[0].data);
       if (theme) {
         clonedTheme = theme.clone();
       }
-    } else if (result.properties?.actions[0].action === 'add_group') {
-      const group = this.context.themesHelper.findGroupByName(result.properties?.actions[0].data);
+    } else if (result.properties.actions[0].action.startsWith('add_group')) {
+      const group = this.context.themesHelper.findGroupByName(result.properties.actions[0].data);
       if (group) {
         clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(group);
       }
-    } else if (result.properties?.actions[0].action === 'add_layer') {
-      const layer = this.context.themesHelper.findLayerByName(result.properties?.actions[0].data);
+    } else if (result.properties.actions[0].action.startsWith('add_layer')) {
+      const layer = this.context.themesHelper.findLayerByName(result.properties.actions[0].data);
       if (layer) {
         clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(layer);
+        activate = true;
       }
     } else {
       console.warn('Unsupported result type');
     }
 
     if (clonedTheme) {
-      this.context.themesHelper.mergeThemeInLayerTree(clonedTheme);
+      this.context.themesHelper.mergeThemeInLayerTree(clonedTheme, activate);
     }
   }
 
