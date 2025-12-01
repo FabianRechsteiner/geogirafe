@@ -67,7 +67,7 @@ class LRPanelComponent extends GirafeResizableElement {
       }
     }
 
-    return StateToggleManager.filterValidTogglePaths(this.context.stateManager, togglePaths);
+    return togglePaths;
   }
 
   /**

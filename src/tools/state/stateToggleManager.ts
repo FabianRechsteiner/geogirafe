@@ -11,12 +11,11 @@ import { getPropertyByPath, setPropertyByPath } from '../utils/pathUtils';
 export default class StateToggleManager {
   private readonly eventsCallbacks: Callback[] = [];
   private togglePaths: string[];
+  private readonly stateManager: StateManager;
 
-  constructor(
-    togglePaths: string[],
-    private stateManager: StateManager
-  ) {
-    this.togglePaths = StateToggleManager.filterValidTogglePaths(this.stateManager, togglePaths);
+  constructor(togglePaths: string[], stateManager: StateManager) {
+    this.togglePaths = togglePaths;
+    this.stateManager = stateManager;
     this.initToggle();
     this.watchToggle();
   }
@@ -87,22 +86,6 @@ export default class StateToggleManager {
           }
         })
       );
-    });
-  }
-
-  /**
-   * Filters out invalid toggle paths from the given array of paths.
-   * Invalid path are path not leading to object in the state, or not leading to boolean value.
-   * @static
-   */
-  static filterValidTogglePaths(stateManager: StateManager, paths: string[]): string[] {
-    return paths.filter((path) => {
-      const result = getPropertyByPath(stateManager.state, path);
-      if (result.found && (result.object === true || result.object === false)) {
-        return true;
-      }
-      console.warn(`Configured state toggle path "${path}" doesn't lead to a boolean property. Skip it.`);
-      return false;
     });
   }
 }
