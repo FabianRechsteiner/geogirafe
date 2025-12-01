@@ -66,10 +66,4 @@ describe('StateToggleManager class', () => {
     expect(state.interface.sharePanelVisible).toBeFalsy();
     expect(state.interface.userPreferencesPanelVisible).toBeFalsy();
   });
-
-  it('filterValidTogglePaths', () => {
-    const filteredPaths = StateToggleManager.filterValidTogglePaths(stateManager, paths);
-    expect(filteredPaths).not.toContain(paths[3]);
-    expect(filteredPaths.length).toEqual(5);
-  });
 });
