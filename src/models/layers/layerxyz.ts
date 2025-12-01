@@ -6,7 +6,7 @@ type LayerXYZTilesOptions = {
   disclaimer?: string;
   metadataUrl?: string;
   opacity?: number;
-  protected?: boolean;
+  restricted?: boolean;
 };
 
 class LayerXYZ extends Layer {
@@ -33,7 +33,7 @@ class LayerXYZ extends Layer {
       metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       opacity: this.opacity,
-      protected: this.protected
+      restricted: this.restricted
     };
     const clonedObject = new LayerXYZ(this.id, this.name, this.order, this.source, options);
     clonedObject.activeState = this.activeState;
@@ -50,7 +50,7 @@ class LayerXYZ extends Layer {
       metadataUrl: options.metadata?.metadataUrl,
       disclaimer: options.metadata?.disclaimer,
       opacity: options.metadata?.opacity,
-      protected: options.metadata?.protected
+      restricted: options.public === undefined ? (options.metadata?.protected ?? false) : !options.public
     };
   }
 }

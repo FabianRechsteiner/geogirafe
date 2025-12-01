@@ -58,6 +58,7 @@ export interface GMFTreeItem {
   layer?: string;
   dimensions?: Record<string, object>;
   time?: ITimeOptions;
+  public?: boolean;
 }
 
 export interface GMFTheme {

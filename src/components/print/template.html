@@ -140,6 +140,13 @@
       </div>
       `})}
 
+      <div class="${this.hasRestrictedLayers ? 'warning': 'hidden'}">
+        <h3 i18n="Warning: Private Layers are active">Warning: Private Layers are active</h3>
+        <span i18n="Private layers are enabled and will be printed."></span>
+        <span i18n="The generated document may contain sensitive data."></span>
+        <span i18n="Please review or disable them before printing."></span>
+      </div>
+
       <button id="export-pdf" class="gg-button" onclick="${() => this.print()}" i18n="Print">Print</button>
 
       <div id="print-list">

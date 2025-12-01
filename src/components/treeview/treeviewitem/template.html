@@ -5,12 +5,13 @@
 
 <div id="container">
   <header>
-    <!-- Spacer -->
-    <img
-      class="${this.layer.protected ? 'gg-small gg-image gg-opacity' : 'hidden'}"
-      alt="Protected layer"
-      src="icons/protected.svg" />
-    <div class="${this.layer.protected ? 'hidden' : 'gg-spacer gg-small'}"></div>
+    <!-- Spacer / Restricted icon -->
+    <div class="gg-spacer gg-small">
+      <img
+        class="${this.layer.restricted ? 'gg-small gg-lock gg-opacity' : 'hidden'}"
+        alt="Protected layer"
+        src="icons/protected.svg" />
+    </div>
 
     <!-- Checkbox -->
     <button

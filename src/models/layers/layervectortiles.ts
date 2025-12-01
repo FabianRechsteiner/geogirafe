@@ -43,7 +43,7 @@ class LayerVectorTiles extends Layer {
       metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       opacity: this.opacity,
-      protected: this.protected
+      restricted: this.restricted
     };
     const clonedObject = new LayerVectorTiles(this.id, this.name, this.order, this.style, this.source, options);
     clonedObject.activeState = this.activeState;

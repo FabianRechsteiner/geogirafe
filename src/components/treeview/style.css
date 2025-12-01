@@ -72,6 +72,7 @@ header:hover .tool {
 .gg-spacer {
   width: 1.5rem;
   padding: 0;
+  text-align: center;
 }
 .gg-caret {
   transform: scale(130%);
@@ -79,10 +80,8 @@ header:hover .tool {
 .gg-caret.gg-rotate90 {
   transform: scale(130%) rotate(90deg);
 }
-.gg-small.gg-image {
+.gg-small.gg-lock {
   min-width: 1rem;
-  width: 1rem;
-  padding: 0.25rem;
 }
 .gg-tree-label {
   text-align: left;
