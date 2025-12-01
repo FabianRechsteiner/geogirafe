@@ -16,6 +16,7 @@ import { toDegrees, toRadians } from 'ol/math';
 import { unByKeyAll } from '../../tools/utils/olutils';
 import { padNumber } from 'ol/string';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import Layer from '../../models/layers/layer';
 
 /** Represents the status of a printing process. */
 enum PrintStatus {
@@ -62,13 +63,15 @@ class PrintComponent extends GirafeHTMLElement {
   private visible = false;
   private isWithCapabilitiesComponentSetup = false;
   private hasErrorFetchingCapabilities = false;
-  showCustomScale = false;
-  attributeNames: string[] = [];
-  printFormats: string[] = [];
-  layouts: MFPCapabilitiesLayout[] = [];
-  selectedLayout?: MFPCapabilitiesLayout;
-  scales: number[] = [];
-  dpis: number[] = [];
+
+  protected showCustomScale = false;
+  protected attributeNames: string[] = [];
+  protected printFormats: string[] = [];
+  protected layouts: MFPCapabilitiesLayout[] = [];
+  protected selectedLayout?: MFPCapabilitiesLayout;
+  protected scales: number[] = [];
+  protected dpis: number[] = [];
+  protected hasRestrictedLayers = false;
 
   constructor() {
     super('print');
@@ -403,6 +406,17 @@ class PrintComponent extends GirafeHTMLElement {
         }
       })
     );
+    this.eventsCallbacks.push(
+      this.subscribe(/layers\.layersList\..*\.activeState/, () => {
+        this.verifyRestrictedLayers();
+        this.render();
+      })
+    );
+  }
+
+  private verifyRestrictedLayers() {
+    const allLayers = this.context.layerManager.getFlattenedLayerTree(this.state.layers.layersList);
+    this.hasRestrictedLayers = allLayers.find((l) => l instanceof Layer && l.active && l.restricted) !== undefined;
   }
 
   /**
@@ -411,6 +425,7 @@ class PrintComponent extends GirafeHTMLElement {
    */
   private async togglePanel(visible: boolean): Promise<void> {
     this.visible = visible;
+    this.verifyRestrictedLayers();
     this.render();
   }
 
@@ -641,6 +656,16 @@ class PrintComponent extends GirafeHTMLElement {
     if (this.getCapabilitiesAttribute('datasource')) {
       customAttributes['datasource'] = this.selectedFeaturesToDatasource();
     }
+    if (this.hasRestrictedLayers) {
+      let comment = '';
+      if (customAttributes['comments']) {
+        comment = customAttributes['comments'] as string;
+      }
+
+      comment += `\n${this.context.i18nManager.getTranslation('Warning: This document may contain sensitive data.')}`;
+      customAttributes['comments'] = comment;
+    }
+
     return customAttributes;
   }
 

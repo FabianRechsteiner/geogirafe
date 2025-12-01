@@ -10,7 +10,7 @@ export type LayerWmtsOptions = {
   disclaimer?: string;
   metadataUrl?: string;
   opacity?: number;
-  protected?: boolean;
+  restricted?: boolean;
   dimensions?: Record<string, object>;
   imageType?: string;
   style?: string;
@@ -95,7 +95,7 @@ class LayerWmts extends Layer implements ILayerWithLegend {
       metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       opacity: this.opacity,
-      protected: this.protected,
+      restricted: this.restricted,
       dimensions: this.dimensions,
       imageType: this.imageType,
       style: this.style,
@@ -143,7 +143,7 @@ class LayerWmts extends Layer implements ILayerWithLegend {
       metadataUrl: options.metadata?.metadataUrl,
       disclaimer: options.metadata?.disclaimer,
       opacity: options.metadata?.opacity,
-      protected: options.metadata?.protected,
+      restricted: options.public === undefined ? (options.metadata?.protected ?? false) : !options.public,
       dimensions: options.dimensions,
       imageType: options.imageType,
       style: options.style,

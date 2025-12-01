@@ -14,7 +14,7 @@ export type LayerWmsOptions = {
   disclaimer?: string;
   metadataUrl?: string;
   opacity?: number;
-  protected?: boolean;
+  restricted?: boolean;
   minResolution?: number;
   maxResolution?: number;
   layers?: string;
@@ -118,7 +118,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       metadataUrl: this.metadataUrl,
       disclaimer: this.disclaimer,
       opacity: this.opacity,
-      protected: this.protected,
+      restricted: this.restricted,
       minResolution: this.minResolution,
       maxResolution: this.maxResolution,
       layers: this.layers,
@@ -216,7 +216,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
       metadataUrl: options.metadata?.metadataUrl,
       disclaimer: options.metadata?.disclaimer,
       opacity: options.metadata?.opacity,
-      protected: options.metadata?.protected,
+      restricted: options.public === undefined ? (options.metadata?.protected ?? false) : !options.public,
       minResolution: options.minResolutionHint,
       maxResolution: options.maxResolutionHint,
       layers: options.layers,
