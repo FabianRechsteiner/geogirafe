@@ -42,7 +42,8 @@
 
   <div class="${this.state.layers.layersList.length > 0 ? 'treeview-list' : 'hidden'}">
     <!-- prettier-ignore -->
-    ${this.sortedLayers().filter(layer => layer.isVisible).map(layer => (layer instanceof ThemeLayer) ? uHtmlFor(layer, layer.treeItemId)`
+    ${this.sortedLayers().filter(layer => layer.isVisible).map(layer => (layer instanceof ThemeLayer) ? uHtmlFor(layer,
+    layer.treeItemId)`
     <girafe-tree-view-theme themeid="${layer.treeItemId}"></girafe-tree-view-theme>
     ` : (layer instanceof GroupLayer) ? uHtmlFor(layer, layer.treeItemId)`
     <girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>
@@ -52,7 +53,17 @@
   </div>
 
   <div class="${this.state.layers.layersList.length > 0 ? 'hidden' : 'treeview-no-data'}">
-    <div class="no-data">
+    <div class="${this.state.themes.isLoaded ? 'hidden' : 'treeview-loading'}">
+      <img
+        loading="eager"
+        src="icons/progress.svg"
+        class="gg-spin gg-big"
+        alt="${this.context.i18nManager.getTranslation('Loading')}" />
+      <div>
+        <span i18n="Loading">Loading...</span>
+      </div>
+    </div>
+    <div class="${this.state.themes.isLoaded ? 'no-data' : 'hidden'}">
       <span i18n="Nothing here yet!">Nothing here yet!</span>
       <span>-</span>
       <span i18n="Add your first items">Add your first items</span>
