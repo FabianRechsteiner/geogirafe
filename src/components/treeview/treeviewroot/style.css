@@ -65,6 +65,17 @@
   justify-content: center;
 }
 
+.treeview-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+img:-moz-loading {
+  visibility: hidden;
+}
+
 .no-data {
   color: #999;
   text-align: center;

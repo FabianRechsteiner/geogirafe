@@ -35,6 +35,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
       this.refreshRender();
     });
     this.subscribe('treeview.advanced', () => this.refreshRender());
+    this.subscribe('themes.isLoaded', () => this.refreshRender());
     this.subscribe(/layers\.layersList\..*\.order/, () => this.refreshRender());
   }
 
