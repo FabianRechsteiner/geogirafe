@@ -181,5 +181,25 @@
         "url": "https://geo.so.ch/api/wmts/1.0.0/WMTSCapabilities.xml"
       }
     ]
+  },
+  "onboarding": {
+    "steps": [
+      {
+        "element": "[data-tour='theme-selection']",
+        "title": "onboarding-theme-selection-title",
+        "description": "onboarding-theme-selection-description"
+      },
+      {
+        "element": "[data-tour='basemap-selection']",
+        "title": "onboarding-basemap-selection-title",
+        "description": "onboarding-basemap-selection-description"
+      },
+      {
+        "component": "treeviewroot",
+        "element": "[data-tour='treeview-filter']",
+        "title": "onboarding-treeview-filter-selection-title",
+        "description": "onboarding-treeview-filter-selection-description"
+      }
+    ]
   }
 }

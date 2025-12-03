@@ -84,7 +84,8 @@ export default defineConfig(({ command }) => {
               'qr-code-styling',
               'source-map-js',
               'tippy.js',
-              'vanilla-picker'
+              'vanilla-picker',
+              'driver.js'
             ]
           },
           entryFileNames: (chunkInfo) => {

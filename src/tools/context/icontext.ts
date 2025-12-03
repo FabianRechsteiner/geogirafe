@@ -11,6 +11,7 @@ import LocalFileManager from '../localfile/localfilemanager';
 import LogManager from '../logging/logmanager';
 import OfflineManager from '../offline/offlinemanager';
 import OgcApiFeaturesManager from '../ogcapi/ogcapifeaturesmanager';
+import OnBoardingManager from '../onboarding/onboardingmanager';
 import OrderingManager from '../ordering/orderingmanager';
 import ISessionManager from '../share/isessionmanager';
 import ShareManager from '../share/sharemanager';
@@ -60,6 +61,7 @@ export default interface IGirafeContext {
   readonly wmsManager: WmsManager;
   readonly ogcApiFeaturesManager: OgcApiFeaturesManager;
   readonly localFileManager: LocalFileManager;
+  readonly onBoardingManager: OnBoardingManager;
 
   initialize(): Promise<void>;
 }

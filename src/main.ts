@@ -19,4 +19,5 @@ const girafeApp = new GeoGirafeApp();
 girafeApp.isReady().then(() => {
   // Remove the splash-screen
   splash.end();
+  girafeApp.context.onBoardingManager.start();
 });
