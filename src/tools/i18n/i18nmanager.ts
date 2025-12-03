@@ -42,7 +42,22 @@ class I18nManager extends GirafeSingleton {
     return Number.parseFloat(`${number}`).toLocaleString(this.context.configManager.Config.general.locale);
   }
 
-  private async loadTranslations(language: string): Promise<TranslationsDict> {
+  public async ensureTranslationLoaded(): Promise<boolean> {
+    if (!this.context.stateManager.state?.language) {
+      return false;
+    }
+
+    try {
+      await this.loadTranslations(this.context.stateManager.state.language);
+    } catch (err) {
+      console.warn('Skipping translation due to config error:', err);
+      return false;
+    }
+
+    return true;
+  }
+
+  async loadTranslations(language: string): Promise<TranslationsDict> {
     if (this.loadingLanguagePromise) {
       // There's already a promise for loading translations
       // => return it instead of starting another request
@@ -92,14 +107,8 @@ class I18nManager extends GirafeSingleton {
   }
 
   async translate(dom: DocumentFragment | HTMLElement): Promise<void> {
-    if (!this.context.stateManager.state?.language) {
-      return;
-    }
-
-    try {
-      await this.loadTranslations(this.context.stateManager.state.language);
-    } catch (err) {
-      console.warn('Skipping translation due to config error:', err);
+    const translationLoaded = await this.ensureTranslationLoaded();
+    if (!translationLoaded) {
       return;
     }
 

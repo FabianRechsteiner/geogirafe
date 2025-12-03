@@ -50,7 +50,7 @@ export default class GeoGirafeApp {
   protected mainComponent!: GeoGirafeAppComponent;
   private readonly isIframe: boolean;
 
-  protected get context() {
+  public get context() {
     return this.mainComponent.getContext();
   }
 

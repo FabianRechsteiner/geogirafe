@@ -210,6 +210,15 @@ class GirafeConfig {
     reasons: string[];
     email: string;
   };
+  onboarding?: {
+    steps: {
+      component?: string;
+      element: string;
+      title: string;
+      description: string;
+    }[];
+  };
+
   // The extended configuration can be used by third-party components or extensions
   // to add custom attributes to the GirafeConfig.
   extendedConfig?: Record<string, object>;
@@ -249,6 +258,7 @@ class GirafeConfig {
     this.crs = this.initCRS(config);
     this.contact = this.initConfigContact(config);
     this.extendedConfig = this.initExtendedConfig(config);
+    this.onboarding = this.initOnboarding(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -375,12 +385,8 @@ class GirafeConfig {
     if (!config.print?.url) {
       throw new Error(`Configuration for print.url is required. See https://doc.geomapfish.dev/docs/configuration`);
     }
-    if (!config.print?.attributeNames) {
-      config.print.attributeNames = ['title', 'comments', 'legend'];
-    }
-    if (!config.print?.formats) {
-      config.print.formats = ['pdf', 'png'];
-    }
+    config.print.attributeNames ??= ['title', 'comments', 'legend'];
+    config.print.formats ??= ['pdf', 'png'];
     return config.print;
   }
 
@@ -633,6 +639,10 @@ class GirafeConfig {
 
   private initExtendedConfig(config: GirafeConfig) {
     return config.extendedConfig ?? undefined;
+  }
+
+  private initOnboarding(config: GirafeConfig) {
+    return config.onboarding ?? undefined;
   }
 }
 
