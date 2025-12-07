@@ -128,6 +128,10 @@
               slot="main"
               data-toggle-path="interface.drawingPanelVisible"
               data-title="drawing-panel"></girafe-drawing>
+            <girafe-selection-tool
+              slot="main"
+              data-toggle-path="interface.selectionToolPanelVisible"
+              data-title="selection-tool-panel"></girafe-selection-tool>
             <girafe-print
               slot="main"
               data-toggle-path="interface.printPanelVisible"
@@ -182,6 +186,13 @@
           class="gg-icon-button gg-big"
           onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
           <img alt="draw-icon" src="icons/draw.svg" />
+        </button>
+        <button
+          tip="selection-tool-panel"
+          slot="menu-content"
+          class="gg-icon-button gg-big"
+          onclick="document.geogirafe.state.interface.selectionToolPanelVisible = !document.geogirafe.state.interface.selectionToolPanelVisible">
+          <img alt="draw-icon" src="icons/arrow.svg" />
         </button>
         <button
           tip="external-entry"

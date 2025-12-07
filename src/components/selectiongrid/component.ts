@@ -94,6 +94,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   closePanel() {
     this.state.interface.selectionComponentVisible = false;
     this.state.selection.selectedFeatures = [];
+    this.state.selection.selectionParameters = [];
     this.state.selection.highlightedFeatures = [];
     this.resultsSelected = false;
     this.state.selection.gridSelected = false;

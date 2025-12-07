@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import MockHelper from '../../tests/mockhelper';
 import ObjectSelection from '../../state/objectselection';
 import SelectionSerializer from './selectionserializer';
@@ -54,7 +54,7 @@ describe('SelectionSerializer.serialize', () => {
     );
   });
 
-  it('should return empty string if no selection parameters', () => {
+  it('should return empty string if no selection parameters (and default SelectionMode)', () => {
     const selection = new ObjectSelection();
     const serialized = serializer.brainSerialize(selection);
     expect(serialized).toBe('');

@@ -6,6 +6,7 @@ import type { Circle as CircleGeom, Geometry } from 'ol/geom';
 import type Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 import IGirafeContext from '../../tools/context/icontext';
+import { getAreaAsMetricText, getLengthAsMetricText } from '../../tools/utils/olutils';
 
 export enum DrawingShape {
   Point,
@@ -240,17 +241,11 @@ export default class DrawingFeature {
   }
 
   getLengthText(length: number) {
-    if (this.displayMeasure) {
-      return length > 100 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m';
-    }
-    return '';
+    return getLengthAsMetricText(this.displayMeasure ? length : undefined);
   }
 
   getAreaText(area: number) {
-    if (this.displayMeasure) {
-      return area > 10000 ? (area / 1000000).toFixed(2) + ' km²' : area.toFixed(2) + ' m²';
-    }
-    return '';
+    return getAreaAsMetricText(this.displayMeasure ? area : undefined);
   }
 
   getCoordText(coord: number[]) {

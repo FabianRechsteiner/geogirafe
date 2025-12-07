@@ -1,16 +1,15 @@
-import { Map, Feature, MapBrowserEvent, MapEvent, Collection } from 'ol';
-import { Style, Stroke, Fill, Circle, RegularShape } from 'ol/style';
+import { Collection, Feature, Map, MapBrowserEvent, MapEvent } from 'ol';
+import { Circle, Fill, RegularShape, Stroke, Style } from 'ol/style';
 import { ProjectionLike } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { platformModifierKeyOnly } from 'ol/events/condition';
 import { DragBox } from 'ol/interaction';
 import { ScaleLine } from 'ol/control';
 import { DragBoxEvent } from 'ol/interaction/DragBox';
 import { Geometry, GeometryCollection, Point } from 'ol/geom';
 import { Extent, getCenter, getHeight, getWidth } from 'ol/extent';
 
-import { ScreenSpaceEventHandler, Cartesian2, Cesium3DTileset } from 'cesium';
+import { Cartesian2, Cesium3DTileset, ScreenSpaceEventHandler } from 'cesium';
 import proj4 from 'proj4';
 
 import SwipeManager from './tools/swipemanager';
@@ -49,7 +48,9 @@ import CircleStyle from 'ol/style/Circle';
 import { parseCoordinates } from '../../tools/geometrytools';
 import CircleGeom from 'ol/geom/Circle';
 import WfsFilter from '../../tools/wfs/wfsfilter';
-import { applyOpacityToLayers } from '../../tools/utils/utils';
+import { applyFeaturesToSelection, applyOpacityToLayers } from '../../tools/utils/utils';
+import { SelectionMode } from '../../models/selection';
+import { platformModifierKeyOnly } from 'ol/events/condition';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -482,10 +483,12 @@ export default class MapComponent extends GirafeHTMLElement {
   }
 
   select(extent: number[]) {
-    // Reset current selection
-    this.state.selection.selectedFeatures = [];
-    this.state.selection.selectionParameters = [];
-    this.state.selection.highlightedFeatures = [];
+    // Reset current selection if SelectionMode is Replace
+    if (this.state.selection.selectionMode === SelectionMode.Replace) {
+      this.selectNone();
+    } else if (this.state.selection.selectionMode === SelectionMode.Add) {
+      this.state.selection.selectionParameters = [];
+    }
     // Layers selectable today are WMS, WMTS (with wms layer) and Local files
     // Use batch for changes to prevent multiple selection of objects
     this.context.stateManager.batchChanges(() => {
@@ -493,6 +496,12 @@ export default class MapComponent extends GirafeHTMLElement {
       this.wmtsManager.selectFeatures(extent);
       this.context.localFileManager.selectFeatures(extent);
     });
+  }
+
+  selectNone() {
+    this.state.selection.selectedFeatures = [];
+    this.state.selection.selectionParameters = [];
+    this.state.selection.highlightedFeatures = [];
   }
 
   async onSelectFeatures(selectionParams: SelectionParam[]) {
@@ -513,8 +522,7 @@ export default class MapComponent extends GirafeHTMLElement {
       const wfsPromises = selectionParams.map((param) => {
         const wfsGetFeatureInfoSelectionParam = param.clone((l) => l.wfsQueryable);
         const client = this.context.wfsManager.getClient(wfsGetFeatureInfoSelectionParam._ogcServer);
-        const features = client.getFeature(wfsGetFeatureInfoSelectionParam);
-        return features;
+        return client.getFeature(wfsGetFeatureInfoSelectionParam);
       });
 
       const wmsGmlFeatures = (await Promise.all(wmsPromises)).flat();
@@ -525,8 +533,7 @@ export default class MapComponent extends GirafeHTMLElement {
       if (gmlFeatures.length === 0 && this.state.selection.selectedFeatures.length === 0) {
         this.state.interface.selectionComponentVisible = false;
       } else {
-        this.state.selection.selectedFeatures.push(...gmlFeatures);
-        this.state.interface.selectionComponentVisible = true;
+        applyFeaturesToSelection(gmlFeatures, this.state);
       }
     } finally {
       this.state.loading = false;

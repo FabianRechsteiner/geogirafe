@@ -43,6 +43,7 @@ import VideoRecordComponent from '../../components/videorecord/component';
 import { DrawingState } from '../../components/drawing/drawingFeature';
 import DrawingSerializer from '../../components/drawing/drawingSerializer';
 import { ShareState, ShareStateSerializer } from '../../components/share/sharestate';
+import SelectionToolComponent from '../../components/selectiontool/component';
 
 export default class GeoGirafeApp {
   private readonly readyPromise: Promise<void>;
@@ -127,6 +128,7 @@ export default class GeoGirafeApp {
     customElements.define('girafe-edit-form', EditFromComponent);
     customElements.define('girafe-scale', ScaleComponent);
     customElements.define('girafe-search', SearchComponent);
+    customElements.define('girafe-selection-tool', SelectionToolComponent);
     customElements.define('girafe-selection-grid', SelectionGridComponent);
     customElements.define('girafe-selection-window', SelectionWindowComponent);
     customElements.define('girafe-share', ShareComponent);

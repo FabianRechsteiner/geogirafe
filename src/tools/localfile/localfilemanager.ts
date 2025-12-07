@@ -8,6 +8,7 @@ import { Geometry } from 'ol/geom';
 import LayerLocalFile from '../../models/layers/layerlocalfile';
 import { extend, intersects } from 'ol/extent';
 import IGirafeContext from '../context/icontext';
+import { applyFeaturesToSelection } from '../utils/utils';
 
 class LocalFileManager extends GirafeSingleton {
   private readonly map: Map;
@@ -191,8 +192,7 @@ Verify that those features can be displayed within the maximal extent configured
     for (const activeLayer of Object.values(this.activeLayers)) {
       const features = activeLayer.olayer.getSource()?.getFeaturesInExtent(extent);
       if (features && features.length > 0) {
-        this.context.stateManager.state.selection.selectedFeatures.push(...features);
-        this.context.stateManager.state.interface.selectionComponentVisible = true;
+        applyFeaturesToSelection(features, this.context.stateManager.state);
       }
     }
   }

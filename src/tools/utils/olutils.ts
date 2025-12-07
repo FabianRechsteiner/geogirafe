@@ -4,13 +4,14 @@ import type BaseLayer from 'ol/layer/Base';
 import type Feature from 'ol/Feature';
 import { fromCircle } from 'ol/geom/Polygon.js';
 import { Coordinate } from 'ol/coordinate';
-import { Projection, get as getProjection, ProjectionLike } from 'ol/proj';
-import { getDistance as getSphericalDistance, getArea as getSphericalArea } from 'ol/sphere';
+import { get as getProjection, Projection, ProjectionLike } from 'ol/proj';
+import { getArea as getSphericalArea, getDistance as getSphericalDistance } from 'ol/sphere';
 import { unByKey } from 'ol/Observable';
-import { Circle, Geometry, LineString, Polygon } from 'ol/geom';
+import { Circle, Geometry, LineString, Point, Polygon } from 'ol/geom';
 import GeoConsts from '../geoconsts';
 import { buffer } from 'ol/extent';
 import { Pixel } from 'ol/pixel';
+import { Stroke, Style } from 'ol/style';
 
 /**
  * Unsubscribe to all OpenLayer listeners.
@@ -78,13 +79,22 @@ export const getDistance = (coordinates: Coordinate[], projection: string) => {
  * @param polygon ol Polygon
  * @returns the area of a polygon, considering the current map projection (projected or geographic)
  */
-export const getArea = (polygon: Polygon, projection: string) => {
+export const getAreaOfPolygon = (polygon: Polygon, projection: string) => {
   if (isProjectionInDegrees(projection)) {
     return getSphericalArea(polygon, {
       projection: getProjection(projection)!
     });
   }
   return polygon.getArea();
+};
+
+export const getAreaOfCircle = (circle: Circle, projection: string) => {
+  if (isProjectionInDegrees(projection)) {
+    return getSphericalArea(circle, {
+      projection: getProjection(projection)!
+    });
+  }
+  return Math.PI * Math.pow(circle.getRadius(), 2);
 };
 
 const isProjectionInDegrees = (proj: string): boolean => {
@@ -137,4 +147,59 @@ export const reprojectGeometry = (
   } catch (e) {
     throw new Error(`Not able to reproject geometry: ${e}`);
   }
+};
+
+export const ensurePolygonIsProperlyClosed = (polygon: Polygon): Coordinate[] => {
+  const coordinates = polygon.getCoordinates()[0];
+  let segments = [...coordinates];
+  if (coordinates.length > 2 && coordinates[0][0] != coordinates[coordinates.length - 1][0]) {
+    segments = [...coordinates, coordinates[0]];
+    polygon.setCoordinates([segments]);
+  }
+  return segments;
+};
+
+export const getHalfPoint = (coordinates: Coordinate[]): Point => {
+  return new Point(new LineString(coordinates).getCoordinateAt(0.5));
+};
+
+export const getLabelStyle = (position: Point, text: string, labelStyle: Style): Style | undefined => {
+  if (text.trim() != '') {
+    const style = labelStyle.clone();
+    style.setGeometry(position);
+    style.getText()!.setText(text);
+    return style;
+  }
+  return undefined;
+};
+
+export const getRadiusDataForCircle = (circle: Circle, defaultStyle: Style, stroke: Stroke) => {
+  const radius = circle.getRadius();
+  const center = circle.getCenter();
+  const radiusLine = [center, [center[0] + radius, center[1]]];
+  const radiusLineStyle = defaultStyle.clone();
+  radiusLineStyle.setStroke(stroke);
+  radiusLineStyle.getText()!.setText('');
+  radiusLineStyle.setGeometry(new LineString(radiusLine));
+  return {
+    style: radiusLineStyle,
+    radius: radius,
+    radiusLine: radiusLine
+  };
+};
+
+export const getLengthAsMetricText = (length?: number): string => {
+  if (length) {
+    const formatedLength = length > 100 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m';
+    return formatedLength;
+  }
+  return '';
+};
+
+export const getAreaAsMetricText = (area?: number): string => {
+  if (area) {
+    const formatedArea = area > 10000 ? (area / 1000000).toFixed(2) + ' km²' : area.toFixed(2) + ' m²';
+    return formatedArea;
+  }
+  return '';
 };

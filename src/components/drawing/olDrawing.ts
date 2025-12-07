@@ -24,7 +24,14 @@ import { getPointResolution, Projection } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
 import { never, primaryAction } from 'ol/events/condition';
 import { Pixel } from 'ol/pixel';
-import { getArea, getDistance } from '../../tools/utils/olutils';
+import {
+  ensurePolygonIsProperlyClosed,
+  getAreaOfPolygon,
+  getDistance,
+  getHalfPoint,
+  getLabelStyle,
+  getRadiusDataForCircle
+} from '../../tools/utils/olutils';
 import { ContextMenu, EntryInteractionType, MenuEntry } from '../map/tools/contextmenu';
 import { formatCoordinates } from '../../tools/geometrytools';
 import { v4 as uuidv4 } from 'uuid';
@@ -50,10 +57,6 @@ function getLineStroke(strokeType: LineStroke, lineWidth: number) {
       // minimal length creates dots with rounded lineCap
       return [0.01, 5 * lineWidth];
   }
-}
-
-function getHalfPoint(coordinates: Coordinate[]) {
-  return new Point(new LineString(coordinates).getCoordinateAt(0.5));
 }
 
 function extractVerticesFromGeometry(geometry: Geometry): MultiPoint {
@@ -778,11 +781,9 @@ export default class OlDrawing {
     const styles = [defaultStyle];
 
     const addLabel = (position: Point, text: string) => {
-      if (text != '') {
-        const style = labelStyle.clone();
-        style.setGeometry(position);
-        style.getText()!.setText(text);
-        styles.push(style);
+      const labelStyleToAdd = getLabelStyle(position, text, labelStyle);
+      if (labelStyleToAdd) {
+        styles.push(labelStyleToAdd);
       }
     };
 
@@ -863,25 +864,26 @@ export default class OlDrawing {
       );
     } else if (dFeature.type == DrawingShape.Polygon) {
       const polygon = geometry as Polygon;
-      const segments = this.ensurePolygonIsProperlyClosed(polygon);
+      const segments = ensurePolygonIsProperlyClosed(polygon);
       new LineString(segments).forEachSegment((a, b) =>
         addLabel(getHalfPoint([a, b]), dFeature.getLengthText(getDistance([a, b], this.state.projection)))
       );
-      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getArea(polygon, this.state.projection)));
+      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getAreaOfPolygon(polygon, this.state.projection)));
     } else if (dFeature.type == DrawingShape.Disk) {
-      const radius = (geometry as CircleGeom).getRadius();
-      const center = (geometry as CircleGeom).getCenter();
-      const radiusLine = [center, [center[0] + radius, center[1]]];
-      const radiusLineStyle = defaultStyle.clone();
-      radiusLineStyle.setStroke(new Stroke({ color: measureColor, width: dFeature.strokeWidth }));
-      radiusLineStyle.getText()!.setText('');
-      radiusLineStyle.setGeometry(dFeature.displayMeasure ? new LineString(radiusLine) : new LineString([]));
-      styles.push(radiusLineStyle);
-      addLabel(getHalfPoint(radiusLine), dFeature.getLengthText(radius));
+      const radiusDataForCircle = getRadiusDataForCircle(
+        geometry as CircleGeom,
+        defaultStyle,
+        new Stroke({ color: measureColor, width: dFeature.strokeWidth })
+      );
+      if (!dFeature.displayMeasure) {
+        radiusDataForCircle.style.setGeometry(new LineString([]));
+      }
+      styles.push(radiusDataForCircle.style);
+      addLabel(getHalfPoint(radiusDataForCircle.radiusLine), dFeature.getLengthText(radiusDataForCircle.radius));
     } else if (dFeature.type == DrawingShape.FreehandPolygon) {
       const polygon = geometry as Polygon;
-      this.ensurePolygonIsProperlyClosed(polygon);
-      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getArea(polygon, this.state.projection)));
+      ensurePolygonIsProperlyClosed(polygon);
+      addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getAreaOfPolygon(polygon, this.state.projection)));
       addLabel(
         new Point(polygon.getCoordinates()[0][0]),
         dFeature.getLengthText(getDistance(polygon.getCoordinates()[0], this.state.projection))
@@ -898,12 +900,12 @@ export default class OlDrawing {
       const segment2 = [rect.getCoordinates()[0][1], rect.getCoordinates()[0][2]];
       addLabel(getHalfPoint(segment1), dFeature.getLengthText(getDistance(segment1, this.state.projection)));
       addLabel(getHalfPoint(segment2), dFeature.getLengthText(getDistance(segment2, this.state.projection)));
-      addLabel(rect.getInteriorPoint(), dFeature.getAreaText(getArea(rect, this.state.projection)));
+      addLabel(rect.getInteriorPoint(), dFeature.getAreaText(getAreaOfPolygon(rect, this.state.projection)));
     } else if (dFeature.type == DrawingShape.Square) {
       const square = geometry as Polygon;
       const segment = [square.getCoordinates()[0][0], square.getCoordinates()[0][1]];
       addLabel(getHalfPoint(segment), dFeature.getLengthText(getDistance(segment, this.state.projection)));
-      addLabel(square.getInteriorPoint(), dFeature.getAreaText(getArea(square, this.state.projection)));
+      addLabel(square.getInteriorPoint(), dFeature.getAreaText(getAreaOfPolygon(square, this.state.projection)));
     }
 
     if (dFeature.selected && this.rotateAndScale == null) {
@@ -951,16 +953,6 @@ export default class OlDrawing {
     }
 
     return styles;
-  }
-
-  ensurePolygonIsProperlyClosed(polygon: Polygon) {
-    const coordinates = polygon.getCoordinates()[0];
-    let segments = [...coordinates];
-    if (coordinates.length > 2 && coordinates[0][0] != coordinates[coordinates.length - 1][0]) {
-      segments = [...coordinates, coordinates[0]];
-      polygon.setCoordinates([segments]);
-    }
-    return segments;
   }
 
   private removeDrawInteraction() {
