@@ -15,4 +15,3 @@
 (If necessary, add some screenshots of log messages)
 
 /label ~bug
-/label ~gg::new

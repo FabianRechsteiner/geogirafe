@@ -10,5 +10,4 @@
 
 (Any other information about this feature request, or any point to watch out for or open question)
 
-/label ~gg::new
 /label ~feature
