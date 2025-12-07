@@ -1,10 +1,33 @@
 ## Description
 
-_(What is this Merge-Request for)_
+What is the purpose of this Merge Request?_  
+_What probem does it solve?_  
+_What are the linked issues or references?_
 
 ## Job done
 
-_(Explain shortly was was done, and what are the important things to know about those changes)_
+_Briefly explain what was done and highlight the key points to understand._  
+_If technical choices need justification, please provide the explanation here._  
+_(These details should help the reviewer understand the changes.)_
+
+## Release-Notes
+
+_The text in this section will be used to generate the release notes._  
+_Please provide a simple, user-friendly description of what was done._  
+_Avoid technical details—write for end-users only._  
+_(No images, just text.)_
+
+## Migration Steps / Breaking-Changes
+
+- [ ] Check this box if migrating to this version requires manual work.
+
+_If checked, document the required steps below._
+_Examples of changes that require manual migration:_
+- _Updates to main templates (index.html, mobile.html, ...)_
+- _Update to main typescript files (main.ts, main.*.ts, ...)_
+- _Renaming or deletion of a configuration entry (config.json file)_
+- _Renaming od deletion of a public/protected method in an exported class_
+- _Migration to a new version of a dependency with breaking changes_
 
 ## Definition of Done
 
