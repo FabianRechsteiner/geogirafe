@@ -1,7 +1,7 @@
 import type OlGeomGeometry from 'ol/geom/Geometry';
 import { Circle, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon } from 'ol/geom';
 import { getCenter } from 'ol/extent';
-import { getArea, getDistance, polygonFromCircle } from '../../../tools/utils/olutils';
+import { getAreaOfPolygon, getDistance, polygonFromCircle } from '../../../tools/utils/olutils';
 import { formatCoordinates } from '../../../tools/geometrytools';
 
 /**
@@ -114,10 +114,10 @@ export default class FormatGridGeomValue {
     let geoArea = 0;
     if (geometry instanceof MultiPolygon) {
       for (const polygon of geometry.getPolygons()) {
-        geoArea += getArea(polygon, this.projection);
+        geoArea += getAreaOfPolygon(polygon, this.projection);
       }
     } else {
-      geoArea = getArea(geometry, this.projection);
+      geoArea = getAreaOfPolygon(geometry, this.projection);
     }
     const area = (Math.round(geoArea * 100) / 100).toLocaleString(this.locale, { minimumFractionDigits: 2 });
     icons += `<span>${area}&nbsp;m<sup>2</sup></span>`;

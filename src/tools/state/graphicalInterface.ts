@@ -5,6 +5,7 @@ export default class GraphicalInterface {
   isMobile = false;
   helpVisible = false;
   drawingPanelVisible = false;
+  selectionToolPanelVisible = false;
   printPanelVisible = false;
   extLayerPanelVisible = false;
   crossSectionPanelVisible = false;

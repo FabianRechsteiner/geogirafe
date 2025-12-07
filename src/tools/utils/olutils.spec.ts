@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { getOlayerByName, removeUnwantedOlParams, getDistance, getArea } from './olutils';
+import { getOlayerByName, removeUnwantedOlParams, getDistance, getAreaOfPolygon } from './olutils';
 import { Map } from 'ol';
 import BaseLayer from 'ol/layer/Base';
 import Feature from 'ol/Feature';
@@ -157,7 +157,7 @@ describe('getArea', () => {
       ]
     ];
     stateManager.state.projection = 'EPSG:2056';
-    expect(getArea(new Polygon(coordinatesProjected), stateManager.state.projection)).toBe(1000 * 1000);
+    expect(getAreaOfPolygon(new Polygon(coordinatesProjected), stateManager.state.projection)).toBe(1000 * 1000);
 
     // Same polygon as above, but corners are transformed to WGS84 using
     //  https://www.swisstopo.admin.ch/en/coordinates-conversion-navref
@@ -172,7 +172,7 @@ describe('getArea', () => {
     ];
     stateManager.state.projection = 'EPSG:4326';
     // Allow 2% deviation
-    expect(getArea(new Polygon(coordinatesGeographic), stateManager.state.projection)).approximately(
+    expect(getAreaOfPolygon(new Polygon(coordinatesGeographic), stateManager.state.projection)).approximately(
       1000 * 1000,
       1000 * 1000 * 0.02
     );

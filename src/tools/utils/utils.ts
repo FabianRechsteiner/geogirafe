@@ -1,4 +1,8 @@
 import BaseLayer from '../../models/layers/baselayer';
+import Feature from 'ol/Feature';
+import { Geometry } from 'ol/geom';
+import State from '../state/state';
+import { SelectionMode } from '../../models/selection';
 
 /**
  * Checks if the system prefers dark mode.
@@ -7,9 +11,9 @@ import BaseLayer from '../../models/layers/baselayer';
  */
 export const systemIsInDarkMode = () => {
   return (
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
+    typeof globalThis !== 'undefined' &&
+    typeof globalThis.matchMedia === 'function' &&
+    globalThis.matchMedia('(prefers-color-scheme: dark)').matches
   );
 };
 
@@ -68,15 +72,15 @@ export const hexToRgbaArray = (hex: string): [number, number, number, number] | 
   hex = hex.replace(shorthandRegex, (_m, r: string, g: string, b: string) => '#' + r + r + g + g + b + b);
 
   if (hex.length >= 7) {
-    r = parseInt(hex.slice(1, 3), 16);
-    g = parseInt(hex.slice(3, 5), 16);
-    b = parseInt(hex.slice(5, 7), 16);
+    r = Number.parseInt(hex.slice(1, 3), 16);
+    g = Number.parseInt(hex.slice(3, 5), 16);
+    b = Number.parseInt(hex.slice(5, 7), 16);
 
     if (hex.length === 9) {
       // Contains alpha value
-      a = Math.round(100 * (parseInt(hex.slice(7, 9), 16) / 255)) / 100;
+      a = Math.round(100 * (Number.parseInt(hex.slice(7, 9), 16) / 255)) / 100;
     }
-    if ([r, g, b, a].includes(NaN)) {
+    if ([r, g, b, a].includes(Number.NaN)) {
       return null;
     }
     return [r, g, b, a];
@@ -125,9 +129,7 @@ export const rgbStrToRgbaArray = (rgbaStr: string): [number, number, number, num
  */
 export const colorToRgbaArray = (color: string): [number, number, number, number] | null => {
   let rgbaColor = hexToRgbaArray(color);
-  if (!rgbaColor) {
-    rgbaColor = rgbStrToRgbaArray(color);
-  }
+  rgbaColor ??= rgbStrToRgbaArray(color);
   return rgbaColor;
 };
 
@@ -150,5 +152,52 @@ export const applyOpacityToLayers = (opacity: number, layers: BaseLayer[], callb
       (layer as any as { opacity: number }).opacity = opacity;
       callback?.(layer);
     }
+  }
+};
+
+/**
+ * Applies the given Array of Features to the Selection (<code>state.selection.selectedFeatures</code>) depending on the
+ * given SelectionMode (via <code>state.selection.selectionMode</code>).
+ * @param features Array of Features to add/replace/remove to/from existing selected Features
+ * @param state The State to apply the given Features
+ */
+export const applyFeaturesToSelection = (features: Feature<Geometry>[], state: State) => {
+  // Check if we have set a Geometry of the Selection (e.g. Polygon) and additionally filter the given Features
+  if (state.selection.selectionGeometry) {
+    features = features.filter((feature) =>
+      state.selection.selectionGeometry!.intersectsExtent(feature.getGeometry()!.getExtent())
+    );
+  }
+  switch (state.selection.selectionMode) {
+    case SelectionMode.Replace:
+      state.selection.selectedFeatures.push(...features);
+      break;
+    case SelectionMode.Add:
+      // Push/Add only Features that are not already in Selection (can happen if you select overlapping Regions
+      state.selection.selectedFeatures.push(
+        ...features.filter(
+          (newlySelectedFeature) =>
+            !state.selection.selectedFeatures.some(
+              (alreadySelectedFeature) => newlySelectedFeature.getId() === alreadySelectedFeature.getId()
+            )
+        )
+      );
+      break;
+    case SelectionMode.Remove:
+      for (const featureToRemove of features) {
+        const idxOfGmlFeatureToRemove = state.selection.selectedFeatures.findIndex(
+          (gmlFeature, _idx, _feature) => featureToRemove.getId() === gmlFeature.getId()
+        );
+        if (idxOfGmlFeatureToRemove > -1) {
+          state.selection.selectedFeatures.splice(idxOfGmlFeatureToRemove, 1);
+        }
+      }
+      break;
+  }
+
+  const noFeaturesSelected = state.selection.selectedFeatures.length == 0;
+  state.interface.selectionComponentVisible = !noFeaturesSelected;
+  if (noFeaturesSelected) {
+    state.selection.highlightedFeatures = [];
   }
 };
