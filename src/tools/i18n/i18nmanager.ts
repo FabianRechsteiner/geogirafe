@@ -144,6 +144,9 @@ class I18nManager extends GirafeSingleton {
     }
     const htmlLangElement = document.querySelector('html[lang]');
     htmlLangElement?.setAttribute('lang', newLanguage);
+
+    // Translate elements in main html page
+    this.translate(document.body);
   }
 
   private getFnTranslated(item: Element, key: string): string {
