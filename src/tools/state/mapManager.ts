@@ -18,10 +18,8 @@ export default class MapManager extends GirafeSingleton {
       /** Make Map pan on Wheel/Middle-Button Click */
       new DragPan({
         condition: function (mapBrowserEvent) {
-          return (
-            (mapBrowserEvent.originalEvent as PointerEvent).isPrimary &&
-            (mapBrowserEvent.originalEvent as PointerEvent).button < 2
-          );
+          const event = mapBrowserEvent.originalEvent as PointerEvent;
+          return event.isPrimary && event.button < 2 && !event.shiftKey;
         }
       })
     ])
