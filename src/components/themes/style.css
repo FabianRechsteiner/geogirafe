@@ -1,7 +1,7 @@
 .themes {
   display: flex;
   flex-wrap: wrap;
-  width: 51rem;
+  width: 55rem;
   margin-top: 0;
   overflow-y: auto;
   max-height: 70vh;
@@ -17,7 +17,7 @@
 .new-theme {
   align-content: flex-end;
   position: relative;
-  width: 9rem;
+  width: 8rem;
   border: none;
   background-color: transparent;
   cursor: pointer;
@@ -45,7 +45,7 @@
 .theme > img,
 .custom-theme > button > img,
 .new-theme > img {
-  width: 100%;
+  max-width: 100%;
 }
 
 button.select {
