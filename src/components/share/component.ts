@@ -9,12 +9,16 @@ import SimpleMaskManager from '../../tools/layers/simplemaskmanager';
 import type { Callback } from '../../tools/state/statemanager';
 import GeoGirafeShareManager from './tools/geogirafesharemanager';
 import { ShareState } from './sharestate';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
-class ShareComponent extends GirafeHTMLElement {
+class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  visible = false;
+  isPanelVisible = false;
+  panelTitle = 'share-panel';
+  panelTogglePath = 'interface.sharePanelVisible';
+
   shareLink?: string;
   qrCode?: string;
   success: boolean = true;
@@ -82,7 +86,7 @@ class ShareComponent extends GirafeHTMLElement {
   }
 
   render() {
-    if (this.visible) {
+    if (this.isPanelVisible) {
       this.renderComponent();
     } else {
       this.renderEmptyComponent();
@@ -243,14 +247,15 @@ class ShareComponent extends GirafeHTMLElement {
     setTimeout(() => copyButton.classList.remove('copy-success'), 1000);
   }
 
+  public togglePanel(isVisible: boolean): void {
+    this.isPanelVisible = isVisible;
+    this.render();
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.render();
     this.initializeShortenerService();
-    this.subscribe('interface.sharePanelVisible', (_, newValue) => {
-      this.visible = newValue;
-      this.render();
-    });
   }
 }
 

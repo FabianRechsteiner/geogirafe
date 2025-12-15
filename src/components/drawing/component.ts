@@ -20,10 +20,15 @@ import locateIcon from './assets/locate.svg?raw';
 import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
 import LayerDrawing from '../../models/layers/layerdrawing';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
-export default class DrawingComponent extends GirafeHTMLElement {
+export default class DrawingComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
+
+  isPanelVisible = false;
+  panelTitle = 'drawing-panel';
+  panelTogglePath = 'interface.drawingPanelVisible';
 
   checkedIcon: string = checkedIcon;
   noCheckedIcon: string = noCheckedIcon;
@@ -32,7 +37,6 @@ export default class DrawingComponent extends GirafeHTMLElement {
   visibleIcon: string = visibleIcon;
   notVisibleIcon: string = notVisibleIcon;
 
-  visible = false;
   renderedOnce = false;
   drawingState!: DrawingState;
   colorPickers: [GirafeColorPicker, () => string][] = [];
@@ -83,7 +87,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    if (this.visible) {
+    if (this.isPanelVisible) {
       this.renderComponent();
     } else {
       this.hide();
@@ -225,22 +229,21 @@ export default class DrawingComponent extends GirafeHTMLElement {
     this.subscribe('extendedState.drawing.features', (olds, news) => this.onFeaturesChanged(olds, news));
     this.subscribe('projection', (olds, news) => this.onProjectionChanged(olds, news));
     this.subscribe('globe.loaded', () => {
-      if (this.state.globe.loaded && this.visible) {
+      if (this.state.globe.loaded && this.isPanelVisible) {
         this.cesiumDrawing.registerInteractions();
       } else {
         this.cesiumDrawing.unregisterInteractions();
       }
     });
 
-    this.subscribe('interface.drawingPanelVisible', (_, newValue) => this.togglePanel(newValue));
     this.subscribe('projection', (_, newProjection) => this.warnWhenInWebMercator(newProjection));
   }
 
   togglePanel(visible: boolean) {
-    if (this.visible == visible) return;
+    if (this.isPanelVisible == visible) return;
 
-    this.visible = visible;
-    if (this.visible) {
+    this.isPanelVisible = visible;
+    if (this.isPanelVisible) {
       this.registerEvents();
       if (this.activeDrawingLayer) {
         this.activateLayerInTreeAndMap();
@@ -272,7 +275,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
     const added = newFeatures.filter((f) => !oldIds.includes(f.id));
 
     // Update the current feature selection
-    if (!this.visible || this.batchCreateMode) {
+    if (!this.isPanelVisible || this.batchCreateMode) {
       // If the component isn't visible (e.g. if features are added via shared state), deselect all features
       this.deselectAllFeatures();
     } else if (added.length > 0) {
@@ -294,7 +297,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
     //this.cesiumDrawing.addFeatures(added)
     //this.cesiumDrawing.deleteFeatures(deleted)
 
-    if (this.visible) {
+    if (this.isPanelVisible) {
       // Deactivate the drawing tool after finishing the shape
       if (!this.batchCreateMode) {
         this.setTool(null);
@@ -429,7 +432,7 @@ export default class DrawingComponent extends GirafeHTMLElement {
   }
 
   private warnWhenInWebMercator(projection: string = this.state.projection) {
-    if (this.visible && projection === 'EPSG:3857') {
+    if (this.isPanelVisible && projection === 'EPSG:3857') {
       const errorMessage = 'Web Mercator projection distorts distances and areas';
       this.context.stateManager.state.infobox.elements.push({
         id: uuidv4(),

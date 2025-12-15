@@ -1,24 +1,22 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
-class ContactComponent extends GirafeHTMLElement {
+class ContactComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  visible = false;
+  isPanelVisible = false;
+  panelTitle = 'contact-panel';
+  panelTogglePath = 'interface.contactPanelVisible';
+
   shortUrl = '';
 
   constructor() {
     super('contact');
   }
 
-  private registerEvents() {
-    this.subscribe('interface.contactPanelVisible', (_oldValue: boolean, newValue: boolean) =>
-      this.togglePanel(newValue)
-    );
-  }
-
-  private togglePanel(visible: boolean) {
-    this.visible = visible;
+  public togglePanel(visible: boolean) {
+    this.isPanelVisible = visible;
     if (visible) {
       this.shortUrl = this.getCurrentStateUrl();
     }
@@ -71,7 +69,7 @@ class ContactComponent extends GirafeHTMLElement {
   }
 
   render() {
-    if (this.visible) {
+    if (this.isPanelVisible) {
       super.render();
     } else {
       this.hide();
@@ -81,7 +79,6 @@ class ContactComponent extends GirafeHTMLElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.registerEvents();
     this.render();
   }
 }

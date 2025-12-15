@@ -5,6 +5,7 @@ import WmtsManager from '../map/tools/wmtsmanager';
 import LayerWmsExternal from '../../models/layers/layerwmsexternal';
 import LayerWmtsExternal from '../../models/layers/layerwmtsexternal';
 import ThemeLayerExternal from '../../models/layers/themelayerexternal';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
 type SourceType = 'WMS' | 'WMTS' | 'local';
 type ExternalLayer = LayerWmsExternal | LayerWmtsExternal;
@@ -17,11 +18,14 @@ type PredefinedSource = {
   url: string;
 };
 
-class ExternalLayersComponent extends GirafeHTMLElement {
+class ExternalLayersComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  visible = false;
+  isPanelVisible = false;
+  panelTitle = 'ext-layer-panel';
+  panelTogglePath = 'interface.extLayerPanelVisible';
+
   loading = false;
 
   public predefinedSources: PredefinedSource[] = [];
@@ -46,7 +50,7 @@ class ExternalLayersComponent extends GirafeHTMLElement {
   }
 
   render() {
-    if (this.visible) {
+    if (this.isPanelVisible) {
       super.render();
       super.girafeTranslate();
     } else {
@@ -54,8 +58,9 @@ class ExternalLayersComponent extends GirafeHTMLElement {
     }
   }
 
-  closeWindow() {
-    this.state.interface.extLayerPanelVisible = false;
+  togglePanel(isVisible: boolean): void {
+    this.isPanelVisible = isVisible;
+    this.render();
   }
 
   public setSelectedTab(selectedTab: 'wms_wmts' | 'file') {
@@ -249,10 +254,6 @@ class ExternalLayersComponent extends GirafeHTMLElement {
     const config = this.context.configManager.Config;
     this.predefinedSources = config.externalLayers?.predefinedSources || [];
     this.render();
-    this.subscribe('interface.extLayerPanelVisible', (_, newValue) => {
-      this.visible = newValue;
-      this.render();
-    });
   }
 }
 

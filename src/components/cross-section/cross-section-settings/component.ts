@@ -36,15 +36,19 @@ import OL3Parser from 'jsts/org/locationtech/jts/io/OL3Parser.js';
 import { BufferOp, BufferParameters } from 'jsts/org/locationtech/jts/operation/buffer.js';
 import { StyleLike } from 'ol/style/Style';
 import { getDistance } from '../../../tools/utils/olutils';
+import IGirafePanel from '../../../tools/state/igirafepanel';
 
-class CrossSectionSettingsComponent extends GirafeHTMLElement {
+class CrossSectionSettingsComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['./style.css', '../../../styles/common.css'];
 
   crossSectionState!: CrossSectionState;
   private readonly eventsCallbacks: Callback[] = [];
   darkFrontendMode: boolean = false;
-  visible: boolean = false;
+
+  isPanelVisible = false;
+  panelTitle = 'cross-section-settings';
+  panelTogglePath = 'interface.crossSectionPanelVisible';
 
   private get map() {
     return this.context.mapManager.getMap();
@@ -892,7 +896,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
 
   // Renders the component or the empty component depending on visibility attribute
   render(): void {
-    if (this.visible) {
+    if (this.isPanelVisible) {
       this.renderComponent();
     } else {
       this.renderEmptyComponent();
@@ -1158,14 +1162,8 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.modifyInteraction.un('modifyend', () => {});
   }
 
-  registerVisibilityEvents(): void {
-    this.subscribe('interface.crossSectionPanelVisible', (_oldValue: boolean, _newValue: boolean) =>
-      this.togglePanel(_newValue)
-    );
-  }
-
-  private async togglePanel(visible: boolean): Promise<void> {
-    this.visible = visible;
+  public togglePanel(visible: boolean) {
+    this.isPanelVisible = visible;
     this.render();
   }
 
@@ -1189,7 +1187,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement {
     this.initializeMapElements();
     this.render();
     super.girafeTranslate();
-    this.registerVisibilityEvents();
   }
 }
 

@@ -1,10 +1,14 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
-class AboutComponent extends GirafeHTMLElement {
+class AboutComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  visible = false;
+  isPanelVisible = false;
+  panelTitle = 'about-panel';
+  panelTogglePath = 'interface.aboutPanelVisible';
+
   loaded = false;
   version!: string;
   build!: string;
@@ -27,14 +31,8 @@ class AboutComponent extends GirafeHTMLElement {
     this.render();
   }
 
-  private registerEvents() {
-    this.subscribe('interface.aboutPanelVisible', (_oldValue: boolean, newValue: boolean) =>
-      this.togglePanel(newValue)
-    );
-  }
-
-  private togglePanel(visible: boolean) {
-    this.visible = visible;
+  public togglePanel(visible: boolean) {
+    this.isPanelVisible = visible;
     if (visible) {
       this.loadVersionInfos();
     }
@@ -44,11 +42,10 @@ class AboutComponent extends GirafeHTMLElement {
   connectedCallback() {
     super.connectedCallback();
     this.render();
-    this.registerEvents();
   }
 
   render() {
-    if (this.visible) {
+    if (this.isPanelVisible) {
       super.render();
     } else {
       this.hide();
