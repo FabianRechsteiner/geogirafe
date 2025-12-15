@@ -9,7 +9,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
   open = false;
   openDirection: OpenDirection = 'bottom';
 
-  constructor() {
+  public constructor() {
     super('menubutton');
   }
 
@@ -92,7 +92,7 @@ class MenuButtonComponent extends GirafeHTMLElement {
     return buttons;
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     super.girafeTranslate();

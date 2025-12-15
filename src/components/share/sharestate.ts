@@ -12,7 +12,7 @@ export class ShareStateSerializer implements IBrainSerializer<ShareState> {
   private readonly context: IGirafeContext;
   private readonly syncToInterface: boolean;
 
-  constructor(context: IGirafeContext, syncToInterface: boolean = false) {
+  public constructor(context: IGirafeContext, syncToInterface: boolean = false) {
     this.context = context;
     this.syncToInterface = syncToInterface;
   }

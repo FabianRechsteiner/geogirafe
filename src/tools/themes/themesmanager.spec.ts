@@ -29,6 +29,7 @@ afterAll(() => {
 
 describe('ThemesManager.prepareOgcServers', () => {
   it('should return an empty object when given an empty input', () => {
+    // @ts-expect-error: private property
     const result = manager.prepareOgcServers({});
     expect(result).toEqual({});
   });
@@ -51,7 +52,9 @@ describe('ThemesManager.prepareOgcServers', () => {
     };
 
     // Ignore WFS Preload
+    // @ts-expect-error: private property
     vi.spyOn(context.themesManager, 'preloadWfsServer').mockResolvedValue();
+    // @ts-expect-error: private property
     const result = manager.prepareOgcServers(input);
 
     const server1 = result['WMS 1'];

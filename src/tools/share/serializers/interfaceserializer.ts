@@ -5,7 +5,7 @@ import GraphicalInterface from '../../state/graphicalInterface';
 export default class InterfaceSerializer implements IBrainSerializer<GraphicalInterface> {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 

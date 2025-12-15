@@ -31,7 +31,7 @@ class TimeWidget extends GirafeHTMLElement {
   private readonly debounceTime = 500;
   private timeChangeEventDebounced: ((unset: boolean) => void) | undefined = undefined;
 
-  constructor(name: string) {
+  public constructor(name: string) {
     super(name);
   }
 
@@ -135,7 +135,7 @@ class TimeWidget extends GirafeHTMLElement {
     this.timeChangeEventDebounced(unset);
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     super.girafeTranslate();

@@ -4,11 +4,11 @@ class PrototypeBannerComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  constructor() {
+  public constructor() {
     super('prototype');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
   }

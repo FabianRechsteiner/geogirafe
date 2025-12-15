@@ -14,7 +14,7 @@ class OsmManager {
     }
   > = {};
 
-  constructor(map: Map) {
+  public constructor(map: Map) {
     this.map = map;
   }
 

@@ -3,17 +3,18 @@ import { Callback } from '../tools/state/statemanager';
 import { GgUserInteractionEvent } from '../tools/state/userinteractionevent';
 import IGirafeContext from '../tools/context/icontext';
 
-class GirafeHTMLElement extends HTMLElement {
-  templateUrl: string | null = null;
-  styleUrl: string | null = null;
-  template!: Hole | (() => Hole);
-  name: string;
-  shadow: ShadowRoot;
-  displayStyle?: string;
-  timeoutId?: NodeJS.Timeout;
-  rendered: boolean = false;
+abstract class GirafeHTMLElement extends HTMLElement {
+  protected templateUrl: string | null = null;
+  protected styleUrl: string | null = null;
+  protected styleUrls: string[] | null = null;
+  protected template!: Hole | (() => Hole);
+  public readonly name: string;
+  protected shadow: ShadowRoot;
+  private displayStyle?: string;
+  private timeoutId?: NodeJS.Timeout;
+  protected rendered: boolean = false;
 
-  callbacks: Callback[] = [];
+  private readonly callbacks: Callback[] = [];
 
   private readonly unsafeCache = new Map<string, TemplateStringsArray>();
   private _context?: IGirafeContext;
@@ -25,7 +26,7 @@ class GirafeHTMLElement extends HTMLElement {
     return this._context;
   }
 
-  constructor(name: string, context?: IGirafeContext) {
+  public constructor(name: string, context?: IGirafeContext) {
     super();
     this.name = name;
     if (context) {
@@ -34,19 +35,23 @@ class GirafeHTMLElement extends HTMLElement {
     this.shadow = this.attachShadow({ mode: 'open' });
   }
 
-  get state() {
+  protected get state() {
     return this.context.stateManager.state;
   }
 
-  getById<T = HTMLElement>(id: string) {
-    return this.shadow.querySelector('#' + id)! as T;
+  protected getById<T = HTMLElement>(id: string) {
+    return this.shadow.getElementById(id) as T;
   }
 
-  girafeTranslate() {
+  protected getChildElement<T = HTMLElement>(selector: string) {
+    return this.shadow.querySelector(selector) as T;
+  }
+
+  protected girafeTranslate() {
     this.context.i18nManager.translate(this.shadow);
   }
 
-  userInfoChanged() {
+  private userInfoChanged() {
     this.context.pluginManager.filterPlugins(this.shadow);
   }
 
@@ -61,15 +66,15 @@ class GirafeHTMLElement extends HTMLElement {
    * @param val
    * @returns
    */
-  isNullOrUndefined(val: unknown): boolean {
+  protected isNullOrUndefined(val: unknown): boolean {
     return val === undefined || val === null;
   }
 
-  isNullOrUndefinedOrBlank(val: unknown): boolean {
+  protected isNullOrUndefinedOrBlank(val: unknown): boolean {
     return val === undefined || val === null || val === '';
   }
 
-  getParentOfType(parentNodeName: string, elem: Node | null, initialElem: Node | null = elem): Node | null {
+  protected getParentOfType(parentNodeName: string, elem: Node | null, initialElem: Node | null = elem): Node | null {
     // Stop case : we found null or an object of the right type
     if (elem === null || (elem !== initialElem && elem.nodeName === parentNodeName)) {
       return elem;
@@ -89,7 +94,7 @@ class GirafeHTMLElement extends HTMLElement {
   /**
    * Render the component's template.
    */
-  render() {
+  protected render() {
     // TODO REG : Reactivate this check and fix all the code.
     /*if (this.rendered) {
       throw Error('Component already rendered. Please call refreshRender() instead.');
@@ -111,7 +116,7 @@ class GirafeHTMLElement extends HTMLElement {
    * The method should be called when the component
    * has already been rendered and needs to be updated.
    */
-  refreshRender() {
+  protected refreshRender() {
     if (!this.rendered) {
       throw Error('Component cannot be re-rendered. Please call render() first.');
     }
@@ -135,7 +140,7 @@ class GirafeHTMLElement extends HTMLElement {
    * Renders a hidden span with the name of the component.
    * Useful to render a placeholder for not visible component.
    */
-  renderEmpty() {
+  protected renderEmpty() {
     this.defineDisplayStyle();
     this.hide();
     uRender(this.shadow, uHtml`<span style="display: none">${this.name}</span>`);
@@ -147,7 +152,7 @@ class GirafeHTMLElement extends HTMLElement {
    * This allows to convert a string with html in a right html object.
    * For example, htmlUnsafe('<div></div>') will return an html div object.
    */
-  htmlUnsafe(str: string) {
+  protected htmlUnsafe(str: string) {
     // NOTE REG: If this method is used much more in the future, we will have to take care of memory leaks
     // see discussion here: https://github.com/WebReflection/uhtml/issues/126
     const template = this.getUnsafeTemplate(str);
@@ -186,7 +191,7 @@ class GirafeHTMLElement extends HTMLElement {
    * In those case, we often juste want to do the same as the click event when Enter or Space is pressed
    * Then this method can be used : it just calls the click event on the same element
    */
-  simulateClick(e: KeyboardEvent) {
+  protected simulateClick(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       const target = e.target as HTMLInputElement;
@@ -199,7 +204,7 @@ class GirafeHTMLElement extends HTMLElement {
   /**
    * Hide the component (display: none).
    */
-  hide() {
+  protected hide() {
     this.style.display = 'none';
     this.unregisterInteractionListeners();
   }
@@ -207,33 +212,18 @@ class GirafeHTMLElement extends HTMLElement {
   /**
    * Show the component (display: block).
    */
-  show() {
+  protected show() {
     if (this.displayStyle) {
       this.style.display = this.displayStyle;
     }
   }
 
   /**
-   * Returns the serialization of the current element. This method should be
-   * overwritten by child classes
-   * @returns An object describing the current element serialized
-   */
-  serialize() {
-    return {};
-  }
-
-  /**
-   * Deserialize an element and set the current element state to the deserialized one
-   * @param _serializedElement The element serialization as returned by the serialize method
-   */
-  deserialize(_serializedElement: unknown) {}
-
-  /**
    * Subscribes with <callback> to the state changes made on <path>
    */
-  subscribe(path: string, callback: Callback): Callback;
-  subscribe(path: RegExp, callback: Callback): Callback;
-  subscribe(path: string | RegExp, callback: Callback): Callback {
+  protected subscribe(path: string, callback: Callback): Callback;
+  protected subscribe(path: RegExp, callback: Callback): Callback;
+  protected subscribe(path: string | RegExp, callback: Callback): Callback {
     // @ts-expect-error The call would have succeeded against this implementation,
     // but implementation signatures of overloads are not externally visible.
     const subscription = this.context.stateManager.subscribe(path, callback);
@@ -245,9 +235,9 @@ class GirafeHTMLElement extends HTMLElement {
    *
    * @param callback Unsubscribe all callbacks
    */
-  unsubscribe(callback: Callback): void;
-  unsubscribe(callbacks: Callback[]): void;
-  unsubscribe(callbacks: Callback | Callback[]): void {
+  protected unsubscribe(callback: Callback): void;
+  protected unsubscribe(callbacks: Callback[]): void;
+  protected unsubscribe(callbacks: Callback | Callback[]): void {
     (Array.isArray(callbacks) ? callbacks : [callbacks]).forEach((callback) => {
       const index = this.callbacks.findIndex((c) => c === callback);
       if (index >= 0) {
@@ -257,7 +247,7 @@ class GirafeHTMLElement extends HTMLElement {
     });
   }
 
-  connectedCallback() {
+  protected connectedCallback() {
     this._context = this.getInheritedContext();
     this.context.componentManager.registerComponent(this);
     this.subscribe('language', () => this.girafeTranslate());
@@ -268,7 +258,7 @@ class GirafeHTMLElement extends HTMLElement {
    * When the component is disconnected from the DOM
    * all the callbacks will be unregistered
    */
-  disconnectedCallback() {
+  protected disconnectedCallback() {
     for (const callback of this.callbacks) {
       this.context.stateManager.unsubscribe(callback);
     }
@@ -276,11 +266,11 @@ class GirafeHTMLElement extends HTMLElement {
     this.unregisterInteractionListeners();
   }
 
-  registerInteractionListener(eventName: GgUserInteractionEvent, isExclusive: boolean): boolean {
+  protected registerInteractionListener(eventName: GgUserInteractionEvent, isExclusive: boolean): boolean {
     return this.context.userInteractionManager.registerListener(eventName, isExclusive, this.name);
   }
 
-  unregisterInteractionListeners(eventNames?: GgUserInteractionEvent | GgUserInteractionEvent[]): void {
+  protected unregisterInteractionListeners(eventNames?: GgUserInteractionEvent | GgUserInteractionEvent[]): void {
     if (!eventNames) {
       this.context.userInteractionManager.unregisterAllListenersOfTool(this.name);
     }
@@ -292,7 +282,7 @@ class GirafeHTMLElement extends HTMLElement {
     }
   }
 
-  canExecute(eventName: GgUserInteractionEvent) {
+  protected canExecute(eventName: GgUserInteractionEvent) {
     return this.context.userInteractionManager.canListenerExecute(eventName, this.name);
   }
 

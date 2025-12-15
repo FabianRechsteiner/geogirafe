@@ -4,7 +4,7 @@ import StateManager from '../../../tools/state/statemanager';
 class DragHelper {
   private readonly stateManager: StateManager;
 
-  constructor(stateManager: StateManager) {
+  public constructor(stateManager: StateManager) {
     this.stateManager = stateManager;
   }
 

@@ -8,7 +8,7 @@ class VectorTilesManager {
 
   basemapLayers: olVectorTileLayer[] = [];
 
-  constructor(map: Map) {
+  public constructor(map: Map) {
     this.map = map;
   }
 

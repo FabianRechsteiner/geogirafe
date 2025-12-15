@@ -17,9 +17,9 @@ type UserThemeConfig = {
  * in the layer tree.
  */
 export default class UserLayerManager extends GirafeSingleton {
-  themeLayerItemIds: Record<string, string> = {};
+  private themeLayerItemIds: Record<string, string> = {};
 
-  userThemeConfig: Record<string, UserThemeConfig> = {
+  private readonly userThemeConfig: Record<string, UserThemeConfig> = {
     drawing: {
       name: 'Drawings',
       isRemovable: false,
@@ -37,7 +37,7 @@ export default class UserLayerManager extends GirafeSingleton {
     }
   };
 
-  get state() {
+  private get state() {
     return this.context.stateManager.state;
   }
 

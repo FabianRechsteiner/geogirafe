@@ -3,9 +3,9 @@ import LayerWms from '../../models/layers/layerwms';
 import IGirafeContext from '../context/icontext';
 
 export default class WmsLegendHelper {
-  context: IGirafeContext;
+  private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 

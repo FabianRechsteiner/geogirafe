@@ -18,22 +18,22 @@ export default abstract class OgcApiClient<Server = ServerOgcApi> {
   protected readonly options: OgcApiClientOptions;
   public initialized: boolean;
 
-  get state() {
+  protected get state() {
     return this.stateManager.state;
   }
 
-  get url(): string {
+  public get url(): string {
     return this.getUrl();
   }
 
-  protected constructor(serverOgc: ServerOgc, opt: OgcApiClientOptions, stateManager: StateManager) {
+  public constructor(serverOgc: ServerOgc, opt: OgcApiClientOptions, stateManager: StateManager) {
     this.serverOgc = serverOgc;
     this.options = opt;
     this.stateManager = stateManager;
     this.initialized = false;
   }
 
-  async getServer(): Promise<Server> {
+  public async getServer(): Promise<Server> {
     return this.describeServer();
   }
 

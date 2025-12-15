@@ -6,7 +6,7 @@ import { SourceMapConsumer } from 'source-map-js';
 class ErrorManager extends GirafeSingleton {
   private sourceMaps: { [key: string]: SourceMapConsumer } = {};
 
-  initializeSingleton() {
+  public override initializeSingleton() {
     this.listenToAllErrors();
   }
 

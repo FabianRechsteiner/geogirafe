@@ -6,7 +6,7 @@ import { isCoordinateInDegrees } from '../utils/olutils';
 import { BASEMAP_VISIBLE_PARAMETER, SEARCH_VISIBLE_PARAMETER } from './permalinkmanager-constants';
 
 export default class PermalinkManager extends GirafeSingleton {
-  urlParamKeys: string[] = [
+  private readonly urlParamKeys: string[] = [
     'map_x',
     'map_y',
     'map_zoom',
@@ -20,10 +20,10 @@ export default class PermalinkManager extends GirafeSingleton {
     SEARCH_VISIBLE_PARAMETER,
     BASEMAP_VISIBLE_PARAMETER
   ];
-  urlParamKeysWithPrefix: string[] = ['wfs_'];
-  params: Record<string, string | null> = {};
+  private readonly urlParamKeysWithPrefix: string[] = ['wfs_'];
+  private params: Record<string, string | null> = {};
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.getPermalinkParamsFromUrl();
     this.removePermalinkParamsFromUrl();
     this.setStateFromParams();

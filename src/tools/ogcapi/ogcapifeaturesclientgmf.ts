@@ -6,7 +6,7 @@ import IGirafeContext from '../context/icontext';
 import { OgcApiClientOptions } from './ogcapiclient';
 
 export default class OgcApiFeaturesClientGmf extends OgcApiFeaturesClient {
-  constructor(serverConfig: ServerOgc, opt: OgcApiClientOptions, context: IGirafeContext) {
+  public constructor(serverConfig: ServerOgc, opt: OgcApiClientOptions, context: IGirafeContext) {
     super(serverConfig, opt, context);
   }
 
@@ -14,7 +14,7 @@ export default class OgcApiFeaturesClientGmf extends OgcApiFeaturesClient {
    * POC overwrite: The demo server does not support schema requests. We therefore create a very simple schema based on
    * the first item of the collection.
    */
-  public async getSchema(collectionId: string): Promise<OapifSchemaResponse> {
+  public override async getSchema(collectionId: string): Promise<OapifSchemaResponse> {
     const items = await this.getItems(collectionId, undefined, undefined, 1);
     const item: Feature = items[0];
     const properties: Record<string, OapifPropertySchema> = Object.fromEntries(

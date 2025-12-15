@@ -16,11 +16,11 @@ class LayerLocalFile extends Layer implements ILayerWithLegend {
   public _features: Feature<Geometry>[];
   public lastModifiedDate: string;
   public legend: boolean = true;
-  public isLegendExpanded: boolean;
+  public override isLegendExpanded: boolean;
   public wasLegendExpanded: boolean;
   public extent: Extent;
 
-  constructor(file: File, features: Feature<Geometry>[], extent: Extent, locale: string) {
+  public constructor(file: File, features: Feature<Geometry>[], extent: Extent, locale: string) {
     super(0, file.name, 0, { isDefaultChecked: true });
     this._features = features;
     this.extent = extent;
@@ -29,7 +29,7 @@ class LayerLocalFile extends Layer implements ILayerWithLegend {
     this.wasLegendExpanded = false;
   }
 
-  clone(): LayerLocalFile {
+  public clone(): LayerLocalFile {
     throw new Error('Cannot clone layer for local file.');
   }
 }

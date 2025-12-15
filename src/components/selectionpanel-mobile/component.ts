@@ -29,7 +29,7 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
   currentIndex = 0;
   private readonly debounceOnAdjustVisible = debounce(this.onAdjustVisible.bind(this), 200);
 
-  constructor() {
+  public constructor() {
     super('selectionpanel-mobile');
   }
 
@@ -62,7 +62,7 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
     this.refreshRender(); // For translations
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     this.subscribe('interface.swipeupPanelContent', this.render.bind(this));

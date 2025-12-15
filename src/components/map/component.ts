@@ -48,6 +48,7 @@ import CircleStyle from 'ol/style/Circle';
 import { parseCoordinates } from '../../tools/geometrytools';
 import CircleGeom from 'ol/geom/Circle';
 import WfsFilter from '../../tools/wfs/wfsfilter';
+import { Callback } from '../../tools/state/statemanager';
 import { applyFeaturesToSelection, applyOpacityToLayers } from '../../tools/utils/utils';
 import { SelectionMode } from '../../models/selection';
 import { platformModifierKeyOnly } from 'ol/events/condition';
@@ -95,6 +96,19 @@ export default class MapComponent extends GirafeHTMLElement {
     return this.context.configManager.Config;
   }
 
+  /**
+   *
+   * @param path Overridden to make those methods public for this component
+   * @param callback
+   */
+  public override subscribe(path: string, callback: Callback): Callback;
+  public override subscribe(path: RegExp, callback: Callback): Callback;
+  public override subscribe(path: string | RegExp, callback: Callback): Callback {
+    // @ts-expect-error The call would have succeeded against this implementation,
+    // but implementation signatures of overloads are not externally visible.
+    return super.subscribe(path, callback);
+  }
+
   // For object selection
   selectedFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
   highlightedFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
@@ -106,7 +120,7 @@ export default class MapComponent extends GirafeHTMLElement {
 
   mapTargetResizeObserver!: ResizeObserver;
 
-  constructor() {
+  public constructor() {
     super('map');
   }
 
@@ -514,15 +528,16 @@ export default class MapComponent extends GirafeHTMLElement {
       // WMS GetFeatureInfo
       const wmsPromises = selectionParams.map((param) => {
         const wmsGetFeatureInfoSelectionParam = param.clone((l) => l.queryable && l.wmsQueryableOnly);
-        const client = this.context.wmsManager.getClient(wmsGetFeatureInfoSelectionParam._ogcServer);
+        const client = this.context.wmsManager.getClient(wmsGetFeatureInfoSelectionParam.ogcServer);
         return client.getFeatureInfo(wmsGetFeatureInfoSelectionParam);
       });
 
       // WFS GetFeature
       const wfsPromises = selectionParams.map((param) => {
         const wfsGetFeatureInfoSelectionParam = param.clone((l) => l.wfsQueryable);
-        const client = this.context.wfsManager.getClient(wfsGetFeatureInfoSelectionParam._ogcServer);
-        return client.getFeature(wfsGetFeatureInfoSelectionParam);
+        const client = this.context.wfsManager.getClient(wfsGetFeatureInfoSelectionParam.ogcServer);
+        const features = client.getFeature(wfsGetFeatureInfoSelectionParam);
+        return features;
       });
 
       const wmsGmlFeatures = (await Promise.all(wmsPromises)).flat();
@@ -540,7 +555,7 @@ export default class MapComponent extends GirafeHTMLElement {
     }
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.olMap = this.context.mapManager.getMap();
     this.focusFeature = new FocusFeature(this.olMap, this.context.configManager);
@@ -695,6 +710,11 @@ export default class MapComponent extends GirafeHTMLElement {
       // ambientOcclusion.uniforms.bias = 0.5;
       // ambientOcclusion.uniforms.stepSize = 1;
       // ambientOcclusion.uniforms.blurStepSize = 1;
+
+      // REG: Adding the following line solves the problem, but it remains a log less performatn with ambiant occlusion.
+      // So I don't know what we want to do with it.
+      // See https://github.com/CesiumGS/cesium/issues/13039#issuecomment-3583233494
+      // viewer.camera.frustum.near = 1.0;
 
       this.loading = false;
       this.state.globe.loaded = true;
@@ -942,11 +962,19 @@ export default class MapComponent extends GirafeHTMLElement {
     if (layer instanceof LayerWms && layer.active) {
       this.context.wmsManager.getClient(layer).changeTimeRestriction(layer);
     } else if (layer instanceof GroupLayer) {
-      // Apply the time restriction to all children of the group layers
-      for (const childLayer of layer.children) {
-        if (isTimeAwareLayer(childLayer) && childLayer.timeRestriction !== layer.timeRestriction) {
-          childLayer.timeRestriction = layer.timeRestriction;
-        }
+      this.context.stateManager.batchChanges(() => {
+        // Recursively apply the time restriction to all children of the group layer
+        this.setTimeRestrictionOnChildren(layer, layer.timeRestriction);
+      });
+    }
+  }
+
+  private setTimeRestrictionOnChildren(layer: GroupLayer, newTime: string | undefined) {
+    for (const childLayer of layer.children) {
+      if (childLayer instanceof GroupLayer) {
+        this.setTimeRestrictionOnChildren(childLayer, newTime);
+      } else if (isTimeAwareLayer(childLayer) && childLayer.timeRestriction !== newTime) {
+        childLayer.timeRestriction = newTime;
       }
     }
   }

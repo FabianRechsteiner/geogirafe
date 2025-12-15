@@ -64,9 +64,13 @@ describe('WmsClient.addLayer()', () => {
     wmsClientQg1L1.addLayer(layerQg1L3);
     wmsClientQg2L1.addLayer(layerQg2L1);
 
+    // @ts-expect-error: private property
     expect(wmsClientQg1L1.layerInStandardLayers(layerQg1L1)).toEqual(true);
+    // @ts-expect-error: private property
     expect(wmsClientQg1L1.layerInStandardLayers(layerQg1L3)).toEqual(true);
+    // @ts-expect-error: private property
     expect(wmsClientQg1L1.layerIsIndependentLayer(layerQg1L1)).toEqual(false);
+    // @ts-expect-error: private property
     expect(wmsClientQg1L1.layerIsIndependentLayer(layerQg1L3)).toEqual(false);
   });
 
@@ -76,7 +80,9 @@ describe('WmsClient.addLayer()', () => {
     wmsClientQg1L1.addLayer(layerQg1L3);
     wmsClientQg2L1.addLayer(layerQg2L1);
 
+    // @ts-expect-error: private property
     expect(wmsClientQg1L1.layerIsIndependentLayer(layerQg1L2)).toEqual(true);
+    // @ts-expect-error: private property
     expect(wmsClientQg1L1.layerInStandardLayers(layerQg1L2)).toEqual(false);
   });
 });
@@ -119,19 +125,26 @@ describe('WmsClient.selectFeatures()', () => {
     // add selection param wmsClientQg2 standardLayers
     wmsClientQg2L1.selectFeatures([0, 1, 2, 3]);
 
+    // @ts-expect-error: private property
     expect(wmsClientQg1L1.state.selection.selectionParameters.length).toEqual(3);
 
-    expect(wmsClientQg1L1.state.selection.selectionParameters[0]._layers.map((l) => l.name)).toEqual([
+    // @ts-expect-error: private property
+    expect(wmsClientQg1L1.state.selection.selectionParameters[0].layers.map((l) => l.name)).toEqual([
       'qgis1-layer1',
       'qgis1-layer3'
     ]);
-    expect(wmsClientQg1L1.state.selection.selectionParameters[0]._ogcServer).toEqual(ogcServerQg1);
+    // @ts-expect-error: private property
+    expect(wmsClientQg1L1.state.selection.selectionParameters[0].ogcServer).toEqual(ogcServerQg1);
 
-    expect(wmsClientQg1L1.state.selection.selectionParameters[1]._layers.map((l) => l.name)).toEqual(['qgis1-layer2']);
-    expect(wmsClientQg1L1.state.selection.selectionParameters[1]._ogcServer).toEqual(ogcServerQg1);
+    // @ts-expect-error: private property
+    expect(wmsClientQg1L1.state.selection.selectionParameters[1].layers.map((l) => l.name)).toEqual(['qgis1-layer2']);
+    // @ts-expect-error: private property
+    expect(wmsClientQg1L1.state.selection.selectionParameters[1].ogcServer).toEqual(ogcServerQg1);
 
-    expect(wmsClientQg1L1.state.selection.selectionParameters[2]._layers.map((l) => l.name)).toEqual(['qgis2-layer1']);
-    expect(wmsClientQg1L1.state.selection.selectionParameters[2]._ogcServer).toEqual(ogcServerQg2);
+    // @ts-expect-error: private property
+    expect(wmsClientQg1L1.state.selection.selectionParameters[2].layers.map((l) => l.name)).toEqual(['qgis2-layer1']);
+    // @ts-expect-error: private property
+    expect(wmsClientQg1L1.state.selection.selectionParameters[2].ogcServer).toEqual(ogcServerQg2);
   });
 });
 
@@ -172,6 +185,7 @@ describe('WmsClient.GetFeatureInfo()', () => {
     wmsClientQg1L1.selectFeatures([0, 1, 2, 3]);
     wmsClientQg2L1.selectFeatures([0, 1, 2, 3]);
 
+    // @ts-expect-error: private property
     const selectionParams = wmsClientQg1L1.state.selection.selectionParameters;
     selectionParam1Qg1 = selectionParams[0];
     selectionParam2Qg1 = selectionParams[1];

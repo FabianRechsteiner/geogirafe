@@ -12,7 +12,7 @@ class SimpleMaskManager {
   private readonly map: Map;
   private visible: boolean = false;
 
-  constructor(map: Map) {
+  public constructor(map: Map) {
     this.map = map;
   }
 

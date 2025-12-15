@@ -45,7 +45,7 @@ export default class PrintManager {
   protected encoder: MFPEncoder;
   protected customizer: BaseCustomizer;
 
-  constructor() {
+  public constructor() {
     this.legendEncoder = new MFPLegendEncoder();
     this.encoder = new MFPEncoder();
     this.customizer = new BaseCustomizer();

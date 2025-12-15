@@ -61,7 +61,7 @@ export default class ResizeWindow {
   /**
    * Create the instance and calls init.
    */
-  constructor(shadow: ShadowRoot) {
+  public constructor(shadow: ShadowRoot) {
     this.shadow = shadow;
     this.host = (this.shadow.getRootNode() as ShadowRoot).host as HTMLElement;
     this.init();
@@ -70,7 +70,7 @@ export default class ResizeWindow {
   /**
    * Initializes the class by cleaning and attaching events to new existing elements.
    */
-  init() {
+  private init() {
     this.destroy();
     this.elements = this.directions.map((direction) => {
       return this.attachEvent(direction);
@@ -80,7 +80,7 @@ export default class ResizeWindow {
   /**
    * Destroys all elements in the object and removes their onmousedown event listeners.
    */
-  destroy() {
+  public destroy() {
     this.elements.filter((element) => element !== null).forEach((element) => (element!.onmousedown = null));
     this.elements = [];
   }

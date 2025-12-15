@@ -15,7 +15,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
   private areAllLegendExpanded: boolean = true;
   public isTreeFiltered: boolean = false;
 
-  constructor() {
+  public constructor() {
     super('treeviewroot');
   }
 
@@ -39,7 +39,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
     this.subscribe(/layers\.layersList\..*\.order/, () => this.refreshRender());
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.filterHelper = new TreeViewFilterHelper(this.context);
     this.render();

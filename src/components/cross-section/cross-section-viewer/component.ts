@@ -30,7 +30,7 @@ class CrossSectionViewComponent extends GirafeResizableElement {
   pytreeManager: PytreeManager | null = null;
   private scatterplotInitialized = false;
 
-  constructor() {
+  public constructor() {
     super('cross-section-view');
   }
 
@@ -631,7 +631,7 @@ class CrossSectionViewComponent extends GirafeResizableElement {
     this.render();
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     this.crossSectionState = this.state.extendedState.crossSection as CrossSectionState;
     this.abortController = new AbortController();

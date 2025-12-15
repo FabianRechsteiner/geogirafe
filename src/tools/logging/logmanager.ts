@@ -1,13 +1,13 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 
 export default class LogManager extends GirafeSingleton {
-  defaultDebug: typeof console.debug = console.debug;
-  defaultLog: typeof console.log = console.log;
-  defaultInfo: typeof console.info = console.info;
-  defaultWarn: typeof console.warn = console.warn;
-  defaultError: typeof console.error = console.error;
+  private readonly defaultDebug: typeof console.debug = console.debug;
+  private readonly defaultLog: typeof console.log = console.log;
+  private readonly defaultInfo: typeof console.info = console.info;
+  private readonly defaultWarn: typeof console.warn = console.warn;
+  private readonly defaultError: typeof console.error = console.error;
 
-  initLogging() {
+  public initLogging() {
     console.debug = this.debug.bind(this);
     console.log = this.log.bind(this);
     console.info = this.info.bind(this);

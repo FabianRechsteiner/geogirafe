@@ -33,9 +33,9 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
   public timeAttribute?: string;
   public timeRestriction?: string;
 
-  children: BaseLayer[] = [];
+  public children: BaseLayer[] = [];
 
-  constructor(id: number, name: string, order: number, options?: GroupLayerOptions) {
+  public constructor(id: number, name: string, order: number, options?: GroupLayerOptions) {
     super(id, name, order, options);
     this.isExpanded = options?.isDefaultExpanded || false;
     this.isExclusiveGroup = options?.isExclusiveGroup ?? false;
@@ -46,7 +46,7 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
     this.setDefaultTimeRestriction();
   }
 
-  clone(): GroupLayer {
+  public clone(): GroupLayer {
     const options = {
       isDefaultChecked: this.isDefaultChecked,
       metadataUrl: this.metadataUrl,
@@ -71,23 +71,23 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
     return clonedObject;
   }
 
-  get active() {
+  public get active() {
     return this.activeState === 'on';
   }
 
-  get inactive() {
+  public get inactive() {
     return this.activeState === 'off';
   }
 
-  get semiActive() {
+  public get semiActive() {
     return this.activeState === 'semi';
   }
 
-  get hasTimeRestriction() {
+  public get hasTimeRestriction() {
     return !!this.timeRestriction;
   }
 
-  get hasGrandChildren(): boolean {
+  public get hasGrandChildren(): boolean {
     for (const child of this.children) {
       if ((child as GroupLayer).children?.length) {
         return true;
@@ -96,7 +96,7 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
     return false;
   }
 
-  setDefaultTimeRestriction() {
+  public setDefaultTimeRestriction() {
     if (this.timeOptions) {
       const timeFormatter = new LayerTimeFormatter(this.timeOptions);
       this.timeRestriction = timeFormatter.getFormattedDefault();
@@ -107,7 +107,7 @@ class GroupLayer extends BaseLayer implements ILayerWithTime {
    * Checks if all the children are LayerWms with the same ogcServer, opacity
    * time
    */
-  get isMixed(): boolean {
+  public get isMixed(): boolean {
     // It was explicitly set to true, it can't be unmixed
     if (this._isMixed) {
       return this._isMixed;

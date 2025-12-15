@@ -11,7 +11,7 @@ export type ScaleFn = (frameState: FrameState) => number;
 class PrintMaskLayer extends SimpleMaskLayer {
   private scaleFn?: ScaleFn;
 
-  constructor(options = {}) {
+  public constructor(options = {}) {
     super({ className: 'printMask', ...options });
   }
 

@@ -24,7 +24,7 @@ class LayerTimeFormatter {
   public minDefaultValue?: Date;
   public maxDefaultValue?: Date;
 
-  constructor(options?: ITimeOptions) {
+  public constructor(options?: ITimeOptions) {
     this.minValue = new Date(options?.minValue ?? MIN_DATE);
     this.maxValue = new Date(options?.maxValue ?? MAX_DATE);
     this.resolution = options?.resolution ?? 'month';
@@ -171,16 +171,16 @@ class LayerTimeFormatter {
   /**
    * Formats a given date into a date string of type 'YYYY-MM-DD'.
    */
-  static formatAsDate(date: Date): string {
+  private static formatAsDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
 
-  static getMondayOfWeek(date: Date): Date {
+  private static getMondayOfWeek(date: Date): Date {
     const monday = date.getUTCDate() - date.getUTCDay() + (date.getUTCDay() === 0 ? -6 : 1);
     return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), monday));
   }
 
-  static getSundayOfWeek(date: Date): Date {
+  private static getSundayOfWeek(date: Date): Date {
     const weekEndDay = date.getUTCDate() - (date.getUTCDay() === 0 ? 7 : date.getUTCDay()) + 7;
     return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), weekEndDay));
   }
@@ -189,7 +189,7 @@ class LayerTimeFormatter {
    * Formats a given date into a string, representing the week range from Monday to Sunday that the date falls into,
    * e.g. 'YYYY-MM-DD/YYYY-MM-DD'
    */
-  static formatAsWeekRange(date: Date): string {
+  private static formatAsWeekRange(date: Date): string {
     const startOfWeek = LayerTimeFormatter.getMondayOfWeek(date);
     const endOfWeek = LayerTimeFormatter.getSundayOfWeek(date);
     return `${LayerTimeFormatter.formatAsDate(startOfWeek)}${TIME_RANGE_SEPARATOR}${LayerTimeFormatter.formatAsDate(endOfWeek)}`;
@@ -198,14 +198,14 @@ class LayerTimeFormatter {
   /**
    * Formats a given date into a date string of type 'YYYY-MM'.
    */
-  static formatAsMonth(date: Date): string {
+  private static formatAsMonth(date: Date): string {
     return `${date.toISOString().split('T')[0].slice(0, -3)}`;
   }
 
   /**
    * Formats a given date into a year string of type 'YYYY'.
    */
-  static formatAsYear(date: Date): string {
+  private static formatAsYear(date: Date): string {
     return `${date.getUTCFullYear()}`;
   }
 
@@ -216,7 +216,7 @@ class LayerTimeFormatter {
    * @param {TimeResolution} resolution - The time resolution specifying the format (e.g. day, week, month, year).
    * @return {string} A formatted string representation of the date based on the provided resolution.
    */
-  static queryStringFromSingleValueAndResolution(date: Date, resolution: TimeResolution): string {
+  public static queryStringFromSingleValueAndResolution(date: Date, resolution: TimeResolution): string {
     switch (resolution) {
       case 'day':
         return LayerTimeFormatter.formatAsDate(date);
@@ -241,7 +241,11 @@ class LayerTimeFormatter {
    * @param {TimeResolution} resolution - The resolution of the date range, can be 'day', 'week', 'month', or 'year'.
    * @return {string} A query string representing the date range formatted according to the specified resolution.
    */
-  static queryStringFromDateRangeAnResolution(lowerLimit: Date, upperLimit: Date, resolution: TimeResolution): string {
+  private static queryStringFromDateRangeAnResolution(
+    lowerLimit: Date,
+    upperLimit: Date,
+    resolution: TimeResolution
+  ): string {
     switch (resolution) {
       case 'day':
         return `${LayerTimeFormatter.formatAsDate(lowerLimit)}${TIME_RANGE_SEPARATOR}${LayerTimeFormatter.formatAsDate(upperLimit)}`;

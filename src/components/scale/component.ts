@@ -4,7 +4,7 @@ class ScaleComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrl = '../../styles/common.css';
 
-  constructor() {
+  public constructor() {
     super('scale');
   }
 
@@ -25,7 +25,7 @@ class ScaleComponent extends GirafeHTMLElement {
     return 'No scale';
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     super.render();
     super.girafeTranslate();

@@ -63,7 +63,7 @@ class SearchComponent extends GirafeHTMLElement {
   // Keeping track of the last input timeout
   private ongoingSearchTimeoutId = 0;
 
-  constructor() {
+  public constructor() {
     super('search');
   }
 
@@ -129,7 +129,7 @@ class SearchComponent extends GirafeHTMLElement {
     );
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
 
     this.defaultSearchStrokeColor = this.context.configManager.Config.search.defaultStrokeColor as string;

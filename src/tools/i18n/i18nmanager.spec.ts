@@ -13,8 +13,10 @@ describe('I18nManager.loadTranslations', () => {
 
   beforeEach(() => {
     context = MockHelper.startMocking();
+    // @ts-expect-error: private property
     context.i18nManager.translations = {};
     i18nManager = context.i18nManager;
+    // @ts-expect-error: private property
     i18nManager.loadingLanguagePromise = null;
     configManager = context.configManager;
     configManager.Config.languages.translations = {};
@@ -26,6 +28,7 @@ describe('I18nManager.loadTranslations', () => {
   });
 
   it('should return cached translations if already loaded', async () => {
+    // @ts-expect-error: private property
     i18nManager.translations['fr'] = { layer: 'couche' };
     // @ts-ignore
     const translations = await i18nManager.loadTranslations('fr');
@@ -36,6 +39,7 @@ describe('I18nManager.loadTranslations', () => {
     const promise = new Promise<TranslationsDict>((resolve) => {
       setTimeout(() => resolve({ layer: 'couche' }), 100);
     });
+    // @ts-expect-error: private property
     i18nManager.loadingLanguagePromise = promise;
     // @ts-ignore
     const translations = await i18nManager.loadTranslations('fr');
@@ -55,7 +59,9 @@ describe('I18nManager.loadTranslations', () => {
     const translations = await i18nManager.loadTranslations('fr');
 
     expect(translations).toEqual({ layer: 'couche', map: 'carte' });
+    // @ts-expect-error: private property
     expect(i18nManager.translations['fr']).toEqual({ layer: 'couche', map: 'carte' });
+    // @ts-expect-error: private property
     expect(i18nManager.loadingLanguagePromise).toBeNull();
   });
 
@@ -72,7 +78,9 @@ describe('I18nManager.loadTranslations', () => {
     const translations = await i18nManager.loadTranslations('fr');
 
     expect(translations).toEqual({ layer: 'reg', map: 'carte' });
+    // @ts-expect-error: private property
     expect(i18nManager.translations['fr']).toEqual({ layer: 'reg', map: 'carte' });
+    // @ts-expect-error: private property
     expect(i18nManager.loadingLanguagePromise).toBeNull();
   });
 
@@ -89,7 +97,9 @@ describe('I18nManager.loadTranslations', () => {
     const translations = await i18nManager.loadTranslations('fr');
 
     expect(translations).toEqual({ layer: 'couche', map: 'carte' });
+    // @ts-expect-error: private property
     expect(i18nManager.translations['fr']).toEqual({ layer: 'couche', map: 'carte' });
+    // @ts-expect-error: private property
     expect(i18nManager.loadingLanguagePromise).toBeNull();
   });
 
@@ -107,6 +117,7 @@ describe('I18nManager.getTranslation', () => {
 
   beforeEach(() => {
     context = MockHelper.startMocking();
+    // @ts-expect-error: private property
     context.i18nManager.translations = {
       fr: { layer: 'couche', map: 'carte' },
       en: { layer: 'layer', map: 'map' }
@@ -145,6 +156,7 @@ describe('I18nManager.getTranslation', () => {
 
   it('should return key if translation does not exist in any language', () => {
     // Unset translations
+    // @ts-expect-error: private property
     i18nManager.translations = {};
 
     // Set current language to English
@@ -162,6 +174,7 @@ describe('I18nManager.translate', () => {
 
   beforeEach(() => {
     context = MockHelper.startMocking();
+    // @ts-expect-error: private property
     context.i18nManager.translations = {
       fr: { layer: 'couche', map: 'carte' },
       en: { layer: 'layer', map: 'map' }
@@ -249,6 +262,7 @@ describe('I18nManager.formatNumber', () => {
 
   it('should format integer number according to locale', () => {
     configManager.Config.general.locale = 'en-US';
+    // @ts-expect-error: private property
     const formatted = i18nManager.formatNumber(12345);
     expect(typeof formatted).toEqual('string');
     expect(formatted).toBe('12,345');
@@ -256,6 +270,7 @@ describe('I18nManager.formatNumber', () => {
 
   it('should format floating point number according to locale', () => {
     configManager.Config.general.locale = 'fr-FR';
+    // @ts-expect-error: private property
     const formatted = i18nManager.formatNumber(123.45);
     expect(typeof formatted).toEqual('string');
     expect(formatted).toBe('123,45');
@@ -263,6 +278,7 @@ describe('I18nManager.formatNumber', () => {
 
   it('should return NaN string for non-numeric input', () => {
     configManager.Config.general.locale = 'en-US';
+    // @ts-expect-error: private property
     const formatted = i18nManager.formatNumber('abc123');
     expect(formatted).toBe('NaN');
   });

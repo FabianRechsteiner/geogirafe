@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 export default class ServiceWorkerHelper {
   private readonly serviceWorker: ServiceWorker | null = null;
 
-  constructor(sw: ServiceWorker | null) {
+  public constructor(sw: ServiceWorker | null) {
     this.serviceWorker = sw;
   }
 

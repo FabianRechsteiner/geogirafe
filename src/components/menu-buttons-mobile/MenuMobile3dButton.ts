@@ -7,7 +7,7 @@ export default class MenuMobile3dButton extends GirafeHTMLElement {
   icon = 'icons/globe.svg';
   label = '2D / 3D';
 
-  constructor() {
+  public constructor() {
     super('mobile-3d-button');
   }
 
@@ -15,7 +15,7 @@ export default class MenuMobile3dButton extends GirafeHTMLElement {
     this.state.globe.display = this.state.globe.display === '3D' ? '2D' : '3D';
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
   }

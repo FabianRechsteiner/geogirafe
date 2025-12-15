@@ -93,6 +93,7 @@ describe('componentComponent', () => {
     it('should return the minimum date for slider position of 0', () => {
       component.initialize(defaultOptions);
       const date = component['sliderPositionToDateString']('0');
+      // @ts-expect-error: private property
       expect(date).toBe(LayerTimeFormatter.formatAsDate(new Date(MIN_DATE)));
     });
 

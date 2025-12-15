@@ -25,27 +25,27 @@ abstract class Layer extends BaseLayer {
   public swiped: 'left' | 'right' | 'no' = 'no';
   public isLegendExpanded: boolean = false;
 
-  declare parent: ThemeLayer | GroupLayer;
+  declare public parent: ThemeLayer | GroupLayer;
 
-  constructor(id: number, name: string, order: number, options?: LayerOptions) {
+  public constructor(id: number, name: string, order: number, options?: LayerOptions) {
     super(id, name, order, options);
     this.opacity = options?.opacity ?? 1;
     this.restricted = options?.restricted ?? false;
   }
 
-  get isTransparent() {
+  public get isTransparent() {
     return this.opacity !== 1;
   }
 
-  get hasValidOpacity() {
+  public get hasValidOpacity() {
     return this.opacity >= 0 && this.opacity <= 1;
   }
 
-  get active() {
+  public get active() {
     return this.activeState === 'on';
   }
 
-  get inactive() {
+  public get inactive() {
     return this.activeState === 'off';
   }
 }

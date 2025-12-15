@@ -6,7 +6,7 @@ import IGirafeContext from '../../../tools/context/icontext';
 export default class TreeViewFilterHelper {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
   /**

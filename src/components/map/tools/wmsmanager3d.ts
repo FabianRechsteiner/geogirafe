@@ -10,7 +10,7 @@ export default class WmsManager3d {
   // Group maps from the same server into one ImageryLayer
   layersRecord: Record<string, { layers: LayerWms; imagery: ImageryLayer }[]> = {};
 
-  constructor(map3d: CesiumScene, context: IGirafeContext) {
+  public constructor(map3d: CesiumScene, context: IGirafeContext) {
     this.map3d = map3d;
     this.context = context;
   }

@@ -10,7 +10,7 @@ class TimePickerComponent extends TimeWidget {
   templateUrl = './template.html';
   styleUrls = ['../../../styles/common.css', './style.css'];
 
-  constructor() {
+  public constructor() {
     super('time-picker');
   }
 

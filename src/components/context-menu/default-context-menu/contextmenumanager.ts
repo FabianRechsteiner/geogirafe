@@ -27,7 +27,7 @@ export default class MapContextMenuManager {
   private readonly rasters: Raster[] = [];
   public projection: string | null = null;
 
-  constructor(mapContextMenuState: MapContextMenuState, context: IGirafeContext) {
+  public constructor(mapContextMenuState: MapContextMenuState, context: IGirafeContext) {
     this.mapContextMenuState = mapContextMenuState;
     this.context = context;
   }

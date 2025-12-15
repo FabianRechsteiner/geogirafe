@@ -59,7 +59,7 @@ export type PotreeMetadata = {
 export class PytreeManager {
   baseURL: string;
   config: PytreeConfig | null = null;
-  constructor(theBaseURL: string) {
+  public constructor(theBaseURL: string) {
     this.baseURL = theBaseURL;
   }
 

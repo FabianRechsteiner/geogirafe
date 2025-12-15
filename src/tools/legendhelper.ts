@@ -10,7 +10,7 @@ class LegendHelper {
    * @param options to create the legend url.
    * @returns The legend URL or undefined.
    */
-  static readonly getWMSLegendURL = (
+  public static readonly getWMSLegendURL = (
     url: string | undefined,
     layerName: string,
     options?: WMSLegendURLOptions
@@ -70,7 +70,7 @@ class LegendHelper {
    * @param {TileLayer<WMTS>} olayer - The OpenLayers tile layer object.
    * @returns The legend URL or undefined if not found.
    */
-  static readonly getWMTSLegendURL = (olayer: TileLayer<WMTS>): string | undefined => {
+  public static readonly getWMTSLegendURL = (olayer: TileLayer<WMTS>): string | undefined => {
     // BGE case of multiple styles ? case of multiple legendUrl ?
     const styles = olayer.get('capabilitiesStyles');
     if (!Array.isArray(styles) || styles.length <= 0) {

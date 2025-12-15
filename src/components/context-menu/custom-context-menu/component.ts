@@ -15,7 +15,7 @@ class MapCustomContextMenuComponent extends GirafeHTMLElement {
   // Because OpenLayer is recreating a new object each time when we do an addOverlay()
   private static contextMenuOverlay: Overlay;
 
-  constructor() {
+  public constructor() {
     super('custom-map-context-menu');
   }
 
@@ -44,7 +44,7 @@ class MapCustomContextMenuComponent extends GirafeHTMLElement {
     });
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     if (!MapCustomContextMenuComponent.contextMenuOverlay) {
       MapCustomContextMenuComponent.contextMenuOverlay = new Overlay({

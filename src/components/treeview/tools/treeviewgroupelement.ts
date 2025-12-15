@@ -6,7 +6,7 @@ import TreeViewElement from './treeviewelement';
 export default abstract class TreeViewGroupElement extends TreeViewElement {
   override layer: GroupLayer | ThemeLayer;
 
-  constructor(layer: GroupLayer | ThemeLayer, name: string) {
+  public constructor(layer: GroupLayer | ThemeLayer, name: string) {
     super(layer, name);
     this.layer = layer;
   }

@@ -13,7 +13,7 @@ export default class DrawingManager {
 
   private readonly map: Map;
 
-  constructor(map: Map) {
+  public constructor(map: Map) {
     this.map = map;
   }
 

@@ -17,7 +17,7 @@ class ThemeComponent extends GirafeHTMLElement {
     return this.context.customThemesManager.customThemes;
   }
 
-  constructor() {
+  public constructor() {
     super('themes');
   }
 
@@ -93,7 +93,7 @@ class ThemeComponent extends GirafeHTMLElement {
     }
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     super.render();
     this.registerEvents();

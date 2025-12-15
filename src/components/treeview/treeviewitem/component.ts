@@ -42,7 +42,7 @@ class TreeViewItemComponent extends TreeViewElement {
     }
   }
 
-  constructor(layer: Layer) {
+  public constructor(layer: Layer) {
     super(layer, 'treeviewitem');
     this.layer = layer;
   }
@@ -230,7 +230,7 @@ class TreeViewItemComponent extends TreeViewElement {
     this.removeFromParent();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.wmsLegendHelper = new WmsLegendHelper(this.context);
     this.render();

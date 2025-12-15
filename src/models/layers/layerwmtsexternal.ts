@@ -1,7 +1,7 @@
 import LayerWmts from './layerwmts';
 
 export default class LayerWmtsExternal extends LayerWmts {
-  static nextAvailableLayerId = 20000000;
+  private static nextAvailableLayerId = 20000000;
 
   private selected: boolean = false;
 
@@ -14,12 +14,12 @@ export default class LayerWmtsExternal extends LayerWmts {
     this.isDefaultChecked = value;
   }
 
-  constructor(name: string, url: string, layer: string) {
+  public constructor(name: string, url: string, layer: string) {
     const id = LayerWmtsExternal.nextAvailableLayerId++;
     super(id, name, 0, url, layer);
   }
 
-  override clone(): LayerWmtsExternal {
+  public override clone(): LayerWmtsExternal {
     const clonedLayer = new LayerWmtsExternal(this.name, this.url, this.layer);
     clonedLayer.isSelected = this.isSelected;
     return clonedLayer;

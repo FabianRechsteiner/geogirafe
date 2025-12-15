@@ -10,11 +10,11 @@ class LayerManager extends GirafeSingleton {
   private readonly layerClones: BaseLayer[] = [];
   private readonly layerIdToClone: Map<string, BaseLayer> = new Map<string, BaseLayer>();
 
-  get state() {
+  private get state() {
     return this.context.stateManager.state;
   }
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.context.stateManager.subscribe(
       /layers\.layersList\..*\.activeState/,
       (_oldActive: boolean, _newActive: boolean, layer: BaseLayer) => this.onLayerToggled(layer)
@@ -85,13 +85,13 @@ class LayerManager extends GirafeSingleton {
     return allLayers;
   }
 
-  activateIfDefaultChecked(layer: BaseLayer) {
+  private activateIfDefaultChecked(layer: BaseLayer) {
     if (layer.isDefaultChecked) {
       this.toggle(layer, 'on');
     }
   }
 
-  toggle(layer: BaseLayer, state: 'on' | 'off') {
+  public toggle(layer: BaseLayer, state: 'on' | 'off') {
     if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       this.toggleGroupOrTheme(layer, state);
     } else if (layer instanceof Layer) {
@@ -102,11 +102,11 @@ class LayerManager extends GirafeSingleton {
   private onLayerToggled(layer: BaseLayer) {
     if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       // Toggle parents if necessary
-      this.#manageExclusiveGroups(layer);
-      this.#toggleParent(layer);
+      this.manageExclusiveGroups(layer);
+      this.toggleParent(layer);
       // Toggle childs if necessary
       if (layer.activeState !== 'semi') {
-        this.#toggleChilds(layer, layer.activeState);
+        this.toggleChilds(layer, layer.activeState);
       }
     } else if (layer instanceof Layer) {
       // Hide the legend when the layer is deactivated (if configured so)
@@ -122,14 +122,14 @@ class LayerManager extends GirafeSingleton {
         }
       }
       // Toggle parents if necessary
-      this.#manageExclusiveGroups(layer);
-      this.#toggleParent(layer);
+      this.manageExclusiveGroups(layer);
+      this.toggleParent(layer);
     }
 
-    this.#manageDisclaimer(layer);
+    this.manageDisclaimer(layer);
   }
 
-  #manageDisclaimer(layer: BaseLayer) {
+  private manageDisclaimer(layer: BaseLayer) {
     if (layer.active && layer.disclaimer) {
       this.state.infobox.elements.push({
         id: layer.treeItemId,
@@ -146,7 +146,7 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  toggleLayer(layer: Layer, state?: 'on' | 'off') {
+  public toggleLayer(layer: Layer, state?: 'on' | 'off') {
     if (!(layer instanceof Layer)) {
       throw new Error('This method should only be called on leafs layers, not on groups');
     }
@@ -166,7 +166,7 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  toggleGroupOrTheme(groupOrTheme: GroupLayer | ThemeLayer, state?: 'on' | 'off' | 'semi') {
+  public toggleGroupOrTheme(groupOrTheme: GroupLayer | ThemeLayer, state?: 'on' | 'off' | 'semi') {
     let newState: 'on' | 'off' | 'semi';
     if (state) {
       newState = state;
@@ -182,20 +182,20 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  #toggleParent(layer: BaseLayer) {
+  private toggleParent(layer: BaseLayer) {
     if (layer.parent) {
       if (
         (layer.parent instanceof GroupLayer && layer.parent.isExclusiveGroup) ||
         (layer.parent instanceof ThemeLayer && layer.parent.isExclusiveTheme)
       ) {
-        if (this.#isAnyChildActive(layer.parent)) {
+        if (this.isAnyChildActive(layer.parent)) {
           this.toggleGroupOrTheme(layer.parent, 'on');
         } else {
           this.toggleGroupOrTheme(layer.parent, 'off');
         }
-      } else if (this.#areAllChildrenActive(layer.parent)) {
+      } else if (this.areAllChildrenActive(layer.parent)) {
         this.toggleGroupOrTheme(layer.parent, 'on');
-      } else if (this.#areAllChildrenInactive(layer.parent)) {
+      } else if (this.areAllChildrenInactive(layer.parent)) {
         this.toggleGroupOrTheme(layer.parent, 'off');
       } else {
         this.toggleGroupOrTheme(layer.parent, 'semi');
@@ -203,11 +203,11 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  #toggleChilds(group: GroupLayer | ThemeLayer, state: 'on' | 'off') {
+  private toggleChilds(group: GroupLayer | ThemeLayer, state: 'on' | 'off') {
     if (group instanceof GroupLayer && group.active && group.isExclusiveGroup && group.children.length >= 1) {
       // We activate a group, and this group is an exclusive group.
       // If there isn't any active child yet, we activate the first one
-      if (!this.#isAnyChildActive(group)) {
+      if (!this.isAnyChildActive(group)) {
         this.toggle(group.children[0], state);
       }
     } else {
@@ -218,7 +218,7 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  #manageExclusiveGroups(layer: BaseLayer) {
+  private manageExclusiveGroups(layer: BaseLayer) {
     // This method manages the case of exclusives groups:
     // If we have activate a layer, and if the parent group is defined as "exclusive"
     // It means only 1 child can be activated at the same time.
@@ -243,7 +243,7 @@ class LayerManager extends GirafeSingleton {
     }
   }
 
-  #areAllChildrenActive(groupOrTheme: GroupLayer | ThemeLayer) {
+  private areAllChildrenActive(groupOrTheme: GroupLayer | ThemeLayer) {
     let allActive = true;
     for (const child of groupOrTheme.children) {
       if (!child.active) {
@@ -253,7 +253,7 @@ class LayerManager extends GirafeSingleton {
     return allActive;
   }
 
-  #areAllChildrenInactive(groupOrTheme: GroupLayer | ThemeLayer) {
+  private areAllChildrenInactive(groupOrTheme: GroupLayer | ThemeLayer) {
     let allInactive = true;
     for (const child of groupOrTheme.children) {
       if (!child.inactive) {
@@ -263,7 +263,7 @@ class LayerManager extends GirafeSingleton {
     return allInactive;
   }
 
-  #isAnyChildActive(groupOrTheme: GroupLayer | ThemeLayer) {
+  private isAnyChildActive(groupOrTheme: GroupLayer | ThemeLayer) {
     for (const child of groupOrTheme.children) {
       if (child.active) {
         return true;
@@ -276,22 +276,22 @@ class LayerManager extends GirafeSingleton {
     return false;
   }
 
-  setError(layer: BaseLayer, error: string) {
+  public setError(layer: BaseLayer, error: string) {
     layer.hasError = true;
     layer.errorMessage = error;
     console.warn(layer.errorMessage);
   }
 
-  unsetError(layer: BaseLayer) {
+  public unsetError(layer: BaseLayer) {
     layer.hasError = false;
     layer.errorMessage = null;
   }
 
-  isLayerWithLegend(layer: ILayerWithLegend | Layer): layer is ILayerWithLegend {
+  public isLayerWithLegend(layer: ILayerWithLegend | Layer): layer is ILayerWithLegend {
     return (<ILayerWithLegend>layer).isLegendExpanded !== undefined;
   }
 
-  isLayerWithFilter(layer: ILayerWithFilter | Layer): layer is ILayerWithFilter {
+  public isLayerWithFilter(layer: ILayerWithFilter | Layer): layer is ILayerWithFilter {
     return (<ILayerWithFilter>layer).filter !== undefined;
   }
 

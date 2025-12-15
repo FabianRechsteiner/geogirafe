@@ -22,7 +22,7 @@ class LayerVectorTiles extends Layer {
   public source: string;
   public projection?: string;
 
-  constructor(
+  public constructor(
     id: number,
     name: string,
     order: number,
@@ -36,7 +36,7 @@ class LayerVectorTiles extends Layer {
     this.projection = options?.projection;
   }
 
-  clone() {
+  public clone() {
     const options = {
       projection: this.projection,
       isDefaultChecked: this.isDefaultChecked,

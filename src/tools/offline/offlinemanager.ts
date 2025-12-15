@@ -42,7 +42,7 @@ class OfflineManager extends GirafeSingleton {
     })
   });
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.map.addLayer(this.vectorLayer);
   }
 
@@ -293,11 +293,11 @@ class OfflineManager extends GirafeSingleton {
     });
   }
 
-  async clearTileStore() {
+  public async clearTileStore() {
     this.clearStore(this.tilesStoreName);
   }
 
-  async clearBBoxStore() {
+  public async clearBBoxStore() {
     this.vectorLayer.setSource(null);
     this.clearStore(this.bboxStoreName);
   }

@@ -21,7 +21,7 @@ export class UserPreference {
   private readonly _configToStateMapper: (valueInConfig: any) => any;
   private _options: PreferenceOption[] = [];
 
-  constructor(
+  public constructor(
     configPath: string,
     statePath: string | null,
     group: PreferenceGroup,

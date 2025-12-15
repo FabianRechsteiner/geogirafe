@@ -77,12 +77,14 @@ describe('LayerTimeFormatter', () => {
     });
 
     it('should format week range', () => {
+      // @ts-expect-error: private property
       const week = LayerTimeFormatter.formatAsWeekRange(new Date('2025-01-04T00:00:00Z')); // Saturday
 
       expect(week).toBe('2024-12-30/2025-01-05');
     });
 
     it('should format week range ignoring local time', () => {
+      // @ts-expect-error: private property
       const week = LayerTimeFormatter.formatAsWeekRange(new Date('2025-01-05T23:59:59Z')); // Sunday night
 
       expect(week).toBe('2024-12-30/2025-01-05');

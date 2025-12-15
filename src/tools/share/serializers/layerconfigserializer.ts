@@ -26,7 +26,7 @@ import ServerOgc from '../../../models/serverogc';
 export default class LayersConfigSerializer implements IBrainSerializer<LayersConfig> {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 

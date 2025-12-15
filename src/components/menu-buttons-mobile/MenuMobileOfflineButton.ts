@@ -7,7 +7,7 @@ export default class MenuMobileOfflineButton extends GirafeHTMLElement {
   icon = 'icons/offline.svg';
   label = 'Offline mode';
 
-  constructor() {
+  public constructor() {
     super('mobile-drawing-button');
   }
 
@@ -21,7 +21,7 @@ export default class MenuMobileOfflineButton extends GirafeHTMLElement {
     }, 50);
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
   }

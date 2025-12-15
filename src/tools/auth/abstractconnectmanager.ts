@@ -4,7 +4,7 @@ export default abstract class AbstractConnectManager {
   private readonly storagePath = 'oAuth';
 
   protected readonly context;
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 

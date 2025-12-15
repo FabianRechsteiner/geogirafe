@@ -16,11 +16,11 @@ export type AllSearchResults = {
 };
 
 export default class SearchResult {
-  bbox?: Extent;
+  public bbox?: Extent;
 
-  geometry?: GeometryResult | GeometryCollectionResult;
+  public geometry?: GeometryResult | GeometryCollectionResult;
 
-  properties?: {
+  public properties?: {
     label: string;
     layer_name: string;
     actions: {
@@ -29,5 +29,5 @@ export default class SearchResult {
     }[];
   };
 
-  selected: boolean = false;
+  public selected: boolean = false;
 }

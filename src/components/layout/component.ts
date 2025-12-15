@@ -12,7 +12,7 @@ class LayoutComponent extends GirafeHTMLElement implements IGirafePanel {
   panelTitle = 'layout-panel';
   panelTogglePath = 'interface.layoutPanelVisible';
 
-  constructor() {
+  public constructor() {
     super('layout');
     this.onLayoutSelect = this.onLayoutSelect.bind(this);
     this.onShadowsToggle = this.onShadowsToggle.bind(this);
@@ -95,7 +95,7 @@ class LayoutComponent extends GirafeHTMLElement implements IGirafePanel {
     this.state.globe.shadowsTimestamp = date.valueOf();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     this.registerEvents();

@@ -46,11 +46,13 @@ describe('WMS Manager tests', () => {
 
   describe('WmsManager.getClient()', () => {
     it('should return a WmsClientQGis for a layerWms of type qgisserver', () => {
+      // @ts-expect-error: private property
       expect(wmsClientQg1L1.ogcServer.name).toEqual('QGIS-1-has-wfs');
       expect(wmsClientQg1L1 instanceof WmsClientQgis).toEqual(true);
     });
 
     it('should return a WmsClientMapServer for an OgcServer of type mapserver', () => {
+      // @ts-expect-error: private property
       expect(wmsClientMsOgcS1.ogcServer.name).toEqual('MapServer-1-has-wfs');
       expect(wmsClientMsOgcS1 instanceof WmsClientMapServer).toEqual(true);
     });

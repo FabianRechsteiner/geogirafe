@@ -69,11 +69,11 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
    * It has to be the same when coming back from the issuer after a redirect
    * Therefore, we keep it in localStorage.
    */
-  get codeVerifier(): string {
+  private get codeVerifier(): string {
     return this.loadFromLocalStorage('codeVerifier') as string;
   }
 
-  set codeVerifier(value: string) {
+  private set codeVerifier(value: string) {
     this.saveToLocalStorage('codeVerifier', value);
   }
 
@@ -264,7 +264,7 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     }
   }
 
-  async logoutFromIssuer() {
+  private async logoutFromIssuer() {
     // Save the current state of the application before logout
     this.context.sessionManager.saveStateToSession();
 

@@ -16,7 +16,7 @@ import { isTimeAwareLayer, TimeAwareLayer } from '../../models/layers/timeawarel
 import Feature from 'ol/Feature';
 
 export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient, WfsClientOptionalOptions> {
-  get state() {
+  private get state() {
     return this.context.stateManager.state;
   }
 
@@ -26,7 +26,7 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
 
   public static readonly UnknownFeatureType: string = 'UNKNOWN';
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.context.stateManager.subscribe(/layers\.layersList\..*\.filter/, (_oldFilter, newFilter) => {
       void this.onSelectedFeaturesFilterChange(newFilter);
     });
@@ -47,13 +47,13 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
     this.registerClientClass('georama.webgis', WfsClientGeorama);
   }
 
-  async onSelectedFeaturesFilterChange(filter: WfsFilter | undefined) {
+  private async onSelectedFeaturesFilterChange(filter: WfsFilter | undefined) {
     const selectionParamsFilteredLayers: SelectionParam[] = this.state.selection.selectionParameters.map((param) =>
       param.clone((l) => l.wfsQueryable && l.filter === filter)
     );
-    const filteredSelectionParams = selectionParamsFilteredLayers.filter((param) => param._layers.length > 0);
+    const filteredSelectionParams = selectionParamsFilteredLayers.filter((param) => param.layers.length > 0);
     const filteredLayersId = filteredSelectionParams
-      .map((p) => p._layers.map((l) => l.queryLayers))
+      .map((p) => p.layers.map((l) => l.queryLayers))
       .flat()
       .join(';');
 
@@ -62,7 +62,7 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
     this.state.loading = true;
     // WFS GetFeature
     const wfsPromises = filteredSelectionParams.map((param) => {
-      const client = this.getClient(param._ogcServer);
+      const client = this.getClient(param.ogcServer);
       const features = client.getFeature(param);
       return features;
     });
@@ -102,9 +102,9 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
     return false;
   }
 
-  async getServerWfs(ogcServer: ServerOgc): Promise<ServerWfs>;
-  async getServerWfs(layer: LayerWms): Promise<ServerWfs>;
-  async getServerWfs(object: ServerOgc | LayerWms): Promise<ServerWfs> {
+  public async getServerWfs(ogcServer: ServerOgc): Promise<ServerWfs>;
+  public async getServerWfs(layer: LayerWms): Promise<ServerWfs>;
+  public async getServerWfs(object: ServerOgc | LayerWms): Promise<ServerWfs> {
     const ogcServer = object instanceof LayerWms ? object.ogcServer : object;
     const client = this.getClient(ogcServer);
     return client.getServerWfs();
@@ -114,7 +114,7 @@ export default class WfsManager extends VendorSpecificOgcServerManager<WfsClient
    * Extracts the feature type from the feature's ID. A feature ID may contain a prefix,
    * the feature type and a feature-specific ID. It returns "UNKNOWN" if the ID is absent.
    */
-  static extractFeatureTypeFromId(feature: Feature): string {
+  public static extractFeatureTypeFromId(feature: Feature): string {
     let id = feature.getId();
     if (!id) {
       return WfsManager.UnknownFeatureType;

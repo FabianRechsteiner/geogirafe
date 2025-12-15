@@ -4,7 +4,7 @@ import IGirafeContext from '../tools/context/icontext';
 class GirafeSingleton {
   protected readonly context;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 
@@ -15,7 +15,7 @@ class GirafeSingleton {
      */
   }
 
-  isNullOrUndefinedOrBlank(val: unknown) {
+  protected isNullOrUndefinedOrBlank(val: unknown) {
     return val === undefined || val === null || val === '';
   }
 }

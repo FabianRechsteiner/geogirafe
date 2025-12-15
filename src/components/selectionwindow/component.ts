@@ -50,11 +50,11 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   showDropdown = false;
   private columnAliasHelper!: ColumnAliasHelper;
 
-  constructor() {
+  public constructor() {
     super('selectionwindow');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.csvManager = new CsvManager(this.context);
     this.columnAliasHelper = new ColumnAliasHelper(this.context.stateManager);
@@ -157,7 +157,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   /**
    * Closes the window and deselect the selected features.
    */
-  closeWindow() {
+  protected override closeWindow() {
     this.visible = false;
     this.state.interface.selectionComponentVisible = false; // Will render it again.
     this.state.selection.focusedFeatures = null;

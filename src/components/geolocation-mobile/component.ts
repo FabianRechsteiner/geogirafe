@@ -35,7 +35,7 @@ export default class GeolocationMobile extends GirafeHTMLElement {
   private isPressed = false;
   private hasLongpressed = false;
 
-  constructor() {
+  public constructor() {
     super('geolocation-mobile');
     this.positionFeature = new Feature();
     this.positionFeature.setProperties({ order: 1 });
@@ -101,7 +101,7 @@ export default class GeolocationMobile extends GirafeHTMLElement {
     });
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.registerInteractionListener('map.contextmenu', false);
 

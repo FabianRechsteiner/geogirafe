@@ -9,7 +9,7 @@ class CoordinateComponent extends GirafeHTMLElement {
   east: string | null = null;
   north: string | null = null;
 
-  constructor() {
+  public constructor() {
     super('coordinate');
   }
 
@@ -36,7 +36,7 @@ class CoordinateComponent extends GirafeHTMLElement {
     this.render();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     super.girafeTranslate();

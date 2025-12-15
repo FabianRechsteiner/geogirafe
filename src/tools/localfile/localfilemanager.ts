@@ -12,12 +12,12 @@ import { applyFeaturesToSelection } from '../utils/utils';
 
 class LocalFileManager extends GirafeSingleton {
   private readonly map: Map;
-  name: string;
+  private readonly name: string;
 
   private readonly supportedFileFormats = [GPX, GeoJSON, IGC, new KML({ extractStyles: true }), TopoJSON];
   private readonly supportedFileExtensions = ['gpx', 'geojson', 'igc', 'kml', 'topojson', 'json'];
 
-  activeLayers: Record<
+  private activeLayers: Record<
     string,
     {
       layerFile: LayerLocalFile;
@@ -25,13 +25,13 @@ class LocalFileManager extends GirafeSingleton {
     }
   > = {};
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     super(context);
     this.map = this.context.mapManager.getMap();
     this.name = `localFileManager`;
   }
 
-  override initializeSingleton(): void {
+  public override initializeSingleton(): void {
     this.registerEvents();
     // Add drag n drop interaction to add local files
     const dragAndDropInteraction = this.createInteraction();
@@ -42,7 +42,7 @@ class LocalFileManager extends GirafeSingleton {
     this.context.userInteractionManager.registerListener('map.drop', false, this.name);
   }
 
-  createInteraction() {
+  private createInteraction() {
     // Handle dropping of unsupported files
     this.map.getViewport().addEventListener('drop', (event) => this.handleUnsupportedFiles(event));
 
@@ -59,7 +59,7 @@ class LocalFileManager extends GirafeSingleton {
     return dragAndDropInteraction;
   }
 
-  async loadLocalFile(localFile: File) {
+  public async loadLocalFile(localFile: File) {
     const text = await localFile.text();
     let reader = null;
     if (text.includes('<kml') && text.includes('</kml>')) {
@@ -76,7 +76,7 @@ class LocalFileManager extends GirafeSingleton {
     this.loadLocalFileFeatures(localFile, features);
   }
 
-  loadLocalFileFeatures(localFile: File, features: Feature<Geometry>[]) {
+  private loadLocalFileFeatures(localFile: File, features: Feature<Geometry>[]) {
     // Check if all features can be displayed in the current map maximum extent
     // This will also approximately validate if the SRID is correct
     const featureType = localFile.name.replace('.', '_');
@@ -130,7 +130,7 @@ Verify that those features can be displayed within the maximal extent configured
     void window.gAlert(msg, 'Unsupported file format');
   }
 
-  validateAndCompleteFeatures(featureType: string, features: Feature<Geometry>[]) {
+  private validateAndCompleteFeatures(featureType: string, features: Feature<Geometry>[]) {
     const validatedFeatures: Feature<Geometry>[] = [];
     const maxExtent = this.map.getView().get('extent');
     let counter = 0;
@@ -156,7 +156,7 @@ Verify that those features can be displayed within the maximal extent configured
     };
   }
 
-  addLayer(layerFile: LayerLocalFile) {
+  public addLayer(layerFile: LayerLocalFile) {
     const vectorSource = new VectorSource({
       features: layerFile._features
     });
@@ -167,14 +167,14 @@ Verify that those features can be displayed within the maximal extent configured
     this.activeLayers[layerFile.treeItemId] = { layerFile: layerFile, olayer: olayer };
   }
 
-  getLayer(layerFile: LayerLocalFile) {
+  public getLayer(layerFile: LayerLocalFile) {
     if (this.layerExists(layerFile)) {
       return this.activeLayers[layerFile.treeItemId].olayer;
     }
     return null;
   }
 
-  removeLayer(layerFile: LayerLocalFile) {
+  public removeLayer(layerFile: LayerLocalFile) {
     if (this.layerExists(layerFile)) {
       const olayer = this.activeLayers[layerFile.treeItemId].olayer;
       delete this.activeLayers[layerFile.treeItemId];
@@ -184,11 +184,11 @@ Verify that those features can be displayed within the maximal extent configured
     }
   }
 
-  layerExists(layer: LayerLocalFile) {
+  public layerExists(layer: LayerLocalFile) {
     return layer.treeItemId in this.activeLayers;
   }
 
-  selectFeatures(extent: number[]) {
+  public selectFeatures(extent: number[]) {
     for (const activeLayer of Object.values(this.activeLayers)) {
       const features = activeLayer.olayer.getSource()?.getFeaturesInExtent(extent);
       if (features && features.length > 0) {
@@ -196,7 +196,7 @@ Verify that those features can be displayed within the maximal extent configured
       }
     }
   }
-  changeOpacity(layer: LayerLocalFile) {
+  public changeOpacity(layer: LayerLocalFile) {
     const oLayer = this.activeLayers[layer.treeItemId].olayer;
     oLayer.setOpacity(layer.opacity);
   }

@@ -5,7 +5,7 @@ import DrawingFeature, { DrawingState, type SerializedFeature } from './drawingF
 export default class DrawingSerializer implements IBrainSerializer<DrawingState> {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 

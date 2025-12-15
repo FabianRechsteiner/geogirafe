@@ -14,7 +14,7 @@ class AboutComponent extends GirafeHTMLElement implements IGirafePanel {
   build!: string;
   date!: string;
 
-  constructor() {
+  public constructor() {
     super('about');
   }
 
@@ -39,7 +39,7 @@ class AboutComponent extends GirafeHTMLElement implements IGirafePanel {
     this.render();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
   }

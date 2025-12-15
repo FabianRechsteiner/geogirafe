@@ -9,7 +9,7 @@ export default class EditFromComponent extends GirafeHTMLElement {
   public featureSchema?: OgcApiFeaturesSchema;
   public feature?: Feature;
 
-  constructor() {
+  public constructor() {
     super('editform');
   }
 
@@ -74,7 +74,7 @@ export default class EditFromComponent extends GirafeHTMLElement {
     }
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     super.render();
   }

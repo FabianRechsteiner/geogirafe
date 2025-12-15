@@ -4,11 +4,11 @@ export default class DisplaySelectorButtonMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css'];
 
-  constructor() {
+  public constructor() {
     super('display-selector-button-mobile');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.subscribe('interface.swipeupPanelContent', () => {
       this.render();

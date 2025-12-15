@@ -74,7 +74,7 @@ export default class DrawingFeature {
   private readonly drawingState: DrawingState;
   private readonly defaultDrawingConfig: any;
 
-  constructor(tool: DrawingShape, drawingState: DrawingState, drawingConfig: any) {
+  public constructor(tool: DrawingShape, drawingState: DrawingState, drawingConfig: any) {
     this.defaultDrawingConfig = drawingConfig;
     this.drawingState = drawingState;
     this._tool = tool;

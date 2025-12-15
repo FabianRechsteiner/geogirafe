@@ -1,9 +1,6 @@
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import ThemeLayer from '../../../models/layers/themelayer';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore This import is not used in the typescript file but needed in the HTML Template
-// Cannot use <ts-expect-error> here because after the build-lib, the error disappear
-import GroupLayer from '../../../models/layers/grouplayer'; // NOSONAR
+import _GroupLayer from '../../../models/layers/grouplayer'; // NOSONAR
 
 class MobileThemeElementComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -15,7 +12,7 @@ class MobileThemeElementComponent extends GirafeHTMLElement {
     return ['themeid'];
   }
 
-  constructor() {
+  public constructor() {
     super('theme-mobile');
   }
 
@@ -33,7 +30,7 @@ class MobileThemeElementComponent extends GirafeHTMLElement {
     super.refreshRender();
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     this.render();
   }

@@ -26,7 +26,7 @@ import GMFManager from './gmfmanager';
 export default class GMFConnectManager extends AbstractConnectManager {
   private readonly gmfManager: GMFManager;
 
-  constructor(context: IGirafeContext, gmfManager: GMFManager) {
+  public constructor(context: IGirafeContext, gmfManager: GMFManager) {
     super(context);
     this.gmfManager = gmfManager;
   }

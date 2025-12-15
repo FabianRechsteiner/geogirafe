@@ -2,7 +2,7 @@ import ServerOgc from '../serverogc';
 import LayerWms, { LayerWmsOptions } from './layerwms';
 
 export default class LayerWmsExternal extends LayerWms {
-  static nextAvailableLayerId = 10000000;
+  private static nextAvailableLayerId = 10000000;
 
   private selected: boolean = false;
 
@@ -15,7 +15,7 @@ export default class LayerWmsExternal extends LayerWms {
     this.isDefaultChecked = value;
   }
 
-  constructor(title: string, name: string, ogcServer: ServerOgc) {
+  public constructor(title: string, name: string, ogcServer: ServerOgc) {
     const id = LayerWmsExternal.nextAvailableLayerId++;
     const options: LayerWmsOptions = {
       layers: name,
@@ -27,7 +27,7 @@ export default class LayerWmsExternal extends LayerWms {
     super(id, title, 0, ogcServer, options);
   }
 
-  override clone(): LayerWmsExternal {
+  public override clone(): LayerWmsExternal {
     const clonedLayer = new LayerWmsExternal(this.name, this.layers!, this.ogcServer);
     clonedLayer.isSelected = this.isSelected;
     return clonedLayer;

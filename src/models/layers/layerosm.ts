@@ -10,11 +10,11 @@ class LayerOsm extends Layer {
    * For example, any method doing <this.xxx = value> is forbidden here, because the modification be known from the proxy
    */
 
-  constructor(order: number) {
+  public constructor(order: number) {
     super(LayerConsts.LayerOsmId, 'OpenStreetMap', order);
   }
 
-  clone() {
+  public clone() {
     const clonedObject = new LayerOsm(this.order);
     clonedObject.activeState = this.activeState;
     return clonedObject;

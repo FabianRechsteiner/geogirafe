@@ -6,7 +6,7 @@ export default class OauthComponent extends GirafeHTMLElement {
 
   public userIconUrl?: string;
 
-  constructor(name: string = 'oauth') {
+  public constructor(name: string = 'oauth') {
     super(name);
   }
 
@@ -67,7 +67,7 @@ export default class OauthComponent extends GirafeHTMLElement {
     return hashHex;
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     super.render();
     this.registerEvents();

@@ -43,7 +43,7 @@ export default class CesiumDrawing {
     return this.context.configManager.Config;
   }
 
-  constructor(map: MapComponent, toolName: string, context: IGirafeContext) {
+  public constructor(map: MapComponent, toolName: string, context: IGirafeContext) {
     this.toolName = toolName;
     this.context = context;
     map.subscribe('globe.loaded', () => {

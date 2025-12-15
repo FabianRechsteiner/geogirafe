@@ -15,7 +15,7 @@ class CogManager {
     }
   > = {};
 
-  constructor(map: Map) {
+  public constructor(map: Map) {
     this.map = map;
   }
 

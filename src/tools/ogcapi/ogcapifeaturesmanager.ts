@@ -17,7 +17,7 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
   OgcApiFeaturesClient,
   OgcApiClientOptions
 > {
-  get state() {
+  protected get state() {
     return this.context.stateManager.state;
   }
 
@@ -25,14 +25,14 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
     return ogcServer.urlOapif ?? '';
   }
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     // Register the clients
     this.registerClientClass('default', OgcApiFeaturesClient);
     this.registerClientClass('georama', OgcApiFeaturesClientGeorama);
     this.registerClientClass('gmf', OgcApiFeaturesClientGmf);
   }
 
-  async getSchema(layer: OapifLayer): Promise<OgcApiFeaturesSchema> {
+  public async getSchema(layer: OapifLayer): Promise<OgcApiFeaturesSchema> {
     this.state.loading = true;
     try {
       const schema = await this.getClient(layer.server).getSchema(layer.collectionId);
@@ -44,7 +44,12 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
     }
   }
 
-  async getItems(layer: OapifLayer, crs?: string, bbox?: number[], limit?: number): Promise<Feature<Geometry>[]> {
+  public async getItems(
+    layer: OapifLayer,
+    crs?: string,
+    bbox?: number[],
+    limit?: number
+  ): Promise<Feature<Geometry>[]> {
     this.state.loading = true;
     try {
       return await this.getClient(layer.server).getItems(layer.collectionId, crs, bbox, limit);
@@ -55,7 +60,7 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
     }
   }
 
-  async getItem(layer: OapifLayer, featureId: string): Promise<Feature<Geometry> | undefined> {
+  public async getItem(layer: OapifLayer, featureId: string): Promise<Feature<Geometry> | undefined> {
     this.state.loading = true;
     try {
       return await this.getClient(layer.server).getItem(layer.collectionId, featureId, this.state.projection);
@@ -66,7 +71,7 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
     }
   }
 
-  async createItem(layer: OapifLayer, feature: Feature<Geometry>): Promise<boolean> {
+  public async createItem(layer: OapifLayer, feature: Feature<Geometry>): Promise<boolean> {
     this.state.loading = true;
     try {
       return await this.getClient(layer.server).createItem(layer.collectionId, feature, this.state.projection);
@@ -78,7 +83,7 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
     }
   }
 
-  async updateItem(layer: OapifLayer, featureId: string, feature: Feature<Geometry>): Promise<boolean> {
+  public async updateItem(layer: OapifLayer, featureId: string, feature: Feature<Geometry>): Promise<boolean> {
     this.state.loading = true;
     try {
       return await this.getClient(layer.server).updateItem(
@@ -95,7 +100,7 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
     }
   }
 
-  async deleteItem(layer: OapifLayer, featureId: string): Promise<boolean> {
+  public async deleteItem(layer: OapifLayer, featureId: string): Promise<boolean> {
     this.state.loading = true;
     try {
       return await this.getClient(layer.server).deleteItem(layer.collectionId, featureId);
@@ -107,15 +112,15 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
     }
   }
 
-  async getServer(ogcServer: ServerOgc): Promise<ServerOgcApiFeatures>;
-  async getServer(layer: LayerWms): Promise<ServerOgcApiFeatures>;
-  async getServer(object: ServerOgc | LayerWms): Promise<ServerOgcApiFeatures> {
+  public async getServer(ogcServer: ServerOgc): Promise<ServerOgcApiFeatures>;
+  public async getServer(layer: LayerWms): Promise<ServerOgcApiFeatures>;
+  public async getServer(object: ServerOgc | LayerWms): Promise<ServerOgcApiFeatures> {
     const ogcServer = object instanceof LayerWms ? object.ogcServer : object;
     const client = this.getClient(ogcServer);
     return client.getServer();
   }
 
-  async getCollectionByTitle(title: string, server: ServerOgc): Promise<OapifCollection | null> {
+  public async getCollectionByTitle(title: string, server: ServerOgc): Promise<OapifCollection | null> {
     const collections = await this.getClient(server).getCollections();
     return collections.find((collection: any) => collection.title === title) ?? null;
   }

@@ -4,11 +4,11 @@ export default class MenuMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', '../../styles/common.mobile.css', './style.css'];
 
-  constructor() {
+  public constructor() {
     super('menu-mobile');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.subscribe('interface.swipeupPanelContent', () => {
       this.render();

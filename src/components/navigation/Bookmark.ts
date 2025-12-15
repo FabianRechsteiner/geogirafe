@@ -5,7 +5,7 @@ export class Bookmark {
   name: string;
   position: MapPosition;
 
-  constructor(name: string, position: MapPosition) {
+  public constructor(name: string, position: MapPosition) {
     if (!Bookmark.BOOKMARKNAMEPATTERN.test(name)) {
       throw new Error(
         'Bookmark name is not valid: it can only contain alphanumeric characters and the dash (-) underscore (_) and space characters.'

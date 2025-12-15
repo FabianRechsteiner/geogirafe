@@ -45,7 +45,7 @@ abstract class BaseLayer {
   @BrainIgnoreClone
   public parent?: ThemeLayer | GroupLayer;
 
-  constructor(id: number, name: string, order: number, options?: BaseLayerOptions) {
+  public constructor(id: number, name: string, order: number, options?: BaseLayerOptions) {
     this.id = id;
     this.treeItemId = uuidv4();
     this.name = name;

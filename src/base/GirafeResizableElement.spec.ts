@@ -20,21 +20,25 @@ describe('GirafeResizableElement.constructor', () => {
 
   it('should initialize dock property to default value (right)', () => {
     resizableElement = new GirafeResizableElement('girafe-test');
+    // @ts-expect-error: private property
     expect(resizableElement.dock).toBe('right');
   });
 
   it('should initialize dock property to value left', () => {
     resizableElement = new GirafeResizableElement('girafe-test', 'left');
+    // @ts-expect-error: private property
     expect(resizableElement.dock).toBe('left');
   });
 
   it('should initialize dock property to value right', () => {
     resizableElement = new GirafeResizableElement('girafe-test', 'right');
+    // @ts-expect-error: private property
     expect(resizableElement.dock).toBe('right');
   });
 
   it('should initialize dock property to value bottom', () => {
     resizableElement = new GirafeResizableElement('girafe-test', 'bottom');
+    // @ts-expect-error: private property
     expect(resizableElement.dock).toBe('bottom');
   });
 
@@ -62,6 +66,7 @@ describe('GirafeResizableElement.makeResizable', () => {
       <button id="hide"></button>
       <button id="close"></button>
     `;
+    // @ts-expect-error: private property
     resizableElement.shadow.appendChild(panel);
     resizableElement.makeResizable();
   });
@@ -71,30 +76,40 @@ describe('GirafeResizableElement.makeResizable', () => {
   });
 
   it('should initialize gutter element', () => {
+    // @ts-expect-error: private property
     expect(resizableElement.gutter).toBeDefined();
+    // @ts-expect-error: private property
     expect(resizableElement.gutter!.id).toBe('gutter');
   });
 
   it('should initialize closeButton element', () => {
+    // @ts-expect-error: private property
     expect(resizableElement.closeButton).toBeDefined();
+    // @ts-expect-error: private property
     expect(resizableElement.closeButton!.id).toBe('close');
   });
 
   it('should set gutter onmousedown handler', () => {
+    // @ts-expect-error: private property
     expect(typeof resizableElement.gutter!.onmousedown).toBe('function');
   });
 
   it('should set gutter ondblclick handler', () => {
+    // @ts-expect-error: private property
     expect(typeof resizableElement.gutter!.ondblclick).toBe('function');
   });
 
   it('should set closeButton onclick handler if closeButton exists', () => {
+    // @ts-expect-error: private property
     expect(typeof resizableElement.closeButton!.onclick).toBe('function');
   });
 
   it('should initialize toggleSize based on gutter dimensions', () => {
+    // @ts-expect-error: private property
     const gutterRect = resizableElement.gutter!.getBoundingClientRect();
+    // @ts-expect-error: private property
     const expectedSize = resizableElement.dock === 'bottom' ? gutterRect.height : gutterRect.width;
+    // @ts-expect-error: private property
     expect(resizableElement.toggleSize).toBe(expectedSize);
   });
 });
@@ -115,6 +130,7 @@ describe('GirafeResizableElement.initSizeLimits', () => {
       <button id="hide"></button>
       <button id="close"></button>
     `;
+    // @ts-expect-error: private property
     resizableElement.shadow.appendChild(panel);
     resizableElement.makeResizable();
   });
@@ -136,9 +152,13 @@ describe('GirafeResizableElement.initSizeLimits', () => {
     // @ts-ignore
     resizableElement.initSizeLimits();
 
+    // @ts-expect-error: private property
     expect(resizableElement.minWidth).toBe(100);
+    // @ts-expect-error: private property
     expect(resizableElement.maxWidth).toBe(300);
+    // @ts-expect-error: private property
     expect(resizableElement.minHeight).toBe(50);
+    // @ts-expect-error: private property
     expect(resizableElement.maxHeight).toBe(200);
   });
 
@@ -155,9 +175,13 @@ describe('GirafeResizableElement.initSizeLimits', () => {
     // @ts-ignore
     resizableElement.initSizeLimits();
 
+    // @ts-expect-error: private property
     expect(resizableElement.minWidth).toBeUndefined();
+    // @ts-expect-error: private property
     expect(resizableElement.maxWidth).toBeUndefined();
+    // @ts-expect-error: private property
     expect(resizableElement.minHeight).toBeUndefined();
+    // @ts-expect-error: private property
     expect(resizableElement.maxHeight).toBeUndefined();
   });
 });

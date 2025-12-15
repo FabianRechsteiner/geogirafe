@@ -5,7 +5,7 @@ import MapPosition from '../../state/mapposition';
 export default class MapPositionSerializer implements IBrainSerializer<MapPosition> {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 

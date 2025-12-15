@@ -18,7 +18,7 @@ class SnapManager extends GirafeSingleton {
     return this.context.mapManager.getMap();
   }
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.context.stateManager.subscribe(
       /layers\.layersList\..*\.activeState/,
       (_oldActive: string, _newActive: string, layer: Layer) => {

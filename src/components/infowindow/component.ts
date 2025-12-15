@@ -8,7 +8,7 @@ class InfoWindowComponent extends GirafeDraggableElement {
   visible: boolean = false;
   private resizeWindow: ResizeWindow | null = null;
 
-  constructor() {
+  public constructor() {
     super('infowindow');
   }
 
@@ -57,11 +57,11 @@ class InfoWindowComponent extends GirafeDraggableElement {
     host.style.left = this.configToCssValue(this.state.infoWindow.left) ?? windowConfig.defaultWindowPositionLeft;
   }
 
-  closeWindow() {
+  protected override closeWindow() {
     this.state.interface.infoWindowVisible = false;
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     // Initialize floating window
     window.gOpenWindow = (

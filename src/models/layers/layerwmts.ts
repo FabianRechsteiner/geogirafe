@@ -45,7 +45,7 @@ class LayerWmts extends Layer implements ILayerWithLegend {
   public maxResolution?: number;
   public legend: boolean;
   public legendImage?: string;
-  public isLegendExpanded: boolean;
+  public override isLegendExpanded: boolean;
   public wasLegendExpanded: boolean;
 
   // A WMTS layer can have WMS informations to be able to query infos and print with a WMS layer.
@@ -59,7 +59,7 @@ class LayerWmts extends Layer implements ILayerWithLegend {
   /** Linked ol layer, starting with an underscore to not be part of the proxy. **/
   public _olayer?: TileLayer<WMTS>;
 
-  constructor(
+  public constructor(
     id: number,
     name: string,
     order: number,
@@ -89,7 +89,7 @@ class LayerWmts extends Layer implements ILayerWithLegend {
     this.hiDPILegendImages = opts.hiDPILegendImages;
   }
 
-  clone(): LayerWmts {
+  public clone(): LayerWmts {
     const options = {
       isDefaultChecked: this.isDefaultChecked,
       metadataUrl: this.metadataUrl,
@@ -115,18 +115,18 @@ class LayerWmts extends Layer implements ILayerWithLegend {
     return clonedObject;
   }
 
-  get layerUniqueId() {
+  public get layerUniqueId() {
     if (this.dimensions) {
       return this.layer + JSON.stringify(this.dimensions);
     }
     return this.name;
   }
 
-  hasRestrictedResolution() {
+  public hasRestrictedResolution() {
     return (this.minResolution && this.minResolution !== 0) || (this.maxResolution && this.maxResolution !== 999999999);
   }
 
-  isVisibleAtResolution(resolution: number) {
+  public isVisibleAtResolution(resolution: number) {
     if (resolution === undefined || resolution === null || !this.hasRestrictedResolution()) {
       return true;
     }

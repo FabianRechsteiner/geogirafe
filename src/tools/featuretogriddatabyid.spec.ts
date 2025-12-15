@@ -104,6 +104,7 @@ describe('FeatureToGridDataById', () => {
   });
 
   test('createGridDataWithColumns', () => {
+    // @ts-expect-error: private property
     const gridData: GridData = FeatureToGridDataById.createGridDataWithColumns(features[0].getProperties());
     expect(gridData.columns).toEqual(['col1', 'col2']);
     expect(gridData.data).toEqual([]);
@@ -115,6 +116,7 @@ describe('FeatureToGridDataById', () => {
     featureToGridDataById = new FeatureToGridDataById({});
     const gridDataById: GridDataById = featureToGridDataById.toGridDataById(features);
     const testGridData = gridDataById['bar'];
+    // @ts-expect-error: private property
     FeatureToGridDataById.removeEmptyColumns(testGridData);
     expect(testGridData.columns).toEqual(['col1', 'col2']);
     expect(testGridData.data).toEqual([
@@ -130,6 +132,7 @@ describe('FeatureToGridDataById', () => {
       [undefined, 'value6', undefined, 'value8'],
       ['value9', 'value10', undefined, 'value12']
     ];
+    // @ts-expect-error: private property
     const emptyColumnIndices = FeatureToGridDataById.findEmptyColumnIndexOf(data);
     expect(emptyColumnIndices).toStrictEqual([2]);
   });

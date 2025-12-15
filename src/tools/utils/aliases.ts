@@ -3,7 +3,7 @@ import StateManager from '../state/statemanager';
 export default class ColumnAliasHelper {
   private readonly stateManager: StateManager;
 
-  constructor(stateManager: StateManager) {
+  public constructor(stateManager: StateManager) {
     this.stateManager = stateManager;
   }
 

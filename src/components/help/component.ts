@@ -20,7 +20,7 @@ class HelpComponent extends GirafeHTMLElement {
   arrowWhite: string = ArrowWhite;
   currentArrow?: string;
 
-  constructor() {
+  public constructor() {
     super('help');
   }
 
@@ -81,7 +81,7 @@ class HelpComponent extends GirafeHTMLElement {
     }
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     super.girafeTranslate();

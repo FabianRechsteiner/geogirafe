@@ -19,7 +19,7 @@ class TimeRestrictionComponent extends GirafeHTMLElement {
 
   public timeWidget!: TimeSliderComponent | TimePickerComponent;
 
-  constructor(layer: TimeAwareLayer) {
+  public constructor(layer: TimeAwareLayer) {
     super(`time-${layer.id}`);
     this.layer = layer;
     this.timeOptions = this.layer.timeOptions!;
@@ -76,7 +76,7 @@ class TimeRestrictionComponent extends GirafeHTMLElement {
     }
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.renderComponent();
   }

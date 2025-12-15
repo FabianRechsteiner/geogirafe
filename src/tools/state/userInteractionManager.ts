@@ -35,7 +35,7 @@ class UserInteractionManager extends GirafeSingleton {
    * @return {boolean} Returns true if the listener was successfully registered, false if the listener
    *                   was already registered.
    */
-  registerListener(eventName: GgUserInteractionEvent, isExclusive: boolean, toolName: string): boolean {
+  public registerListener(eventName: GgUserInteractionEvent, isExclusive: boolean, toolName: string): boolean {
     if (this.isListenerRegistered(eventName, toolName)) {
       // Prevent registering if the listener already exists
       return false;
@@ -63,7 +63,7 @@ class UserInteractionManager extends GirafeSingleton {
    * @param {string} toolName - The name of the tool associated with the event listener to be unregistered.
    * @return {void}
    */
-  unregisterListener(eventName: GgUserInteractionEvent, toolName: string): void {
+  public unregisterListener(eventName: GgUserInteractionEvent, toolName: string): void {
     const index = this.listenersInState.findIndex((l) => l.eventName === eventName && l.toolName === toolName);
     if (index > -1) {
       this.state.userInteractionListeners.splice(index, 1);
@@ -76,7 +76,7 @@ class UserInteractionManager extends GirafeSingleton {
    * @param {string} toolName - The name of the tool for which all event listeners should be unregistered.
    * @return {void}
    */
-  unregisterAllListenersOfTool(toolName: string): void {
+  public unregisterAllListenersOfTool(toolName: string): void {
     this.listenersInState
       .filter((l) => l.toolName === toolName)
       .forEach((l) => this.unregisterListener(l.eventName, l.toolName));
@@ -89,7 +89,7 @@ class UserInteractionManager extends GirafeSingleton {
    * @param {string} toolName - The name of the tool associated with the event.
    * @return {boolean} Returns true if the listener can execute; otherwise, returns false.
    */
-  canListenerExecute(eventName: GgUserInteractionEvent, toolName: string): boolean {
+  public canListenerExecute(eventName: GgUserInteractionEvent, toolName: string): boolean {
     if (!this.isListenerRegistered(eventName, toolName)) {
       return false;
     }

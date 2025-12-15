@@ -7,7 +7,7 @@ export default class MenuMobileDrawingButton extends GirafeHTMLElement {
   icon = 'icons/draw.svg';
   label = 'drawing-panel';
 
-  constructor() {
+  public constructor() {
     super('mobile-drawing-button');
   }
 
@@ -21,7 +21,7 @@ export default class MenuMobileDrawingButton extends GirafeHTMLElement {
     }, 50);
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
   }

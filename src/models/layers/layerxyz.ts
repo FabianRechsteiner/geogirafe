@@ -20,14 +20,20 @@ class LayerXYZ extends Layer {
 
   public source: string;
 
-  constructor(id: number, name: string, order: number, source: string, options?: GMFTreeItem | LayerXYZTilesOptions) {
+  public constructor(
+    id: number,
+    name: string,
+    order: number,
+    source: string,
+    options?: GMFTreeItem | LayerXYZTilesOptions
+  ) {
     let opts = options ?? {};
     opts = LayerXYZ.isGMFTreeItem(opts) ? LayerXYZ.getOptionsFromGMFTreeItem(opts) : opts;
     super(id, name, order, opts);
     this.source = source;
   }
 
-  clone() {
+  public clone() {
     const options = {
       isDefaultChecked: this.isDefaultChecked,
       metadataUrl: this.metadataUrl,

@@ -66,7 +66,7 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
     }
   }
 
-  constructor() {
+  public constructor() {
     super('share');
   }
 
@@ -252,7 +252,7 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
     this.render();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     this.initializeShortenerService();

@@ -77,7 +77,13 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
 
   public editable?: string;
 
-  constructor(id: number, name: string, order: number, ogcServer: ServerOgc, options?: GMFTreeItem | LayerWmsOptions) {
+  public constructor(
+    id: number,
+    name: string,
+    order: number,
+    ogcServer: ServerOgc,
+    options?: GMFTreeItem | LayerWmsOptions
+  ) {
     let opts = options ?? {};
     opts = LayerWms.isGMFTreeItem(opts) ? LayerWms.getOptionsFromGMFTreeItem(opts) : opts;
     super(id, name, order, opts);
@@ -112,7 +118,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     this.setDefaultTimeRestriction();
   }
 
-  clone(): LayerWms {
+  public clone(): LayerWms {
     const options: LayerWmsOptions = {
       isDefaultChecked: this.isDefaultChecked,
       metadataUrl: this.metadataUrl,
@@ -151,7 +157,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     return (minResolution && minResolution !== 0) || (maxResolution && maxResolution !== 999999999);
   }
 
-  hasRestrictedResolution() {
+  public hasRestrictedResolution() {
     return LayerWms.isResolutionRangeRestricted(this.minResolution, this.maxResolution);
   }
 
@@ -170,30 +176,30 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     return resolution >= (minResolution ?? -1) && resolution <= (maxResolution ?? Infinity);
   }
 
-  isVisibleAtResolution(resolution: number) {
+  public isVisibleAtResolution(resolution: number) {
     return LayerWms.isInVisibleRange(resolution, this.minResolution, this.maxResolution);
   }
 
-  get hasFilter() {
+  public get hasFilter() {
     return this.filter !== null && this.filter !== undefined;
   }
 
-  get hasTimeRestriction() {
+  public get hasTimeRestriction() {
     return !!this.timeRestriction;
   }
 
-  setDefaultTimeRestriction() {
+  public setDefaultTimeRestriction() {
     if (this.timeOptions) {
       const timeFormatter = new LayerTimeFormatter(this.timeOptions);
       this.timeRestriction = timeFormatter.getFormattedDefault();
     }
   }
 
-  get serverUniqueQueryId() {
+  public get serverUniqueQueryId() {
     return this.ogcServer.uniqueWmsQueryId;
   }
 
-  get wfsQueryable(): boolean {
+  public get wfsQueryable(): boolean {
     return (
       this.queryable &&
       this.ogcServer.wfsSupport &&
@@ -202,7 +208,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
     );
   }
 
-  get wmsQueryableOnly(): boolean {
+  public get wmsQueryableOnly(): boolean {
     return this.queryable && !this.ogcServer.wfsSupport;
   }
 

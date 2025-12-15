@@ -35,7 +35,7 @@ export class ContextMenu {
     return this.context.mapManager.getMap();
   }
 
-  constructor(
+  public constructor(
     context: IGirafeContext,
     menuEntries: MenuEntry[] = [],
     isExclusive: boolean = false,

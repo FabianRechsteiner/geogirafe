@@ -18,7 +18,7 @@ import GlobeSerializer from './serializers/globeserializer';
 class StateSerializer extends GirafeSingleton {
   private readonly brainSerializer = new BrainSerializer<State | ExtendedState>();
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.addSerializer(Array<Basemap>, new ActiveBasemapsSerializer(this.context));
     this.addSerializer(MapPosition, new MapPositionSerializer(this.context));
     this.addSerializer(LayersConfig, new LayersConfigSerializer(this.context));

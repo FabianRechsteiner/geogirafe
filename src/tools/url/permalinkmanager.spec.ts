@@ -43,6 +43,7 @@ describe('PermalinkManager', () => {
   });
 
   afterEach(() => {
+    // @ts-expect-error: private property
     permalinkManager.params = {};
   });
 
@@ -55,6 +56,7 @@ describe('PermalinkManager', () => {
     mockLocation('http://example.com?');
     permalinkManager['getPermalinkParamsFromUrl']();
 
+    // @ts-expect-error: private property
     expect(permalinkManager.params).toEqual(emptyUrlParameters);
   });
 
@@ -69,6 +71,7 @@ describe('PermalinkManager', () => {
     );
     permalinkManager['getPermalinkParamsFromUrl']();
 
+    // @ts-expect-error: private property
     expect(permalinkManager.params).toEqual({
       ...emptyUrlParameters,
       map_x: '2000',
@@ -94,6 +97,7 @@ describe('PermalinkManager', () => {
     mockLocation('http://example.com?wfs_layer=testlayer&wfs_attr1=22&wfs_attr2=testValue');
     permalinkManager['getPermalinkParamsFromUrl']();
 
+    // @ts-expect-error: private property
     expect(permalinkManager.params).toEqual({
       ...emptyUrlParameters,
       wfs_layer: 'testlayer',

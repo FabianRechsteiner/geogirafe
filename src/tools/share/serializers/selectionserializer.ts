@@ -16,7 +16,7 @@ export type SharedInitialSelection = {
 export default class SelectionSerializer implements IBrainSerializer<ObjectSelection> {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 
@@ -48,7 +48,7 @@ export default class SelectionSerializer implements IBrainSerializer<ObjectSelec
     if (selectionParam.selectionQuery) {
       serializedSelectionQuery = {
         query: selectionParam.selectionQuery.map((q) => q as SharedFilter),
-        layerName: selectionParam._layers[0].name
+        layerName: selectionParam.layers[0].name
       };
     }
     return {

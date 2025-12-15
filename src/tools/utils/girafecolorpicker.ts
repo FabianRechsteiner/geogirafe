@@ -1,22 +1,22 @@
 import Picker, { Options } from 'vanilla-picker';
 
 class GirafeColorPicker extends Picker {
-  declare domElement: HTMLElement;
-  parent?: HTMLElement;
-  fixedPosition: boolean;
+  declare private readonly domElement: HTMLElement;
+  private readonly parent?: HTMLElement;
+  private readonly fixedPosition: boolean;
 
   /**
    *
    * @param options picker options
    * @param fixedPosition set this to true to compensate for overflow issues in panels
    */
-  constructor(options: Options, fixedPosition = false) {
+  public constructor(options: Options, fixedPosition = false) {
     super(options);
     this.parent = options.parent;
     this.fixedPosition = fixedPosition;
   }
 
-  openHandler(e: PointerEvent) {
+  public override openHandler(e: PointerEvent) {
     /**
      * This is a fix for color picker display in panels with overflow.
      * There is a CSS limitation when using overflow :
