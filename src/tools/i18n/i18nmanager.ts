@@ -26,7 +26,8 @@ type AvailableLanguages = {
 };
 
 class I18nManager extends GirafeSingleton {
-  private translations: AvailableLanguages = {};
+  private readonly translations: AvailableLanguages = {};
+  private readonly translationAliases: Record<string, string> = {};
   private loadingLanguagePromise: Promise<TranslationsDict> | null = null;
 
   public constructor(context: IGirafeContext) {
@@ -67,7 +68,7 @@ class I18nManager extends GirafeSingleton {
     if (language in this.translations) {
       // Translation were already loaded.
       // => stop here
-      return Promise.resolve(this.translations[language]);
+      return this.translations[language];
     }
 
     // Load translations
@@ -98,11 +99,23 @@ class I18nManager extends GirafeSingleton {
 
   public getTranslation(key: string) {
     const currentLanguage = this.context.stateManager?.state?.language ?? 'en';
+
     const translationDict = this.translations[currentLanguage];
-    const translation = translationDict ? translationDict[key] : null;
-    if (translation !== undefined && translation !== null) {
-      return translation;
+    if (translationDict) {
+      // First look in translations
+      let translation = translationDict[key];
+      if (translation) {
+        return translation;
+      }
+      // Otherwise, try with translation alias
+      const alias = this.translationAliases[key];
+      translation = translationDict[alias];
+      if (translation) {
+        return translation;
+      }
     }
+
+    // No translation found.
     return key;
   }
 
@@ -113,7 +126,7 @@ class I18nManager extends GirafeSingleton {
     }
 
     const toTranslate = dom.querySelectorAll('[i18n]');
-    toTranslate.forEach((item) => {
+    for (const item of toTranslate) {
       const key = item.getAttribute('i18n');
       let translation: string;
       if (item.hasAttribute('i18nFn')) {
@@ -127,14 +140,14 @@ class I18nManager extends GirafeSingleton {
         // Default : simply set innerHTML.
         item.innerHTML = translation;
       }
-    });
+    }
 
     const tooltips = dom.querySelectorAll('[tip]');
-    tooltips.forEach((item) => {
+    for (const item of tooltips) {
       const key = item.getAttribute('tip');
       const translation = this.getTranslation(key!);
       item.setAttribute('title', translation);
-    });
+    }
   }
 
   private handleLanguageChange() {
@@ -155,6 +168,17 @@ class I18nManager extends GirafeSingleton {
       return this.formatNumber(key);
     }
     return key;
+  }
+
+  /**
+   * Define a translation alias.
+   * The alias will use the same translation as the key.
+   * But if the key already has another translation, the alias will be ignored
+   */
+  public addTranslationAlias(key: string, alias: string) {
+    if (key !== alias) {
+      this.translationAliases[alias] = key;
+    }
   }
 }
 

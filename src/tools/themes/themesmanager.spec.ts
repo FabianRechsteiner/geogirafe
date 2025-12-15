@@ -16,7 +16,7 @@ const emptyTheme = {
 
 beforeAll(async () => {
   context = MockHelper.startMocking();
-  global.fetch = fetchMock;
+  globalThis.fetch = fetchMock;
   fetchMock.mockResolvedValueOnce({ json: vi.fn().mockResolvedValue(emptyTheme) });
   manager = context.themesManager;
   // @ts-ignore
