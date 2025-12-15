@@ -87,9 +87,8 @@
   },
   "contextmenu": {
     "crs": [
-      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 2 },
-      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 },
-      { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
+      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 3 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 }
     ]
   },
   "crs": [
@@ -100,6 +99,33 @@
     {
       "code": "EPSG:21781",
       "definition": "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs"
+    }
+  ],
+  "Links": [
+    {
+      "translation": "Mapilary",
+      "crs": "EPSG:4326",
+      "url": "https://www.mapillary.com/app/?lat=###MAPY###&lng=###MAPX###"
+    },
+    {
+      "translation": "Google Street View",
+      "crs": "EPSG:4326",
+      "url": "https://maps.google.ch/?ie=UTF8&ll=###MAPY###,###MAPX###&layer=c&cbll=###MAPY###,###MAPX###&cbp=12,57.78,,0,8.1"
+    },
+    {
+      "translation": "Google Street View",
+      "crs": "EPSG:4326",
+      "url": "https://www.google.ch/maps/@###MAPY###,###MAPX###,212a,35y,357.21h,51.15t/data=!3m1!1e3?hl=fr"
+    },
+    {
+      "translation": "Vers la vue 3D Pully",
+      "crs": "EPSG:2056",
+      "url": "https://pully.uzuverse.com/?x=###MAPX###&y=###MAPX###&z=600"
+    },
+    {
+      "translation": "Vers la vue 3D Régionale",
+      "crs": "EPSG:2056",
+      "url": "https://est-lausannois.uzuverse.com/?x=###MAPX###&y=###MAPX###&z=600"
     }
   ],
   "contact": {
