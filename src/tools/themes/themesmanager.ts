@@ -370,7 +370,13 @@ class ThemesManager extends GirafeSingleton {
       if (options.metadata?.metadataUrl) {
         options.metadata.metadataUrl = this.calculateMetadataUrl(options.metadata.metadataUrl);
       }
-      return new LayerWms(elem.id, elem.name, order.value, ogcServer, elem);
+      const wmsLayer = new LayerWms(elem.id, elem.name, order.value, ogcServer, elem);
+      // For WMFS queries, the layers attribute will be used. It can be different from the name.
+      // But in order to be able to define the translations only once, we use an translation alias here.
+      if (wmsLayer.layers) {
+        this.context.i18nManager.addTranslationAlias(wmsLayer.name, wmsLayer.layers);
+      }
+      return wmsLayer;
     } else {
       // Layer is invalid : it does not have any OGC-Server
       this.context.errorManager.pushMessage(

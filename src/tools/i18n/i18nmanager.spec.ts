@@ -20,7 +20,7 @@ describe('I18nManager.loadTranslations', () => {
     i18nManager.loadingLanguagePromise = null;
     configManager = context.configManager;
     configManager.Config.languages.translations = {};
-    global.fetch = fetchMock;
+    globalThis.fetch = fetchMock;
   });
 
   afterAll(() => {
@@ -164,6 +164,15 @@ describe('I18nManager.getTranslation', () => {
 
     const translation = i18nManager.getTranslation('unknownKey');
     expect(translation).toBe('unknownKey');
+  });
+
+  it('should return translation of the key if alias is given', () => {
+    // Set current language to French (where 'unknownKey' does not exist)
+    stateManager.state.language = 'fr';
+
+    i18nManager.addTranslationAlias('layer', 'layerAlias');
+    const translation = i18nManager.getTranslation('layerAlias');
+    expect(translation).toBe('couche');
   });
 });
 
