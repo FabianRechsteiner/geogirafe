@@ -17,6 +17,7 @@ import { unByKeyAll } from '../../tools/utils/olutils';
 import { padNumber } from 'ol/string';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Layer from '../../models/layers/layer';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
 /** Represents the status of a printing process. */
 enum PrintStatus {
@@ -43,9 +44,13 @@ interface PrintElement {
  * Be able to print the content on the map, based on the layer tree and the OL map.
  * Have actions on the print mask and on the map (rotation).
  */
-class PrintComponent extends GirafeHTMLElement {
+class PrintComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
+
+  isPanelVisible = false;
+  panelTitle = 'print-panel';
+  panelTogglePath = 'interface.printPanelVisible';
 
   private readonly default_dpi = 96;
   private readonly default_scale = 10000;
@@ -60,7 +65,6 @@ class PrintComponent extends GirafeHTMLElement {
   private capabilities?: MFPCapabilities;
   private configAttributeNames: string[] = [];
   private printMaskManager?: PrintMaskManager;
-  private visible = false;
   private isWithCapabilitiesComponentSetup = false;
   private hasErrorFetchingCapabilities = false;
 
@@ -80,7 +84,6 @@ class PrintComponent extends GirafeHTMLElement {
   connectedCallback() {
     super.connectedCallback();
     this.render();
-    this.registerVisibilityEvents();
   }
 
   /**
@@ -88,7 +91,7 @@ class PrintComponent extends GirafeHTMLElement {
    * Fetch the print capabilities at first rendering, then render the print mask too and register to events.
    */
   render() {
-    if (this.visible) {
+    if (this.isPanelVisible) {
       this.renderComponent();
     } else {
       this.renderEmptyComponent();
@@ -371,14 +374,6 @@ class PrintComponent extends GirafeHTMLElement {
   }
 
   /**
-   * Event about visibility that must be always listened by this component, even hidden.
-   * @private
-   */
-  private registerVisibilityEvents() {
-    this.subscribe('interface.printPanelVisible', (_oldValue, newValue) => this.togglePanel(newValue));
-  }
-
-  /**
    * Listen events that must be listened if the print panel is visible.
    * @private
    */
@@ -423,8 +418,8 @@ class PrintComponent extends GirafeHTMLElement {
    * Set the visibility of the panel.
    * @private
    */
-  private async togglePanel(visible: boolean): Promise<void> {
-    this.visible = visible;
+  public togglePanel(visible: boolean) {
+    this.isPanelVisible = visible;
     this.verifyRestrictedLayers();
     this.render();
   }

@@ -18,6 +18,7 @@ import {
   getRadiusDataForCircle,
   getAreaOfCircle
 } from '../../tools/utils/olutils';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
 const defaultFill = new Fill({
   color: 'rgba(255, 255, 255, 0.5)'
@@ -27,11 +28,14 @@ const defaultStroke = new Stroke({
   width: 3
 });
 
-export default class SelectionToolComponent extends GirafeHTMLElement {
+export default class SelectionToolComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  visible = false;
+  isPanelVisible = false;
+  panelTitle = 'selection-tool-panel';
+  panelTogglePath = 'interface.selectionToolPanelVisible';
+
   renderedOnce = false;
 
   buttons: { id: string; tool: SelectionTool }[] = [
@@ -181,7 +185,7 @@ export default class SelectionToolComponent extends GirafeHTMLElement {
 
     this.selectionMode = this.state.selection.selectionMode;
 
-    if (this.visible) {
+    if (this.isPanelVisible) {
       this.renderComponent();
     } else {
       this.hide();
@@ -232,8 +236,6 @@ export default class SelectionToolComponent extends GirafeHTMLElement {
 
     this.render();
 
-    this.subscribe('interface.selectionToolPanelVisible', (_, newValue) => this.togglePanel(newValue));
-
     this.defaultStyle = new Style({
       image: new Circle({
         fill: defaultFill,
@@ -271,10 +273,10 @@ export default class SelectionToolComponent extends GirafeHTMLElement {
   }
 
   togglePanel(visible: boolean) {
-    if (this.visible == visible) return;
+    if (this.isPanelVisible == visible) return;
 
-    this.visible = visible;
-    if (this.visible) {
+    this.isPanelVisible = visible;
+    if (this.isPanelVisible) {
       this.setTool(SelectionTool.Point);
       this.registerEvents();
     } else {

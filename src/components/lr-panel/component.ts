@@ -1,4 +1,5 @@
 import GirafeResizableElement from '../../base/GirafeResizableElement';
+import IGirafePanel, { isGirafePanel } from '../../tools/state/igirafepanel';
 import StateToggleManager from '../../tools/state/stateToggleManager';
 
 /**
@@ -8,22 +9,25 @@ import StateToggleManager from '../../tools/state/stateToggleManager';
  * toggle paths based on changes in its state.
  * It also has methods to shows/hide itself based on the state toggle paths and state.
  *
- * To have the toggle on the state working, the component must have this structure, with
- * a slot="main" and children with the data-toggle-path set:
+ * To have the toggle on the state working, the component must implement the IGirafePanel interface
+ * and be added to the lr-panel:
  * <girafe-lr-panel>
- *   <any slot="main" data-toggle-path="my.state.path1.to.boolean"></any>
- *   <any slot="main" data-toggle-path="my.state.path2.to.boolean"></any>
+ *   <any slot="main"></any>
+ *   <any slot="main"></any>
  * </girafe-lr-panel>
  */
 class LRPanelComponent extends GirafeResizableElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  private stateToggleManager!: StateToggleManager;
+  private stateToggleManager?: StateToggleManager;
   public title: string = 'Unknown panel';
-  private panelTitles: Record<string, string> = {};
+
   public get hasMultipleChilds() {
-    return Object.keys(this.panelTitles).length > 1;
+    if (this.stateToggleManager) {
+      return this.stateToggleManager.panels.length > 1;
+    }
+    return false;
   }
 
   constructor() {
@@ -39,54 +43,57 @@ class LRPanelComponent extends GirafeResizableElement {
     const panel = this.shadow.getElementById('panel');
     panel?.classList.add(this.dock);
 
-    const togglePaths = this.retrieveTogglePaths();
-    this.stateToggleManager = new StateToggleManager(togglePaths, this.context.stateManager);
-    this.showOnChildChange(togglePaths);
+    const elements = this.shadow.querySelectorAll('slot')[0].assignedElements();
+    if (elements.length > 1) {
+      // We only want to manage toggle is more than 1 panel exists
+      this.retrieveTogglePanels(elements).then((panels) => {
+        this.stateToggleManager = new StateToggleManager(panels, this.context.stateManager);
+        this.registerOnChildChange(panels);
+      });
+    }
   }
 
   /**
    * Closes the panel by deactivating all state toggles and hiding itself.
    */
   closePanel() {
-    this.stateToggleManager.deactivateAll();
+    this.stateToggleManager!.deactivateAll();
     this.hide();
   }
 
   /**
    * Retrieve the (valid boolean) toggle paths from child elements of the main slot.
    */
-  private retrieveTogglePaths(): string[] {
-    const elements = this.shadow.querySelectorAll('slot')[0].assignedNodes();
-    const togglePaths: string[] = [];
+  private async retrieveTogglePanels(elements: Element[]): Promise<IGirafePanel[]> {
+    const panels: IGirafePanel[] = [];
     for (const element of elements) {
-      const togglePath = (element as HTMLElement).dataset['togglePath'];
-      const panelTitle = (element as HTMLElement).dataset['title'] ?? 'Unknown panel';
-      if (togglePath) {
-        this.panelTitles[togglePath] = panelTitle;
-        togglePaths.push(togglePath);
+      await customElements.whenDefined(element.tagName.toLowerCase());
+      if (isGirafePanel(element)) {
+        panels.push(element);
+      } else {
+        throw new Error('To be able to be used as a panel, the Component should implement the interface IGirafePanel.');
       }
     }
-
-    return togglePaths;
+    return panels;
   }
 
   /**
    * Subscribes to changes in togglePaths and shows or hides the component based on the changes.
    */
-  private showOnChildChange(togglePaths: string[]) {
-    togglePaths.forEach((path) => {
-      this.subscribe(path, (oldValue, newValue) => {
-        if (oldValue !== newValue) {
-          if (newValue) {
-            this.title = this.panelTitles[path];
-            this.show();
-            this.refreshRender();
-          } else {
-            this.hide();
-          }
-        }
-      });
-    });
+  private registerOnChildChange(panels: IGirafePanel[]) {
+    for (const panel of panels) {
+      this.subscribe(panel.panelTogglePath, () => this.renderPanel(panel));
+    }
+  }
+
+  public renderPanel(panel: IGirafePanel) {
+    if (panel.isPanelVisible) {
+      this.title = panel.panelTitle;
+      this.show();
+      this.refreshRender();
+    } else {
+      this.hide();
+    }
   }
 }
 

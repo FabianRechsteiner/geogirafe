@@ -1,7 +1,8 @@
 import type { Callback } from './statemanager';
 import State from '../state/state';
 import StateManager from '../state/statemanager';
-import { getPropertyByPath, setPropertyByPath } from '../utils/pathUtils';
+import { setPropertyByPath } from '../utils/pathUtils';
+import IGirafePanel from './igirafepanel';
 
 /**
  * Manages the toggling of state properties based on specified paths.
@@ -10,13 +11,14 @@ import { getPropertyByPath, setPropertyByPath } from '../utils/pathUtils';
  */
 export default class StateToggleManager {
   private readonly eventsCallbacks: Callback[] = [];
-  private togglePaths: string[];
+  //private readonly togglePaths: string[];
   private readonly stateManager: StateManager;
 
-  constructor(togglePaths: string[], stateManager: StateManager) {
-    this.togglePaths = togglePaths;
+  public readonly panels: IGirafePanel[] = [];
+
+  constructor(elements: IGirafePanel[], stateManager: StateManager) {
+    this.panels = elements;
     this.stateManager = stateManager;
-    this.initToggle();
     this.watchToggle();
   }
 
@@ -35,38 +37,23 @@ export default class StateToggleManager {
    * Set to false every state leaded by toggle paths except the specified one.
    * Use the given value on the specified one.
    */
-  toggle(setPath: string, newValue: boolean) {
-    this.togglePaths
-      .filter((path) => path !== setPath)
-      .forEach((path) => {
-        setPropertyByPath(this.state, path, false);
-      });
-    setPropertyByPath(this.state, setPath, newValue);
+  toggle(panel: IGirafePanel, isVisible: boolean) {
+    const panelsToHide = this.panels.filter((p) => p.panelTogglePath !== panel.panelTogglePath);
+    for (const panelToHide of panelsToHide) {
+      setPropertyByPath(this.state, panelToHide.panelTogglePath, false);
+      panelToHide.togglePanel(false);
+    }
+    setPropertyByPath(this.state, panel.panelTogglePath, isVisible);
+    panel.togglePanel(isVisible);
   }
 
   /**
    * Set to false every state leaded by toggle paths.
    */
   deactivateAll() {
-    this.toggle(this.togglePaths[0], false);
-  }
-
-  /**
-   * Initializes the toggle for the given paths.
-   * If any of the paths has a truthy value in the state, sets all other paths to false.
-   * @private
-   */
-  private initToggle() {
-    let oneActive = false;
-    this.togglePaths.forEach((path) => {
-      const result = getPropertyByPath(this.state, path);
-      if (oneActive) {
-        setPropertyByPath(this.state, path, false);
-      }
-      if (result.object === true) {
-        oneActive = true;
-      }
-    });
+    for (const panel of this.panels) {
+      setPropertyByPath(this.state, panel.panelTogglePath, false);
+    }
   }
 
   /**
@@ -74,18 +61,8 @@ export default class StateToggleManager {
    * @private
    **/
   private watchToggle() {
-    this.togglePaths.forEach((path) => {
-      this.eventsCallbacks.push(
-        this.stateManager.subscribe(path, (oldValue, newValue) => {
-          if (oldValue == null) {
-            // Don't toggle initial value, needed in tests.
-            return;
-          }
-          if (oldValue !== newValue) {
-            this.toggle(path, newValue);
-          }
-        })
-      );
-    });
+    for (const panel of this.panels) {
+      this.stateManager.subscribe(panel.panelTogglePath, (_, visible) => this.toggle(panel, visible));
+    }
   }
 }

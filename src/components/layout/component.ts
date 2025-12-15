@@ -1,13 +1,16 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
 type LayoutType = '2D' | '3D' | '2D/3D';
 const ALLOWED_LAYOUTS: LayoutType[] = ['2D', '3D', '2D/3D'];
 
-class LayoutComponent extends GirafeHTMLElement {
+class LayoutComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  visible = false;
+  isPanelVisible = false;
+  panelTitle = 'layout-panel';
+  panelTogglePath = 'interface.layoutPanelVisible';
 
   constructor() {
     super('layout');
@@ -16,16 +19,13 @@ class LayoutComponent extends GirafeHTMLElement {
   }
 
   private registerEvents() {
-    this.subscribe('interface.layoutPanelVisible', (_oldValue: boolean, newValue: boolean) =>
-      this.onPanelVisibilityChanged(newValue)
-    );
     this.subscribe('globe.display', (_oldValue: string, newValue: string) =>
       this.onLayoutChanged(newValue as LayoutType)
     );
   }
 
-  private onPanelVisibilityChanged(visible: boolean) {
-    this.visible = visible;
+  public togglePanel(visible: boolean) {
+    this.isPanelVisible = visible;
     this.render();
     if (visible) {
       const currentLayout = this.state.globe.display as LayoutType;
@@ -45,7 +45,7 @@ class LayoutComponent extends GirafeHTMLElement {
 
   private onLayoutChanged(globe: LayoutType) {
     this.syncLayoutSelect(globe);
-    if (this.visible) {
+    if (this.isPanelVisible) {
       this.updateShadowsVisibility(globe);
     }
   }
@@ -102,7 +102,7 @@ class LayoutComponent extends GirafeHTMLElement {
   }
 
   render() {
-    if (this.visible) {
+    if (this.isPanelVisible) {
       super.render();
     } else {
       this.hide();

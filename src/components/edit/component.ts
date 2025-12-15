@@ -12,6 +12,7 @@ import OgcApiFeaturesSchema from '../../tools/ogcapi/ogcapifeaturesschema';
 import { DEMO_LAYERS } from '../../tools/ogcapi/demolayers';
 import { OapifLayer } from '../../models/serverogcapifeatures';
 import { getSelectionBoxFromMapClick } from '../../tools/utils/olutils';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
 const getStyle = (col = 'rgb(255,89,0)', width = 4) => {
   return new Style({
@@ -28,11 +29,13 @@ const baseStyle = getStyle();
 const editStyle = getStyle('rgb(0,81,255)', 6);
 const newId = '-';
 
-export default class EditComponent extends GirafeHTMLElement {
+export default class EditComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  visible: boolean = false;
+  isPanelVisible = false;
+  panelTitle = 'edit-panel';
+  panelTogglePath = 'interface.editPanelVisible';
 
   editableLayersList: OapifLayer[] = [];
 
@@ -60,7 +63,7 @@ export default class EditComponent extends GirafeHTMLElement {
 
   render() {
     super.render();
-    if (this.visible) {
+    if (this.isPanelVisible) {
       this.renderComponent();
     } else {
       this.renderEmptyComponent();
@@ -363,8 +366,8 @@ export default class EditComponent extends GirafeHTMLElement {
     }
   }
 
-  private togglePanel(visible: boolean) {
-    this.visible = visible;
+  public togglePanel(visible: boolean) {
+    this.isPanelVisible = visible;
     this.render();
   }
 
@@ -437,7 +440,6 @@ export default class EditComponent extends GirafeHTMLElement {
     super.connectedCallback();
     this.subscribe('oauth.status', () => this.loginStateChanged());
     // Add ogc servers to state
-    this.subscribe('interface.editPanelVisible', (_, newValue) => this.togglePanel(newValue));
     this.subscribe('application.isReady', () => {
       if (this.state.application.isReady) {
         this.loginStateChanged();

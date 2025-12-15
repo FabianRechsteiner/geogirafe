@@ -5,15 +5,19 @@ import { getPropertyByPath, setPropertyByPath } from '../../tools/utils/pathUtil
 import { Color } from 'vanilla-picker';
 import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 import { applyOpacityToLayers, systemIsInDarkMode } from '../../tools/utils/utils';
+import IGirafePanel from '../../tools/state/igirafepanel';
 
 /**
  Lets the user override default configuration values and saves them as user data.
  */
-export default class UserPreferencesComponent extends GirafeHTMLElement {
+export default class UserPreferencesComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  visible = false;
+  isPanelVisible = false;
+  panelTitle = 'user-preferences-panel';
+  panelTogglePath = 'interface.userPreferencesPanelVisible';
+
   ready: boolean = false;
   preferences!: Record<string, UserPreference>;
   preferenceGroups: PreferenceGroup[] = PreferenceGroups;
@@ -84,13 +88,12 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
     super.connectedCallback();
     this.initPreferences();
     this.render();
-    this.subscribe('interface.userPreferencesPanelVisible', (_, newValue) => this.togglePanel(newValue));
     this.subscribe('interface.darkFrontendMode', (_, newValue) => this.onChangeDarkFrontendMode(newValue));
     this.subscribe('interface.darkMapMode', (_, newValue) => this.onChangeDarkMapMode(newValue));
   }
 
   render(): void {
-    if (this.visible) {
+    if (this.isPanelVisible) {
       this.renderComponent();
     } else {
       this.hide();
@@ -105,8 +108,8 @@ export default class UserPreferencesComponent extends GirafeHTMLElement {
     super.girafeTranslate();
   }
 
-  private togglePanel(visible: boolean): void {
-    this.visible = visible;
+  public togglePanel(visible: boolean): void {
+    this.isPanelVisible = visible;
     this.render();
   }
 
