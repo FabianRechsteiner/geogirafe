@@ -37,10 +37,13 @@ export default class OnBoardingManager extends GirafeSingleton {
       for (const stepConfig of this.config.onboarding.steps) {
         let element: string | Element | undefined;
         if (stepConfig.component) {
-          element =
-            this.context.componentManager
-              .getComponentsByName(stepConfig.component)[0]
-              .shadow.querySelector(stepConfig.element) ?? undefined;
+          // @ts-expect-error getChildElement is protected, but  we do not want to make it public,
+          // because we should not give access to the shadow from from outside.
+          // The onboarding is a very special case, because we want to be able
+          // to focus an HTML element inside the shadow dom, to show help text.
+          // So this should be the only exception to this protected access.
+          // prettier-ignore
+          element = this.context.componentManager.getComponentsByName(stepConfig.component)[0].getChildElement(stepConfig.element) ?? undefined;
         } else {
           element = stepConfig.element;
         }

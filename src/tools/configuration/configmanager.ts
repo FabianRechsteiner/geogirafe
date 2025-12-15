@@ -9,7 +9,7 @@ class ConfigManager extends GirafeSingleton {
   private loadingPromise: Promise<GirafeConfig> | null = null;
   private readonly storagePathForOverrides: string = 'configOverrides';
 
-  get Config() {
+  public get Config() {
     return this.config!;
   }
 

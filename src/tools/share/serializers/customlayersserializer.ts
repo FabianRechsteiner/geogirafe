@@ -15,7 +15,7 @@ export default class CustomLayersSerializer extends LayersConfigSerializer {
     return customTheme;
   }
 
-  protected getSerializedLayer(layer: BaseLayer): SharedLayer {
+  protected override getSerializedLayer(layer: BaseLayer): SharedLayer {
     const serializedLayer = super.getSerializedLayer(layer);
     serializedLayer.checked = Number(layer.isDefaultChecked);
     return serializedLayer;

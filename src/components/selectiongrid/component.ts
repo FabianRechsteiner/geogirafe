@@ -30,11 +30,11 @@ class SelectionGridComponent extends GirafeResizableElement {
   currentTabId: string = '';
   resultsSelected = false;
 
-  constructor() {
+  public constructor() {
     super('selectiongrid');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.csvManager = new CsvManager(this.context);
     this.selectionTabulatorManager = new SelectionTabulatorManager(this.context);

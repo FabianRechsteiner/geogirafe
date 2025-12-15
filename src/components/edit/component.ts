@@ -57,7 +57,7 @@ export default class EditComponent extends GirafeHTMLElement implements IGirafeP
   private layer?: OapifLayer; // Layer definition / config
   private demoMapLayer?: VectorLayer; // Layer in the map
 
-  constructor() {
+  public constructor() {
     super('edit');
   }
 
@@ -436,7 +436,7 @@ export default class EditComponent extends GirafeHTMLElement implements IGirafeP
     }
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.subscribe('oauth.status', () => this.loginStateChanged());
     // Add ogc servers to state

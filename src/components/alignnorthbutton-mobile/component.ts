@@ -4,11 +4,11 @@ export default class AlignNorthButtonMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  constructor() {
+  public constructor() {
     super('align-north-button-mobile');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     const compassIcon = this.shadow.getElementById('compass-icon') as HTMLImageElement;

@@ -4,11 +4,11 @@ export default class DrawingContainerMobile extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', '../../styles/common.mobile.css', './style.css'];
 
-  constructor() {
+  public constructor() {
     super('drawing-mobile');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.subscribe('interface.swipeupPanelContent', () => {
       // Disable the drawing mode if the swipeup panel were to host anything else than

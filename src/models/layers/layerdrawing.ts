@@ -12,13 +12,13 @@ export default class LayerDrawing extends Layer {
 
   public _oLayer: VectorLayer;
 
-  constructor(name: string, oLayer: VectorLayer) {
+  public constructor(name: string, oLayer: VectorLayer) {
     super(0, name, 0, { isDefaultChecked: true });
     this.isRemovable = false;
     this._oLayer = oLayer;
   }
 
-  clone(): LayerDrawing {
+  public clone(): LayerDrawing {
     throw new Error('Cannot clone vector layer.');
   }
 }

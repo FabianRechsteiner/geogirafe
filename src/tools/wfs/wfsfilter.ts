@@ -45,13 +45,19 @@ const BeginningOfTime = '0001-01-01';
 const EndOfTime = '9999-12-31';
 
 class WfsFilter<WfsXmlTypes extends XmlTypes = XmlTypes> {
-  property: string;
-  propertyType?: WfsXmlTypes;
-  operator: WfsOperator;
-  value: string;
-  value2: string;
+  public property: string;
+  public propertyType?: WfsXmlTypes;
+  public operator: WfsOperator;
+  public value: string;
+  public value2: string;
 
-  constructor(property: string, operator: WfsOperator, value: string, value2: string = '', propertyType?: WfsXmlTypes) {
+  public constructor(
+    property: string,
+    operator: WfsOperator,
+    value: string,
+    value2: string = '',
+    propertyType?: WfsXmlTypes
+  ) {
     this.property = property;
     this.operator = operator;
     this.value = value;
@@ -124,7 +130,7 @@ class WfsFilter<WfsXmlTypes extends XmlTypes = XmlTypes> {
    *
    * @returns a simple filter string that can be used in a WMS GetMap request, does not provide any XML namespace (xmlns attributes)
    */
-  toWmsGetMapFilter(): string {
+  public toWmsGetMapFilter(): string {
     if (!this.propertyType) {
       throw new Error('The type of the property should never be null !');
     }

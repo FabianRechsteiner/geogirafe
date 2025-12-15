@@ -5,9 +5,9 @@ export type CameraConfig = {
 };
 
 export default class GlobeState {
-  display: '2D' | '3D' | '2D/3D' = '2D';
-  loaded = false;
-  shadows = false;
-  shadowsTimestamp = Date.now();
-  camera: CameraConfig | null = null;
+  public display: '2D' | '3D' | '2D/3D' = '2D';
+  public loaded = false;
+  public shadows = false;
+  public shadowsTimestamp = Date.now();
+  public camera: CameraConfig | null = null;
 }

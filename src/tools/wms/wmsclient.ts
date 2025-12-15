@@ -11,18 +11,18 @@ import Exception from 'jsts/java/lang/Exception';
 import IGirafeContext from '../context/icontext';
 
 export default abstract class WmsClient {
-  map: Map;
-  ogcServer: ServerOgc;
+  private readonly map: Map;
+  private readonly ogcServer: ServerOgc;
   private readonly context: IGirafeContext;
-  resolutionTolerance = 5;
-  capabilityPromise: Promise<Record<string, unknown>> | null = null;
-  capabilities: Record<string, unknown> | null = null;
+  private readonly resolutionTolerance = 5;
+  private capabilityPromise: Promise<Record<string, unknown>> | null = null;
+  private capabilities: Record<string, unknown> | null = null;
 
-  get state() {
+  private get state() {
     return this.context.stateManager.state;
   }
 
-  get audienceExcludedPaths() {
+  private get audienceExcludedPaths() {
     return (
       this.context.configManager.Config.oauth?.issuer.audienceExcludedPaths ??
       this.context.configManager.Config.gmfauth?.audienceExcludedPaths ??
@@ -33,13 +33,13 @@ export default abstract class WmsClient {
   // The Id of this dictionary if an unique ID that allow the differenciantion of server queries.
   // For example, a combination of server URL and ImageType could be used.
   // Each element of this dictionary will generate 1 WMS server query
-  layers: LayerWms[] = [];
-  olayer?: ImageLayer<ImageWMS>;
+  private layers: LayerWms[] = [];
+  private olayer?: ImageLayer<ImageWMS>;
 
   // Independent layers are layers that need to be queried alone
   // (not combine to other WMS layers in the same query)
   // The treeItemId will be used as key for this dictionary
-  independentLayers: Record<
+  private independentLayers: Record<
     string,
     {
       layerWms: LayerWms;
@@ -47,7 +47,7 @@ export default abstract class WmsClient {
     }
   > = {};
 
-  basemapLayers: Record<
+  private basemapLayers: Record<
     string,
     {
       layerWms: LayerWms;
@@ -55,17 +55,13 @@ export default abstract class WmsClient {
     }
   > = {};
 
-  constructor(ogcServer: ServerOgc, map: Map, context: IGirafeContext) {
+  public constructor(ogcServer: ServerOgc, map: Map, context: IGirafeContext) {
     this.ogcServer = ogcServer;
     this.map = map;
     this.context = context;
   }
 
-  get uniqueQueryId(): string {
-    return this.ogcServer.uniqueWmsQueryId;
-  }
-
-  removeAllBasemapLayers() {
+  public removeAllBasemapLayers() {
     for (const basmapLayer of Object.values(this.basemapLayers)) {
       this.map.removeLayer(basmapLayer.olayer);
     }
@@ -134,9 +130,9 @@ export default abstract class WmsClient {
     return source;
   }
 
-  abstract getOpenLayerLayerNames(layerList: LayerWms[]): string[];
+  public abstract getOpenLayerLayerNames(layerList: LayerWms[]): string[];
 
-  addBasemapLayer(layerWms: LayerWms) {
+  public addBasemapLayer(layerWms: LayerWms) {
     const source = this.createImageWMSSource([layerWms]);
     const olayer = new ImageLayer({
       source: source,
@@ -153,7 +149,7 @@ export default abstract class WmsClient {
     this.map.addLayer(olayer);
   }
 
-  removeLayer(layerWms: LayerWms) {
+  public removeLayer(layerWms: LayerWms) {
     if (this.layerExists(layerWms)) {
       if (layerWms.treeItemId in this.independentLayers) {
         const olayer = this.independentLayers[layerWms.treeItemId].olayer;
@@ -181,7 +177,7 @@ export default abstract class WmsClient {
     }
   }
 
-  layerExists(layerWms: LayerWms) {
+  public layerExists(layerWms: LayerWms) {
     return (
       this.layerInStandardLayers(layerWms) ||
       this.layerIsIndependentLayer(layerWms) ||
@@ -189,19 +185,19 @@ export default abstract class WmsClient {
     );
   }
 
-  layerInStandardLayers(layerWms: LayerWms) {
+  private layerInStandardLayers(layerWms: LayerWms) {
     return this.layers.some((l) => l.treeItemId === layerWms.treeItemId);
   }
 
-  layerIsIndependentLayer(layerWms: LayerWms) {
+  private layerIsIndependentLayer(layerWms: LayerWms) {
     return layerWms.treeItemId in this.independentLayers;
   }
 
-  layerIsBasemapLayer(layerWms: LayerWms) {
+  private layerIsBasemapLayer(layerWms: LayerWms) {
     return layerWms.treeItemId in this.basemapLayers;
   }
 
-  getOLayer(layerWms: LayerWms): ImageLayer<ImageWMS> | null {
+  public getOLayer(layerWms: LayerWms): ImageLayer<ImageWMS> | null {
     if (layerWms.treeItemId in this.independentLayers) {
       return this.independentLayers[layerWms.treeItemId].olayer;
     }
@@ -301,7 +297,7 @@ export default abstract class WmsClient {
     }
   }
 
-  abstract buildFilterQuery(layerWms: LayerWms): string;
+  public abstract buildFilterQuery(layerWms: LayerWms): string;
 
   private updateTimeRestriction(layerWms: LayerWms, olayer: ImageLayer<ImageWMS>) {
     const source = olayer.getSource() as ImageWMS;
@@ -317,7 +313,7 @@ export default abstract class WmsClient {
     }
   }
 
-  selectFeatures(extent: number[]) {
+  public selectFeatures(extent: number[]) {
     if (this.layers.length === 0 && !this.independentLayers) {
       return;
     }
@@ -346,7 +342,7 @@ export default abstract class WmsClient {
   /**
    * Selects features based on the specified query and prepares selection parameters.
    */
-  selectFeaturesByQuery(query: WfsFilter[]) {
+  public selectFeaturesByQuery(query: WfsFilter[]) {
     const selectionParams: SelectionParam[] = [];
 
     selectionParams.push(
@@ -388,8 +384,8 @@ export default abstract class WmsClient {
       console.log('WMSClient called before resolution is set.');
       return urlsAndLayerNames;
     }
-    param._layers.forEach((layer) => {
-      const olLayer = param._oLayer ?? this.getOLayer(layer);
+    param.layers.forEach((layer) => {
+      const olLayer = param.oLayer ?? this.getOLayer(layer);
       if (!layer.queryable || !olLayer || !layer.isVisibleAtResolution(currentResolution)) {
         return;
       }
@@ -481,7 +477,7 @@ export class WmsClientQgis extends WmsClient {
   /** QGIS-server does not filter on a WMS layer made from multiple underlying WFS queryLayers
    * Solution: directly query the queryLayers
    */
-  getOpenLayerLayerNames(layerList: LayerWms[]) {
+  public override getOpenLayerLayerNames(layerList: LayerWms[]) {
     const hasFilter = layerList.some((layerWms) => layerWms.hasFilter);
     if (hasFilter) {
       const layerNames = layerList.flatMap((l: LayerWms) => l.queryLayers?.split(','));
@@ -498,7 +494,7 @@ export class WmsClientQgis extends WmsClient {
    * MapServer: (<filter>...</filter><filter>...</filter>)
    * QGIS-server: (<filter>...</filter>)(<filter>...</filter>)
    */
-  buildFilterQuery(layerWms: LayerWms) {
+  public override buildFilterQuery(layerWms: LayerWms) {
     let filterStr = '';
     if (layerWms.hasFilter) {
       const filter = layerWms.filter as WfsFilter;
@@ -510,11 +506,11 @@ export class WmsClientQgis extends WmsClient {
 }
 
 export class WmsClientMapServer extends WmsClient {
-  getOpenLayerLayerNames(layerList: LayerWms[]) {
+  public override getOpenLayerLayerNames(layerList: LayerWms[]) {
     return layerList.map((l: LayerWms) => l.layers) as string[];
   }
 
-  buildFilterQuery(layerWms: LayerWms): string {
+  public override buildFilterQuery(layerWms: LayerWms): string {
     let filterStr = '';
     if (layerWms.hasFilter) {
       const filter = layerWms.filter as WfsFilter;

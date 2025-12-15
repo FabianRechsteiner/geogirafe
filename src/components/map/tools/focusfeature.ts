@@ -28,7 +28,7 @@ export class FocusFeature {
   private focusAnimation: EventsKey | null = null;
   private strokeColor!: number[] | null;
 
-  constructor(map: Map, configManager: ConfigManager) {
+  public constructor(map: Map, configManager: ConfigManager) {
     this.olMap = map;
     this.configManager = configManager;
     this.createFocusLayer();

@@ -22,7 +22,7 @@ class MobileSelectedLayerElementComponent extends MobileLayerElementComponent {
 
   wmsLegendHelper!: WmsLegendHelper;
 
-  constructor() {
+  public constructor() {
     super('layer-selected-mobile');
   }
 
@@ -44,7 +44,7 @@ class MobileSelectedLayerElementComponent extends MobileLayerElementComponent {
     super.render();
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     this.wmsLegendHelper = new WmsLegendHelper(this.context);
     this.render();

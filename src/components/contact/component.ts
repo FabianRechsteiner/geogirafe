@@ -11,7 +11,7 @@ class ContactComponent extends GirafeHTMLElement implements IGirafePanel {
 
   shortUrl = '';
 
-  constructor() {
+  public constructor() {
     super('contact');
   }
 
@@ -77,7 +77,7 @@ class ContactComponent extends GirafeHTMLElement implements IGirafePanel {
     super.girafeTranslate();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
   }

@@ -32,7 +32,7 @@ class SwipeManager {
   wmsManager: WmsManager;
   localFileManager: LocalFileManager;
 
-  constructor(
+  public constructor(
     map: Map,
     swiper: HTMLInputElement,
     closeButton: HTMLButtonElement,

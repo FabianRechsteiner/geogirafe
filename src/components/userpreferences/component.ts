@@ -25,7 +25,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement implemen
 
   private readonly storagePath = 'configOverrides';
 
-  constructor() {
+  public constructor() {
     super('user-preferences');
   }
 
@@ -84,7 +84,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement implemen
     });
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     this.initPreferences();
     this.render();

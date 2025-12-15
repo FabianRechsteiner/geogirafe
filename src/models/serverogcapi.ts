@@ -4,7 +4,7 @@ export default class ServerOgcApi {
   public url: string;
   public conformsTo?: Record<ConformanceLevel, boolean>;
 
-  constructor(url: string) {
+  public constructor(url: string) {
     this.url = url;
   }
 }

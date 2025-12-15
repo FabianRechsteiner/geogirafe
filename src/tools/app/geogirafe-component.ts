@@ -8,7 +8,7 @@ export default class GeoGirafeAppComponent extends GirafeHTMLElement {
   private readonly ready: Promise<void>;
   private resolveReady!: () => void;
 
-  constructor() {
+  public constructor() {
     super('geogirafe-main-app');
     this.shadow.innerHTML = '<slot></slot>';
     this.ready = new Promise((resolve) => {
@@ -20,7 +20,7 @@ export default class GeoGirafeAppComponent extends GirafeHTMLElement {
     return this.context;
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.initialize().then(() => {
       // App is ready
@@ -28,7 +28,7 @@ export default class GeoGirafeAppComponent extends GirafeHTMLElement {
     });
   }
 
-  override getInheritedContext(): IGirafeContext {
+  public override getInheritedContext(): IGirafeContext {
     return new GirafeContext();
   }
 

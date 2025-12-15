@@ -19,8 +19,11 @@ describe('CsvManager', () => {
 
   describe('generateCsv', () => {
     it('should return empty string if data or columnDefs are empty', () => {
+      // @ts-expect-error: private property
       expect(csvManager.generateCsv([], [])).toBe('');
+      // @ts-expect-error: private property
       expect(csvManager.generateCsv([{ a: 1 }], [])).toBe('');
+      // @ts-expect-error: private property
       expect(csvManager.generateCsv([], [{ name: 'a' }])).toBe('');
     });
 
@@ -29,6 +32,7 @@ describe('CsvManager', () => {
       const columnDefs = [{ name: 'a' }, { name: 'b' }];
 
       const expectedCsv = "'translated_a','translated_b'\n'1','2'\n";
+      // @ts-expect-error: private property
       expect(csvManager.generateCsv(data, columnDefs)).toBe(expectedCsv);
     });
 
@@ -39,6 +43,7 @@ describe('CsvManager', () => {
       context.configManager.Config.csv.includeHeader = false;
 
       const expectedCsv = "'1','2'\n";
+      // @ts-expect-error: private property
       expect(csvManager.generateCsv(data, columnDefs)).toBe(expectedCsv);
     });
   });

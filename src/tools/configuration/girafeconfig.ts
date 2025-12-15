@@ -1,27 +1,27 @@
 class GirafeConfig {
-  general: {
+  public general: {
     locale: string;
     logLevel: 'debug' | 'info' | 'warn' | 'error';
   };
-  languages: {
+  public languages: {
     translations: {
       [key: string]: string[];
     };
     defaultLanguage: string;
   };
-  interface: {
+  public interface: {
     defaultSelectionComponent: string;
     darkFrontendMode: boolean | undefined;
     darkMapMode: boolean;
   };
-  themes: {
+  public themes: {
     url: string;
     defaultTheme: string;
     imagesUrlPrefix: string;
     showErrorsOnStart: boolean;
     selectionMode: 'add' | 'replace';
   };
-  basemaps: {
+  public basemaps: {
     show: boolean;
     defaultBasemap: string;
     OSM: boolean;
@@ -29,14 +29,14 @@ class GirafeConfig {
     emptyBasemap: boolean;
     opacityBasemaps: string[];
   };
-  treeview: {
+  public treeview: {
     hideLegendWhenLayerIsDeactivated: boolean;
     defaultIconSize: {
       width: number;
       height: number;
     };
   };
-  search: {
+  public search: {
     url: string;
     objectPreview?: boolean;
     layerPreview?: boolean;
@@ -46,7 +46,7 @@ class GirafeConfig {
     defaultStrokeWidth?: number;
     paintSearchResults?: boolean;
   };
-  print?: {
+  public print?: {
     url: string;
     formats?: string[];
     defaultFormat?: string;
@@ -63,7 +63,7 @@ class GirafeConfig {
     };
     customScale?: boolean;
   };
-  selection: {
+  public selection: {
     maxFeature: number;
     defaultFillColor: string;
     defaultStrokeColor: string;
@@ -71,7 +71,7 @@ class GirafeConfig {
     highlightFillColor: string;
     highlightStrokeColor: string;
   };
-  drawing: {
+  public drawing: {
     defaultFillColor: string;
     defaultStrokeColor: string;
     defaultStrokeWidth: number;
@@ -81,15 +81,15 @@ class GirafeConfig {
     defaultVertexFillColor: string;
     defaultVertexStrokeWidth: number;
   };
-  share?: {
+  public share?: {
     service: 'gmf' | 'geogirafe' | null;
     createUrl: string;
     getUrl?: string;
   };
-  projections: {
+  public projections: {
     [key: string]: string;
   };
-  map: {
+  public map: {
     srid: string;
     startZoom: string;
     startPosition: string;
@@ -99,7 +99,7 @@ class GirafeConfig {
     constrainRotation: boolean;
     showScaleLine: boolean;
   };
-  map3d?: {
+  public map3d?: {
     terrainImagery: {
       url: string;
       srid: 4326 | 3857;
@@ -112,17 +112,17 @@ class GirafeConfig {
     tilesetsUrls: string[];
     maximumZoomDistance: number;
   };
-  lidar?: {
+  public lidar?: {
     url: string;
   };
-  externalLayers?: {
+  public externalLayers?: {
     predefinedSources: {
       label: string;
       type: 'WMS' | 'WMTS';
       url: string;
     }[];
   };
-  contextmenu: {
+  public contextmenu: {
     crs: {
       code: string;
       translation: string;
@@ -146,31 +146,31 @@ class GirafeConfig {
       url: string;
     }[];
   };
-  crs: { code: string; definition: string }[];
-  csv: {
+  public crs: { code: string; definition: string }[];
+  public csv: {
     encoding: string;
     extension: string;
     includeHeader: boolean;
     quote: string;
     separator: string;
   };
-  metadata: {
+  public metadata: {
     metadataUrlPrefix: string;
   };
-  infoWindow: {
+  public infoWindow: {
     defaultWindowWidth: string;
     defaultWindowHeight: string;
     defaultWindowPositionTop: string;
     defaultWindowPositionLeft: string;
   };
-  offline?: {
+  public offline?: {
     downloadStartZoom: number;
     downloadEndZoom: number;
   };
-  query: {
+  public query: {
     legacy: boolean;
   };
-  gmfauth?: {
+  public gmfauth?: {
     url: string;
     loginRequired: boolean;
     checkSessionOnLoad: boolean;
@@ -179,7 +179,7 @@ class GirafeConfig {
     refererPolicy: ReferrerPolicy;
     audienceExcludedPaths: string[];
   };
-  oauth?: {
+  public oauth?: {
     issuer: {
       url: string;
       algorithm: 'oauth2' | 'oidc';
@@ -200,17 +200,17 @@ class GirafeConfig {
       refererPolicy: ReferrerPolicy;
     };
   };
-  userdata: {
+  public userdata: {
     source: 'localStorage' | 'server';
     getUrl: string | undefined;
     postUrl: string | undefined;
   };
-  contact?: {
+  public contact?: {
     url: string;
     reasons: string[];
     email: string;
   };
-  onboarding?: {
+  public onboarding?: {
     steps: {
       component?: string;
       element: string;
@@ -221,7 +221,7 @@ class GirafeConfig {
 
   // The extended configuration can be used by third-party components or extensions
   // to add custom attributes to the GirafeConfig.
-  extendedConfig?: Record<string, object>;
+  public extendedConfig?: Record<string, object>;
 
   public static readonly DEFAULT_LOCALE = 'en-US';
 
@@ -231,7 +231,7 @@ class GirafeConfig {
    * Every property of config that is not complying with GirafeConfig type is ignored.
    * @param config the configuration
    */
-  constructor(config: GirafeConfig) {
+  public constructor(config: GirafeConfig) {
     // Default values are documented here : https://doc.geomapfish.dev/docs/configuration
     // NOTE: Please adapt the documentation if necessary when doing changes here.
     this.general = this.initConfigGeneral(config);
@@ -385,6 +385,7 @@ class GirafeConfig {
     if (!config.print?.url) {
       throw new Error(`Configuration for print.url is required. See https://doc.geomapfish.dev/docs/configuration`);
     }
+
     config.print.attributeNames ??= ['title', 'comments', 'legend'];
     config.print.formats ??= ['pdf', 'png'];
     return config.print;

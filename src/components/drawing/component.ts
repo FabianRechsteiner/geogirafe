@@ -81,7 +81,7 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
   //  the drawing tool. It possibly will be part of advanced drawing/editing tools.
   batchCreateMode: boolean = false;
 
-  constructor(name = 'drawing') {
+  public constructor(name = 'drawing') {
     super(name);
   }
 
@@ -209,7 +209,7 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
     ].includes(this.drawingState.activeTool);
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     if (!this.state.extendedState.drawing) {
       throw new Error('ExtendedState has to be defined in main typescript file.');

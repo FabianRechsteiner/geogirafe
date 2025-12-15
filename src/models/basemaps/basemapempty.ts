@@ -1,7 +1,7 @@
 import Basemap from './basemap';
 
 export default class BasemapEmpty extends Basemap {
-  constructor() {
+  public constructor() {
     const basemapMetadata = {
       isLegendExpanded: false,
       wasLegendExpanded: false,

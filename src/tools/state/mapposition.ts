@@ -1,18 +1,17 @@
 import { Coordinate } from 'ol/coordinate';
 
 class MapPosition {
-  center: Coordinate = [];
-  zoom?: number;
-  // Dummy default value because it should never be null. It will be recalculated when the map is created
-  resolution?: number;
-  scale?: number;
-  crosshair?: Coordinate;
-  tooltip?: {
+  public center: Coordinate = [];
+  public zoom?: number;
+  public resolution?: number;
+  public scale?: number;
+  public crosshair?: Coordinate;
+  public tooltip?: {
     content: string;
     position?: Coordinate;
   };
 
-  get isValid() {
+  public get isValid() {
     if (Number.isNaN(this.resolution)) {
       return false;
     }

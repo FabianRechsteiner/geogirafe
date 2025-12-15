@@ -20,14 +20,20 @@ class LayerCog extends Layer {
 
   public source: string;
 
-  constructor(id: number, name: string, order: number, source: string, options?: GMFTreeItem | LayerCogTilesOptions) {
+  public constructor(
+    id: number,
+    name: string,
+    order: number,
+    source: string,
+    options?: GMFTreeItem | LayerCogTilesOptions
+  ) {
     let opts = options ?? {};
     opts = LayerCog.isGMFTreeItem(opts) ? LayerCog.getOptionsFromGMFTreeItem(opts) : opts;
     super(id, name, order, opts);
     this.source = source;
   }
 
-  clone() {
+  public clone() {
     const options = {
       isDefaultChecked: this.isDefaultChecked,
       metadataUrl: this.metadataUrl,

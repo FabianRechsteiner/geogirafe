@@ -7,7 +7,7 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
   styleUrls = ['../style.css', '../../../styles/common.css'];
   override layer: GroupLayer;
 
-  constructor(group: GroupLayer) {
+  public constructor(group: GroupLayer) {
     super(group, 'treeviewgroup');
     this.layer = group;
   }
@@ -44,7 +44,7 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
     });
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     super.girafeTranslate();

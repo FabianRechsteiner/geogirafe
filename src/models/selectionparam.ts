@@ -33,36 +33,48 @@ function sameUrlAndImageTypeForAll(layers: LayerWms[]) {
  * - a selection box OR a WFS query
  */
 export default class SelectionParam {
-  _ogcServer: ServerOgc;
-  _layers: LayerWms[];
-  srid: string;
-  selectionBox?: number[];
-  _oLayer?: OLayerImage<OSourceImageWMS>;
-  selectionQuery?: WfsFilter[];
+  private readonly _ogcServer: ServerOgc;
+  public get ogcServer() {
+    return this._ogcServer;
+  }
 
-  constructor(
+  private readonly _layers: LayerWms[];
+  public get layers() {
+    return this._layers;
+  }
+
+  private readonly _oLayer?: OLayerImage<OSourceImageWMS>;
+  public get oLayer() {
+    return this._oLayer;
+  }
+
+  public readonly srid: string;
+  public readonly selectionBox?: number[];
+  public readonly selectionQuery?: WfsFilter[];
+
+  public constructor(
     ogcServer: ServerOgc,
     layers: LayerWms[],
     srid: string,
     selectionBox?: number[],
-    _oLayer?: OLayerImage<OSourceImageWMS>,
+    oLayer?: OLayerImage<OSourceImageWMS>,
     selectionQuery?: WfsFilter[]
   ) {
     this._ogcServer = ogcServer;
     this._layers = layers;
     this.srid = srid;
     this.selectionBox = selectionBox;
-    this._oLayer = _oLayer;
+    this._oLayer = oLayer;
     this.selectionQuery = selectionQuery;
 
     if (!this.selectionBox && !this.selectionQuery) {
       throw new Error('SelectionParam needs either a `selectionBox` or a `selectionQuery` parameter.');
     }
 
-    sameUrlAndImageTypeForAll(this._layers);
+    sameUrlAndImageTypeForAll(this.layers);
   }
 
-  clone(layerFilter: (l: LayerWms) => boolean = () => true): SelectionParam {
+  public clone(layerFilter: (l: LayerWms) => boolean = () => true): SelectionParam {
     return new SelectionParam(
       this._ogcServer,
       this._layers.filter(layerFilter),

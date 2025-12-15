@@ -14,7 +14,7 @@ class ModalsComponent extends GirafeHTMLElement {
   resolveAlertConfirm!: (value: boolean) => void;
   resolvePrompt!: (value: string | false) => void;
 
-  constructor() {
+  public constructor() {
     super('native-modals');
   }
 
@@ -95,7 +95,7 @@ class ModalsComponent extends GirafeHTMLElement {
     super.render();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     const defaultMessageHandler = (translatedMessage: string) => translatedMessage;
     window.gConfirm = (

@@ -12,7 +12,7 @@ class InfoboxComponent extends GirafeHTMLElement {
   // Each message can have a seperate timer or be persistent (until closed by user)
   private readonly autoCloseTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-  constructor() {
+  public constructor() {
     super('infobox');
   }
 
@@ -68,7 +68,7 @@ class InfoboxComponent extends GirafeHTMLElement {
     return str;
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     super.render();
     super.girafeTranslate();

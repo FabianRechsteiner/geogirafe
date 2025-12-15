@@ -77,11 +77,11 @@ class PrintComponent extends GirafeHTMLElement implements IGirafePanel {
   protected dpis: number[] = [];
   protected hasRestrictedLayers = false;
 
-  constructor() {
+  public constructor() {
     super('print');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
   }

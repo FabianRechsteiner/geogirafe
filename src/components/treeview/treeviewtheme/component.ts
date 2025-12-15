@@ -11,7 +11,7 @@ class TreeViewThemeComponent extends TreeViewGroupElement {
 
   override layer: ThemeLayer;
 
-  constructor(theme: ThemeLayer) {
+  public constructor(theme: ThemeLayer) {
     super(theme, 'treeviewtheme');
     this.layer = theme;
   }
@@ -50,7 +50,7 @@ class TreeViewThemeComponent extends TreeViewGroupElement {
     });
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     super.girafeTranslate();

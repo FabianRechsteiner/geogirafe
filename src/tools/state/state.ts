@@ -106,7 +106,7 @@ export default class State {
 
   // All themes from themes.json
   // Dictionary where the key is the id of the theme
-  themes: ThemesConfig = {
+  public themes: ThemesConfig = {
     _allThemes: {},
     isLoaded: false,
     lastSelectedTheme: null
@@ -114,44 +114,44 @@ export default class State {
 
   // All basemaps from themes.json
   // Dictionary where the key is the id of the basemap
-  basemaps: Record<number, Basemap> = {};
+  public basemaps: Record<number, Basemap> = {};
 
   // All OCG Servers from themes.json
   // Dictionary where the key is the name of the server
-  ogcServers: Record<string, ServerOgc> = {};
+  public ogcServers: Record<string, ServerOgc> = {};
 
   // Current active basemaps
   @BrainSerialize
-  activeBasemaps: Basemap[] = [];
+  public activeBasemaps: Basemap[] = [];
 
   // Current projection
   @BrainSerialize
-  projection!: string;
+  public projection!: string;
 
   // Current mouse coordinates
-  mouseCoordinates: number[] = [];
+  public mouseCoordinates: number[] = [];
 
   // Interface configuration (visible panels, ...)
   @BrainSerialize
-  interface: GraphicalInterface = new GraphicalInterface();
+  public interface: GraphicalInterface = new GraphicalInterface();
 
-  userInteractionListeners: GgUserInteractionListener[] = [];
+  public userInteractionListeners: GgUserInteractionListener[] = [];
 
   // Current language
-  language: string | null = null;
+  public language: string | null = null;
 
   // LIDAR
-  lidar: Lidar = {
+  public lidar: Lidar = {
     line: null,
     drawActive: false
   };
 
   // Is the application currently loading map data?
-  loading = false;
+  public loading = false;
 
   // Global variables that represent the state of the application.
   // They can be used when waiting for big steps in the app.
-  application = {
+  public application = {
     isConfigurationLoaded: false,
     // This doesn't mean that the user is authenticated, just that the authentication-processed is initialized (including silent login)
     isAuthInitialized: false,
@@ -163,19 +163,19 @@ export default class State {
 
   // Current position configuration of the map
   @BrainSerialize
-  position = new MapPosition();
+  public position = new MapPosition();
 
   // Current layers configuration
   @BrainSerialize
-  layers = new LayersConfig();
+  public layers = new LayersConfig();
 
   // Current Treeview state
-  treeview: TreeviewConfig = {
+  public treeview: TreeviewConfig = {
     renderEnabled: true
   };
 
   // Current Print state
-  print: PrintConfig = {
+  public print: PrintConfig = {
     maskVisible: false,
     pageSize: null,
     format: null,
@@ -185,22 +185,22 @@ export default class State {
 
   // Current 3D-Globe state
   @BrainSerialize
-  globe: GlobeState = new GlobeState();
+  public globe: GlobeState = new GlobeState();
 
   // TODO REG : What is this used for?
   // Is it the default theme configured in the user preferences?
   // Do we really need this?
-  theme: Theme | null = null;
+  public theme: Theme | null = null;
 
   // To manage selected and focused features
   @BrainSerialize
-  selection = new ObjectSelection();
+  public selection = new ObjectSelection();
 
-  infobox = {
+  public infobox = {
     elements: [] as InfoBoxContent[]
   };
 
-  infoWindow: InfoWindow = {
+  public infoWindow: InfoWindow = {
     title: null,
     url: null,
     width: null,
@@ -210,9 +210,9 @@ export default class State {
   };
 
   // Indicates is the application is currently used in offline mode
-  isOffline = false;
+  public isOffline = false;
 
-  oauth: LoginState = {
+  public oauth: LoginState = {
     status: 'not-initialized',
     audience: []
   };
@@ -220,5 +220,5 @@ export default class State {
   // The State object is defined as <not extensible> by the StateManager.
   // This property can be used by third-parts components or extensions
   // to add custom attributes to the state.
-  extendedState: ExtendedState = {};
+  public extendedState: ExtendedState = {};
 }

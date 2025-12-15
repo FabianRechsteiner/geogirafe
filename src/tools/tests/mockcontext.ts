@@ -66,7 +66,7 @@ export default class MockGirafeContext implements IGirafeContext {
   public readonly localFileManager: LocalFileManager;
   public readonly onBoardingManager: OnBoardingManager;
 
-  constructor() {
+  public constructor() {
     this.componentManager = new ComponentManager(this);
     this.userDataManager = new UserDataManager(this);
     this.configManager = new ConfigManager(this);
@@ -124,6 +124,7 @@ export default class MockGirafeContext implements IGirafeContext {
     this.authManager.initializeSingleton();
     this.pluginManager.initializeSingleton();
     this.i18nManager.initializeSingleton();
+    // @ts-expect-error: private property
     this.i18nManager.translations = { fr: { a: 'translated_a', b: 'translated_b' } };
 
     this.userInteractionManager.initializeSingleton();

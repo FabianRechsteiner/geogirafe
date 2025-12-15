@@ -26,19 +26,19 @@ type AvailableLanguages = {
 };
 
 class I18nManager extends GirafeSingleton {
-  translations: AvailableLanguages = {};
-  loadingLanguagePromise: Promise<TranslationsDict> | null = null;
+  private translations: AvailableLanguages = {};
+  private loadingLanguagePromise: Promise<TranslationsDict> | null = null;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     super(context);
   }
 
-  override initializeSingleton(): void {
+  public override initializeSingleton(): void {
     this.context.stateManager.subscribe('language', () => this.handleLanguageChange());
     this.handleLanguageChange();
   }
 
-  formatNumber(number: string | number): string {
+  private formatNumber(number: string | number): string {
     return Number.parseFloat(`${number}`).toLocaleString(this.context.configManager.Config.general.locale);
   }
 
@@ -57,7 +57,7 @@ class I18nManager extends GirafeSingleton {
     return true;
   }
 
-  async loadTranslations(language: string): Promise<TranslationsDict> {
+  private async loadTranslations(language: string): Promise<TranslationsDict> {
     if (this.loadingLanguagePromise) {
       // There's already a promise for loading translations
       // => return it instead of starting another request
@@ -96,7 +96,7 @@ class I18nManager extends GirafeSingleton {
     return this.loadingLanguagePromise;
   }
 
-  getTranslation(key: string) {
+  public getTranslation(key: string) {
     const currentLanguage = this.context.stateManager?.state?.language ?? 'en';
     const translationDict = this.translations[currentLanguage];
     const translation = translationDict ? translationDict[key] : null;
@@ -106,7 +106,7 @@ class I18nManager extends GirafeSingleton {
     return key;
   }
 
-  async translate(dom: DocumentFragment | HTMLElement): Promise<void> {
+  public async translate(dom: DocumentFragment | HTMLElement): Promise<void> {
     const translationLoaded = await this.ensureTranslationLoaded();
     if (!translationLoaded) {
       return;
@@ -137,7 +137,7 @@ class I18nManager extends GirafeSingleton {
     });
   }
 
-  handleLanguageChange() {
+  private handleLanguageChange() {
     const newLanguage = this.context.stateManager.state.language;
     if (!newLanguage) {
       return;

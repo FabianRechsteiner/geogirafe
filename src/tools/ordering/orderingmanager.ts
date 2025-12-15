@@ -16,7 +16,7 @@ export default class OrderingManager extends GirafeSingleton {
     return this.context.stateManager.state;
   }
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.registerEvents();
   }
 

@@ -45,7 +45,7 @@ class ExternalLayersComponent extends GirafeHTMLElement implements IGirafePanel 
     return this.externalLayers.length > this.filteredLayers.length;
   }
 
-  constructor() {
+  public constructor() {
     super('external-layers');
   }
 
@@ -245,7 +245,7 @@ class ExternalLayersComponent extends GirafeHTMLElement implements IGirafePanel 
     }
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     const olMap = this.context.mapManager.getMap();
     // TODO REG : User context singleton for the WMTS-Manager

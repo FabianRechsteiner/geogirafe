@@ -44,7 +44,7 @@ export default class Brain<T extends Record<string | symbol, any>> {
   private delayed = false;
   private readonly delayedCallbacks: CallbackInfos = new Map();
 
-  constructor(initialState: TTarget, callback: Callback) {
+  public constructor(initialState: TTarget, callback: Callback) {
     this.initialState = initialState;
     this.stateProxy = this.createProxy(this.initialState, '');
     this.externalCallback = callback;

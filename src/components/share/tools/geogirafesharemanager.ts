@@ -7,7 +7,7 @@ class GeoGirafeShareManager implements IUrlShortener {
   private readonly serviceUrl: string;
   private readonly urlManager: UrlManager;
 
-  constructor(serviceUrl: string, urlManager: UrlManager) {
+  public constructor(serviceUrl: string, urlManager: UrlManager) {
     this.serviceUrl = serviceUrl;
     this.urlManager = urlManager;
   }

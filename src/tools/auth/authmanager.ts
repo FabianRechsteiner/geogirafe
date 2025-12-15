@@ -15,12 +15,12 @@ export default class AuthManager extends GirafeSingleton {
     return this.context.stateManager.state;
   }
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     super(context);
     this.gmfManager = new GMFManager(this.context);
   }
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.context.stateManager.subscribe('oauth.status', () => this.loginStateChanged());
     this.context.stateManager.subscribe('oauth.tokens', () => this.tokensChanged());
   }

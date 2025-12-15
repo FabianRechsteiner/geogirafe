@@ -5,7 +5,7 @@ import GlobeState from '../../state/globe';
 export default class GlobeSerializer implements IBrainSerializer<GlobeState> {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 

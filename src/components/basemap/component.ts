@@ -6,7 +6,7 @@ class BasemapComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
   styleUrls = ['../../styles/common.css', './style.css'];
 
-  constructor() {
+  public constructor() {
     super('basemap');
   }
 
@@ -82,7 +82,7 @@ class BasemapComponent extends GirafeHTMLElement {
     );
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     if (this.context.configManager.Config.basemaps.show && this.state.interface.basemapComponentVisible) {
       this.render();

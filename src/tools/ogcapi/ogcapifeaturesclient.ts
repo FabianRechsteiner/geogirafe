@@ -24,7 +24,7 @@ const default_crs = 'EPSG:4326';
 export default class OgcApiFeaturesClient extends OgcApiClient<ServerOgcApiFeatures> {
   private collections: Record<string, OapifCollection> = {};
 
-  constructor(serverConfig: ServerOgc, opt: OgcApiClientOptions, context: IGirafeContext) {
+  public constructor(serverConfig: ServerOgc, opt: OgcApiClientOptions, context: IGirafeContext) {
     super(serverConfig, opt, context.stateManager);
   }
 
@@ -338,7 +338,7 @@ export default class OgcApiFeaturesClient extends OgcApiClient<ServerOgcApiFeatu
   /**
    * Expands the method from OgcApiClient by customizing headers to support GeoJson content and optional CRS identifier.
    */
-  protected getFetchOptions(method: HttpMethod = 'GET', crsIdentifier?: string): RequestInit {
+  protected override getFetchOptions(method: HttpMethod = 'GET', crsIdentifier?: string): RequestInit {
     const fetchOptions = super.getFetchOptions(method);
 
     // Add header info about the request body

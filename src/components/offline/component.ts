@@ -13,7 +13,7 @@ class OfflineComponent extends GirafeHTMLElement {
 
   public totalOfflineDataSizeMB = 0;
 
-  constructor() {
+  public constructor() {
     super('offline-mobile');
   }
 
@@ -72,7 +72,7 @@ class OfflineComponent extends GirafeHTMLElement {
     super.render();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.downloadStartZoom = this.context.configManager.Config.offline?.downloadStartZoom;
     super.render();

@@ -22,7 +22,7 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
   host: HTMLDivElement;
   printCoordinate = printCoordinate;
 
-  constructor() {
+  public constructor() {
     super('map-context-menu');
     this.host = document.createElement('div');
   }
@@ -109,7 +109,7 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
     this.eventsCallbacks.length = 0;
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.state.extendedState.mapcontextmenu = new MapContextMenuState();
     this.mapContextMenuState = this.state.extendedState.mapcontextmenu as MapContextMenuState;

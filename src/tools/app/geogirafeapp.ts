@@ -55,7 +55,7 @@ export default class GeoGirafeApp {
     return this.mainComponent.getContext();
   }
 
-  constructor(isIframe: boolean = false) {
+  public constructor(isIframe: boolean = false) {
     this.isIframe = isIframe;
     this.readyPromise = new Promise((resolve) => {
       this.resolveReady = resolve;

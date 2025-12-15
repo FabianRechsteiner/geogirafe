@@ -15,12 +15,12 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
   private dragButton!: HTMLButtonElement;
   private container!: HTMLElement;
 
-  constructor(layer: BaseLayer, name: string) {
+  public constructor(layer: BaseLayer, name: string) {
     super(name);
     this.layer = layer;
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     this.dragManager = this.context.dragManager;
   }

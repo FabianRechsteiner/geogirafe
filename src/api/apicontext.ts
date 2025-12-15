@@ -64,7 +64,7 @@ export default class GirafeApiContext implements IGirafeContext {
   public readonly localFileManager: LocalFileManager;
   public readonly onBoardingManager: OnBoardingManager;
 
-  constructor() {
+  public constructor() {
     this.componentManager = new ComponentManager(this);
     this.userDataManager = new UserDataManager(this);
     this.configManager = new ConfigManager(this);

@@ -8,7 +8,7 @@ export type GmfSuccessResponse = {
 class GmfShareManager implements IUrlShortener {
   serviceUrl: string;
 
-  constructor(serviceUrl: string) {
+  public constructor(serviceUrl: string) {
     this.serviceUrl = serviceUrl;
   }
 

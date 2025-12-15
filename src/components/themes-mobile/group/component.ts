@@ -15,7 +15,7 @@ class MobileGroupElementComponent extends GirafeHTMLElement {
 
   static readonly observedAttributes: string[] = [];
 
-  constructor() {
+  public constructor() {
     super('group-mobile');
   }
 
@@ -37,7 +37,7 @@ class MobileGroupElementComponent extends GirafeHTMLElement {
     super.refreshRender();
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     MobileGroupElementComponent.observedAttributes.push('groupid');
     this.render();

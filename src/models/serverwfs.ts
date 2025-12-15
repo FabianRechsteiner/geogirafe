@@ -6,19 +6,19 @@ export interface LayerAttribute<WfsXmlTypes = XmlTypes> {
 }
 
 class ServerWfs<WfsXmlTypes = XmlTypes> {
-  name: string;
-  url: string;
-  layers: Record<string, LayerAttribute<WfsXmlTypes>[]> = {};
-  featureTypeToGeometryColumnName: { [key: string]: string } = {};
-  initialized: boolean;
+  public name: string;
+  public url: string;
+  public layers: Record<string, LayerAttribute<WfsXmlTypes>[]> = {};
+  public featureTypeToGeometryColumnName: { [key: string]: string } = {};
+  public initialized: boolean;
 
-  constructor(name: string, url: string) {
+  public constructor(name: string, url: string) {
     this.name = name;
     this.url = url;
     this.initialized = false;
   }
 
-  addLayerAttribute(layer: string, name: string, type: string) {
+  public addLayerAttribute(layer: string, name: string, type: string) {
     if (!(layer in this.layers)) {
       // Layer does not exists yet
       this.layers[layer] = [];
@@ -30,7 +30,7 @@ class ServerWfs<WfsXmlTypes = XmlTypes> {
     });
   }
 
-  getGeometryColumnNameToFeatureTypes(featureTypes: string[]): Record<string, string[]> {
+  public getGeometryColumnNameToFeatureTypes(featureTypes: string[]): Record<string, string[]> {
     if (!this.initialized) {
       throw new Error('Initialize WFS server before trying to get geometry column names.');
     }

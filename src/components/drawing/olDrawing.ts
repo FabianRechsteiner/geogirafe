@@ -158,7 +158,7 @@ export default class OlDrawing {
     return this.context.configManager.Config;
   }
 
-  constructor(
+  public constructor(
     map: MapComponent,
     toolName: string,
     context: IGirafeContext,

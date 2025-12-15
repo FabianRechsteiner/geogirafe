@@ -2,7 +2,7 @@ import GirafeSingleton from '../../base/GirafeSingleton';
 import GirafeConfig from '../configuration/girafeconfig';
 
 class PluginManager extends GirafeSingleton {
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.context.stateManager.subscribe('oauth.userInfo', () => this.filterPlugins(document));
     this.filterPlugins(document);
   }

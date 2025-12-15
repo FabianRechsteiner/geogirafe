@@ -10,12 +10,12 @@ import IGirafeContext from '../context/icontext';
 export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient, OlMap> {
   private readonly map: OlMap;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     super(context);
     this.map = this.context.mapManager.getMap();
   }
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     // Register the default client
     this.registerClientClass('default', WmsClientDefault);
     this.registerClientClass('geoserver', WmsClientGeoServer);
@@ -27,20 +27,20 @@ export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient
   public getClientId(ogcServer: ServerOgc): string {
     return ogcServer.uniqueWmsQueryId;
   }
-  public createClient(
+  public override createClient(
     clientClass: new (os: ServerOgc, map: OlMap, context: IGirafeContext) => WmsClient,
     ogcServer: ServerOgc
   ): WmsClient {
     return new clientClass(ogcServer, this.map, this.context);
   }
 
-  selectFeatures(extent: number[]) {
+  public selectFeatures(extent: number[]) {
     for (const client of this._clients.values()) {
       client.selectFeatures(extent);
     }
   }
 
-  selectFeaturesByQuery(query: WfsFilter[], layer: LayerWms) {
+  public selectFeaturesByQuery(query: WfsFilter[], layer: LayerWms) {
     const client = this.getClient(layer.ogcServer);
     if (!client) {
       throw new Error(`Cannot select features by query: no client found for layer ${layer.name}`);
@@ -54,7 +54,7 @@ export default class WmsManager extends VendorSpecificOgcServerManager<WmsClient
     }
   }
 
-  removeAllBasemapLayers() {
+  public removeAllBasemapLayers() {
     for (const client of this._clients.values()) {
       client.removeAllBasemapLayers();
     }

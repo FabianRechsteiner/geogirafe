@@ -4,7 +4,7 @@ export default class MobileOauthComponent extends OauthComponent {
   templateUrl = '../auth/template.html';
   styleUrls = ['../../styles/common.mobile.css', './style.css'];
 
-  constructor() {
+  public constructor() {
     super('oauth-mobile');
   }
 }

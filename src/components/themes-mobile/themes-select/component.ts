@@ -12,7 +12,7 @@ export default class MobileThemeComponent extends GirafeHTMLElement {
 
   public activeLayersByGroup = new Map<GroupLayer, Layer[]>();
 
-  constructor() {
+  public constructor() {
     super('themes-select');
   }
 
@@ -103,7 +103,7 @@ export default class MobileThemeComponent extends GirafeHTMLElement {
     this.refreshRender();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
     if (!this.context.configManager.Config.basemaps.show) {

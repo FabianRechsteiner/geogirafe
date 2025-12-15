@@ -3,7 +3,7 @@ import IGirafeContext from '../context/icontext';
 export default class GMFManager {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 
@@ -11,15 +11,15 @@ export default class GMFManager {
     return this.context.configManager.Config.oauth !== undefined;
   }
 
-  get state() {
+  private get state() {
     return this.context.stateManager.state;
   }
 
-  get gmfConfigForOAuth() {
+  private get gmfConfigForOAuth() {
     return this.context.configManager.Config.oauth!.geomapfish;
   }
 
-  get gmfConfigForGmfAuth() {
+  private get gmfConfigForGmfAuth() {
     return this.context.configManager.Config.gmfauth!;
   }
 

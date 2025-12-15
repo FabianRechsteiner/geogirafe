@@ -36,9 +36,9 @@ export interface FeatureToGridDataOptions {
  * A feature-to-grid data converter, to show feature's properties in grid-like system.
  */
 export default class FeatureToGridDataById {
-  options: FeatureToGridDataOptions;
+  public options: FeatureToGridDataOptions;
 
-  constructor(options: FeatureToGridDataOptions) {
+  public constructor(options: FeatureToGridDataOptions) {
     this.options = {
       ...{
         keepGeomProperty: false,
@@ -53,7 +53,7 @@ export default class FeatureToGridDataById {
    * is mapped by its ID as the key.
    * @returns The grid data objects, by id.
    */
-  toGridDataById(features: OlFeature[]): GridDataById {
+  public toGridDataById(features: OlFeature[]): GridDataById {
     const gridDataById: GridDataById = features.reduce(
       (gridDataById, feature) => this.addFeatureToGridDataById(gridDataById, feature),
       {} as GridDataById
@@ -94,7 +94,7 @@ export default class FeatureToGridDataById {
    * @returns {GridData} A new empty grid data object with columns from given properties.
    * @static
    */
-  static createGridDataWithColumns(properties: Record<string, unknown>): GridData {
+  private static createGridDataWithColumns(properties: Record<string, unknown>): GridData {
     return {
       columns: Object.keys(properties),
       notOlProperties: [],
@@ -108,7 +108,7 @@ export default class FeatureToGridDataById {
    * It's expected that all features in the gridData have the same properties.
    * @static
    */
-  static removeEmptyColumns(gridData: GridData) {
+  private static removeEmptyColumns(gridData: GridData) {
     const emptyColumnIndexes = FeatureToGridDataById.findEmptyColumnIndexOf(gridData.data);
     gridData.columns = gridData.columns.filter((_column, index) => !emptyColumnIndexes.includes(index));
     gridData.data.forEach((_, index) => {
@@ -122,7 +122,7 @@ export default class FeatureToGridDataById {
    * @returns An array of indexes representing the empty columns.
    * @static
    */
-  static findEmptyColumnIndexOf(data: unknown[][]): number[] {
+  private static findEmptyColumnIndexOf(data: unknown[][]): number[] {
     if (!data[0]) {
       return [];
     }
@@ -142,7 +142,7 @@ export default class FeatureToGridDataById {
     return emptyColumnIndexes;
   }
 
-  static getUserFeatureType(feature: OlFeature): string {
+  public static getUserFeatureType(feature: OlFeature): string {
     return WfsManager.extractFeatureTypeFromId(feature);
   }
 }

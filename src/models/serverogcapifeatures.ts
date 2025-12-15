@@ -11,7 +11,7 @@ export const oapifPropertyTypesList = [...oapifNumericTypes, ...oapifTextTypes, 
 export type oapifPropertyTypes = (typeof oapifPropertyTypesList)[number];
 
 export default class ServerOgcApiFeatures extends ServerOgcApi {
-  constructor(url: string) {
+  public constructor(url: string) {
     super(url);
   }
 }

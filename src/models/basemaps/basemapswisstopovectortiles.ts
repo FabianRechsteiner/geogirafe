@@ -3,7 +3,7 @@ import LayerVectorTiles from '../layers/layervectortiles';
 import Basemap from './basemap';
 
 export default class BasemapSwisstopoVectorTiles extends Basemap {
-  constructor() {
+  public constructor() {
     const basemapMetadata = {
       isLegendExpanded: false,
       wasLegendExpanded: false,

@@ -9,12 +9,12 @@ import MenuButtonComponent from '../components/menubutton/component';
 import { applyOpacityToLayers } from '../tools/utils/utils';
 
 export default class GeoGirafeApi extends GirafeHTMLElement {
-  constructor() {
+  public constructor() {
     super('geogirafe-api');
     this.injectConfigMetaTags();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.initialize().then(() => {
       console.log('GeoGirafe API is ready!');
@@ -27,7 +27,7 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
     });
   }
 
-  override getInheritedContext(): IGirafeContext {
+  protected override getInheritedContext(): IGirafeContext {
     return new GirafeApiContext();
   }
 

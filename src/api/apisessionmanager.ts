@@ -2,7 +2,7 @@ import GirafeSingleton from '../base/GirafeSingleton';
 import ISessionManager from '../tools/share/isessionmanager';
 
 class ApiSessionManager extends GirafeSingleton implements ISessionManager {
-  override initializeSingleton() {
+  public override initializeSingleton() {
     /* For the API: Do Nothing */
   }
 

@@ -5,7 +5,7 @@ export default class ApplicationLifeCycleManager extends GirafeSingleton {
     return this.context.stateManager.state;
   }
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.context.stateManager.subscribe('themes.isLoaded', (_, isThemesLoaded) => {
       this.log(isThemesLoaded, 'Themes are loaded');
       this.checkApplicationReady();

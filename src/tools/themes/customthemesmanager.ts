@@ -7,7 +7,7 @@ import CustomTheme from '../../models/customtheme';
 import CustomLayersSerializer from '../share/serializers/customlayersserializer';
 
 class CustomThemesManager extends GirafeSingleton {
-  customThemes: CustomTheme[] = [];
+  public customThemes: CustomTheme[] = [];
   private readonly storagePath: string = 'customThemes';
   private readonly serializer = new CustomLayersSerializer(this.context);
 

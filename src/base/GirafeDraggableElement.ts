@@ -30,28 +30,23 @@ That's it, it should work.
 */
 
 class GirafeDraggableElement extends GirafeHTMLElement {
-  button?: HTMLElement;
-  div?: HTMLElement;
-  header?: HTMLElement;
-  closeButton?: HTMLElement;
-  container?: HTMLElement;
+  private header?: HTMLElement;
+  private closeButton?: HTMLElement;
+  private container?: HTMLElement;
 
-  get host(): HTMLElement {
+  private get host(): HTMLElement {
     return (this.shadow.getRootNode() as ShadowRoot).host as HTMLElement;
   }
 
-  pos1 = 0;
-  pos2 = 0;
-  pos3 = 0;
-  pos4 = 0;
+  private posX = 0;
+  private posY = 0;
 
-  constructor(component: string) {
+  public constructor(component: string) {
     super(component);
   }
 
-  makeDraggable(container?: HTMLElement | undefined) {
+  protected makeDraggable(container?: HTMLElement | undefined) {
     this.container = container || document.querySelector('#content')!;
-    this.div = this.shadow.querySelector('#draggable')!;
     this.header = this.shadow.querySelector('#header')!;
     this.setDefaultPosition();
     this.header.onmousedown = (e) => this.dragMouseDown(this, e);
@@ -74,27 +69,27 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     this.host.style.left = css.left;
   }
 
-  closeWindow() {
+  protected closeWindow() {
     throw new Error('This function must be overriden to close the associated window');
   }
 
-  dragMouseDown(_this: GirafeDraggableElement, e: MouseEvent) {
+  private dragMouseDown(_this: GirafeDraggableElement, e: MouseEvent) {
     e.preventDefault();
     // get the mouse cursor position at startup:
-    _this.pos3 = e.clientX;
-    _this.pos4 = e.clientY;
+    _this.posX = e.clientX;
+    _this.posY = e.clientY;
     document.onmouseup = () => _this.closeDragElement();
     // call a function whenever the cursor moves:
     document.onmousemove = (e) => _this.elementDrag(_this, e);
   }
 
-  elementDrag(_this: GirafeDraggableElement, e: MouseEvent) {
+  private elementDrag(_this: GirafeDraggableElement, e: MouseEvent) {
     e.preventDefault();
 
     const hostRect = _this.host.getBoundingClientRect();
 
     // Position left
-    const pos1 = _this.pos3 - e.clientX;
+    const pos1 = _this.posX - e.clientX;
     const newLeft = _this.host.offsetLeft - pos1;
     const newRight = newLeft + hostRect.width;
     if (newLeft < 0) {
@@ -102,13 +97,12 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     } else if (newRight > this.getContainerWidth()) {
       _this.host.style.left = this.getContainerWidth() - hostRect.width + 'px';
     } else {
-      _this.pos1 = pos1;
-      _this.pos3 = e.clientX;
+      _this.posX = e.clientX;
       _this.host.style.left = newLeft + 'px';
     }
 
     // Position top
-    const pos2 = _this.pos4 - e.clientY;
+    const pos2 = _this.posY - e.clientY;
     const newTop = _this.host.offsetTop - pos2;
     const newBottom = newTop + hostRect.height;
     if (newTop < 0) {
@@ -116,21 +110,20 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     } else if (newBottom > this.getContainerHeight()) {
       _this.host.style.top = this.getContainerHeight() - hostRect.height + 'px';
     } else {
-      _this.pos2 = pos2;
-      _this.pos4 = e.clientY;
+      _this.posY = e.clientY;
       _this.host.style.top = newTop + 'px';
     }
   }
 
-  getContainerWidth(): number {
+  private getContainerWidth(): number {
     return Math.max(this.container?.scrollWidth as number, this.container?.offsetWidth as number);
   }
 
-  getContainerHeight(): number {
+  private getContainerHeight(): number {
     return Math.max(this.container?.scrollHeight as number, this.container?.offsetHeight as number);
   }
 
-  resize(_this: GirafeDraggableElement) {
+  private resize(_this: GirafeDraggableElement) {
     const width = this.getContainerWidth();
     const height = this.getContainerHeight();
     const left = _this.host.style.left;
@@ -143,7 +136,7 @@ class GirafeDraggableElement extends GirafeHTMLElement {
     }
   }
 
-  closeDragElement() {
+  private closeDragElement() {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;

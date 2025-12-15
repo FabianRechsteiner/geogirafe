@@ -2,12 +2,12 @@ import ThemeLayer from './layers/themelayer';
 import CustomIcon from '../components/themes/images/custom.svg';
 
 export default class CustomTheme {
-  id: number;
-  layers: ThemeLayer[];
-  name: string;
-  icon: string;
+  public id: number;
+  public layers: ThemeLayer[];
+  public name: string;
+  public icon: string;
 
-  get hasThemes() {
+  public get hasThemes() {
     for (const layer of this.layers) {
       if (layer instanceof ThemeLayer) {
         return true;
@@ -16,7 +16,7 @@ export default class CustomTheme {
     return false;
   }
 
-  constructor(name: string) {
+  public constructor(name: string) {
     this.id = Date.now();
     this.name = name;
     this.layers = [];

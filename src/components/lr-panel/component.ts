@@ -30,11 +30,11 @@ class LRPanelComponent extends GirafeResizableElement {
     return false;
   }
 
-  constructor() {
+  public constructor() {
     super('lr-panel');
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     this.render();
 

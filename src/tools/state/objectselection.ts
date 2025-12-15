@@ -5,15 +5,15 @@ import { SelectionMode } from '../../models/selection';
 import { Geometry } from 'ol/geom';
 
 export default class ObjectSelection {
-  initialSelectionBox?: number[];
-  initialSelectionQuery?: InitialSelectionQuery;
-  selectionParameters: SelectionParam[] = [];
-  selectedFeatures: Feature[] = [];
-  focusedFeatures: Feature[] | null = null;
-  highlightedFeatures: Feature[] = [];
-  gridSelected: boolean = false;
-  selectionMode: SelectionMode = SelectionMode.Replace;
-  selectionGeometry?: Geometry;
+  public initialSelectionBox?: number[];
+  public initialSelectionQuery?: InitialSelectionQuery;
+  public selectionParameters: SelectionParam[] = [];
+  public selectedFeatures: Feature[] = [];
+  public focusedFeatures: Feature[] | null = null;
+  public highlightedFeatures: Feature[] = [];
+  public gridSelected: boolean = false;
+  public selectionMode: SelectionMode = SelectionMode.Replace;
+  public selectionGeometry?: Geometry;
 }
 
 export type InitialSelectionQuery = { query: WfsFilter[]; layerName: string };

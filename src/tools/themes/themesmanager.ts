@@ -19,13 +19,13 @@ import { DEFAULT_OPACITY, OPACITY_FOR_DEFAULT_BASEMAP } from './themes-config';
 import Layer from '../../models/layers/layer';
 
 class ThemesManager extends GirafeSingleton {
-  anonymousUserInfo = { u: 'anonymous' };
+  public anonymousUserInfo = { u: 'anonymous' };
 
-  get state() {
+  private get state() {
     return this.context.stateManager.state;
   }
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     // We have to wait the authentication to be able to load the themes with the right user-rights
     this.context.stateManager.subscribe('application.isAuthInitialized', async () => {
       if (this.state.application.isAuthInitialized) {
@@ -151,7 +151,7 @@ class ThemesManager extends GirafeSingleton {
     }
   }
 
-  prepareOgcServers(ogcServerJson: Record<string, GMFServerOgc>) {
+  private prepareOgcServers(ogcServerJson: Record<string, GMFServerOgc>) {
     const servers: { [key: string]: ServerOgc } = {};
     if (ogcServerJson) {
       for (const serverName of Object.keys(ogcServerJson)) {
@@ -170,7 +170,7 @@ class ThemesManager extends GirafeSingleton {
    * In order to limit the network overload, the servers calls are done sequetially
    * and each call will wait the previous one to be done
    */
-  async preloadWfsServer(ogcServers: { [key: string]: ServerOgc }) {
+  private async preloadWfsServer(ogcServers: { [key: string]: ServerOgc }) {
     for (const server of Object.values(ogcServers)) {
       if (server.wfsSupport) {
         await this.context.wfsManager.getServerWfs(server);

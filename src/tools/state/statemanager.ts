@@ -11,13 +11,13 @@ class StateManager extends GirafeSingleton {
   private readonly girafeState = new State();
   private readonly stateProxy: Brain<State>;
 
-  get state() {
+  public get state() {
     return this.stateProxy.getState();
   }
 
   private readonly callbacks: Record<string, Callback[]> = {};
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     super(context);
 
     this.stateProxy = new Brain(this.girafeState, (path, oldValue, newValue, parents) => {
@@ -25,7 +25,7 @@ class StateManager extends GirafeSingleton {
     });
   }
 
-  override initializeSingleton(): void {
+  public override initializeSingleton(): void {
     this.setDefaultValues();
   }
 

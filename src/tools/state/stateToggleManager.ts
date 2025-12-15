@@ -16,20 +16,20 @@ export default class StateToggleManager {
 
   public readonly panels: IGirafePanel[] = [];
 
-  constructor(elements: IGirafePanel[], stateManager: StateManager) {
+  public constructor(elements: IGirafePanel[], stateManager: StateManager) {
     this.panels = elements;
     this.stateManager = stateManager;
     this.watchToggle();
   }
 
-  get state(): State {
+  private get state(): State {
     return this.stateManager.state;
   }
 
   /**
    * To call to destroy properly the component.
    */
-  destroy() {
+  public destroy() {
     this.stateManager.unsubscribe(this.eventsCallbacks);
   }
 
@@ -37,7 +37,7 @@ export default class StateToggleManager {
    * Set to false every state leaded by toggle paths except the specified one.
    * Use the given value on the specified one.
    */
-  toggle(panel: IGirafePanel, isVisible: boolean) {
+  private toggle(panel: IGirafePanel, isVisible: boolean) {
     const panelsToHide = this.panels.filter((p) => p.panelTogglePath !== panel.panelTogglePath);
     for (const panelToHide of panelsToHide) {
       setPropertyByPath(this.state, panelToHide.panelTogglePath, false);
@@ -50,7 +50,7 @@ export default class StateToggleManager {
   /**
    * Set to false every state leaded by toggle paths.
    */
-  deactivateAll() {
+  public deactivateAll() {
     for (const panel of this.panels) {
       setPropertyByPath(this.state, panel.panelTogglePath, false);
     }

@@ -10,7 +10,7 @@ import { isTimeAwareLayer, TimeAwareLayer } from '../../models/layers/timeawarel
 import WfsFilter, { isWfsOperator } from '../wfs/wfsfilter';
 
 export default class ThemesHelper extends GirafeSingleton {
-  override initializeSingleton() {
+  public override initializeSingleton() {
     this.context.stateManager.subscribe(
       'themes.lastSelectedTheme',
       (_oldTheme: ThemeLayer | CustomTheme | null, newTheme: ThemeLayer | CustomTheme | null) =>
@@ -18,7 +18,7 @@ export default class ThemesHelper extends GirafeSingleton {
     );
   }
 
-  get state() {
+  private get state() {
     return this.context.stateManager.state;
   }
 

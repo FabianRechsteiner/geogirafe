@@ -21,23 +21,23 @@ That's it.
 */
 
 class GirafeResizableElement extends GirafeHTMLElement {
-  gutter?: HTMLElement;
-  closeButton?: HTMLElement;
-  dock: 'left' | 'right' | 'bottom';
-  prevX = 0;
-  prevY = 0;
+  private gutter?: HTMLElement;
+  private closeButton?: HTMLElement;
+  protected readonly dock: 'left' | 'right' | 'bottom';
+  private prevX = 0;
+  private prevY = 0;
 
-  toggleSize: number = 0;
+  private toggleSize: number = 0;
 
-  lastWidth = 0;
-  minWidth?: number;
-  maxWidth?: number;
+  private lastWidth = 0;
+  private minWidth?: number;
+  private maxWidth?: number;
 
-  lastHeight = 0;
-  minHeight?: number;
-  maxHeight?: number;
+  private lastHeight = 0;
+  private minHeight?: number;
+  private maxHeight?: number;
 
-  constructor(component: string, docking?: 'left' | 'right' | 'bottom') {
+  public constructor(component: string, docking?: 'left' | 'right' | 'bottom') {
     super(component);
     const dock = docking ?? this.getAttribute('dock');
     if (!dock) {

@@ -4,7 +4,7 @@ import ISessionManager from './isessionmanager';
 class SessionManager extends GirafeSingleton implements ISessionManager {
   private readonly sessionHash = 'session';
 
-  override initializeSingleton() {
+  public override initializeSingleton() {
     window.addEventListener('pagehide', () => this.saveStateToSession());
   }
 

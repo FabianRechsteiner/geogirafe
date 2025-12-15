@@ -1,17 +1,17 @@
 import { GMFServerOgc } from './gmf';
 
 export default class ServerOgc {
-  name: string;
-  url: string;
-  wfsSupport: boolean;
-  urlWfs?: string;
-  oapifSupport: boolean;
-  urlOapif?: string;
-  type: string;
-  imageType: string;
-  aliases: Record<string, string>;
+  public name: string;
+  public url: string;
+  public wfsSupport: boolean;
+  public urlWfs?: string;
+  public oapifSupport: boolean;
+  public urlOapif?: string;
+  public type: string;
+  public imageType: string;
+  public aliases: Record<string, string>;
 
-  constructor(name: string, elem: GMFServerOgc) {
+  public constructor(name: string, elem: GMFServerOgc) {
     this.name = name;
     this.url = elem.url;
     this.wfsSupport = elem.wfsSupport;
@@ -47,7 +47,7 @@ export default class ServerOgc {
     return this.aliases[key];
   }
 
-  get uniqueWmsQueryId(): string {
+  public get uniqueWmsQueryId(): string {
     return this.name + this.imageType;
   }
 }

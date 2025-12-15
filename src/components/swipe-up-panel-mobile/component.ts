@@ -26,11 +26,11 @@ export default class SwipeUpPanelMobile extends GirafeHTMLElement {
   private previousMoveTimestamp = 0;
   private resizeObserver: ResizeObserver | null = null;
 
-  constructor() {
+  public constructor() {
     super('swipe-up-panel-mobile');
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
 
     // Render the panel for the first time, as hidden so that we can make references to the DOM elements

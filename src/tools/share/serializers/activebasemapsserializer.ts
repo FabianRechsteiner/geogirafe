@@ -7,7 +7,7 @@ import IGirafeContext from '../../context/icontext';
 export default class ActiveBasemapsSerializer implements IBrainSerializer<Basemap[]> {
   private readonly context: IGirafeContext;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 

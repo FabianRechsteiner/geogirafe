@@ -9,7 +9,7 @@ class MobileLayerElementComponent extends GirafeHTMLElement {
 
   static readonly observedAttributes: string[] = [];
 
-  constructor(name?: string) {
+  public constructor(name?: string) {
     super(name ?? 'layer-mobile');
   }
 
@@ -40,7 +40,7 @@ class MobileLayerElementComponent extends GirafeHTMLElement {
     super.refreshRender();
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     MobileLayerElementComponent.observedAttributes.push('layerid');
     this.registerEvents();

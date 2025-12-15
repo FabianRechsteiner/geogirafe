@@ -9,7 +9,7 @@ export default class ComponentManager extends GirafeSingleton {
   private registeredCallbacks: Callback[][] = [];
   private registeredCallbacksClasses: Constructor<GirafeHTMLElement>[] = [];
 
-  registerComponent(component: GirafeHTMLElement) {
+  public registerComponent(component: GirafeHTMLElement) {
     if (this.components[component.name] == undefined) {
       this.components[component.name] = [];
     }
@@ -22,13 +22,13 @@ export default class ComponentManager extends GirafeSingleton {
     }
   }
 
-  getComponents<T extends GirafeHTMLElement>(type: Constructor<T>): T[] {
+  public getComponents<T extends GirafeHTMLElement>(type: Constructor<T>): T[] {
     return Object.values(this.components)
       .flat()
       .filter((c) => c instanceof type) as T[];
   }
 
-  getComponentsByName(name: string) {
+  public getComponentsByName(name: string) {
     return this.components[name];
   }
 }

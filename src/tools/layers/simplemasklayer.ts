@@ -10,7 +10,7 @@ class SimpleMaskLayer extends Layer {
   protected size: [number, number] | null = null;
   private readonly fillColor: string;
 
-  constructor(options = {}, color: string = '#000') {
+  public constructor(options = {}, color: string = '#000') {
     super({ className: 'simpleMask', ...options });
 
     this.fillColor = color;
@@ -22,14 +22,14 @@ class SimpleMaskLayer extends Layer {
   /**
    * Updates the box size (width, height), in pixel, of the mask.
    */
-  updateSize(size: [number, number]) {
+  public updateSize(size: [number, number]) {
     this.size = size;
   }
 
   /**
    * Draw the mask.
    */
-  render(frameState: FrameState) {
+  public override render(frameState: FrameState) {
     if (this.size === null) {
       throw Error('Cannot render Mask : size has not been set.');
     }
@@ -53,7 +53,7 @@ class SimpleMaskLayer extends Layer {
    * @param {[number, number]} box_lr - The [x, y] coordinates of the lower-right corner of the cut-out box.
    * @param {[number, number]} box_ll - The [x, y] coordinates of the lower-left corner of the cut-out box.
    */
-  drawBoxMask(
+  public drawBoxMask(
     canvasWidth: number,
     canvasHeight: number,
     box_ul: [number, number],
@@ -85,7 +85,7 @@ class SimpleMaskLayer extends Layer {
     this.context.fill();
   }
 
-  static calculateBoxCorners(
+  private static calculateBoxCorners(
     totalWidth: number,
     totalHeight: number,
     boxWidth: number,

@@ -18,7 +18,7 @@ class NavigationComponent extends GirafeHTMLElement {
 
   private selfNavigation: boolean = false;
 
-  constructor() {
+  public constructor() {
     super('navigation');
   }
 
@@ -126,7 +126,7 @@ class NavigationComponent extends GirafeHTMLElement {
     }
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.loadBookmarks();
     this.render();

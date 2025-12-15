@@ -15,7 +15,7 @@ class XyzManager {
     }
   > = {};
 
-  constructor(map: Map) {
+  public constructor(map: Map) {
     this.map = map;
   }
 

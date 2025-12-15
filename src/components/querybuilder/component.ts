@@ -34,7 +34,7 @@ class QueryBuilderComponent extends GirafeHTMLElement {
   ];
   operatorOptions: { operator: WfsOperator; displayName: string }[] = [];
 
-  constructor(layer: LayerWms, context: IGirafeContext) {
+  public constructor(layer: LayerWms, context: IGirafeContext) {
     super('querybuilder', context);
     this.layer = layer;
   }
@@ -201,7 +201,7 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     super.refreshRender();
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     this.render();
   }

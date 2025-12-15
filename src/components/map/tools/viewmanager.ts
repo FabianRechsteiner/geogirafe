@@ -8,7 +8,7 @@ import StateManager from '../../../tools/state/statemanager';
 class ViewManager {
   map: Map;
 
-  get state() {
+  private get state() {
     return this.stateManager.state;
   }
 
@@ -25,7 +25,7 @@ class ViewManager {
   constrainRotation: boolean | number;
   view: View;
 
-  constructor(map: Map, configManager: ConfigManager, stateManager: StateManager) {
+  public constructor(map: Map, configManager: ConfigManager, stateManager: StateManager) {
     this.map = map;
     this.configManager = configManager;
     this.stateManager = stateManager;

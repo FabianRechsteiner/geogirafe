@@ -10,11 +10,11 @@ class VideoRecordComponent extends GirafeHTMLElement {
   chunks: Blob[] = [];
   stream: MediaStream | null = null;
 
-  constructor() {
+  public constructor() {
     super('videorecord');
   }
 
-  connectedCallback() {
+  protected override connectedCallback() {
     super.connectedCallback();
     super.render();
     super.girafeTranslate();

@@ -110,7 +110,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement implements IGirafe
     });
   };
 
-  constructor() {
+  public constructor() {
     super('cross-section-settings');
   }
 
@@ -1167,7 +1167,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement implements IGirafe
     this.render();
   }
 
-  connectedCallback(): void {
+  protected override connectedCallback(): void {
     super.connectedCallback();
     this.state.extendedState.crossSection = new CrossSectionState();
     this.crossSectionState = this.state.extendedState.crossSection as CrossSectionState;

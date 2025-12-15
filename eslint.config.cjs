@@ -63,5 +63,14 @@ module.exports = defineConfig([
       '@typescript-eslint/no-explicit-any': 'off'
     }
   },
+  {
+    files: ['src/models/**/*.ts', 'src/tools/**/*.ts', 'src/api/**/*.ts', 'src/base/**/*.ts'],
+    rules: {
+      // To make the library api consistent, we want to force the usage of member accessors (private/protected/public).
+      // This will allow testing if there is any breaking change in the API from one version to new one
+      // TODO REG : Activate this for the whole project (including components)
+      '@typescript-eslint/explicit-member-accessibility': 'error'
+    }
+  },
   globalIgnores(['src/tools/tests', 'src/typings', '**/*.spec.ts'])
 ]);

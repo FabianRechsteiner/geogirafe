@@ -13,7 +13,7 @@ type GridColumnDef = {
 
 export default class CsvManager {
   private readonly context: IGirafeContext;
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
   }
 
@@ -27,7 +27,7 @@ export default class CsvManager {
    * @param columnDefs Column definitions.
    * @returns The CSV file as string.
    */
-  generateCsv(data: { [x: string]: unknown }[], columnDefs: GridColumnDef[]): string {
+  private generateCsv(data: { [x: string]: unknown }[], columnDefs: GridColumnDef[]): string {
     if (data.length == 0 || columnDefs.length == 0) {
       return '';
     }
@@ -72,7 +72,7 @@ export default class CsvManager {
    * @param columnDefs Column definitions.
    * @param fileName The CSV file name, without the extension.
    */
-  startDownload(data: { [x: string]: unknown }[], columnDefs: GridColumnDef[], fileName: string): void {
+  public startDownload(data: { [x: string]: unknown }[], columnDefs: GridColumnDef[], fileName: string): void {
     const fileContent = this.generateCsv(data, columnDefs);
     download(fileContent, fileName, `text/csv;charset=${this.config.csv.encoding}`);
   }

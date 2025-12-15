@@ -25,16 +25,16 @@ class ThemeLayer extends BaseLayer {
   public location?: Coordinate;
   public zoom?: number;
 
-  children: BaseLayer[] = [];
+  public children: BaseLayer[] = [];
 
-  constructor(id: number, name: string, order: number, icon?: string, options?: ThemeLayerOptions) {
+  public constructor(id: number, name: string, order: number, icon?: string, options?: ThemeLayerOptions) {
     super(id, name, order, options);
     this.isExpanded = options?.isDefaultExpanded || true;
     this.isExclusiveTheme = options?.isExclusiveTheme ?? false;
     this.icon = icon;
   }
 
-  clone(): ThemeLayer {
+  public clone(): ThemeLayer {
     const options = {
       disclaimer: this.disclaimer,
       isDefaultExpanded: this.isExpanded
@@ -56,15 +56,15 @@ class ThemeLayer extends BaseLayer {
     return clonedObject;
   }
 
-  get active() {
+  public get active() {
     return this.activeState === 'on';
   }
 
-  get inactive() {
+  public get inactive() {
     return this.activeState === 'off';
   }
 
-  get semiActive() {
+  public get semiActive() {
     return this.activeState === 'semi';
   }
 }

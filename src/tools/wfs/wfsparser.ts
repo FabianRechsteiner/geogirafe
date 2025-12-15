@@ -19,11 +19,14 @@ import GML32 from 'ol/format/GML32';
  */
 
 export default class WfsParser extends OlWFS {
-  constructor(opt_options?: Options) {
+  public constructor(opt_options?: Options) {
     super(opt_options);
   }
 
-  readFeatures(source: Document | Element | object | string, opt_options?: ReadOptions): Feature<Geometry>[] {
+  public override readFeatures(
+    source: Document | Element | object | string,
+    opt_options?: ReadOptions
+  ): Feature<Geometry>[] {
     // @ts-expect-error gmlFormat_ is private in super class
     if (this.gmlFormat_ instanceof GML32) {
       return this.readFeaturesGML32(source, opt_options);

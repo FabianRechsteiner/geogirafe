@@ -13,7 +13,7 @@ export default class OgcApiFeaturesSchema {
   private readonly schema: OapifSchemaResponse;
   public formAttributes: [string, OapifPropertySchema][] = [];
 
-  constructor(schema: OapifSchemaResponse) {
+  public constructor(schema: OapifSchemaResponse) {
     this.schema = schema;
 
     // Extract all attributes that can be edited in a form
@@ -28,7 +28,7 @@ export default class OgcApiFeaturesSchema {
   /**
    * Generates a template object based on the schema's properties, excluding the geometry.
    */
-  get template(): Record<string, number | string | boolean | null> {
+  public get template(): Record<string, number | string | boolean | null> {
     return Object.fromEntries(
       Object.entries(this.schema.properties)
         .filter(([_, properties]) => !this.isGeometry(properties) && !this.isPrimaryKey(properties))
@@ -36,12 +36,12 @@ export default class OgcApiFeaturesSchema {
     );
   }
 
-  get idAttribute(): string {
+  public get idAttribute(): string {
     const pk = Object.entries(this.schema.properties).find(([_, properties]) => this.isPrimaryKey(properties));
     return pk ? pk[0] : this.formAttributes[0][0];
   }
 
-  get geometryAttribute(): string | undefined {
+  public get geometryAttribute(): string | undefined {
     const geometryAttributes = Object.entries(this.schema.properties).filter(([_, properties]) =>
       this.isGeometry(properties)
     );

@@ -16,7 +16,7 @@ class TimeSliderComponent extends TimeWidget {
 
   private discreteTimeSteps?: string[];
 
-  constructor() {
+  public constructor() {
     super('time-slider');
   }
 

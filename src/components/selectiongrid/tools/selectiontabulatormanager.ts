@@ -44,7 +44,7 @@ export default class SelectionTabulatorManager {
   private readonly context: IGirafeContext;
   private readonly columnAliasHelper: ColumnAliasHelper;
 
-  constructor(context: IGirafeContext) {
+  public constructor(context: IGirafeContext) {
     this.context = context;
     this.columnAliasHelper = new ColumnAliasHelper(context.stateManager);
     this.featureToGridData = new FeatureToGridDataById({ keepGeomProperty: true });
