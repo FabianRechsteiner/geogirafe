@@ -92,8 +92,12 @@ export default class AuthManager extends GirafeSingleton {
           await this.gmfManager.loginWithToken();
         }
         // And then we get the UserInfos
+        const previousUsername = this.state.oauth.userInfo?.username;
         await this.gmfManager.getUserInfo();
         if (this.state.oauth.userInfo?.username) {
+          // TODO REG : At the moment we just test if the username has changed,
+          // but actually we should test if some of the rights have changed
+          this.state.oauth.somethingChanged = this.state.oauth.userInfo.username !== previousUsername;
           this.state.oauth.status = 'loggedIn';
         } else {
           this.state.oauth.error = 'No user found in the token';

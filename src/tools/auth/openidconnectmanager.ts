@@ -228,7 +228,9 @@ export default class OpenIdConnectManager extends AbstractConnectManager {
     this.state.oauth.tokens = tokens;
     // Prepare refresh token
     if (this.state.oauth.tokens.expires_in) {
-      const expiresInMs = this.state.oauth.tokens.expires_in * 1000;
+      // Refresh the token 1 minutes before its expiration,
+      // to be sure that it will still be valid when using it.
+      const expiresInMs = (this.state.oauth.tokens.expires_in - 60) * 1000;
       setTimeout(() => this.refreshToken(), expiresInMs);
     }
     this.state.oauth.status = 'issuer.loggedIn';

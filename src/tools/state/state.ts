@@ -82,6 +82,7 @@ type LoginState = {
   userInfo?: UserInfo;
   audience: string[];
   error?: string;
+  somethingChanged: boolean;
 };
 
 export type InfoWindow = {
@@ -214,7 +215,8 @@ export default class State {
 
   public oauth: LoginState = {
     status: 'not-initialized',
-    audience: []
+    audience: [],
+    somethingChanged: true
   };
 
   // The State object is defined as <not extensible> by the StateManager.

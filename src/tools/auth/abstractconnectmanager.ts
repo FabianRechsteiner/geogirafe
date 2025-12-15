@@ -37,6 +37,7 @@ export default abstract class AbstractConnectManager {
   }
 
   protected loggedOut() {
+    this.context.sessionManager.saveStateToSession();
     this.state.oauth.status = 'loggedOut';
     this.state.oauth.tokens = undefined;
     this.state.oauth.userInfo = undefined;
