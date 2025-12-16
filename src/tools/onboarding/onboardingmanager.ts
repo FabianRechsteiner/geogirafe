@@ -34,7 +34,7 @@ export default class OnBoardingManager extends GirafeSingleton {
         progressText: this.context.i18nManager.getTranslation('onboarding-progress-text')
       });
       const steps = [] as DriveStep[];
-      for (const stepConfig of this.config.onboarding.steps) {
+      for (const stepConfig of this.config.onboarding.steps ?? []) {
         let element: string | Element | undefined;
         if (stepConfig.component) {
           // @ts-expect-error getChildElement is protected, but  we do not want to make it public,
