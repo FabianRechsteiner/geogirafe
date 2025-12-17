@@ -39,12 +39,12 @@
     </div>
     ${this.groupedResults[group].map(result => uHtml`
     <button
-      class="${result.selected ? 'result selected': 'result'}"
+      class="${result.get('selected') ? 'result selected': 'result'}"
       onmousedown="${() => this.onMouseDown()}"
       onclick="${() => this.onSelect(result)}"
       onmouseover="${() => this.onMouseOver(result)}"
       onmouseleave="${() => this.onMouseLeave()}">
-      ${result.properties?.label}
+      ${result.get('label')}
     </button>
     `)} `)}
   </div>
