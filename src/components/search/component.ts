@@ -1,11 +1,12 @@
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
+import GeoJSON from 'ol/format/GeoJSON';
+
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { type Geometry, LineString, MultiLineString, MultiPolygon, Point, MultiPoint, Polygon } from 'ol/geom';
+import { type Geometry, Point } from 'ol/geom';
 import { Style, Icon, Stroke, Fill } from 'ol/style';
 import { buffer, getWidth, getHeight, getCenter, containsExtent, type Extent } from 'ol/extent';
-import type { Coordinate } from 'ol/coordinate';
 import type { Color } from 'vanilla-picker';
 import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
@@ -16,10 +17,9 @@ import SearchIcon from './images/search.svg';
 import PaintbrushIcon from './images/paintbrush.svg';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
-import type { GeometryResult, GeometryCollectionResult, AllSearchResults } from '../../models/searchresult';
+import type { SearchResultsActions } from '../../models/searchresult';
 import { parseCoordinates } from '../../tools/geometrytools';
 import ThemeLayer from '../../models/layers/themelayer';
-import SearchResult from '../../models/searchresult';
 import BaseLayer from '../../models/layers/baselayer';
 
 class SearchComponent extends GirafeHTMLElement {
@@ -37,10 +37,11 @@ class SearchComponent extends GirafeHTMLElement {
   private previewLayers: BaseLayer[] = [];
   private previewGeoLayer: VectorLayer<VectorSource> | null = null;
   private maxExtent?: number[];
+  private readonly geoJsonFormatter = new GeoJSON();
 
   private ignoreBlur = false;
-  public groupedResults: Record<string, SearchResult[]> = {};
-  protected allResults: SearchResult[] = [];
+  public groupedResults: Record<string, Feature[]> = {};
+  protected allResults: Feature[] = [];
   protected forceHide = true;
 
   private readonly searchTermPlaceholder = '###SEARCHTERM###';
@@ -48,8 +49,8 @@ class SearchComponent extends GirafeHTMLElement {
   private readonly COORD_REGEX = /^(\d+[.,]?\d*)\s*[,;/\s]\s*(\d+[.,]?\d*)$/;
 
   private focusedResultIndex = -1;
-  private focusedResult: SearchResult | null = null;
-  private selectedResult: SearchResult | null = null;
+  private focusedResult: Feature | null = null;
+  private selectedResult: Feature | null = null;
 
   private searchInput?: HTMLInputElement;
 
@@ -70,9 +71,9 @@ class SearchComponent extends GirafeHTMLElement {
   private async initialSearch() {
     const searchTerm = this.context.permalinkManager.getSearchTerm();
     const results = await this.fetchSearch(searchTerm);
-    if (results.features.length > 0) {
+    if (results.length > 0) {
       // Apply the first search result in the list
-      const firstResult = results.features[0];
+      const firstResult = results[0];
       this.preview(firstResult);
       this.onSelect(firstResult);
     }
@@ -182,13 +183,13 @@ class SearchComponent extends GirafeHTMLElement {
     }
     if (term.length > 0) {
       try {
-        const data = await this.fetchSearch(term);
+        const features = await this.fetchSearch(term);
         // If the search term is at least two charecter but yieds no result, a warning
         // box is displayed for 2 seconds and then fades out (CSS)
-        if (data.features.length === 0 && term.length >= 2) {
+        if (features.length === 0 && term.length >= 2) {
           this.showNoResultWarning = true;
         }
-        this.displayResults(data);
+        this.displayResults(features);
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
           // Request was aborted, ignore the error
@@ -199,13 +200,17 @@ class SearchComponent extends GirafeHTMLElement {
     }
   }
 
-  protected async fetchSearch(term: string): Promise<AllSearchResults> {
+  protected async fetchSearch(term: string): Promise<Feature[]> {
     const url = this.context.configManager.Config.search.url
       .replace(this.searchTermPlaceholder, term)
       .replace(this.searchLangPlaceholder, this.state.language as string);
     const response = await fetch(url, { signal: this.abortController.signal });
     const data = await response.json();
-    return data;
+    const features = this.geoJsonFormatter.readFeatures(data, {
+      dataProjection: this.context.configManager.getDefaultConfigValue('search.resultsSrid') as string,
+      featureProjection: this.map.getView().getProjection()
+    });
+    return features;
   }
 
   /**
@@ -245,42 +250,34 @@ class SearchComponent extends GirafeHTMLElement {
       return;
     }
 
-    const result = {
-      bbox: [east_coord, north_coord, east_coord, north_coord],
-      geometry: {
-        type: 'Point',
-        coordinates: [east_coord, north_coord]
-      },
-      properties: {
-        label: `${coord1} ${coord2}`,
-        layer_name: 'recenter_map'
-      }
-    } as SearchResult;
+    const feature = new Feature({
+      geometry: new Point([east_coord, north_coord]),
+      label: `${coord1} ${coord2}`,
+      layer_name: 'recenter_map'
+    });
 
-    this.allResults = [result];
-    this.groupedResults.recenter_map = [result];
+    this.allResults = [feature];
+    this.groupedResults.recenter_map = [feature];
     super.render();
     super.girafeTranslate();
   }
 
-  private displayResults(results: AllSearchResults) {
+  private displayResults(features: Feature[]) {
     // First, group the results
-    for (const result of results.features) {
+    for (const result of features) {
       // results.features.forEach((result) => {
       let type = 'Unknown layer type';
-      if (result.properties) {
-        if (result.properties.layer_name) {
-          type = result.properties.layer_name;
-        } else if (result.properties.actions[0].action.startsWith('add_theme')) {
-          type = 'add_theme';
-        } else if (result.properties.actions[0].action.startsWith('add_group')) {
-          type = 'add_group';
-        } else if (result.properties.actions[0].action.startsWith('add_layer')) {
-          type = 'add_layer';
-        }
+      if (result.get('layer_name')) {
+        type = result.get('layer_name');
+      } else if (result.get('actions')[0].action.startsWith('add_theme')) {
+        type = 'add_theme';
+      } else if (result.get('actions')[0].action.startsWith('add_group')) {
+        type = 'add_group';
+      } else if (result.get('actions')[0].action.startsWith('add_layer')) {
+        type = 'add_layer';
       }
 
-      let resultList: SearchResult[];
+      let resultList: Feature[];
       if (type in this.groupedResults) {
         resultList = this.groupedResults[type];
       } else {
@@ -310,7 +307,7 @@ class SearchComponent extends GirafeHTMLElement {
     }
   }
 
-  public onMouseOver(result: SearchResult) {
+  public onMouseOver(result: Feature) {
     this.focusResult(result);
   }
 
@@ -326,17 +323,17 @@ class SearchComponent extends GirafeHTMLElement {
     this.focusResult(result);
   }
 
-  private focusResult(result: SearchResult) {
+  private focusResult(result: Feature) {
     // Clear old selection and preview
     this.clearPreview();
     if (this.focusedResult) {
-      this.focusedResult.selected = false;
+      this.focusedResult.set('selected', false);
     }
 
     // Set new selected object, and activate preview
     this.focusedResultIndex = this.allResults.findIndex((r) => r === result);
     this.focusedResult = this.allResults[this.focusedResultIndex];
-    this.focusedResult.selected = true;
+    this.focusedResult.set('selected', true);
     this.render();
     this.preview(result);
 
@@ -345,15 +342,13 @@ class SearchComponent extends GirafeHTMLElement {
     resultHtmlElement.scrollIntoView({ block: 'nearest' });
   }
 
-  private preview(result: SearchResult) {
-    if (result.bbox && this.context.configManager.Config.search.objectPreview) {
+  private preview(result: Feature) {
+    if (result.getGeometry() && this.context.configManager.Config.search.objectPreview) {
       // Result with geometry
-      if (result.geometry) {
-        this.addFeatureToPreview(result.geometry);
-        this.updatePreviewLayerStyle();
-      }
+      this.addFeatureToPreview(result);
+      this.updatePreviewLayerStyle();
     }
-    const firstAction = result.properties?.actions?.[0];
+    const firstAction = result.get('actions')?.[0];
     if (firstAction?.action.startsWith('add_layer') && this.context.configManager.Config.search.layerPreview) {
       const layer = this.context.themesHelper.findLayerByName(firstAction.data);
       if (layer) {
@@ -366,47 +361,8 @@ class SearchComponent extends GirafeHTMLElement {
     }
   }
 
-  private addFeatureToPreview(geometry: GeometryResult | GeometryCollectionResult) {
-    switch (geometry.type) {
-      case 'Point': {
-        const feature = new Feature<Point>(new Point(geometry.coordinates as Coordinate));
-        this.previewFeaturesCollection.push(feature);
-        return;
-      }
-      case 'MultiPoint': {
-        const feature = new Feature<MultiPoint>(new MultiPoint(geometry.coordinates as Coordinate[]));
-        this.previewFeaturesCollection.push(feature);
-        return;
-      }
-      case 'MultiLineString': {
-        const feature = new Feature<MultiLineString>(new MultiLineString(geometry.coordinates as Coordinate[][]));
-        this.previewFeaturesCollection.push(feature);
-        return;
-      }
-      case 'LineString': {
-        const feature = new Feature<LineString>(new LineString(geometry.coordinates as Coordinate[]));
-        this.previewFeaturesCollection.push(feature);
-        return;
-      }
-      case 'Polygon': {
-        const feature = new Feature<Polygon>(new Polygon(geometry.coordinates as Coordinate[][]));
-        this.previewFeaturesCollection.push(feature);
-        return;
-      }
-      case 'MultiPolygon': {
-        const feature = new Feature<MultiPolygon>(new MultiPolygon(geometry.coordinates as Coordinate[][][]));
-        this.previewFeaturesCollection.push(feature);
-        return;
-      }
-      case 'GeometryCollection': {
-        for (const geom of geometry.geometries) {
-          this.addFeatureToPreview(geom);
-        }
-        return;
-      }
-      default:
-        throw new Error('Geometry type of search result is not being supported.');
-    }
+  private addFeatureToPreview(feature: Feature) {
+    this.previewFeaturesCollection.push(feature);
   }
 
   public clearPreview() {
@@ -418,48 +374,50 @@ class SearchComponent extends GirafeHTMLElement {
     this.previewLayers = [];
   }
 
-  public onSelect(result: SearchResult) {
-    this.selectedResult = result;
+  public onSelect(feature: Feature) {
+    this.selectedResult = feature;
     this.ignoreBlur = false;
     this.forceHide = true;
     this.previewLayers = [];
     super.render();
 
-    if (result.bbox) {
+    const geom = feature.getGeometry();
+    if (geom) {
       // Result with geometry
-      this.zoomTo(result.bbox);
+      this.zoomTo(geom.getExtent());
     } else {
-      this.addResultToTreeView(result);
+      this.addResultToTreeView(feature);
     }
 
     this.onFocusOut();
 
     // Update searchbox with result
-    if (this.searchInput && result.properties) {
-      this.searchInput.value = result.properties.label;
+    if (this.searchInput && feature.get('label')) {
+      this.searchInput.value = feature.get('label');
     }
   }
 
-  private addResultToTreeView(result: SearchResult) {
+  private addResultToTreeView(feature: Feature) {
     let clonedTheme: ThemeLayer | undefined;
-    if (!result.properties || result.properties.actions.length === 0) {
+    const actions = feature.get('actions') as SearchResultsActions[] | undefined;
+    if (!actions || actions.length === 0) {
       // Nothing to add
       return;
     }
 
     let activate = false;
-    if (result.properties.actions[0].action.startsWith('add_theme')) {
-      const theme = this.context.themesHelper.findThemeByName(result.properties.actions[0].data);
+    if (actions[0].action.startsWith('add_theme')) {
+      const theme = this.context.themesHelper.findThemeByName(actions[0].data);
       if (theme) {
         clonedTheme = theme.clone();
       }
-    } else if (result.properties.actions[0].action.startsWith('add_group')) {
-      const group = this.context.themesHelper.findGroupByName(result.properties.actions[0].data);
+    } else if (actions[0].action.startsWith('add_group')) {
+      const group = this.context.themesHelper.findGroupByName(actions[0].data);
       if (group) {
         clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(group);
       }
-    } else if (result.properties.actions[0].action.startsWith('add_layer')) {
-      const layer = this.context.themesHelper.findLayerByName(result.properties.actions[0].data);
+    } else if (actions[0].action.startsWith('add_layer')) {
+      const layer = this.context.themesHelper.findLayerByName(actions[0].data);
       if (layer) {
         clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(layer);
         activate = true;

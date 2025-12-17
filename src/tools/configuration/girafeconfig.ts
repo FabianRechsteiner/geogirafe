@@ -38,6 +38,7 @@ class GirafeConfig {
   };
   public search: {
     url: string;
+    resultsSrid: string;
     objectPreview?: boolean;
     layerPreview?: boolean;
     minResolution?: number;
@@ -267,7 +268,8 @@ class GirafeConfig {
       // We just display a warning in the console
       console.warn(e);
       this.search = {
-        url: ''
+        url: '',
+        resultsSrid: config.map.srid
       };
     }
 
@@ -400,6 +402,7 @@ class GirafeConfig {
     }
     return {
       url: config.search.url,
+      resultsSrid: config.search.resultsSrid ?? config.map.srid,
       objectPreview: config.search.objectPreview ?? false,
       layerPreview: config.search.layerPreview ?? false,
       minResolution: config.search.minResolution ?? 0.5,
