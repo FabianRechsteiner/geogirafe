@@ -201,3 +201,20 @@ export const applyFeaturesToSelection = (features: Feature<Geometry>[], state: S
     state.selection.highlightedFeatures = [];
   }
 };
+const urlRegExp = /(https?:\/\/[^"<]*?(?=\s|$|<\/[^a]>))/gi;
+const telRegExp = /((\b(0041|0)|\B\+41)(\s?\(0\))?(\s)?[1-9]{2}(\s)?\d{3}(\s)?\d{2}(\s)?\d{2}\b)/gi;
+const mailRegExp =
+  /(^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$)/gi; //NOSONAR(typescript:S5843) As this is the official Regular Expression, we will not mess around with it
+
+export const linkify = (str: string) => {
+  if (urlRegExp.test(str)) {
+    return str.replaceAll(urlRegExp, '<a href="$1" target="_blank">$1</a>');
+  }
+  if (mailRegExp.test(str)) {
+    return str.replaceAll(mailRegExp, '<a href="mailto:$1" target="_blank">$1</a>');
+  }
+  if (telRegExp.test(str)) {
+    return str.replaceAll(telRegExp, '<a href="tel:$1" target="_blank">$1</a>');
+  }
+  return str;
+};

@@ -1,5 +1,6 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { InfoBoxContent } from '../../tools/state/state';
+import { linkify as utils_linkify } from '../../tools/utils/utils';
 
 class InfoboxComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -62,10 +63,7 @@ class InfoboxComponent extends GirafeHTMLElement {
   }
 
   linkify(str: string) {
-    if (this.urlRegExp.test(str)) {
-      return str.replaceAll(this.urlRegExp, '<a href="$1" target="_blank">$1</a>');
-    }
-    return str;
+    return utils_linkify(str);
   }
 
   protected override connectedCallback() {

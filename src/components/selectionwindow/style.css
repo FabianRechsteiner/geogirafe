@@ -1,35 +1,93 @@
-#content div {
-  padding: 1rem 2rem;
+:host {
+  --selection-window-header-height: 2.5rem;
+  --selection-window-footer-height: 2.5rem;
+  --selection-window-content-padding: 0.5rem;
+}
+
+#header {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--bkg-color) !important;
+  height: var(--selection-window-header-height) !important;
+
+  .title {
+    flex-grow: 1;
+    text-align: start;
+    padding: 0.25rem 0;
+    font-weight: 600;
+  }
+  button {
+    flex-grow: 0;
+  }
+}
+
+.hr {
+  background-color: var(--bkg-color-grad1);
+  height: 2px;
+  margin: 0.125rem 0.5rem;
+}
+
+#content {
+  height: calc(
+    100% - var(--selection-window-header-height) - var(--selection-window-footer-height) - 2 *
+      var(--selection-window-content-padding)
+  ) !important;
+  div {
+    padding: var(--selection-window-content-padding);
+  }
+}
+
+#footer {
+  height: var(--selection-window-footer-height) !important;
+  border-top: none !important;
 }
 
 table {
   border-collapse: collapse;
   width: 100%;
+  table-layout: auto;
 }
-
+td.feature-id {
+  text-align: left;
+  color: var(--text-color);
+  font-weight: 600;
+  line-height: 2rem;
+}
 td.label {
-  text-align: right;
-  padding-right: 1rem;
-  color: var(--text-color-grad1);
-  width: 8rem;
-  vertical-align: top;
+  text-align: left;
+  padding-right: 0.5rem;
+  padding-left: 0.25rem;
+  color: var(--text-color);
+  font-weight: 600;
 }
-
-td.label:after {
-  content: ' :';
+tr.key-value {
+  line-height: 2rem;
+}
+tr.key-value:nth-child(odd) {
+  background-color: var(--bkg-color-grad1);
+}
+tr.key-value:nth-child(even) {
+  background-color: var(--bkg-color);
 }
 
 button {
-  flex-grow: 1;
+  flex-grow: 0.25;
   border: none;
   background-color: unset;
   color: var(--text-color-grad1);
   padding: 0.5rem;
   cursor: pointer;
 }
+button.showing-dropdown {
+  background-color: var(--bkg-color-grad1);
+}
+button:disabled:hover {
+  background-color: var(--bkg-color);
+  cursor: default;
+}
 
 button > img {
-  max-height: calc(var(--window-header-height) / 2);
+  max-height: calc(var(--selection-window-header-height) / 2);
 }
 
 #previous i {
@@ -46,10 +104,11 @@ button > img {
 }
 
 #counter {
-  line-height: var(--window-footer-height);
-  height: var(--window-footer-height);
+  line-height: var(--selection-window-footer-height);
+  height: var(--selection-window-footer-height);
   text-align: center;
   margin-top: 0;
+  flex-grow: 1;
 }
 
 /** ==== Layers Dropdown ==== */
@@ -59,16 +118,17 @@ button > img {
   padding: 0.5rem 0;
 
   position: absolute;
-  bottom: 2rem;
+  top: var(--selection-window-header-height);
 
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 option.layers-dropdown-item {
   cursor: pointer;
   padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+  flex-grow: 1;
+  display: flex;
 }
 
 option.layers-dropdown-item:hover {
