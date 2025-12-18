@@ -42,8 +42,6 @@ export default class GMFManager {
         throw new Error(gmfLoginResponse.statusText);
       }
     }
-
-    this.state.oauth.status = 'loggedIn';
   }
 
   public async logout() {

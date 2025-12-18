@@ -37,7 +37,8 @@ class ThemesManager extends GirafeSingleton {
     this.context.stateManager.subscribe('oauth.status', async () => {
       if (
         this.state.themes.isLoaded &&
-        (this.state.oauth.status === 'loggedIn' || this.state.oauth.status === 'loggedOut')
+        ((this.state.oauth.somethingChanged && this.state.oauth.status === 'loggedIn') ||
+          this.state.oauth.status === 'loggedOut')
       ) {
         await this.initialize();
       }
