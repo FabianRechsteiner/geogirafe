@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { getValidIndex, minMax, hexToRgbaArray, rgbStrToRgbaArray } from './utils';
+import { getValidIndex, minMax, hexToRgbaArray, rgbStrToRgbaArray, linkify } from './utils';
 
 it('tests getValidIndex function', () => {
   // Test a case where maxIndex is not provided or 0
@@ -66,4 +66,36 @@ it('converts an rgb string to an rgba array', () => {
   expect(rgbStrToRgbaArray('rgb(0, 51, 256)')).toBe(null);
   expect(rgbStrToRgbaArray('rgb(0, 51, 255, 100)')).toBe(null);
   expect(rgbStrToRgbaArray('rgb(-50, 51, 255)')).toBe(null);
+});
+
+it('should return plain link wrapped in Anchor-Element', () => {
+  const plainLink = 'https://gitlab.com/geogirafe/gg-viewer/';
+  const linkifiedLink = linkify(plainLink);
+  expect(linkifiedLink).toEqual(
+    '<a href="https://gitlab.com/geogirafe/gg-viewer/" target="_blank">https://gitlab.com/geogirafe/gg-viewer/</a>'
+  );
+});
+
+it('should return already wrapped link unchanged', () => {
+  const alreadyWrappedLink =
+    '<a href="https://gitlab.com/geogirafe/gg-viewer/">https://gitlab.com/geogirafe/gg-viewer/</a>';
+  const linkifiedLink = linkify(alreadyWrappedLink);
+  expect(linkifiedLink).toEqual(alreadyWrappedLink);
+});
+
+it('should return phone number with country code wrapped in Anchor-Element', () => {
+  const phoneNumber = '+41 61 267 99 53';
+  const linkifiedPhoneNumber = linkify(phoneNumber);
+  expect(linkifiedPhoneNumber).toEqual('<a href="tel:+41 61 267 99 53" target="_blank">+41 61 267 99 53</a>');
+});
+it('should return phone number without country code wrapped in Anchor-Element', () => {
+  const phoneNumber = '061 267 99 53';
+  const linkifiedPhoneNumber = linkify(phoneNumber);
+  expect(linkifiedPhoneNumber).toEqual('<a href="tel:061 267 99 53" target="_blank">061 267 99 53</a>');
+});
+
+it('should return email address wrapped in Anchor-Element', () => {
+  const mailAddress = 'geo@bs.ch';
+  const linkifiedMailAddress = linkify(mailAddress);
+  expect(linkifiedMailAddress).toEqual('<a href="mailto:geo@bs.ch" target="_blank">geo@bs.ch</a>');
 });

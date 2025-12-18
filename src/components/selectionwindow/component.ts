@@ -5,7 +5,7 @@ import { debounce } from '../../tools/utils/debounce';
 import type { Callback } from '../../tools/state/statemanager';
 import type { GridDataById } from '../../tools/featuretogriddatabyid';
 import FeatureToGridDataById from '../../tools/featuretogriddatabyid';
-import { getValidIndex } from '../../tools/utils/utils';
+import { getValidIndex, linkify } from '../../tools/utils/utils';
 import IconCenter from './images/center.svg';
 import ResizeWindow from '../../tools/resizewindow';
 import DOMPurify from 'dompurify';
@@ -41,6 +41,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   private resizeWindow: ResizeWindow | null = null;
   private readonly featureToGridData = new FeatureToGridDataById({ removeEmptyColumns: false });
   private windowFeatures: WindowFeature[] = [];
+  private windowLayers: string[] = [];
   visible = false;
   focusedIndex = 0;
   maxIndex = 0;
@@ -97,8 +98,12 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * Toggles the visibility of the layers dropdown.
    */
   openDropdown() {
-    this.showDropdown = !this.showDropdown;
-    this.render();
+    if (this.windowLayers.length == 1) {
+      this.generateCSV(this.windowLayers[0]);
+    } else {
+      this.showDropdown = !this.showDropdown;
+      this.render();
+    }
   }
 
   /**
@@ -106,14 +111,13 @@ class SelectionWindowComponent extends GirafeDraggableElement {
    * @returns The list of layers to export.
    */
   getLayersList() {
-    const layers: Layer[] = [];
-    this.windowFeatures.forEach((feature) => {
-      if (!layers.some((layer) => layer.id === feature.id)) {
-        const label = `Export ${feature.id}`;
-        layers.push({ id: feature.id, label });
-      }
-    });
-    return layers;
+    return this.windowLayers.map(
+      (layer) =>
+        ({
+          id: layer,
+          label: `Export ${layer}`
+        }) as Layer
+    );
   }
 
   /**
@@ -137,7 +141,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
       return { name: column };
     });
 
-    this.csvManager.startDownload(data, columns, 'query-results.csv');
+    this.csvManager.startDownload(data, columns, `${layer.replace(' ', '-')}.csv`);
 
     this.showDropdown = false;
     this.render();
@@ -164,6 +168,18 @@ class SelectionWindowComponent extends GirafeDraggableElement {
     this.state.selection.selectedFeatures = [];
   }
 
+  onFocusWindowFeatureChecked(event: Event) {
+    const target = event.target! as HTMLInputElement;
+    const newFocusIndex = Number.parseInt(target.value);
+    if (newFocusIndex <= this.maxIndex + 1 && newFocusIndex >= 1) {
+      this.onFocusWindowFeature(newFocusIndex - 1);
+    } else if (newFocusIndex < 1) {
+      target.value = '0';
+    } else {
+      target.value = (this.maxIndex + 1).toString();
+    }
+  }
+
   /**
    * Sets the focus on a specific feature.
    */
@@ -186,6 +202,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
       keyValue[0] = this.context.i18nManager.getTranslation(
         this.columnAliasHelper.getColumnAlias(windowFeature.id, keyValue[0])
       );
+      keyValue[1] = linkify(keyValue[1] as string);
       keyValue[1] = DOMPurify.sanitize(keyValue[1] as string, config);
     });
     // Render and translate data.
@@ -268,6 +285,9 @@ class SelectionWindowComponent extends GirafeDraggableElement {
       this.closeWindow();
       return;
     }
+    this.windowLayers = this.windowFeatures
+      .map((feature) => feature.id)
+      .filter((id, index, self) => self.indexOf(id) === index);
     this.maxIndex = this.windowFeatures.length - 1;
     this.onFocusWindowFeature(0);
   }
