@@ -1,19 +1,19 @@
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import TileLayer from 'ol/layer/Tile';
-import type { Map } from 'ol';
+import type { Map as olMap } from 'ol';
 import type { Layer as OLayer } from 'ol/layer';
 import type LayerWmts from '../../../models/layers/layerwmts';
 import SelectionParam from '../../../models/selectionparam';
 import StateManager from '../../../tools/state/statemanager';
 import LayerWms from '../../../models/layers/layerwms';
-import OLayerImage from 'ol/layer/Image';
-import OSourceImageWMS from 'ol/source/ImageWMS';
 import ServerOgc from '../../../models/serverogc';
+import ImageWMS from 'ol/source/ImageWMS';
+import ImageLayer from 'ol/layer/Image';
 
 // TODO REG : Move to core, because we have a cross-dependency issue with the extlayers component
 class WmtsManager {
-  map: Map;
+  map: olMap;
   private readonly stateManager: StateManager;
 
   wmtsCapabilitiesByServer: Record<string, Record<string, unknown>> = {};
@@ -40,7 +40,7 @@ class WmtsManager {
     return this.stateManager.state;
   }
 
-  public constructor(map: Map, stateManager: StateManager) {
+  public constructor(map: olMap, stateManager: StateManager) {
     this.map = map;
     this.stateManager = stateManager;
   }
@@ -199,30 +199,48 @@ class WmtsManager {
   }
 
   selectFeatures(extent: number[]) {
-    const selectionParams: SelectionParam[] = [];
+    const ogcServerToWmsLayers = new Map<ServerOgc, LayerWms[]>();
+    const ogcServerToOlLayer = new Map<ServerOgc, ImageLayer<ImageWMS>>();
     const allWmtsLayers = [...Object.values(this.basemapLayers), ...Object.values(this.wmtsLayers)];
-    allWmtsLayers.forEach((wmtsItem) => {
+    for (const wmtsItem of allWmtsLayers) {
       const wmtsLayer = wmtsItem.layerWmts;
       const queryLayers = wmtsLayer.wmsLayers ?? wmtsLayer.queryLayers;
       if (!queryLayers || !wmtsLayer.ogcServer) {
-        return;
+        continue;
       }
-      const ogcServer = new ServerOgc(wmtsLayer.ogcServer.name, wmtsLayer.ogcServer);
-      const layers = queryLayers.split(',').map((wmsLayer) => {
-        return new LayerWms(0, wmsLayer, 0, ogcServer, {
-          queryLayers,
-          layers: queryLayers,
-          queryable: true
-        });
-      });
-      const oLayer = new OLayerImage({
-        source: new OSourceImageWMS({
-          url: ogcServer.url,
-          params: { LAYERS: queryLayers }
-        })
-      });
-      selectionParams.push(new SelectionParam(ogcServer, layers, this.state.projection, extent, oLayer));
-    });
+      const wmsLayers = queryLayers.split(',');
+      for (const wmsLayer of wmsLayers) {
+        let layers = ogcServerToWmsLayers.get(wmtsLayer.ogcServer);
+        if (!layers) {
+          layers = [];
+          ogcServerToWmsLayers.set(wmtsLayer.ogcServer, layers);
+          const oLayer = new ImageLayer({
+            source: new ImageWMS({
+              url: wmtsLayer.ogcServer.url,
+              params: { LAYERS: wmsLayer }
+            })
+          });
+          ogcServerToOlLayer.set(wmtsLayer.ogcServer, oLayer);
+        }
+
+        const alreadyExists = layers.some((l) => l.name === wmsLayer);
+        if (!alreadyExists) {
+          const layer = new LayerWms(0, wmsLayer, 0, wmtsLayer.ogcServer, {
+            queryLayers: wmsLayer,
+            layers: wmsLayer,
+            queryable: true
+          });
+          layers.push(layer);
+        }
+      }
+    }
+
+    const selectionParams: SelectionParam[] = [];
+    for (const [ogcServer, wmsLayers] of ogcServerToWmsLayers) {
+      const oLayer = ogcServerToOlLayer.get(ogcServer)!;
+      selectionParams.push(new SelectionParam(ogcServer, wmsLayers, this.state.projection, extent, oLayer));
+    }
+
     this.state.selection.selectionParameters.push(...selectionParams);
   }
 
