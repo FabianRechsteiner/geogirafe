@@ -6,7 +6,8 @@ import {
   extractNotDefaultExportTypeNames,
   extractNotDefaultExportValueNames,
   htmlRegex,
-  isLineCommented
+  isLineCommented,
+  appendImportExtension
 } from './tools';
 
 describe('Buildtools: comments and templateUrl', () => {
@@ -363,5 +364,123 @@ describe('Buildtools: generate main files', () => {
     const defaultObject = extractDefaultGlobalExportName(code);
     expect(defaultObject.objectType).toEqual('enum');
     expect(defaultObject.objectName).toEqual('MyEnum');
+  });
+});
+
+describe('Buildtools: append import extensions', () => {
+  const relativeCode = `
+    import OsmManager from './tools/osmmanager';
+    import OsmManager from '../core/regManager';
+  `;
+  const expectedRelativeCode = `
+    import OsmManager from './tools/osmmanager.js';
+    import OsmManager from '../core/regManager.js';
+  `;
+
+  const multilineCode = `
+    import {
+      extractDefaultGlobalExportName,
+      extractDefaultExportTypeName,
+      extractDefaultExportValueName,
+      extractNotDefaultExportTypeNames,
+      extractNotDefaultExportValueNames,
+      htmlRegex,
+      isLineCommented,
+      appendImportExtension
+    } from './tools';
+  `;
+  const expectedMultilineCode = `
+    import {
+      extractDefaultGlobalExportName,
+      extractDefaultExportTypeName,
+      extractDefaultExportValueName,
+      extractNotDefaultExportTypeNames,
+      extractNotDefaultExportValueNames,
+      htmlRegex,
+      isLineCommented,
+      appendImportExtension
+    } from './tools.js';
+  `;
+
+  const olCode = `
+    import VectorLayer from 'ol/layer/Vector';
+    import Feature from 'ol/Feature';
+    import {
+      Geometry,
+      LinearRing,
+      LineString,
+      MultiLineString,
+      MultiPoint,
+      MultiPolygon,
+      Point,
+      Polygon,
+      SimpleGeometry,
+      GeometryCollection
+    } from 'ol/geom';
+    import { Draw, Modify } from 'ol/interaction';
+  `;
+  const expectedOlCode = `
+    import VectorLayer from 'ol/layer/Vector.js';
+    import Feature from 'ol/Feature.js';
+    import {
+      Geometry,
+      LinearRing,
+      LineString,
+      MultiLineString,
+      MultiPoint,
+      MultiPolygon,
+      Point,
+      Polygon,
+      SimpleGeometry,
+      GeometryCollection
+    } from 'ol/geom.js';
+    import { Draw, Modify } from 'ol/interaction.js';
+  `;
+
+  const noChangeCode = `
+    import OsmManager from './tools/osmmanager.js';
+    import OsmManager from '../core/regManager.js';
+    import { Draw, Modify } from 'ol/interaction.js';
+    import {
+      extractDefaultGlobalExportName,
+      extractDefaultExportTypeName,
+      extractDefaultExportValueName,
+      extractNotDefaultExportTypeNames,
+      extractNotDefaultExportValueNames,
+      htmlRegex,
+      isLineCommented,
+      appendImportExtension
+    } from './tools.js';
+    import proj4 from 'proj4';
+  `;
+
+  it('manage relative import with extension without point', async () => {
+    const newCode = appendImportExtension(relativeCode, 'js');
+    expect(newCode).toEqual(expectedRelativeCode);
+  });
+
+  it('manage relative import with extension with point', async () => {
+    const newCode = appendImportExtension(relativeCode, '.js');
+    expect(newCode).toEqual(expectedRelativeCode);
+  });
+
+  it('do not add extension is alreaydy exist', async () => {
+    const newCode = appendImportExtension(expectedRelativeCode, '.js');
+    expect(newCode).toEqual(expectedRelativeCode);
+  });
+
+  it('manage multiline import', async () => {
+    const newCode = appendImportExtension(multilineCode, '.js');
+    expect(newCode).toEqual(expectedMultilineCode);
+  });
+
+  it('manage openlayers import', async () => {
+    const newCode = appendImportExtension(olCode, '.js');
+    expect(newCode).toEqual(expectedOlCode);
+  });
+
+  it('manage no change import', async () => {
+    const newCode = appendImportExtension(noChangeCode, '.js');
+    expect(newCode).toEqual(noChangeCode);
   });
 });

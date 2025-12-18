@@ -267,3 +267,34 @@ export function extractNotDefaultExportValueNames(code) {
   }
   return exportNames;
 }
+
+export function appendImportExtension(code, extension) {
+  if (!extension.startsWith('.')) {
+    extension = `.${extension}`;
+  }
+  // Replace all relative imports to add the extension
+  let importRegex = /from\s+['"](\.[^'"]*)['"]/g;
+  let updatedCode = appendExtensionToMatchingImports(code, importRegex, extension);
+  // Replace all lib imports to add the extension
+  // Except:
+  // - uhtml/keyed
+  // - packages starting with @
+  importRegex = /from\s+['"]((?!(?:uhtml\/keyed)['"])([^.@'"]*\/[^'"]*))['"]/g;
+  updatedCode = appendExtensionToMatchingImports(updatedCode, importRegex, extension);
+
+  return updatedCode;
+}
+
+function appendExtensionToMatchingImports(code, importRegex, extension) {
+  const updatedCode = code.replaceAll(importRegex, (match, importPath) => {
+    if (path.extname(importPath)) {
+      return match;
+    }
+
+    // Add the extension to the import path
+    const newImportPath = importPath + extension;
+    return match.replace(importPath, newImportPath);
+  });
+
+  return updatedCode;
+}
