@@ -82,7 +82,7 @@ export default class PermalinkManager extends GirafeSingleton {
   public hasMapPosition() {
     // When map position and feature query are present, the feature selection query has priority.
     // It will move the map to display all selected features, making an additional map position unnecessary.
-    return this.params['map_x'] && this.params['map_y'] && this.params['map_zoom'] && !this.hasFeatureSelectionQuery();
+    return this.params['map_x'] && this.params['map_y'] && !this.hasFeatureSelectionQuery();
   }
 
   public hasToolTip() {
@@ -93,7 +93,7 @@ export default class PermalinkManager extends GirafeSingleton {
     if (this.hasMapPosition()) {
       const position = new MapPosition();
 
-      let center = [parseFloat(this.params['map_x']!), parseFloat(this.params['map_y']!)];
+      let center = [Number.parseFloat(this.params['map_x']!), Number.parseFloat(this.params['map_y']!)];
       // Transform position to the target projection by making an educated guess about the current CRS
       // of the permalink map position
       const defaultProjection = this.context.configManager.getDefaultConfigValue('map.srid') as string;
@@ -103,7 +103,8 @@ export default class PermalinkManager extends GirafeSingleton {
       }
 
       position.center = center;
-      position.zoom = parseFloat(this.params['map_zoom']!);
+      const defaultZoom = this.context.configManager.getDefaultConfigValue('map.startZoom') as string;
+      position.zoom = Number.parseInt(this.params['map_zoom'] ?? defaultZoom);
 
       if (this.params['map_crosshair'] === 'true') {
         position.crosshair = center;
