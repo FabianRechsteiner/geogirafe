@@ -209,7 +209,6 @@ export default class MapComponent extends GirafeHTMLElement {
         // The map component may not be fully ready when other part of the application will be initialized
         // And some operations that need a fuly loaded map need to be first done when the application is ready
         // For example, Permalink needs resolution,
-        this.showCrosshair(this.state.position);
         this.onCameraChanged(this.state.globe.camera);
         // If the app is opened from a permalink, prioritize this data over settings in the shared state
         if (this.context.permalinkManager.hasFeatureSelectionQuery()) {
@@ -219,6 +218,7 @@ export default class MapComponent extends GirafeHTMLElement {
         } else {
           this.applyFeatureSelectionFromSharedState();
         }
+        this.showCrosshair(this.state.position);
       }
     });
   }
