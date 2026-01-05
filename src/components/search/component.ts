@@ -5,8 +5,8 @@ import GeoJSON from 'ol/format/GeoJSON';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { type Geometry, Point } from 'ol/geom';
-import { Style, Icon, Stroke, Fill } from 'ol/style';
-import { buffer, getWidth, getHeight, getCenter, containsExtent, type Extent } from 'ol/extent';
+import { Fill, Icon, Stroke, Style } from 'ol/style';
+import { buffer, containsExtent, type Extent, getCenter, getHeight, getWidth } from 'ol/extent';
 import type { Color } from 'vanilla-picker';
 import GirafeColorPicker from '../../tools/utils/girafecolorpicker';
 
@@ -53,10 +53,13 @@ class SearchComponent extends GirafeHTMLElement {
   private selectedResult: Feature | null = null;
 
   private searchInput?: HTMLInputElement;
+  private girafeColorPicker?: GirafeColorPicker;
 
   public paintSearchResults?: boolean;
   public defaultSearchStrokeColor!: string;
   public defaultSearchFillColor!: string;
+  public searchStrokeColor!: string;
+  public searchFillColor!: string | number[];
 
   private abortController = new AbortController();
   public showNoResultWarning = false;
@@ -170,8 +173,7 @@ class SearchComponent extends GirafeHTMLElement {
     // Cancel any previous search
     this.abortController.abort();
     // Create a new controller for the new request
-    const currentAbortController = new AbortController();
-    this.abortController = currentAbortController;
+    this.abortController = new AbortController();
 
     const target = e.target as HTMLInputElement;
     const term = target.value.trim();
@@ -206,11 +208,11 @@ class SearchComponent extends GirafeHTMLElement {
       .replace(this.searchLangPlaceholder, this.state.language as string);
     const response = await fetch(url, { signal: this.abortController.signal });
     const data = await response.json();
-    const features = this.geoJsonFormatter.readFeatures(data, {
+
+    return this.geoJsonFormatter.readFeatures(data, {
       dataProjection: this.context.configManager.getDefaultConfigValue('search.resultsSrid') as string,
       featureProjection: this.map.getView().getProjection()
     });
-    return features;
   }
 
   /**
@@ -331,7 +333,7 @@ class SearchComponent extends GirafeHTMLElement {
     }
 
     // Set new selected object, and activate preview
-    this.focusedResultIndex = this.allResults.findIndex((r) => r === result);
+    this.focusedResultIndex = this.allResults.indexOf(result);
     this.focusedResult = this.allResults[this.focusedResultIndex];
     this.focusedResult.set('selected', true);
     this.render();
@@ -517,15 +519,22 @@ class SearchComponent extends GirafeHTMLElement {
     super.render();
     const colorPicker = this.shadowRoot?.getElementById('colorPickerBtn');
     if (colorPicker) {
-      const fillPicker = new GirafeColorPicker({
+      this.girafeColorPicker = new GirafeColorPicker({
         parent: colorPicker,
         color: this.context.configManager.Config.search.defaultStrokeColor,
         popup: 'right'
       });
-      fillPicker.onChange = (color: Color) => {
+      this.girafeColorPicker.onChange = (color: Color) => {
         // The fill color should be the selected color with a bit more transparency
         const fillColor = [color.rgba[0], color.rgba[1], color.rgba[2], color.rgba[3] / 2];
+        this.searchFillColor = fillColor;
+        this.searchStrokeColor = color.hex;
         this.updatePreviewLayerStyle(fillColor, color.hex);
+      };
+      this.girafeColorPicker.onOpen = (_) => {
+        if (this.defaultColorHasChanged()) {
+          this.girafeColorPicker?.setColor(this.context.configManager.Config.search.defaultStrokeColor as string, true);
+        }
       };
     }
   }
@@ -537,10 +546,15 @@ class SearchComponent extends GirafeHTMLElement {
 
     // Only update style if new colors were provided via color picker or default colors have changed
     if (this.defaultColorHasChanged()) {
-      this.defaultSearchFillColor = this.context.configManager.Config.search.defaultFillColor as string;
-      this.defaultSearchStrokeColor = this.context.configManager.Config.search.defaultStrokeColor as string;
+      const defaultFillColor = this.context.configManager.Config.search.defaultFillColor as string;
+      this.defaultSearchFillColor = defaultFillColor;
+      this.searchFillColor = defaultFillColor;
+      const defaultStrokeColor = this.context.configManager.Config.search.defaultStrokeColor as string;
+      this.defaultSearchStrokeColor = defaultStrokeColor;
+      this.searchStrokeColor = defaultStrokeColor;
     }
-    const strokeColorWithFallback = strokeColor ?? this.defaultSearchStrokeColor;
+    const strokeColorWithFallback = strokeColor ?? this.searchStrokeColor ?? this.defaultSearchStrokeColor;
+    const fillColorWithFallback = fillColor ?? this.searchFillColor ?? this.defaultSearchFillColor;
 
     this.previewGeoLayer.setStyle(
       new Style({
@@ -548,7 +562,7 @@ class SearchComponent extends GirafeHTMLElement {
           color: strokeColorWithFallback,
           width: this.context.configManager.Config.search.defaultStrokeWidth
         }),
-        fill: new Fill({ color: fillColor ?? this.defaultSearchFillColor }),
+        fill: new Fill({ color: fillColorWithFallback }),
         image: new Icon({
           anchor: [0.5, 1],
           anchorXUnits: 'fraction',
