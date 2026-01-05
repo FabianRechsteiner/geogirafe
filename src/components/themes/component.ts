@@ -64,7 +64,10 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   isThemeActive(theme: Theme) {
-    return theme.id === this.state.themes.lastSelectedTheme?.id;
+    if (this.context.configManager.Config.themes.selectionMode === 'replace') {
+      return theme.id === this.state.themes.lastSelectedTheme?.id;
+    }
+    return false;
   }
 
   onCustomThemeChanged(customTheme: CustomTheme) {
