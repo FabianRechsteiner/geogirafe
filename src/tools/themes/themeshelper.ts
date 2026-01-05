@@ -80,7 +80,9 @@ export default class ThemesHelper extends GirafeSingleton {
       return layer;
     }
 
-    console.warn(`Layer ${layername} was found, but is not a layer`);
+    if (layer !== null) {
+      console.warn(`Layer ${layername} was found, but is not a layer`);
+    }
     return null;
   }
 
@@ -92,7 +94,7 @@ export default class ThemesHelper extends GirafeSingleton {
       }
     }
 
-    console.warn(`Layer ${layername} not found !`);
+    console.warn(`Layer ${layername} not found!`);
     return null;
   }
 
