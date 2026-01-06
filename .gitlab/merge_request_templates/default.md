@@ -36,9 +36,10 @@ _Examples of changes that require manual migration:_
 - [ ] Code compiles and conforms to defined coding standards (eslint, tsc, prettier).
 - [ ] If necessary (at the developer's discretion), unit tests have been added for critical parts.
 - [ ] All unittests run without error.
+- [ ] NEW: The UI was tested in both Light and Dark mode
 - [ ] Sonar-Scan returns no new issues or security hotspots.
 - [ ] Documentation has been updated where necessary (see documentation repository).
-- [ ] Merge-Request contains a few explanations of what was done.
+- [ ] Merge-Request contains a few explanations of what was done (incl. release notes & migration steps).
 - [ ] A Reviewer has been assigned to the Merge-Request.
 
 ### For the Reviewer:
