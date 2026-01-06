@@ -15,7 +15,10 @@
         Select attribute...
       </option>
       ${this.layerAttributes.map(attr => uHtmlFor(attr, attr.name)`
-      <option i18n="${attr.name}" value="${attr.name}" ?selected="${this.currentLayerAttribute?.name==attr.name}">
+      <option
+        i18n="${this.layerAttributesTranslations[attr.name]}"
+        value="${attr.name}"
+        ?selected="${this.currentLayerAttribute?.name==attr.name}">
         ${attr.name}
       </option>
       `)}
