@@ -7,6 +7,7 @@ import tippy from 'tippy.js';
 import TimeRestrictionComponent from '../../timerestriction/component';
 import LayerWms from '../../../models/layers/layerwms';
 import Layer from '../../../models/layers/layer';
+import State from '../../../tools/state/state';
 
 export default abstract class TreeViewElement extends GirafeHTMLElement {
   private dragManager!: DragManager;
@@ -151,15 +152,22 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
   }
 
   protected removeFromParent() {
-    if (this.layer.parent) {
-      const index = this.layer.parent.children.findIndex((l) => l === this.layer);
+    TreeViewElement.removeLayerFromParent(this.layer, this.state);
+  }
+
+  private static removeLayerFromParent(layer: BaseLayer, state: State) {
+    if (layer.parent) {
+      const index = layer.parent.children.indexOf(layer);
       if (index >= 0) {
-        this.layer.parent.children.splice(index, 1);
+        layer.parent.children.splice(index, 1);
+      }
+      if (layer.parent.children.length === 0) {
+        TreeViewElement.removeLayerFromParent(layer.parent, state);
       }
     } else {
-      const index = this.state.layers.layersList.findIndex((l) => l === this.layer);
+      const index = state.layers.layersList.indexOf(layer);
       if (index >= 0) {
-        this.state.layers.layersList.splice(index, 1);
+        state.layers.layersList.splice(index, 1);
       }
     }
   }
