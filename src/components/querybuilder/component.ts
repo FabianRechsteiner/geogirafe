@@ -4,6 +4,7 @@ import { LayerAttribute } from '../../models/serverwfs';
 import WfsFilter, { mapAttributeTypeToFilterOperators, WfsOperator } from '../../tools/wfs/wfsfilter';
 import { isString, isNumber, isDate } from '../../models/xmlTypes';
 import IGirafeContext from '../../tools/context/icontext';
+import ColumnAliasHelper from '../../tools/utils/aliases';
 
 class QueryBuilderComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -13,7 +14,9 @@ class QueryBuilderComponent extends GirafeHTMLElement {
   deactivated: boolean = false;
   layer: LayerWms;
   layerAttributes: LayerAttribute[] = [];
+  layerAttributesTranslations: Record<string, string> = {};
   currentLayerAttribute?: LayerAttribute = undefined;
+  columnAliasHelper!: ColumnAliasHelper;
 
   showVal: boolean = false;
   showVal2: boolean = false;
@@ -46,15 +49,24 @@ class QueryBuilderComponent extends GirafeHTMLElement {
 
     super.render();
 
+    const stackedLayerAttributes: LayerAttribute[][] = [];
     this.context.wfsManager.getServerWfs(this.layer).then((serverWfs) => {
       const queryLayers = this.layer.queryLayers!.split(',');
 
-      const stackedLayerAttributes = queryLayers.map((l: string) => serverWfs.layers[l]);
+      for (const queryLayer of queryLayers) {
+        const attributes = serverWfs.layers[queryLayer];
+        stackedLayerAttributes.push(attributes);
+        for (const attribute of attributes) {
+          const translation = this.context.i18nManager.getTranslation(
+            this.columnAliasHelper.getColumnAlias(queryLayer, attribute.name)
+          );
+          this.layerAttributesTranslations[attribute.name] = translation;
+        }
+      }
+
       const layerAttributesCount: Record<string, number> = {};
       for (const la of stackedLayerAttributes.flat()) {
-        if (layerAttributesCount[la.name] === undefined) {
-          layerAttributesCount[la.name] = 0;
-        }
+        layerAttributesCount[la.name] ??= 0;
         layerAttributesCount[la.name]++;
       }
       const commonAttributesNames = Object.keys(layerAttributesCount).filter(
@@ -203,6 +215,7 @@ class QueryBuilderComponent extends GirafeHTMLElement {
 
   protected override connectedCallback() {
     super.connectedCallback();
+    this.columnAliasHelper = new ColumnAliasHelper(this.context.stateManager);
     this.render();
   }
 }
