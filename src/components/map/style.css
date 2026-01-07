@@ -135,11 +135,11 @@
 
 #swiper {
   display: none;
-  width: 99%;
+  width: 100%;
   position: absolute;
-  left: 0.5%;
   top: 50%;
   height: 0;
+  margin: 0;
 }
 
 input[type='range'] {
@@ -176,14 +176,15 @@ input[type='range']::-moz-range-thumb {
 }
 
 .close-swiper {
+  --button-size: 2rem;
   display: none;
   position: absolute;
   top: 0;
-  transform: translateX(-3px);
-  width: 2rem;
-  height: 2rem;
-  background-color: var(--ol-background-color);
-  color: var(--ol-subtle-foreground-color);
+  transform: translateX(calc(-1 * var(--button-size) / 2));
+  width: var(--button-size);
+  height: var(--button-size);
+  background-color: var(--bkg-color);
+  color: var(--text-color);
   border-radius: 4px;
   border-width: 1px;
   cursor: pointer;
@@ -191,8 +192,8 @@ input[type='range']::-moz-range-thumb {
 
 .close-swiper:hover,
 .close-swiper:focus {
-  outline: 1px solid var(--ol-subtle-foreground-color);
-  color: var(--ol-foreground-color);
+  outline: 1px solid var(--text-color);
+  color: var(--text-color-grad1);
 }
 
 .ol-viewport .tooltip {
