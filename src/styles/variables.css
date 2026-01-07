@@ -45,7 +45,7 @@ body.dark-theme {
   --lnk-active: #ff4040;
   --error-color: #ff6347;
   --success-color: #529c52;
-  --svg-filter: invert(1);
+  --svg-filter: invert(1) hue-rotate(180deg);
   --svg-legend-bkg: var(--legend-bkg);
 }
 

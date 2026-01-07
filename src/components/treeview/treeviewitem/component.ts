@@ -86,7 +86,8 @@ class TreeViewItemComponent extends TreeViewElement {
       if (this.layer.legendImage) {
         this.legendUrls[this.layer.name] = this.layer.legendImage;
       } else {
-        console.error(`The WMTS Layer ${this.layer.name} has no legendImage.`);
+        this.layer.hasError = true;
+        this.layer.errorMessage = `The WMTS Layer ${this.layer.name} has no legendImage.`;
       }
     }
   }

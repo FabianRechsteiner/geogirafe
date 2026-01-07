@@ -29,9 +29,11 @@
     </button>
 
     <!-- Error icon -->
-    <button class="${this.layer.hasError ? 'gg-icon-button gg-small gg-opacity' : 'hidden'}" tip="Error on layer">
+    <div
+      class="${this.layer.hasError ? 'gg-icon gg-small gg-opacity' : 'hidden'}"
+      tip="${this.layer.errorMessage ? this.layer.errorMessage : 'Error on layer'}">
       <img alt="Error on layer" src="icons/error.svg" />
-    </button>
+    </div>
 
     <!-- Label -->
     <div class="${this.isVisibleInCurrentResolution() ? 'label-container' : 'label-container label-out-resolution'}">
