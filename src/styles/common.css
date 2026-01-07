@@ -156,6 +156,12 @@ a:visited {
   justify-content: center;
   cursor: pointer;
 }
+/* Icon */
+.gg-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 /* Big style */
 .gg-big,
 .gg-big-withtext {
