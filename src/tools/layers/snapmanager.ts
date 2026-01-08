@@ -12,10 +12,15 @@ type SnapOptions = {
 };
 
 class SnapManager extends GirafeSingleton {
-  private readonly snapLayers = new Map<SnappableLayer, SnapOptions>();
+  private readonly activeSnapLayers = new Map<SnappableLayer, SnapOptions>();
+  private inactiveSnapLayers: SnappableLayer[] = [];
 
   private get olMap(): OlMap {
     return this.context.mapManager.getMap();
+  }
+
+  private get state() {
+    return this.context.stateManager.state;
   }
 
   public override initializeSingleton() {
@@ -31,6 +36,13 @@ class SnapManager extends GirafeSingleton {
         this.layerUpdated(layer);
       }
     );
+    this.context.stateManager.subscribe('layers.isSnappingActive', (_: boolean, isSnappingActive: boolean) => {
+      if (isSnappingActive) {
+        this.activateSnappingForAllLayers();
+      } else {
+        this.deactivateSnappingForAllLayers();
+      }
+    });
 
     this.olMap
       .getInteractions()
@@ -39,13 +51,29 @@ class SnapManager extends GirafeSingleton {
 
   private mapInteractionsChanged(interaction: Interaction) {
     if (!(interaction instanceof Snap)) {
-      this.snapLayers.forEach((options) => {
+      for (const options of this.activeSnapLayers.values()) {
         // Snapping interactions have to be removed and readded, because they mut be the last ones in the list of interactions
         // This is a limitation of OpenLayers. Otherwise the drawing interaction will prevail to the snapping one
         // And snapping won't work when the drawing tool is changed.
         this.olMap.removeInteraction(options.snapInteraction);
         this.olMap.addInteraction(options.snapInteraction);
-      });
+      }
+    }
+  }
+
+  private activateSnappingForAllLayers() {
+    for (const layer of this.inactiveSnapLayers) {
+      const snapOptions = this.createSnapOptions(layer);
+      this.registerLayer(layer, snapOptions);
+    }
+    this.inactiveSnapLayers = [];
+  }
+
+  private deactivateSnappingForAllLayers() {
+    const layersToDeactivate = Array.from(this.activeSnapLayers.keys());
+    for (const layer of layersToDeactivate) {
+      this.unregisterLayer(layer);
+      this.inactiveSnapLayers.push(layer);
     }
   }
 
@@ -56,8 +84,12 @@ class SnapManager extends GirafeSingleton {
     }
 
     if (layer.active && layer.snapActive) {
-      const snapOptions = this.createSnapOptions(layer);
-      this.registerLayer(layer, snapOptions);
+      if (this.state.layers.isSnappingActive) {
+        const snapOptions = this.createSnapOptions(layer);
+        this.registerLayer(layer, snapOptions);
+      } else {
+        this.inactiveSnapLayers.push(layer);
+      }
     } else {
       this.unregisterLayer(layer);
     }
@@ -84,7 +116,7 @@ class SnapManager extends GirafeSingleton {
   }
 
   private registerLayer(layer: SnappableLayer, snapOptions: SnapOptions) {
-    this.snapLayers.set(layer, snapOptions);
+    this.activeSnapLayers.set(layer, snapOptions);
     this.loadFeaturesForLayer(layer, snapOptions);
     snapOptions.snapInteraction.setActive(true);
     this.olMap.addInteraction(snapOptions.snapInteraction);
@@ -93,17 +125,17 @@ class SnapManager extends GirafeSingleton {
   }
 
   private unregisterLayer(layer: SnappableLayer) {
-    const snapOptions = this.snapLayers.get(layer);
+    const snapOptions = this.activeSnapLayers.get(layer);
     if (snapOptions) {
       snapOptions.snapInteraction.setActive(false);
       snapOptions.snapFeatures.clear();
       this.olMap.removeInteraction(snapOptions.snapInteraction);
-      this.snapLayers.delete(layer);
+      this.activeSnapLayers.delete(layer);
     }
   }
 
   private reloadFeatures() {
-    for (const [layer, options] of this.snapLayers) {
+    for (const [layer, options] of this.activeSnapLayers) {
       this.loadFeaturesForLayer(layer, options);
     }
   }
@@ -111,12 +143,7 @@ class SnapManager extends GirafeSingleton {
   private async loadFeaturesForLayer(layer: SnappableLayer, options: SnapOptions) {
     const client = this.context.wfsManager.getClient(layer.ogcServer);
     const extent = this.olMap.getView().getViewStateAndExtent().extent;
-    const selectionParam = new SelectionParam(
-      layer.ogcServer,
-      [layer],
-      this.context.stateManager.state.projection,
-      extent
-    );
+    const selectionParam = new SelectionParam(layer.ogcServer, [layer], this.state.projection, extent);
     const features = await client.getFeature(selectionParam);
     options.snapFeatures.extend(features);
   }

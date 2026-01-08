@@ -89,13 +89,15 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
     super.render();
     if (this.isPanelVisible) {
       this.renderComponent();
+      this.state.layers.isSnappingActive = true;
     } else {
       this.hide();
+      this.state.layers.isSnappingActive = false;
     }
     super.girafeTranslate();
   }
 
-  renderComponent() {
+  private renderComponent() {
     this.show();
     if (!this.renderedOnce) {
       this.renderedOnce = true;
