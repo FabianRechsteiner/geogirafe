@@ -128,7 +128,7 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
 
   private injectConfigMetaTags() {
     const location = new URL(import.meta.url);
-    if (import.meta.env.DEV) {
+    if (import.meta?.env?.DEV) {
       location.pathname = location.pathname.replace('/src/api', '');
     }
     const origin = `${location.origin}${location.pathname.substring(0, location.pathname.lastIndexOf('/'))}`;
