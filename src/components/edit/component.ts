@@ -65,8 +65,10 @@ export default class EditComponent extends GirafeHTMLElement implements IGirafeP
     super.render();
     if (this.isPanelVisible) {
       this.renderComponent();
+      this.state.layers.isSnappingActive = true;
     } else {
       this.renderEmptyComponent();
+      this.state.layers.isSnappingActive = false;
     }
     super.girafeTranslate();
   }
