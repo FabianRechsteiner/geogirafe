@@ -70,7 +70,7 @@ ${stack}
     if (error?.stack) {
       try {
         // NOTE REG: Specific to Vite: When running in debug mode, we do not need to calculate the original stacktrace
-        stack = import.meta.env.DEV ? error.stack : await this.getOriginalStackTrace(error);
+        stack = import.meta?.env?.DEV ? error.stack : await this.getOriginalStackTrace(error);
       } catch (e) {
         // If an error accurs during the calculation of the stacktrace, we just ignore it
         // and return the original stacktrace. Otherwise it could lead to an infinite exception loop.
