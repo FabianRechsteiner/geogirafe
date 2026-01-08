@@ -101,7 +101,6 @@ sonarcloud-check:
     paths:
       - .sonar/cache
   script:
-    - echo $SONAR_TOKEN
     - sonar-scanner
 
 #################################
