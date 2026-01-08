@@ -341,3 +341,18 @@ a:visited {
 .girafe-button-tiny img {
   overflow: hidden;
 }
+
+.girafe-onboarding-theme {
+  background-color: var(--bkg-color) !important;
+  color: var(--text-color) !important;
+}
+
+.girafe-onboarding-theme button {
+  background-color: var(--bkg-color) !important;
+  color: var(--text-color) !important;
+  text-shadow: none !important;
+}
+
+.girafe-onboarding-theme button.driver-popover-close-btn {
+  z-index: 10000;
+}

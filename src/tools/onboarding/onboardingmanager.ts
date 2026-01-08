@@ -20,6 +20,7 @@ export default class OnBoardingManager extends GirafeSingleton {
     const tourAlreadyDone = sessionStorage.getItem(this.STORAGE_ITEM_NAME);
     if (tourAlreadyDone !== 'true') {
       const onboardingDriver = driver({
+        popoverClass: 'girafe-onboarding-theme',
         showProgress: true,
         onDestroyed: (
           _element: Element | undefined,
