@@ -34,6 +34,10 @@ class ExternalLayersComponent extends GirafeHTMLElement implements IGirafePanel 
     return this.predefinedSources.filter((source) => source.type === 'WMS' || source.type === 'WMTS');
   }
 
+  public get hasPredefinedWmsWmtsSources(): boolean {
+    return this.predefinedWmsWmtsSources.length == 0;
+  }
+
   public selectedTab: 'wms_wmts' | 'file' = 'wms_wmts';
   private wmtsManager!: WmtsManager;
 
