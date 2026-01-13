@@ -1,5 +1,5 @@
 import { cloneDeepWith } from 'lodash-es';
-import { ignoreCloneSymbol } from './decorators';
+import { ignoreCloneSymbol, ignoreSymbol } from './decorators';
 
 type Primitive = string | number | boolean | bigint | null | undefined;
 
@@ -22,15 +22,15 @@ export function deepFreeze(obj: any, visitedObjects = new WeakSet()) {
   visitedObjects.add(obj);
 
   Object.freeze(obj);
-  Object.getOwnPropertyNames(obj).forEach((prop) => {
-    if (!isIgnoredProperty(prop) && !isFlagedIgnoreClone(obj, prop)) {
+  for (const prop of Object.getOwnPropertyNames(obj)) {
+    if (!isIgnoredProperty(obj, prop) && !isFlagedIgnoreClone(obj, prop)) {
       // Do not freeze ignored objects
       const value = obj[prop];
       if (typeof value === 'object' && value !== null) {
         deepFreeze(value, visitedObjects);
       }
     }
-  });
+  }
 }
 
 /**
@@ -45,13 +45,8 @@ export function deepFreeze(obj: any, visitedObjects = new WeakSet()) {
  * @returns The value to use for the cloned property, or `undefined` to use the default cloning behavior.
  */
 export function deepCloneCustomizer(value: any, prop?: string | number, target?: object) {
-  if (prop?.toString().startsWith('_')) {
+  if (isFlagedIgnore(value, prop) || isFlagedIgnoreClone(target, prop) || prop?.toString().startsWith('_')) {
     // Do not clone : just copy the reference
-    return value;
-  }
-
-  if (isFlagedIgnoreClone(target, prop)) {
-    // Do not clone marked properties
     return value;
   }
   // Else : do nothing special, the default cloneDeep will be used.
@@ -123,8 +118,16 @@ export function isConstructor(prop: string): boolean {
  * @param prop - The property name or symbol to check.
  * @returns `true` if the property should be ignored, otherwise `false`.
  */
-export function isIgnoredProperty(prop: string | symbol): boolean {
-  return typeof prop === 'symbol' || (prop.startsWith('_') && !isVirtualProperty(prop));
+export function isIgnoredProperty(target: any, prop: string | symbol): boolean {
+  if (typeof prop === 'symbol') {
+    return true;
+  }
+
+  if (prop.startsWith('_') && !isVirtualProperty(prop)) {
+    return true;
+  }
+
+  return isFlagedIgnore(target, prop);
 }
 
 /**
@@ -136,6 +139,17 @@ export function isIgnoredProperty(prop: string | symbol): boolean {
  */
 export function isFlagedIgnoreClone(target: any, prop?: string | number) {
   return target?.[ignoreCloneSymbol]?.includes(prop);
+}
+
+/**
+ * Checks if a property on a target object is flagged to be totally ignored by brain.
+ *
+ * @param target - The object containing the property.
+ * @param prop - The property name or index to check.
+ * @returns `true` if the property is flagged to be ignored, otherwise `false`.
+ */
+export function isFlagedIgnore(target: any, prop?: string | number) {
+  return target?.[ignoreSymbol]?.includes(prop);
 }
 
 /**

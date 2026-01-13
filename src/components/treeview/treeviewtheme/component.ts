@@ -43,10 +43,8 @@ class TreeViewThemeComponent extends TreeViewGroupElement {
       this.refreshRender(layer);
       this.refreshRender(layer.parent);
     });
-    this.subscribe('treeview.renderEnabled', (_oldValue: boolean, enabled: boolean) => {
-      if (enabled) {
-        this.refreshRender();
-      }
+    this.subscribe('treeview.renderEnabled', () => {
+      this.refreshRender();
     });
   }
 
