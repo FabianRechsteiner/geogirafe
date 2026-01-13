@@ -28,6 +28,16 @@ export type SharedInternalTheme = {
    * Or if it was explicitly removed from the user, and then we won't have to display it again
    */
   excludedChildrenIds: number[];
+  /**
+   * When configuring the share with "preferNames=true", the name of the layer will be used to generate the sahred state
+   * instead of the ID. But in this case, we also have to share the type os the layer, because tha layer name can be
+   * the same for a them, a group, a WMS-Layer, a WMTSLayer, etc...
+   * Also note that the "excludedChildrenNames" options has some limitations : if we have 2 layers of different types with the same name
+   * And if one of it is exceluded, both will be excluded.
+   */
+  name: string;
+  type: string;
+  excludedChildrenNames: string[];
 };
 
 export type SharedInternalGroup = {
@@ -39,6 +49,10 @@ export type SharedInternalGroup = {
   children: SharedInternalLayer[];
   /* See comment above */
   excludedChildrenIds: number[];
+  /* See comment above */
+  name: string;
+  type: string;
+  excludedChildrenNames: string[];
 };
 
 export type SharedInternalLayer = {
@@ -50,6 +64,9 @@ export type SharedInternalLayer = {
   opacity?: number;
   swiped?: 'left' | 'right' | 'no';
   filter?: SharedFilter;
+  /* See comment above */
+  name: string;
+  type: string;
 };
 
 export type SharedExternalTheme = {
@@ -76,4 +93,10 @@ export type SharedExternalLayer = {
   isExpanded: number;
   opacity?: number;
   swiped?: 'left' | 'right' | 'no';
+};
+
+export type SharedBasemap = {
+  id: number;
+  name: string;
+  opacity: number;
 };

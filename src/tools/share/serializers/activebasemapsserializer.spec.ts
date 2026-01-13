@@ -33,7 +33,7 @@ describe('ActiveBasemapsSerializer.serialize', () => {
     ];
 
     const serialized = serializer.brainSerialize(basemaps);
-    expect(serialized).toBe('1=-1');
+    expect(serialized).toEqual('[{"id":1,"name":"OpenStreetMap","opacity":-1}]');
   });
 });
 
@@ -48,13 +48,15 @@ describe('ActiveBasemapsSerializer.deserialize', () => {
     basemaps.forEach((basemap) => {
       context.stateManager.state.basemaps[basemap.id] = basemap;
     });
-    serializer.brainDeserialize('1=-1');
+    serializer.brainDeserialize('[{"id":1,"name":"OpenStreetMap","opacity":-1}]');
     const state = context.stateManager.state;
     expect(state.activeBasemaps).toBeInstanceOf(Array<Basemap>);
     expect(state.activeBasemaps[0].id).toBe(basemaps[0].id);
     expect(state.activeBasemaps[0].opacity).toBe(-1);
+    expect(state.activeBasemaps[0].opacityDisabled).toBeTruthy();
   });
-  it('deserializing with non existing IDs should throw an Error', () => {
+
+  it('should deserialize a valid basemap even if another one cannot be found', () => {
     const basemaps = [
       new Basemap({
         id: 1,
@@ -64,8 +66,97 @@ describe('ActiveBasemapsSerializer.deserialize', () => {
     basemaps.forEach((basemap) => {
       context.stateManager.state.basemaps[basemap.id] = basemap;
     });
-    expect(() => serializer.brainDeserialize('1=-1;2=0;42=0.45')).toThrow(
-      new Error(`Some basemaps could not be deserialized: 2,42.`)
+    serializer.brainDeserialize(
+      '[{"id":1,"name":"OpenStreetMap","opacity":-1},{"id":2,"name":"NotExisting","opacity":0.5}]'
     );
+    const state = context.stateManager.state;
+    expect(state.activeBasemaps).toBeInstanceOf(Array<Basemap>);
+    expect(state.activeBasemaps[0].id).toBe(basemaps[0].id);
+    expect(state.activeBasemaps[0].opacity).toBe(-1);
+    expect(state.activeBasemaps[0].opacityDisabled).toBeTruthy();
+  });
+
+  it('should deserialize a valid basemap with the right opacity', () => {
+    const basemaps = [
+      new Basemap({
+        id: 1,
+        name: 'OpenStreetMap'
+      })
+    ];
+    basemaps.forEach((basemap) => {
+      context.stateManager.state.basemaps[basemap.id] = basemap;
+    });
+    serializer.brainDeserialize('[{"id":1,"name":"OpenStreetMap","opacity":0.45}]');
+    const state = context.stateManager.state;
+    expect(state.activeBasemaps).toBeInstanceOf(Array<Basemap>);
+    expect(state.activeBasemaps[0].id).toBe(basemaps[0].id);
+    expect(state.activeBasemaps[0].opacity).toBe(0.45);
+    expect(state.activeBasemaps[0].opacityDisabled).toBeFalsy();
+  });
+});
+
+describe('ActiveBasemapsSerializer.deserialize (preferNames)', () => {
+  beforeAll(() => {
+    context.configManager.Config.share!.preferNames = true;
+  });
+
+  afterAll(() => {
+    context.configManager.Config.share!.preferNames = false;
+  });
+
+  it('should deserialize a valid basemap id and set it as activeBasemap (preferNames)', () => {
+    const basemaps = [
+      new Basemap({
+        id: 1,
+        name: 'OpenStreetMap'
+      })
+    ];
+    basemaps.forEach((basemap) => {
+      context.stateManager.state.basemaps[basemap.id] = basemap;
+    });
+    serializer.brainDeserialize('[{"id":999,"name":"OpenStreetMap","opacity":-1}]');
+    const state = context.stateManager.state;
+    expect(state.activeBasemaps).toBeInstanceOf(Array<Basemap>);
+    expect(state.activeBasemaps[0].id).toBe(basemaps[0].id);
+    expect(state.activeBasemaps[0].opacity).toBe(-1);
+    expect(state.activeBasemaps[0].opacityDisabled).toBeTruthy();
+  });
+
+  it('should deserialize a valid basemap even if another one cannot be found (preferNames)', () => {
+    const basemaps = [
+      new Basemap({
+        id: 1,
+        name: 'OpenStreetMap'
+      })
+    ];
+    basemaps.forEach((basemap) => {
+      context.stateManager.state.basemaps[basemap.id] = basemap;
+    });
+    serializer.brainDeserialize(
+      '[{"id":999,"name":"OpenStreetMap","opacity":-1},{"id":888,"name":"NotExisting","opacity":0.5}]'
+    );
+    const state = context.stateManager.state;
+    expect(state.activeBasemaps).toBeInstanceOf(Array<Basemap>);
+    expect(state.activeBasemaps[0].id).toBe(basemaps[0].id);
+    expect(state.activeBasemaps[0].opacity).toBe(-1);
+    expect(state.activeBasemaps[0].opacityDisabled).toBeTruthy();
+  });
+
+  it('should deserialize a valid basemap with the right opacity (preferNames)', () => {
+    const basemaps = [
+      new Basemap({
+        id: 1,
+        name: 'OpenStreetMap'
+      })
+    ];
+    basemaps.forEach((basemap) => {
+      context.stateManager.state.basemaps[basemap.id] = basemap;
+    });
+    serializer.brainDeserialize('[{"id":999,"name":"OpenStreetMap","opacity":0.45}]');
+    const state = context.stateManager.state;
+    expect(state.activeBasemaps).toBeInstanceOf(Array<Basemap>);
+    expect(state.activeBasemaps[0].id).toBe(basemaps[0].id);
+    expect(state.activeBasemaps[0].opacity).toBe(0.45);
+    expect(state.activeBasemaps[0].opacityDisabled).toBeFalsy();
   });
 });

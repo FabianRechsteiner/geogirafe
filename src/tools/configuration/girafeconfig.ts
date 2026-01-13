@@ -84,6 +84,7 @@ class GirafeConfig {
   };
   public share?: {
     service: 'gmf' | 'geogirafe' | null;
+    preferNames: boolean;
     createUrl: string;
     getUrl?: string;
   };
@@ -367,6 +368,7 @@ class GirafeConfig {
     }
     return {
       service: config.share?.service ?? 'gmf',
+      preferNames: config.share?.preferNames ?? false,
       createUrl: config.share?.createUrl,
       getUrl: config.share?.getUrl
     };

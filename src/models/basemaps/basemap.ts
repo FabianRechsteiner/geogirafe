@@ -22,6 +22,10 @@ class Basemap {
     const layer = this.layersList.find((l) => l instanceof LayerVectorTiles);
     return layer?.projection;
   }
+
+  public get opacityDisabled() {
+    return this.opacity === -1;
+  }
 }
 
 export default Basemap;
