@@ -51,18 +51,18 @@ export default class Brain<T extends Record<string | symbol, any>> {
   }
 
   private callback(path: string, oldValue: TTarget, newValue: TTarget | TProxy, parents: TProxy[]) {
-    if (!this.delayed) {
-      // Immediate Callback
-      this.externalCallback(path, oldValue, newValue, parents);
-    } else {
+    if (this.delayed) {
       // Remember all callback infos
       const infos = this.delayedCallbacks.get(path);
-      if (!infos) {
-        this.delayedCallbacks.set(path, { oldValue: oldValue, newValue: newValue, parents: parents });
-      } else {
+      if (infos) {
         // Just set the new value
         infos.newValue = newValue;
+      } else {
+        this.delayedCallbacks.set(path, { oldValue: oldValue, newValue: newValue, parents: parents });
       }
+    } else {
+      // Immediate Callback
+      this.externalCallback(path, oldValue, newValue, parents);
     }
   }
 
@@ -125,6 +125,11 @@ export default class Brain<T extends Record<string | symbol, any>> {
 
     const minimalPaths = new Set<string>();
 
+    const parentsPaths = [];
+    for (const p of parents) {
+      parentsPaths.push(...p.__brainFullPaths);
+    }
+
     for (const candidate of [...existingPaths, ...candidatePaths]) {
       // Already present
       if (minimalPaths.has(candidate)) {
@@ -132,12 +137,12 @@ export default class Brain<T extends Record<string | symbol, any>> {
       }
 
       // If the candidate hat a minimal path as prefix
-      if ([...minimalPaths].some((path) => candidate.startsWith(`${path}.`))) {
+      if (Array.from(minimalPaths).some((path) => candidate.startsWith(`${path}.`))) {
         continue;
       }
 
       // If not prefixed by any parent
-      if (!this.isRightParent(candidate, parents)) {
+      if (!this.isRightParent(candidate, parentsPaths)) {
         continue;
       }
 
@@ -148,32 +153,25 @@ export default class Brain<T extends Record<string | symbol, any>> {
     return returnValue;
   }
 
-  private isRightParent(candidate: string, parents: TProxy[]): boolean {
-    const parentsPaths = [];
-    for (const p of parents) {
-      parentsPaths.push(...p.__brainFullPaths);
+  private isRightParent(candidate: string, parentsPaths: string[]): boolean {
+    if (parentsPaths.length === 0 || parentsPaths[0].length === 0) {
+      // On the root
+      return true;
     }
 
-    if (parentsPaths?.length > 0 && parentsPaths[0].length > 0) {
-      // Not on the root
-      let circularReference = false;
-      let rightParent = false;
-      for (const parentPath of parentsPaths) {
-        if (parentPath.includes(`${candidate}.`)) {
-          circularReference = true;
-          break;
-        } else if (candidate.startsWith(`${parentPath}.`)) {
-          rightParent = true;
-          break;
-        }
+    for (const parentPath of parentsPaths) {
+      if (parentPath.includes(`${candidate}.`)) {
+        // Circular reference
+        return true;
       }
-
-      if (!circularReference && !rightParent) {
-        return false;
+      if (candidate.startsWith(`${parentPath}.`)) {
+        // Parent found
+        return true;
       }
     }
 
-    return true;
+    // Not a valid parent
+    return false;
   }
 
   private getOrCreateProxyForValue(proxy: object, prop: string, value: any, childPaths: string[]): TProxy | undefined {
@@ -205,9 +203,8 @@ export default class Brain<T extends Record<string | symbol, any>> {
       const fullPaths = valueProxy.__brainFullPaths;
       if (merged.length !== fullPaths.length || merged.some((p: string, i: number) => p !== fullPaths[i])) {
         fullPaths.splice(0, fullPaths.length, ...merged);
+        this.updateChildPathsRecursively(valueProxy, fullPaths);
       }
-
-      this.updateChildPathsRecursively(valueProxy, fullPaths);
     } else {
       // Create a new proxy
       valueProxy = this.createProxy(value, prop, proxy);
@@ -259,7 +256,7 @@ export default class Brain<T extends Record<string | symbol, any>> {
 
   private recalculateChildrenForArray(proxy: TProxy, target: TTarget, oldValue: TTarget) {
     if (!Array.isArray(target)) {
-      throw new Error('This method is only for arrays');
+      throw new TypeError('This method is only for arrays');
     }
 
     // Clean previous childs
@@ -339,11 +336,11 @@ export default class Brain<T extends Record<string | symbol, any>> {
   private handleGetIgnored(target: any, prop: string | symbol) {
     const value = target[prop];
 
-    if (typeof prop === 'symbol' || prop.startsWith('_')) {
+    if (isIgnoredProperty(target, prop)) {
       return value;
     }
 
-    throw new Error(`Unknown ignored property: ${prop}`);
+    throw new Error(`Unknown ignored property: ${prop as string}`);
   }
 
   private handleGetFunctions(proxy: TProxy, target: any, func: string) {
@@ -412,7 +409,7 @@ export default class Brain<T extends Record<string | symbol, any>> {
   }
 
   private getHandler(proxy: TProxy, target: TTarget, prop: string | symbol) {
-    if (isIgnoredProperty(prop)) {
+    if (isIgnoredProperty(target, prop)) {
       return this.handleGetIgnored(target, prop);
     }
 
@@ -477,7 +474,7 @@ export default class Brain<T extends Record<string | symbol, any>> {
       const childPaths = proxy.__brainFullPaths.map((path) => this.getFullPath(path, prop as string));
       this.cleanProxyForValue(proxy, prop as string, oldValue, childPaths);
 
-      if (isIgnoredProperty(prop)) {
+      if (isIgnoredProperty(target, prop)) {
         // Ignored => No callback and no clone of the old version
         // Just set the new value
         target[prop as string] = newValue;

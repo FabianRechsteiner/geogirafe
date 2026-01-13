@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import Brain from './brain';
-import { BrainIgnoreClone } from './decorators';
+import { BrainIgnore, BrainIgnoreClone } from './decorators';
 
 type TestState = {
   objectValue: {};
@@ -447,7 +447,7 @@ describe('State: base principles', () => {
     expect(counter).toBe(2);
   });
 
-  it('Base principles: Do not clone objects with attribute BrainIgnoreClone', () => {
+  it('Base principles: Do not clone objects with decorator @BrainIgnoreClone', () => {
     class Pizza {
       key: string;
       @BrainIgnoreClone
@@ -479,7 +479,7 @@ describe('State: base principles', () => {
     expect(counter).toBe(2);
   });
 
-  it('Base principles: Do not clone objects with attribute BrainIgnoreClone, but listen to changes', () => {
+  it('Base principles: Do not clone objects with decorator @BrainIgnoreClone, but listen to changes', () => {
     class Pizza {
       key: string;
       @BrainIgnoreClone
@@ -508,6 +508,40 @@ describe('State: base principles', () => {
 
     (brain.getState().objectValue as any).owner.place = 'Bernwiller';
     expect(counter).toBe(2);
+  });
+
+  it('Base principles: Do not create proxy for attributes with decorator @BrainIgnore', () => {
+    class Pizza {
+      key: string;
+      @BrainIgnore
+      owner: object;
+
+      constructor(key: string, owner: object) {
+        this.key = key;
+        this.owner = owner;
+      }
+    }
+
+    const pizzeria = {
+      name: 'Noninna',
+      place: 'Aspach'
+    };
+    const pizza1 = new Pizza('pizza1', pizzeria);
+
+    state.objectValue = pizza1;
+    let counter = 1;
+    brain = new Brain(state, () => {
+      counter++;
+    });
+
+    const pizzaProxy = brain.getState().objectValue as Pizza;
+    expect(pizzaProxy.__brainIsProxy).toBeTruthy();
+
+    const owner = pizzaProxy.owner;
+    expect(owner.__brainIsProxy).toBeFalsy();
+
+    (owner as any).place = 'Bernwiller';
+    expect(counter).toBe(1);
   });
 
   it('Base principles: Handles multiple parents referencing the same object', () => {

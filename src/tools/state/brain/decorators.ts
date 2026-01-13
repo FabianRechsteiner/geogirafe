@@ -1,6 +1,11 @@
 /**
  * A symbol used to mark properties that should be ignored during cloning operations.
  */
+export const ignoreSymbol = Symbol('brainIgnore');
+
+/**
+ * A symbol used to mark properties that should be ignored during cloning operations.
+ */
 export const ignoreCloneSymbol = Symbol('brainIgnoreClone');
 
 /**
@@ -17,6 +22,17 @@ export const serializeSymbol = Symbol('brainSerialize');
 export function BrainIgnoreClone(target: any, propertyKey: string | symbol): void {
   target[ignoreCloneSymbol] ??= [];
   target[ignoreCloneSymbol].push(propertyKey);
+}
+
+/**
+ * A decorator function that marks a property of a class to be ignored. No proxy will be created for this object.
+ *
+ * @param target - The target object (class prototype) where the property resides.
+ * @param propertyKey - The key of the property to be ignored.
+ */
+export function BrainIgnore(target: any, propertyKey: string | symbol): void {
+  target[ignoreSymbol] ??= [];
+  target[ignoreSymbol].push(propertyKey);
 }
 
 /**

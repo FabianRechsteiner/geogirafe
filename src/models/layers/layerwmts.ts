@@ -1,3 +1,4 @@
+import { BrainIgnore } from '../../tools/state/brain/decorators';
 import { GMFTreeItem } from '../gmf';
 import ServerOgc from '../serverogc';
 import ILayerWithLegend from './ilayerwithlegend';
@@ -50,7 +51,9 @@ class LayerWmts extends Layer implements ILayerWithLegend {
 
   // A WMTS layer can have WMS informations to be able to query infos and print with a WMS layer.
   // TODO REG : Shouldn't we link here directly an object of type LayerWMS ?
+  @BrainIgnore
   public ogcServer?: ServerOgc;
+
   public wmsLayers?: string;
   public queryLayers?: string;
   public printLayers?: string;

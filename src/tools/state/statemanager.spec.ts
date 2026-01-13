@@ -59,7 +59,7 @@ describe('StateManager.subscribe', () => {
       controlValue = 2;
     };
     try {
-      manager.state.ogcServers = {};
+      manager.state.basemaps = {};
       manager.subscribe('ogcServers', callback);
       expect(controlValue).toEqual(1);
     } finally {

@@ -8,6 +8,7 @@ import ITimeOptions from '../../tools/time/itimeoptions';
 import ISnappingConfig from '../../tools/snap/isnapconfig';
 import LayerTimeFormatter from '../../tools/time/layertimeformatter';
 import Layer from './layer';
+import { BrainIgnore } from '../../tools/state/brain/decorators';
 
 export type LayerWmsOptions = {
   isDefaultChecked?: boolean;
@@ -46,6 +47,7 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
    */
 
   // Base WMS attributes
+  @BrainIgnore
   public ogcServer: ServerOgc;
 
   public minResolution?: number;
