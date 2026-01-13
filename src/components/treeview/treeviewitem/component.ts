@@ -140,11 +140,11 @@ class TreeViewItemComponent extends TreeViewElement {
 
   registerEvents() {
     this.subscribe(/layers\..*\.isLegendExpanded/, (_oldValue: boolean, _newValue: boolean, layer: Layer) => {
-      this.refreshLegends();
+      this.refreshLegendsAndStyle();
       this.refreshRender(layer);
     });
     this.subscribe(/layers\.layersList\..*\.activeState/, (_oldValue: boolean, _newValue: boolean, layer: Layer) => {
-      this.refreshLegends();
+      this.refreshLegendsAndStyle();
       this.refreshRender(layer);
     });
     this.subscribe(/layers\.layersList\..*\.hasError/, (_oldValue: boolean, _newValue: boolean, layer: Layer) =>
@@ -169,12 +169,27 @@ class TreeViewItemComponent extends TreeViewElement {
       this.refreshRender(layer)
     );
     this.subscribe('treeview.advanced', () => this.refreshRender(this.layer));
-    this.subscribe('position', () => this.refreshLegends());
+    this.subscribe('position', () => this.refreshLegendsAndStyle());
   }
 
-  refreshLegends() {
-    if (this.layer instanceof LayerWms && this.layer.parent.isExpanded && this.layer.isLegendExpanded) {
+  refreshLegendsAndStyle() {
+    if (!this.layer.parent.isExpanded) {
+      // Not visible, nothing to refresh
+      return;
+    }
+
+    let refresh = false;
+    if (this.layer instanceof LayerWms && this.layer.legend && this.layer.isLegendExpanded) {
       this.setWmsLegend();
+      refresh = true;
+    }
+
+    if ((this.layer instanceof LayerWms || this.layer instanceof LayerWmts) && this.layer.hasRestrictedResolution()) {
+      // Restricted resolution, maybe the layername should be written italic
+      refresh = true;
+    }
+
+    if (refresh) {
       super.refreshRender();
     }
   }
