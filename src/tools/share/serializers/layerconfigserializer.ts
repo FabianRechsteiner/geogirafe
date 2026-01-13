@@ -22,6 +22,11 @@ import {
   SharedLayer
 } from './sharedtypes';
 import ServerOgc from '../../../models/serverogc';
+import LayerWmts from '../../../models/layers/layerwmts';
+import LayerVectorTiles from '../../../models/layers/layervectortiles';
+import LayerCog from '../../../models/layers/layercog';
+import LayerOsm from '../../../models/layers/layerosm';
+import LayerXYZ from '../../../models/layers/layerxyz';
 
 export default class LayersConfigSerializer implements IBrainSerializer<LayersConfig> {
   private readonly context: IGirafeContext;
@@ -32,6 +37,10 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
 
   private get state() {
     return this.context.stateManager.state;
+  }
+
+  private get preferNames(): boolean {
+    return this.context.configManager.Config.share?.preferNames ?? false;
   }
 
   public brainSerialize(layersConfig: LayersConfig): string {
@@ -135,6 +144,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     const originalTheme = this.context.themesHelper.findBaseLayerById(group.id) as ThemeLayer;
     const sharedChildren: SharedInternalLayer[] = [];
     const removedChildrenIds: number[] = [];
+    const removedChildrenNames: string[] = [];
     for (const originalChild of originalTheme.children) {
       const index = group.children.findIndex((el) => el.id === originalChild.id);
       if (index >= 0) {
@@ -144,6 +154,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
       } else {
         // Element is not in the list any more, and therefore should not be shared or restored
         removedChildrenIds.push(originalChild.id);
+        removedChildrenNames.push(originalChild.name);
       }
     }
 
@@ -154,8 +165,40 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
       isExpanded: Number(group.isExpanded),
       timeRestriction: isTimeAwareLayer(group) ? group.timeRestriction : undefined,
       children: sharedChildren,
-      excludedChildrenIds: removedChildrenIds
+      excludedChildrenIds: removedChildrenIds,
+      name: group.name,
+      type: this.getInternalLayerType(group),
+      excludedChildrenNames: removedChildrenNames
     };
+  }
+
+  private getInternalLayerType(layer: BaseLayer) {
+    if (layer instanceof ThemeLayer) {
+      return 'theme';
+    }
+    if (layer instanceof GroupLayer) {
+      return 'group';
+    }
+    if (layer instanceof LayerWms) {
+      return 'wms';
+    }
+    if (layer instanceof LayerWmts) {
+      return 'wmts';
+    }
+    if (layer instanceof LayerVectorTiles) {
+      return 'vt';
+    }
+    if (layer instanceof LayerCog) {
+      return 'cog';
+    }
+    if (layer instanceof LayerOsm) {
+      return 'osm';
+    }
+    if (layer instanceof LayerXYZ) {
+      return 'xyz';
+    }
+
+    throw new Error(`The layer ${layer.name} has an unknown type and cannot be shared.`);
   }
 
   private getInternalSerializedLayer(layer: Layer): SharedInternalLayer {
@@ -170,7 +213,9 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
         layer instanceof LayerWms && this.context.layerManager.isLayerWithFilter(layer)
           ? (layer.filter as SharedFilter)
           : undefined,
-      timeRestriction: isTimeAwareLayer(layer) ? layer.timeRestriction : undefined
+      timeRestriction: isTimeAwareLayer(layer) ? layer.timeRestriction : undefined,
+      name: layer.name,
+      type: this.getInternalLayerType(layer)
     };
   }
 
@@ -180,7 +225,11 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
       let layer;
       if ('id' in sharedLayer) {
         // Id attribute found => we are on an internal layer
-        layer = this.findBaseLayerById(sharedLayer.id);
+        if (this.preferNames && sharedLayer.name) {
+          layer = this.findBaseLayerByName(sharedLayer.name, sharedLayer.type);
+        } else {
+          layer = this.findBaseLayerById(sharedLayer.id);
+        }
         if (layer) {
           this.deserializeInternalObject(layer, sharedLayer);
         } else {
@@ -284,14 +333,18 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     let reorder = false;
     for (let i = originalLayer.children.length - 1; i >= 0; i--) {
       const child = originalLayer.children[i];
-      const serializedChild = sharedLayer.children.find((l) => l.id == child.id);
+      const serializedChild = this.preferNames
+        ? sharedLayer.children.find((l) => l.name == child.name)
+        : sharedLayer.children.find((l) => l.id == child.id);
       if (serializedChild) {
         this.deserializeInternalObject(child, serializedChild);
       } else {
         // This child exists in the original layer, but not in the shared state.
         // => If it is present in the x list, it was explicitely removed
         // And we can remove it from the current object
-        const explicitlyRemoved = sharedLayer.excludedChildrenIds.find((id) => id == child.id);
+        const explicitlyRemoved = this.preferNames
+          ? sharedLayer.excludedChildrenNames.find((name) => name == child.name)
+          : sharedLayer.excludedChildrenIds.find((id) => id == child.id);
         if (explicitlyRemoved) {
           originalLayer.children.splice(i, 1);
           console.debug(`Layer ${child.name} was removed from initial state`);
@@ -308,17 +361,21 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     }
 
     if (reorder) {
-      console.debug(`Reordering childs for layer ${originalLayer.name}`);
-      let order = 1;
-      for (const child of originalLayer.children) {
-        child.order = order++;
-      }
+      this.reorderChildren(originalLayer);
+    }
+  }
+
+  private reorderChildren(originalLayer: ThemeLayer | GroupLayer) {
+    console.debug(`Reordering childs for layer ${originalLayer.name}`);
+    let order = 1;
+    for (const child of originalLayer.children) {
+      child.order = order++;
     }
   }
 
   private findBaseLayerById(layerId: number): BaseLayer | null {
     for (const theme of Object.values(this.state.themes._allThemes)) {
-      const layer = this.findLayerRecursive(theme, layerId);
+      const layer = this.findLayerRecursiveById(theme, layerId);
       if (layer) {
         return layer;
       }
@@ -326,7 +383,7 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     return null;
   }
 
-  private findLayerRecursive(layer: BaseLayer, layerId: number): BaseLayer | null {
+  private findLayerRecursiveById(layer: BaseLayer, layerId: number): BaseLayer | null {
     if (layer.id === layerId) {
       // When deserializing the layer, we clone it,
       // otherwise the following operation will also
@@ -338,7 +395,38 @@ export default class LayersConfigSerializer implements IBrainSerializer<LayersCo
     // Else, we call recursively on the children
     if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
       for (const childLayer of layer.children) {
-        const foundChild = this.findLayerRecursive(childLayer, layerId);
+        const foundChild = this.findLayerRecursiveById(childLayer, layerId);
+        if (foundChild) {
+          return foundChild;
+        }
+      }
+    }
+    return null;
+  }
+
+  private findBaseLayerByName(layerName: string, layerType: string): BaseLayer | null {
+    for (const theme of Object.values(this.state.themes._allThemes)) {
+      const layer = this.findLayerRecursiveByName(theme, layerName, layerType);
+      if (layer) {
+        return layer;
+      }
+    }
+    return null;
+  }
+
+  private findLayerRecursiveByName(layer: BaseLayer, layerName: string, layerType: string): BaseLayer | null {
+    if (layer.name === layerName && this.getInternalLayerType(layer) === layerType) {
+      // When deserializing the layer, we clone it,
+      // otherwise the following operation will also
+      // affect the layer referenced in other themes
+      const foundLayer = layer.clone();
+      return foundLayer;
+    }
+
+    // Else, we call recursively on the children
+    if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
+      for (const childLayer of layer.children) {
+        const foundChild = this.findLayerRecursiveByName(childLayer, layerName, layerType);
         if (foundChild) {
           return foundChild;
         }

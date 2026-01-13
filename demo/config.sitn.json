@@ -47,7 +47,8 @@
   },
   "share": {
     "service": "gmf",
-    "createUrl": "https://sitn.ne.ch/short/create"
+    "createUrl": "https://sitn.ne.ch/short/create",
+    "preferNames": true
   },
   "projections": {
     "EPSG:3857": "W-M",

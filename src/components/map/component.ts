@@ -1010,6 +1010,13 @@ export default class MapComponent extends GirafeHTMLElement {
         throw new TypeError('Unknown basemap type');
       }
     }
+
+    // Apply default opacity
+    for (const basemap of basemaps) {
+      if (!basemap.opacityDisabled) {
+        this.onChangeBasemapOpacity(basemap);
+      }
+    }
   }
 
   /**

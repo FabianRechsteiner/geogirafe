@@ -14,12 +14,11 @@ class BasemapComponent extends GirafeHTMLElement {
     if (basemap.opacity == 0) return;
 
     const newBasemapProjection = basemap.projection ?? this.context.configManager.Config.map.srid;
-    const opacityDisabled = basemap.opacity == -1;
     const activeBasemaps = [...this.state.activeBasemaps];
-    if (opacityDisabled) {
+    if (basemap.opacityDisabled) {
       // Normal basemap change (no opacity basemap)
       this.state.projection = newBasemapProjection;
-      const idx = activeBasemaps.findIndex((activeBasemap: Basemap) => activeBasemap.opacity == -1);
+      const idx = activeBasemaps.findIndex((activeBasemap: Basemap) => activeBasemap.opacityDisabled);
       if (idx >= 0) {
         activeBasemaps.splice(idx, 1);
       }
@@ -49,7 +48,7 @@ class BasemapComponent extends GirafeHTMLElement {
 
   changeBasemapOpacity(basemap: Basemap, e: PointerEvent) {
     e.stopPropagation();
-    if (basemap.opacity == -1) {
+    if (basemap.opacityDisabled) {
       console.warn(`Trying to set Opacity on Basemap '${basemap.name}' which does not allow it`);
       return;
     }

@@ -86,10 +86,16 @@ function getTestData(options: { [key: string]: any } = {}) {
           checked: options.isGroupChecked ? 1 : 0,
           isExpanded: options.isGroupExpanded ? 1 : 0,
           children: [] as unknown[],
-          excludedChildrenIds: options.addSecondMissingLayer ? [22] : []
+          excludedChildrenIds: options.addSecondMissingLayer ? [22] : [],
+          name: 'Group 1',
+          type: 'group',
+          excludedChildrenNames: options.addSecondMissingLayer ? ['Layer WMTS 2'] : []
         }
       ],
-      excludedChildrenIds: options.addSecondMissingGroup ? [12] : []
+      excludedChildrenIds: options.addSecondMissingGroup ? [12] : [],
+      name: 'test-theme',
+      type: 'theme',
+      excludedChildrenNames: options.addSecondMissingGroup ? ['Group 2'] : []
     }
   ];
 
@@ -100,7 +106,9 @@ function getTestData(options: { [key: string]: any } = {}) {
       checked: 0,
       isExpanded: 0,
       opacity: options.opacity ?? 1,
-      swiped: options.swiped ?? 'no'
+      swiped: options.swiped ?? 'no',
+      name: 'Layer WMTS 1',
+      type: 'wmts'
     });
   }
 
@@ -301,6 +309,80 @@ describe('LayersConfigSerializer.deserialize', () => {
   });
 
   it('should serialize a missing original layer correctly (explicitely removed)', () => {
+    const data = getTestData({ addWmtsLayer: true, addSecondMissingLayer: true });
+    serializer.brainDeserialize(data.controlValue);
+    const layersConfig = context.stateManager.state.layers;
+    const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+});
+
+describe('LayersConfigSerializer.deserialize (preferNames)', () => {
+  beforeAll(() => {
+    context.configManager.Config.share!.preferNames = true;
+  });
+
+  afterAll(() => {
+    context.configManager.Config.share!.preferNames = false;
+  });
+
+  it('should return serialized data for a GroupLayer (id, order) (preferNames)', () => {
+    const data = getTestData();
+    serializer.brainDeserialize(data.controlValue);
+    const layersConfig = context.stateManager.state.layers;
+    const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a GroupLayer (isExpanded) (preferNames)', () => {
+    const data = getTestData({ isGroupExpanded: true });
+    serializer.brainDeserialize(data.controlValue);
+    const layersConfig = context.stateManager.state.layers;
+    const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a GroupLayer with children (preferNames)', () => {
+    const data = getTestData({ addWmtsLayer: true });
+    serializer.brainDeserialize(data.controlValue);
+    const layersConfig = context.stateManager.state.layers;
+    const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a GroupLayer with children (opacity) (preferNames)', () => {
+    const data = getTestData({ addWmtsLayer: true, opacity: 0.5 });
+    serializer.brainDeserialize(data.controlValue);
+    const layersConfig = context.stateManager.state.layers;
+    const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a GroupLayer with children (swiped left) (preferNames)', () => {
+    const data = getTestData({ addWmtsLayer: true, swiped: 'left' });
+    serializer.brainDeserialize(data.controlValue);
+    const layersConfig = context.stateManager.state.layers;
+    const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should return serialized data for a GroupLayer with children (swiped right) (preferNames)', () => {
+    const data = getTestData({ addWmtsLayer: true, swiped: 'left' });
+    serializer.brainDeserialize(data.controlValue);
+    const layersConfig = context.stateManager.state.layers;
+    const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should serialize a missing original group correctly (explicitely removed) (preferNames)', () => {
+    const data = getTestData({ addSecondMissingGroup: true });
+    serializer.brainDeserialize(data.controlValue);
+    const layersConfig = context.stateManager.state.layers;
+    const serialized = serializer.brainSerialize(layersConfig);
+    expect(serialized).toEqual(data.controlValue);
+  });
+
+  it('should serialize a missing original layer correctly (explicitely removed) (preferNames)', () => {
     const data = getTestData({ addWmtsLayer: true, addSecondMissingLayer: true });
     serializer.brainDeserialize(data.controlValue);
     const layersConfig = context.stateManager.state.layers;
