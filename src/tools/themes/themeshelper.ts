@@ -336,8 +336,8 @@ export default class ThemesHelper extends GirafeSingleton {
       .reduce((a, b) => Math.max(a, b), 0);
   }
 
-  public mergeThemeInLayerTree(theme: ThemeLayer, activate: boolean = false): BaseLayer[] {
-    theme.order = this.getInitialOrderForNewTheme();
+  public mergeThemeInLayerTree(theme: ThemeLayer, activate: boolean = false, forceTop: boolean = false): BaseLayer[] {
+    theme.order = forceTop ? -1 : this.getInitialOrderForNewTheme();
     const insertedLayers = this.mergeLayerWithExistingLayerTree(theme, this.state.layers.layersList);
     if (activate) {
       for (const insertedLayer of insertedLayers) {

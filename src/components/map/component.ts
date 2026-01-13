@@ -1055,7 +1055,7 @@ export default class MapComponent extends GirafeHTMLElement {
       }
       const clonedTheme = this.context.themesHelper.getMinimalClonedThemeForLayer(layer);
       clonedTheme.isExpanded = true;
-      this.context.themesHelper.mergeThemeInLayerTree(clonedTheme, true);
+      this.context.themesHelper.mergeThemeInLayerTree(clonedTheme, true, true);
       // Now, get the tree item
       layerInTree = this.context.layerManager.getTreeItemByLayerName(featureSelectionFromUrl.layer);
     }
