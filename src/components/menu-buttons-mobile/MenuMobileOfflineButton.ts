@@ -8,15 +8,14 @@ export default class MenuMobileOfflineButton extends GirafeHTMLElement {
   label = 'Offline mode';
 
   public constructor() {
-    super('mobile-drawing-button');
+    super('mobile-offline-button');
   }
 
   onPointerUp() {
     // If not delaying, the releasing of the click is also fired
-    // on the button of the drawing toolbox that's underneath
-    // the pointer, resulting in selecting the polygon tool
+    // on the offline panel shown
     setTimeout(() => {
-      this.state.interface.drawingPanelVisible = true;
+      this.state.interface.offlinePanelVisible = true;
       this.state.interface.swipeupPanelContent = 'offline';
     }, 50);
   }

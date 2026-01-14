@@ -21,7 +21,7 @@ function customDnsLookup(hostname, arg1, arg2) {
   const callback = typeof arg1 === 'function' ? arg1 : arg2;
   const options = typeof arg1 === 'function' ? undefined : arg1;
   if (hostname === 'app.localhost') {
-    callback(null, '127.0.0.1', 4);
+    callback(null, '127.0.0.1', 4); // use '0.0.0.0' for being accessible from other devices on the network
   } else {
     originalDnsLookup(hostname, options, callback);
   }
