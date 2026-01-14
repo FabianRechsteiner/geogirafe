@@ -7,4 +7,13 @@ export default class DrawingComponentMobile extends DrawingComponent {
   public constructor() {
     super('drawing-mobile');
   }
+
+  protected override connectedCallback() {
+    super.connectedCallback();
+    this.subscribe('interface.swipeupPanelContent', (_oldContent: string, newContent: string) => {
+      if (this.state.interface.swipeupPanelContent === 'drawing' || newContent === 'drawing') {
+        this.togglePanel(true);
+      }
+    });
+  }
 }

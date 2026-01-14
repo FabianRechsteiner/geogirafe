@@ -5,6 +5,7 @@ export default class GraphicalInterface {
   public isMobile = false;
   public helpVisible = false;
   public drawingPanelVisible = false;
+  public offlinePanelVisible = false;
   public printPanelVisible = false;
   public extLayerPanelVisible = false;
   public crossSectionPanelVisible = false;
