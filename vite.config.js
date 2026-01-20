@@ -7,6 +7,7 @@ import HtmlRebuildPlugin from './buildtools/vite-restart-plugin';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import dns from 'dns';
+import analyzer from 'vite-bundle-analyzer';
 
 /**
  * Custom name resolution for app.localhost:
@@ -43,7 +44,7 @@ const geogirafeSource = 'src';
 const certsDirectory = 'buildtools/certs';
 
 // https://v2.vitejs.dev/config/
-export default defineConfig(({ command }) => {
+export default defineConfig(({ command, mode }) => {
   return {
     base: './',
     server: {
@@ -111,7 +112,6 @@ export default defineConfig(({ command }) => {
           { src: `${geogirafeSource}/styles/*.css`, dest: 'styles/' },
           { src: `${geogirafeSource}/assets/*`, dest: '' },
           { src: `${geogirafeSource}/tools/auth/silentlogincallback.html`, dest: '' },
-          //{ src: `${geogirafeSource}/api/index.html`, dest: 'api/' },
           { src: 'node_modules/ol/ol.css', dest: 'lib/ol/' },
           { src: 'node_modules/tabulator-tables/dist/css/tabulator.min.css', dest: 'lib/tabulator-tables/' },
           { src: 'node_modules/tippy.js/dist/*.css', dest: 'lib/tippy.js/' },
@@ -122,7 +122,15 @@ export default defineConfig(({ command }) => {
       HtmlRebuildPlugin(),
       createHtmlPlugin({
         minify: true
-      })
+      }),
+      mode === 'analyze' &&
+        // https://www.npmjs.com/package/vite-bundle-analyzer
+        analyzer({
+          analyzerMode: 'static',
+          openAnalyzer: true,
+          defaultSizes: 'brotli', // or "gzip"
+          summary: true
+        })
     ],
     define: {
       // Define relative base path in cesium for loading assets
