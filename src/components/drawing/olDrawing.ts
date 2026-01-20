@@ -22,7 +22,7 @@ import VectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { getPointResolution, Projection } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
-import { never, primaryAction } from 'ol/events/condition';
+import { always, never, primaryAction } from 'ol/events/condition';
 import { Pixel } from 'ol/pixel';
 import {
   ensurePolygonIsProperlyClosed,
@@ -41,10 +41,9 @@ import {
   isPrimaryPointerAction
 } from '../../tools/state/userinteractionevent';
 import IGirafeContext from '../../tools/context/icontext';
-import { getCenter, getHeight, getWidth } from 'ol/extent';
 import { StyleFunction } from 'ol/style/Style';
-import { FeatureLike } from 'ol/Feature';
-import CircleStyle from 'ol/style/Circle';
+
+import Transform from 'ol-ext/interaction/Transform';
 
 function getLineStroke(strokeType: LineStroke, lineWidth: number) {
   switch (strokeType) {
@@ -78,44 +77,6 @@ function extractVerticesFromGeometry(geometry: Geometry): MultiPoint {
   return new MultiPoint(vertices);
 }
 
-function calculateCenter(geometry: Geometry) {
-  let center, coordinates, minRadius;
-  if (geometry instanceof Polygon) {
-    let x = 0;
-    let y = 0;
-    let i = 0;
-    coordinates = geometry.getCoordinates()[0].slice();
-    for (const coordinate of coordinates) {
-      x += coordinate[0];
-      y += coordinate[1];
-      i++;
-    }
-    center = [x / i, y / i];
-  } else if (geometry instanceof LineString) {
-    center = geometry.getCoordinateAt(0.5);
-    coordinates = geometry.getCoordinates();
-  } else {
-    center = getCenter(geometry.getExtent());
-  }
-  let sqDistances;
-  if (coordinates) {
-    sqDistances = coordinates.map(function (coordinate: Coordinate) {
-      const dx = coordinate[0] - center[0];
-      const dy = coordinate[1] - center[1];
-      return dx * dx + dy * dy;
-    });
-    minRadius = Math.sqrt(Math.max(...sqDistances)) / 3;
-  } else {
-    minRadius = Math.max(getWidth(geometry.getExtent()), getHeight(geometry.getExtent())) / 3;
-  }
-  return {
-    center: center,
-    coordinates: coordinates,
-    minRadius: minRadius,
-    sqDistances: sqDistances
-  };
-}
-
 export default class OlDrawing {
   private readonly map: MapComponent;
   private readonly toolName: string;
@@ -134,7 +95,7 @@ export default class OlDrawing {
 
   lastClosestFeature: Feature | null = null;
   translate: Translate | null = null;
-  rotateAndScale: Modify | null = null;
+  transform: Transform | null = null;
 
   defaultStyle: StyleFunction | undefined;
 
@@ -263,97 +224,35 @@ export default class OlDrawing {
     }
   }
 
-  private addRotateAndScaleInteraction() {
-    this.removeRotateAndScaleInteraction();
-
-    const defaultStyle = this.defaultStyle!;
-    const getCoordinates = (feature: FeatureLike) => {
-      const geometry = feature.getGeometry();
-      if (geometry instanceof Point) {
-        return geometry.getCoordinates();
-      } else if (geometry instanceof LineString) {
-        return geometry.getCoordinates()[0];
-      } else if (geometry instanceof Polygon) {
-        return geometry.getCoordinates()[0][0];
-      }
-      return [];
-    };
-
-    this.rotateAndScale = new Modify({
-      features: this.modifiableFeatures,
-      condition: (event) => {
-        return this.rotateAndScale != null && primaryAction(event);
-      },
-      deleteCondition: never,
-      insertVertexCondition: never,
-      style: function (feature: FeatureLike, resolution: number) {
-        feature.get('features').forEach(function (modifyFeature: Feature) {
-          const modifyGeometry = modifyFeature.get('modifyGeometry');
-          if (modifyGeometry) {
-            const point = getCoordinates(feature);
-            let modifyPoint = modifyGeometry.point;
-            if (!modifyPoint) {
-              // save the initial geometry and vertex position
-              modifyPoint = point;
-              modifyGeometry.point = modifyPoint;
-              modifyGeometry.geometry0 = modifyGeometry.geometry;
-              // get anchor and minimum radius of vertices to be used
-              const result = calculateCenter(modifyGeometry.geometry0);
-              modifyGeometry.center = result.center;
-              modifyGeometry.minRadius = result.minRadius;
-            }
-
-            const center = modifyGeometry.center;
-            const minRadius = modifyGeometry.minRadius;
-            let dx, dy;
-            dx = modifyPoint[0] - center[0];
-            dy = modifyPoint[1] - center[1];
-            const initialRadius = Math.hypot(dx, dy);
-            if (initialRadius > minRadius) {
-              const initialAngle = Math.atan2(dy, dx);
-              dx = point[0] - center[0];
-              dy = point[1] - center[1];
-              const currentRadius = Math.hypot(dx, dy);
-              if (currentRadius > 0) {
-                const currentAngle = Math.atan2(dy, dx);
-                const geometry = modifyGeometry.geometry0.clone();
-                geometry.scale(currentRadius / initialRadius, undefined, center);
-                geometry.rotate(currentAngle - initialAngle, center);
-                modifyGeometry.geometry = geometry;
-              }
-            }
-          }
-        });
-        return defaultStyle(feature, resolution);
+  private addTransformInteraction() {
+    this.transform = new Transform({
+      enableRotatedTransform: false,
+      features: new Collection(this.lastClosestFeature ? [this.lastClosestFeature] : []),
+      hitTolerance: this.map.pixelTolerance,
+      translateFeature: false,
+      scale: true,
+      rotate: true,
+      keepAspectRatio: always,
+      keepRectangle: false,
+      translate: false,
+      stretch: false,
+      pointRadius: function (f) {
+        const radius = f.get('radius') || 10;
+        return [radius, radius];
       }
     });
-
-    this.rotateAndScale.on('modifystart', function (event) {
-      // prettier-ignore
-      event.features.forEach(function (feature) {//NOSONAR(typescript:S7728) Collection<?> is a custom Implementation with custom forEach
-        feature.set('modifyGeometry', { geometry: feature.getGeometry()!.clone() }, true);
-      });
-    });
-
-    this.rotateAndScale.on('modifyend', (event) => {
-      // prettier-ignore
-      event.features.forEach((olFeature) => {//NOSONAR(typescript:S7728) Collection<?> is a custom Implementation with custom forEach
-        const modifyGeometry = olFeature.get('modifyGeometry');
-        if (modifyGeometry) {
-          olFeature.setGeometry(modifyGeometry.geometry);
-          olFeature.unset('modifyGeometry', true);
-          this.updateGeometryInState(olFeature);
-        }
-      });
-    });
-
-    this.map.olMap.addInteraction(this.rotateAndScale);
+    this.map.olMap.addInteraction(this.transform);
+    if (this.lastClosestFeature) {
+      this.transform.select(this.lastClosestFeature, true);
+      this.lastClosestFeature.changed();
+    }
   }
 
-  private removeRotateAndScaleInteraction() {
-    if (this.rotateAndScale) {
-      this.map.olMap.removeInteraction(this.rotateAndScale);
-      this.rotateAndScale = null;
+  private removeTransformInteraction() {
+    if (this.transform) {
+      this.map.olMap.removeInteraction(this.transform);
+      this.transform = null;
+      this.lastClosestFeature?.changed();
     }
   }
 
@@ -398,9 +297,9 @@ export default class OlDrawing {
         callback: (_evt: MouseEvent, _mapCoordinate: Coordinate) => {
           if (this.lastClosestFeature) {
             this.removeModifyInteraction();
-            this.addRotateAndScaleInteraction();
+            this.addTransformInteraction();
             this.map.olMap.on('singleclick', () => {
-              this.removeRotateAndScaleInteraction();
+              this.removeTransformInteraction();
               this.addModifyInteraction();
             });
           }
@@ -908,7 +807,7 @@ export default class OlDrawing {
       addLabel(square.getInteriorPoint(), dFeature.getAreaText(getAreaOfPolygon(square, this.state.projection)));
     }
 
-    if (dFeature.selected && this.rotateAndScale == null) {
+    if (dFeature.selected && this.transform == null) {
       const vertexStyle = dFeature.getVertexStyle();
       // Add a node style to every vertex of the geometry
       vertexStyle.setGeometry(function (f) {
@@ -918,38 +817,6 @@ export default class OlDrawing {
         }
       });
       styles.push(vertexStyle);
-    }
-
-    // Draw Point/Circle for Center of Geometry if rotating/scaling
-    if (this.rotateAndScale != null) {
-      const result = calculateCenter(geometry);
-      const center = result.center;
-      if (center) {
-        styles.push(
-          new Style({
-            geometry: new Point(center),
-            image: new CircleStyle({
-              radius: 4,
-              fill: new Fill({
-                color: '#ff3333'
-              })
-            })
-          })
-        );
-        const coordinates = result.coordinates;
-        if (coordinates) {
-          const minRadius = result.minRadius;
-          const sqDistances = result.sqDistances!;
-          const rsq = minRadius * minRadius;
-          const points = coordinates.filter(function (_c, index) {
-            return sqDistances[index] > rsq;
-          });
-          const vertexStyle = dFeature.getVertexStyle();
-          // Add a node style to every vertex of the geometry
-          vertexStyle.setGeometry(new MultiPoint(points));
-          styles.push(vertexStyle);
-        }
-      }
     }
 
     return styles;
