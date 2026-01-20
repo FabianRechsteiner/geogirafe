@@ -3,7 +3,7 @@ import ResizeWindow from '../../tools/resizewindow';
 
 class InfoWindowComponent extends GirafeDraggableElement {
   templateUrl = './template.html';
-  styleUrls = ['../../styles/common.css', '../../styles/resizable.css', './style.css'];
+  styleUrls = ['../../styles/common.css', '../../styles/resizable.css', '../../styles/window.css', './style.css'];
 
   visible: boolean = false;
   private resizeWindow: ResizeWindow | null = null;
@@ -95,7 +95,7 @@ class InfoWindowComponent extends GirafeDraggableElement {
       if (Number(value) && Number(value) > 0) return value + 'px';
       // Check for a valid CSS
       const matches = value.match(/^\d.*(px|em|rem|%)$/g);
-      return matches && matches.length === 1 ? value : null;
+      return matches?.length === 1 ? value : null;
     }
     return null;
   }
