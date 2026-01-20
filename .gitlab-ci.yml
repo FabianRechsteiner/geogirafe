@@ -17,6 +17,7 @@ workflow:
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
 
 #################################
 # Define pipeline variables
@@ -109,10 +110,12 @@ include:
   - template: Security/SAST.gitlab-ci.yml
 
 #################################
-# Increment version number
+# For dev: increment version number (X.Y.Z-PIPILINE-ID)
+# For tag: set version to the tag name
 versioning:
   stage: versioning
   image: debian:stable-slim
+
   needs:
     - job: eslint
       artifacts: false
@@ -122,7 +125,13 @@ versioning:
   before_script:
     - apt update && apt -y install jq
   script:
-    - jq --arg build "$CI_PIPELINE_ID" '.version = (.version | split(".") | .[0] + "." + .[1] + "." + $build)' package.json > package-temp.json
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        VERSION="${CI_COMMIT_TAG#v}"
+        jq --arg version "$VERSION" '.version = $version' package.json > package-temp.json
+      else
+        jq --arg build "$CI_PIPELINE_ID" '.version = (.version | split(".") | .[0] + "." + .[1] + "." + .[2] + "-dev." + $build)' package.json > package-temp.json
+      fi
     - rm package.json && mv package-temp.json package.json
 
   artifacts:
@@ -233,7 +242,9 @@ publish-docker:
       artifacts: true
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT && $CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: on_success
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT && $CI_COMMIT_TAG'
       when: on_success
     - when: never
 
@@ -242,10 +253,17 @@ publish-docker:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
 
   script:
+    # Calculate docker tag
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        DOCKER_TAG="${CI_COMMIT_TAG#v}"
+      else
+        DOCKER_TAG="latest"
+      fi
     # build
-    - docker build -t ${DOCKER_IMAGE} -f buildtools/Dockerfile dist
+    - docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f buildtools/Dockerfile dist
     # push
-    - docker push ${DOCKER_IMAGE}
+    - docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
 
 #################################
 # Publish the library to npm
@@ -257,7 +275,9 @@ publish-lib:
       artifacts: true
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT && $CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: on_success
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT && $CI_COMMIT_TAG'
       when: on_success
     - when: never
 
@@ -266,6 +286,7 @@ publish-lib:
     - npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
   script:
     - cd dist/lib && npm publish --access public
+
 #################################
 # Configure and optimize the demo
 # Compress everything with gzip and brotli
