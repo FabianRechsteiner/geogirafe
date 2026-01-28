@@ -46,8 +46,9 @@
     "url": "https://sitn.ne.ch/pytree"
   },
   "share": {
-    "service": "gmf",
+    "service": "geogirafe",
     "createUrl": "https://sitn.ne.ch/short/create",
+    "getUrl": "https://sitn.ne.ch/short/get",
     "preferNames": true
   },
   "projections": {
