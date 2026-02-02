@@ -61,14 +61,17 @@ export interface GMFTreeItem {
   public?: boolean;
 }
 
+export type GMFThemeFunctionality = string | string[] | number | number[] | boolean | boolean[];
+
+export interface GMFThemeFunctionalities {
+  [key: string]: GMFThemeFunctionality;
+}
+
 export interface GMFTheme {
   id: number;
   name: string;
   icon: string;
-  // TODO: make a type for this if necessary
-  functionalities: {
-    [key: string]: string;
-  };
+  functionalities: GMFThemeFunctionalities;
   metadata: GMFMetadata;
   children: GMFTreeItem[];
 }

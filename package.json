@@ -150,6 +150,7 @@
     "build-apk": "docker run -v ./dist:/geogirafe/dist -v ./buildtools:/geogirafe/buildtools geogirafe/cordova-builder bash -c \"cp /geogirafe/buildtools/cordova/apk-build.sh . && chmod u+x apk-build.sh && ./apk-build.sh\"",
     "build-apk-win": "docker run -v %cd%/dist:/geogirafe/dist -v %cd%/buildtools:/geogirafe/buildtools geogirafe/cordova-builder bash -c \"cp /geogirafe/buildtools/cordova/apk-build.sh . && chmod u+x apk-build.sh && ./apk-build.sh\"",
     "test": "vitest --run --coverage",
+    "test-without-coverage": "vitest --run",
     "test-watch": "vitest",
     "configure-demo": "bash -C './buildtools/configure-demo.sh'",
     "configure-demo-win": "buildtools\\configure-demo.cmd",

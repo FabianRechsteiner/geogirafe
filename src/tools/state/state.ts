@@ -12,9 +12,11 @@ import type CustomTheme from '../../models/customtheme';
 import ObjectSelection from './objectselection';
 import type Theme from '../../models/theme';
 import GraphicalInterface from './graphicalInterface';
+import { GMFThemeFunctionalities, GMFThemeFunctionality } from '../../models/gmf';
 
 export type ThemesConfig = {
   _allThemes: Record<number, ThemeLayer>;
+  _allFunctionalities: Record<number, GMFThemeFunctionalities>;
   isLoaded: boolean;
   lastSelectedTheme: ThemeLayer | CustomTheme | null;
 };
@@ -109,9 +111,12 @@ export default class State {
   // Dictionary where the key is the id of the theme
   public themes: ThemesConfig = {
     _allThemes: {},
+    _allFunctionalities: {},
     isLoaded: false,
     lastSelectedTheme: null
   };
+
+  public functionalities: Record<string, GMFThemeFunctionality> = {};
 
   // All basemaps from themes.json
   // Dictionary where the key is the id of the basemap

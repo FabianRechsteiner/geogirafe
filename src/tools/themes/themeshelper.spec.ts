@@ -6,7 +6,7 @@ import WfsFilter from '../wfs/wfsfilter';
 import GroupLayer from '../../models/layers/grouplayer';
 import Layer from '../../models/layers/layer';
 import IGirafeContext from '../context/icontext';
-import StateManager from '../state/statemanager';
+import StateManager, { Callback } from '../state/statemanager';
 import ThemeLayer from '../../models/layers/themelayer';
 
 let context: IGirafeContext;
@@ -200,5 +200,68 @@ describe('ThemesHelper.getInitialOrderForNewTheme', () => {
 
     theme3.isPinned = true;
     expect(themesHelper.getInitialOrderForNewTheme()).toEqual(103);
+  });
+});
+
+describe('ThemesHelper.onSelectedThemeChanged', () => {
+  let stateManager: StateManager;
+  const callbacks: Callback[] = [];
+
+  beforeEach(() => {
+    stateManager = context.stateManager;
+    for (const callback of callbacks) {
+      stateManager.unsubscribe(callback);
+      callbacks.splice(callbacks.indexOf(callback), 1);
+    }
+  });
+
+  it('should trigger change in functionalities if functionality is known', () => {
+    stateManager.state.themes._allFunctionalities = {
+      42: {
+        default_basemap: ['blank']
+      }
+    };
+    let subscriptionCalled = false;
+    callbacks.push(stateManager.subscribe('functionalities.default_basemap', () => {
+      subscriptionCalled = true;
+    }));
+
+    stateManager.state.themes.lastSelectedTheme = new ThemeLayer(42, 'lastSelectedTheme', 101);
+
+    expect(subscriptionCalled).toBeTruthy();
+  });
+
+  it('should NOT trigger change in functionalities if functionality is not known', () => {
+    stateManager.state.themes._allFunctionalities = {
+      42: {
+        unknown_functionality: "Lorem Ipsum Dolor Sit Amet"
+      }
+    };
+    let subscriptionCalled = false;
+    callbacks.push(stateManager.subscribe('functionalities.unknown_functionality', (_oldValue, newValue) => {
+      console.log(newValue);
+      subscriptionCalled = true;
+    }));
+
+    stateManager.state.themes.lastSelectedTheme = new ThemeLayer(42, 'lastSelectedTheme', 101);
+
+    expect(subscriptionCalled).toBeFalsy();
+  });
+
+  it('should trigger change in functionalities.default_basemap with expected params', () => {
+    stateManager.state.themes._allFunctionalities = {
+      42: {
+        default_basemap: ['blank']
+      }
+    };
+    let paramsCalledWith: string[] | undefined = undefined;
+    callbacks.push(stateManager.subscribe('functionalities.default_basemap', (_oldVal: string[], newVal: string[]) => {
+      paramsCalledWith = newVal;
+    }));
+
+    stateManager.state.themes.lastSelectedTheme = new ThemeLayer(42, 'lastSelectedTheme', 101);
+
+    expect(paramsCalledWith).not.toBeUndefined();
+    expect(paramsCalledWith).toEqual(['blank']);
   });
 });
