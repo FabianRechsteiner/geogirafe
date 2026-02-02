@@ -46,6 +46,10 @@ class BasemapComponent extends GirafeHTMLElement {
     return this.isBasemapActive(basemap) ? 'basemap-container active-basemap' : 'basemap-container';
   }
 
+  findBasemapByName(name: string): Basemap | undefined {
+    return Object.values(this.state.basemaps).find((basemap) => basemap.name == name);
+  }
+
   changeBasemapOpacity(basemap: Basemap, e: PointerEvent) {
     e.stopPropagation();
     if (basemap.opacityDisabled) {
@@ -79,6 +83,16 @@ class BasemapComponent extends GirafeHTMLElement {
     this.subscribe('interface.basemapComponentVisible', (_oldValue: boolean, newValue: boolean) =>
       this.toggleVisibility(newValue)
     );
+    this.subscribe('functionalities.default_basemap', (_oldValue: string[], newValue: string[]) => {
+      for (const defaultBasemapName of newValue) {
+        const defaultBasemap = this.findBasemapByName(defaultBasemapName == 'blank' ? 'Empty' : defaultBasemapName);
+        if (defaultBasemap) {
+          this.changeBasemap(defaultBasemap);
+        } else {
+          console.warn(`BasemapComponent: Could not find Basemap '${defaultBasemapName}' to set by Functionality 'functionalities.default_basemap'`);
+        }
+      }
+    });
   }
 
   protected override connectedCallback() {

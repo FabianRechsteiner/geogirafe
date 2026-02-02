@@ -8,13 +8,15 @@ import LayerWms from '../../models/layers/layerwms';
 import ThemeLayer from '../../models/layers/themelayer';
 import { isTimeAwareLayer, TimeAwareLayer } from '../../models/layers/timeawarelayer';
 import WfsFilter, { isWfsOperator } from '../wfs/wfsfilter';
+import { KNOWN_FUNCTIONALITIES } from '../functionalities';
+
+type LastSelectedTheme = ThemeLayer | CustomTheme | null;
 
 export default class ThemesHelper extends GirafeSingleton {
   public override initializeSingleton() {
     this.context.stateManager.subscribe(
       'themes.lastSelectedTheme',
-      (_oldTheme: ThemeLayer | CustomTheme | null, newTheme: ThemeLayer | CustomTheme | null) =>
-        this.onSelectedThemeChanged(newTheme)
+      (_oldTheme: LastSelectedTheme, newTheme: LastSelectedTheme) => this.onSelectedThemeChanged(newTheme)
     );
   }
 
@@ -28,7 +30,7 @@ export default class ThemesHelper extends GirafeSingleton {
         return theme;
       }
 
-      const child = this.findBaseLayerRecurviveById(theme.children, layerId);
+      const child = this.findBaseLayerRecursiveById(theme.children, layerId);
       if (child) {
         return child;
       }
@@ -37,13 +39,13 @@ export default class ThemesHelper extends GirafeSingleton {
     throw new Error(`No BaseLayer with ID ${layerId} could be found.`);
   }
 
-  private findBaseLayerRecurviveById(layers: BaseLayer[], layerId: number): BaseLayer | null {
+  private findBaseLayerRecursiveById(layers: BaseLayer[], layerId: number): BaseLayer | null {
     for (const layer of layers) {
       if (layer.id === layerId) {
         return layer;
       }
       if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
-        const child = this.findBaseLayerRecurviveById(layer.children, layerId);
+        const child = this.findBaseLayerRecursiveById(layer.children, layerId);
         if (child) {
           return child;
         }
@@ -132,23 +134,36 @@ export default class ThemesHelper extends GirafeSingleton {
 
   private onThemeChanged(theme: ThemeLayer) {
     // Create a clone of the theme object to use it in the treeview.
-    // This is essential, otherwise all changes done in the layers
-    // (For example when expanding legend, expanding a group, or activating the layer)
-    // Will also be done in the default layer configuration that has been loaded from themes.json
-    // And when a theme will be selected aging from the themes-selector
+    // This is essential, otherwise all changes are done in the layers
+    // (For example, when expanding legend, expanding a group, or activating the layer).
+    // Will also be done in the default layer configuration that has been loaded from themes.json,
+    // And when a theme is selected aging from the themes-selector
     // The default configuration will have been overwritten.
     const clonedTheme = theme.clone();
+    const themeAlreadyInLayersList = this.state.layers.layersList.find((l) => l.id == clonedTheme.id);
 
+    if (themeAlreadyInLayersList) {
+      console.info(`The theme ${clonedTheme.name} is already present in the treeview.`);
+      return;
+    }
     if (this.context.configManager.Config.themes.selectionMode === 'replace') {
       // Mode is <replace>
       this.emptyLayerTree();
       this.state.layers.layersList.push(clonedTheme);
-    } else if (!this.state.layers.layersList.find((l) => l.id == clonedTheme.id)) {
+    } else {
       // Mode is <add>
       clonedTheme.order = this.getInitialOrderForNewTheme();
       this.state.layers.layersList.push(clonedTheme);
-    } else {
-      console.info(`The theme ${clonedTheme.name} is already present in the treeview.`);
+    }
+    const themeFunctionalities = this.state.themes._allFunctionalities[theme.id];
+    if (themeFunctionalities) {
+      Object.keys(themeFunctionalities).forEach((functionality) => {
+        if (KNOWN_FUNCTIONALITIES.includes(functionality)) {
+          this.state.functionalities[functionality] = themeFunctionalities[functionality];
+        } else {
+          console.warn(`Unknown functionality '${functionality}' found on Theme '${theme.name}'.`);
+        }
+      });
     }
   }
 

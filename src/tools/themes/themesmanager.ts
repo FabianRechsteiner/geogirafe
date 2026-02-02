@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import GirafeSingleton from '../../base/GirafeSingleton';
 import Basemap from '../../models/basemaps/basemap';
-import { GMFBackgroundLayer, GMFServerOgc, GMFTheme, GMFTreeItem } from '../../models/gmf';
+import { GMFBackgroundLayer, GMFServerOgc, GMFTheme, GMFThemeFunctionalities, GMFTreeItem } from '../../models/gmf';
 import GroupLayer from '../../models/layers/grouplayer';
 import BaseLayer from '../../models/layers/baselayer';
 import LayerOsm from '../../models/layers/layerosm';
@@ -113,7 +113,9 @@ class ThemesManager extends GirafeSingleton {
     const content = await response.json();
     this.state.ogcServers = this.prepareOgcServers(content['ogcServers']);
     this.state.basemaps = this.prepareBasemaps(content['background_layers']);
-    this.state.themes._allThemes = this.prepareThemes(content['themes']);
+    const themesAndFunctionalities = this.prepareThemes(content['themes']);
+    this.state.themes._allThemes = themesAndFunctionalities.themes;
+    this.state.themes._allFunctionalities = themesAndFunctionalities.themesFunctionalities;
     this.context.customThemesManager.loadCustomThemes();
     this.state.themes.isLoaded = true;
 
@@ -197,7 +199,15 @@ class ThemesManager extends GirafeSingleton {
       basemaps[basemapSwisstopoVectorTiles.id] = basemapSwisstopoVectorTiles;
     }
 
-    basemapJson.forEach((elem: GMFBackgroundLayer) => {
+    this.addBasemapsFromConfig(basemapJson, basemaps);
+
+    this.applyOpacityToBasemaps(basemaps);
+
+    return basemaps;
+  }
+
+  private addBasemapsFromConfig(basemapsJson: GMFBackgroundLayer[], basemaps: { [key: number]: Basemap }) {
+    basemapsJson.forEach((elem: GMFBackgroundLayer) => {
       // Create basemap
       const basemap = new Basemap(elem);
       basemaps[basemap.id] = basemap;
@@ -220,37 +230,43 @@ class ThemesManager extends GirafeSingleton {
         }
       }
     });
+  }
 
-    // Apply Opacity
+  private applyOpacityToBasemaps(basemaps: { [key: number]: Basemap }) {
     for (const basemap of Object.values(basemaps)) {
       if (this.context.configManager.Config.basemaps.opacityBasemaps.includes(basemap.name)) {
-        // If it is the default Basemap the Opacity should NOT be 0 as otherwise the User would end up seeing nothing
-        const isDefaultBasemap = this.context.configManager.Config.basemaps.defaultBasemap == basemap.name;
-        basemap.opacity = isDefaultBasemap ? OPACITY_FOR_DEFAULT_BASEMAP : DEFAULT_OPACITY;
-        for (const basemapLayer of basemap.layersList) {
-          if (basemapLayer instanceof LayerVectorTiles) {
-            // Vector tiles layers are not supported as opacitybasemap, because the tiles cannot reprojected on the fly
-            // And displaying a basemap from some SRID with an VT from another SRID won't work
-            // So for the moment we do not allow VT configured as opacitybasemaps
-            // (But the opposite will still work : a VT basemap with a WMTS opacitybasemap)
-          }
-          if (basemapLayer instanceof Layer) {
-            basemapLayer.opacity = basemap.opacity;
-          }
-        }
+        this.applyOpacityToBasemap(basemap);
       }
     }
+  }
 
-    return basemaps;
+  private applyOpacityToBasemap(basemap: Basemap) {
+    // If it is the default Basemap the Opacity should NOT be 0 as otherwise the User would end up seeing nothing
+    const isDefaultBasemap = this.context.configManager.Config.basemaps.defaultBasemap == basemap.name;
+    basemap.opacity = isDefaultBasemap ? OPACITY_FOR_DEFAULT_BASEMAP : DEFAULT_OPACITY;
+    for (const basemapLayer of basemap.layersList) {
+      if (basemapLayer instanceof LayerVectorTiles) {
+        // Vector tiles layers are not supported as opacitybasemap, because the tiles cannot reprojected on the fly
+        // And displaying a basemap from some SRID with an VT from another SRID won't work
+        // So for the moment we do not allow VT configured as opacitybasemaps
+        // (But the opposite will still work : a VT basemap with a WMTS opacitybasemap)
+      } else if (basemapLayer instanceof Layer) {
+        basemapLayer.opacity = basemap.opacity;
+      }
+    }
   }
 
   private prepareThemes(themesJson: GMFTheme[]) {
     const themes: { [key: number]: ThemeLayer } = {};
     const order = { value: 0 };
+    const themesFunctionalities: {
+      [key: number]: GMFThemeFunctionalities;
+    } = {};
     themesJson.forEach((themeJson: GMFTheme, index: number) => {
       if (!themeJson.icon.startsWith('http') && this.context.configManager.Config.themes.imagesUrlPrefix) {
         themeJson.icon = this.context.configManager.Config.themes.imagesUrlPrefix + themeJson.icon;
       }
+      themesFunctionalities[themeJson.id] = themeJson['functionalities'];
       const theme = new ThemeLayer(themeJson['id'], themeJson['name'], index, themeJson['icon'], themeJson['metadata']);
       themeJson.children.forEach((layerJson: GMFTreeItem) => {
         const layer = this.prepareThemeLayer(layerJson, null, order);
@@ -262,7 +278,7 @@ class ThemesManager extends GirafeSingleton {
       themes[index] = theme;
     });
 
-    return themes;
+    return { themes, themesFunctionalities };
   }
 
   private calculateMetadataUrl(metadataUrl?: string) {
