@@ -23,8 +23,7 @@ export default class BasemapSwisstopoVectorTiles extends Basemap {
       LayerConsts.LayerSwisstopoVectorTilesId,
       'Swisstopo Vector-Tiles',
       0,
-      'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json',
-      'leichtebasiskarte_v3.0.1',
+      'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.lightbasemap.vt/style.json',
       { projection: 'EPSG:3857' }
     );
     this.layersList.push(vectorTilesLayer);
