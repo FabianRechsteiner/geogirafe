@@ -429,12 +429,13 @@ class ThemesManager extends GirafeSingleton {
         projection: 'EPSG:3857',
         isDefaultChecked: elem.metadata?.isChecked,
         disclaimer: elem.metadata?.disclaimer,
-        metadata: elem.metadata
+        metadata: elem.metadata,
+        layerName: elem.metadata.layerName
       };
       if (options.metadata?.metadataUrl) {
         options.metadata.metadataUrl = this.calculateMetadataUrl(options.metadata.metadataUrl);
       }
-      return new LayerVectorTiles(elem.id, elem.name, order.value, elem.style, elem.metadata.layerName, options);
+      return new LayerVectorTiles(elem.id, elem.name, order.value, elem.style, options);
     }
     return null;
   }

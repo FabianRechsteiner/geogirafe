@@ -89,7 +89,9 @@ class BasemapComponent extends GirafeHTMLElement {
         if (defaultBasemap) {
           this.changeBasemap(defaultBasemap);
         } else {
-          console.warn(`BasemapComponent: Could not find Basemap '${defaultBasemapName}' to set by Functionality 'functionalities.default_basemap'`);
+          console.warn(
+            `BasemapComponent: Could not find Basemap '${defaultBasemapName}' to set by Functionality 'functionalities.default_basemap'`
+          );
         }
       }
     });

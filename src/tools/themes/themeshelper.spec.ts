@@ -222,9 +222,11 @@ describe('ThemesHelper.onSelectedThemeChanged', () => {
       }
     };
     let subscriptionCalled = false;
-    callbacks.push(stateManager.subscribe('functionalities.default_basemap', () => {
-      subscriptionCalled = true;
-    }));
+    callbacks.push(
+      stateManager.subscribe('functionalities.default_basemap', () => {
+        subscriptionCalled = true;
+      })
+    );
 
     stateManager.state.themes.lastSelectedTheme = new ThemeLayer(42, 'lastSelectedTheme', 101);
 
@@ -234,14 +236,16 @@ describe('ThemesHelper.onSelectedThemeChanged', () => {
   it('should NOT trigger change in functionalities if functionality is not known', () => {
     stateManager.state.themes._allFunctionalities = {
       42: {
-        unknown_functionality: "Lorem Ipsum Dolor Sit Amet"
+        unknown_functionality: 'Lorem Ipsum Dolor Sit Amet'
       }
     };
     let subscriptionCalled = false;
-    callbacks.push(stateManager.subscribe('functionalities.unknown_functionality', (_oldValue, newValue) => {
-      console.log(newValue);
-      subscriptionCalled = true;
-    }));
+    callbacks.push(
+      stateManager.subscribe('functionalities.unknown_functionality', (_oldValue, newValue) => {
+        console.log(newValue);
+        subscriptionCalled = true;
+      })
+    );
 
     stateManager.state.themes.lastSelectedTheme = new ThemeLayer(42, 'lastSelectedTheme', 101);
 
@@ -255,9 +259,11 @@ describe('ThemesHelper.onSelectedThemeChanged', () => {
       }
     };
     let paramsCalledWith: string[] | undefined = undefined;
-    callbacks.push(stateManager.subscribe('functionalities.default_basemap', (_oldVal: string[], newVal: string[]) => {
-      paramsCalledWith = newVal;
-    }));
+    callbacks.push(
+      stateManager.subscribe('functionalities.default_basemap', (_oldVal: string[], newVal: string[]) => {
+        paramsCalledWith = newVal;
+      })
+    );
 
     stateManager.state.themes.lastSelectedTheme = new ThemeLayer(42, 'lastSelectedTheme', 101);
 

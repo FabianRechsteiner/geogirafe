@@ -8,6 +8,4 @@
  * });
  * </code>
  */
-export const KNOWN_FUNCTIONALITIES = [
-  "default_basemap"
-];
+export const KNOWN_FUNCTIONALITIES = ['default_basemap'];
