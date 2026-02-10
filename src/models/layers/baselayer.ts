@@ -37,6 +37,8 @@ abstract class BaseLayer {
     return this.metadataUrl !== undefined;
   }
 
+  public isHighlighted: boolean = false;
+
   public abstract activeState: string;
   public abstract get active(): boolean;
   public abstract get inactive(): boolean;

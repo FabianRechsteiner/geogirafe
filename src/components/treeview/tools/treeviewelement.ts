@@ -15,6 +15,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
 
   private dragButton!: HTMLButtonElement;
   private container!: HTMLElement;
+  private header!: HTMLElement;
 
   public constructor(layer: BaseLayer, name: string) {
     super(name);
@@ -30,6 +31,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     super.render();
     this.dragButton = this.shadow.getElementById('drag-button') as HTMLButtonElement;
     this.container = this.shadow.getElementById('container') as HTMLElement;
+    this.header = this.shadow.querySelector('header') as HTMLElement;
 
     super.girafeTranslate();
     this.initializeDrag();
@@ -37,6 +39,24 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     if (isTimeAwareLayer(this.layer)) {
       this.createTimeRestrictionTooltip(this.layer);
     }
+
+    this.subscribe(/layers\.layersList\..*\.isHighlighted/, (_oldValue: boolean, newValue: boolean, layer: Layer) => {
+      if (newValue && layer === this.layer) {
+        this.highlight();
+      }
+    });
+  }
+
+  private highlight() {
+    this.header.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest'
+    });
+    this.header.classList.add('highlight');
+    setTimeout(() => {
+      this.header.classList.remove('highlight');
+      this.layer.isHighlighted = false;
+    }, 3000);
   }
 
   public refreshRender(): void;
@@ -47,6 +67,10 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
       // Else, call refresh only if the layer in param is the current one
       super.refreshRender();
       super.girafeTranslate();
+
+      if (this.layer.isHighlighted) {
+        this.highlight();
+      }
     }
   }
 

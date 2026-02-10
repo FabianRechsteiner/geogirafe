@@ -20,7 +20,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import type { SearchResultsActions } from '../../models/searchresult';
 import { parseCoordinates } from '../../tools/geometrytools';
 import ThemeLayer from '../../models/layers/themelayer';
-import BaseLayer from '../../models/layers/baselayer';
+import { LayerTreeChanges } from '../../tools/themes/themeshelper';
 
 class SearchComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -34,7 +34,7 @@ class SearchComponent extends GirafeHTMLElement {
   }
 
   private readonly previewFeaturesCollection: Collection<Feature<Geometry>> = new Collection();
-  private previewLayers: BaseLayer[] = [];
+  private previewLayers?: LayerTreeChanges;
   private previewGeoLayer: VectorLayer<VectorSource> | null = null;
   private maxExtent?: number[];
   private readonly geoJsonFormatter = new GeoJSON();
@@ -372,15 +372,20 @@ class SearchComponent extends GirafeHTMLElement {
     this.previewFeaturesCollection.clear();
 
     // Clear preview layer
-    this.context.themesHelper.removeLayersFromLayerTree(this.previewLayers);
-    this.previewLayers = [];
+    if (this.previewLayers) {
+      this.context.themesHelper.removeLayersFromLayerTree(this.previewLayers.insertedLayers);
+      for (const layer of this.previewLayers.activatedLayers) {
+        this.context.layerManager.toggle(layer, 'off');
+      }
+      this.previewLayers = undefined;
+    }
   }
 
   public onSelect(feature: Feature) {
     this.selectedResult = feature;
     this.ignoreBlur = false;
     this.forceHide = true;
-    this.previewLayers = [];
+    this.previewLayers = undefined;
     super.render();
 
     const geom = feature.getGeometry();

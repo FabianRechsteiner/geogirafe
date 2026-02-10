@@ -12,6 +12,11 @@ import { KNOWN_FUNCTIONALITIES } from '../functionalities';
 
 type LastSelectedTheme = ThemeLayer | CustomTheme | null;
 
+export type LayerTreeChanges = {
+  insertedLayers: BaseLayer[];
+  activatedLayers: BaseLayer[];
+};
+
 export default class ThemesHelper extends GirafeSingleton {
   public override initializeSingleton() {
     this.context.stateManager.subscribe(
@@ -140,12 +145,23 @@ export default class ThemesHelper extends GirafeSingleton {
     // And when a theme is selected aging from the themes-selector
     // The default configuration will have been overwritten.
     const clonedTheme = theme.clone();
-    const themeAlreadyInLayersList = this.state.layers.layersList.find((l) => l.id == clonedTheme.id);
 
+    const themeAlreadyInLayersList = this.state.layers.layersList.find((l) => l.id == clonedTheme.id);
     if (themeAlreadyInLayersList) {
-      console.info(`The theme ${clonedTheme.name} is already present in the treeview.`);
+      themeAlreadyInLayersList.isHighlighted = true;
+      const layername = this.context.i18nManager.getTranslation(clonedTheme.name);
+      const msg = this.context.i18nManager
+        .getTranslation('The theme {name} is already present in the treeview.')
+        .replace('{name}', layername);
+      this.state.infobox.elements.push({
+        id: theme.treeItemId,
+        text: msg,
+        type: 'info',
+        duration: 5000
+      });
       return;
     }
+
     if (this.context.configManager.Config.themes.selectionMode === 'replace') {
       // Mode is <replace>
       this.emptyLayerTree();
@@ -155,15 +171,16 @@ export default class ThemesHelper extends GirafeSingleton {
       clonedTheme.order = this.getInitialOrderForNewTheme();
       this.state.layers.layersList.push(clonedTheme);
     }
+
     const themeFunctionalities = this.state.themes._allFunctionalities[theme.id];
     if (themeFunctionalities) {
-      Object.keys(themeFunctionalities).forEach((functionality) => {
+      for (const functionality of Object.keys(themeFunctionalities)) {
         if (KNOWN_FUNCTIONALITIES.includes(functionality)) {
           this.state.functionalities[functionality] = themeFunctionalities[functionality];
         } else {
           console.warn(`Unknown functionality '${functionality}' found on Theme '${theme.name}'.`);
         }
-      });
+      }
     }
   }
 
@@ -178,6 +195,12 @@ export default class ThemesHelper extends GirafeSingleton {
       (children[0] as GroupLayer).isExpanded = true;
       children = (children[0] as GroupLayer).children;
     }
+
+    const clonedLayer = this.findBaseLayerRecursiveById([clone], layer.id);
+    if (clonedLayer) {
+      clonedLayer.isHighlighted = true;
+    }
+
     return clone;
   }
 
@@ -351,15 +374,15 @@ export default class ThemesHelper extends GirafeSingleton {
       .reduce((a, b) => Math.max(a, b), 0);
   }
 
-  public mergeThemeInLayerTree(theme: ThemeLayer, activate: boolean = false, forceTop: boolean = false): BaseLayer[] {
+  public mergeThemeInLayerTree(
+    theme: ThemeLayer,
+    activate: boolean = false,
+    forceTop: boolean = false
+  ): LayerTreeChanges {
     theme.order = forceTop ? -1 : this.getInitialOrderForNewTheme();
-    const insertedLayers = this.mergeLayerWithExistingLayerTree(theme, this.state.layers.layersList);
-    if (activate) {
-      for (const insertedLayer of insertedLayers) {
-        this.context.layerManager.toggle(insertedLayer, 'on');
-      }
-    }
-    return insertedLayers;
+    const layerTreeChanges = { insertedLayers: [], activatedLayers: [] };
+    this.mergeLayerWithExistingLayerTree(theme, this.state.layers.layersList, activate, layerTreeChanges);
+    return layerTreeChanges;
   }
 
   /**
@@ -372,30 +395,60 @@ export default class ThemesHelper extends GirafeSingleton {
   private mergeLayerWithExistingLayerTree(
     newLayer: BaseLayer,
     existingList: BaseLayer[],
+    activate: boolean = false,
+    layerTreeChanges?: LayerTreeChanges,
     parent?: GroupLayer | ThemeLayer
-  ): BaseLayer[] {
+  ) {
     const existingLayer = existingList.find((l) => l.id === newLayer.id);
     if (!existingLayer) {
       // The theme is not already present. We just add the theme to the layertree
-      if (parent) {
-        newLayer.parent = parent;
-      }
-      existingList.push(newLayer);
-      return [newLayer];
+      this.addLayerToLayerTree(newLayer, existingList, activate, layerTreeChanges, parent);
+      return;
+    } else if (newLayer.isHighlighted) {
+      this.highlightLayerInLayerTree(existingLayer, activate, layerTreeChanges);
     }
 
     // Otherwise, we have to merge the themes
-    const insertedLayers = [];
     if (
       (newLayer instanceof ThemeLayer || newLayer instanceof GroupLayer) &&
       (existingLayer instanceof ThemeLayer || existingLayer instanceof GroupLayer)
     ) {
       for (const child of newLayer.children) {
-        insertedLayers.push(...this.mergeLayerWithExistingLayerTree(child, existingLayer.children, existingLayer));
+        this.mergeLayerWithExistingLayerTree(child, existingLayer.children, activate, layerTreeChanges, existingLayer);
       }
     }
+  }
 
-    return insertedLayers;
+  private highlightLayerInLayerTree(existingLayer: BaseLayer, activate: boolean, layerTreeChanges?: LayerTreeChanges) {
+    existingLayer.isHighlighted = true;
+    if (existingLayer.parent) {
+      existingLayer.parent.isExpanded = true;
+    }
+    if (activate && existingLayer.inactive) {
+      this.context.layerManager.toggle(existingLayer, 'on');
+      if (layerTreeChanges) {
+        layerTreeChanges.activatedLayers.push(existingLayer);
+      }
+    }
+  }
+
+  private addLayerToLayerTree(
+    newLayer: BaseLayer,
+    existingList: BaseLayer[],
+    activate: boolean = false,
+    layerTreeChanges?: LayerTreeChanges,
+    parent?: GroupLayer | ThemeLayer
+  ) {
+    if (parent) {
+      newLayer.parent = parent;
+    }
+    existingList.push(newLayer);
+    if (activate) {
+      this.context.layerManager.toggle(newLayer, 'on');
+    }
+    if (layerTreeChanges) {
+      layerTreeChanges.insertedLayers.push(newLayer);
+    }
   }
 
   public removeLayersFromLayerTree(layersToRemove: BaseLayer[]) {

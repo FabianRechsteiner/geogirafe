@@ -412,6 +412,7 @@
     "The following link will be sent with your message. It contains your current configuration and will help us to understand your problem.": "The following link will be sent with your message. It contains your current configuration and will help us to understand your problem.",
     "The generated document may contain sensitive data.": "The generated document may contain sensitive data.",
     "The print server is unavailable. Please, try later.": "The print server is unavailable. Please, try later.",
+    "The theme {name} is already present in the treeview.": "The theme {name} is already present in the treeview.",
     "theme": "Default theme",
     "Theme selection": "Theme selection",
     "Themes": "Themes",

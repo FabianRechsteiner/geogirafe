@@ -102,3 +102,16 @@ header:hover .tool {
   font-style: italic;
   color: var(--text-color);
 }
+
+@keyframes headerFade {
+  from {
+    background-color: var(--highlight-color);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.highlight {
+  animation: headerFade 3s ease-in-out forwards;
+}
