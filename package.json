@@ -52,7 +52,7 @@
     "vanilla-picker": "2.12.3"
   },
   "peerDependencies": {
-    "@geoblocks/mapfishprint": "0.2",
+    "@geoblocks/mapfishprint": "0.3",
     "@types/geojson": "7946",
     "cesium": ">1.113",
     "ol": "8 || 9 || 10",
@@ -62,7 +62,7 @@
     "proj4": "2"
   },
   "devDependencies": {
-    "@geoblocks/mapfishprint": "0.2.20",
+    "@geoblocks/mapfishprint": "0.3.0",
     "@geoblocks/print": "0.7.9",
     "@types/babel__generator": "7.27.0",
     "@types/d3": "7.4.3",

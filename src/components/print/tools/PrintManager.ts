@@ -96,7 +96,7 @@ export default class PrintManager {
       customizer: this.customizer
     });
 
-    const attributes: MFPAttributes = {
+    const attributes: Partial<MFPAttributes> = {
       map: mapSpec
     };
     Object.assign(attributes, options.customAttributes);
