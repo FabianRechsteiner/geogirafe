@@ -43,6 +43,9 @@ class ThemeComponent extends GirafeHTMLElement {
   }
 
   onThemeChanged(theme: ThemeLayer) {
+    if (this.context.configManager.Config.themes.selectionMode === 'add') {
+      this.state.themes.lastSelectedTheme = null;
+    }
     this.state.themes.lastSelectedTheme = theme;
     if (theme.disclaimer) {
       this.state.infobox.elements.push({

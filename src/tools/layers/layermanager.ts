@@ -38,6 +38,7 @@ class LayerManager extends GirafeSingleton {
     this.layerClones.push(...addedLayers);
     this.fillLayerIdToClone(addedLayers);
     this.activateDefaultLayers(addedLayers);
+    this.highlightNewLayers(addedLayers);
   }
 
   private fillLayerIdToClone(layers: BaseLayer[]) {
@@ -322,6 +323,15 @@ class LayerManager extends GirafeSingleton {
       // Continue recursively
       if (layer instanceof GroupLayer || layer instanceof ThemeLayer) {
         this.activateDefaultLayers(layer.children);
+      }
+    }
+  }
+
+  private highlightNewLayers(layers: BaseLayer[]) {
+    // Do not highlight at application start
+    if (this.state.application.isReady) {
+      for (const layer of layers) {
+        layer.isHighlighted = true;
       }
     }
   }

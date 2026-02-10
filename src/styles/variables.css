@@ -6,6 +6,7 @@ body {
   --bkg-color: rgb(255, 255, 255);
   --text-color: #222;
   --link-color: grey;
+  --highlight-color: rgba(0, 120, 255, 0.1);
 
   --bx-shdw: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.16);
   --t-bkg: #ffffffbb;
@@ -47,6 +48,7 @@ body.dark-theme {
   --success-color: #529c52;
   --svg-filter: invert(1) hue-rotate(180deg);
   --svg-legend-bkg: var(--legend-bkg);
+  --highlight-color: rgba(174, 208, 247, 0.5);
 }
 
 /* Legends theme colors for the map */
@@ -78,6 +80,7 @@ body.dark-map {
     --svg-filter: invert(1);
     --svg-map-filter: invert(1) hue-rotate(180deg);
     --svg-legend-bkg: var(--legend-bkg);
+    --highlight-color: rgba(174, 208, 247, 0.5);
   }
 
   /* Override dark mode with light mode styles if the user decides to swap */
@@ -98,6 +101,7 @@ body.dark-map {
     --lnk-active: #ff0000;
     --svg-filter: none;
     --svg-legend-bkg: var(--legend-bkg);
+    --highlight-color: rgba(0, 120, 255, 0.1);
   }
   body.dark-theme.light-map {
     --svg-map-filter: none;

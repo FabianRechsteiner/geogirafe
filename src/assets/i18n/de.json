@@ -410,6 +410,7 @@
     "The following link will be sent with your message. It contains your current configuration and will help us to understand your problem.": "Der folgende Link wird mit Ihrer Nachricht gesendet. Er enthält Ihre aktuelle Konfiguration und hilft uns, Ihr Problem zu verstehen.",
     "The generated document may contain sensitive data.": "Das generierte Dokument kann sensible Daten enthalten.",
     "The print server is unavailable. Please, try later.": "Der Druckserver ist nicht verfügbar. Bitte versuche es später erneut.",
+    "The theme {name} is already present in the treeview.": "Das Thema {name} ist bereits im Layerbaum vorhanden.",
     "theme": "Standardthema",
     "Theme selection": "Themenauswahl",
     "Themes": "Themen",

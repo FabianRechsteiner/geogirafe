@@ -84,5 +84,11 @@ export function redirectTo(page: string) {
 
   mobileUrl.search = currentUrl.search;
   mobileUrl.hash = currentUrl.hash;
-  globalThis.location.href = mobileUrl.toString();
+
+  setTimeout(() => {
+    // Dispatch special event before redirecting, because some components need perhaps to do/cancel things
+    const event = new CustomEvent('gg:redirect');
+    globalThis.dispatchEvent(event);
+    globalThis.location.href = mobileUrl.toString();
+  });
 }

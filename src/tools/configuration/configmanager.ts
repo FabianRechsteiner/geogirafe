@@ -1,6 +1,7 @@
 import GirafeSingleton from '../../base/GirafeSingleton';
 import GirafeConfig from './girafeconfig';
 import { getPropertyByPath, mergeObjects } from '../utils/pathUtils';
+import IGirafeContext from '../context/icontext';
 
 class ConfigManager extends GirafeSingleton {
   private config: GirafeConfig | null = null;
@@ -8,6 +9,14 @@ class ConfigManager extends GirafeSingleton {
   private defaultConfig: GirafeConfig | null = null;
   private loadingPromise: Promise<GirafeConfig> | null = null;
   private readonly storagePathForOverrides: string = 'configOverrides';
+  private readonly abortController = new AbortController();
+
+  public constructor(context: IGirafeContext) {
+    super(context);
+    globalThis.addEventListener('gg:redirect', () => {
+      this.abortController.abort();
+    });
+  }
 
   public get Config() {
     return this.config!;
@@ -62,17 +71,16 @@ class ConfigManager extends GirafeSingleton {
 
     for (const configUrl of configUrls) {
       try {
-        const response = await fetch(configUrl);
+        const response = await fetch(configUrl, { signal: this.abortController.signal });
         const newJsonConfig = await response.json();
         jsonConfig = this.mergeConfigs(jsonConfig, newJsonConfig);
       } catch {
-        // TODO REG: Manage better the errors at the aplication start:
-        // - the window.gAlert fuction should be callable at the very beggining of the app
-        // - The ErrorManager should handled suches case, but it seems to be initialized too late.
-        // - normal alerts seems to be blocked on mobile.
-        const errorMessage = `Error while reading the configuration file ${configUrl}. Please verify your configuration.`;
-        window.alert(errorMessage);
-        throw new Error(errorMessage);
+        // If the loading of config file was aborted due to automatic redirect to another interface
+        // We do not display any error.
+        if (!this.abortController.signal.aborted) {
+          const errorMessage = `Error while reading the configuration file ${configUrl}. Please verify your configuration.`;
+          globalThis.alert(errorMessage);
+        }
       }
     }
 
