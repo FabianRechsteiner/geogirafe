@@ -64,7 +64,8 @@
   top: 7rem !important;
 }
 
-.img-location {
+.img-location,
+.img-disable-location {
   width: 55%;
   height: auto;
 }
@@ -72,6 +73,7 @@
 .ol-zoom-in,
 .ol-zoom-out,
 .btn-location,
+.btn-disable-location,
 .ol-rotate-reset {
   width: 2rem !important;
   height: 2rem !important;

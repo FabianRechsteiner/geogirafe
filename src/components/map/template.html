@@ -6,6 +6,9 @@
     <button onclick="${()=>this.locateUser()}" class="btn-location">
       <img class="img-location" alt="location-icon" src="icons/adjust.svg" />
     </button>
+    <button id="disable-location" onclick="${()=>this.disableLocateUser()}" class="btn-disable-location hidden">
+      <img class="img-disable-location" alt="disable-location-icon" src="icons/adjust-disable.svg" />
+    </button>
   </div>
   <div id="cs-map">
     <div class="${this.loading ? 'loading center' : 'loading hidden'}">

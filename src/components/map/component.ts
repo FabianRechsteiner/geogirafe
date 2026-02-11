@@ -228,6 +228,7 @@ export default class MapComponent extends GirafeHTMLElement {
       // The user's current position is utilized to show the distance to objects in the layer
       navigator.permissions.query({ name: 'geolocation' }).then((result) => {
         if (result.state === 'granted' || result.state === 'prompt') {
+          this.shadow.getElementById('disable-location')?.classList.remove('hidden');
           this.getCurrentLocation();
         }
       });
@@ -262,6 +263,11 @@ export default class MapComponent extends GirafeHTMLElement {
       }
     );
   }
+
+  disableLocateUser = (): void => {
+    this.geolocationSource.clear();
+    this.shadow.getElementById('disable-location')?.classList.add('hidden');
+  };
 
   readonly updateGeolocation = (position: GeolocationPosition): void => {
     const coords = position.coords;
