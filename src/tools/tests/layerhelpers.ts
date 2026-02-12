@@ -13,9 +13,25 @@ export function createTestOgcServer(): ServerOgc {
   });
 }
 
+export function createTestOgcServerQGis(): ServerOgc {
+  return new ServerOgc('testOgcServer', {
+    url: 'https://ogc.test.url',
+    wfsSupport: false,
+    type: 'qgisserver',
+    imageType: 'image/png'
+  });
+}
+
 export function createTestLayerWms(options?: LayerWmsOptions): LayerWms {
   const ogcServer = createTestOgcServer();
   const layerWms = new LayerWms(1, 'testWms', 1, ogcServer, options);
+  layerWms.activeState = 'on';
+  return layerWms;
+}
+
+export function createTestLayerWmsQGis(options?: LayerWmsOptions): LayerWms {
+  const ogcServer = createTestOgcServerQGis();
+  const layerWms = new LayerWms(1, 'testWmsQGis', 1, ogcServer, options);
   layerWms.activeState = 'on';
   return layerWms;
 }

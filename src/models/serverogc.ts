@@ -7,7 +7,7 @@ export default class ServerOgc {
   public urlWfs?: string;
   public oapifSupport: boolean;
   public urlOapif?: string;
-  public type: string;
+  public type: 'mapserver' | 'qgisserver' | 'georama' | 'geoserver' | 'arcgis' | 'other';
   public imageType: string;
   public aliases: Record<string, string>;
 

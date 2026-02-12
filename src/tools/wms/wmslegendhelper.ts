@@ -71,6 +71,10 @@ export default class WmsLegendHelper {
         graphicUrl += '&WIDTH=' + this.context.configManager.Config.treeview.defaultIconSize.width;
       }
 
+      if (layer.ogcServer.type === 'qgisserver') {
+        graphicUrl += '&LAYERTITLE=False';
+      }
+
       legends[l] = graphicUrl;
     }
 

@@ -179,7 +179,7 @@ export class MFPLegendEncoder {
     }
     const layerNames = layerWms.layers?.split(',') ?? [];
     layerNames.forEach((name) => {
-      const url = LegendHelper.getWMSLegendURL(layerWms.ogcServer.url, name, {
+      const url = LegendHelper.getWMSLegendURL(layerWms.ogcServer, name, {
         dpi,
         serverType,
         scale: this.options?.scale,

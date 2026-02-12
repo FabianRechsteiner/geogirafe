@@ -1,21 +1,22 @@
 import { appendParams } from 'ol/uri';
 import TileLayer from 'ol/layer/Tile';
 import WMTS from 'ol/source/WMTS';
+import ServerOgc from '../models/serverogc';
 
 class LegendHelper {
   /**
    * Get the WMS legend URL.
-   * @param url The base url of the wms service.
+   * @param serverOgc The base url of the wms service.
    * @param layerName The name of a wms layer.
    * @param options to create the legend url.
    * @returns The legend URL or undefined.
    */
   public static readonly getWMSLegendURL = (
-    url: string | undefined,
+    serverOgc: ServerOgc,
     layerName: string,
     options?: WMSLegendURLOptions
   ): string | undefined => {
-    if (!url) {
+    if (!serverOgc.url) {
       return undefined;
     }
     const queryString: Record<string, unknown> = {
@@ -26,6 +27,11 @@ class LegendHelper {
       REQUEST: 'GetLegendGraphic',
       LAYER: layerName
     };
+
+    if (serverOgc.type === 'qgisserver') {
+      queryString.LAYERTITLE = 'False';
+    }
+
     const scale = options?.scale;
     const legendRule = options?.legendRule;
     const legendWidth = options?.legendWidth;
@@ -62,7 +68,7 @@ class LegendHelper {
     if (additionalQueryString) {
       Object.assign(queryString, additionalQueryString);
     }
-    return appendParams(url, queryString);
+    return appendParams(serverOgc.url, queryString);
   };
 
   /**

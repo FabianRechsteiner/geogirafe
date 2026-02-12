@@ -34,7 +34,7 @@ export const DEMO_LAYERS: Record<string, any> = {
       urlWfs: '',
       oapifSupport: true,
       urlOapif: 'https://geomapfish-demo-2-9.camptocamp.com/mapserv_proxy/QGIS_Server/wfs3',
-      type: 'gmf',
+      type: 'qgisserver',
       imageType: ''
     })
   }
