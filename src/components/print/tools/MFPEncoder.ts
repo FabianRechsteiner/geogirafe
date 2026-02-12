@@ -87,7 +87,7 @@ export default class MFPEncoder {
         // If all the children have the same ogcServer and the group
         // has no grandchildren, we keep the layers together
         if (group.isMixed === false && group.hasGrandChildren === false) {
-          layers.push(group);
+          layers.push(...group.children);
         } else {
           const resultLayers = this.getFlatLayers(group.children);
           layers.push(...resultLayers);

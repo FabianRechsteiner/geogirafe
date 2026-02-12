@@ -88,7 +88,7 @@ export interface GMFServerOgc {
   urlWfs?: string;
   oapifSupport?: boolean;
   urlOapif?: string;
-  type: string;
+  type: 'mapserver' | 'qgisserver' | 'georama' | 'geoserver' | 'arcgis' | 'other';
   imageType: string;
   attributes?: GMFServerOgcAttributes;
 }

@@ -13,7 +13,7 @@ const server: ServerOgc = new ServerOgc('test', {
   urlWfs: '',
   oapifSupport: true,
   urlOapif: mockUrl,
-  type: 'default',
+  type: 'qgisserver',
   imageType: ''
 });
 let context: IGirafeContext;

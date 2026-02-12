@@ -3,6 +3,7 @@ import { EncodeLegendOptions, LegendURLDPI, MFPLegendClass, MFPLegendEncoder } f
 import {
   createTestGroupLayer,
   createTestLayerWms,
+  createTestLayerWmsQGis,
   createTestLayerWmts,
   createTestOgcServer
 } from '../../../tools/tests/layerhelpers';
@@ -226,6 +227,23 @@ describe('MFPLegendEncoder', () => {
           'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=TRUE&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=bar&SCALE=10000&filtered=houses'
         ]
       });
+    });
+  });
+
+  describe('encodeLayerWmsLegendClasses QGis', () => {
+    let layer: LayerWms;
+    beforeEach(() => {
+      layer = createTestLayerWmsQGis();
+    });
+
+    it('should return MFPLegendClass for QGisServer (including LAYERTITLE)', () => {
+      layer.layers = 'foo';
+      const result = encoder.encodeLayerWmsLegendClasses(layer);
+      expect(result?.name).toEqual('testWmsQGis');
+      // One layer = no subclass, complete directly the current class.
+      expect(result?.icons).toEqual([
+        'https://ogc.test.url?FORMAT=image%2Fpng&TRANSPARENT=TRUE&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&LAYER=foo&LAYERTITLE=False&SCALE=10000'
+      ]);
     });
   });
 

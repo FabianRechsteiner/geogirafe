@@ -11,7 +11,7 @@ import {
   createTestOgcServer
 } from '../../../tools/tests/layerhelpers';
 import { createOlVectorLayer, createOlWmtsLayer } from '../../../tools/tests/olhelpers';
-import { BaseCustomizer, MFPWmtsLayer } from '@geoblocks/mapfishprint';
+import { BaseCustomizer, MFPWmsLayer, MFPWmtsLayer } from '@geoblocks/mapfishprint';
 import IGirafeContext from '../../../tools/context/icontext';
 
 describe('MFPEncoder', () => {
@@ -109,10 +109,14 @@ describe('MFPEncoder', () => {
       expect(result.dpi).toBe(defaultOptions.dpi);
       expect(result.scale).toBe(defaultOptions.scale);
       expect(result.rotation).toBe(180);
-      expect(result.layers.length).toBe(5);
+      expect(result.layers.length).toBe(6);
       // Test order
       expect(result.layers[0].name).toBe('Test Vector layer');
-      expect(result.layers[4].name).toBe('basemap-below');
+      expect((result.layers[1] as MFPWmsLayer).layers[0]).toBe('wms-2');
+      expect((result.layers[2] as MFPWmtsLayer).name).toBe('testWmts');
+      expect((result.layers[3] as MFPWmsLayer).layers[0]).toBe('wms-0');
+      expect((result.layers[4] as MFPWmsLayer).layers[0]).toBe('wms-1');
+      expect(result.layers[5].name).toBe('basemap-below');
     });
   });
 

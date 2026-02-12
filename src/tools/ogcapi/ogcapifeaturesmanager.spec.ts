@@ -35,7 +35,7 @@ describe('OgcApiFeaturesManager', () => {
       urlWfs: '',
       oapifSupport: true,
       urlOapif: "'https://testUrl.com",
-      type: 'default',
+      type: 'qgisserver',
       imageType: ''
     })
   };
