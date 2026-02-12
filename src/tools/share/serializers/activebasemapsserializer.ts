@@ -23,8 +23,7 @@ export default class ActiveBasemapsSerializer implements IBrainSerializer<Basema
   }
 
   public brainDeserialize(serializedString: string) {
-    const activeBasemaps = this.deserialize(serializedString);
-    this.state.activeBasemaps = activeBasemaps;
+    this.state.activeBasemaps = this.deserialize(serializedString);
   }
 
   private serialize(basemaps: Basemap[]): string {

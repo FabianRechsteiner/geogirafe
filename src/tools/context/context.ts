@@ -30,6 +30,7 @@ import UserDataManager from '../userdata/userdatamanager';
 import WfsManager from '../wfs/wfsmanager';
 import WmsManager from '../wms/wmsmanager';
 import IGirafeContext from './icontext';
+import ThemeFavoritesManager from '../themes/themefavoritesmanager';
 
 export default class GirafeContext implements IGirafeContext {
   public readonly userDataManager: UserDataManager;
@@ -63,6 +64,7 @@ export default class GirafeContext implements IGirafeContext {
   public readonly ogcApiFeaturesManager: OgcApiFeaturesManager;
   public readonly localFileManager: LocalFileManager;
   public readonly onBoardingManager: OnBoardingManager;
+  public readonly themeFavoritesManager: ThemeFavoritesManager;
 
   public constructor() {
     this.componentManager = new ComponentManager(this);
@@ -96,6 +98,7 @@ export default class GirafeContext implements IGirafeContext {
     this.localFileManager = new LocalFileManager(this);
     this.ogcApiFeaturesManager = new OgcApiFeaturesManager(this);
     this.onBoardingManager = new OnBoardingManager(this);
+    this.themeFavoritesManager = new ThemeFavoritesManager(this);
   }
 
   public async initialize() {
@@ -136,5 +139,6 @@ export default class GirafeContext implements IGirafeContext {
     this.localFileManager.initializeSingleton();
     this.ogcApiFeaturesManager.initializeSingleton();
     this.onBoardingManager.initializeSingleton();
+    this.themeFavoritesManager.initializeSingleton();
   }
 }

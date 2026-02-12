@@ -1,7 +1,7 @@
 .themes {
   display: flex;
-  flex-wrap: wrap;
-  width: 55rem;
+  flex-wrap: nowrap;
+  width: 58rem;
   margin-top: 0;
   overflow-y: auto;
   max-height: 70vh;
@@ -10,6 +10,100 @@
   padding: 1rem;
   background-color: var(--bkg-color);
   position: absolute;
+  flex-direction: column;
+}
+
+#close-themes-menu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  z-index: -1;
+}
+
+#active-themes {
+  display: flex;
+  justify-content: flex-start;
+  flex: 1;
+  flex-flow: row wrap;
+}
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: var(--app-standard-border);
+  background-color: transparent;
+  border-radius: 6px;
+  padding: 0.25rem;
+  margin: 0.25rem;
+  height: 9rem;
+  width: 7rem;
+
+  &:hover{
+    cursor: pointer;
+    background-color: var(--bkg-color-grad2);
+  }
+
+  img.theme-favorite {
+    width: 1.5rem;
+    height: 1.5rem;
+    align-self: flex-start;
+    content: url('icons/favorite-no.svg');
+
+    &:hover {
+      content: url('icons/favorite-add.svg');
+    }
+
+    &.yes {
+      content: url('icons/favorite-yes.svg');
+
+      &:hover {
+        content: url('icons/favorite-remove.svg');
+      }
+    }
+
+    &.placeholder {
+      content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=);
+    }
+  }
+
+  img.delete-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: -1.5rem;
+    align-self: flex-end;
+    content: url('icons/close.svg');
+
+    &.placeholder {
+      content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=);
+    }
+  }
+
+  img.theme-icon {
+    max-width: 5rem;
+    max-height: 2.5rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &.selected {
+    background-color: var(--bkg-color-grad1);
+    border: solid 1px var(--text-color);
+  }
+
+  span.theme-name {
+    text-align: center;
+    overflow: hidden;
+    max-width: 6rem;
+    word-break: break-word;
+    color: var(--text-color);
+    line-height: 1.1rem;
+    max-height: 2.2rem;
+  }
 }
 
 .theme,
@@ -74,4 +168,16 @@ button.delete {
 
 .theme-icon {
   --svg-filter: none;
+}
+
+#themes-type-chooser {
+  flex: 0;
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.gg-tabs {
+  margin: 0;
+  flex-grow: 1;
 }

@@ -29,6 +29,7 @@ import UrlManager from '../url/urlmanager';
 import UserDataManager from '../userdata/userdatamanager';
 import WfsManager from '../wfs/wfsmanager';
 import WmsManager from '../wms/wmsmanager';
+import ThemeFavoritesManager from '../themes/themefavoritesmanager';
 
 export default interface IGirafeContext {
   readonly userDataManager: UserDataManager;
@@ -62,6 +63,7 @@ export default interface IGirafeContext {
   readonly ogcApiFeaturesManager: OgcApiFeaturesManager;
   readonly localFileManager: LocalFileManager;
   readonly onBoardingManager: OnBoardingManager;
+  readonly themeFavoritesManager: ThemeFavoritesManager;
 
   initialize(): Promise<void>;
 }
