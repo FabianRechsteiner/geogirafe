@@ -32,6 +32,7 @@ import WfsManager from '../wfs/wfsmanager';
 import WmsManager from '../wms/wmsmanager';
 import { MockConfig } from './mockconfig';
 import OnBoardingManager from '../onboarding/onboardingmanager';
+import ThemeFavoritesManager from '../themes/themefavoritesmanager';
 
 export default class MockGirafeContext implements IGirafeContext {
   public readonly userDataManager: UserDataManager;
@@ -65,6 +66,7 @@ export default class MockGirafeContext implements IGirafeContext {
   public readonly ogcApiFeaturesManager: OgcApiFeaturesManager;
   public readonly localFileManager: LocalFileManager;
   public readonly onBoardingManager: OnBoardingManager;
+  public readonly themeFavoritesManager: ThemeFavoritesManager;
 
   public constructor() {
     this.componentManager = new ComponentManager(this);
@@ -98,6 +100,7 @@ export default class MockGirafeContext implements IGirafeContext {
     this.localFileManager = new LocalFileManager(this);
     this.ogcApiFeaturesManager = new OgcApiFeaturesManager(this);
     this.onBoardingManager = new OnBoardingManager(this);
+    this.themeFavoritesManager = new ThemeFavoritesManager(this);
 
     this.initialize();
   }
@@ -145,5 +148,6 @@ export default class MockGirafeContext implements IGirafeContext {
     this.localFileManager.initializeSingleton();
     this.ogcApiFeaturesManager.initializeSingleton();
     this.onBoardingManager.initializeSingleton();
+    this.themeFavoritesManager.initializeSingleton();
   }
 }

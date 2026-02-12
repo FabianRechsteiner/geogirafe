@@ -24,6 +24,11 @@ function getAllTypescriptFiles(directoryPath: string, fileList: string[] = []) {
 function getAllHtmlFiles(directoryPath: string, fileList: string[] = []) {
   return getAllFilesOfType(directoryPath, '.html', fileList);
 }
+
+function getAllStylesheetFiles(directoryPath: string, fileList: string[] = []) {
+  return getAllFilesOfType(directoryPath, '.css', fileList);
+}
+
 function getAllSvgFiles(directoryPath: string, fileList: string[] = []) {
   return getAllFilesOfType(directoryPath, '.svg', fileList);
 }
@@ -275,8 +280,9 @@ describe('Components architecture', () => {
     const parentPath = path.join(__dirname, '..'); // include parent path for index and mobile templates
     const htmlFiles = getAllHtmlFiles(parentPath);
     const tsFiles = getAllTypescriptFiles(__dirname);
+    const cssFiles = getAllStylesheetFiles(__dirname);
 
-    for (const file of [...htmlFiles, ...tsFiles]) {
+    for (const file of [...htmlFiles, ...tsFiles, ...cssFiles]) {
       const code = fs.readFileSync(file, 'utf8');
       const regex = /(icons\/[^'"]+\.svg)/gm;
       const matches = code.matchAll(regex);

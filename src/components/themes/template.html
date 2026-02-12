@@ -1,8 +1,7 @@
 <button
   class="gg-icon-button gg-big-withtext"
   tip="Theme selection"
-  onclick="${() => this.toggleThemesList()}"
-  onblur="${() => this.onBlur()}">
+  onclick="${() => this.toggleThemesList()}">
   <img
     alt="menu-icon"
     src="icons/themes.svg"
@@ -12,29 +11,47 @@
 </button>
 
 <div class="${(this.menuOpen ? 'themes' : 'hidden')}">
-  ${Object.values(this.state.themes._allThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
-  <button
-    class="${this.isThemeActive(theme)? 'theme selected' : 'theme'}"
-    onmousedown="${() => this.onThemeChanged(theme)}">
-    <img class="theme-icon" alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
-    <span i18n="${theme.name}">${theme.name}</span>
-  </button>
-  `)} ${Object.values(this.customThemes ?? {}).map(theme => uHtmlFor(theme, theme.id)`
-  <div class="${this.isThemeActive(theme)? 'custom-theme selected' : 'custom-theme'}">
-    <button class="select" onmousedown="${() => this.onCustomThemeChanged(theme)}">
-      <img alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
-      <span i18n="${theme.name}">${theme.name}</span>
-    </button>
-    <button class="girafe-button-small delete" onmousedown="${(e:Event) => this.onDeleteCustomTheme(theme, e)}">
-      <img alt="delete-icon" src="icons/close.svg" />
-    </button>
+  <div id="themes-type-chooser">
+    <div class="gg-tabs">
+      ${Object.values(ThemeTypes).map((themeType) => uHtml`
+      <button
+        id="${'choose-themes-type-' + themeType}"
+        i18n="${'themes-type-' + themeType}"
+        class="${this.isThemeTypeActive(themeType) ? 'gg-tab active' : 'gg-tab'}"
+        .active="${this.isThemeTypeActive(themeType)}"
+        onclick="${() => this.activateThemeType(themeType)}"></button>
+      `)}
+    </div>
   </div>
-  `)}
-
-  <div class="new-theme">
-    <button class="select" onmousedown="${() => this.onAddCustomTheme()}">
-      <img alt="Create custom theme" src="${this.newIcon}" tip="Save the current layer configuration as new theme" />
-      <span i18n="Create custom theme">Create custom theme</span>
-    </button>
+  <div id="active-themes">
+    ${Object.values(this.activeThemes).map(theme => uHtmlFor(theme, theme.id)`
+    <!-- //NOSONAR(web:S6819) --><div role="button" tabIndex="0"
+      class="${this.isThemeActive(theme)? 'theme-card selected' : 'theme-card'}"
+      onkeyup="${() => this.onThemeChanged(theme)}"
+      onclick="${() => this.onThemeChanged(theme)}">
+    <!-- //NOSONAR(web:S6847) --><img class="${this.isThemeFavorite(theme)? 'theme-favorite yes' : 'theme-favorite'}"
+           tip="themes-add-remove-favorites" alt="themes-add-remove-favorites" src=""
+           onclick="${(e: Event) => this.onThemeFavoriteChanged(theme, e)}"
+           onkeyup="${(e: Event) => this.onThemeFavoriteChanged(theme, e)}"/>
+    <!-- //NOSONAR(web:S6847) --><img class="${this.isCustomTheme(theme) ? 'delete-icon' : 'delete-icon placeholder'}"
+           onclick="${(e: Event) => this.onDeleteCustomTheme(theme as CustomTheme, e)}"
+           onkeyup="${(e: Event) => this.onDeleteCustomTheme(theme as CustomTheme, e)}"
+           alt="delete-icon" src="" />
+      <img class="theme-icon" alt="${'Icon for ' + theme.name}" src="${theme.icon}" />
+      <span i18n="${theme.name}" class="theme-name">${theme.name}</span>
+    </div>
+    `)}
+    <!-- //NOSONAR(web:S6819) --><div role="button" tabIndex="0"
+         class="${this.isThemeTypeActive('custom') ? 'theme-card' : 'hidden'}"
+         onclick="${() => this.onAddCustomTheme()}"
+         onkeyup="${() => this.onAddCustomTheme()}">
+      <img class="theme-favorite placeholder"
+           src=""
+           alt=""
+           disabled/>
+      <img class="theme-icon"  alt="Create custom theme" src="${this.newIcon}" tip="Save the current layer configuration as new theme" />
+      <span i18n="Create custom theme" class="theme-name">Create custom theme</span>
+    </div>
   </div>
 </div>
+<!-- //NOSONAR(web:S6819) --><div id="close-themes-menu" onclick="${() => this.onBlur()}"></div>
