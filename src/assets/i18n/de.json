@@ -352,6 +352,7 @@
     "Search visible": "Suche sichtbar",
     "Search...": "Suchen...",
     "search_tip": "Ort, Objekt oder Karte suchen",
+    "search_tooltip": "Suchen Sie nach einem Ort, einer Adresse, einer Karte oder geografischen Daten",
     "searchFillColor": "Suchresultat Füllfarbe",
     "searchStrokeColor": "Suchresultat Strichfarbe",
     "Select all": "Alles auswählen",
