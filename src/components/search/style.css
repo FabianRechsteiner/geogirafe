@@ -10,6 +10,10 @@
   flex-direction: row;
   border: 1px solid #cfd6dd;
   border-radius: 4px;
+
+  slot[name="search-tooltip"] {
+    display: none;
+  }
 }
 
 #search {

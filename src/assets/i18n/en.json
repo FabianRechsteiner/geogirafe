@@ -353,6 +353,7 @@
     "Search visible": "Search visible",
     "Search...": "Search...",
     "search_tip": "Search for a place, object or map",
+    "search_tooltip": "Search for a place, address, map, or geographic data",
     "searchFillColor": "Search result fill color",
     "searchStrokeColor": "Search result stroke color",
     "Select all": "Select all",

@@ -1,6 +1,7 @@
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
+import tippy from 'tippy.js';
 
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -143,6 +144,7 @@ class SearchComponent extends GirafeHTMLElement {
     this.render();
     super.girafeTranslate();
     this.registerEvents();
+    this.createTooltip();
     if (this.context.permalinkManager.hasSearch()) {
       this.subscribe('application.isReady', () => {
         if (this.state.application.isReady) {
@@ -517,6 +519,40 @@ class SearchComponent extends GirafeHTMLElement {
           this.onSelect(this.allResults[this.focusedResultIndex]);
         }
         break;
+    }
+  }
+
+  private createTooltip() {
+    const searchInput = this.shadowRoot?.getElementById('search');
+    if (searchInput) {
+      // Create a tooltip using tippy.js
+      tippy(searchInput, {
+        content: () => {
+          // Check if there's a slot named "search-tooltip"
+          const slot = this.shadow.querySelector('slot[name="search-tooltip"]') as HTMLSlotElement;
+          if (slot) {
+            const assignedNodes = slot.assignedNodes({ flatten: true });
+            if (assignedNodes.length > 0) {
+              // Create a temporary div to hold the content
+              const tooltipContent = document.createElement('div');
+              assignedNodes.forEach((node) => {
+                tooltipContent.appendChild(node.cloneNode(true));
+              });
+              return tooltipContent;
+            }
+          }
+          // Fallback to the default tooltip text if no slot content is found
+          return this.context.i18nManager.getTranslation('search_tooltip') || 'Search...';
+        },
+        trigger: 'mouseenter',
+        hideOnClick: false,
+        interactive: true,
+        theme: 'light',
+        placement: 'bottom',
+        arrow: true,
+        appendTo: document.body,
+        maxWidth: '300px'
+      });
     }
   }
 
