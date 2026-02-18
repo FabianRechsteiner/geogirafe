@@ -5,6 +5,7 @@ import { ColumnDefinition, RowComponent, TabulatorFull as Tabulator } from 'tabu
 import { getUid } from 'ol/util';
 import ColumnAliasHelper from '../../../tools/utils/aliases';
 import IGirafeContext from '../../../tools/context/icontext';
+import { linkify } from '../../../tools/utils/utils';
 
 /**
  * Represents the header text and state of a tab.
@@ -188,9 +189,11 @@ export default class SelectionTabulatorManager {
       const columns = entry.columns;
       const notOlProperties = entry.notOlProperties;
       for (const [_, row] of Object.entries(notOlProperties)) {
-        for (const [key, _] of Object.entries(row)) {
+        for (const [key, value] of Object.entries(row)) {
           if (!columns.includes(key)) {
             delete row[key];
+          } else if (typeof value === 'string') {
+            row[key] = linkify(value);
           }
         }
       }

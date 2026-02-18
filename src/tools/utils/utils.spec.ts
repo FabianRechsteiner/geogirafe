@@ -83,6 +83,13 @@ it('should return already wrapped link unchanged', () => {
   expect(linkifiedLink).toEqual(alreadyWrappedLink);
 });
 
+it('should return already wrapped link using single quotation mark instead of quotation mark unchanged', () => {
+  const alreadyWrappedLink =
+    "<a href='https://intercapi.vd.ch/territoire/intercapi/faces?type=grundstueck_grundbuch_auszug&bfs=5890&n1=210' target='_blank'>Cliquer ici</a>";
+  const linkifiedLink = linkify(alreadyWrappedLink);
+  expect(linkifiedLink).toEqual(alreadyWrappedLink);
+});
+
 it('should return phone number with country code wrapped in Anchor-Element', () => {
   const phoneNumber = '+41 61 267 99 53';
   const linkifiedPhoneNumber = linkify(phoneNumber);
