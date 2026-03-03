@@ -29,6 +29,9 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
   iframeUrl?: string;
   iframeCode?: string;
 
+  awaitingShareLink: boolean = false;
+  awaitingIframeUrl: boolean = false;
+
   private urlShortener?: IUrlShortener;
   private simpleMaskManager?: SimpleMaskManager;
 
@@ -103,6 +106,8 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
     this.simpleMaskManager = new SimpleMaskManager(this.context.mapManager.getMap());
     // While the component is visible, listen for changes in the state to update the shared link
     this.registerEvents();
+    // Generate the share link when the component is rendered (but don't copy to clipboard)
+    this.generateShareLink().then(() => this.refreshRender());
   }
 
   /**
@@ -138,8 +143,14 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
   }
 
   public async generateAndCopyLink() {
-    await this.generateShareLink();
-    this.copyToClipboard('short');
+    // If there's already a share link, just copy it to clipboard
+    if (this.shareLink) {
+      this.copyToClipboard('short');
+    } else {
+      // Otherwise generate a new link and copy it
+      await this.generateShareLink();
+      this.copyToClipboard('short');
+    }
     this.refreshRender();
   }
 
@@ -154,6 +165,9 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
       return;
     }
 
+    this.awaitingShareLink = true;
+    this.refreshRender();
+
     const baseUrl = this.context.urlManager.getBaseUrlPath();
     const hash = this.context.shareManager.getStateToShare();
 
@@ -163,12 +177,16 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
     this.shareLink = response.shorturl;
     this.success = response.success;
     this.qrCode = response.qrcode;
+    this.awaitingShareLink = false;
   }
 
   private async generateIframeCode() {
     if (!this.urlShortener || !this.iframeSize) {
       return;
     }
+
+    this.awaitingIframeUrl = true;
+    this.refreshRender();
 
     const baseUrl = this.context.urlManager.getRootUrl();
     const hash = this.context.shareManager.getStateToShare();
@@ -179,6 +197,7 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
     const response = await this.urlShortener.shortenUrl(longIframeUrl, indexDocument);
     this.iframeUrl = response.shorturl;
     this.iframeCode = `<iframe title="iframe GeoGirafe" width="${this.iframeWidth}" height="${this.iframeHeight}" src="${this.iframeUrl}"></iframe>`;
+    this.awaitingIframeUrl = false;
   }
 
   closeWindow() {
