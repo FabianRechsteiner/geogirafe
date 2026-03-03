@@ -10,40 +10,40 @@
     <div id="share-map" class="${this.urlShortener ? 'group' : 'hidden'}">
       <h3 class="title" i18n="Share this map">Share this map</h3>
 
-      <div>
+      <div class="${this.awaitingShareLink ? 'disabled' : 'enabled'}">
         <div class="link">
           <input type="text" value="${this.shareLink}" class="gg-input" disabled />
           <button
             id="btn-copy-short"
             class="gg-button"
-            i18n="Generate and copy link"
             onclick="${() => this.generateAndCopyLink()}">
-            Generate and copy link
+            <img alt="loading/copy" src="" class="${this.awaitingShareLink ? 'icon-loading' : 'icon-copy'}" width="20" height="20" />
+            <span i18n="${this.awaitingShareLink ? 'Generating link' : (!this.shareLink ? 'Generate and copy link' : 'Copy to Clipboard')}"></span>
           </button>
         </div>
-      </div>
 
-      <img alt="share-qrcode" class="${(this.qrCode ? 'qrcode' : 'hidden')}" src="${this.qrCode}" />
-      <div class="${(this.success ? 'hidden' : 'qrcode error')}">
-        <img alt="error-icon" src="icons/error.svg" />
-        <span i18n="Error, can not fetch the shortener service. Please try again later.">
-          Error, can not fetch the shortener service. Please try again later.</span
-        >
-      </div>
+        <img alt="share-qrcode" class="${(this.qrCode ? 'qrcode' : 'qrcode-placeholder')}" src="${this.qrCode}" />
+        <div class="${(this.success ? 'hidden' : 'qrcode error')}">
+          <img alt="error-icon" src="icons/error.svg" />
+          <span i18n="Error, can not fetch the shortener service. Please try again later.">
+            Error, can not fetch the shortener service. Please try again later.</span
+          >
+        </div>
 
-      <div class="social">
-        <button onclick="${() => this.shareFacebook()}">
-          <img alt="share-facebook" src="${this.facebookLogo}" />
-        </button>
-        <button onclick="${() => this.shareTwitter()}">
-          <img alt="share-twitter" src="${this.twitterLogo}" />
-        </button>
-        <button onclick="${() => this.shareLinkedIn()}">
-          <img alt="share-linkedin" src="${this.linkedInLogo}" />
-        </button>
-        <button onclick="${() => this.shareMail()}">
-          <img alt="share-mail" src="${this.mailLogo}" />
-        </button>
+        <div class="social">
+          <button onclick="${() => this.shareFacebook()}">
+            <img alt="share-facebook" src="${this.facebookLogo}" />
+          </button>
+          <button onclick="${() => this.shareTwitter()}">
+            <img alt="share-twitter" src="${this.twitterLogo}" />
+          </button>
+          <button onclick="${() => this.shareLinkedIn()}">
+            <img alt="share-linkedin" src="${this.linkedInLogo}" />
+          </button>
+          <button onclick="${() => this.shareMail()}">
+            <img alt="share-mail" src="${this.mailLogo}" />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -80,10 +80,10 @@
         <button
           id="btn-copy-iframe"
           class="gg-button"
-          i18n="Generate and copy code"
           ?disabled="${this.iframeSize === ''}"
           onclick="${() => this.generateAndCopyIframeCode()}">
-          Generate and copy code
+          <img alt="loading/copy" src="" class="${this.awaitingIframeUrl ? 'icon-loading' : 'icon-copy'}" width="20" height="20" />
+          <span i18n="${this.awaitingIframeUrl ? 'Generating code' : 'Generate and copy code'}"></span>
         </button>
       </div>
     </div>

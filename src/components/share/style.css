@@ -18,14 +18,25 @@
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+
+  button {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
 }
 
 .qrcode {
-  margin: auto;
-  margin-top: 2rem;
+  margin: 2rem auto auto;
   display: block;
   width: 10rem;
   opacity: 0.7;
+}
+.qrcode-placeholder {
+  margin: 2rem auto auto;
+  display: block;
+  width: 10rem;
+  height: 10rem;
+  content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=);
 }
 
 .social {
@@ -83,4 +94,21 @@ input {
   input[type='checkbox'] {
     flex-grow: unset;
   }
+}
+
+.disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+.enabled {
+  opacity: 1;
+  pointer-events: unset;
+}
+
+.icon-loading {
+  content: url('icons/3-dots-fade.svg');
+}
+.icon-copy {
+  margin: 1px;
+  content: url('icons/content_copy.svg');
 }
