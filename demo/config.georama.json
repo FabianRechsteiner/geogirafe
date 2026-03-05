@@ -13,7 +13,7 @@
   },
   "themes": {
     "url": "https://demo.georama.io/webgis/themes.json",
-    "defaultTheme": "bees_pg"
+    "defaultTheme": "forest_fires"
   },
   "basemaps": {
     "defaultBasemap": "OpenStreetMap",
