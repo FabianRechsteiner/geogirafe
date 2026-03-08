@@ -26,9 +26,7 @@
 GeoGirafe is a flexible application to build online geoportals.
 This repository contains the web-viewer part of the project.
 
-**Please note that GeoGirafe is at its very beginning, can strongly evolve and is therefore not intended for the moment to be used by people other than developers or contributors.**
-
-The project documentation can be found here: https://doc.geomapfish.dev.  
+The project documentation can be found here: https://doc.geogirafe.org.  
 The demo instances of GeoGirafe can be tested here: https://demo.geomapfish.dev.
 
 ## Goal
@@ -53,7 +51,7 @@ GeoGirafe is developed according to the following principles:
 
 ## Architecture
 
-Architectural choices made for the GeoGirafe project, including strategic objectives and technological choices, is explained in details here: https://doc.geomapfish.dev/docs/architecture.
+Architectural choices made for the GeoGirafe project, including strategic objectives and technological choices, is explained in details here: https://doc.geogirafe.org/docs/introduction/architecture.
 
 # Getting Started
 
