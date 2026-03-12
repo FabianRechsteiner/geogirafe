@@ -28,7 +28,7 @@
     "defaultLayout": "1) A4 paysage"
   },
   "lidar": {
-    "url": "https://map.cartoriviera.ch/lidar_server/pytree"
+    "url": "https://map.cartoriviera.ch/pytree"
   },
   "share": {
     "service": "geogirafe",
