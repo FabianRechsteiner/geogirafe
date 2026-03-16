@@ -176,8 +176,7 @@ export default class SelectionTabulatorManager {
       columnDefinition.push({
         title: this.context.i18nManager.getTranslation(columnAlias),
         field: column,
-        formatter: 'html',
-        sorter: 'string'
+        formatter: 'html'
       });
     }
 
