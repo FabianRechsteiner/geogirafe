@@ -163,6 +163,10 @@ export default class State {
     isAuthInitialized: false,
     // This doesn't mean that a shared state was loaded, just that the processed is finished
     isStateInitialized: false,
+    // Cutom serializer are ready. There are important for desirializing the shared state or the current session
+    isCustomSerializerInitialized: false,
+    // When isAuthInitialized and isCustomSerializerInitialized, then we are ready to load themes
+    isReadyToLoadThemes: false,
     // Everything needed by GeoGirafe to work properly has been loaded
     isReady: false
   };

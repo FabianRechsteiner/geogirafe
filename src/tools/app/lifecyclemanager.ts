@@ -28,13 +28,35 @@ export default class ApplicationLifeCycleManager extends GirafeSingleton {
     });
     this.context.stateManager.subscribe('application.isAuthInitialized', (_, isAuthInitialized) => {
       this.log(isAuthInitialized, 'Authentication has been initialized');
+      this.checkReadyToLoadThemes();
       this.checkApplicationReady();
     });
+    this.context.stateManager.subscribe(
+      'application.isCustomSerializerInitialized',
+      (_, isCustomSerializerInitialized) => {
+        this.log(isCustomSerializerInitialized, 'Custom Serializers have been initialized');
+        this.checkReadyToLoadThemes();
+        this.checkApplicationReady();
+      }
+    );
   }
 
   private log(value: boolean, text: string) {
     if (value) {
       console.info(`ApplicationLifeCycle: ${text}`);
+    }
+  }
+
+  /**
+   * For the application to be ready to load the themes and to deserialize the shared state or the session,
+   * The following elements must have been prepared:
+   * - Custom Serializer
+   * - OAuth process done
+   */
+  private checkReadyToLoadThemes() {
+    const isReady = this.state.application.isAuthInitialized && this.state.application.isCustomSerializerInitialized;
+    if (isReady) {
+      this.state.application.isReadyToLoadThemes = true;
     }
   }
 
@@ -54,7 +76,8 @@ export default class ApplicationLifeCycleManager extends GirafeSingleton {
       !this.state.projection ||
       !this.state.position.resolution ||
       !this.state.application.isStateInitialized ||
-      !this.state.application.isAuthInitialized
+      !this.state.application.isAuthInitialized ||
+      !this.state.application.isCustomSerializerInitialized
     ) {
       isReady = false;
     }
