@@ -74,6 +74,7 @@ export default class GeoGirafeApp {
     await this.initializeServiceWorker();
     this.initializeInterface();
     this.addCustomSerializers();
+    this.context.stateManager.state.application.isCustomSerializerInitialized = true;
     this.defineCoreComponents();
     this.resolveReady();
   }
@@ -94,7 +95,6 @@ export default class GeoGirafeApp {
 
   protected addCustomSerializers() {
     // Add custom state and serializers (need to be done early, because the shared state will need them)
-    // TODO REG : Is this not done too late ? We need to check this, perhaps it shouol dbe done before the intialization of the share
     this.context.stateManager.state.extendedState.drawing = new DrawingState();
     this.context.stateSerializer.addSerializer(DrawingState, new DrawingSerializer(this.context));
     this.context.stateManager.state.extendedState.share = new ShareState();
