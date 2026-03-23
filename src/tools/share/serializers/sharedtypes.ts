@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { WfsOperator } from '../../wfs/wfsfilter';
 
 export type SharedFilter = {

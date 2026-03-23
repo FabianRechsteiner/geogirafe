@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export type TimeResolution = 'day' | 'week' | 'month' | 'year';
 export type TimeMode = 'value' | 'range';
 export type TimeWidget = 'datepicker' | 'slider';

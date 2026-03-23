@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { IBrainSerializer } from '../../state/brain/serialize';
 import LayersConfig from '../../state/layersConfig';
 import GroupLayer from '../../../models/layers/grouplayer';

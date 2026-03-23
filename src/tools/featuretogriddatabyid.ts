@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type OlFeature from 'ol/Feature';
 import { removeUnwantedOlParams } from './utils/olutils';
 import WfsManager from './wfs/wfsmanager';

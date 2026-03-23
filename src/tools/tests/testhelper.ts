@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 class TestHelper {
   public static obj2ContainsObj1PropertiesValues(obj1: any, obj2: any) {
     if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {

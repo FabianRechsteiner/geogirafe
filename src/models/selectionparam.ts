@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerWms from './layers/layerwms';
 import ServerOgc from './serverogc';
 import type OLayerImage from 'ol/layer/Image';

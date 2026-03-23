@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerTimeFormatter from '../../../tools/time/layertimeformatter';
 import ITimeOptions from '../../../tools/time/itimeoptions';
 import TimeWidget, { TimeRangeLimit } from '../tools/timewidget';

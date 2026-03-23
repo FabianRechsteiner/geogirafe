@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import path from 'path';
 import { EOL } from 'os';
 import { copy, replaceInFile } from './tools.js';

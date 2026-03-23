@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type GroupLayer from '../../../models/layers/grouplayer';
 import type BaseLayer from '../../../models/layers/baselayer';
 import type MapManager from '../../../tools/state/mapManager';

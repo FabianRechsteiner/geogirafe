@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Collection, Feature, Map, MapBrowserEvent, MapEvent } from 'ol';
 import { Circle, Fill, RegularShape, Stroke, Style } from 'ol/style';
 import { ProjectionLike } from 'ol/proj';

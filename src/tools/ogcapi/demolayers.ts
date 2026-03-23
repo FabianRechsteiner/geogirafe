@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // POC demo variables
 import ServerOgc from '../../models/serverogc';
 

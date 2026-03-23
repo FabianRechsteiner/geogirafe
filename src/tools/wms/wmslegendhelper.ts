@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { ImageWMS } from 'ol/source';
 import LayerWms from '../../models/layers/layerwms';
 import IGirafeContext from '../context/icontext';

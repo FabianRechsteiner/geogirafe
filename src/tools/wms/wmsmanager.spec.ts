@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { it, expect, describe, vi } from 'vitest';
 
 import Map from 'ol/Map';

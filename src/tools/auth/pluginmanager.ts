@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeSingleton from '../../base/GirafeSingleton';
 import GirafeConfig from '../configuration/girafeconfig';
 

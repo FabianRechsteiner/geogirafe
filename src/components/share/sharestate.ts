@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { IBrainSerializable } from '../../tools/state/brain/decorators';
 import type { IBrainSerializer } from '../../tools/state/brain/serialize';
 import IGirafeContext from '../../tools/context/icontext';

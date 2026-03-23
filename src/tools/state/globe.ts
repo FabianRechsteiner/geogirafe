@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export type CameraConfig = {
   heading: number;
   pitch: number;

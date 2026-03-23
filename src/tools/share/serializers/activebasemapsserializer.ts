@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import Basemap from '../../../models/basemaps/basemap';
 import { IBrainSerializer } from '../../state/brain/serialize';
 import IGirafeContext from '../../context/icontext';

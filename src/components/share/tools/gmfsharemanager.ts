@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { generateQrCode } from '../../../tools/utils/qrcode';
 import { IUrlShortener, UrlShortenerResponse } from './iurlshortener';
 

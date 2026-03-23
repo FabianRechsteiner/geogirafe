@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { fromLonLat } from 'ol/proj';
 
 export function formatCoordinates(coords: number[], locale: string): string[] {

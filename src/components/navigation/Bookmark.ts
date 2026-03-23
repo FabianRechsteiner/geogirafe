@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import MapPosition from '../../tools/state/mapposition';
 
 export class Bookmark {

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeSingleton from '../../base/GirafeSingleton';
 import OlMap from 'ol/Map';
 import type { Extent } from 'ol/extent';

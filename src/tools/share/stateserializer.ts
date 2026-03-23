@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LZString from 'lz-string';
 import Basemap from '../../models/basemaps/basemap';
 import MapPositionSerializer from './serializers/mappositionserializer';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayer from '../../../models/layers/baselayer';
 import ThemeLayer from '../../../models/layers/themelayer';
 import GroupLayer from '../../../models/layers/grouplayer';

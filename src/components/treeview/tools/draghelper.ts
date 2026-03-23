@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayer from '../../../models/layers/baselayer';
 import StateManager from '../../../tools/state/statemanager';
 

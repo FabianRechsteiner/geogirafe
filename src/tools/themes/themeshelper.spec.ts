@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { it, expect, describe, beforeAll, afterAll, beforeEach } from 'vitest';
 import MockHelper from '../tests/mockhelper';
 import ThemesHelper from './themeshelper';

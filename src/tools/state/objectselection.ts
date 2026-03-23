@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Feature } from 'ol';
 import SelectionParam from '../../models/selectionparam';
 import WfsFilter from '../wfs/wfsfilter';

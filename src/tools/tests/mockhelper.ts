@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 import MockGirafeContext from './mockcontext';

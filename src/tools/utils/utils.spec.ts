@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { it, expect } from 'vitest';
 import { getValidIndex, minMax, hexToRgbaArray, rgbStrToRgbaArray, linkify } from './utils';
 

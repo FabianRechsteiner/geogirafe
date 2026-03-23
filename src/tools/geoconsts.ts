@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { METERS_PER_UNIT as ol_METERS_PER_UNIT } from 'ol/proj';
 
 class GeoConsts {

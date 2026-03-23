@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { isBrainSerializable, serializeSymbol } from './decorators';
 
 export type Constructor<T> = new (...args: any[]) => T;

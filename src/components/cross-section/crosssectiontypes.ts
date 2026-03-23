@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export type VectorFeatureFileFormat = 'kml' | 'geojson' | 'gpx';
 export type PrintFileFormat = 'svg' | 'pdf' | 'png';
 export type ColorVariable = 'intensity' | 'natural' | 'classification' | 'uniform';

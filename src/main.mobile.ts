@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { redirectTo, SplashScreen } from './main.tools';
 import GeoGirafeAppMobile from './tools/app/geogirafeapp-mobile';
 

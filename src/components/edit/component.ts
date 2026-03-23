@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { Draw, Modify, Select } from 'ol/interaction';
 import Feature from 'ol/Feature';

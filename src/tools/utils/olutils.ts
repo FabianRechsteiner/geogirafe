@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { EventsKey } from 'ol/events';
 import { Map } from 'ol';
 import type BaseLayer from 'ol/layer/Base';

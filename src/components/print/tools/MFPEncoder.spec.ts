@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { expect, describe, it, beforeEach, afterAll } from 'vitest';
 import MFPEncoder, { EncodeMapOptions } from './MFPEncoder';
 import MockHelper from '../../../tools/tests/mockhelper';

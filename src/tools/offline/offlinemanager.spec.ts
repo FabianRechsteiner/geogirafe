@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import OfflineManager from './offlinemanager';
 import { Extent } from 'ol/extent';

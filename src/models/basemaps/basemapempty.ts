@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import Basemap from './basemap';
 
 export default class BasemapEmpty extends Basemap {

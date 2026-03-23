@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 <div class="${this.context.configManager.Config.oauth || this.context.configManager.Config.gmfauth ? '' : 'hidden'}">
   <div class="${this.state.oauth.status === 'loggedIn' ? 'hidden' : 'container'}">
     <button class="gg-icon-button gg-medium-withtext" onclick="${() => this.onLoginClick()}">

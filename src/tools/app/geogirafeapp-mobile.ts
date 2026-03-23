@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import AlignNorthButtonMobile from '../../components/alignnorthbutton-mobile/component';
 import MobileOauthComponent from '../../components/auth-mobile/component';
 import MobileThemeComponent from '../../components/themes-mobile/themes-select/component';

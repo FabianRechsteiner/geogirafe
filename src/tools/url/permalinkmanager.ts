@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeSingleton from '../../base/GirafeSingleton';
 import DOMPurify from 'dompurify';
 import MapPosition from '../state/mapposition';

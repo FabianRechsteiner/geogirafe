@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 const HtmlRebuildPlugin = function () {
   return {
     name: 'girafe-html-rebuild',

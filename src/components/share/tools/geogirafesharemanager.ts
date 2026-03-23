@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import UrlManager from '../../../tools/url/urlmanager';
 import { GmfSuccessResponse } from './gmfsharemanager';
 import { IUrlShortener, UrlShortenerResponse } from './iurlshortener';

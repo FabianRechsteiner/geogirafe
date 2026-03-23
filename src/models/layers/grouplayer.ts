@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayer from './baselayer';
 import ILayerWithTime from './ilayerwithtime';
 import ITimeOptions from '../../tools/time/itimeoptions';

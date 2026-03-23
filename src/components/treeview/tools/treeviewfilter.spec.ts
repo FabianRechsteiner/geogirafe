@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createTestOgcServer } from '../../../tools/tests/layerhelpers';
 import GroupLayer from '../../../models/layers/grouplayer';

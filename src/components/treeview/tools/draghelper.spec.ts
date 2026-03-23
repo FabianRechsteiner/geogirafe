@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, test, expect } from 'vitest';
 import GroupLayer from '../../../models/layers/grouplayer';
 import LayerWms from '../../../models/layers/layerwms';

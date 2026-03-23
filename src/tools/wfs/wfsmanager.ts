@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import SelectionParam from '../../models/selectionparam';
 import LayerWms from '../../models/layers/layerwms';
 import ServerWfs from '../../models/serverwfs';

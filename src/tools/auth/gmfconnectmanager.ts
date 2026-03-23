@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import IGirafeContext from '../context/icontext';
 import AbstractConnectManager from './abstractconnectmanager';
 import GMFManager from './gmfmanager';

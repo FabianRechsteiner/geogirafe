@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { Callback } from './statemanager';
 import State from '../state/state';
 import StateManager from '../state/statemanager';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import Feature from 'ol/Feature';
 import Layer from './layer';
 import Geometry from 'ol/geom/Geometry';

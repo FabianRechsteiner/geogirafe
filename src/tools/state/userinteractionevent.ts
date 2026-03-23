@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { MapBrowserEvent } from 'ol';
 
 type gGKeyEvent = 'keydown' | 'keyup' | 'keypress';

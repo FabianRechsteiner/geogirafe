@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import DrawingComponent from './component';
 
 export default class DrawingComponentMobile extends DrawingComponent {

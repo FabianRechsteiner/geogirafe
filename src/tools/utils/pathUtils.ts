@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * Get a property value out of an object by providing the path to the property.
  * @returns the property or object, following the given path, and the

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Map } from 'ol';
 import olVectorTileLayer from 'ol/layer/VectorTile.js';
 import apply, { applyStyle } from 'ol-mapbox-style';

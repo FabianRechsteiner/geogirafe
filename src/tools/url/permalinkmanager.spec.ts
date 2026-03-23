@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, it, expect, beforeAll, afterAll, vi, afterEach } from 'vitest';
 import PermalinkManager from './permalinkmanager';
 import MockHelper from '../tests/mockhelper';

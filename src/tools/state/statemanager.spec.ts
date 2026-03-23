@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import StateManager from './statemanager';
 import ThemeLayer from '../../models/layers/themelayer';

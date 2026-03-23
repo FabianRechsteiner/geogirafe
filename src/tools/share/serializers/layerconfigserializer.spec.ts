@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import LayersConfigSerializer from './layerconfigserializer';
 import MockHelper from '../../tests/mockhelper';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import CustomTheme from '../../../models/customtheme';
 import BaseLayer from '../../../models/layers/baselayer';
 import ThemeLayer from '../../../models/layers/themelayer';

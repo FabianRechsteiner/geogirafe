@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { ShareState, ShareStateSerializer } from './sharestate';
 import MockHelper from '../../tools/tests/mockhelper';

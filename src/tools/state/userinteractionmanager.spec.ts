@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import UserInteractionManager from './userInteractionManager';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import StateManager from './statemanager';

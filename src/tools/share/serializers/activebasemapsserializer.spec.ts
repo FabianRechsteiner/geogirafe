@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import ActiveBasemapsSerializer from './activebasemapsserializer';
 import MockHelper from '../../tests/mockhelper';

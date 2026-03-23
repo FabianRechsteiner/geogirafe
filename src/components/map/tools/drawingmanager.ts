@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerDrawing from '../../../models/layers/layerdrawing';
 import VectorLayer from 'ol/layer/Vector';
 import { Map } from 'ol';

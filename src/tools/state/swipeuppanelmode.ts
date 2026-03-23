@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * The pannel can be:
  * - "closed": it is invisible, below screen

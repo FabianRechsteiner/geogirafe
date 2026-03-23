@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import IGirafePanel, { isGirafePanel } from '../../tools/state/igirafepanel';
 import StateToggleManager from '../../tools/state/stateToggleManager';

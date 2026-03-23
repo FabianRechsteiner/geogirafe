@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { it, describe, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import StateToggleManager from './stateToggleManager';
 import MockHelper from '../tests/mockhelper';

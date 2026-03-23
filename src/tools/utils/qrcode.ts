@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import QRCodeStyling from 'qr-code-styling';
 
 export async function generateQrCode(url: string) {

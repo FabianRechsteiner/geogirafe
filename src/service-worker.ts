@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * To allow offline mode, the first 100 queries made by the application will be cached.
  * We could have implemented a more specific cache with file extensions for example

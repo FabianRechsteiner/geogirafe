@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerConsts from '../layers/layerconsts';
 import LayerOsm from '../layers/layerosm';
 import Basemap from './basemap';

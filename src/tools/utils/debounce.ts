@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * @param {T} func The function to debounce.
  * @param {number} wait The wait time in ms.

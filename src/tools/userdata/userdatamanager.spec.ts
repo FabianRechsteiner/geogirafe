@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
 import MockHelper from '../tests/mockhelper';
 import IGirafeContext from '../context/icontext';

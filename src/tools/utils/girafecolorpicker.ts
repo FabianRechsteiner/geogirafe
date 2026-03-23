@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import Picker, { Options } from 'vanilla-picker';
 
 class GirafeColorPicker extends Picker {

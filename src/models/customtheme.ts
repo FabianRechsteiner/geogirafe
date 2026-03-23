@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import ThemeLayer from './layers/themelayer';
 import CustomIcon from '../components/themes/images/custom.svg';
 

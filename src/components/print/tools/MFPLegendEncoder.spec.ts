@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { it, describe, expect, beforeEach, afterAll } from 'vitest';
 import { EncodeLegendOptions, LegendURLDPI, MFPLegendClass, MFPLegendEncoder } from './MFPLegendEncoder';
 import {

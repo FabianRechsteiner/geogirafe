@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import TileLayer from 'ol/layer/Tile';

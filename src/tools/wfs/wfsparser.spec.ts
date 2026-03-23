@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, expect, it, vi } from 'vitest';
 import WfsParser from './wfsparser';
 import { Options } from 'ol/format/WFS';

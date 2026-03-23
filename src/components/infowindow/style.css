@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: Apache-2.0 */
 :host {
   --selection-window-footer-height: 0rem;
 }
@@ -9,4 +10,3 @@
     background-color: var(--bkg-color) !important;
   }
 }
-

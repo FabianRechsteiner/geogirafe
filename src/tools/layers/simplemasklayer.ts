@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { FrameState } from 'ol/Map';
 import { createCanvasContext2D } from 'ol/dom';
 import Layer from 'ol/layer/Layer';

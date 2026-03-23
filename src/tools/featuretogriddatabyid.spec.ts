@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { test, expect, describe, beforeEach } from 'vitest';
 import FeatureToGridDataById from './featuretogriddatabyid';
 import type { FeatureToGridDataOptions, GridDataById, GridData } from './featuretogriddatabyid';

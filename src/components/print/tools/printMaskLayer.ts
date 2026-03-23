@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { FrameState } from 'ol/Map';
 import { toRadians } from 'ol/math';
 import GeoConsts from '../../../tools/geoconsts';

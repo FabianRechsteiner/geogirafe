@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeResizableElement from '../../base/GirafeResizableElement';
 import type { Callback } from '../../tools/state/statemanager';
 import * as olExtent from 'ol/extent';

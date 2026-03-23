@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import ThemeFavoritesManager from './themefavoritesmanager';
 import IGirafeContext from '../context/icontext';
@@ -9,8 +10,8 @@ let themeFavoritesManager: ThemeFavoritesManager;
 let context: IGirafeContext;
 
 const storagePath = 'themeFavorites';
-const themeLayer: ThemeLayer = new ThemeLayer(42, "ThemeLayer", 1);
-const customTheme: CustomTheme = new CustomTheme("CustomTheme");
+const themeLayer: ThemeLayer = new ThemeLayer(42, 'ThemeLayer', 1);
+const customTheme: CustomTheme = new CustomTheme('CustomTheme');
 
 beforeAll(() => {
   context = MockHelper.startMocking();

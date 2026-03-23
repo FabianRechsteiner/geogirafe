@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import Map from 'ol/Map';
 import { getOlayerByName } from '../utils/olutils';
 import SimpleMaskLayer from './simplemasklayer';

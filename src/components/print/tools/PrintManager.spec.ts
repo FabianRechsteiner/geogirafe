@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { expect, it, describe, beforeEach, afterAll } from 'vitest';
 import PrintManager from './PrintManager';
 import MockHelper from '../../../tools/tests/mockhelper';

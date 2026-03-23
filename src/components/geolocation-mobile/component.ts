@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import Geolocation, { type GeolocationError } from 'ol/Geolocation.js';
 import Feature from 'ol/Feature.js';
 import Point from 'ol/geom/Point.js';

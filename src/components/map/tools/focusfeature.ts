@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { Feature, Map } from 'ol';
 import VectorSource from 'ol/source/Vector';
 import type RenderEvent from 'ol/render/Event';

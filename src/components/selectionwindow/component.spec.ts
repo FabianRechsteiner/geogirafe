@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { expect, it, describe } from 'vitest';
 import SelectionWindowComponent from './component';
 import type { GridDataById } from '../../tools/featuretogriddatabyid';

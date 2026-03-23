@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { ConformanceLevel } from '../tools/ogcapi/ogcapiconformance';
 
 export default class ServerOgcApi {

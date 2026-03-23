@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { IBrainSerializer } from '../../state/brain/serialize';
 import ObjectSelection, { InitialSelectionQuery } from '../../state/objectselection';
 import WfsFilter from '../../wfs/wfsfilter';

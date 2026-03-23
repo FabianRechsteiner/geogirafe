@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, it, beforeAll, assert, afterAll, expect, beforeEach, afterEach } from 'vitest';
 import GirafeHTMLElement from './GirafeHTMLElement';
 import MockHelper from '../tools/tests/mockhelper';

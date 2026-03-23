@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { GMFServerOgc } from './gmf';
 
 export default class ServerOgc {

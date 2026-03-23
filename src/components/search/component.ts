@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
