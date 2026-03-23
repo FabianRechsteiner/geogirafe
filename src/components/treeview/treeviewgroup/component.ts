@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GroupLayer from '../../../models/layers/grouplayer';
 import ThemeLayer from '../../../models/layers/themelayer';
 import TreeViewGroupElement from '../tools/treeviewgroupelement';

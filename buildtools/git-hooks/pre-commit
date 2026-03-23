@@ -10,3 +10,4 @@ echo "  \____| \___| \___/  \____||_||_|   \__,_||_|   \___| "
 echo "                                                       "
 echo "Executing Git pre-commit to keep the girafe beautiful..."
 npx lint-staged
+node buildtools/add-license-header.js

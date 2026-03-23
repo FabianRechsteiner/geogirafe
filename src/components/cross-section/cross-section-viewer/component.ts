@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { Callback } from '../../../tools/state/statemanager';
 import type { ColorVariable, ColorPalette, PytreeResponseData, Dataset } from './../crosssectiontypes';
 import type { Marker } from './../scatterplot';

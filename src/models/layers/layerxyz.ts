@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { GMFTreeItem } from '../gmf';
 import Layer from './layer';
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import TwitterLogo from './images/twitter.svg';
 import FacebookLogo from './images/facebook.svg';
 import LinkedInLogo from './images/linkedin.svg';

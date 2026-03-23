@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GeoGirafeAppComponent from './geogirafe-component';
 import tippy from 'tippy.js';
 import AboutComponent from '../../components/about/component';

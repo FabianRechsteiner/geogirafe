@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Image as ImageLayer } from 'ol/layer';
 import ImageWMS from 'ol/source/ImageWMS';
 import WMSCapabilities from 'ol/format/WMSCapabilities.js';

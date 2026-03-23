@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { download } from './download';
 import IGirafeContext from '../context/icontext';
 

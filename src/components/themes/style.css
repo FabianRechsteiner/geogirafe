@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: Apache-2.0 */
 .themes {
   display: flex;
   flex-wrap: nowrap;
@@ -43,7 +44,7 @@
   height: 9rem;
   width: 7rem;
 
-  &:hover{
+  &:hover {
     cursor: pointer;
     background-color: var(--bkg-color-grad2);
   }

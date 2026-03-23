@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { fromUrl, GeoTIFFImage, TypedArray } from 'geotiff';
 
 export interface GeoTransform {

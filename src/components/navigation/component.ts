@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import MapPosition from '../../tools/state/mapposition';
 import { Bookmark } from './Bookmark';

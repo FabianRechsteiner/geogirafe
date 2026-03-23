@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import IGirafeContext from '../../tools/context/icontext';
 import type { IBrainSerializer } from '../../tools/state/brain/serialize';
 import DrawingFeature, { DrawingState, type SerializedFeature } from './drawingFeature';

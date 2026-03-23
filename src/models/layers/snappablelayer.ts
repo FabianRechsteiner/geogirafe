@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerWms from './layerwms';
 import Layer from './layer';
 import BaseLayer from './baselayer';

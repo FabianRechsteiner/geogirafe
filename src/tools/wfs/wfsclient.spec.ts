@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { vi, afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { GetFeatureOptionsPartial, WfsClientMapServer } from './wfsclient';
 import ServerOgc from '../../models/serverogc';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import MapPosition from './mapposition';
 import GlobeState from './globe';
 import type Basemap from '../../models/basemaps/basemap';

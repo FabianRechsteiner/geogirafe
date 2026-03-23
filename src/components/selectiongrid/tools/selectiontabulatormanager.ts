@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type OlFeature from 'ol/Feature';
 import OlGeomGeometry from 'ol/geom/Geometry';
 import FeatureToGridDataById, { GridData, GridDataById } from '../../../tools/featuretogriddatabyid';

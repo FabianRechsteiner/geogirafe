@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeSingleton from '../../base/GirafeSingleton';
 import LayerWmts from '../../models/layers/layerwmts';
 import { Feature } from 'ol';

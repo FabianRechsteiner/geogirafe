@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import Basemap from '../../models/basemaps/basemap';
 import { applyOpacityToLayers } from '../../tools/utils/utils';

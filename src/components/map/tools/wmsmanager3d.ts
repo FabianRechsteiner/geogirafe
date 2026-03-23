@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerWms from '../../../models/layers/layerwms';
 import SelectionParam from '../../../models/selectionparam';
 import { Scene as CesiumScene, WebMapServiceImageryProvider, ImageryLayer } from 'cesium';

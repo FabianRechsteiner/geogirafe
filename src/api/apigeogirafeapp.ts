@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import proj4 from 'proj4';
 import GirafeHTMLElement from '../base/GirafeHTMLElement';
 import MapComponent from '../components/map/component';

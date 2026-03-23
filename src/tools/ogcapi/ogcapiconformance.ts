@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 //@SONAR_STOP@
 const OgcApiConformanceClasses = {
   'features-p1-core': 'http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core',

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Feature } from 'ol';
 import { WFS as OlWFS } from 'ol/format';
 import { ReadOptions } from 'ol/format/Feature';

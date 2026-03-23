@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { expect, it, describe } from 'vitest';
 import { FocusFeature } from './focusfeature';
 

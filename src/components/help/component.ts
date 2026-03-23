@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ArrowBlack from './images/arrow_black.webp';
 import ArrowWhite from './images/arrow_white.webp';

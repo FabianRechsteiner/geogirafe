@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import DrawingFeature, { DrawingShape, DrawingState, LineStroke } from './drawingFeature';
 import MapComponent from '../map/component';
 import { Collection, Feature, MapBrowserEvent } from 'ol';

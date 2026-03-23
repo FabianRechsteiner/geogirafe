@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import tippy from 'tippy.js';
 import Layer from '../../../models/layers/layer';
 import LayerWms from '../../../models/layers/layerwms';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 interface ISnappingConfig {
   tolerance?: number;
   edge?: boolean;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { TimeAwareLayer } from '../../models/layers/timeawarelayer';
 import TimePickerComponent from './timepicker/component';

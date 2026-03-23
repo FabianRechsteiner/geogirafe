@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Map } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';

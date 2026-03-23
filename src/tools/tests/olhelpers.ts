@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // Helpers for creating Openlayers object for tests
 import TileLayer from 'ol/layer/Tile';
 import WMTS from 'ol/source/WMTS';

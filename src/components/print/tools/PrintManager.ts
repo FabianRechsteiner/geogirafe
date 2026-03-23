@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { MFPSpec, MFPReportResponse, MFPCancelResponse } from '@geoblocks/mapfishprint';
 import type { MFPAttributes } from '@geoblocks/mapfishprint/src/types';
 import type Feature from 'ol/Feature';

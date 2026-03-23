@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 PREFIX="/geogirafe"
 if [ "$1" = 'ci' ];
 then

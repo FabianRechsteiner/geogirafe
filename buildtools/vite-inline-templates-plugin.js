@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { inlineTemplate } from './tools.js';
 
 const InlineTemplatesPlugin = function () {

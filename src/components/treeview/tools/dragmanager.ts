@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayer from '../../../models/layers/baselayer';
 import DragHelper from './draghelper';
 import GirafeSingleton from '../../../base/GirafeSingleton';

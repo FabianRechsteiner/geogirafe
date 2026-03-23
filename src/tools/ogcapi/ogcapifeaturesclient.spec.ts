@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import OgcApiFeaturesClient from './ogcapifeaturesclient';
 import ServerOgc from '../../models/serverogc';

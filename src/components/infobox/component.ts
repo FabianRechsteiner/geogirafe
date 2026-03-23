@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { InfoBoxContent } from '../../tools/state/state';
 import { linkify as utils_linkify } from '../../tools/utils/utils';

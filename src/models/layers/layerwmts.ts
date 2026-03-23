@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { BrainIgnore } from '../../tools/state/brain/decorators';
 import { GMFTreeItem } from '../gmf';
 import ServerOgc from '../serverogc';

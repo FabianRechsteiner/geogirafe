@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ServerOgc from '../../models/serverogc';
 import { WmsClientDefault } from '../../tools/wms/wmsclient';

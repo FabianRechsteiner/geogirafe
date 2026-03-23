@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerWmts from './layerwmts';
 
 export default class LayerWmtsExternal extends LayerWmts {

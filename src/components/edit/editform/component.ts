@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import Feature from 'ol/Feature';
 import OgcApiFeaturesSchema from '../../../tools/ogcapi/ogcapifeaturesschema';

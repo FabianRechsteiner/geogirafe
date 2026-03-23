@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Map } from 'ol';
 import { getRenderPixel } from 'ol/render';
 import WmtsManager from './wmtsmanager';

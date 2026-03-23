@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import path from 'path';
 import fs from 'node:fs';
 import { appendImportExtension, findFilesRecursive } from './tools.js';

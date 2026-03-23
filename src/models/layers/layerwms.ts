@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import WfsFilter from '../../tools/wfs/wfsfilter';
 import { GMFChildLayer, GMFTreeItem } from '../gmf';
 import ServerOgc from '../serverogc';

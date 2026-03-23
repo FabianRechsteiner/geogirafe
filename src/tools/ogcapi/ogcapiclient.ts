@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import StateManager from '../state/statemanager';
 import ServerOgcApi, { OgcApiDefaultEncoding, HttpMethod, OgcApiLinksResponse } from '../../models/serverogcapi';
 import ServerOgc from '../../models/serverogc';

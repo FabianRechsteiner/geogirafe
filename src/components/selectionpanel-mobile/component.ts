@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { Feature } from 'ol';
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import FeatureToGridDataById from '../../tools/featuretogriddatabyid';

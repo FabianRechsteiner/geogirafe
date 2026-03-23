@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Map as OlMap } from 'ol';
 
 import WmsClient, { WmsClientDefault, WmsClientGeoServer, WmsClientMapServer, WmsClientQgis } from './wmsclient';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeSingleton from '../../base/GirafeSingleton';
 import { Feature, Map } from 'ol';
 import DragAndDrop from 'ol/interaction/DragAndDrop.js';

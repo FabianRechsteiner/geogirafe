@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import View from 'ol/View';
 import { get as getProjection, transform } from 'ol/proj';
 import GeoConsts from '../../../tools/geoconsts';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import I18nManager, { TranslationsDict } from './i18nmanager';
 import MockHelper from '../tests/mockhelper';

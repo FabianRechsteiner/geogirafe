@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import DragManager from '../../components/treeview/tools/dragmanager';
 import ApplicationLifeCycleManager from '../app/lifecyclemanager';
 import AuthManager from '../auth/authmanager';

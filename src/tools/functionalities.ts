@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * Known Functionalities which are allowed in <code>GMFTheme.functionalities</code> and are published to
  * <code>State.functionalities</code>. Subscribe a Handler to get notified when a Theme which such a Functionality is

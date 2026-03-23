@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeSingleton from '../../base/GirafeSingleton';
 import { isSnappableLayer, SnappableLayer } from '../../models/layers/snappablelayer';
 import SelectionParam from '../../models/selectionparam';

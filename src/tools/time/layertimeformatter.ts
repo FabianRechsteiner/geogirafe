@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import ITimeOptions, { TimeMode, TimeResolution } from './itimeoptions';
 import Filter from 'ol/format/filter/Filter';
 import { during } from 'ol/format/filter';

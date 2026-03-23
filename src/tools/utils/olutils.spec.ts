@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { getOlayerByName, removeUnwantedOlParams, getDistance, getAreaOfPolygon } from './olutils';
 import { Map } from 'ol';

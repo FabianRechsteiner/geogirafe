@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { GMFBackgroundLayer } from '../gmf';
 import BaseLayer from '../layers/baselayer';
 import LayerVectorTiles from '../layers/layervectortiles';

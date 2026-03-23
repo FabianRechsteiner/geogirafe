@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { EventsKey } from 'ol/events';
 import type { MFPReportResponse } from '@geoblocks/mapfishprint';
 import type {

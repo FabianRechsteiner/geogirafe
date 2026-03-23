@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import PrintMaskManager from './printMaskManager';
 import { Size } from 'ol/size';
 import { describe, expect, it } from 'vitest';

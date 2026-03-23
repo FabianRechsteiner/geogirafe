@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { BaseCustomizer, MFPLayer, MFPMap, MFPWmtsLayer, MFPWmsLayer } from '@geoblocks/mapfishprint';
 import GroupLayer from '../../../models/layers/grouplayer';
 import type BaseLayer from '../../../models/layers/baselayer';

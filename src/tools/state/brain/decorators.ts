@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * A symbol used to mark properties that should be ignored during cloning operations.
  */

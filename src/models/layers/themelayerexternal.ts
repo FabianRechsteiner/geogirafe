@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerWmsExternal from './layerwmsexternal';
 import LayerWmtsExternal from './layerwmtsexternal';
 import ThemeLayer from './themelayer';

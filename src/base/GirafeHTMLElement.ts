@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { render as uRender, html as uHtml, Hole } from 'uhtml';
 import { Callback } from '../tools/state/statemanager';
 import { GgUserInteractionEvent } from '../tools/state/userinteractionevent';

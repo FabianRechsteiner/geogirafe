@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import ThemeLayer from '../../../models/layers/themelayer';
 import TreeViewGroupElement from '../tools/treeviewgroupelement';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import OgcApiFeaturesClient from './ogcapifeaturesclient';
 import ServerOgc from '../../models/serverogc';
 import { OapifCollection } from '../../models/serverogcapifeatures';

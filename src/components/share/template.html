@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 <div id="panel">
   <div id="content">
     <div class="${!this.urlShortener ? '' : 'hidden'}">
@@ -13,12 +14,15 @@
       <div class="${this.awaitingShareLink ? 'disabled' : 'enabled'}">
         <div class="link">
           <input type="text" value="${this.shareLink}" class="gg-input" disabled />
-          <button
-            id="btn-copy-short"
-            class="gg-button"
-            onclick="${() => this.generateAndCopyLink()}">
-            <img alt="loading/copy" src="" class="${this.awaitingShareLink ? 'icon-loading' : 'icon-copy'}" width="20" height="20" />
-            <span i18n="${this.awaitingShareLink ? 'Generating link' : (!this.shareLink ? 'Generate and copy link' : 'Copy to Clipboard')}"></span>
+          <button id="btn-copy-short" class="gg-button" onclick="${() => this.generateAndCopyLink()}">
+            <img
+              alt="loading/copy"
+              src=""
+              class="${this.awaitingShareLink ? 'icon-loading' : 'icon-copy'}"
+              width="20"
+              height="20" />
+            <span
+              i18n="${this.awaitingShareLink ? 'Generating link' : (!this.shareLink ? 'Generate and copy link' : 'Copy to Clipboard')}"></span>
           </button>
         </div>
 
@@ -82,7 +86,12 @@
           class="gg-button"
           ?disabled="${this.iframeSize === ''}"
           onclick="${() => this.generateAndCopyIframeCode()}">
-          <img alt="loading/copy" src="" class="${this.awaitingIframeUrl ? 'icon-loading' : 'icon-copy'}" width="20" height="20" />
+          <img
+            alt="loading/copy"
+            src=""
+            class="${this.awaitingIframeUrl ? 'icon-loading' : 'icon-copy'}"
+            width="20"
+            height="20" />
           <span i18n="${this.awaitingIframeUrl ? 'Generating code' : 'Generate and copy code'}"></span>
         </button>
       </div>

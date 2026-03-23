@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import IGirafeContext from '../../context/icontext';
 import { IBrainSerializer } from '../../state/brain/serialize';
 import MapPosition from '../../state/mapposition';

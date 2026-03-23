@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import LayerWms, { LayerWmsOptions } from '../../models/layers/layerwms';
 import LayerWmts, { LayerWmtsOptions } from '../../models/layers/layerwmts';
 import GroupLayer, { GroupLayerOptions } from '../../models/layers/grouplayer';

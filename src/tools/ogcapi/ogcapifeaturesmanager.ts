@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Feature } from 'ol';
 import { Geometry } from 'ol/geom';
 import OgcApiFeaturesClient from './ogcapifeaturesclient';

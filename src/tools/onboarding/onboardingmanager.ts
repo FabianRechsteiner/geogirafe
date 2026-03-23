@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Config, Driver, driver, DriveStep, State } from 'driver.js';
 import GirafeSingleton from '../../base/GirafeSingleton';
 import 'driver.js/dist/driver.css';

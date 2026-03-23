@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Overlay } from 'ol';
 import { Coordinate } from 'ol/coordinate';
 import { v4 as uuidv4 } from 'uuid';

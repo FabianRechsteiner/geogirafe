@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Color } from 'vanilla-picker';
 import { v4 as uuidv4 } from 'uuid';
 import DrawingFeature, { DrawingState, DrawingShape, ArrowStyle, ArrowPosition, LineStroke } from './drawingFeature';
