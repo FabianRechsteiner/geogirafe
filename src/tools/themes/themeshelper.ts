@@ -244,7 +244,7 @@ export default class ThemesHelper extends GirafeSingleton {
     let added = false;
     if (this.context.permalinkManager.hasGroups()) {
       for (const groupname of this.context.permalinkManager.getGroups()) {
-        added = this.addLayerBaseFromUrl(groupname, 'group') || added;
+        added = this.addLayerBaseFromName(groupname, 'group') || added;
       }
     }
     return added;
@@ -254,38 +254,44 @@ export default class ThemesHelper extends GirafeSingleton {
     let added = false;
     if (this.context.permalinkManager.hasLayers()) {
       for (const layername of this.context.permalinkManager.getLayers()) {
-        added = this.addLayerBaseFromUrl(layername, 'layer') || added;
+        added = this.addLayerBaseFromName(layername, 'layer') || added;
       }
     }
     return added;
   }
 
-  private addLayerBaseFromUrl(layer: string, type: 'layer' | 'group'): boolean {
-    let added = false;
+  public addLayerFromName(layername: string): boolean {
+    return this.addLayerBaseFromName(layername, 'layer');
+  }
+
+  private addLayerBaseFromName(layer: string, type: 'layer' | 'group'): boolean {
     const layerOptions = this.extractLayerOptions(layer, type);
-    if (layerOptions) {
-      const clonedTheme = this.getMinimalClonedThemeForLayer(layerOptions.originalLayer);
-      this.mergeLayerWithExistingLayerTree(clonedTheme, this.state.layers.layersList);
-      added = true;
-      if (layerOptions.active) {
-        const clonedLayer = this.findLayerRecursive(clonedTheme.children, layerOptions.originalLayer.name);
-        if (clonedLayer) {
-          this.context.layerManager.toggle(clonedLayer, 'on');
-          if (layerOptions.opacity) {
-            (clonedLayer as Layer).opacity = layerOptions.opacity;
-          }
-          if (layerOptions.filter) {
-            (clonedLayer as unknown as ILayerWithFilter).filter = layerOptions.filter;
-          }
-          if (layerOptions.timeRestriction) {
-            (clonedLayer as TimeAwareLayer).timeRestriction = layerOptions.timeRestriction;
-          }
-        }
-      }
-    } else {
+    if (!layerOptions) {
       console.warn(`Layer ${layer} cannot be found`);
+      return false;
     }
-    return added;
+
+    const clonedTheme = this.getMinimalClonedThemeForLayer(layerOptions.originalLayer);
+    this.mergeLayerWithExistingLayerTree(clonedTheme, this.state.layers.layersList);
+    if (!layerOptions.active) {
+      // Layer added, but inactive. No further config needed
+      return true;
+    }
+
+    const clonedLayer = this.findLayerRecursive(this.state.layers.layersList, layerOptions.originalLayer.name);
+    if (clonedLayer) {
+      this.context.layerManager.toggle(clonedLayer, 'on');
+      if (layerOptions.opacity) {
+        (clonedLayer as Layer).opacity = layerOptions.opacity;
+      }
+      if (layerOptions.filter) {
+        (clonedLayer as unknown as ILayerWithFilter).filter = layerOptions.filter;
+      }
+      if (layerOptions.timeRestriction) {
+        (clonedLayer as TimeAwareLayer).timeRestriction = layerOptions.timeRestriction;
+      }
+    }
+    return true;
   }
 
   private extractLayerOptions(urlParam: string, type: 'layer' | 'group') {
@@ -405,14 +411,18 @@ export default class ThemesHelper extends GirafeSingleton {
       // The theme is not already present. We just add the theme to the layertree
       this.addLayerToLayerTree(newLayer, existingList, activate, layerTreeChanges, parent);
       return;
-    } else if (newLayer.isHighlighted) {
-      this.highlightLayerInLayerTree(existingLayer, activate, layerTreeChanges);
     }
 
-    // Otherwise, we have to merge the themes
+    if (newLayer.isHighlighted) {
+      // The layer is already present
+      this.highlightLayerInLayerTree(existingLayer, activate, layerTreeChanges);
+      return;
+    }
+
+    // Otherwise, we have to merge the themes/groups
     if (
-      (newLayer instanceof ThemeLayer || newLayer instanceof GroupLayer) &&
-      (existingLayer instanceof ThemeLayer || existingLayer instanceof GroupLayer)
+      (newLayer instanceof ThemeLayer && existingLayer instanceof ThemeLayer) ||
+      (newLayer instanceof GroupLayer && existingLayer instanceof GroupLayer)
     ) {
       for (const child of newLayer.children) {
         this.mergeLayerWithExistingLayerTree(child, existingLayer.children, activate, layerTreeChanges, existingLayer);

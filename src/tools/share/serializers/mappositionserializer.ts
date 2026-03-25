@@ -19,7 +19,8 @@ export default class MapPositionSerializer implements IBrainSerializer<MapPositi
       center: mapPosition.center,
       resolution: mapPosition.resolution,
       crosshair: mapPosition.crosshair,
-      tooltip: mapPosition.tooltip
+      tooltip: mapPosition.tooltip,
+      markers: mapPosition.markers
     };
 
     return JSON.stringify(pos);
@@ -32,6 +33,7 @@ export default class MapPositionSerializer implements IBrainSerializer<MapPositi
     mapPosition.resolution = pos.resolution;
     mapPosition.crosshair = pos.crosshair;
     mapPosition.tooltip = pos.tooltip;
+    mapPosition.markers = pos.markers;
 
     this.state.position = mapPosition;
   }

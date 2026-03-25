@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { Collection, Feature, Map, MapBrowserEvent, MapEvent } from 'ol';
-import { Circle, Fill, RegularShape, Stroke, Style } from 'ol/style';
+import { Circle, Fill, Icon, RegularShape, Stroke, Style } from 'ol/style';
 import { ProjectionLike } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -53,6 +53,7 @@ import { Callback } from '../../tools/state/statemanager';
 import { applyFeaturesToSelection, applyOpacityToLayers } from '../../tools/utils/utils';
 import { SelectionMode } from '../../models/selection';
 import { platformModifierKeyOnly } from 'ol/events/condition';
+import { Coordinate } from 'ol/coordinate';
 
 // read this about the import of olcesium / cesium: https://github.com/openlayers/ol-cesium/issues/953
 declare global {
@@ -88,6 +89,11 @@ export default class MapComponent extends GirafeHTMLElement {
   crosshairFeature!: Feature;
   crosshairLayer!: VectorLayer<VectorSource>;
   geolocationSource!: VectorSource;
+
+  private readonly markerSource = new VectorSource();
+  private readonly markerLayer = new VectorLayer({
+    source: this.markerSource
+  });
 
   get projection() {
     return this.olMap.getView().getProjection();
@@ -167,6 +173,12 @@ export default class MapComponent extends GirafeHTMLElement {
     this.subscribe('selection.focusedFeatures', (_oldFeature: Feature[] | null, newFeature: Feature[] | null) =>
       this.focusFeature.setFocusedFeatures(newFeature)
     );
+    this.subscribe('position.markers', () => {
+      this.clearAllMarkers();
+      for (const marker of this.state.position.markers) {
+        this.addMarker(marker.position, marker.imageUrl);
+      }
+    });
 
     this.subscribe('globe.display', async () => {
       await this.onGlobeToggled();
@@ -220,6 +232,9 @@ export default class MapComponent extends GirafeHTMLElement {
           this.applyFeatureSelectionFromSharedState();
         }
         this.showCrosshair(this.state.position);
+        for (const marker of this.state.position.markers) {
+          this.addMarker(marker.position, marker.imageUrl);
+        }
       }
     });
   }
@@ -356,6 +371,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.setHighlightLayerStyle();
     this.olMap.addLayer(this.selectionLayer);
     this.olMap.addLayer(this.highlightLayer);
+    this.olMap.addLayer(this.markerLayer);
     this.selectionLayer.setZIndex(1002);
     this.highlightLayer.setZIndex(1003);
     this.selectionLayer.set('altitudeMode', 'clampToGround');
@@ -1138,10 +1154,33 @@ export default class MapComponent extends GirafeHTMLElement {
     if (position?.isValid) {
       // We need the following to recalculate resolution and scale to properly update the position state
       this.state.position = position;
+      if (position.markers.length > 0) {
+        // Add marker to the map
+        this.addMarker(position.markers[0].position, position.markers[0].imageUrl);
+      }
     }
   }
 
-  showCrosshair(position: MapPosition) {
+  private clearAllMarkers() {
+    this.markerSource.clear();
+  }
+
+  private addMarker(position: Coordinate, imageUrl: string) {
+    const iconStyle = new Style({
+      image: new Icon({
+        //anchor: [0.5, 1], // Point d'ancrage (centre en bas)
+        src: imageUrl
+        //scale: 0.5, // Ajustez la taille si nécessaire
+      })
+    });
+    const marker = new Feature({
+      geometry: new Point(position)
+    });
+    marker.setStyle(iconStyle);
+    this.markerSource.addFeature(marker);
+  }
+
+  private showCrosshair(position: MapPosition) {
     if (!position.crosshair) {
       return;
     }

@@ -95,6 +95,10 @@ export default defineConfig(({ command, mode }) => {
               return 'geogirafe-api.js';
             }
             return 'assets/[name].[hash].js';
+          },
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name == 'api.css') return 'geogirafe-api.css';
+            return 'assets/[name].[hash].[ext]';
           }
         }
       }

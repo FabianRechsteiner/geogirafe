@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 import { Coordinate } from 'ol/coordinate';
 
+export type MapMarker = {
+  imageUrl: string;
+  position: Coordinate;
+};
+
 class MapPosition {
   public center: Coordinate = [];
   public zoom?: number;
@@ -11,6 +16,7 @@ class MapPosition {
     content: string;
     position?: Coordinate;
   };
+  public markers: MapMarker[] = [];
 
   public get isValid() {
     if (Number.isNaN(this.resolution)) {
@@ -37,6 +43,12 @@ class MapPosition {
           position: this.tooltip.position ? [...this.tooltip.position] : undefined
         }
       : undefined;
+    for (const marker of this.markers) {
+      position.markers.push({
+        imageUrl: marker.imageUrl,
+        position: marker.position
+      });
+    }
 
     return position;
   }

@@ -1,0 +1,23 @@
+{
+  "themes": {
+    "url": "https://map.cartoriviera.ch/themes?background=background&interface=api"
+  },
+  "search": {
+    "url": "https://map.cartoriviera.ch/search?limit=90&partitionlimit=15&interface=api&query=###SEARCHTERM###"
+  },
+  "api": {
+    "demo": {
+      "center": "2544836, 1155204",
+      "zoom": "11",
+      "basemap": "asitvd.fond_couleur",
+      "crosshair": "2554917, 1145605",
+      "tooltip": "2554917, 1145605 | Hello from the GeoGirafe API!",
+      "layers": "culture_loisir_theatres",
+      "multiLayers": "culture_loisir_places_jeux, culture_loisir_theatres, culture_loisir_musees",
+      "layersWithConfig": "culture_loisir_places_jeux|o;0.4|f;commune;eq;Vevey",
+      "layersWithConfigCenter": "2557097,1144584",
+      "marker": "2554917,1145605|api/parking.png",
+      "markers": "2554917,1145605|api/parking.png ; 2557097,1144584|api/marker-blue.png ; 2558936,1144984|api/marker-green.png"
+    }
+  }
+}

@@ -18,6 +18,7 @@ const emptyUrlParameters = {
   map_zoom: null,
   map_crosshair: null,
   map_tooltip: null,
+  map_marker: null,
   search: null,
   basemap: null,
   themes: null,
