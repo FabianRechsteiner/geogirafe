@@ -74,7 +74,7 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
 
   protected describeFeatureType(): Promise<ServerWfs<WfsXmlTypes>> {
     if (!this.serverWfs) {
-      this.serverWfs = this.describeFeatureTypeInternal();
+      this.serverWfs = this.parseDescribeFeatureTypeResponse();
       this.serverWfs.catch((error) => {
         const msg = `WFS server with URL ${this.wfsUrl} could not be initialized. Error: `;
         console.error(msg, error);
@@ -85,12 +85,16 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     return this.serverWfs;
   }
 
-  private async describeFeatureTypeInternal() {
-    const serverWfs = new ServerWfs<WfsXmlTypes>('', this.wfsUrl);
+  private async requestDescribeFeatureType(): Promise<Document> {
     const url = this.getDescribeFeatureTypeUrl();
     const response = await fetch(url);
     const content = await response.text();
-    const xml = new DOMParser().parseFromString(content, 'text/xml');
+    return new DOMParser().parseFromString(content, 'text/xml');
+  }
+
+  private async parseDescribeFeatureTypeResponse() {
+    const serverWfs = new ServerWfs<WfsXmlTypes>('', this.wfsUrl);
+    const xml = await this.requestDescribeFeatureType();
 
     // First, find all direct "element" children
     const elementTypeToName = this.getElementToTypeName(xml);
@@ -121,52 +125,48 @@ export default class WfsClient<WfsXmlTypes = XmlTypes> {
     const featureType = elementTypeToName[typeName];
     const elements = tag.getElementsByTagName('sequence')[0].getElementsByTagName('element');
 
-    let geometryAttributeFound: boolean = false;
-    for (const element of elements) {
-      if (this.manageLayerAttribute(serverWfs, element, featureType)) {
-        geometryAttributeFound = true;
-      }
-    }
+    try {
+      serverWfs.addLayer(featureType);
 
-    // If we didn't find any geometry attribute for this featureType, then we have a problem
-    // Because the wfs query won't be possible
-    if (!geometryAttributeFound) {
-      throw new Error('No Geometry column for the type ' + featureType);
+      for (const element of elements) {
+        this.manageLayerAttribute(serverWfs, element, featureType);
+      }
+
+      // If we didn't find any geometry attribute for this featureType, wfs querying won't be possible
+      if (!serverWfs.featureTypeToGeometryColumnName[featureType]) {
+        throw new Error(`No Geometry column for the type ${featureType}`);
+      }
+    } catch (error) {
+      serverWfs.removeLayer(featureType);
+      console.error(`Error while parsing feature type ${typeName}: ${error}`);
     }
   }
 
   protected manageLayerAttribute(serverWfs: ServerWfs<WfsXmlTypes>, element: Element, featureType: string) {
-    let geometryAttributeFound: boolean = false;
-    const type = element.getAttribute('type');
+    const attributeType = element.getAttribute('type');
+    const attributeName = element.getAttribute('name');
 
-    if (type?.startsWith('gml:')) {
-      // We are on the geometry attribute
-      const geometryAttributeName = element.getAttribute('name');
-      if (geometryAttributeName) {
-        serverWfs.featureTypeToGeometryColumnName[featureType] = geometryAttributeName;
-        geometryAttributeFound = true;
-      } else {
-        throw new Error('Why is geometryAttributeName null here ?');
-      }
-    } else {
-      // We are not on a geometry attribute, but on a normal attribute
-      // We update the WMS Layer with its attribute information
-      const attrName = element.getAttribute('name');
-      const attrType = element.getAttribute('type');
-      if (!attrName || !attrType) {
-        console.warn(
-          `Error while loading attribute for layer ${featureType}. Querying or filtering this layer won't work correctly.`
-        );
-      } else if (this.validateLayerAttributeType(attrType)) {
-        serverWfs.addLayerAttribute(featureType, attrName, attrType);
-      } else {
-        console.warn(
-          `Unmanaged layer attribute type: ${attrType} for attribute ${attrName} of featureType ${featureType}. ${attrName} ignored.`
-        );
-      }
+    if (!attributeName || !attributeType) {
+      console.warn(
+        `Error while loading attributes for layer ${featureType}. Attribute name and/or type is missing. Element ignored.`
+      );
+      return;
     }
 
-    return geometryAttributeFound;
+    // Handle the geometry attribute
+    if (attributeType.startsWith('gml:')) {
+      serverWfs.featureTypeToGeometryColumnName[featureType] = attributeName;
+      return;
+    }
+    // Handle all remaining regular attributes
+    if (!this.validateLayerAttributeType(attributeType)) {
+      console.warn(
+        `Unmanaged layer attribute type: ${attributeType} for attribute ${attributeName} of featureType ${featureType}. ${attributeName} ignored.`
+      );
+      return;
+    }
+
+    serverWfs.addLayerAttribute(featureType, attributeName, attributeType);
   }
 
   protected validateLayerAttributeType(type: string) {

@@ -19,11 +19,19 @@ class ServerWfs<WfsXmlTypes = XmlTypes> {
     this.initialized = false;
   }
 
-  public addLayerAttribute(layer: string, name: string, type: string) {
-    if (!(layer in this.layers)) {
-      // Layer does not exists yet
+  public addLayer(layer: string) {
+    if (!this.layers[layer]) {
       this.layers[layer] = [];
     }
+  }
+
+  public removeLayer(layer: string) {
+    delete this.layers[layer];
+    delete this.featureTypeToGeometryColumnName[layer];
+  }
+
+  public addLayerAttribute(layer: string, name: string, type: string) {
+    this.addLayer(layer);
 
     this.layers[layer].push({
       name: name,
