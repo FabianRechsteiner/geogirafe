@@ -1,6 +1,6 @@
 {
   "general": {
-    "locale": "fr-FR"
+    "locale": "fr-CH"
   },
   "languages": {
     "translations": {
@@ -13,9 +13,10 @@
     "defaultTheme": "POI"
   },
   "basemaps": {
+    "emptyBasemap": false,
     "defaultBasemap": "sdt_01_03_mensuration_officielle",
-    "OSM": true,
-    "SwissTopoVectorTiles": true
+    "OSM": false,
+    "SwissTopoVectorTiles": false
   },
   "search": {
     "url": "https://geo.jura.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr",
@@ -57,7 +58,7 @@
     "maximumZoomDistance": 25000
   },
   "gmfauth": {
-    "url": "https://geo.jura.ch/",
+    "url": "https://geo.jura.ch",
     "audience": ["geo.jura.ch"],
     "audienceExcludedPaths": ["^/tiles/", "^/pytree/"]
   },
@@ -83,8 +84,77 @@
   "contextmenu": {
     "crs": [
       { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 1 },
-      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 5 },
       { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
+    ],
+    "sources": [
+      {
+        "id": "mnt",
+        "translation": "Altitude (Terrain)",
+        "prefix": "",
+        "suffix": " m",
+        "precision": 1,
+        "crs": "EPSG:2056",
+        "nodata": 0.0,
+        "url": "https://geoservices.jura.ch/cog/SDT_10_15_MNT_22_025m_cog.tif"
+      },
+      {
+        "id": "mns",
+        "translation": "Altitude (Surface)",
+        "prefix": "",
+        "suffix": " m",
+        "precision": 1,
+        "crs": "EPSG:2056",
+        "nodata": 0.0,
+        "url": "https://geoservices.jura.ch/cog/SDT_10_15_MNS_22_SP_025m_cog.tif"
+      },
+      {
+        "id": "mnh",
+        "translation": "Altitude (Surface-Terrain)",
+        "prefix": "",
+        "suffix": " m",
+        "precision": 1,
+        "crs": "EPSG:2056",
+        "nodata": 0.0,
+        "url": "https://geoservices.jura.ch/cog/SDT_10_15_MNH_22_025m_cog.tif"
+      },
+      {
+        "id": "pente",
+        "translation": "Pente",
+        "prefix": "",
+        "suffix": " °",
+        "precision": 1,
+        "crs": "EPSG:2056",
+        "nodata": 0.0,
+        "url": "https://geoservices.jura.ch/cog/SDT_10_15_Pentes_degree_22_1m_cog.tif"
+      }
+    ],
+    "links": [
+      {
+        "translation": "Google Street View",
+        "crs": "EPSG:4326",
+        "url": "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "Google Earth",
+        "crs": "EPSG:4326",
+        "url": "https://earth.google.com/web/@###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "Bâtiments 3D Swisstopo",
+        "crs": "EPSG:4326",
+        "url": "https://map.geo.admin.ch/?lang=fr&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.swisstopo.swissnames3d&lon=###MAPX###&lat=###MAPY###&elevation=618&heading=0.000&pitch=-70.001"
+      },
+      {
+        "translation": "OpenStreetMap",
+        "crs": "EPSG:4326",
+        "url": "https://www.openstreetmap.org/#map=13/###MAPY###/###MAPX###"
+      },
+      {
+        "translation": "map.geo.admin.ch",
+        "crs": "EPSG:2056",
+        "url": "https://map.geo.admin.ch/#/map?lang=fr&center=###MAPX###,###MAPY###&z=10"
+      }
     ]
   },
   "crs": [
@@ -96,5 +166,17 @@
       "code": "EPSG:21781",
       "definition": "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs"
     }
-  ]
+  ],
+  "infoWindow": {
+    "defaultWindowWidth": "500px",
+    "defaultWindowHeight": "350px"
+  },
+  "interface": {
+    "defaultSelectionComponent": "grid"
+  },
+  "contact": {
+    "url": "https://geo.jura.ch",
+    "reasons": ["Give feeback", "Ask a question", "Report an error"],
+    "email": "sit@jura.ch"
+  }
 }
