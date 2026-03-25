@@ -221,6 +221,19 @@ class GirafeConfig {
       description: string;
     }[];
   };
+  public api?: {
+    demo: {
+      center: string;
+      zoom: string;
+      basemap: string;
+      crosshair: string;
+      tooltip: string;
+      layers: string;
+      multiLayers: string;
+      layersWithConfig: string;
+      layersWithConfigCenter: string;
+    };
+  };
 
   // The extended configuration can be used by third-party components or extensions
   // to add custom attributes to the GirafeConfig.
@@ -262,6 +275,7 @@ class GirafeConfig {
     this.contact = this.initConfigContact(config);
     this.extendedConfig = this.initExtendedConfig(config);
     this.onboarding = this.initOnboarding(config);
+    this.api = this.initApiConfig(config);
 
     try {
       this.search = this.initConfigSearch(config);
@@ -650,6 +664,10 @@ class GirafeConfig {
 
   private initOnboarding(config: GirafeConfig) {
     return config.onboarding ?? undefined;
+  }
+
+  private initApiConfig(config: GirafeConfig) {
+    return config.api ?? undefined;
   }
 }
 

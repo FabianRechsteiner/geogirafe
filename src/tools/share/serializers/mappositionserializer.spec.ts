@@ -32,6 +32,10 @@ describe('MapPositionSerializer.serialize', () => {
       content: 'Test tooltip',
       position: [10, 20]
     };
+    mapPosition.markers.push({
+      imageUrl: 'http://url.to.marker',
+      position: [11, 22]
+    });
 
     const serialized = serializer.brainSerialize(mapPosition);
     expect(serialized).toBe(
@@ -42,7 +46,13 @@ describe('MapPositionSerializer.serialize', () => {
         tooltip: {
           content: 'Test tooltip',
           position: [10, 20]
-        }
+        },
+        markers: [
+          {
+            imageUrl: 'http://url.to.marker',
+            position: [11, 22]
+          }
+        ]
       })
     );
   });
@@ -57,7 +67,13 @@ describe('MapPositionSerializer.deserialize', () => {
       tooltip: {
         content: 'Test tooltip',
         position: [10, 20]
-      }
+      },
+      markers: [
+        {
+          imageUrl: 'http://url.to.marker',
+          position: [11, 22]
+        }
+      ]
     });
 
     serializer.brainDeserialize(json);
@@ -71,6 +87,12 @@ describe('MapPositionSerializer.deserialize', () => {
       content: 'Test tooltip',
       position: [10, 20]
     });
+    expect(state.position.markers).toEqual([
+      {
+        imageUrl: 'http://url.to.marker',
+        position: [11, 22]
+      }
+    ]);
   });
 
   it('should override previous map position in state', () => {

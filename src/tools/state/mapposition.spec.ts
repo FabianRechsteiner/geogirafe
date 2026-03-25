@@ -16,6 +16,7 @@ describe('MapPosition', () => {
     expect(mapPosition.scale).toBeUndefined();
     expect(mapPosition.crosshair).toBeUndefined();
     expect(mapPosition.tooltip).toBeUndefined();
+    expect(mapPosition.markers.length).toBe(0);
   });
 
   describe('isValid', () => {

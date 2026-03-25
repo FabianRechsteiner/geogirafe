@@ -4,5 +4,20 @@
   },
   "search": {
     "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=api&query=###SEARCHTERM###&lang=###SEARCHLANG###"
+  },
+  "api": {
+    "demo": {
+      "center": "2614484, 1267592",
+      "zoom": "11",
+      "basemap": "OF_Orthofoto2023Mai",
+      "crosshair": "2611738, 1267123",
+      "tooltip": "2611738, 1267123 | Hello from the GeoGirafe API!",
+      "layers": "TK_TagesheimKita",
+      "multiLayers": "GL_AbschnittsStoergrade, SW_Jugendlichenanteil, KJ_Jugendangebot",
+      "layersWithConfig": "GR_Grundwasserschutzzonen|o;0.4|f;gr_gz_kantypbez;eq;S1",
+      "layersWithConfigCenter": "2613521, 1269262",
+      "marker": "2611738,1267123|api/parking.png",
+      "markers": "2611738,1267123|api/parking.png ; 2610941,1267226|api/marker-blue.png ; 2610604,1267122|api/marker-green.png"
+    }
   }
 }

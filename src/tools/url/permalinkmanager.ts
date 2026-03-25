@@ -13,6 +13,7 @@ export default class PermalinkManager extends GirafeSingleton {
     'map_zoom',
     'map_crosshair',
     'map_tooltip',
+    'map_marker',
     'search',
     'basemap',
     'themes',
@@ -86,8 +87,12 @@ export default class PermalinkManager extends GirafeSingleton {
     return this.params['map_x'] && this.params['map_y'] && !this.hasFeatureSelectionQuery();
   }
 
-  public hasToolTip() {
+  private hasToolTip() {
     return this.params['map_tooltip'] !== null;
+  }
+
+  private hasMarker() {
+    return this.params['map_marker'] !== null;
   }
 
   public getMapPosition(targetProjection: Projection) {
@@ -120,6 +125,14 @@ export default class PermalinkManager extends GirafeSingleton {
           content: content,
           position: center
         };
+      }
+
+      if (this.hasMarker()) {
+        const imageUrl = DOMPurify.sanitize(this.params['map_marker']!);
+        position.markers.push({
+          imageUrl: imageUrl,
+          position: center
+        });
       }
 
       if (position.isValid) {

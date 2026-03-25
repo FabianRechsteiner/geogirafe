@@ -656,3 +656,8 @@ h4 {
   font-weight: 100;
   font-style: italic;
 }
+
+.u-btn {
+  display: inline-block !important;
+  padding: 6px 16px;
+}

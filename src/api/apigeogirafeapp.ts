@@ -7,12 +7,23 @@ import IGirafeContext from '../tools/context/icontext';
 import GirafeApiContext from './apicontext';
 import BasemapComponent from '../components/basemap/component';
 import MenuButtonComponent from '../components/menubutton/component';
-import { applyOpacityToLayers } from '../tools/utils/utils';
+import MapCustomContextMenuComponent from '../components/context-menu/custom-context-menu/component';
+import SearchComponent from '../components/search/component';
+import SelectionWindowComponent from '../components/selectionwindow/component';
 
 export default class GeoGirafeApi extends GirafeHTMLElement {
+  protected templateUrl = './template.html';
+  protected styleUrls = ['../styles/common.css', './style.css'];
+
+  private isInitialized = false;
+
   public constructor() {
     super('geogirafe-api');
     this.injectConfigMetaTags();
+  }
+
+  private get config() {
+    return this.context.configManager.Config.api!.demo;
   }
 
   protected override connectedCallback() {
@@ -23,9 +34,40 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
       this.subscribe('application.isReady', (_: boolean, isLoaded: boolean) => {
         if (isLoaded) {
           this.manageAttributes();
+          this.isInitialized = true;
+          this.dispatchEvent(new CustomEvent('geogirafe-api-ready'));
         }
       });
+      this.render();
     });
+  }
+
+  public static get observedAttributes() {
+    return ['center', 'zoom', 'basemap', 'basemapselector', 'crosshair', 'tooltip', 'markers', 'layers'];
+  }
+
+  protected attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (this.isInitialized) {
+      // We listen to attribute changes only if the API is already initialized
+      console.log(`Attribute ${name} changed : ${oldValue} → ${newValue}`);
+      if (name === 'center') {
+        this.manageCenterAttribute();
+      } else if (name === 'zoom') {
+        this.manageZoomAttribute();
+      } else if (name === 'basemap') {
+        this.manageBasemapAttribute();
+      } else if (name === 'basemapselector') {
+        this.manageBasemapSelectorAttribute();
+      } else if (name === 'crosshair') {
+        this.manageCrosshairAttribute();
+      } else if (name === 'tooltip') {
+        this.manageTooltipAttribute();
+      } else if (name === 'markers') {
+        this.manageMarkersAttribute();
+      } else if (name === 'layers') {
+        this.manageLayersAttribute();
+      }
+    }
   }
 
   protected override getInheritedContext(): IGirafeContext {
@@ -36,7 +78,6 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
     if (!customElements.get('girafe-map')) {
       customElements.define('girafe-map', MapComponent);
     }
-    this.shadow.innerHTML = `<girafe-map></girafe-map>`;
   }
 
   private manageAttributes() {
@@ -44,10 +85,58 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
     this.manageZoomAttribute();
     this.manageBasemapAttribute();
     this.manageBasemapSelectorAttribute();
+    this.manageSearchbarAttribute();
+    this.manageCrosshairAttribute();
+    this.manageTooltipAttribute();
+    this.manageMarkersAttribute();
+    this.manageLayersAttribute();
+    this.manageSelectionboxAttribute();
+
+    this.manageUserInteraction();
+  }
+
+  private manageUserInteraction() {
+    // Deacivate the preview of search results
+    this.context.configManager.Config.search.objectPreview = false;
+    this.context.configManager.Config.search.layerPreview = false;
+
+    // Force window as selection component
+    this.state.interface.selectionComponent = 'window';
+
+    // Deactivate selection if the selectionbox is not active
+    const selectionbox = this.getAttribute('selectionbox');
+    if (selectionbox === null) {
+      this.context.userInteractionManager.registerListener('map.select', true, 'api');
+    }
+  }
+
+  private getAttributeFromConfig(attributeName: string): string | null {
+    let attributeValue = this.getAttribute(attributeName);
+    if (!attributeValue) {
+      return null;
+    }
+
+    if (attributeValue.startsWith('api.demo.')) {
+      const configName = attributeValue.replace('api.demo.', '');
+      attributeValue = (this.config as Record<string, string>)[configName];
+      this.setAttribute(attributeName, attributeValue);
+    }
+    return attributeValue;
+  }
+
+  private defineAndAddComponent(customElementName: string, customElementType: CustomElementConstructor) {
+    if (!customElements.get(customElementName)) {
+      customElements.define(customElementName, customElementType);
+    }
+    const existingElement = this.shadowRoot?.querySelector(customElementName);
+    if (!existingElement) {
+      const component = new customElementType();
+      this.shadow.appendChild(component);
+    }
   }
 
   private manageCenterAttribute() {
-    const center = this.getAttribute('center');
+    const center = this.getAttributeFromConfig('center');
     if (center) {
       const coords = center.split(',');
       const x = Number(coords[0].trim());
@@ -61,7 +150,7 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
   }
 
   private manageZoomAttribute() {
-    const zoom = this.getAttribute('zoom');
+    const zoom = this.getAttributeFromConfig('zoom');
     if (zoom) {
       const zoomLevel = Number(zoom.trim());
       if (Number.isNaN(zoomLevel)) {
@@ -73,7 +162,7 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
   }
 
   private manageBasemapAttribute() {
-    const basemap = this.getAttribute('basemap');
+    const basemap = this.getAttributeFromConfig('basemap');
     if (basemap) {
       const basemapName = basemap.trim();
       if (basemapName) {
@@ -82,7 +171,8 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
           (b) => b.name === basemapName
         );
         if (availableBasemap) {
-          applyOpacityToLayers(1, availableBasemap.layersList);
+          // Force opacity to 1 for the API
+          availableBasemap.opacity = 1;
           this.context.stateManager.state.activeBasemaps = [availableBasemap];
         } else {
           console.warn(`Basemap '${basemapName}' not found in configuration`);
@@ -91,16 +181,93 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
     }
   }
 
+  private manageLayersAttribute() {
+    const layers = this.getAttributeFromConfig('layers');
+    if (layers) {
+      const layerNames = layers.split(',');
+      for (const layerName of layerNames) {
+        if (!this.context.themesHelper.addLayerFromName(layerName.trim())) {
+          console.warn(`Cannot add layer ${layerName.trim()}`);
+        }
+      }
+    }
+  }
+
   private manageBasemapSelectorAttribute() {
     const basemapselector = this.getAttribute('basemapselector');
     if (basemapselector != null) {
-      if (!customElements.get('girafe-menu-button')) {
-        customElements.define('girafe-menu-button', MenuButtonComponent);
+      this.defineAndAddComponent('girafe-menu-button', MenuButtonComponent);
+      this.defineAndAddComponent('girafe-basemap', BasemapComponent);
+    }
+  }
+
+  private manageSearchbarAttribute() {
+    const searchbar = this.getAttribute('searchbar');
+    if (searchbar != null) {
+      this.defineAndAddComponent('girafe-search', SearchComponent);
+    }
+  }
+
+  private manageSelectionboxAttribute() {
+    const selectionbox = this.getAttribute('selectionbox');
+    if (selectionbox != null) {
+      this.defineAndAddComponent('girafe-selection-window', SelectionWindowComponent);
+    }
+  }
+
+  private manageCrosshairAttribute() {
+    const crosshair = this.getAttributeFromConfig('crosshair');
+    if (crosshair) {
+      const coords = crosshair.split(',');
+      const x = Number(coords[0].trim());
+      const y = Number(coords[1].trim());
+      if (!Number.isNaN(x) && !Number.isNaN(y)) {
+        this.context.stateManager.state.position.crosshair = [x, y];
+      } else {
+        console.warn('Invalid crosshair coordinates');
       }
-      if (!customElements.get('girafe-basemap')) {
-        customElements.define('girafe-basemap', BasemapComponent);
+    }
+  }
+
+  private manageTooltipAttribute() {
+    const tooltip = this.getAttributeFromConfig('tooltip');
+    if (tooltip) {
+      this.defineAndAddComponent('girafe-custom-context-menu', MapCustomContextMenuComponent);
+      const content = tooltip.split('|');
+      const coords = content[0].split(',');
+      const x = Number(coords[0].trim());
+      const y = Number(coords[1].trim());
+      if (!Number.isNaN(x) && !Number.isNaN(y)) {
+        const text = content[1];
+        this.context.stateManager.state.position.tooltip = {
+          position: [x, y],
+          content: text
+        };
+      } else {
+        console.warn('Invalid tooltip coordinates');
       }
-      this.shadow.innerHTML += '<girafe-basemap></girafe-basemap>';
+    }
+  }
+
+  private manageMarkersAttribute() {
+    const markers = this.getAttributeFromConfig('markers');
+    if (markers) {
+      const markerValues = markers.split(';');
+      for (const makerValue of markerValues) {
+        const content = makerValue.split('|');
+        const coords = content[0].split(',');
+        const x = Number(coords[0].trim());
+        const y = Number(coords[1].trim());
+        if (!Number.isNaN(x) && !Number.isNaN(y)) {
+          const imageUrl = content[1].trim();
+          this.context.stateManager.state.position.markers.push({
+            position: [x, y],
+            imageUrl: imageUrl
+          });
+        } else {
+          console.warn('Invalid marker coordinates');
+        }
+      }
     }
   }
 
@@ -113,7 +280,9 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
     }
     register(proj4);
 
-    // Tell the application it is initialized (no auth at the moment for the api)
+    // No custom serializer for the API
+    this.context.stateManager.state.application.isCustomSerializerInitialized = true;
+    // No auth for the api
     this.context.stateManager.state.application.isAuthInitialized = true;
 
     // Automatically toggle dark/light mode when changed in the system
@@ -129,9 +298,7 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
 
   private injectConfigMetaTags() {
     const location = new URL(import.meta.url);
-    if (import.meta?.env?.DEV) {
-      location.pathname = location.pathname.replace('/src/api', '');
-    }
+    location.pathname = location.pathname.replace('/src/api', '');
     const origin = `${location.origin}${location.pathname.substring(0, location.pathname.lastIndexOf('/'))}`;
     const baseConfigUrl = `${origin}/config.json`;
     const apiConfigUrl = `${origin}/config.api.json`;
