@@ -66,8 +66,9 @@ function handleMessage(event: ExtendableMessageEvent): void {
     audience = data.audience ?? [];
     log(`audience changed: ${audience}`);
   }
+  audienceExcludedPaths = [];
   if (data.audienceExcludedPaths) {
-    audienceExcludedPaths = data.audienceExcludedPaths ? data.audienceExcludedPaths.map((str) => new RegExp(str)) : [];
+    audienceExcludedPaths = data.audienceExcludedPaths.map((str) => new RegExp(str));
     log(`audienceExcludedPaths changed: ${audienceExcludedPaths}`);
   }
   if (data.access_token) {
@@ -279,6 +280,6 @@ async function openIndexedDB(): Promise<IDBDatabase> {
 
 function log(str: string, error?: Error): void {
   if (logLevel === 'debug') {
-    console.debug(`SW: ${str}`, error);
+    console.debug(`SW: ${str}`, error ?? '');
   }
 }
