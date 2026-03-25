@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { vi, afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { vi, afterAll, describe, expect, it, beforeEach } from 'vitest';
 import { GetFeatureOptionsPartial, WfsClientMapServer } from './wfsclient';
 import ServerOgc from '../../models/serverogc';
 import MockHelper from '../tests/mockhelper';
@@ -12,8 +12,9 @@ describe('WfsClient', () => {
   let server: ServerOgc;
   let client: WfsClientMapServer;
 
-  beforeAll(() => {
+  beforeEach(() => {
     context = MockHelper.startMocking();
+    vi.resetAllMocks();
     server = new ServerOgc('testOgcServer', {
       url: 'https://wms-1.test.url',
       wfsSupport: true,
@@ -140,6 +141,112 @@ describe('WfsClient', () => {
       // Client should overwrite featureTypes and geometryName
       expect(completeOptions[1].featureTypes).toEqual(['layer2']);
       expect(completeOptions[1].geometryName).toBe('geom');
+    });
+  });
+
+  describe('describeFeatureType', () => {
+    const xmlResponse = `
+      <schema
+        targetNamespace="http://mapserver.gis.umn.edu/mapserver" 
+        xmlns:ms="http://mapserver.gis.umn.edu/mapserver" 
+        xmlns:ogc="http://www.opengis.net/ogc"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:gml="http://www.opengis.net/gml"
+        elementFormDefault="qualified" version="0.1" >
+        <import namespace="http://www.opengis.net/gml" schemaLocation="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd" />
+        
+        <element name="testlayer1" type="ms:testlayer1Type" substitutionGroup="gml:_Feature" />
+        <complexType name="testlayer1Type">
+          <complexContent>
+            <extension base="gml:AbstractFeatureType">
+              <sequence>
+                <element name="geom" type="gml:SurfacePropertyType" minOccurs="0" maxOccurs="1"/>
+                <element name="text_de" minOccurs="0" type="string"/>
+              </sequence>
+            </extension>
+          </complexContent>
+        </complexType>
+      </schema>
+    `;
+
+    const mockDescribeFeatureRequest = async (xmlResponse: string) => {
+      const describeFeatureTypeResponse = new DOMParser().parseFromString(xmlResponse, 'application/xml');
+
+      // @ts-ignore
+      vi.spyOn(client as WfsClientMapServer, 'requestDescribeFeatureType').mockReturnValue(
+        // @ts-ignore
+        new Promise((resolve) => resolve(describeFeatureTypeResponse)) as Promise<Document>
+      );
+    };
+
+    it('registers the features type described in the response', async () => {
+      await mockDescribeFeatureRequest(xmlResponse);
+      const server = await client.getServerWfs();
+
+      expect(server.layers).toBeDefined();
+      expect(Object.keys(server.layers)).toContain('testlayer1');
+      expect(server.layers['testlayer1']).toEqual([{ name: 'text_de', type: 'string' }]);
+    });
+
+    it('registers the feature type even if it does not have any attributes except a geometry', async () => {
+      const xmlNoAttributes = xmlResponse.replace('<element name="text_de" minOccurs="0" type="string"/>', '');
+      await mockDescribeFeatureRequest(xmlNoAttributes);
+      const server = await client.getServerWfs();
+
+      expect(server.layers).toBeDefined();
+      expect(Object.keys(server.layers)).toContain('testlayer1');
+      expect(server.layers['testlayer1']).toEqual([]);
+    });
+
+    it('ignores an attribute if its type is missing', async () => {
+      const xmlNoType = xmlResponse.replace(
+        '<element name="text_de" minOccurs="0" type="string"/>',
+        '<element name="text_de" minOccurs="0"/>'
+      );
+      await mockDescribeFeatureRequest(xmlNoType);
+      const server = await client.getServerWfs();
+
+      expect(server.layers).toBeDefined();
+      expect(Object.keys(server.layers)).toContain('testlayer1');
+      expect(server.layers['testlayer1']).toEqual([]);
+    });
+
+    it('ignores an attribute if its name is missing', async () => {
+      const xmlNoAttributeName = xmlResponse.replace(
+        '<element name="text_de" minOccurs="0" type="string"/>',
+        '<element minOccurs="0" type="string"/>'
+      );
+      await mockDescribeFeatureRequest(xmlNoAttributeName);
+      const server = await client.getServerWfs();
+
+      expect(server.layers).toBeDefined();
+      expect(Object.keys(server.layers)).toContain('testlayer1');
+      expect(server.layers['testlayer1']).toEqual([]);
+    });
+
+    it('ignores the feature type if it does not contain a geometry attribute', async () => {
+      const xmlNoGeometry = xmlResponse.replace(
+        '<element name="geom" type="gml:SurfacePropertyType" minOccurs="0" maxOccurs="1"/>',
+        ''
+      );
+      await mockDescribeFeatureRequest(xmlNoGeometry);
+      const server = await client.getServerWfs();
+
+      expect(server.layers).toBeDefined();
+      expect(Object.keys(server.layers)).toEqual([]);
+    });
+
+    it('ignores the feature type if the geometry attribute has no geometry name', async () => {
+      const xmlNoGeometryName = xmlResponse.replace(
+        '<element name="geom" type="gml:SurfacePropertyType" minOccurs="0" maxOccurs="1"/>',
+        '<element type="gml:SurfacePropertyType" minOccurs="0" maxOccurs="1"/>'
+      );
+      await mockDescribeFeatureRequest(xmlNoGeometryName);
+      const server = await client.getServerWfs();
+
+      expect(server.layers).toBeDefined();
+      expect(Object.keys(server.layers)).toEqual([]);
     });
   });
 });
