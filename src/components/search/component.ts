@@ -145,7 +145,13 @@ class SearchComponent extends GirafeHTMLElement {
     this.render();
     super.girafeTranslate();
     this.registerEvents();
-    this.createTooltip();
+    this.context.i18nManager.ensureTranslationLoaded().then((loaded) => {
+      if (loaded) {
+        this.createTooltip();
+      } else {
+        console.debug('Translations not loaded');
+      }
+    });
     if (this.context.permalinkManager.hasSearch()) {
       this.subscribe('application.isReady', () => {
         if (this.state.application.isReady) {
