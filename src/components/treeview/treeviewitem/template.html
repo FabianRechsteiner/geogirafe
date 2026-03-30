@@ -122,19 +122,14 @@
     </button>
 
     <!-- Drag -->
-    <button id="drag-button" class="gg-icon-button gg-small gg-grab gg-opacity tool" tip="Move">
+    <button id="drag-button" class="${this.getButtonClass('draggable')}" tip="Move">
       <img alt="Move layer" src="icons/drag.svg" />
     </button>
 
     <!-- Remove icon -->
-    ${this.layer.isRemovable ? uHtml`
-    <button
-      class="remove gg-icon-button gg-small gg-opacity tool"
-      tip="Remove layer"
-      onclick="${() => this.deleteLayer()}">
+    <button class="${this.getButtonClass('removable')}" tip="Remove layer" onclick="${() => this.deleteLayer()}">
       <img alt="Remove layer" src="icons/trash.svg" />
     </button>
-    ` : ``}
   </header>
 
   ${Object.keys(this.legendUrls).map((l:string) => uHtml`

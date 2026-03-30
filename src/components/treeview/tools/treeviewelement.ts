@@ -80,6 +80,9 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
   }
 
   protected initializeDrag() {
+    if (!this.layer.isDraggable) {
+      return;
+    }
     this.dragButton.draggable = true;
     this.dragButton.ondragstart = (e: DragEvent) => this.dragStart(e);
     this.dragButton.ondragend = (e: DragEvent) => this.dragEnd(e);
@@ -126,12 +129,12 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     const activeButtonClasses = buttonClasses + ' active';
     switch (button) {
       case 'swipedLeft':
-        if (!this.layer.inactive && this.layer instanceof Layer) {
+        if (this.layer.isSwipeable && !this.layer.inactive && this.layer instanceof Layer) {
           return this.layer.swiped === 'left' ? activeButtonClasses : buttonClasses;
         }
         return 'hidden';
       case 'swipedRight':
-        if (!this.layer.inactive && this.layer instanceof Layer) {
+        if (this.layer.isSwipeable && !this.layer.inactive && this.layer instanceof Layer) {
           return this.layer.swiped === 'right' ? activeButtonClasses : buttonClasses;
         }
         return 'hidden';
@@ -155,6 +158,17 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
           return this.layer.snapActive ? activeButtonClasses : buttonClasses;
         }
         return 'hidden';
+      case 'draggable':
+        if (this.layer.isDraggable) {
+          return 'gg-icon-button gg-small gg-grab gg-opacity tool';
+        }
+        return 'hidden';
+      case 'removable':
+        if (this.layer.isRemovable) {
+          return 'gg-icon-button gg-small remove gg-opacity tool';
+        } else {
+          return 'hidden';
+        }
       default:
         throw Error('Unsupported type: ' + button);
     }
