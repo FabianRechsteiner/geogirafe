@@ -30,7 +30,10 @@ abstract class BaseLayer {
   // The pinned state will bring layers to the top of their parent, independent of their order.
   // Additionally, pinned themes will stay in the tree when switching between themes or emptying the tree.
   public isPinned: boolean = false;
+  // Flags to control button visibility in layer tree
   public isRemovable: boolean = true;
+  public isSwipeable: boolean = true;
+  public isDraggable: boolean = true;
 
   public hasError: boolean = false;
   public errorMessage: string | null = null;

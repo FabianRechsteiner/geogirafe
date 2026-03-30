@@ -8,6 +8,8 @@ import LayerLocalFile from '../../models/layers/layerlocalfile';
 type UserThemeConfig = {
   name: string;
   isRemovable: boolean;
+  isSwipeable: boolean;
+  isDraggable: boolean;
   isPinned: boolean;
 };
 
@@ -24,16 +26,22 @@ export default class UserLayerManager extends GirafeSingleton {
     drawing: {
       name: 'Drawings',
       isRemovable: false,
+      isSwipeable: false,
+      isDraggable: false,
       isPinned: true
     },
     localFile: {
       name: 'Local Files',
       isRemovable: true,
+      isSwipeable: false,
+      isDraggable: false,
       isPinned: true
     },
     default: {
       name: 'User data',
       isRemovable: true,
+      isSwipeable: false,
+      isDraggable: false,
       isPinned: true
     }
   };
@@ -70,6 +78,8 @@ export default class UserLayerManager extends GirafeSingleton {
       themeLayer.order = this.context.themesHelper.getInitialOrderForNewTheme();
       themeLayer.isPinned = config.isPinned;
       themeLayer.isRemovable = config.isRemovable;
+      themeLayer.isSwipeable = config.isSwipeable;
+      themeLayer.isDraggable = config.isDraggable;
     }
     return themeLayer;
   }
