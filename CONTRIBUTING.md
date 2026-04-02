@@ -78,7 +78,7 @@ Once the merge request has been reviewed and accepted, it will be merged. If som
 You can contact us through the following channels:
 
 - By opening an issue in this GitLab Repository
-- By Email
+- By Email: info@geogirafe.org
 
 ## Thank you!
 
