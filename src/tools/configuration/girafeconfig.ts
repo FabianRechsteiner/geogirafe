@@ -118,6 +118,10 @@ class GirafeConfig {
   public lidar?: {
     url: string;
   };
+  public news?: {
+    urls: string[];
+    autoDisplay: boolean;
+  };
   public externalLayers?: {
     predefinedSources: {
       label: string;
@@ -260,6 +264,7 @@ class GirafeConfig {
     this.drawing = this.initConfigDrawing(config);
     this.projections = this.initConfigProjections(config);
     this.map = this.initConfigMap(config);
+    this.news = this.initConfigNews(config);
     this.lidar = this.initConfigLidar(config);
     this.csv = this.initConfigCsv(config);
     this.metadata = this.initConfigMetadata(config);
@@ -309,6 +314,14 @@ class GirafeConfig {
       this.map3d = this.initConfigMap3D(config);
     } catch (e) {
       // The application can be started even if the 3D Part is not correctly configured
+      // We just display a warning in the console
+      console.warn(e);
+    }
+
+    try {
+      this.news = this.initConfigNews(config);
+    } catch (e) {
+      // The application can be started even if the news is not correctly configured
       // We just display a warning in the console
       console.warn(e);
     }
@@ -453,6 +466,10 @@ class GirafeConfig {
 
   private initConfigLidar(config: GirafeConfig) {
     return config.lidar;
+  }
+
+  private initConfigNews(config: GirafeConfig) {
+    return config.news;
   }
 
   private initConfigCsv(config: GirafeConfig) {

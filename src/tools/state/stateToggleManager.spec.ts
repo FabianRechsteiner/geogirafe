@@ -40,7 +40,8 @@ describe('StateToggleManager class', () => {
     new TestPanel('drawing', 'interface.drawingPanelVisible'),
     new TestPanel('print', 'interface.printPanelVisible'),
     new TestPanel('userprefs', 'interface.userPreferencesPanelVisible'),
-    new TestPanel('share', 'interface.sharePanelVisible')
+    new TestPanel('share', 'interface.sharePanelVisible'),
+    new TestPanel('news', 'interface.newsPanelVisible')
   ];
 
   beforeEach(() => {
@@ -55,6 +56,7 @@ describe('StateToggleManager class', () => {
     expect(state.interface.printPanelVisible).toBeFalsy();
     expect(state.interface.userPreferencesPanelVisible).toBeFalsy();
     expect(state.interface.sharePanelVisible).toBeFalsy();
+    expect(state.interface.newsPanelVisible).toBeFalsy();
 
     state.interface.userPreferencesPanelVisible = true;
     expect(state.interface.helpVisible).toBeFalsy();
@@ -62,6 +64,7 @@ describe('StateToggleManager class', () => {
     expect(state.interface.printPanelVisible).toBeFalsy();
     expect(state.interface.userPreferencesPanelVisible).toBeTruthy();
     expect(state.interface.sharePanelVisible).toBeFalsy();
+    expect(state.interface.newsPanelVisible).toBeFalsy();
   });
 
   it('deactivateAll', () => {
@@ -72,5 +75,6 @@ describe('StateToggleManager class', () => {
     expect(state.interface.printPanelVisible).toBeFalsy();
     expect(state.interface.userPreferencesPanelVisible).toBeFalsy();
     expect(state.interface.sharePanelVisible).toBeFalsy();
+    expect(state.interface.newsPanelVisible).toBeFalsy();
   });
 });
