@@ -45,6 +45,10 @@
   "lidar": {
     "url": "https://sitn.ne.ch/pytree"
   },
+  "news": {
+    "urls": ["https://geogirafe.org/feed/atom/"],
+    "autoDisplay": false
+  },
   "share": {
     "service": "geogirafe",
     "createUrl": "https://sitn.ne.ch/short/create",

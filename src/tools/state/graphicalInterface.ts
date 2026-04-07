@@ -10,6 +10,7 @@ export default class GraphicalInterface {
   public printPanelVisible = false;
   public extLayerPanelVisible = false;
   public crossSectionPanelVisible = false;
+  public newsPanelVisible = false;
   public editPanelVisible = false;
   public sharePanelVisible = false;
   public selectionComponentVisible = false;

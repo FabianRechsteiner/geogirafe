@@ -47,6 +47,12 @@ export type Lidar = {
   drawActive: boolean;
 };
 
+export type News = {
+  urls: string[] | null;
+  lastViewDate: number;
+  lastPublishDate: number;
+};
+
 type Functionalities = {
   authorized_plugins?: string[];
 };
@@ -151,6 +157,12 @@ export default class State {
   public lidar: Lidar = {
     line: null,
     drawActive: false
+  };
+
+  public news: News = {
+    urls: null,
+    lastViewDate: 0,
+    lastPublishDate: 0
   };
 
   // Is the application currently loading map data?

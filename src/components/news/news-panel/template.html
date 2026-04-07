@@ -1,0 +1,28 @@
+<div id="panel">
+  <div id="content">
+    ${ this.entries.map(f => uHtmlFor(f, f.id)`
+    <div class="news-item">
+      <div class="news-header">
+        <div class="news-title">
+          <b>${f.title}</b>
+        </div>
+
+        <div class="news-meta">
+          <div class="news-date">
+            ${f.date?.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) ?? ''}
+          </div>
+        </div>
+      </div>
+
+      <div class="news-description">${this.htmlUnsafe(f.description ?? '')}</div>
+
+      ${f.content ? uHtml`
+      <details class="news-details">
+        <summary class="news-details-toggle" i18n="show_content">Show content</summary>
+        <div class="details-content">${this.htmlUnsafe(f.content ?? '')}</div>
+      </details>
+      ` : ''}
+    </div>
+    `) }
+  </div>
+</div>

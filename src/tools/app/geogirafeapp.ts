@@ -21,6 +21,8 @@ import MapComponent from '../../components/map/component';
 import MenuButtonComponent from '../../components/menubutton/component';
 import ModalsComponent from '../../components/modals/component';
 import NavigationComponent from '../../components/navigation/component';
+import NewsButtonComponent from '../../components/news/news-button/component';
+import NewsPanelComponent from '../../components/news/news-panel/component';
 import OauthComponent from '../../components/auth/component';
 import PrintComponent from '../../components/print/component';
 import PrototypeBannerComponent from '../../components/prototypebanner/component';
@@ -120,6 +122,8 @@ export default class GeoGirafeApp {
     customElements.define('girafe-menu-button', MenuButtonComponent);
     customElements.define('girafe-modals', ModalsComponent);
     customElements.define('girafe-nav-history', NavigationComponent);
+    customElements.define('girafe-news-button', NewsButtonComponent);
+    customElements.define('girafe-news', NewsPanelComponent);
     customElements.define('girafe-print', PrintComponent);
     customElements.define('girafe-prototype-banner', PrototypeBannerComponent);
     customElements.define('girafe-query-builder', QueryBuilderComponent);
