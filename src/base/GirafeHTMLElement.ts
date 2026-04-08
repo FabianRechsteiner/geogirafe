@@ -11,7 +11,7 @@ abstract class GirafeHTMLElement extends HTMLElement {
   protected template!: Hole | (() => Hole);
   public readonly name: string;
   protected shadow: ShadowRoot;
-  private displayStyle?: string;
+  protected displayStyle?: string;
   private timeoutId?: NodeJS.Timeout;
   protected rendered: boolean = false;
 

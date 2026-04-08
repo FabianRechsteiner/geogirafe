@@ -1,0 +1,60 @@
+:host {
+    display: grid;
+    grid-template-columns: auto auto 60px auto;
+    justify-content: left;
+    align-items: center;
+}
+input {
+    border: 1px solid var(--bkg-color-grad1);
+    width: inherit;
+    padding-right: 0;
+    background-color: var(--bkg-color-input);
+}
+input:focus {
+    border: 1px solid var(--lt-color-gray-900);
+}
+
+button {
+    border: solid 1px var(--bkg-color);
+    color: var(--text-color);
+    padding: 0;
+    background-color: var(--bkg-color);
+    cursor: pointer;
+}
+button:hover {
+    border: solid 1px var(--text-color-grad2);
+}
+button.selected {
+    border: solid 1px var(--text-color-grad2);
+    background-color: var(--bkg-color-grad1);
+    color: var(--bkg-color);
+}
+
+.icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    fill: var(--text-color);
+    margin: 3px;
+    flex-shrink: 0;
+}
+.icon:hover {
+    fill: var(--text-color-grad2);
+}
+.gg-icon-button:hover {
+    border: none;
+}
+
+button:disabled,
+input:disabled,
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+label.gg-label {
+    padding: 0 5px !important;
+
+    &.disabled {
+        pointer-events: revert;
+    }
+}

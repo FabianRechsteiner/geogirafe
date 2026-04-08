@@ -28,7 +28,7 @@ export default class CesiumDrawing {
   scene: Cesium.Scene | undefined = undefined;
   handler: Cesium.ScreenSpaceEventHandler | undefined = undefined;
   entities: Cesium.EntityCollection | undefined = undefined;
-  fixedLength: number = 0;
+  fixedLineLength: number = 0;
 
   private readonly context: IGirafeContext;
 
@@ -59,8 +59,8 @@ export default class CesiumDrawing {
     });
   }
 
-  setFixedLength(length: number) {
-    this.fixedLength = Number.isNaN(length) ? 0 : length;
+  setFixedLineLength(length: number) {
+    this.fixedLineLength = Number.isNaN(length) ? 0 : length;
   }
 
   activateTool(tool: DrawingShape) {
@@ -162,7 +162,7 @@ export default class CesiumDrawing {
   }
 
   fixLastLength(tool: DrawingShape, length: number, coord: Cartesian3[]) {
-    if (this.fixedLength > 0 && tool != DrawingShape.Rectangle) {
+    if (this.fixedLineLength > 0 && tool != DrawingShape.Rectangle) {
       const factor = tool == DrawingShape.Square ? Math.SQRT2 / 2 : 1;
       const pointCarto = new EllipsoidGeodesic(
         Cartographic.fromCartesian(coord[coord.length - 2]),
@@ -181,7 +181,7 @@ export default class CesiumDrawing {
             this.activeShapePoints.push(newPosition);
           } else {
             this.activeShapePoints[this.activeShapePoints.length - 1] = newPosition;
-            this.fixLastLength(tool, this.fixedLength, this.activeShapePoints);
+            this.fixLastLength(tool, this.fixedLineLength, this.activeShapePoints);
           }
           this.activeShapes.forEach((e) => this.entities!.remove(e));
           this.activeShapes = this.getShapes(

@@ -90,7 +90,10 @@ export default class OlDrawing {
   snap: Snap | null = null;
   editContextMenu: ContextMenu | null = null;
   currentShape: DrawingShape | null = null;
-  fixedLength: number = 0;
+  fixedLineLength: number = 0;
+  fixedSquareSide: number = 0;
+  fixedRectangleWidth: number = 0;
+  fixedRectangleHeight: number = 0;
   drawingSource: VectorSource;
   drawingLayer: VectorLayer;
 
@@ -527,25 +530,39 @@ export default class OlDrawing {
     return olFeature;
   }
 
-  setFixedLength(length: number) {
-    this.fixedLength = Number.isNaN(length) ? 0 : length;
+  setFixedLineLength(length: number) {
+    this.fixedLineLength = Number.isNaN(length) ? 0 : length;
+  }
+
+  setFixedSquareSide(length: number) {
+    this.fixedSquareSide = Number.isNaN(length) ? 0 : length;
+  }
+
+  setFixedRectangleWidth(width: number) {
+    this.fixedRectangleWidth = Number.isNaN(width) ? 0 : width;
+  }
+
+  setFixedRectangleHeight(height: number) {
+    this.fixedRectangleHeight = Number.isNaN(height) ? 0 : height;
   }
 
   createLineStringFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
-    this.fixLastLength(this.fixedLength, coordinates);
+    this.fixLastLength(this.fixedLineLength, coordinates);
     geom = geom ?? new LineString(coordinates as Coordinate[]);
     geom.setCoordinates(coordinates);
     return geom;
   }
 
   createSquareFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry, proj: Projection) {
-    this.fixLastLength(this.fixedLength, coordinates, Math.SQRT2);
-    return createRegularPolygon(4)(coordinates, geom, proj);
+    this.fixLastLength(this.fixedSquareSide, coordinates, Math.SQRT2);
+    const poly = createRegularPolygon(4)(coordinates, geom, proj);
+    console.log('createSquareFixedLength ' + JSON.stringify(poly.getCoordinates()));
+    return poly;
   }
 
   createPolygonFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
     const coord = coordinates[0] as Coordinate[];
-    this.fixLastLength(this.fixedLength, coord);
+    this.fixLastLength(this.fixedLineLength, coord);
     geom = geom ?? new Polygon([coord]);
     geom.setCoordinates([coord]);
     return geom;
@@ -553,10 +570,60 @@ export default class OlDrawing {
 
   createDiskFixedLength(coordinates: SketchCoordType, geom: SimpleGeometry) {
     const coord = coordinates as Coordinate[];
-    this.fixLastLength(this.fixedLength, coord);
+    this.fixLastLength(this.fixedLineLength, coord);
     geom = geom ?? new CircleGeom(coord[0], getDistance(coord, this.state.projection));
     (geom as CircleGeom).setCenterAndRadius(coord[0], getDistance(coord, this.state.projection));
     return geom;
+  }
+
+  createRectangleFixedSides(coordinates: SketchCoordType, geom: SimpleGeometry, proj: Projection) {
+    if (coordinates.length < 2) {
+      geom = geom ?? createBox()(coordinates, geom, proj);
+      return geom;
+    }
+    // If no fixed dimensions are set, behave like the normal box drawing.
+    if (this.fixedRectangleWidth <= 0 && this.fixedRectangleHeight <= 0) {
+      geom = geom ?? createBox()(coordinates, geom, proj);
+      return createBox()(coordinates, geom, proj);
+    }
+
+    const coords = coordinates as Coordinate[];
+    const start = coords[0];
+    const pointer = coords[1];
+
+    // Decide in which quadrant the user is dragging.
+    const signX = pointer[0] >= start[0] ? 1 : -1;
+    const signY = pointer[1] >= start[1] ? 1 : -1;
+
+    // Convert "meters" (or whatever your getDistance returns) to map units along X and Y.
+    const xUnit: Coordinate = [start[0] + 1, start[1]];
+    const yUnit: Coordinate = [start[0], start[1] + 1];
+
+    const metersPerMapUnitX = getDistance([start, xUnit], this.state.projection);
+    const metersPerMapUnitY = getDistance([start, yUnit], this.state.projection);
+
+    // Guard against division by 0 in weird edge cases.
+    if (metersPerMapUnitX <= 0 || metersPerMapUnitY <= 0) {
+      geom = geom ?? createBox()(coordinates, geom, proj);
+      return createBox()(coordinates, geom, proj);
+    }
+
+    const dxMapUnits = (this.fixedRectangleWidth / metersPerMapUnitX) * signX;
+    const dyMapUnits = (this.fixedRectangleHeight / metersPerMapUnitY) * signY;
+
+    if (dxMapUnits != 0 && dyMapUnits != 0) {
+      // Overwrite width and height
+      coords[1] = [start[0] + dxMapUnits, start[1] + dyMapUnits];
+    } else if (dxMapUnits != 0) {
+      // Overwrite only width
+      coords[1] = [start[0] + dxMapUnits, pointer[1]];
+    } else if (dyMapUnits != 0) {
+      // Overwrite only height
+      coords[1] = [pointer[0], start[1] + dyMapUnits];
+    }
+
+    geom = geom ?? createBox()(coords, geom, proj);
+    return createBox()(coords, geom, proj);
   }
 
   addDrawInteraction(tool: DrawingShape) {
@@ -590,7 +657,7 @@ export default class OlDrawing {
         break;
       case DrawingShape.Rectangle:
         olTool = 'Circle';
-        geomFunction = createBox();
+        geomFunction = this.createRectangleFixedSides.bind(this);
         break;
       case DrawingShape.FreehandPolyline:
         olTool = 'LineString';
