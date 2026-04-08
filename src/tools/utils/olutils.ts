@@ -177,7 +177,8 @@ export const getLabelStyle = (position: Point, text: string, labelStyle: Style):
 export const getRadiusDataForCircle = (circle: Circle, defaultStyle: Style, stroke: Stroke) => {
   const radius = circle.getRadius();
   const center = circle.getCenter();
-  const radiusLine = [center, [center[0] + radius, center[1]]];
+  const pointer = (circle.getProperties()['pointer'] as Coordinate) ?? [center[0] + radius, center[1]];
+  const radiusLine = [center, pointer];
   const radiusLineStyle = defaultStyle.clone();
   radiusLineStyle.setStroke(stroke);
   radiusLineStyle.getText()!.setText('');
@@ -204,3 +205,10 @@ export const getAreaAsMetricText = (area?: number): string => {
   }
   return '';
 };
+
+export const getAzimuthAsText = (azimuth?: number): string => {
+  if (azimuth) {
+    return `${azimuth.toFixed(0)}°`;
+  }
+  return '';
+}

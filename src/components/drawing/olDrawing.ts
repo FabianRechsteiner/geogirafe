@@ -193,6 +193,26 @@ export default class OlDrawing {
     });
     this.map.olMap.addInteraction(this.modify);
 
+    this.modify.on('modifystart', (e) => {
+      e.features.forEach((olFeature) => {
+        olFeature.on('change', (e) => {
+          const geometry = (e.target as Feature).getGeometry();
+          if (geometry && geometry.getType() == 'Circle') {
+            const circle = geometry as CircleGeom;
+            const newRadius = circle.getRadius();
+            const properties = circle.getProperties();
+            const {pointer} = properties;
+            const oldRadiusLine = new LineString([circle.getCenter(), pointer]);
+            oldRadiusLine.scale(newRadius / oldRadiusLine.getLength());
+            circle.setProperties({
+              ...properties,
+              pointer: oldRadiusLine.getLastCoordinate()
+            });
+          }
+        });
+      });
+    })
+
     // Update the modified geometries in the state
     this.modify.on('modifyend', (e) => {
       e.features.forEach((olFeature) => this.updateGeometryInState(olFeature)); //NOSONAR(typescript:S7728) Collection<?> is a custom Implementation with custom forEach
@@ -518,7 +538,12 @@ export default class OlDrawing {
     const geometry = (dFeature.geojson as any).geometry;
     let olFeature;
     if (geometry.type == 'Disk') {
-      olFeature = new Feature(new CircleGeom(geometry.center, geometry.radius));
+      const geom = new CircleGeom(geometry.center, geometry.radius);
+      geom.setProperties({
+        azimuth: geometry.azimuth,
+        pointer: geometry.pointer
+      })
+      olFeature = new Feature(geom);
     } else {
       olFeature = new Feature(new GeoJSON().readFeatures(dFeature.geojson)[0].getGeometry());
     }
@@ -556,6 +581,10 @@ export default class OlDrawing {
     this.fixLastLength(this.fixedLength, coord);
     geom = geom ?? new CircleGeom(coord[0], getDistance(coord, this.state.projection));
     (geom as CircleGeom).setCenterAndRadius(coord[0], getDistance(coord, this.state.projection));
+    geom.setProperties({
+      azimuth: ((90 - (Math.atan2(coord[1][1] - coord[0][1], coord[1][0] - coord[0][0]) * (180 / Math.PI)) + 360) % 360),
+      pointer: coord[1]
+    });
     return geom;
   }
 
@@ -770,16 +799,17 @@ export default class OlDrawing {
       );
       addLabel(polygon.getInteriorPoint(), dFeature.getAreaText(getAreaOfPolygon(polygon, this.state.projection)));
     } else if (dFeature.type == DrawingShape.Disk) {
-      const radiusDataForCircle = getRadiusDataForCircle(
-        geometry as CircleGeom,
-        defaultStyle,
-        new Stroke({ color: measureColor, width: dFeature.strokeWidth })
-      );
-      if (!dFeature.displayMeasure) {
-        radiusDataForCircle.style.setGeometry(new LineString([]));
+      if (dFeature.displayMeasure) {
+        const radiusDataForCircle = getRadiusDataForCircle(
+          geometry as CircleGeom,
+          defaultStyle,
+          new Stroke({ color: measureColor, width: dFeature.strokeWidth })
+        );
+        styles.push(radiusDataForCircle.style);
+        const lengthText = dFeature.getLengthText(radiusDataForCircle.radius);
+        const azimuthText = dFeature.getAzimuthText(geometry as CircleGeom);
+        addLabel(getHalfPoint(radiusDataForCircle.radiusLine), `${lengthText}, ${azimuthText}`);
       }
-      styles.push(radiusDataForCircle.style);
-      addLabel(getHalfPoint(radiusDataForCircle.radiusLine), dFeature.getLengthText(radiusDataForCircle.radius));
     } else if (dFeature.type == DrawingShape.FreehandPolygon) {
       const polygon = geometry as Polygon;
       ensurePolygonIsProperlyClosed(polygon);
