@@ -372,7 +372,7 @@ class CrossSectionViewComponent extends GirafeResizableElement {
     }
   }
 
-  render() {
+  override render() {
     if (this.visible) {
       this.renderComponent();
     } else {
@@ -625,6 +625,10 @@ class CrossSectionViewComponent extends GirafeResizableElement {
     this.subscribe('interface.crossSectionPanelVisible', (_oldValue: boolean, _newValue: boolean) => {
       this.togglePanel(_newValue);
     });
+  }
+
+  closePanel(): void {
+    this.togglePanel(false);
   }
 
   private togglePanel(visible: boolean): void {

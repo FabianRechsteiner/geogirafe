@@ -28,7 +28,7 @@ class InfoWindowComponent extends GirafeDraggableElement {
     this.subscribe(/infoWindow\.(url|title)/, () => this.render());
   }
 
-  render() {
+  override render() {
     if (this.visible) {
       this.renderComponent();
     } else {

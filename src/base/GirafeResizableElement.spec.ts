@@ -4,6 +4,14 @@ import GirafeResizableElement from './GirafeResizableElement';
 import MockHelper from '../tools/tests/mockhelper';
 import IGirafeContext from '../tools/context/icontext';
 
+class GirafeResizableTestElement extends GirafeResizableElement {
+  protected override closePanel(): void {
+    throw new Error('Method not implemented.');
+  }
+  templateUrl = 'EMPTY';
+  styleUrls = [];
+}
+
 describe('GirafeResizableElement.constructor', () => {
   let resizableElement: GirafeResizableElement;
   let context: IGirafeContext;
@@ -11,7 +19,7 @@ describe('GirafeResizableElement.constructor', () => {
   beforeAll(() => {
     context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
-      customElements.define('girafe-test', GirafeResizableElement);
+      customElements.define('girafe-test', GirafeResizableTestElement);
     }
   });
 
@@ -20,25 +28,25 @@ describe('GirafeResizableElement.constructor', () => {
   });
 
   it('should initialize dock property to default value (right)', () => {
-    resizableElement = new GirafeResizableElement('girafe-test');
+    resizableElement = new GirafeResizableTestElement('girafe-test');
     // @ts-expect-error: private property
     expect(resizableElement.dock).toBe('right');
   });
 
   it('should initialize dock property to value left', () => {
-    resizableElement = new GirafeResizableElement('girafe-test', 'left');
+    resizableElement = new GirafeResizableTestElement('girafe-test', 'left');
     // @ts-expect-error: private property
     expect(resizableElement.dock).toBe('left');
   });
 
   it('should initialize dock property to value right', () => {
-    resizableElement = new GirafeResizableElement('girafe-test', 'right');
+    resizableElement = new GirafeResizableTestElement('girafe-test', 'right');
     // @ts-expect-error: private property
     expect(resizableElement.dock).toBe('right');
   });
 
   it('should initialize dock property to value bottom', () => {
-    resizableElement = new GirafeResizableElement('girafe-test', 'bottom');
+    resizableElement = new GirafeResizableTestElement('girafe-test', 'bottom');
     // @ts-expect-error: private property
     expect(resizableElement.dock).toBe('bottom');
   });
@@ -46,7 +54,7 @@ describe('GirafeResizableElement.constructor', () => {
   it('should initialize dock property to value bottom', () => {
     expect(() => {
       // @ts-ignore
-      resizableElement = new GirafeResizableElement('girafe-test', 'invalid');
+      resizableElement = new GirafeResizableTestElement('girafe-test', 'invalid');
     }).toThrowError();
   });
 });
@@ -58,9 +66,9 @@ describe('GirafeResizableElement.makeResizable', () => {
   beforeAll(() => {
     context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
-      customElements.define('girafe-test', GirafeResizableElement);
+      customElements.define('girafe-test', GirafeResizableTestElement);
     }
-    resizableElement = new GirafeResizableElement('girafe-test');
+    resizableElement = new GirafeResizableTestElement('girafe-test');
     const panel = document.createElement('div');
     panel.innerHTML = `
       <div id="gutter"></div>
@@ -122,9 +130,9 @@ describe('GirafeResizableElement.initSizeLimits', () => {
   beforeAll(() => {
     context = MockHelper.startMocking();
     if (!customElements.get('girafe-test')) {
-      customElements.define('girafe-test', GirafeResizableElement);
+      customElements.define('girafe-test', GirafeResizableTestElement);
     }
-    resizableElement = new GirafeResizableElement('girafe-test');
+    resizableElement = new GirafeResizableTestElement('girafe-test');
     const panel = document.createElement('div');
     panel.innerHTML = `
       <div id="gutter"></div>

@@ -27,7 +27,7 @@ afterAll(() => {
 });
 beforeEach(() => {
   vi.resetAllMocks();
-  global.fetch = vi.fn();
+  globalThis.fetch = vi.fn();
   client = new OgcApiFeaturesClient(server, {}, context);
 });
 
@@ -36,18 +36,18 @@ describe('OgcApiClient.loadConformance', () => {
     const mockConformance = {
       conformsTo: ['http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core']
     };
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => mockConformance
     });
 
     const result = await client.loadConformance();
     expect(result).toEqual(mockConformance.conformsTo);
-    expect(global.fetch).toHaveBeenCalledWith(`${mockUrl}/conformance?f=json`, expect.any(Object));
+    expect(globalThis.fetch).toHaveBeenCalledWith(`${mockUrl}/conformance?f=json`, expect.any(Object));
   });
 
   it('should throw an error if network request fails', async () => {
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: false,
       status: 500,
       statusText: 'Internal Server Error'
@@ -57,7 +57,7 @@ describe('OgcApiClient.loadConformance', () => {
   });
 
   it('should throw an error if response is invalid', async () => {
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({})
     });
@@ -88,7 +88,7 @@ describe('OgcApiClient.loadConformance', () => {
       ]
     };
     vi.spyOn(client, 'getLink').mockResolvedValue(`${mockUrl}/conformance`);
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => mockConformance
     });
@@ -104,18 +104,18 @@ describe('OgcApiClient.loadConformance', () => {
 describe('OgcApiClient.links', () => {
   it('should fetch links successfully', async () => {
     const mockLinksResponse = { links: [{ rel: 'self', href: mockUrl, type: 'application/json' }] };
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => mockLinksResponse
     });
 
     const result = await client.getLinks(mockUrl);
     expect(result).toEqual(mockLinksResponse.links);
-    expect(global.fetch).toHaveBeenCalledWith(mockUrl, expect.any(Object));
+    expect(globalThis.fetch).toHaveBeenCalledWith(mockUrl, expect.any(Object));
   });
 
   it('should throw an error when links fetch fails', async () => {
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: false,
       status: 500,
       statusText: 'Internal Server Error'
@@ -133,7 +133,7 @@ describe('OgcApiClient.links', () => {
     };
 
     vi.spyOn(client, 'getLinks').mockResolvedValue(mockLinks.links);
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => mockLinks
     });
@@ -168,7 +168,7 @@ describe('OgcApiClient.links', () => {
       ]
     };
 
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => mockLinksResponse
     });

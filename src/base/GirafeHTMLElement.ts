@@ -5,9 +5,8 @@ import { GgUserInteractionEvent } from '../tools/state/userinteractionevent';
 import IGirafeContext from '../tools/context/icontext';
 
 abstract class GirafeHTMLElement extends HTMLElement {
-  protected templateUrl: string | null = null;
-  protected styleUrl: string | null = null;
-  protected styleUrls: string[] | null = null;
+  protected abstract templateUrl: string | null;
+  protected abstract styleUrls: string[] | null;
   protected template!: Hole | (() => Hole);
   public readonly name: string;
   protected shadow: ShadowRoot;
@@ -82,13 +81,7 @@ abstract class GirafeHTMLElement extends HTMLElement {
     }
 
     // Otherwise, we try to find a parent recursively
-    let parent: ParentNode | null = null;
-    if (elem instanceof ShadowRoot) {
-      parent = elem.host;
-    } else {
-      parent = elem.parentNode;
-    }
-
+    const parent = elem instanceof ShadowRoot ? elem.host : elem.parentNode;
     return this.getParentOfType(parentNodeName, parent, elem);
   }
 

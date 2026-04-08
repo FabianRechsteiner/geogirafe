@@ -13,6 +13,9 @@
  * with the OfflineManager component of the application.
  */
 
+const sw = globalThis as unknown as ServiceWorkerGlobalScope;
+const currentOrigin = self.location.origin;
+
 let storeVersion: number; // Version of the store. Value is defined by OfflineManager.
 let dbCacheName: string; // Name of the cache for downloaded data. Value is defined by OfflineManager.
 let tilesStoreName: string; // Name of the store used to downloaded tiles. Value is defined by OfflineManager.
@@ -34,10 +37,10 @@ const appCacheName = 'pages'; // Name of the cache for application pages
 const maxCacheCount = 300; // Number of queries that should be cached by the service-worker for offline usage.
 let cacheCount = 0; // Counter related to the max value above
 
-self.addEventListener('message', handleMessage);
-self.addEventListener('install', handleInstall);
-self.addEventListener('activate', handleActivate);
-self.addEventListener('fetch', (event: FetchEvent) => {
+sw.addEventListener('message', handleMessage);
+sw.addEventListener('install', handleInstall);
+sw.addEventListener('activate', handleActivate);
+sw.addEventListener('fetch', (event: FetchEvent) => {
   if (event.request.mode === 'navigate') {
     return;
   }
@@ -45,6 +48,11 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 });
 
 function handleMessage(event: ExtendableMessageEvent): void {
+  if (event.origin !== currentOrigin) {
+    console.warn(`Message ignored: origin not allwed (${event.origin}`);
+    return;
+  }
+
   const data = event.data;
   if (data.logLevel) {
     logLevel = data.logLevel;
@@ -68,7 +76,7 @@ function handleMessage(event: ExtendableMessageEvent): void {
   }
   audienceExcludedPaths = [];
   if (data.audienceExcludedPaths) {
-    audienceExcludedPaths = data.audienceExcludedPaths.map((str) => new RegExp(str));
+    audienceExcludedPaths = data.audienceExcludedPaths.map((str: string) => new RegExp(str));
     log(`audienceExcludedPaths changed: ${audienceExcludedPaths}`);
   }
   if (data.access_token) {
@@ -102,7 +110,7 @@ function handleMessage(event: ExtendableMessageEvent): void {
 }
 
 function handleInstall() {
-  self.skipWaiting();
+  sw.skipWaiting();
   log('Service Worker installed');
 }
 
@@ -110,7 +118,7 @@ function handleActivate(event: ExtendableEvent): void {
   event.waitUntil(
     (async () => {
       if ('clients' in self) {
-        const clientsList = await self.clients.matchAll({ type: 'window' });
+        const clientsList = await sw.clients.matchAll({ type: 'window' });
         for (const client of clientsList) {
           client.navigate(client.url);
           log('Page reloaded by the Service Worker.');
@@ -203,7 +211,7 @@ function getRequest(request: Request): Request {
     return request;
   } catch (error) {
     // In case of error, we return the initial request
-    log('Error while creating the request with authentication', error);
+    log('Error while creating the request with authentication', error as Error);
     return request;
   }
 }

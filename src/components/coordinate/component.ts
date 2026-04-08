@@ -4,7 +4,7 @@ import { formatCoordinates } from '../../tools/geometrytools';
 
 class CoordinateComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = '../../styles/common.css';
+  styleUrls = ['../../styles/common.css'];
 
   #locale?: string;
   east: string | null = null;
@@ -21,7 +21,7 @@ class CoordinateComponent extends GirafeHTMLElement {
     return this.#locale;
   }
 
-  render() {
+  override render() {
     super.render();
     this.#locale = this.context.configManager.Config.general.locale;
   }

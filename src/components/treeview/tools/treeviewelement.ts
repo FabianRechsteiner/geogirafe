@@ -28,7 +28,7 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     this.dragManager = this.context.dragManager;
   }
 
-  public render() {
+  override render() {
     super.render();
     this.dragButton = this.shadow.getElementById('drag-button') as HTMLButtonElement;
     this.container = this.shadow.getElementById('container') as HTMLElement;
@@ -60,9 +60,9 @@ export default abstract class TreeViewElement extends GirafeHTMLElement {
     }, 3000);
   }
 
-  public refreshRender(): void;
-  public refreshRender(layer?: BaseLayer): void;
-  public refreshRender(layer?: BaseLayer): void {
+  public override refreshRender(): void;
+  public override refreshRender(layer?: BaseLayer): void;
+  public override refreshRender(layer?: BaseLayer): void {
     if (this.state.treeview.renderEnabled && (!layer || layer === this.layer)) {
       // Is called without param, call refresh
       // Else, call refresh only if the layer in param is the current one

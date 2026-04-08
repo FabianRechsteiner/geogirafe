@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import path from 'path';
-import { copy } from './tools.js';
+import { copy, deleteFilesRecursive } from './tools.js';
 
 const sourceDir = 'src';
 const targetDir = path.join('dist', 'lib-src-inline');
@@ -16,3 +16,6 @@ copy('main.tools.ts', sourceDir, targetDir);
 copy('main.ts', sourceDir, targetDir);
 copy('main.mobile.ts', sourceDir, targetDir);
 copy('main.iframe.ts', sourceDir, targetDir);
+
+// Delete test files
+deleteFilesRecursive(targetDir, ['.spec.js', '.spec.ts']);

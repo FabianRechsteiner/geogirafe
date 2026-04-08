@@ -22,7 +22,7 @@ class LRPanelComponent extends GirafeResizableElement {
   styleUrls = ['../../styles/common.css', './style.css'];
 
   private stateToggleManager?: StateToggleManager;
-  public title: string = 'Unknown panel';
+  public panelTitle: string = 'Unknown panel';
 
   public get hasMultipleChilds() {
     if (this.stateToggleManager) {
@@ -89,7 +89,7 @@ class LRPanelComponent extends GirafeResizableElement {
 
   public renderPanel(panel: IGirafePanel) {
     if (panel.isPanelVisible) {
-      this.title = panel.panelTitle;
+      this.panelTitle = panel.panelTitle;
       this.show();
       this.refreshRender();
     } else {

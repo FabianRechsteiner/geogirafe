@@ -102,7 +102,7 @@ class LayoutComponent extends GirafeHTMLElement implements IGirafePanel {
     this.registerEvents();
   }
 
-  render() {
+  override render() {
     if (this.isPanelVisible) {
       super.render();
     } else {

@@ -6,6 +6,9 @@ import { register } from 'ol/proj/proj4';
 import GirafeContext from '../context/context';
 
 export default class GeoGirafeAppComponent extends GirafeHTMLElement {
+  templateUrl = null;
+  styleUrls = null;
+
   private readonly ready: Promise<void>;
   private resolveReady!: () => void;
 
@@ -63,12 +66,5 @@ export default class GeoGirafeAppComponent extends GirafeHTMLElement {
         state.interface.darkFrontendMode = false;
       }
     });
-
-    // Translate everything in body that is not a component
-    // TODO REG : Do we still need this ? Probably not
-    /*const bodyElement = document.querySelector('body');
-    if (bodyElement) {
-      document.geogirafe.stateManager.subscribe('language', () => i18nManager.translate(bodyElement));
-    }*/
   }
 }

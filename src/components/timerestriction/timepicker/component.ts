@@ -15,7 +15,7 @@ class TimePickerComponent extends TimeWidget {
     super('time-picker');
   }
 
-  public renderComponent() {
+  override renderComponent() {
     super.renderComponent();
     this.configureInputElements();
     this.addEventListeners();

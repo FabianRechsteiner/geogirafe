@@ -15,7 +15,7 @@ class SimpleMaskLayer extends Layer {
     super({ className: 'simpleMask', ...options });
 
     this.fillColor = color;
-    this.context = createCanvasContext2D();
+    this.context = createCanvasContext2D() as CanvasRenderingContext2D;
     this.context.canvas.style.opacity = '0.5';
     this.context.canvas.style.position = 'absolute';
   }

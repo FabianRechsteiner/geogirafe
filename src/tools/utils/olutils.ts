@@ -146,7 +146,7 @@ export const reprojectGeometry = (
     const reprojectedGeometry = geometry.clone();
     return reprojectedGeometry.transform(sourceProjection, destinationProjection);
   } catch (e) {
-    throw new Error(`Not able to reproject geometry: ${e}`);
+    throw new Error(`Not able to reproject geometry: ${e}`, { cause: e });
   }
 };
 
@@ -211,4 +211,4 @@ export const getAzimuthAsText = (azimuth?: number): string => {
     return `${azimuth.toFixed(0)}°`;
   }
   return '';
-}
+};

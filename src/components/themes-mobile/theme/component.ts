@@ -17,7 +17,7 @@ class MobileThemeElementComponent extends GirafeHTMLElement {
     super('theme-mobile');
   }
 
-  render() {
+  override render() {
     super.render();
     this.refreshTheme();
   }

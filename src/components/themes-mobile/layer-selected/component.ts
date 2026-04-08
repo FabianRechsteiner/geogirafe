@@ -4,8 +4,8 @@ import WmsLegendHelper from '../../../tools/wms/wmslegendhelper';
 import MobileLayerElementComponent from '../layer/component';
 
 class MobileSelectedLayerElementComponent extends MobileLayerElementComponent {
-  templateUrl = './template.html';
-  styleUrls = ['../../../styles/common.mobile.css', './style.css'];
+  override templateUrl = './template.html';
+  override styleUrls = ['../../../styles/common.mobile.css', './style.css'];
 
   iconUrl: string | null = null;
   legendUrls: Record<string, string> = {};
@@ -36,7 +36,7 @@ class MobileSelectedLayerElementComponent extends MobileLayerElementComponent {
     return this.state.oauth.audience.includes(hostname) ? 'use-credentials' : 'anonymous';
   }
 
-  render() {
+  override render() {
     if (this.layer instanceof LayerWms) {
       // Manage Legend icons for WMS
       this.iconUrl = this.wmsLegendHelper.getIconUrl(this.layer);

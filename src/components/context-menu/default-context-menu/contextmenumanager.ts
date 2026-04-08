@@ -102,7 +102,7 @@ export default class MapContextMenuManager {
 
       try {
         const image = await getImage(el.url);
-        const transform = extractGeoTransform(image);
+        const transform = await extractGeoTransform(image);
         raster.image = image;
         raster.transform = transform;
       } catch (err) {

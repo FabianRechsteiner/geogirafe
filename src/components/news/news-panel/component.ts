@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { FeedEntry } from './newsfeedutils';
 
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
@@ -38,7 +39,7 @@ class NewsPanelComponent extends GirafeHTMLElement implements IGirafePanel {
     this.render();
   }
 
-  render() {
+  override render() {
     if (this.isPanelVisible) {
       super.render();
     } else {

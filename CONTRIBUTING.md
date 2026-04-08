@@ -82,29 +82,45 @@ You can contact us through the following channels:
 
 ## Thank you!
 
-> «&nbsp;We ourselves feel that what we are doing is just a drop in the ocean.
+> «&nbsp;We ourselves feel that what we are doing is just a drop in the ocean.  
 > But the ocean would be less because of that missing drop.&nbsp;»
 
 A big thank to all the contributors of GeoGirafe, in alphabetical order:
 
 - Anja Sutter @u222052 (Geoinformation Basel-Landschaft)
-- Anne Maier @svamaa (Geoinformation Basel-Stadt)
+- Alexandre Junod @AlexandreJunod (SIT Yverdon-les-bains)
+- Anne Philipp @svamaa (Geoinformation Basel-Stadt)
 - Arnaud Poncet-Montanges @ponceta (SIGIP)
+- Barbara Bombelli @barbara.bombelli (Geoinformation Ticino)
 - Ben Koch @beeekey (OpenGIS)
 - Benjamin Gerber @ger-benjamin (Camptocamp SA)
 - Clemens Rudert @crud3_rt (OpenGIS)
 - Corentin Junod @D0lpic (SITN Neuchâtel)
 - Daniel Gnerre @gnerred (Cartoriviera)
+- Daniel Kastner @danielkastner (Karakun)
 - Didier Dupertuis @dddpt (OpenGIS)
 - Dietmar Schneider @sdietmar (Techplus Tirol)
 - Guillaume Remy @remyguillaume (Geoinformation Basel-Stadt)
+- Jonathan Lurie @jonathanlurie (Camptocamp SA)
 - Karsten Deininger @kdeininger (Geoinformation Basel-Landschaft)
-- Loris Hubler @hubi_bs (Geoinformation Basel-Stadt)
+- Laurent Lienher @llienher (JaquierPointet SA)
+- Loris Hubler @lhubler (Geoinformation Basel-Stadt)
+- Lucie Nicolier @lucienicolier (JaquierPointet SA)
 - Matthew Parkan @matthew.parkan (SITN Neuchâtel)
 - Michael Müller @michmuel (Geoinformation Basel-Landschaft)
-- Olivier Monod @monodo (Yverdon-les-bains)
+- Moritz Kirmse @mki-c2c (Camptocamp SA)
+- Nicolas Blanc @nicolas-sitylb (SIT Yverdon-les-bains)
+- Olivier Monod @monodo (SIT Yverdon-les-bains)
 - Patricia Moll @piMoll (OpenGIS)
 - Pauline Fanguin @pfanguin (Cartolacote)
+- Philipp Franke @philippfra (Geoinformation Basel-Landschaft)
 - Rémi Bovard @rbovard (Cartoriviera)
-- Ruth Albrecht (Geoinformation Basel-Landschaft)
 - Stéphane Malta e Sousa @maltaesousa (SITN Neuchâtel)
+
+And a special thank you to :
+- Ruth Albrecht (Geoinformation Basel-Landschaft).  
+<img src=".gitlab/ruth.png" width="80" />
+
+She supported GeoGirafe from its very beginning but sadly left us far too soon.  
+We are not forgetting you.
+

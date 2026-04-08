@@ -56,7 +56,7 @@ afterAll(() => {
 describe('OgcApiFeaturesClient.getCollectionRelation', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    global.fetch = vi.fn();
+    globalThis.fetch = vi.fn();
     client = new OgcApiFeaturesClient(server, {}, context);
 
     // Mock getCollection to provide fake collection data for tests
@@ -65,7 +65,7 @@ describe('OgcApiFeaturesClient.getCollectionRelation', () => {
 
   it('should return the parsed JSON response for a valid relation and type', async () => {
     const mockResponse = { test: 'data' };
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => mockResponse
     });
@@ -76,7 +76,7 @@ describe('OgcApiFeaturesClient.getCollectionRelation', () => {
       'application/schema+json'
     );
     expect(result).toEqual(mockResponse);
-    expect(global.fetch).toHaveBeenCalledWith(`${mockUrl}/collections/${collectionId}/schema`, expect.any(Object));
+    expect(globalThis.fetch).toHaveBeenCalledWith(`${mockUrl}/collections/${collectionId}/schema`, expect.any(Object));
   });
 
   it('should throw an error if the relation link is not found', async () => {
@@ -89,11 +89,11 @@ describe('OgcApiFeaturesClient.getCollectionRelation', () => {
     ).rejects.toThrow(
       `OGC API collection '${collectionId}' does not support 'http://www.opengis.net/def/rel/ogc/1.0/invalid'`
     );
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(globalThis.fetch).not.toHaveBeenCalled();
   });
 
   it('should throw an error if the fetch response is not ok', async () => {
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: false,
       status: 404,
       statusText: 'Not Found'
@@ -110,11 +110,11 @@ describe('OgcApiFeaturesClient.getCollectionRelation', () => {
 
   it('should return the raw response for a non-JSON encoding type', async () => {
     const mockResponse = new Response('raw data');
-    (global.fetch as any).mockResolvedValue(mockResponse);
+    (globalThis.fetch as any).mockResolvedValue(mockResponse);
 
     const result = await client.getCollectionRelation(collectionId, 'someOtherRelation', 'text/plain');
     expect(result).toEqual(mockResponse);
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       `${mockUrl}/collections/${collectionId}/someOtherRelation`,
       expect.any(Object)
     );
@@ -124,7 +124,7 @@ describe('OgcApiFeaturesClient.getCollectionRelation', () => {
 describe('OgcApiFeaturesClient.getCrsIdentifier', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    global.fetch = vi.fn();
+    globalThis.fetch = vi.fn();
     client = new OgcApiFeaturesClient(server, {}, context);
     vi.spyOn(client, 'getCollection').mockResolvedValue(mockCollection);
   });
@@ -155,7 +155,7 @@ describe('OgcApiFeaturesClient.getCrsIdentifier', () => {
 describe('OgcApiFeaturesClient.getStorageCrs', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    global.fetch = vi.fn();
+    globalThis.fetch = vi.fn();
     client = new OgcApiFeaturesClient(server, {}, context);
     vi.spyOn(client, 'getCollection').mockResolvedValue(mockCollection);
   });
@@ -201,7 +201,7 @@ describe('OgcApiFeaturesClient.getStorageCrs', () => {
 describe('OgcApiFeaturesClient.reprojectItemToStorageCrs', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    global.fetch = vi.fn();
+    globalThis.fetch = vi.fn();
     client = new OgcApiFeaturesClient(server, {}, context);
     vi.spyOn(client, 'getCollection').mockResolvedValue(mockCollection);
   });

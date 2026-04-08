@@ -167,7 +167,7 @@ export default class GeoGirafeApp {
       try {
         sw = await this.waitForServiceWorkerActivation();
       } catch (err) {
-        throw new Error(`Service worker registration failed. ${err}`);
+        throw new Error(`Service worker registration failed. ${err}`, { cause: err });
       }
 
       // Communicate logging configuration to service-worker

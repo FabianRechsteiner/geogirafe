@@ -204,7 +204,7 @@ export default class OlDrawing {
             const circle = geometry as CircleGeom;
             const newRadius = circle.getRadius();
             const properties = circle.getProperties();
-            const {pointer} = properties;
+            const { pointer } = properties;
             const oldRadiusLine = new LineString([circle.getCenter(), pointer]);
             oldRadiusLine.scale(newRadius / oldRadiusLine.getLength());
             circle.setProperties({
@@ -214,7 +214,7 @@ export default class OlDrawing {
           }
         });
       });
-    })
+    });
 
     // Update the modified geometries in the state
     this.modify.on('modifyend', (e) => {
@@ -545,7 +545,7 @@ export default class OlDrawing {
       geom.setProperties({
         azimuth: geometry.azimuth,
         pointer: geometry.pointer
-      })
+      });
       olFeature = new Feature(geom);
     } else {
       olFeature = new Feature(new GeoJSON().readFeatures(dFeature.geojson)[0].getGeometry());
@@ -599,7 +599,7 @@ export default class OlDrawing {
     geom = geom ?? new CircleGeom(coord[0], getDistance(coord, this.state.projection));
     (geom as CircleGeom).setCenterAndRadius(coord[0], getDistance(coord, this.state.projection));
     geom.setProperties({
-      azimuth: ((90 - (Math.atan2(coord[1][1] - coord[0][1], coord[1][0] - coord[0][0]) * (180 / Math.PI)) + 360) % 360),
+      azimuth: (90 - Math.atan2(coord[1][1] - coord[0][1], coord[1][0] - coord[0][0]) * (180 / Math.PI) + 360) % 360,
       pointer: coord[1]
     });
     return geom;

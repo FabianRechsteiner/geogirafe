@@ -9,7 +9,7 @@ import OlFeature from 'ol/Feature';
 import WfsManager from './wfsmanager';
 
 const fetchMock = vi.fn();
-global.fetch = fetchMock;
+globalThis.fetch = fetchMock;
 let context: IGirafeContext;
 
 describe('WMS Manager tests', () => {

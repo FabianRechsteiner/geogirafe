@@ -89,7 +89,7 @@ class ShareComponent extends GirafeHTMLElement implements IGirafePanel {
     }
   }
 
-  render() {
+  override render() {
     if (this.isPanelVisible) {
       this.renderComponent();
     } else {

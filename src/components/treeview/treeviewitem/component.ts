@@ -48,7 +48,7 @@ class TreeViewItemComponent extends TreeViewElement {
     this.layer = layer;
   }
 
-  render() {
+  override render() {
     // If we come from a html element, the layer was not defined in the constructor
     // And we have to set the layer using the id passed to the layerid attribute
     const layerId = this.getAttribute('layerid');

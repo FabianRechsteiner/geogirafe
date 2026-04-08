@@ -17,7 +17,7 @@ class TreeViewThemeComponent extends TreeViewGroupElement {
     this.layer = theme;
   }
 
-  render() {
+  override render() {
     // If we come from an  html element, the layer was not defined in the constructor
     // And we have to set the layer using the id passed to the layerid attribute
     const themeId = this.getAttribute('themeid');

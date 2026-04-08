@@ -3,7 +3,7 @@ import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 
 class ScaleComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrl = '../../styles/common.css';
+  styleUrls = ['../../styles/common.css'];
 
   public constructor() {
     super('scale');

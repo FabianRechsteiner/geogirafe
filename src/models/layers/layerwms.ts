@@ -61,7 +61,6 @@ class LayerWms extends Layer implements ILayerWithLegend, ILayerWithFilter, ILay
   public iconUrl?: string;
   public legendRule?: string;
   public legendImage?: string;
-  public isLegendExpanded: boolean;
   public wasLegendExpanded: boolean;
   public hiDPILegendImages?: Record<string, string>;
   public printNativeAngle?: boolean; // TODO BGE Is it correct to have it at this level (should be for groups) ?

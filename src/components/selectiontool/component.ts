@@ -181,7 +181,7 @@ export default class SelectionToolComponent extends GirafeHTMLElement implements
     }
   }
 
-  render() {
+  override render() {
     super.render();
 
     this.selectionMode = this.state.selection.selectionMode;
@@ -232,7 +232,7 @@ export default class SelectionToolComponent extends GirafeHTMLElement implements
     }
   }
 
-  connectedCallback() {
+  override connectedCallback() {
     super.connectedCallback();
 
     this.render();

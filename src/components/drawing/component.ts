@@ -88,7 +88,7 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
     super(name);
   }
 
-  render() {
+  override render() {
     super.render();
     if (this.isPanelVisible) {
       this.renderComponent();
@@ -142,7 +142,7 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
     this.warnWhenInWebMercator();
   }
 
-  refreshRender() {
+  override refreshRender() {
     // Set the color picker color to the properties of the first selected feature. Necessary, so subsequently
     // selected features do not change color immediately upon selecting them, but only after manually setting
     // the color via color picker.

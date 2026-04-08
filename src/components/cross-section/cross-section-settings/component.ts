@@ -342,7 +342,6 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement implements IGirafe
 
     this.polygonSource.clear();
     const geometry = this.linestring.getGeometry();
-    // @ts-expect-error: JSTS types not clean
     const jstsGeom = this.parser.read(geometry as Geometry);
     const bufferParams = new BufferParameters(
       BufferParameters.DEFAULT_QUADRANT_SEGMENTS,
@@ -896,7 +895,7 @@ class CrossSectionSettingsComponent extends GirafeHTMLElement implements IGirafe
   }
 
   // Renders the component or the empty component depending on visibility attribute
-  render(): void {
+  override render(): void {
     if (this.isPanelVisible) {
       this.renderComponent();
     } else {

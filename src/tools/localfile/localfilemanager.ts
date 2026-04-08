@@ -62,7 +62,7 @@ class LocalFileManager extends GirafeSingleton {
 
   public async loadLocalFile(localFile: File) {
     const text = await localFile.text();
-    let reader = null;
+    let reader;
     if (text.includes('<kml') && text.includes('</kml>')) {
       reader = new KML({ extractStyles: true });
     } else if (text.includes('<gpx') && text.includes('</gpx>')) {

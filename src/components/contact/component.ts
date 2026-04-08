@@ -69,7 +69,7 @@ class ContactComponent extends GirafeHTMLElement implements IGirafePanel {
     }
   }
 
-  render() {
+  override render() {
     if (this.isPanelVisible) {
       super.render();
     } else {

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * Use this Decorator to mark a Method that seems unused but is used in the HTML Template.
  * @constructor

@@ -83,9 +83,9 @@ class PrintMaskManager {
     // BGE debounce this could be great here
     const mapSize = frameState.size;
     const viewResolution = frameState.viewState.resolution;
-    console.assert(this.state.print.pageSize, 'Can not get optimal scale without print pageSize');
+    console.assert(this.state.print.pageSize !== null, 'Can not get optimal scale without print pageSize');
     const pageSize = this.state.print.pageSize ?? [0, 0];
-    let optimalScale;
+    let optimalScale: number;
     if (this.scaleManuallySelected) {
       optimalScale = this.state.print.scale ?? 10000;
     } else {

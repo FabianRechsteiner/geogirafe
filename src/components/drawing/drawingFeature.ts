@@ -262,7 +262,9 @@ export default class DrawingFeature {
   }
 
   getAzimuthText(circle: CircleGeom) {
-    return getAzimuthAsText(this.displayMeasure ? circle.getProperties()['azimuth'] as number ?? undefined : undefined);
+    return getAzimuthAsText(
+      this.displayMeasure ? ((circle.getProperties()['azimuth'] as number) ?? undefined) : undefined
+    );
   }
 
   isPointOrPolyline() {
@@ -341,8 +343,8 @@ export default class DrawingFeature {
           type: 'Disk',
           center: center,
           radius: radius,
-          azimuth: disk.getProperties()['azimuth'] as number ?? 0,
-          pointer: pointer,
+          azimuth: (disk.getProperties()['azimuth'] as number) ?? 0,
+          pointer: pointer
         }
       };
     }

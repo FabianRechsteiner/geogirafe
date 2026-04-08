@@ -31,7 +31,7 @@ class PrintMaskLayer extends SimpleMaskLayer {
   /**
    * Draw the print canvas mask.
    */
-  render(frameState: FrameState) {
+  override render(frameState: FrameState) {
     if (this.size === null) {
       throw Error('Cannot render Mask : size has not been set.');
     }

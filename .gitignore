@@ -11,3 +11,4 @@ vite.config.js.timestamp-*.mjs
 buildtools/certs/*.pem
 buildtools/certs/default/rootCA-key.pem
 src/service-worker.js
+.agents/skills/superpowers
