@@ -184,10 +184,10 @@ class SwipeManager {
     const mapSize: Size = size;
     const width: number = mapSize[0] * (parseInt(this.swiper.value) / this.swiperMaxVal);
 
-    let tl = null;
-    let tr = null;
-    let bl = null;
-    let br = null;
+    let tl;
+    let tr;
+    let bl;
+    let br;
     if (side === 'right') {
       // Coordinates for rendering to the right
       tl = getRenderPixel(event, [width, 0]);

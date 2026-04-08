@@ -3,6 +3,7 @@ import MagicString from 'magic-string';
 import fs from 'fs-extra';
 import path from 'path';
 import { minify } from 'minify';
+import fg from 'fast-glob';
 
 export function findFilesRecursive(sourceDir, allowedExtensions, fileList = []) {
   const childs = fs.readdirSync(sourceDir);
@@ -23,9 +24,36 @@ export function findFilesRecursive(sourceDir, allowedExtensions, fileList = []) 
   return fileList;
 }
 
+export function deleteFilesRecursive(sourceDir, extensionsToDelete, fileList = []) {
+  const childs = fs.readdirSync(sourceDir);
+
+  childs.forEach((filename) => {
+    const src = path.join(sourceDir, filename);
+
+    if (fs.statSync(src).isDirectory()) {
+      deleteFilesRecursive(src, extensionsToDelete, fileList);
+    } else if (extensionsToDelete.some((ext) => filename.endsWith(ext))) {
+      console.info(`Deleting file ${src}`);
+      fileList.push(src);
+      fs.unlinkSync(src);
+    }
+  });
+}
+
 export function deleteDirectory(sourceDir) {
   if (fs.existsSync(sourceDir)) {
+    console.info(`Deleting directory ${sourceDir} recursively`);
     fs.rmSync(sourceDir, { recursive: true });
+  }
+}
+
+export function deleteFiles(patterns) {
+  for (const pattern of patterns) {
+    const filesToDelete = fg.globSync(pattern, { absolute: true });
+    for (const fileToDelete of filesToDelete) {
+      console.info(`Deleting file ${fileToDelete}`);
+      fs.rmSync(fileToDelete);
+    }
   }
 }
 
@@ -82,7 +110,10 @@ async function getHtmlCode(currentFilename, relativeHtmlPath, styleCode) {
         removeAttributeQuotes: false
       }
     });
-    htmlCode = `template = () => { return uHtml\`${styleCode}\n${htmlCode}\`; }`;
+    htmlCode = `
+  templateUrl = null;
+  styleUrls = null;
+  template = () => { return uHtml\`${styleCode}\n${htmlCode}\`; }`;
     return htmlCode;
   } catch (error) {
     console.error(`Error reading html file for ${currentFilename}: ${error}`);
@@ -136,9 +167,9 @@ function isStringCommented(line) {
 }
 
 // Regex definitions
-export const styleRegex = /styleUrl *= *['"](.*)['"] *;?/g;
-export const stylesRegex = /styleUrls *= *\[([\s\S]*?)\] *;?/gs;
-export const htmlRegex = /templateUrl *= *['"](.*)['"] *;?/g;
+export const styleRegex = /(?:override\s+)?styleUrl *= *['"](.*)['"] *;?/g;
+export const stylesRegex = /(?:override\s+)?styleUrls *= *\[([\s\S]*?)\] *;?/gs;
+export const htmlRegex = /(?:override\s+)?templateUrl *= *['"](.*)['"] *;?/g;
 
 export async function inlineTemplate(filename) {
   // Read the file

@@ -25,7 +25,7 @@ export default class OauthComponent extends GirafeHTMLElement {
     return this.state.oauth.userInfo?.email ?? 'Unknown User';
   }
 
-  refreshRender() {
+  override refreshRender() {
     this.getUserIconUrl().then((url) => {
       this.userIconUrl = url;
       super.refreshRender();

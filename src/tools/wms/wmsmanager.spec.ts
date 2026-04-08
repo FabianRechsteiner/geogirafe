@@ -6,10 +6,9 @@ import Map from 'ol/Map';
 import { mockOgcServers, mockWmsLayers } from '../tests/wmswfsmanagermocking';
 import { WmsClientMapServer, WmsClientQgis } from './wmsclient';
 import MockHelper from '../tests/mockhelper';
-//import ConfigManager from '../configuration/configmanager';
 
 const fetchMock = vi.fn();
-global.fetch = fetchMock;
+globalThis.fetch = fetchMock;
 
 describe('WMS Manager tests', () => {
   let context = MockHelper.startMocking();

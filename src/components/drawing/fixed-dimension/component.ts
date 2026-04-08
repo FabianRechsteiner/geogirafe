@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 
 import checkedIcon from '../../../assets/icons/checked-full.svg?raw';
@@ -42,7 +43,7 @@ class FixedDimensionComponent extends GirafeHTMLElement {
     this.displayStyle = 'grid';
   }
 
-  render() {
+  override render() {
     super.render();
     this.refreshDimensionName();
     this.refreshDimension();

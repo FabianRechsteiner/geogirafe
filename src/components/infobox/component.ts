@@ -12,7 +12,7 @@ class InfoboxComponent extends GirafeHTMLElement {
   urlRegExp = /(https?:\/\/[^"<]*?(?=\s|$|<\/[^a]>))/gi;
 
   // Each message can have a seperate timer or be persistent (until closed by user)
-  private readonly autoCloseTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly autoCloseTimers = new Map<string, NodeJS.Timeout>();
 
   public constructor() {
     super('infobox');

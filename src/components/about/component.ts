@@ -45,7 +45,7 @@ class AboutComponent extends GirafeHTMLElement implements IGirafePanel {
     this.render();
   }
 
-  render() {
+  override render() {
     if (this.isPanelVisible) {
       super.render();
     } else {

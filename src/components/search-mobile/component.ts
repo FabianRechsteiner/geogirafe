@@ -2,8 +2,8 @@
 import SearchComponent from '../search/component';
 
 class MobileSearchComponent extends SearchComponent {
-  templateUrl = './template.html';
-  styleUrls = ['../../styles/common.mobile.css', './style.css'];
+  override templateUrl = './template.html';
+  override styleUrls = ['../../styles/common.mobile.css', './style.css'];
 }
 
 export default MobileSearchComponent;

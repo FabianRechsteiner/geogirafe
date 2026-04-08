@@ -23,7 +23,7 @@ class NavigationComponent extends GirafeHTMLElement {
     super('navigation');
   }
 
-  render() {
+  override render() {
     super.render();
   }
 

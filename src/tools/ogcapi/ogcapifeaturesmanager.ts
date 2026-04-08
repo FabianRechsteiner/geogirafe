@@ -39,7 +39,7 @@ export default class OgcApiFeaturesManager extends VendorSpecificOgcServerManage
       const schema = await this.getClient(layer.server).getSchema(layer.collectionId);
       return new OgcApiFeaturesSchema(schema);
     } catch (e) {
-      throw new Error(`Unable to get schema: ${e}`);
+      throw new Error(`Unable to get schema: ${e}`, { cause: e });
     } finally {
       this.state.loading = false;
     }

@@ -15,6 +15,7 @@
     "isolatedModules": true,
     "noEmit": false,
     "declaration": true,
+    "rootDir": "dist/lib-src-inline",
     "outDir": "dist/lib",
 
     /* Linting */
@@ -24,7 +25,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
-    "types": ["vite/client", "jsts"]
+    "types": ["vite/client", "node"]
   },
   "include": ["dist/lib-src-inline/**/*.ts"]
 }

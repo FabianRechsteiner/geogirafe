@@ -22,7 +22,7 @@ class MobileLayerElementComponent extends GirafeHTMLElement {
     });
   }
 
-  render() {
+  override render() {
     super.render();
     this.refreshGroup();
   }

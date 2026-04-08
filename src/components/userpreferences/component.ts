@@ -93,7 +93,7 @@ export default class UserPreferencesComponent extends GirafeHTMLElement implemen
     this.subscribe('interface.darkMapMode', (_, newValue) => this.onChangeDarkMapMode(newValue));
   }
 
-  render(): void {
+  override render(): void {
     if (this.isPanelVisible) {
       this.renderComponent();
     } else {

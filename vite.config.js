@@ -73,8 +73,9 @@ export default defineConfig(({ command, mode }) => {
           api: resolve(__dirname, 'api.html')
         },
         output: {
-          manualChunks: {
-            lazy: [
+          manualChunks: (id) => {
+            // lazy loading for not priritary libraries
+            const lazyDependencies = [
               '@geoblocks/mapfishprint',
               '@geoblocks/print',
               'buffer',
@@ -88,7 +89,15 @@ export default defineConfig(({ command, mode }) => {
               'tippy.js',
               'vanilla-picker',
               'driver.js'
-            ]
+            ];
+            if (lazyDependencies.some((dep) => id.includes(`node_modules/${dep}`))) {
+              return 'lazy';
+            }
+            // lazy loading for cesium dependencies
+            const cesiumDependencies = ['cesium', 'olcs/OLCesium'];
+            if (cesiumDependencies.some((dep) => id.includes(`node_modules/${dep}`))) {
+              return 'cesium';
+            }
           },
           entryFileNames: (chunkInfo) => {
             if (chunkInfo.name === 'api') {
@@ -102,9 +111,6 @@ export default defineConfig(({ command, mode }) => {
           }
         }
       }
-    },
-    optimizeDeps: {
-      include: ['cesium', 'olcs/OLCesium']
     },
     plugins: [
       viteStaticCopy({

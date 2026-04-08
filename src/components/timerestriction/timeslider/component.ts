@@ -26,7 +26,7 @@ class TimeSliderComponent extends TimeWidget {
    *
    * @param {ITimeOptions} timeOptions - Configuration options for the time widget.
    */
-  public initialize(timeOptions: ITimeOptions) {
+  override initialize(timeOptions: ITimeOptions) {
     super.initialize(timeOptions);
 
     // timeOptions can optionally define a list of discrete time values for the slider to step through
@@ -40,7 +40,7 @@ class TimeSliderComponent extends TimeWidget {
     }
   }
 
-  public renderComponent() {
+  override renderComponent() {
     super.renderComponent();
     this.configureInputElements();
     // Set default values for slider handles
@@ -54,7 +54,7 @@ class TimeSliderComponent extends TimeWidget {
    * @param {TimeRangeLimit} [limit] - Optional parameter specifying the limit ('upper' or 'lower') for which value is to be fetched.
    * @return {string} The date string value retrieved from the input element.
    */
-  public getValue(limit?: TimeRangeLimit): string {
+  public override getValue(limit?: TimeRangeLimit): string {
     return this.sliderPositionToDateString(super.getValue(limit));
   }
 

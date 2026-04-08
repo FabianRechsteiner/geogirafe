@@ -13,7 +13,7 @@ class TreeViewGroupComponent extends TreeViewGroupElement {
     this.layer = group;
   }
 
-  render() {
+  override render() {
     // If we come from an  html element, the layer was not defined in the constructor
     // And we have to set the layer using the id passed to the layerid attribute
     const groupId = this.getAttribute('groupid');

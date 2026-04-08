@@ -307,7 +307,7 @@ class ThemesManager extends GirafeSingleton {
     const ogcServerName = elem.ogcServer ? elem.ogcServer : parentServer;
 
     // Create Layer
-    let layer: BaseLayer | null = null;
+    let layer: BaseLayer | null;
     switch (elem.type) {
       case 'OSM': {
         layer = new LayerOsm(order.value);

@@ -314,7 +314,7 @@ export default class MapComponent extends GirafeHTMLElement {
     this.olMap.getView().setCenter(numbers);
   };
 
-  render() {
+  override render() {
     super.render();
 
     // Read out the default projection from config, ignoring user preferences

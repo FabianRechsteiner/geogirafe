@@ -1,6 +1,6 @@
 ## Description
 
-What is the purpose of this Merge Request?_  
+_What is the purpose of this Merge Request?_  
 _What probem does it solve?_  
 _What are the linked issues or references?_
 
@@ -23,8 +23,9 @@ _(No images, just text.)_
 
 _If checked, document the required steps below._
 _Examples of changes that require manual migration:_
+
 - _Updates to main templates (index.html, mobile.html, ...)_
-- _Update to main typescript files (main.ts, main.*.ts, ...)_
+- _Update to main typescript files (main.ts, main.\*.ts, ...)_
 - _Renaming or deletion of a configuration entry (config.json file)_
 - _Renaming od deletion of a public/protected method in an exported class_
 - _Migration to a new version of a dependency with breaking changes_

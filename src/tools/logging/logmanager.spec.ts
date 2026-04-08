@@ -26,17 +26,14 @@ describe('LogManager', () => {
     expect(written).toBe(true);
     // Info
     configManager.Config.general.logLevel = 'info';
-    str = 'Hello, Giraffe!';
     written = console.debug(str);
     expect(written).toBe(false);
     // Warn
     configManager.Config.general.logLevel = 'warn';
-    str = 'Hello, Giraffe!';
     written = console.debug(str);
     expect(written).toBe(false);
     // Error
     configManager.Config.general.logLevel = 'error';
-    str = 'Hello, Giraffe!';
     written = console.debug(str);
     expect(written).toBe(false);
   });
@@ -49,17 +46,14 @@ describe('LogManager', () => {
     expect(written).toBe(true);
     // Info
     configManager.Config.general.logLevel = 'info';
-    str = 'Hello, Giraffe!';
     written = console.info(str);
     expect(written).toBe(true);
     // Warn
     configManager.Config.general.logLevel = 'warn';
-    str = 'Hello, Giraffe!';
     written = console.info(str);
     expect(written).toBe(false);
     // Error
     configManager.Config.general.logLevel = 'error';
-    str = 'Hello, Giraffe!';
     written = console.info(str);
     expect(written).toBe(false);
   });
@@ -72,17 +66,14 @@ describe('LogManager', () => {
     expect(written).toBe(true);
     // Info
     configManager.Config.general.logLevel = 'info';
-    str = 'Hello, Giraffe!';
     written = console.log(str);
     expect(written).toBe(true);
     // Warn
     configManager.Config.general.logLevel = 'warn';
-    str = 'Hello, Giraffe!';
     written = console.log(str);
     expect(written).toBe(false);
     // Error
     configManager.Config.general.logLevel = 'error';
-    str = 'Hello, Giraffe!';
     written = console.log(str);
     expect(written).toBe(false);
   });
@@ -95,17 +86,14 @@ describe('LogManager', () => {
     expect(written).toBe(true);
     // Info
     configManager.Config.general.logLevel = 'info';
-    str = 'Hello, Giraffe!';
     written = console.warn(str);
     expect(written).toBe(true);
     // Warn
     configManager.Config.general.logLevel = 'warn';
-    str = 'Hello, Giraffe!';
     written = console.warn(str);
     expect(written).toBe(true);
     // Error
     configManager.Config.general.logLevel = 'error';
-    str = 'Hello, Giraffe!';
     written = console.warn(str);
     expect(written).toBe(false);
   });
@@ -118,18 +106,43 @@ describe('LogManager', () => {
     expect(written).toBe(true);
     // Info
     configManager.Config.general.logLevel = 'info';
-    str = 'Hello, Giraffe!';
     written = console.error(str);
     expect(written).toBe(true);
     // Warn
     configManager.Config.general.logLevel = 'warn';
-    str = 'Hello, Giraffe!';
     written = console.error(str);
     expect(written).toBe(true);
     // Error
     configManager.Config.general.logLevel = 'error';
-    str = 'Hello, Giraffe!';
     written = console.error(str);
+    expect(written).toBe(true);
+  });
+
+  it('should output assert log at any level', () => {
+    // Debug
+    configManager.Config.general.logLevel = 'debug';
+    let str = 'Hello, Giraffe!';
+    let written = console.assert(true, str);
+    expect(written).toBe(false);
+    written = console.assert(false, str);
+    expect(written).toBe(true);
+    // Info
+    configManager.Config.general.logLevel = 'info';
+    written = console.assert(true, str);
+    expect(written).toBe(false);
+    written = console.assert(false, str);
+    expect(written).toBe(true);
+    // Warn
+    configManager.Config.general.logLevel = 'warn';
+    written = console.assert(true, str);
+    expect(written).toBe(false);
+    written = console.assert(false, str);
+    expect(written).toBe(true);
+    // Error
+    configManager.Config.general.logLevel = 'error';
+    written = console.assert(true, str);
+    expect(written).toBe(false);
+    written = console.assert(false, str);
     expect(written).toBe(true);
   });
 });

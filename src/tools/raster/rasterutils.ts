@@ -6,9 +6,9 @@ export interface GeoTransform {
   pixelScale: number[];
 }
 
-export function extractGeoTransform(image: GeoTIFFImage): GeoTransform {
-  const tiePoint = image.getTiePoints()[0];
-  const pixelScale = image.getFileDirectory().ModelPixelScale;
+export async function extractGeoTransform(image: GeoTIFFImage): Promise<GeoTransform> {
+  const tiePoint = (await image.getTiePoints())[0];
+  const pixelScale = image.getFileDirectory().getValue('ModelPixelScale') as number[];
   return { tiePoint, pixelScale };
 }
 

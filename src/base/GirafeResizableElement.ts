@@ -21,7 +21,7 @@ That's it.
 
 */
 
-class GirafeResizableElement extends GirafeHTMLElement {
+abstract class GirafeResizableElement extends GirafeHTMLElement {
   private gutter?: HTMLElement;
   private closeButton?: HTMLElement;
   protected readonly dock: 'left' | 'right' | 'bottom';
@@ -50,7 +50,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
     }
   }
 
-  public render() {
+  public override render() {
     this.restoreLastDimensions();
     super.render();
     this.makeResizable();
@@ -123,9 +123,7 @@ class GirafeResizableElement extends GirafeHTMLElement {
     this.dispatchEvent(new CustomEvent('resize-end'));
   }
 
-  protected closePanel() {
-    throw new Error('This function must be overriden to close and clean the associated panel');
-  }
+  protected abstract closePanel(): void;
 
   protected clean() {
     this.style.width = '';

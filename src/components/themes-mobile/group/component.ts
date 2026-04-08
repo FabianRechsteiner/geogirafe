@@ -20,7 +20,7 @@ class MobileGroupElementComponent extends GirafeHTMLElement {
     super('group-mobile');
   }
 
-  render() {
+  override render() {
     super.render();
     this.refreshGroup();
   }

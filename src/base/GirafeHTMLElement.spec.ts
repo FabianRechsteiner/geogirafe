@@ -4,7 +4,10 @@ import GirafeHTMLElement from './GirafeHTMLElement';
 import MockHelper from '../tools/tests/mockhelper';
 import IGirafeContext from '../tools/context/icontext';
 
-class GirafeHTMLTestElement extends GirafeHTMLElement {}
+class GirafeHTMLTestElement extends GirafeHTMLElement {
+  templateUrl = 'EMPTY';
+  styleUrls = [];
+}
 
 describe('GirafeHTMLElement.isNullOrUndefined', () => {
   let element: GirafeHTMLElement;

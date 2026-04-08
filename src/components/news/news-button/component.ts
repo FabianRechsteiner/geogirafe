@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 
 class NewsButtonComponent extends GirafeHTMLElement {
@@ -33,7 +34,7 @@ class NewsButtonComponent extends GirafeHTMLElement {
     return icon;
   }
 
-  connectedCallback(): void {
+  override connectedCallback(): void {
     super.connectedCallback();
     if (this.context.configManager.Config.news) {
       this.subscribe('news.lastViewDate', (_oldValue: number, _newValue: number) => {

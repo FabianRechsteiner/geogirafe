@@ -30,7 +30,7 @@ That's it, it should work.
 
 */
 
-class GirafeDraggableElement extends GirafeHTMLElement {
+abstract class GirafeDraggableElement extends GirafeHTMLElement {
   private header?: HTMLElement;
   private closeButton?: HTMLElement;
   private container?: HTMLElement;

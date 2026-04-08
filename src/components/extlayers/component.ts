@@ -54,7 +54,7 @@ class ExternalLayersComponent extends GirafeHTMLElement implements IGirafePanel 
     super('external-layers');
   }
 
-  render() {
+  override render() {
     if (this.isPanelVisible) {
       super.render();
       super.girafeTranslate();

@@ -62,7 +62,7 @@ export default class EditComponent extends GirafeHTMLElement implements IGirafeP
     super('edit');
   }
 
-  render() {
+  override render() {
     super.render();
     if (this.isPanelVisible) {
       this.renderComponent();

@@ -65,7 +65,7 @@ class ThemeComponent extends GirafeHTMLElement {
     });
   }
 
-  protected render() {
+  override render() {
     super.render();
     if (this.clickOutsideContainer) this.clickOutsideContainer.style.display = this.menuOpen ? 'block' : 'none';
   }

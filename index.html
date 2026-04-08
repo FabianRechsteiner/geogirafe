@@ -33,10 +33,38 @@
     <link rel="stylesheet" href="src/styles/common.css" />
     <link rel="stylesheet" href="src/styles/index.css" />
 
-    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/tippy.css" />
-    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/backdrop.css" />
-    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/border.css" />
-    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="lib/tippy.js/svg-arrow.css" />
+    <link
+      rel="preload"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+      href="lib/tippy.js/tippy.css" />
+    <link
+      rel="preload"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+      href="lib/tippy.js/backdrop.css" />
+    <link
+      rel="preload"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+      href="lib/tippy.js/border.css" />
+    <link
+      rel="preload"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+      href="lib/tippy.js/svg-arrow.css" />
     <noscript>
       <link rel="stylesheet" href="lib/tippy.js/tippy.css" />
       <link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
@@ -160,21 +188,30 @@
           tip="drawing-panel"
           slot="menu-content"
           class="gg-icon-button gg-big"
-          onclick="document.geogirafe.state.interface.drawingPanelVisible = !document.geogirafe.state.interface.drawingPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.drawingPanelVisible =
+              !document.geogirafe.state.interface.drawingPanelVisible
+          ">
           <img alt="draw-icon" src="icons/draw.svg" />
         </button>
         <button
           tip="selection-tool-panel"
           slot="menu-content"
           class="gg-icon-button gg-big"
-          onclick="document.geogirafe.state.interface.selectionToolPanelVisible = !document.geogirafe.state.interface.selectionToolPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.selectionToolPanelVisible =
+              !document.geogirafe.state.interface.selectionToolPanelVisible
+          ">
           <img alt="draw-icon" src="icons/select.svg" />
         </button>
         <button
           tip="external-entry"
           slot="menu-content"
           class="gg-icon-button gg-big"
-          onclick="document.geogirafe.state.interface.extLayerPanelVisible = !document.geogirafe.state.interface.extLayerPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.extLayerPanelVisible =
+              !document.geogirafe.state.interface.extLayerPanelVisible
+          ">
           <img alt="ext-icon" src="icons/external-entry.svg" />
         </button>
         <button
@@ -182,7 +219,9 @@
           slot="menu-content"
           class="gg-icon-button gg-big"
           plugin="config:print"
-          onclick="document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.printPanelVisible = !document.geogirafe.state.interface.printPanelVisible
+          ">
           <img alt="print-icon" src="icons/print.svg" />
         </button>
         <button
@@ -190,14 +229,19 @@
           slot="menu-content"
           class="gg-icon-button gg-big"
           plugin="config:lidar"
-          onclick="document.geogirafe.state.interface.crossSectionPanelVisible = !document.geogirafe.state.interface.crossSectionPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.crossSectionPanelVisible =
+              !document.geogirafe.state.interface.crossSectionPanelVisible
+          ">
           <img alt="cross-section-icon" src="icons/cross-section.svg" />
         </button>
         <button
           tip="edit-panel"
           slot="menu-content"
           class="gg-icon-button gg-big"
-          onclick="document.geogirafe.state.interface.editPanelVisible = !document.geogirafe.state.interface.editPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.editPanelVisible = !document.geogirafe.state.interface.editPanelVisible
+          ">
           <img alt="edit-icon" src="icons/edit.svg" />
         </button>
         <button
@@ -205,21 +249,29 @@
           slot="menu-content"
           class="gg-icon-button gg-big"
           plugin="config:share"
-          onclick="document.geogirafe.state.interface.sharePanelVisible = !document.geogirafe.state.interface.sharePanelVisible">
+          onclick="
+            document.geogirafe.state.interface.sharePanelVisible = !document.geogirafe.state.interface.sharePanelVisible
+          ">
           <img alt="share-icon" src="icons/share.svg" />
         </button>
         <button
           tip="layout-panel"
           class="gg-icon-button gg-big"
           plugin="config:map3d"
-          onclick="document.geogirafe.state.interface.layoutPanelVisible = !document.geogirafe.state.interface.layoutPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.layoutPanelVisible =
+              !document.geogirafe.state.interface.layoutPanelVisible
+          ">
           <img alt="layout-icon" src="icons/layout.svg" />
         </button>
         <button
           tip="contact-panel"
           class="gg-icon-button gg-big"
           plugin="config:contact"
-          onclick="document.geogirafe.state.interface.contactPanelVisible = !document.geogirafe.state.interface.contactPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.contactPanelVisible =
+              !document.geogirafe.state.interface.contactPanelVisible
+          ">
           <img alt="layout-icon" src="icons/mail.svg" />
         </button>
         <button tip="infra3d" class="gg-icon-button gg-big" plugin="plugin_infra3d" onclick="alert('infra3d')">
@@ -237,13 +289,18 @@
         <button
           tip="about-panel"
           class="gg-icon-button gg-big"
-          onclick="document.geogirafe.state.interface.aboutPanelVisible = !document.geogirafe.state.interface.aboutPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.aboutPanelVisible = !document.geogirafe.state.interface.aboutPanelVisible
+          ">
           <img alt="info-icon" src="icons/info.svg" />
         </button>
         <button
           tip="user-preferences-panel"
           class="gg-icon-button gg-big"
-          onclick="document.geogirafe.state.interface.userPreferencesPanelVisible = !document.geogirafe.state.interface.userPreferencesPanelVisible">
+          onclick="
+            document.geogirafe.state.interface.userPreferencesPanelVisible =
+              !document.geogirafe.state.interface.userPreferencesPanelVisible
+          ">
           <img alt="user-preferences-icon" src="icons/config.svg" />
         </button>
       </div>

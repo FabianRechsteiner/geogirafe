@@ -7,6 +7,7 @@ export default class LogManager extends GirafeSingleton {
   private readonly defaultInfo: typeof console.info = console.info;
   private readonly defaultWarn: typeof console.warn = console.warn;
   private readonly defaultError: typeof console.error = console.error;
+  private readonly defaultAssert: typeof console.assert = console.assert;
 
   public initLogging() {
     console.debug = this.debug.bind(this);
@@ -14,6 +15,7 @@ export default class LogManager extends GirafeSingleton {
     console.info = this.info.bind(this);
     console.warn = this.warn.bind(this);
     console.error = this.error.bind(this);
+    console.assert = this.assert.bind(this);
   }
 
   /**
@@ -81,5 +83,15 @@ export default class LogManager extends GirafeSingleton {
   private error(message: unknown, ...optionalParams: unknown[]) {
     this.defaultError(message, ...optionalParams);
     return true;
+  }
+
+  /**
+   * Write log to output if the current loglevel is error
+   * @returns true if the log was written, false instead
+   */
+  private assert(condition: boolean, ...optionalParams: unknown[]) {
+    // assert has the same log level as error
+    this.defaultAssert(condition, ...optionalParams);
+    return !condition;
   }
 }

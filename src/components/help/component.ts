@@ -25,7 +25,7 @@ class HelpComponent extends GirafeHTMLElement {
     super('help');
   }
 
-  render() {
+  override render() {
     super.render();
     this.content = this.shadow.querySelector('#content') as HTMLElement;
     // setting the images for the arrows with the imported files to use vite to serve them, because uhtml does somehow not render variables in css

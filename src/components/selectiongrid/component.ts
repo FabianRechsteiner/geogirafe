@@ -60,7 +60,7 @@ class SelectionGridComponent extends GirafeResizableElement {
   /**
    * Render the component regarding its visibility.
    */
-  render() {
+  override render() {
     if (this.visible) {
       this.renderComponent();
     } else {

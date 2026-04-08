@@ -7,7 +7,7 @@ class ThemeFavoritesManager extends GirafeSingleton {
   private themeFavorites: Array<number | string> = [];
   private readonly storagePath: string = 'themeFavorites';
 
-  public initializeSingleton() {
+  public override initializeSingleton() {
     super.initializeSingleton();
     this.loadThemeFavorites();
   }

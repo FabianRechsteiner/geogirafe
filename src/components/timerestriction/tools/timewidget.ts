@@ -15,7 +15,7 @@ export const TimeChangeEvent = 'timeChange';
  *
  * This class must be extended, since it doesn't have a template of its own.
  */
-class TimeWidget extends GirafeHTMLElement {
+abstract class TimeWidget extends GirafeHTMLElement {
   protected lowerInputElem!: HTMLInputElement;
   protected upperInputElem!: HTMLInputElement;
 
@@ -54,7 +54,7 @@ class TimeWidget extends GirafeHTMLElement {
     this.maxDefaultValue = this.timeFormatter.formatDateString(timeOptions.maxDefValue ?? '');
   }
 
-  public render() {
+  override render() {
     if (!this.mode) {
       // If not initialized, the component can't be displayed
       this.renderEmpty();
@@ -99,14 +99,12 @@ class TimeWidget extends GirafeHTMLElement {
    *
    */
   public getTimeRestriction(): string | undefined {
-    let newTime = '';
     const lower = this.getValue('lower');
     const upper = this.getValue('upper');
-    if (this.mode === 'value') {
-      newTime = this.timeFormatter.formatDateString(lower);
-    } else {
-      newTime = this.timeFormatter.formatTimeRange(lower, upper);
-    }
+    const newTime =
+      this.mode === 'value'
+        ? this.timeFormatter.formatDateString(lower)
+        : this.timeFormatter.formatTimeRange(lower, upper);
     return newTime === '' ? undefined : newTime;
   }
 

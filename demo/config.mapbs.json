@@ -201,5 +201,9 @@
         "description": "onboarding-treeview-filter-selection-description"
       }
     ]
+  },
+  "news": {
+    "urls": ["https://geogirafe.org/feed/atom/"],
+    "autoDisplay": false
   }
 }

@@ -124,7 +124,7 @@ class SearchComponent extends GirafeHTMLElement {
     this.ignoreBlur = false;
   }
 
-  public render() {
+  override render() {
     super.render();
     this.searchInput = this.shadowRoot?.getElementById('search') as HTMLInputElement;
   }

@@ -20,7 +20,7 @@ class MapCustomContextMenuComponent extends GirafeHTMLElement {
     super('custom-map-context-menu');
   }
 
-  render() {
+  override render() {
     if (this.state.position.tooltip) {
       super.render();
       MapCustomContextMenuComponent.contextMenuOverlay.setPosition(this.state.position.tooltip.position);

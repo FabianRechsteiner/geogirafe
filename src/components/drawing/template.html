@@ -36,21 +36,33 @@
     <div id="toolParametersContainer">
       <span i18n="Settings" class="title"></span>
       <div class="toolParameters" data-tool="Polyline,Polygon">
-        <girafe-fixed-dimension dimensionName="length" dimension="length" id="fixedLineLength"
-                                @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
+        <girafe-fixed-dimension
+          dimensionName="length"
+          dimension="length"
+          id="fixedLineLength"
+          @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
         </girafe-fixed-dimension>
       </div>
       <div class="toolParameters" data-tool="Square">
-        <girafe-fixed-dimension dimensionName="side length" dimension="side" id="fixedSquareSide"
-                                @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
+        <girafe-fixed-dimension
+          dimensionName="side length"
+          dimension="side"
+          id="fixedSquareSide"
+          @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
         </girafe-fixed-dimension>
       </div>
       <div class="toolParameters" data-tool="Rectangle">
-        <girafe-fixed-dimension dimensionName="width" dimension="width" id="fixedRectangleWidth"
-                                @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
+        <girafe-fixed-dimension
+          dimensionName="width"
+          dimension="width"
+          id="fixedRectangleWidth"
+          @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
         </girafe-fixed-dimension>
-        <girafe-fixed-dimension dimensionName="height" dimension="height" id="fixedRectangleHeight"
-                                @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
+        <girafe-fixed-dimension
+          dimensionName="height"
+          dimension="height"
+          id="fixedRectangleHeight"
+          @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
         </girafe-fixed-dimension>
       </div>
     </div>
@@ -58,9 +70,11 @@
   <div id="drawingListContainer">
     <div class="titleContainer">
       <span i18n="Drawing List" class="title"></span>
-      <button class="gg-icon-button icon" tip="Delete all shapes" onclick="${() => this.deleteAllFeatures()}"
-              ?disabled="${this.drawingState.features.length === 0}"
-      >
+      <button
+        class="gg-icon-button icon"
+        tip="Delete all shapes"
+        onclick="${() => this.deleteAllFeatures()}"
+        ?disabled="${this.drawingState.features.length === 0}">
         ${this.htmlUnsafe(this.trashIcon)}
       </button>
     </div>

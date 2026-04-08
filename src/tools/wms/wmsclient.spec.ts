@@ -12,7 +12,7 @@ import ServerOgc from '../../models/serverogc';
 import SelectionParam from '../../models/selectionparam';
 
 const fetchMock = vi.fn();
-global.fetch = fetchMock;
+globalThis.fetch = fetchMock;
 let context: IGirafeContext;
 
 let wmsClientQg1L1: WmsClient;

@@ -43,7 +43,7 @@ class QueryBuilderComponent extends GirafeHTMLElement {
     this.layer = layer;
   }
 
-  render() {
+  override render() {
     if (!this.layer.ogcServer.urlWfs) {
       throw new Error('No WFS URL found. Please verify the Layer type.');
     }

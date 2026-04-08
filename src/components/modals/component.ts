@@ -92,7 +92,7 @@ class ModalsComponent extends GirafeHTMLElement {
     this.resolvePrompt(false);
   }
 
-  render() {
+  override render() {
     super.render();
   }
 

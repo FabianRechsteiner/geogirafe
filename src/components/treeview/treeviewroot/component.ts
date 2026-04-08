@@ -24,7 +24,7 @@ class TreeViewRootComponent extends GirafeHTMLElement {
     return this.context.layerManager.getSortedLayers(this.state.layers.layersList);
   }
 
-  public render() {
+  override render() {
     super.render();
     this.girafeTranslate();
   }
