@@ -7,7 +7,8 @@ import type { Circle as CircleGeom, Geometry } from 'ol/geom';
 import type Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 import IGirafeContext from '../../tools/context/icontext';
-import { getAreaAsMetricText, getLengthAsMetricText } from '../../tools/utils/olutils';
+import { getAreaAsMetricText, getAzimuthAsText, getLengthAsMetricText } from '../../tools/utils/olutils';
+import { Coordinate } from 'ol/coordinate';
 
 export enum DrawingShape {
   Point,
@@ -260,6 +261,10 @@ export default class DrawingFeature {
     return 'E ' + coord[0].toFixed(2) + '\nN ' + coord[1].toFixed(2);
   }
 
+  getAzimuthText(circle: CircleGeom) {
+    return getAzimuthAsText(this.displayMeasure ? circle.getProperties()['azimuth'] as number ?? undefined : undefined);
+  }
+
   isPointOrPolyline() {
     return (
       this.type === DrawingShape.Point ||
@@ -327,12 +332,17 @@ export default class DrawingFeature {
   static geojsonFromOlFeature(olFeature: Feature<Geometry>, shapeType: DrawingShape): object {
     if (shapeType === DrawingShape.Disk) {
       const disk = olFeature.getGeometry()! as CircleGeom;
+      const center = disk.getCenter();
+      const radius = disk.getRadius();
+      const pointer = (disk.getProperties()['pointer'] as Coordinate) ?? [center[0] + radius, center[1]];
       return {
         type: 'Feature',
         geometry: {
           type: 'Disk',
-          center: disk.getCenter(),
-          radius: disk.getRadius()
+          center: center,
+          radius: radius,
+          azimuth: disk.getProperties()['azimuth'] as number ?? 0,
+          pointer: pointer,
         }
       };
     }
