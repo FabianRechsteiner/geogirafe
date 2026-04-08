@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 import { Color } from 'vanilla-picker';
 import { v4 as uuidv4 } from 'uuid';
-import DrawingFeature, { DrawingState, DrawingShape, ArrowStyle, ArrowPosition, LineStroke } from './drawingFeature';
+import DrawingFeature, { ArrowPosition, ArrowStyle, DrawingShape, DrawingState, LineStroke } from './drawingFeature';
 import OlDrawing from './olDrawing';
 import CesiumDrawing from './cesiumDrawing';
 
-import { KML, GeoJSON, GPX } from 'ol/format';
-import { Polygon, Geometry } from 'ol/geom';
+import { GeoJSON, GPX, KML } from 'ol/format';
+import { Geometry, Polygon } from 'ol/geom';
 import Feature from 'ol/Feature';
 
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
@@ -22,6 +22,8 @@ import visibleIcon from './assets/visible.svg?raw';
 import notVisibleIcon from './assets/notVisible.svg?raw';
 import LayerDrawing from '../../models/layers/layerdrawing';
 import IGirafePanel from '../../tools/state/igirafepanel';
+import { FixedDimensionValueChangedEventDetails } from './fixed-dimension/component';
+import { UsedInTemplateOnly } from '../../decorators';
 
 export default class DrawingComponent extends GirafeHTMLElement implements IGirafePanel {
   templateUrl = './template.html';
@@ -135,23 +137,6 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
         this.selectedFeatures[0].name = (e.target as HTMLInputElement).value;
         this.refreshRender();
       };
-      this.getById('fixedLengthValue').oninput = (e) => {
-        const val = parseFloat((e.target as HTMLInputElement).value);
-        this.olDrawing.setFixedLength(val);
-        this.cesiumDrawing.setFixedLength(val);
-      };
-      this.getById('fixedLengthEnabled').onchange = (e) => {
-        const elements = Array.from(this.shadowRoot!.querySelectorAll('.fixedLengthElement'));
-        const option = e.target as HTMLInputElement;
-        if (!option.disabled && option.checked) {
-          elements.forEach((e) => e.classList.remove('disabled'));
-          this.getById<HTMLInputElement>('fixedLengthValue').dispatchEvent(new Event('input'));
-        } else {
-          elements.forEach((e) => e.classList.add('disabled'));
-          this.olDrawing.setFixedLength(0);
-          this.cesiumDrawing.setFixedLength(0);
-        }
-      };
       this.setTool();
     }
     this.warnWhenInWebMercator();
@@ -199,17 +184,44 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
     this.toolSelected = this.getById(this.buttons.find((x) => x.tool == tool)!.id)!;
     this.toolSelected.classList.add('selected');
     this.drawingState.activeTool = tool;
+
+    this.showToolParameters(tool);
   }
 
-  fixedLengthOptionAllowed(): boolean {
-    // Enable / disable fix length checkbox based on current tool
-    return ![
-      null,
-      DrawingShape.Point,
-      DrawingShape.Rectangle,
-      DrawingShape.FreehandPolyline,
-      DrawingShape.FreehandPolygon
-    ].includes(this.drawingState.activeTool);
+  showToolParameters(tool: DrawingShape | null = null) {
+    const toolName = tool ? DrawingShape[tool] : 'Pointer';
+    const toolParametersList = this.shadowRoot!.querySelectorAll<HTMLDivElement>('.toolParameters');
+    let hasParameters = false;
+    toolParametersList.forEach((toolParameters) => {
+      const isParametersForTool = toolParameters.dataset.tool?.includes(toolName) ?? false;
+      toolParameters.style.display = isParametersForTool ? 'flex' : 'none';
+      hasParameters ||= isParametersForTool;
+    });
+    this.shadow.querySelector<HTMLSpanElement>('#toolParametersContainer span.title')!.style.display = hasParameters
+      ? 'inline-block'
+      : 'none';
+  }
+
+  @UsedInTemplateOnly()
+  protected fixedDimensionValueChangedHandler(e: CustomEvent) {
+    const details = e.detail as FixedDimensionValueChangedEventDetails;
+    switch (details.id) {
+      case 'fixedLineLength':
+        this.olDrawing.setFixedLineLength(details.value);
+        break;
+      case 'fixedSquareSide':
+        this.olDrawing.setFixedSquareSide(details.value);
+        break;
+      case 'fixedRectangleWidth':
+        this.olDrawing.setFixedRectangleWidth(details.value);
+        break;
+      case 'fixedRectangleHeight':
+        this.olDrawing.setFixedRectangleHeight(details.value);
+        break;
+
+      default:
+        console.debug('Value changed for unknown Dimension with id', details.id);
+    }
   }
 
   protected override connectedCallback() {
@@ -325,20 +337,12 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
     }
   }
 
-  onToggleBatchMode() {
-    // Currently not used, will possibly be part of advanced editing/drawing tools
+  @UsedInTemplateOnly('Currently not used, will possibly be part of advanced editing/drawing tools')
+  protected onToggleBatchMode() {
     this.batchCreateMode = !this.batchCreateMode;
     if (this.batchCreateMode) {
       this.deselectAllFeatures();
     }
-    this.refreshRender();
-  }
-
-  onToggleFixedLength() {
-    this.fixedLengthEnabled = !this.fixedLengthEnabled;
-    const val = this.fixedLengthEnabled ? parseFloat(this.getById<HTMLInputElement>('fixedLengthValue').value) : 0;
-    this.olDrawing.setFixedLength(val);
-    this.cesiumDrawing.setFixedLength(val);
     this.refreshRender();
   }
 
@@ -361,7 +365,8 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
     }
   }
 
-  getOptionsTitle(): string {
+  @UsedInTemplateOnly()
+  protected getOptionsTitle(): string {
     if (this.selectedFeatures.length < 2) {
       return this.selectedFeatures[0]?.name || '';
     } else {
@@ -369,21 +374,25 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
     }
   }
 
-  isDisplayNameEnabled(): boolean {
+  @UsedInTemplateOnly()
+  protected isDisplayNameEnabled(): boolean {
     return this.selectedFeatures.some((f) => f.displayName);
   }
 
-  isDisplayMeasureEnabled(): boolean {
+  @UsedInTemplateOnly()
+  protected isDisplayMeasureEnabled(): boolean {
     return this.selectedFeatures.some((f) => f.displayMeasure);
   }
 
-  isLineStyleEnabled(): boolean {
+  @UsedInTemplateOnly()
+  protected isLineStyleEnabled(): boolean {
     return this.selectedFeatures.some(
       (f) => f.type == DrawingShape.Polyline || f.type == DrawingShape.FreehandPolyline
     );
   }
 
-  isFillColorEnabled(): boolean {
+  @UsedInTemplateOnly()
+  protected isFillColorEnabled(): boolean {
     return !this.selectedFeatures.every((f) => f.isPointOrPolyline());
   }
 
@@ -401,6 +410,14 @@ export default class DrawingComponent extends GirafeHTMLElement implements IGira
         this.drawingState.features.splice(idx, 1);
         this.refreshRender();
       }
+    }
+  }
+
+  async deleteAllFeatures() {
+    const confirm = await window.gConfirm('Do you want to remove all features?', 'Delete Features');
+    if (confirm) {
+      this.drawingState.features = [];
+      this.refreshRender();
     }
   }
 

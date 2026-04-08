@@ -91,13 +91,19 @@ fieldset.field-wrapper {
 #panel > div {
   padding: 1rem;
 }
+#toolParametersContainer {
+  .title {
+    margin-top: 0.5rem;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+}
 
 .toolParameters {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.25rem;
   justify-content: left;
-  grid-template-columns: auto auto 60px auto;
-  align-items: center;
-  margin-top: 10px;
 }
 
 .toolParameters > label {
@@ -108,6 +114,18 @@ fieldset.field-wrapper {
   overflow-y: auto;
   overflow-x: hidden;
   flex-grow: 1;
+  padding-top: 0 !important;
+
+  .titleContainer {
+    display: flex;
+    margin-bottom: 1rem;
+
+    .title {
+      display: flex;
+      flex-grow: 1;
+      align-items: center;
+    }
+  }
 }
 #drawingList {
   display: flex;

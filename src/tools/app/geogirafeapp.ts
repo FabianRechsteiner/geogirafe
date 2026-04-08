@@ -47,6 +47,7 @@ import { DrawingState } from '../../components/drawing/drawingFeature';
 import DrawingSerializer from '../../components/drawing/drawingSerializer';
 import { ShareState, ShareStateSerializer } from '../../components/share/sharestate';
 import SelectionToolComponent from '../../components/selectiontool/component';
+import FixedDimensionComponent from '../../components/drawing/fixed-dimension/component';
 
 export default class GeoGirafeApp {
   private readonly readyPromise: Promise<void>;
@@ -148,6 +149,7 @@ export default class GeoGirafeApp {
     customElements.define('girafe-tree-view-theme', TreeViewThemeComponent);
     customElements.define('girafe-user-preferences', UserPreferencesComponent);
     customElements.define('girafe-video-record', VideoRecordComponent);
+    customElements.define('girafe-fixed-dimension', FixedDimensionComponent);
   }
 
   private async initializeServiceWorker() {

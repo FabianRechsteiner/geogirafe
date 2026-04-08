@@ -2,6 +2,7 @@
 *.tgz
 coverage
 dist
+build-lib
 node_modules
 public/Mock
 public/*.json
