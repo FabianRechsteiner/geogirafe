@@ -54,7 +54,7 @@
   "peerDependencies": {
     "@geoblocks/mapfishprint": "0.3",
     "cesium": ">1.113",
-    "ol": ">10.8",
+    "ol": ">=10.8",
     "ol-ext": "4",
     "ol-mapbox-style": "12",
     "olcs": "2",
