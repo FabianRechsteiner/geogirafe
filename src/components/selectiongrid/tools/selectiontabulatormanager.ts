@@ -123,6 +123,13 @@ export default class SelectionTabulatorManager {
       this.context.stateManager.state.selection.highlightedFeatures = selection
         .map((row) => featureMap.get(getUid(row.geom ?? row.the_geom ?? row.geometry)))
         .filter((feature): feature is OlFeature => feature !== undefined);
+
+      if (selection.length == 1) {
+        this.context.stateManager.state.selection.getDirectionsFeature =
+          this.context.stateManager.state.selection.highlightedFeatures[0];
+      } else {
+        this.context.stateManager.state.selection.getDirectionsFeature = undefined;
+      }
     });
   }
 

@@ -23,6 +23,7 @@ import MobileThemeElementComponent from '../../components/themes-mobile/theme/co
 import MobileGroupElementComponent from '../../components/themes-mobile/group/component';
 import MobileLayerElementComponent from '../../components/themes-mobile/layer/component';
 import MobileSelectedLayerElementComponent from '../../components/themes-mobile/layer-selected/component';
+import GetDirectionsArtifact from '../../components/getdirections/component';
 
 declare const Connection: {
   UNKNOWN: string;
@@ -80,5 +81,6 @@ export default class GeoGirafeAppMobile extends GeoGirafeApp {
     customElements.define('girafe-group', MobileGroupElementComponent);
     customElements.define('girafe-layer', MobileLayerElementComponent);
     customElements.define('girafe-layer-selected', MobileSelectedLayerElementComponent);
+    customElements.define('girafe-get-directions', GetDirectionsArtifact);
   }
 }

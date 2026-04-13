@@ -23,6 +23,7 @@
         <button class="gg-icon-button gg-medium" onclick="${() => this.invertSelection()}" tip="Invert selection">
           <img alt="invert selection icon" src="icons/select-invert.svg" />
         </button>
+        <girafe-get-directions></girafe-get-directions>
         <button
           class="${this.resultsSelected ? 'gg-icon-button gg-medium' : 'gg-icon-button gg-medium disabled'}"
           ?disabled="${!this.resultsSelected}"
