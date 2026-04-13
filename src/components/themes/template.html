@@ -36,6 +36,7 @@
       part="theme-card">
       <img
         class="${this.isThemeFavorite(theme)? 'theme-favorite yes' : 'theme-favorite'}"
+        part="theme-favorite"
         tip="themes-add-remove-favorites"
         alt="themes-add-remove-favorites"
         src=""
@@ -43,6 +44,7 @@
         onkeyup="${(e: Event) => this.onThemeFavoriteChanged(theme, e)}" />
       <img
         class="${this.isCustomTheme(theme) ? 'delete-icon' : 'delete-icon placeholder'}"
+        part="theme-delete"
         onclick="${(e: Event) => this.onDeleteCustomTheme(theme as CustomTheme, e)}"
         onkeyup="${(e: Event) => this.onDeleteCustomTheme(theme as CustomTheme, e)}"
         alt="delete-icon"
