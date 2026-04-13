@@ -43,8 +43,7 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
       }
 
       this.state.interface.swipeupPanelContent = 'features';
-      this.state.selection.focusedFeatures = [];
-      this.state.selection.focusedFeatures.push(this.state.selection.selectedFeatures[0]);
+      this.selectFeatureByIndex(0);
       const container = this.shadow.querySelector('.container');
 
       if (container) {
@@ -55,7 +54,7 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
       }
     } else {
       this.state.interface.swipeupPanelMode = 'closed';
-      this.state.selection.focusedFeatures = null;
+      this.selectFeatureByIndex(-1);
     }
 
     this.render();
@@ -77,7 +76,7 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
 
       if (currentMode === 'closed') {
         this.state.interface.selectionComponentVisible = false;
-        this.state.selection.focusedFeatures = null;
+        this.selectFeatureByIndex(-1);
         this.state.selection.selectedFeatures = [];
       }
     });
@@ -86,8 +85,7 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
       this.currentIndex = 0;
 
       if (this.state.selection.selectedFeatures.length) {
-        this.state.selection.focusedFeatures = [];
-        this.state.selection.focusedFeatures.push(this.state.selection.selectedFeatures[0]);
+        this.selectFeatureByIndex(0);
       } else {
         this.state.selection.focusedFeatures = null;
       }
@@ -116,14 +114,25 @@ export default class SelectionPanelMobile extends GirafeHTMLElement {
     // Calculate the position to scroll to
     const scrollPosition = index * container.clientWidth;
 
-    this.state.selection.focusedFeatures = [];
-    this.state.selection.focusedFeatures.push(this.state.selection.selectedFeatures[index]);
+    this.selectFeatureByIndex(index);
 
     // Scroll to the position
     container.scrollTo({
       left: scrollPosition,
       behavior: smooth ? 'smooth' : 'instant'
     });
+  }
+
+  private selectFeatureByIndex(index: number) {
+    if (index >= 0) {
+      const feature = this.state.selection.selectedFeatures[index];
+      this.state.selection.focusedFeatures = [];
+      this.state.selection.focusedFeatures.push(feature);
+      this.state.selection.getDirectionsFeature = feature;
+    } else {
+      this.state.selection.focusedFeatures = null;
+      this.state.selection.getDirectionsFeature = undefined;
+    }
   }
 
   /**

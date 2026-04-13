@@ -51,6 +51,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   displayedProperties: [string, unknown][] = [];
   showDropdown = false;
   private columnAliasHelper!: ColumnAliasHelper;
+  showDirectionsProviderDropdown = false;
 
   public constructor() {
     super('selectionwindow');
@@ -187,6 +188,7 @@ class SelectionWindowComponent extends GirafeDraggableElement {
   onFocusWindowFeature(index: number) {
     const windowFeature = this.selectedWindowFeature(index);
     this.state.selection.focusedFeatures = [windowFeature.feature];
+    this.state.selection.getDirectionsFeature = windowFeature.feature;
     // Get content.
     this.displayedProperties = Object.entries(windowFeature.notOlProperties).filter((keyValue) => {
       return keyValue[1] !== undefined;

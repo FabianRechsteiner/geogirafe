@@ -59,6 +59,9 @@
       <img alt="Fast next button" src="icons/arrow_right.svg" />
     </div>
 
-    <div class="nav-indicator">${`${this.currentIndex + 1}/${this.state.selection.selectedFeatures.length}`}</div>
+    <div class="nav-center-wrapper">
+      <div class="nav-indicator">${`${this.currentIndex + 1}/${this.state.selection.selectedFeatures.length}`}</div>
+      <girafe-get-directions></girafe-get-directions>
+    </div>
   </div>
 </div>

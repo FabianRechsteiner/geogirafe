@@ -602,7 +602,8 @@ describe('Manage User Interactions', () => {
     // Add names of components that should be ignored when searching for event listeners
     const fileIgnoreList = [
       `menubutton${path.sep}component.ts`, // contains 'click' listener to remove menu overlays, management not necessary
-      `cross-section${path.sep}scatterplot.ts` // contains 'click' and 'drag' listener for d3 plots
+      `cross-section${path.sep}scatterplot.ts`, // contains 'click' and 'drag' listener for d3 plots
+      `getdirections${path.sep}component.ts` // contains 'click' listener on document to close Drop Down Menu when clicking outside
     ];
 
     // Search patterns

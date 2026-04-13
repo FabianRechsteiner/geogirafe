@@ -87,6 +87,12 @@
 
 .nav-indicator {
   text-align: center;
+  font-size: 2em;
+  color: #606368;
+  font-weight: 600;
+}
+
+.nav-center-wrapper {
   width: fit-content;
   height: fit-content;
   position: absolute;
@@ -95,9 +101,8 @@
   bottom: 0;
   top: 0;
   margin: auto;
-  font-size: 2em;
-  color: #606368;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
 }
 
 .feature-property-key-value {

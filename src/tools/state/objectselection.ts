@@ -15,6 +15,7 @@ export default class ObjectSelection {
   public gridSelected: boolean = false;
   public selectionMode: SelectionMode = SelectionMode.Replace;
   public selectionGeometry?: Geometry;
+  public getDirectionsFeature?: Feature;
 }
 
 export type InitialSelectionQuery = { query: WfsFilter[]; layerName: string };
