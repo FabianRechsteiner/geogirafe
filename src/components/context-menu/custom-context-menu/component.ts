@@ -6,7 +6,12 @@ import areEqual from '../../../tools/state/brain/equality';
 
 class MapCustomContextMenuComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['../../../styles/common.css', '../mapcontextmenu.css'];
+  styleUrls = [
+    './style.css',
+    '../../../styles/common.css',
+    '../mapcontextmenu.css',
+    '../../../../node_modules/ol-ext/overlay/Popup.css'
+  ];
 
   private get map() {
     return this.context.mapManager.getMap();
