@@ -4,13 +4,18 @@ import { render } from 'uhtml';
 
 import GirafeHTMLElement from '../../../base/GirafeHTMLElement';
 import { printCoordinate } from '../../../tools/geometrytools';
-import { Overlay } from 'ol';
 import { MapContextMenuState } from './contextmenustate';
 import MapContextMenuManager from './contextmenumanager';
+import Popup from 'ol-ext/overlay/Popup';
 
 class MapDefaultContextMenuComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
-  styleUrls = ['./style.css', '../../../styles/common.css', '../mapcontextmenu.css'];
+  styleUrls = [
+    './style.css',
+    '../../../styles/common.css',
+    '../mapcontextmenu.css',
+    '../../../../node_modules/ol-ext/overlay/Popup.css'
+  ];
 
   private get map() {
     return this.context.mapManager.getMap();
@@ -19,7 +24,7 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
   private readonly eventsCallbacks: Callback[] = [];
   protected mapContextMenuState!: MapContextMenuState;
   protected mapContextMenuManager!: MapContextMenuManager;
-  private contextMenuOverlay?: Overlay;
+  private contextMenuPopup?: Popup;
   host: HTMLDivElement;
   printCoordinate = printCoordinate;
 
@@ -41,17 +46,19 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
 
   showContextMenu(): void {
     this.registerEvents();
-    if (!this.contextMenuOverlay) {
-      this.renderContent();
-      this.contextMenuOverlay = new Overlay({
-        element: this.host,
-        autoPan: { animation: { duration: 250 } }
-      });
-      this.map.addOverlay(this.contextMenuOverlay);
-    } else {
-      this.renderContent();
-    }
-    this.contextMenuOverlay.setPosition(this.mapContextMenuState.position);
+    this.renderContent().then(() => {
+      if (!this.contextMenuPopup) {
+        this.contextMenuPopup = new Popup({
+          autoPan: { animation: { duration: 250 } }
+        });
+        this.map.addOverlay(this.contextMenuPopup);
+      }
+      if (this.mapContextMenuState.position === undefined) {
+        this.contextMenuPopup.hide();
+      } else {
+        this.contextMenuPopup.show(this.mapContextMenuState.position, this.host);
+      }
+    });
   }
 
   closeMenu(): void {
@@ -60,8 +67,8 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
   }
 
   hideContextMenu(): void {
-    if (this.contextMenuOverlay) {
-      this.contextMenuOverlay.setPosition(undefined);
+    if (this.contextMenuPopup) {
+      this.contextMenuPopup.hide();
     }
   }
 
@@ -84,7 +91,7 @@ class MapDefaultContextMenuComponent extends GirafeHTMLElement {
       }),
       this.subscribe('language', (_oldVal: string, _newVal: string) => {
         console.debug(`Language changed from: ${_oldVal} to: ${_newVal}`);
-        if (this.contextMenuOverlay) {
+        if (this.contextMenuPopup) {
           this.renderContent();
         }
       })

@@ -1,0 +1,11 @@
+.map-info-contextmenu {
+    --contextmenu-border-width: 1px;
+    --contextmenu-triangle-width: 20px;
+    --contextmenu-triangle-height: 10px;
+    position: absolute;
+    border-radius: 0;
+    border: var(--contextmenu-border-width) solid var(--text-color-grad1);
+    bottom: var(--contextmenu-triangle-height);
+    left: 0;
+    transform: translateX(-50%);
+}
