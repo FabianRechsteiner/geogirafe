@@ -56,7 +56,7 @@
     "cesium": ">1.113",
     "ol": ">=10.8",
     "ol-ext": "4",
-    "ol-mapbox-style": "12",
+    "ol-mapbox-style": ">=12",
     "olcs": "2",
     "proj4": "2"
   },
