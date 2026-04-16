@@ -2,7 +2,10 @@
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import ArrowBlack from './images/arrow_black.webp';
 import ArrowWhite from './images/arrow_white.webp';
+import CircledBlack from './images/circled_black.webp';
+import CircledWhite from './images/circled_white.webp';
 import { systemIsInDarkMode } from '../../tools/utils/utils';
+import { noop } from '../../tools/utils/async';
 
 class HelpComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -12,14 +15,14 @@ class HelpComponent extends GirafeHTMLElement {
   themes!: HTMLElement;
   search!: HTMLElement;
   menu!: HTMLElement;
+  onboarding!: HTMLElement;
   basemap!: HTMLElement;
   userPreferences!: HTMLElement;
 
   darkFrontendMode: boolean = false;
 
-  arrowBlack: string = ArrowBlack;
-  arrowWhite: string = ArrowWhite;
   currentArrow?: string;
+  currentCircle?: string;
 
   public constructor() {
     super('help');
@@ -32,6 +35,7 @@ class HelpComponent extends GirafeHTMLElement {
     this.themes = this.shadow.querySelector('#themes') as HTMLElement;
     this.search = this.shadow.querySelector('#search') as HTMLElement;
     this.menu = this.shadow.querySelector('#menu') as HTMLElement;
+    this.onboarding = this.shadow.querySelector('#onboarding') as HTMLElement;
     this.basemap = this.shadow.querySelector('#basemap') as HTMLElement;
     this.userPreferences = this.shadow.querySelector('#user-preferences') as HTMLElement;
 
@@ -62,11 +66,13 @@ class HelpComponent extends GirafeHTMLElement {
   changeArrowColor() {
     // change the arrow color depending on the darkFrontendMode state
     this.darkFrontendMode = this.context.stateManager.state.interface.darkFrontendMode ?? systemIsInDarkMode();
-    this.currentArrow = this.darkFrontendMode ? this.arrowBlack : this.arrowWhite;
+    this.currentArrow = this.darkFrontendMode ? ArrowBlack : ArrowWhite;
+    this.currentCircle = this.darkFrontendMode ? CircledBlack : CircledWhite;
 
     this.themes.style.backgroundImage = `url(${this.currentArrow})`;
     this.search.style.backgroundImage = `url(${this.currentArrow})`;
     this.menu.style.backgroundImage = `url(${this.currentArrow})`;
+    this.onboarding.style.backgroundImage = `url(${this.currentCircle})`;
     this.basemap.style.backgroundImage = `url(${this.currentArrow})`;
     this.userPreferences.style.backgroundImage = `url(${this.currentArrow})`;
 
@@ -80,6 +86,11 @@ class HelpComponent extends GirafeHTMLElement {
     } else {
       this.content.style.display = 'none';
     }
+  }
+
+  startOnboardingTour() {
+    this.toggleHelp(false);
+    this.context.onBoardingManager.restart().then(noop);
   }
 
   protected override connectedCallback() {

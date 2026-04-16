@@ -182,6 +182,8 @@
     "help": "Help",
     "help-basemap": "Choose from available background layers to customize your view.",
     "help-menu": "Access advanced tools such as printing, drawing, 3D view, and more.",
+    "help-onboarding": "Restart the onboarding tour.",
+    "help-onboarding-link": "Click here to start.",
     "help-search": "Search for a place, address, map, or geographic data.",
     "help-themes": "Explore available topics. Once selected, the associated maps load automatically.",
     "help-user-preferences": "Manage your user preferences, like language, display mode and map options.",
