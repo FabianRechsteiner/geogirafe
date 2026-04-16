@@ -134,7 +134,8 @@ export default defineConfig(({ command, mode }) => {
       createHtmlPlugin({
         minify: true
       }),
-      mode === 'analyze' &&
+      analyzer &&
+        mode === 'analyze' &&
         // https://www.npmjs.com/package/vite-bundle-analyzer
         analyzer({
           analyzerMode: 'static',

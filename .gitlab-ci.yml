@@ -207,6 +207,26 @@ build-lib:
       - dist/lib
 
 #################################
+# Publish the library to npm
+build-sample-app:
+  stage: build
+  image: node:20-slim
+  needs:
+    - job: build-lib
+      artifacts: true
+  when: on_success
+
+  before_script:
+    - apt update && apt -y install git
+  script:
+    # Check if the sample application can be created
+    - npm create @geogirafe/template@latest sample-app ci ./dist/lib
+    - cd sample-app && npm run build
+  artifacts:
+    paths:
+      - sample-app/dist/app
+
+#################################
 # Optimize files with gzip and brotli before deploying
 optimize:
   stage: publish
@@ -215,12 +235,14 @@ optimize:
       artifacts: true
 
   rules:
-    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT'
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH && $CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+    - if: '$CI_MERGE_REQUEST_ID && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: on_success
     - when: never
+
   before_script:
     - apt update && apt -y install brotli
-
   script:
     # Compress all files
     - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
@@ -307,6 +329,8 @@ pages:
   needs:
     - job: optimize
       artifacts: true
+    - job: build-sample-app
+      artifacts: true
 
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH && $CI_PROJECT_PATH == $MAIN_PROJECT'
@@ -314,11 +338,11 @@ pages:
       variables:
         PATH_PREFIX: ''
         EXPIRE_IN: never
-    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT'
+    - if: '$CI_MERGE_REQUEST_ID && $CI_PROJECT_PATH == $MAIN_PROJECT'
       when: on_success
       variables:
         PATH_PREFIX: 'mr-$CI_MERGE_REQUEST_IID'
-        EXPIRE_IN: 1 week
+        EXPIRE_IN: 2 week
     - when: never
 
   pages:
@@ -367,6 +391,8 @@ pages:
     - *prepare_demo
     - demo='georama'
     - *prepare_demo
+    # Copy sample-app
+    - mv sample-app/dist/app release/sample-app
     # Rename the release directory to public
     - rm -Rf public && mv release public
     # Copy demo index page

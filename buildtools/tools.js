@@ -57,9 +57,12 @@ export function deleteFiles(patterns) {
   }
 }
 
-export function copy(filename, sourceDir, targetDir) {
+export function copy(filename, sourceDir, targetDir, targetFilename = null) {
+  if (targetFilename === null) {
+    targetFilename = filename;
+  }
   const source = path.join(sourceDir, filename);
-  const target = path.join(targetDir, filename);
+  const target = path.join(targetDir, targetFilename);
 
   if (fs.existsSync(source)) {
     // First create destination directory
@@ -111,8 +114,8 @@ async function getHtmlCode(currentFilename, relativeHtmlPath, styleCode) {
       }
     });
     htmlCode = `
-  templateUrl = null;
-  styleUrls = null;
+  protected override templateUrl: string | null = null;
+  protected override styleUrls: string[] | null = null;
   template = () => { return uHtml\`${styleCode}\n${htmlCode}\`; }`;
     return htmlCode;
   } catch (error) {
@@ -167,9 +170,9 @@ function isStringCommented(line) {
 }
 
 // Regex definitions
-export const styleRegex = /(?:override\s+)?styleUrl *= *['"](.*)['"] *;?/g;
-export const stylesRegex = /(?:override\s+)?styleUrls *= *\[([\s\S]*?)\] *;?/gs;
-export const htmlRegex = /(?:override\s+)?templateUrl *= *['"](.*)['"] *;?/g;
+export const styleRegex = /(?:(?:public|private|protected)\s+)?(?:override\s+)?styleUrl *= *['"](.*)['"] *;?/g;
+export const stylesRegex = /(?:(?:public|private|protected)\s+)?(?:override\s+)?styleUrls *= *\[([\s\S]*?)\] *;?/gs;
+export const htmlRegex = /(?:(?:public|private|protected)\s+)?(?:override\s+)?templateUrl *= *['"](.*)['"] *;?/g;
 
 export async function inlineTemplate(filename) {
   // Read the file

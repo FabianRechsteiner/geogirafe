@@ -47,7 +47,7 @@
     "getUrl": "https://map.geo.test.bs.ch/short/get"
   },
   "projections": {
-    "EPSG:3857": "W-M",
+    "EPSG:3857": "WebMercator",
     "EPSG:4326": "WGS84",
     "EPSG:2056": "LV95"
   },

@@ -5,7 +5,6 @@ import { copy, deleteFilesRecursive } from './tools.js';
 const sourceDir = 'src';
 const targetDir = path.join('dist', 'lib-src-inline');
 
-copy('api', sourceDir, targetDir);
 copy('base', sourceDir, targetDir);
 copy('models', sourceDir, targetDir);
 copy('tools', sourceDir, targetDir);
