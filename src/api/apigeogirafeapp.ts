@@ -12,8 +12,8 @@ import SearchComponent from '../components/search/component';
 import SelectionWindowComponent from '../components/selectionwindow/component';
 
 export default class GeoGirafeApi extends GirafeHTMLElement {
-  protected templateUrl = './template.html';
-  protected styleUrls = ['../styles/common.css', './style.css'];
+  protected override templateUrl = './template.html';
+  protected override styleUrls = ['../styles/common.css', './style.css'];
 
   private isInitialized = false;
 
@@ -298,7 +298,11 @@ export default class GeoGirafeApi extends GirafeHTMLElement {
 
   private injectConfigMetaTags() {
     const location = new URL(import.meta.url);
+    // The 2 following lines are a small hack to make the api interface work in both context
+    // (debugging in vite + production app)
     location.pathname = location.pathname.replace('/src/api', '');
+    location.pathname = location.pathname.replace('/node_modules/.vite/deps', '');
+
     const origin = `${location.origin}${location.pathname.substring(0, location.pathname.lastIndexOf('/'))}`;
     const baseConfigUrl = `${origin}/config.json`;
     const apiConfigUrl = `${origin}/config.api.json`;
