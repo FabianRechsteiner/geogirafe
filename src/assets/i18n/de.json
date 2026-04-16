@@ -181,6 +181,8 @@
     "help": "Hilfe",
     "help-basemap": "Wählen Sie aus den verfügbaren Hintergrundkarten, um Ihre Ansicht anzupassen.",
     "help-menu": "Greifen Sie auf erweiterte Werkzeuge zu, wie Drucken, Zeichnen, 3D-Ansicht und mehr.",
+    "help-onboarding": "Starten Sie die Onboarding Tour erneut.",
+    "help-onboarding-link": "Klicken Sie hier zum starten.",
     "help-search": "Suchen Sie nach einem Ort, einer Adresse, einer Karte oder Geodaten.",
     "help-themes": "Entdecken Sie die verfügbaren Themen. Nach der Auswahl werden die zugehörigen Karten automatisch geladen.",
     "help-user-preferences": "Verwalten Sie Ihre Benutzereinstellungen, einschließlich Sprache, Anzeigemodus und Kartenoptionen.",

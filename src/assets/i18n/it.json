@@ -181,6 +181,8 @@
     "help": "Aiuto",
     "help-basemap": "Scegli tra gli sfondi cartografici disponibili per personalizzare la visualizzazione.",
     "help-menu": "Accedi a strumenti avanzati come stampa, disegno, vista 3D e altro ancora.",
+    "help-onboarding": "Riavvia il tour di onboarding.",
+    "help-onboarding-link": "Clicca qui per iniziare.",
     "help-search": "Cerca un luogo, un indirizzo, una mappa o un dato geografico.",
     "help-themes": "Scopri i temi disponibili. Selezionando un tema, le mappe correlate vengono caricate automaticamente.",
     "help-user-preferences": "Gestisci le preferenze utente, inclusa la lingua, la modalità di visualizzazione e le opzioni mappa.",

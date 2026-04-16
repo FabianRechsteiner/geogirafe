@@ -8,7 +8,12 @@ export default class OnBoardingManager extends GirafeSingleton {
     return this.context.configManager.Config;
   }
 
-  private readonly STORAGE_ITEM_NAME = 'geogirafe-onboarding';
+  private readonly STORAGE_PATH = 'onboardingTourAlreadyDone';
+
+  public async restart() {
+    this.context.userDataManager.saveUserData(this.STORAGE_PATH, 'false');
+    return this.start();
+  }
 
   public async start() {
     if (!this.config.onboarding) {
@@ -18,7 +23,7 @@ export default class OnBoardingManager extends GirafeSingleton {
 
     await this.context.i18nManager.ensureTranslationLoaded();
 
-    const tourAlreadyDone = sessionStorage.getItem(this.STORAGE_ITEM_NAME);
+    const tourAlreadyDone = this.context.userDataManager.getUserData(this.STORAGE_PATH) as string || 'false';
     if (tourAlreadyDone !== 'true') {
       const onboardingDriver = driver({
         popoverClass: 'girafe-onboarding-theme',
@@ -28,7 +33,7 @@ export default class OnBoardingManager extends GirafeSingleton {
           _step: DriveStep,
           _options: { config: Config; state: State; driver: Driver }
         ) => {
-          sessionStorage.setItem(this.STORAGE_ITEM_NAME, 'true');
+          this.context.userDataManager.saveUserData(this.STORAGE_PATH, 'true');
         },
         nextBtnText: this.context.i18nManager.getTranslation('onboarding-next-button-text'),
         prevBtnText: this.context.i18nManager.getTranslation('onboarding-previous-button-text'),
