@@ -25,13 +25,15 @@ import { getPointResolution, Projection } from 'ol/proj';
 import { Coordinate } from 'ol/coordinate';
 import { always, never, primaryAction } from 'ol/events/condition';
 import { Pixel } from 'ol/pixel';
+import type { EventsKey } from 'ol/events';
 import {
   ensurePolygonIsProperlyClosed,
   getAreaOfPolygon,
   getDistance,
   getHalfPoint,
   getLabelStyle,
-  getRadiusDataForCircle
+  getRadiusDataForCircle,
+  unByKeyAll
 } from '../../tools/utils/olutils';
 import { ContextMenu, EntryInteractionType, MenuEntry } from '../map/tools/contextmenu';
 import { formatCoordinates } from '../../tools/geometrytools';
@@ -43,6 +45,12 @@ import {
 } from '../../tools/state/userinteractionevent';
 import IGirafeContext from '../../tools/context/icontext';
 import { StyleFunction } from 'ol/style/Style';
+import {
+  calculateCenterAndMinRadius,
+  createScaledAndRotatedGeometry,
+  getGeometryForRendering,
+  shouldAllowVertexInsertionForShape
+} from './shapeConstraints';
 
 import Transform from 'ol-ext/interaction/Transform';
 
@@ -100,6 +108,7 @@ export default class OlDrawing {
   lastClosestFeature: Feature | null = null;
   translate: Translate | null = null;
   transform: Transform | null = null;
+  private readonly modifyFeatureChangeListeners: EventsKey[] = [];
 
   defaultStyle: StyleFunction | undefined;
 
@@ -180,6 +189,9 @@ export default class OlDrawing {
 
   private addModifyInteraction() {
     this.removeModifyInteraction();
+    const vertexStyle = new DrawingFeature(DrawingShape.Point, this.drawingState, this.config.drawing).getVertexStyle(
+      true
+    );
     this.modify = new Modify({
       features: this.modifiableFeatures,
       // Feature editing is triggered by: 1) primary action = click or touch, 2) alternate mouse click = remove vertex
@@ -189,36 +201,67 @@ export default class OlDrawing {
           isAlternateMouseClick(e as MapBrowserEvent<PointerEvent>)) &&
         this.canExecute('map.modify'),
       deleteCondition: never,
-      insertVertexCondition: primaryAction,
-      style: new DrawingFeature(DrawingShape.Point, this.drawingState, this.config.drawing).getVertexStyle(true),
+      // For square/rectangle, we disable vertex insertion only on the hovered shape.
+      insertVertexCondition: (e) => primaryAction(e) && this.shouldAllowVertexInsertionAtEvent(e),
+      style: (feature) => {
+        this.applyScaleRotateOnModifyStyle(feature as Feature<Geometry>);
+        return vertexStyle;
+      },
       snapToPointer: true,
       pixelTolerance: this.map.pixelTolerance
     });
     this.map.olMap.addInteraction(this.modify);
 
     this.modify.on('modifystart', (e) => {
+      this.clearModifyFeatureChangeListeners();
       e.features.forEach((olFeature) => {
-        olFeature.on('change', (e) => {
-          const geometry = (e.target as Feature).getGeometry();
-          if (geometry && geometry.getType() == 'Circle') {
-            const circle = geometry as CircleGeom;
-            const newRadius = circle.getRadius();
-            const properties = circle.getProperties();
-            const { pointer } = properties;
-            const oldRadiusLine = new LineString([circle.getCenter(), pointer]);
-            oldRadiusLine.scale(newRadius / oldRadiusLine.getLength());
-            circle.setProperties({
-              ...properties,
-              pointer: oldRadiusLine.getLastCoordinate()
-            });
-          }
-        });
+        const geometry = olFeature.getGeometry();
+        if (!geometry) {
+          return;
+        }
+
+        const shapeType = this.drawingState.features.find((f) => f.id === olFeature.getId())?.type;
+        if (shapeType === DrawingShape.Square || shapeType === DrawingShape.Rectangle) {
+          olFeature.set('modifyGeometry', { geometry: geometry.clone() }, true);
+        } else if (shapeType === DrawingShape.Disk) {
+          const listener = olFeature.on('change', (e) => {
+            const geometry = (e.target as Feature).getGeometry();
+            if (!geometry) {
+              return;
+            }
+
+            if (geometry.getType() === 'Circle') {
+              const circle = geometry as CircleGeom;
+              const newRadius = circle.getRadius();
+              const properties = circle.getProperties();
+              const { pointer } = properties;
+              const oldRadiusLine = new LineString([circle.getCenter(), pointer]);
+              oldRadiusLine.scale(newRadius / oldRadiusLine.getLength());
+              circle.setProperties({
+                ...properties,
+                pointer: oldRadiusLine.getLastCoordinate()
+              });
+            }
+          });
+          this.modifyFeatureChangeListeners.push(listener);
+        }
       });
     });
 
     // Update the modified geometries in the state
     this.modify.on('modifyend', (e) => {
-      e.features.forEach((olFeature) => this.updateGeometryInState(olFeature)); //NOSONAR(typescript:S7728) Collection<?> is a custom Implementation with custom forEach
+      this.clearModifyFeatureChangeListeners();
+      e.features.forEach((olFeature) => {
+        const shapeType = this.drawingState.features.find((f) => f.id === olFeature.getId())?.type;
+        if (shapeType === DrawingShape.Square || shapeType === DrawingShape.Rectangle) {
+          const modifyGeometry = olFeature.get('modifyGeometry');
+          if (modifyGeometry?.geometry) {
+            olFeature.setGeometry(modifyGeometry.geometry);
+          }
+          olFeature.unset('modifyGeometry', true);
+        }
+        this.updateGeometryInState(olFeature); //NOSONAR(typescript:S7728) Collection<?> is a custom Implementation with custom forEach
+      });
     });
   }
 
@@ -368,9 +411,13 @@ export default class OlDrawing {
   }
 
   private readonly prepareMenuEntriesForVertex = (_e: MouseEvent, mapCoordinate: Coordinate): EntryInteractionType => {
-    return this.hasEditableVertexAtCoordinate(mapCoordinate)
-      ? EntryInteractionType.ENABLED
-      : EntryInteractionType.NOT_SHOWN;
+    if (!this.hasEditableVertexAtCoordinate(mapCoordinate)) {
+      return EntryInteractionType.NOT_SHOWN;
+    }
+    if (this.isSquareOrRectangle(this.getDrawingShapeType(this.lastClosestFeature))) {
+      return EntryInteractionType.NOT_SHOWN;
+    }
+    return EntryInteractionType.ENABLED;
   };
 
   private readonly prepareMenuEntriesForShape = (_e: MouseEvent, mapCoordinate: Coordinate): EntryInteractionType => {
@@ -728,8 +775,10 @@ export default class OlDrawing {
 
   // TODO Move as much parameters as possible into DrawingFeature
   getStyle(dFeature: DrawingFeature, olFeature: Feature<Geometry>) {
-    const modifyGeometry = olFeature.get('modifyGeometry');
-    const geometry = modifyGeometry ? modifyGeometry.geometry : olFeature.getGeometry();
+    const geometry = getGeometryForRendering(olFeature);
+    if (!geometry) {
+      return [];
+    }
     const measureFont = 'Bold ' + dFeature.measureFontSize + 'px/1 ' + dFeature.font;
     const nameFont = 'Bold ' + dFeature.nameFontSize + 'px/1 ' + dFeature.font;
     const measureColor = 'rgba(0, 0, 0, 0.4)';
@@ -909,7 +958,7 @@ export default class OlDrawing {
       const vertexStyle = dFeature.getVertexStyle();
       // Add a node style to every vertex of the geometry
       vertexStyle.setGeometry(function (f) {
-        const geom = f?.getGeometry();
+        const geom = getGeometryForRendering(f as Feature);
         if (geom && geom instanceof Geometry) {
           return extractVerticesFromGeometry(geom);
         }
@@ -930,10 +979,102 @@ export default class OlDrawing {
   }
 
   private removeModifyInteraction() {
+    this.clearModifyFeatureChangeListeners();
     if (this.modify) {
       this.map.olMap.removeInteraction(this.modify);
       this.modify = null;
     }
+  }
+
+  private getDrawingShapeType(olFeature: Feature<Geometry> | Feature | null): DrawingShape | undefined {
+    if (!olFeature) {
+      return undefined;
+    }
+    return this.drawingState.features.find((f) => f.id === olFeature.getId())?.type;
+  }
+
+  private isSquareOrRectangle(shapeType: DrawingShape | undefined): boolean {
+    return shapeType === DrawingShape.Square || shapeType === DrawingShape.Rectangle;
+  }
+
+  private shouldAllowVertexInsertionAtEvent(e: MapBrowserEvent<PointerEvent | KeyboardEvent | WheelEvent>): boolean {
+    const hoveredFeature = this.getHoveredModifiableFeatureAtPixel(e.pixel);
+    return shouldAllowVertexInsertionForShape(this.getDrawingShapeType(hoveredFeature));
+  }
+
+  private getHoveredModifiableFeatureAtPixel(pixel: Pixel): Feature<Geometry> | null {
+    const modifiableFeatureSet = new Set(this.modifiableFeatures.getArray());
+    const hoveredFeature = this.map.olMap.forEachFeatureAtPixel(
+      pixel,
+      (feature, layer) => {
+        if (!(feature instanceof Feature) || layer !== this.drawingLayer || !modifiableFeatureSet.has(feature)) {
+          return undefined;
+        }
+        return feature;
+      },
+      {
+        hitTolerance: this.map.pixelTolerance
+      }
+    );
+    return hoveredFeature instanceof Feature ? (hoveredFeature as Feature<Geometry>) : null;
+  }
+
+  private applyScaleRotateOnModifyStyle(modifyPointFeature: Feature<Geometry>) {
+    const modifyPointGeometry = modifyPointFeature.getGeometry();
+    if (!(modifyPointGeometry instanceof Point)) {
+      return;
+    }
+
+    const currentPoint = modifyPointGeometry.getCoordinates();
+    const features = modifyPointFeature.get('features');
+    if (!features) {
+      return;
+    }
+
+    features.forEach((olFeature: Feature<Geometry>) => {
+      const shapeType = this.getDrawingShapeType(olFeature);
+      if (!this.isSquareOrRectangle(shapeType)) {
+        return;
+      }
+
+      const modifyGeometry = olFeature.get('modifyGeometry');
+      if (!modifyGeometry?.geometry) {
+        return;
+      }
+
+      if (
+        !modifyGeometry.point ||
+        !modifyGeometry.geometry0 ||
+        !modifyGeometry.center ||
+        modifyGeometry.minRadius === undefined
+      ) {
+        modifyGeometry.point = [...currentPoint];
+        modifyGeometry.geometry0 = modifyGeometry.geometry;
+        const geometryData = calculateCenterAndMinRadius(modifyGeometry.geometry0);
+        modifyGeometry.center = geometryData.center;
+        modifyGeometry.minRadius = geometryData.minRadius;
+      }
+
+      if (!modifyGeometry.geometry0 || !modifyGeometry.center || modifyGeometry.minRadius === undefined) {
+        return;
+      }
+
+      modifyGeometry.geometry = createScaledAndRotatedGeometry(
+        modifyGeometry.geometry0,
+        modifyGeometry.center,
+        modifyGeometry.minRadius,
+        modifyGeometry.point,
+        currentPoint
+      );
+    });
+  }
+
+  private clearModifyFeatureChangeListeners() {
+    if (this.modifyFeatureChangeListeners.length === 0) {
+      return;
+    }
+    unByKeyAll(this.modifyFeatureChangeListeners);
+    this.modifyFeatureChangeListeners.length = 0;
   }
 
   private removeSnapInteraction() {
