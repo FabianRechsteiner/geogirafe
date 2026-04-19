@@ -32,7 +32,7 @@ describe('CsvManager', () => {
       const data = [{ a: 1, b: 2 }];
       const columnDefs = [{ name: 'a' }, { name: 'b' }];
 
-      const expectedCsv = "'translated_a','translated_b'\n'1','2'\n";
+      const expectedCsv = "'translated_a';'translated_b'\n'1';'2'\n";
       // @ts-expect-error: private property
       expect(csvManager.generateCsv(data, columnDefs)).toBe(expectedCsv);
     });
@@ -43,7 +43,7 @@ describe('CsvManager', () => {
 
       context.configManager.Config.csv.includeHeader = false;
 
-      const expectedCsv = "'1','2'\n";
+      const expectedCsv = "'1';'2'\n";
       // @ts-expect-error: private property
       expect(csvManager.generateCsv(data, columnDefs)).toBe(expectedCsv);
     });
@@ -52,14 +52,14 @@ describe('CsvManager', () => {
   describe('getRow', () => {
     it('should generate CSV row with correct quoting and escaping', () => {
       const values = ['value1', 'value, with, commas', 'value "with" quotes', "other value 'with' quotes"];
-      const expectedRow = `'value1','value, with, commas','value "with" quotes','other value ''with'' quotes'\n`;
+      const expectedRow = `'value1';'value, with, commas';'value "with" quotes';'other value ''with'' quotes'\n`;
       // @ts-ignore
       expect(csvManager.getRow(values)).toBe(expectedRow);
     });
 
     it('should handle undefined and null values correctly', () => {
       const values = ['value1', undefined, null];
-      const expectedRow = "'value1',,\n";
+      const expectedRow = "'value1';;\n";
       // @ts-ignore
       expect(csvManager.getRow(values)).toBe(expectedRow);
     });
@@ -73,7 +73,7 @@ describe('CsvManager', () => {
 
       csvManager.startDownload(data, columnDefs, fileName);
 
-      const expectedCsv = "'translated_a','translated_b'\n'1','2'\n";
+      const expectedCsv = "'translated_a';'translated_b'\n'1';'2'\n";
       expect(download).toHaveBeenCalledWith(expectedCsv, fileName, 'text/csv;charset=utf-8');
     });
   });
