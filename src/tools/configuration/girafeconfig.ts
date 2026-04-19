@@ -478,7 +478,7 @@ class GirafeConfig {
       extension: '.csv',
       includeHeader: true,
       quote: "'",
-      separator: ','
+      separator: ';' /* Switched to ';' as ',' wasn't working with MS Excel out of the Box (double-click on the file) while for example LibreOffice works with both*/
     };
     return {
       ...defaultConfig,
