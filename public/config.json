@@ -1,0 +1,139 @@
+{
+  "general": {
+    "locale": "de-CH"
+  },
+  "languages": {
+    "translations": {
+      "de": ["i18n/de.json"],
+      "en": ["i18n/en.json"],
+      "fr": ["i18n/fr.json"],
+      "it": ["i18n/it.json"]
+    },
+    "defaultLanguage": "de"
+  },
+  "interface": {
+    "defaultSelectionComponent": "grid"
+  },
+  "themes": {
+    "url": "themes.json",
+    "defaultTheme": "Vectormap",
+    "selectionMode": "replace",
+    "showErrorsOnStart": true
+  },
+  "basemaps": {
+    "defaultBasemap": "Vectormap Lightbasemap",
+    "OSM": true,
+    "SwissTopoVectorTiles": true,
+    "emptyBasemap": false
+  },
+  "search": {
+    "url": "https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=###SEARCHTERM###&type=locations&origins=address,zipcode,gg25,district,gazetteer&lang=###SEARCHLANG###&limit=8&sr=3857&geometryFormat=geojson",
+    "resultsSrid": "EPSG:3857",
+    "objectPreview": true,
+    "layerPreview": false
+  },
+  "projections": {
+    "EPSG:3857": "WebMercator",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "LV95"
+  },
+  "map": {
+    "srid": "EPSG:3857",
+    "scales": [
+      70000000,
+      35000000,
+      15000000,
+      10000000,
+      4000000,
+      2000000,
+      1000000,
+      500000,
+      250000,
+      150000,
+      70000,
+      35000,
+      15000,
+      8000,
+      4000,
+      2000,
+      1000,
+      500
+    ],
+    "startPosition": "971162.37,6023857.92",
+    "startZoom": "12",
+    "constrainScales": true
+  },
+  "news": {
+    "urls": ["https://geogirafe.org/feed/atom/"],
+    "autoDisplay": false
+  },
+  "externalLayers": {
+    "predefinedSources": [
+      {
+        "label": "Swisstopo WMS",
+        "type": "WMS",
+        "url": "https://wms.geo.admin.ch/"
+      },
+      {
+        "label": "Swisstopo WMTS",
+        "type": "WMTS",
+        "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=de"
+      }
+    ]
+  },
+  "contextmenu": {
+    "crs": [
+      {
+        "code": "EPSG:3857",
+        "translation": "EPSG:3857",
+        "format": "decimal",
+        "precision": 2
+      },
+      {
+        "code": "EPSG:4326",
+        "translation": "EPSG:4326",
+        "format": "decimal",
+        "precision": 7
+      },
+      {
+        "code": "EPSG:4326",
+        "translation": "EPSG:4326-DMS",
+        "format": "dms",
+        "precision": 2
+      }
+    ],
+    "links": [
+      {
+        "translation": "Google Street View",
+        "crs": "EPSG:4326",
+        "url": "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "map.geo.admin.ch",
+        "crs": "EPSG:3857",
+        "url": "https://map.geo.admin.ch/?E=###MAPX###&N=###MAPY###&zoom=10"
+      }
+    ]
+  },
+  "crs": [],
+  "onboarding": {
+    "steps": [
+      {
+        "element": "[data-tour='theme-selection']",
+        "title": "onboarding-theme-selection-title",
+        "description": "onboarding-theme-selection-description"
+      },
+      {
+        "element": "[data-tour='basemap-selection']",
+        "title": "onboarding-basemap-selection-title",
+        "description": "onboarding-basemap-selection-description"
+      },
+      {
+        "component": "treeviewroot",
+        "element": "[data-tour='treeview-filter']",
+        "title": "onboarding-treeview-filter-selection-title",
+        "description": "onboarding-treeview-filter-selection-description"
+      }
+    ]
+  }
+}

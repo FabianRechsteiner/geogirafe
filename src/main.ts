@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { redirectTo, SplashScreen } from './main.tools';
 import GeoGirafeApp from './tools/app/geogirafeapp';
+import { ensurePmtilesProtocolRegistered } from './tools/utils/pmtiles';
 
 const shouldSkipRedirect = new URLSearchParams(globalThis.location.search).has('no_redirect');
 
@@ -15,6 +16,7 @@ if (!shouldSkipRedirect && (navigator.userAgent.includes('iPhone') || navigator.
 // Display the splash-screen
 const splash = new SplashScreen();
 splash.begin();
+ensurePmtilesProtocolRegistered();
 
 const girafeApp = new GeoGirafeApp();
 girafeApp.isReady().then(() => {

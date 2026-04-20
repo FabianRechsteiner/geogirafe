@@ -26,14 +26,21 @@ The intended split is:
 
 The upstream baseline has been imported.
 
-The project-specific runtime configuration for your production services is still pending. In particular, the first real `public/config.json` still needs the actual service endpoints and theme configuration for:
+The repository now contains the first runnable Vectormap-specific runtime files:
 
-- WMS
-- WMTS
-- vector tiles
-- search
+- `public/config.json`
+- `public/config.mobile.json`
+- `public/themes.json`
+- `public/styles/ch.vectormap.lightbasemap.json`
 
-Until that file is finalized, this repository is structurally ready but not yet a finished vectormap deployment.
+This first version is intentionally basemap-centric. It gives you a branded GeoGirafe shell with:
+
+- a local Vectormap basemap configuration
+- OpenStreetMap and SwissTopo vector-tile fallbacks
+- a temporary GeoAdmin-based search endpoint
+- a minimal local theme definition that can later be extended with real geodienste WMS, WMTS, and vector-tile layers
+
+It is therefore runnable, but still only a first milestone and not yet the final vectormap deployment.
 
 ## Local development
 
@@ -50,7 +57,9 @@ npm ci
 
 ### Create the runtime configuration
 
-Create `public/config.json` from the example template:
+The repository already ships with a project-specific `public/config.json`.
+
+If you want to start from the example template instead, create `public/config.json` from:
 
 ```bash
 cp public/config.example.json public/config.json
@@ -82,10 +91,12 @@ GeoGirafe loads `config.json` dynamically at runtime. That means:
 - you usually do not need to rebuild the app when only runtime configuration changes
 - repository-specific integration should prefer `public/config.json` over source-level forks when possible
 
-Tracked vectormap-specific files should primarily be:
+Tracked vectormap-specific files are primarily:
 
 - `public/config.json`
-- `public/CNAME` when a custom domain is activated
+- `public/config.mobile.json`
+- `public/themes.json`
+- `public/styles/ch.vectormap.lightbasemap.json`
 - `.github/workflows/deploy-pages.yml`
 - selected branding or project-owned assets that are intentionally different from upstream
 
@@ -104,7 +115,7 @@ The Vite configuration already uses `base: './'`, which is compatible with both:
 - the default `username.github.io/repository` URL
 - a later custom domain
 
-If you add a custom domain later, place the domain name in `public/CNAME`.
+If you add a custom domain later, add `public/CNAME` at that point.
 
 ## Upstream sync workflow
 

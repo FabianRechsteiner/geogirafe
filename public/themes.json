@@ -1,0 +1,53 @@
+{
+  "ogcServers": {},
+  "background_layers": [
+    {
+      "id": 1001,
+      "name": "Vectormap Lightbasemap",
+      "type": "VectorTiles",
+      "style": "styles/ch.vectormap.lightbasemap.json",
+      "metadata": {
+        "isLegendExpanded": false,
+        "wasLegendExpanded": false,
+        "exclusiveGroup": false,
+        "isExpanded": false,
+        "isChecked": true,
+        "thumbnail": "images/basemap_default.webp"
+      }
+    },
+    {
+      "id": 1002,
+      "name": "Swissimage",
+      "type": "WMTS",
+      "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=de",
+      "layer": "ch.swisstopo.swissimage",
+      "imageType": "jpeg",
+      "style": "default",
+      "metadata": {
+        "isLegendExpanded": false,
+        "wasLegendExpanded": false,
+        "exclusiveGroup": false,
+        "isExpanded": false,
+        "isChecked": false,
+        "thumbnail": "images/basemap_default.webp"
+      }
+    }
+  ],
+  "themes": [
+    {
+      "id": 1,
+      "name": "Vectormap",
+      "icon": "images/logo/vectormap-logo.png",
+      "functionalities": {},
+      "metadata": {
+        "isExpanded": true,
+        "isLegendExpanded": false,
+        "wasLegendExpanded": false,
+        "exclusiveGroup": false,
+        "isChecked": true
+      },
+      "children": []
+    }
+  ],
+  "errors": []
+}

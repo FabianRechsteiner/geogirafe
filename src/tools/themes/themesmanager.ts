@@ -416,11 +416,11 @@ class ThemesManager extends GirafeSingleton {
   }
 
   private createVectorTilesLayer(elem: GMFTreeItem, order: { value: number }): LayerVectorTiles | null {
-    if (!elem.style || !elem.metadata?.layerName) {
-      // Layer is invalid : it must contain style URL and layername
+    if (!elem.style) {
+      // Layer is invalid : it must contain at least a style URL.
       this.context.errorManager.pushMessage(
         uuidv4(),
-        `VectorTiles-Layer ${elem.name} (id=${elem.id}) is invalid and cannot be created: missing Style Url or layername.`,
+        `VectorTiles-Layer ${elem.name} (id=${elem.id}) is invalid and cannot be created: missing Style Url.`,
         'error'
       );
     } else {
@@ -431,7 +431,7 @@ class ThemesManager extends GirafeSingleton {
         isDefaultChecked: elem.metadata?.isChecked,
         disclaimer: elem.metadata?.disclaimer,
         metadata: elem.metadata,
-        layerName: elem.metadata.layerName
+        layerName: elem.metadata?.layerName
       };
       if (options.metadata?.metadataUrl) {
         options.metadata.metadataUrl = this.calculateMetadataUrl(options.metadata.metadataUrl);

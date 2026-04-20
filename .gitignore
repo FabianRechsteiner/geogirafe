@@ -7,8 +7,10 @@ node_modules
 public/Mock
 public/*.json
 !public/about.json
+!public/config.mobile.json
 !public/config.json
 !public/config.example.json
+!public/themes.json
 vite.config.js.timestamp-*.mjs
 .npm
 buildtools/certs/*.pem
