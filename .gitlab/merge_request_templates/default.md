@@ -1,7 +1,7 @@
 ## Description
 
 _What is the purpose of this Merge Request?_  
-_What probem does it solve?_  
+_What problem does it solve?_  
 _What are the linked issues or references?_
 
 ## Job done
