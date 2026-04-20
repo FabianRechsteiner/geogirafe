@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 
 import InlineTemplatesPlugin from './buildtools/vite-inline-templates-plugin';
 import HtmlRebuildPlugin from './buildtools/vite-restart-plugin';
@@ -43,6 +43,15 @@ const geogirafeSource = 'src';
 // Path where the SSL-Certificates for local debugging are stored
 // Will be automatically set to the right path when working with the library
 const certsDirectory = 'buildtools/certs';
+const defaultCertsDirectory = `${certsDirectory}/default`;
+
+function getDevCertificatePath(filename) {
+  const primaryPath = `${certsDirectory}/${filename}`;
+  if (existsSync(primaryPath)) {
+    return primaryPath;
+  }
+  return `${defaultCertsDirectory}/${filename}`;
+}
 
 // https://v2.vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -55,8 +64,8 @@ export default defineConfig(({ command, mode }) => {
       https:
         command === 'serve'
           ? {
-              key: readFileSync(`${certsDirectory}/app.localhost.key.pem`),
-              cert: readFileSync(`${certsDirectory}/app.localhost.cert.pem`)
+              key: readFileSync(getDevCertificatePath('app.localhost.key.pem')),
+              cert: readFileSync(getDevCertificatePath('app.localhost.cert.pem'))
             }
           : false
     },
