@@ -6,6 +6,9 @@ build-lib
 node_modules
 public/Mock
 public/*.json
+!public/about.json
+!public/config.json
+!public/config.example.json
 vite.config.js.timestamp-*.mjs
 .npm
 buildtools/certs/*.pem
