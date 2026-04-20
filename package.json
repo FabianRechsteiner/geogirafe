@@ -147,6 +147,8 @@
   ],
   "browser": "main.js",
   "scripts": {
+    "check:runtime-config": "node buildtools/validate-runtime-config.mjs",
+    "check:artifact": "node buildtools/validate-build-artifact.mjs",
     "start": "npm run tsc && vite serve",
     "start-rebundle-deps": "npm run tsc && vite serve --force",
     "start-ignore-tsc": "vite serve",

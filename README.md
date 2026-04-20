@@ -37,8 +37,8 @@ This first version is intentionally basemap-centric. It gives you a branded GeoG
 
 - a local Vectormap basemap configuration
 - OpenStreetMap and SwissTopo vector-tile fallbacks
-- a temporary GeoAdmin-based search endpoint
-- a minimal local theme definition that can later be extended with real geodienste WMS, WMTS, and vector-tile layers
+- a GeoAdmin-based search endpoint as the current fallback search service
+- a local theme definition with real WMS and WMTS runtime entries for the first Vectormap setup
 
 It is therefore runnable, but still only a first milestone and not yet the final vectormap deployment.
 
@@ -83,6 +83,19 @@ The upstream project ships with development certificates. If needed on Windows:
 npm run trust-default-dev-certs-win
 ```
 
+### Validation
+
+Use the same checks locally that now run in GitHub Actions:
+
+```bash
+npm run check:runtime-config
+npm run tsc
+npm run lint
+npm run test-without-coverage
+npm run build
+npm run check:artifact
+```
+
 ## Runtime configuration
 
 GeoGirafe loads `config.json` dynamically at runtime. That means:
@@ -97,7 +110,10 @@ Tracked vectormap-specific files are primarily:
 - `public/config.mobile.json`
 - `public/themes.json`
 - `public/styles/ch.vectormap.lightbasemap.json`
+- `buildtools/validate-runtime-config.mjs`
+- `buildtools/validate-build-artifact.mjs`
 - `.github/workflows/deploy-pages.yml`
+- `.github/workflows/validate.yml`
 - selected branding or project-owned assets that are intentionally different from upstream
 
 ## GitHub Pages deployment
@@ -107,7 +123,9 @@ The repository contains a GitHub Actions workflow for GitHub Pages deployment.
 Deployment model:
 
 - install dependencies with `npm ci`
+- validate runtime configuration with `npm run check:runtime-config`
 - build the application with `npm run build`
+- validate the built artifact with `npm run check:artifact`
 - publish `dist/app` as the Pages artifact
 
 The Vite configuration already uses `base: './'`, which is compatible with both:

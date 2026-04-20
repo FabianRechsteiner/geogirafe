@@ -6,8 +6,8 @@ import { register } from 'ol/proj/proj4';
 import GirafeContext from '../context/context';
 
 export default class GeoGirafeAppComponent extends GirafeHTMLElement {
-  templateUrl = null;
-  styleUrls = null;
+  public templateUrl = null;
+  public styleUrls = null;
 
   private readonly ready: Promise<void>;
   private resolveReady!: () => void;

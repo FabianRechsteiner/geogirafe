@@ -1,28 +1,42 @@
 {
-  "_comment": "Copy this file to public/config.json and replace the placeholder values with the vectormap runtime services.",
+  "_comment": "Copy this file to public/config.json if you want to rebuild the default Vectormap runtime setup from a clean example.",
   "general": {
-    "locale": "en-US"
+    "locale": "de-CH"
   },
   "languages": {
     "translations": {
+      "de": ["i18n/de.json"],
       "en": ["i18n/en.json"],
       "fr": ["i18n/fr.json"],
-      "de": ["i18n/de.json"],
       "it": ["i18n/it.json"]
     },
-    "defaultLanguage": "en"
+    "defaultLanguage": "de"
+  },
+  "interface": {
+    "defaultSelectionComponent": "grid"
   },
   "themes": {
-    "url": "https://example.com/themes.json",
-    "defaultTheme": ""
+    "url": "themes.json",
+    "defaultTheme": "Vectormap",
+    "selectionMode": "replace",
+    "showErrorsOnStart": true
   },
   "basemaps": {
-    "defaultBasemap": "OpenStreetMap",
-    "OSM": true
+    "defaultBasemap": "Vectormap Lightbasemap",
+    "OSM": true,
+    "SwissTopoVectorTiles": true,
+    "emptyBasemap": false
+  },
+  "search": {
+    "url": "https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=###SEARCHTERM###&type=locations&origins=address,zipcode,gg25,district,gazetteer&lang=###SEARCHLANG###&limit=8&sr=3857&geometryFormat=geojson",
+    "resultsSrid": "EPSG:3857",
+    "objectPreview": true,
+    "layerPreview": false
   },
   "projections": {
     "EPSG:3857": "WebMercator",
-    "EPSG:4326": "WGS84"
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "LV95"
   },
   "map": {
     "srid": "EPSG:3857",
@@ -46,11 +60,23 @@
       1000,
       500
     ],
-    "startPosition": "844100,6033454",
-    "startZoom": "0"
+    "startPosition": "971162.37,6023857.92",
+    "startZoom": "12",
+    "constrainScales": true
   },
-  "map3d": {
-    "tilesetsUrls": []
+  "externalLayers": {
+    "predefinedSources": [
+      {
+        "label": "Swisstopo WMS",
+        "type": "WMS",
+        "url": "https://wms.geo.admin.ch/"
+      },
+      {
+        "label": "Swisstopo WMTS",
+        "type": "WMTS",
+        "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=de"
+      }
+    ]
   },
   "contextmenu": {
     "crs": [
@@ -65,13 +91,47 @@
         "translation": "EPSG:4326",
         "format": "decimal",
         "precision": 7
+      },
+      {
+        "code": "EPSG:4326",
+        "translation": "EPSG:4326-DMS",
+        "format": "dms",
+        "precision": 2
       }
     ],
-    "links": []
+    "links": [
+      {
+        "translation": "Google Street View",
+        "crs": "EPSG:4326",
+        "url": "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "map.geo.admin.ch",
+        "crs": "EPSG:3857",
+        "url": "https://map.geo.admin.ch/?E=###MAPX###&N=###MAPY###&zoom=10"
+      }
+    ]
   },
   "crs": [],
   "onboarding": {
-    "steps": []
+    "steps": [
+      {
+        "element": "[data-tour='theme-selection']",
+        "title": "onboarding-theme-selection-title",
+        "description": "onboarding-theme-selection-description"
+      },
+      {
+        "element": "[data-tour='basemap-selection']",
+        "title": "onboarding-basemap-selection-title",
+        "description": "onboarding-basemap-selection-description"
+      },
+      {
+        "component": "treeviewroot",
+        "element": "[data-tour='treeview-filter']",
+        "title": "onboarding-treeview-filter-selection-title",
+        "description": "onboarding-treeview-filter-selection-description"
+      }
+    ]
   },
   "news": {
     "urls": [],

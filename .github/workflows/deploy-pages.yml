@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - agent
-      - main
-      - master
   workflow_dispatch:
 
 permissions:
@@ -34,15 +32,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify runtime config
-        run: |
-          test -f public/config.json || {
-            echo "Missing public/config.json. Add the vectormap runtime configuration before deploying.";
-            exit 1;
-          }
+      - name: Validate runtime config
+        run: npm run check:runtime-config
 
       - name: Build application
         run: npm run build
+
+      - name: Validate built artifact
+        run: npm run check:artifact
 
       - name: Copy optional custom domain
         run: |

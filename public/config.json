@@ -64,7 +64,7 @@
     "constrainScales": true
   },
   "news": {
-    "urls": ["https://geogirafe.org/feed/atom/"],
+    "urls": [],
     "autoDisplay": false
   },
   "externalLayers": {

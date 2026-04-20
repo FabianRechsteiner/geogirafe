@@ -12,6 +12,7 @@ public/*.json
 !public/config.example.json
 !public/themes.json
 vite.config.js.timestamp-*.mjs
+.vite/
 .npm
 buildtools/certs/*.pem
 buildtools/certs/default/rootCA-key.pem
