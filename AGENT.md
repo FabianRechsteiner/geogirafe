@@ -1,8 +1,23 @@
 # AGENT.md - Working Instructions for the Codex Agent
 
-This repository is prepared and maintained with an autonomous coding agent.
+This repository is maintained with an autonomous coding agent.
 
-The project is currently in its discovery and setup phase. The agent must establish the project goals and required configuration before generating substantial project code.
+## Project Context
+
+- Project name: `vectormap-geogirafe`
+- Goal: create a GitHub-hosted WebGIS frontend for the existing `vectormap.ch` work based as closely as practical on the GeoGirafe upstream project
+- Primary upstream source: GeoGirafe on GitLab
+- Deployment target: GitHub Pages
+- Audience of this repository: internal maintainers
+- Runtime target: frontend only, no own backend
+- Backends and data services may come from external providers
+
+## Core Strategy
+
+- Treat the upstream GeoGirafe project as the baseline and preserve upstream compatibility where practical
+- Prefer an approach that makes future upstream adoption simple and low-risk
+- Repository-specific configuration for the final WebGIS may live here as long as it does not unnecessarily break upstream sync
+- If there is a conflict between "stay close to upstream" and "custom project-specific behavior", the agent must make that tradeoff explicit
 
 ## Branch Policy
 
@@ -12,35 +27,49 @@ The project is currently in its discovery and setup phase. The agent must establ
 - Do not create additional branches unless the user explicitly asks for it
 - Before making any file change, staging files, or creating a commit, the agent MUST verify the current branch
 - If the current branch is not `agent`, the agent MUST stop and switch back before continuing
-- The branch policy in this file overrides the default branch habits of the agent
+- This repository-specific branch rule overrides default agent habits
+
+## Upstream Sync Policy
+
+- The agent should structure the repository so that updates from the GitLab GeoGirafe upstream remain easy to apply
+- Prefer simple Git-based sync strategies over manual copy-paste workflows
+- If a direct fork is not technically possible across hosting providers, the agent should use the closest maintainable alternative and document it clearly
+- The agent should avoid unnecessary divergence from upstream file structure unless required for GitHub Pages deployment or project-specific configuration
+- Any sync workflow introduced here must be documented for maintainers in `README.md`
 
 ## Discovery-First Rule
 
-- Before scaffolding the project, the agent MUST ask focused questions to understand the project
-- The agent MUST clarify at least:
-  - project purpose
-  - target users
-  - preferred tech stack
-  - required environments and deployment target
-  - language requirements
-  - initial feature scope
-  - desired repository and tooling configuration
-- Until these points are clear enough, the agent should limit itself to setup documents, lightweight repo configuration, and planning artifacts
-- If a requirement remains ambiguous, the agent should make the assumption explicit before implementing
+- Before scaffolding substantial project code, the agent MUST clarify the remaining architectural decisions
+- The agent MUST especially clarify:
+  - which exact GitLab repository is the canonical upstream
+  - whether this repository should be a Git mirror, a tracked customization layer, or a deploy-ready distribution repo
+  - how GitHub Pages should publish the app
+  - whether a build step is acceptable if upstream requires one
+  - which external services should be wired in the first usable version
+- Until these points are clear enough, the agent should limit itself to repo setup, documentation, and low-risk structural work
 
-## Agent Responsibilities
+## Technology Rules
 
-- The agent should act autonomously once the project direction is clear
-- The agent should propose sensible defaults when the user does not specify a detail
-- The agent may create and update project structure, configuration, source code, documentation, and developer tooling
-- The agent should keep the repository coherent and avoid unnecessary complexity
-- The agent should prefer maintainable, readable defaults over clever or fragile solutions
+- Prefer no build step if and only if the chosen upstream-compatible setup supports it cleanly
+- If upstream requires TypeScript compilation, bundling, or other build tooling, the agent may use the minimum necessary tooling instead of forcing a buildless setup
+- Do not add a backend to this repository
+- Do not introduce extra frameworks or infrastructure without a concrete need
+- Prefer simple, readable configuration over clever automation
+
+## MapLibre and Mapping Guidance
+
+- For MapLibre-related tasks, load the relevant local skill files before implementation
+- Use task-based skill selection:
+  - `maplibre-tile-sources`: source and layer setup, basemap, labels, blank map debugging
+  - `maplibre-pmtiles-patterns`: PMTiles workflows and static hosting patterns
+  - `maplibre-mapbox-migration`: migration work from Mapbox GL JS to MapLibre GL JS
+- Treat the skill guidance as the primary technical baseline unless the repository clearly requires another approach
 
 ## Commit Policy
 
-- The agent MUST commit its own meaningful changes once a coherent unit of work is complete
-- Do not leave intentional implementation work uncommitted after a completed task unless the user asks for a pause
-- Commits should be logically grouped and keep the repository in a usable state
+- The agent MUST commit its own coherent changes
+- Do not leave finished work uncommitted unless the user explicitly asks for that
+- Prefer small, logically grouped commits that keep the repository usable
 
 ### Commit Message Rules
 
@@ -49,54 +78,35 @@ The project is currently in its discovery and setup phase. The agent must establ
 - Prefer imperative mood
 
 Examples:
-- `Add initial agent instructions`
-- `Scaffold Vite app with TypeScript`
-- `Configure linting and formatting`
-- `Add landing page layout and navigation`
-- `Document local development setup`
-
-## Working Style
-
-- Prefer small, incremental changes
-- Verify assumptions against the actual repository state before editing
-- Keep developer documentation up to date as the structure evolves
-- Avoid adding tools, frameworks, or services that are not justified by the project requirements
-- Prefer simple defaults first, then extend only where needed
-
-## Configuration Rules
-
-- The initial project setup should reflect the user's answers, not generic boilerplate by default
-- If the user does not choose a tool, the agent should recommend one and explain the tradeoff briefly
-- Tooling should be selected intentionally:
-  - frontend framework only if needed
-  - backend only if required
-  - database only if required
-  - build tooling only if justified by the chosen stack
-- Secrets must never be committed
-- Environment variables should be documented in a dedicated example file when applicable
+- `Add project-specific agent instructions`
+- `Document upstream sync strategy`
+- `Add GitHub Pages deployment baseline`
+- `Import GeoGirafe upstream baseline`
+- `Configure vectormap project defaults`
 
 ## Documentation
 
-- Keep documentation developer-focused and practical
-- Add or update `README.md` once the project direction is defined
-- Document setup, run commands, environment variables, and important architectural decisions
+- Maintain a practical `README.md`
+- Document setup, sync workflow, deployment, and project-specific configuration
+- Keep documentation developer-focused because this repository is primarily for internal maintainers
 
 ## Definition of Done
 
 Work is considered complete for a given task when:
 
-- The current branch policy has been respected
-- The requested change has been implemented coherently
-- Relevant documentation has been updated when needed
+- The branch policy has been respected
+- The requested change is implemented coherently
+- Upstream compatibility impact has been considered and made explicit when relevant
+- Documentation is updated where needed
 - The change has been verified as far as the local environment allows
-- The agent has either committed the completed work or explicitly explained why it has not been committed yet
+- The completed work has been committed unless the user asked otherwise
 
 ## Expected Behaviour
 
 The agent is expected to:
 
-- ask precise questions early
-- make explicit recommendations where useful
-- implement agreed changes autonomously
-- keep commits and structure clean
-- avoid drifting away from the project's actual goals
+- ask precise follow-up questions when architectural choices remain open
+- recommend the simplest maintainable sync strategy
+- stay as close to GeoGirafe upstream as practical
+- keep repository customizations intentional and documented
+- implement agreed changes autonomously once the open questions are resolved
