@@ -1,0 +1,67 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- prettier-ignore -->
+<div
+  class="full-width-height"
+  style="${this.state.interface.swipeupPanelContent==='features'?'': 'display: none;'}">
+  <div class="container">
+    ${this.state.selection.selectedFeatures.filter((feature) => feature !== undefined).map((feature) => uHtml`
+    <div class="single-feature">
+      <div class="layer-name">
+        <img class="layer-icon" alt="layer icon" src="icons/themes.svg" />
+        <span i18n="${SelectionPanelMobile.getFeatureLayerName(feature)}"></span>
+      </div>
+
+      ${Object.entries(feature.getProperties()).filter((keyValue) => typeof keyValue[1] === "boolean" || typeof
+      keyValue[1] === "string" || typeof keyValue[1] === "number").map((keyValue) => uHtml`
+
+      <div class="feature-property-key-value">
+        <div class="feature-property-key" i18n="${keyValue[0]}"></div>
+        <div class="feature-property-value" i18n="${getLinkFriendlyString(keyValue[1])}"></div>
+      </div>
+      `)}
+
+      <div class="feature-property-key-value">
+        <div class="feature-property-key" i18n="Geometry type"></div>
+        <div class="feature-property-value">${(feature as Feature).getGeometry()?.getType()}</div>
+      </div>
+    </div>
+    `)}
+  </div>
+
+  <div class="pagination">
+    <div
+      class="nav-bt previous-fast-bt"
+      onpointerup="${() => this.touchChangeSlide(-20)}"
+      style="${this.currentIndex <= 0 ? 'opacity: 0.3': ''}">
+      <img alt="Fast previous button" src="icons/arrow_left.svg" />
+    </div>
+
+    <div
+      class="nav-bt previous-bt"
+      onpointerup="${() => this.touchChangeSlide(-1)}"
+      style="${this.currentIndex <= 0 ? 'opacity: 0.3': ''}">
+      <img alt="Previous button" src="icons/arrow_left.svg" />
+    </div>
+
+    <!-- prettier-ignore -->
+    <div
+      class="nav-bt next-bt"
+      onpointerup="${() => this.touchChangeSlide(1)}"
+      style="${this.currentIndex >= (this.state.selection.selectedFeatures.length - 1) ? 'opacity: 0.3': ''}">
+      <img alt="Fast next button" src="icons/arrow_right.svg" />
+    </div>
+
+    <!-- prettier-ignore -->
+    <div
+      class="nav-bt next-fast-bt"
+      onpointerup="${() => this.touchChangeSlide(20)}"
+      style="${this.currentIndex >= (this.state.selection.selectedFeatures.length - 1) ? 'opacity: 0.3': ''}">
+      <img alt="Fast next button" src="icons/arrow_right.svg" />
+    </div>
+
+    <div class="nav-center-wrapper">
+      <div class="nav-indicator">${`${this.currentIndex + 1}/${this.state.selection.selectedFeatures.length}`}</div>
+      <girafe-get-directions></girafe-get-directions>
+    </div>
+  </div>
+</div>

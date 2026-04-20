@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+a {
+  color: white;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+a:visited {
+  color: white;
+}

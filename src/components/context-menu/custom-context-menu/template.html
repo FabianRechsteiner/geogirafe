@@ -1,0 +1,9 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div class="map-info-contextmenu">
+  <button class="contextmenu-closer gg-icon-button gg-small" onclick="${() => this.closeMenu()}"></button>
+  <div>${this.htmlUnsafe(this.state.position.tooltip?.content ?? '')}</div>
+  <svg class="tooltip-triangle" viewBox="0 0 20 10" preserveAspectRatio="none">
+    <polygon points="0,0 10,10 20,0" class="triangle-fill" />
+    <path d="M0,0 L10,10 L20,0" class="triangle-border" />
+  </svg>
+</div>

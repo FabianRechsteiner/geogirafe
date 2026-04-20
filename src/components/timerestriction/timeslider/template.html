@@ -1,0 +1,14 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div id="container">
+  <input id="input-lower" type="range" min="0" max="1" step="1" />
+
+  <input id="input-upper" type="range" min="0" max="1" step="1" />
+
+  <div id="slider-track"></div>
+
+  <div class="${this.resolution === 'year' ? 'slider-label editable' : 'slider-label'}">
+    <input id="output-label-lower" disabled class="gg-input gg-small" />
+    <div class="${this.mode === 'range' ? '' : 'hidden'}">/</div>
+    <input id="output-label-upper" disabled class="${this.mode === 'range' ? 'gg-input gg-small' : 'hidden'}" />
+  </div>
+</div>

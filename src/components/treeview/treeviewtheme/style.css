@@ -1,0 +1,48 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+header {
+  border: none;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-direction: row-reverse;
+  position: relative;
+}
+
+.theme-button {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.theme-button span {
+  margin-left: 0.5rem;
+}
+
+.theme-button:hover {
+  background-color: transparent;
+  cursor: default;
+  border: none;
+}
+
+.children {
+  padding-left: 0.5rem;
+}
+
+.children:first-child {
+  border: none;
+}
+
+.label-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.label-container button {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.tool {
+  z-index: 1;
+}

@@ -1,0 +1,14 @@
+.idea
+*.tgz
+coverage
+dist
+build-lib
+node_modules
+public/Mock
+public/*.json
+vite.config.js.timestamp-*.mjs
+.npm
+buildtools/certs/*.pem
+buildtools/certs/default/rootCA-key.pem
+src/service-worker.js
+.agents/skills/superpowers

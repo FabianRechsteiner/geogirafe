@@ -1,0 +1,17 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.content-horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+.content-vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-content {
+  display: inline-flex;
+  flex-direction: column;
+  width: max-content;
+  background-color: var(--bkg-color);
+}

@@ -1,0 +1,186 @@
+// SPDX-License-Identifier: Apache-2.0
+import GirafeSingleton from '../../base/GirafeSingleton';
+import IGirafeContext from '../context/icontext';
+
+/**
+ * A dictionary that holds translation strings.
+ * For example:
+ * {
+ *  'layer': 'couche'
+ * }
+ */
+export type TranslationsDict = {
+  [lang: string]: string;
+};
+
+/**
+ * A dictionary that holds all the languages with their translation strings.
+ * For example:
+ * {
+ *   'fr': {
+ *     'layer': 'couche'
+ *   },
+ * }
+ */
+type AvailableLanguages = {
+  [lang: string]: TranslationsDict;
+};
+
+class I18nManager extends GirafeSingleton {
+  private readonly translations: AvailableLanguages = {};
+  private readonly translationAliases: Record<string, string> = {};
+  private loadingLanguagePromise: Promise<TranslationsDict> | null = null;
+
+  public constructor(context: IGirafeContext) {
+    super(context);
+  }
+
+  public override initializeSingleton(): void {
+    this.context.stateManager.subscribe('language', () => this.handleLanguageChange());
+    this.handleLanguageChange();
+  }
+
+  private formatNumber(number: string | number): string {
+    return Number.parseFloat(`${number}`).toLocaleString(this.context.configManager.Config.general.locale);
+  }
+
+  public async ensureTranslationLoaded(): Promise<boolean> {
+    if (!this.context.stateManager.state?.language) {
+      return false;
+    }
+
+    try {
+      await this.loadTranslations(this.context.stateManager.state.language);
+    } catch (err) {
+      console.warn('Skipping translation due to config error:', err);
+      return false;
+    }
+
+    return true;
+  }
+
+  private async loadTranslations(language: string): Promise<TranslationsDict> {
+    if (this.loadingLanguagePromise) {
+      // There's already a promise for loading translations
+      // => return it instead of starting another request
+      return this.loadingLanguagePromise;
+    }
+
+    if (language in this.translations) {
+      // Translation were already loaded.
+      // => stop here
+      return this.translations[language];
+    }
+
+    // Load translations
+    this.loadingLanguagePromise = this.context.configManager.loadConfig().then(async () => {
+      if (
+        this.context.configManager.Config?.languages.translations &&
+        language in this.context.configManager.Config.languages.translations
+      ) {
+        let mergedTranslations: TranslationsDict = {};
+        // Translations are loaded in the order defined in the list of files
+        // If an element is present in both results, the last value overwrite all the others
+        for (const url of this.context.configManager.Config.languages.translations[language]) {
+          const response = await fetch(url);
+          const content = await response.json();
+          mergedTranslations = { ...mergedTranslations, ...content[language] };
+        }
+
+        this.translations[language] = mergedTranslations;
+        this.loadingLanguagePromise = null;
+        return this.translations[language];
+      } else {
+        throw new Error('No languages found in config.json');
+      }
+    });
+
+    return this.loadingLanguagePromise;
+  }
+
+  public getTranslation(key: string) {
+    const currentLanguage = this.context.stateManager?.state?.language ?? 'en';
+
+    const translationDict = this.translations[currentLanguage];
+    if (translationDict) {
+      // First look in translations
+      let translation = translationDict[key];
+      if (translation) {
+        return translation;
+      }
+      // Otherwise, try with translation alias
+      const alias = this.translationAliases[key];
+      translation = translationDict[alias];
+      if (translation) {
+        return translation;
+      }
+    }
+
+    // No translation found.
+    return key;
+  }
+
+  public async translate(dom: DocumentFragment | HTMLElement): Promise<void> {
+    const translationLoaded = await this.ensureTranslationLoaded();
+    if (!translationLoaded) {
+      return;
+    }
+
+    const toTranslate = dom.querySelectorAll('[i18n]');
+    for (const item of toTranslate) {
+      const key = item.getAttribute('i18n');
+      let translation: string;
+      if (item.hasAttribute('i18nFn')) {
+        translation = this.getFnTranslated(item, key!);
+      } else {
+        translation = this.getTranslation(key!);
+      }
+      if (item.hasAttribute('placeholder')) {
+        item.setAttribute('placeholder', translation);
+      } else {
+        // Default : simply set innerHTML.
+        item.innerHTML = translation;
+      }
+    }
+
+    const tooltips = dom.querySelectorAll('[tip]');
+    for (const item of tooltips) {
+      const key = item.getAttribute('tip');
+      const translation = this.getTranslation(key!);
+      item.setAttribute('title', translation);
+    }
+  }
+
+  private handleLanguageChange() {
+    const newLanguage = this.context.stateManager.state.language;
+    if (!newLanguage) {
+      return;
+    }
+    const htmlLangElement = document.querySelector('html[lang]');
+    htmlLangElement?.setAttribute('lang', newLanguage);
+
+    // Translate elements in main html page
+    this.translate(document.body);
+  }
+
+  private getFnTranslated(item: Element, key: string): string {
+    const fnName = item.getAttribute('i18nFn');
+    if (fnName === 'formatNumber') {
+      return this.formatNumber(key);
+    }
+    return key;
+  }
+
+  /**
+   * Define a translation alias.
+   * The alias will use the same translation as the key.
+   * But if the key already has another translation, the alias will be ignored
+   */
+  public addTranslationAlias(key: string, alias: string) {
+    if (key !== alias) {
+      this.translationAliases[alias] = key;
+    }
+  }
+}
+
+export default I18nManager;

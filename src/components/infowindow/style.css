@@ -1,0 +1,12 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+:host {
+  --selection-window-footer-height: 0rem;
+}
+#content {
+  overflow-y: hidden !important;
+  background-color: var(--bkg-color) !important;
+  iframe {
+    border: none;
+    background-color: var(--bkg-color) !important;
+  }
+}

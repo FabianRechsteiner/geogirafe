@@ -1,0 +1,91 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<link rel="stylesheet" href="lib/tippy.js/tippy.css" />
+<link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
+<link rel="stylesheet" href="lib/tippy.js/border.css" />
+<link rel="stylesheet" href="lib/tippy.js/svg-arrow.css" />
+
+<div id="container">
+  <header>
+    <!-- Caret -->
+    <button
+      class="gg-icon-button gg-small gg-opacity"
+      tip="Expand / Collapse"
+      onclick="${() => (this.layer as GroupLayer).isExpanded = !(this.layer as GroupLayer).isExpanded}">
+      <img
+        class="${(this.layer as GroupLayer).isExpanded ? 'gg-rotate90 gg-caret' : 'gg-caret'}"
+        alt="Expand/Collapse button"
+        src="icons/expand.svg" />
+    </button>
+
+    <!-- Checkbox -->
+    <button
+      class="${this.layer.activeState === 'on' ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
+      tip="Activate / Deactivate"
+      onclick="${() => this.toggle()}">
+      <img
+        class="${this.layer.activeState === 'on' ? 'gg-checkbox' : 'hidden'}"
+        alt="Expand/Collapse button"
+        src="icons/checked-full.svg" />
+      <img
+        class="${this.layer.activeState === 'semi' ? 'gg-checkbox' : 'hidden'}"
+        alt="Expand/Collapse button"
+        src="icons/checked-half.svg" />
+      <img
+        class="${this.layer.activeState === 'off' ? 'gg-checkbox' : 'hidden'}"
+        alt="Expand/Collapse button"
+        src="icons/checked-no.svg" />
+    </button>
+
+    <!-- Error icon -->
+    <button class="${this.layer.hasError ? 'gg-icon-button gg-small gg-opacity' : 'hidden'}" tip="Error on layer">
+      <img alt="Error on layer" src="icons/error.svg" />
+    </button>
+
+    <!-- Label -->
+    <div class="label-container">
+      <button
+        class="${this.layer.activeState === 'on' ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
+        onclick="${() => this.toggle()}">
+        <span i18n="${this.layer.name}" class="gg-tree-label"> ${this.layer.name} </span>
+      </button>
+    </div>
+
+    <!-- Time restriction -->
+    <div>
+      <button
+        id="timeRestriction"
+        class="${this.getButtonClass('timeRestriction')}"
+        tip="Define time restriction on group">
+        <img alt="Define time restriction on group" src="icons/clock.svg" />
+      </button>
+    </div>
+
+    <!-- Metadata icon -->
+    <button
+      class="${this.layer.hasMetadata ? 'metadata gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
+      tip="Show metadata"
+      onclick="${() => this.showMetadata()}">
+      <img alt="Remove theme" src="icons/info.svg" />
+    </button>
+
+    <!-- Drag -->
+    <button id="drag-button" class="${this.getButtonClass('draggable')}" tip="Move">
+      <img alt="Move layer" src="icons/drag.svg" />
+    </button>
+
+    <!-- Remove icon -->
+    <button class="${this.getButtonClass('removable')}" tip="Remove group" onclick="${() => this.deleteGroup()}">
+      <img alt="Remove group" src="icons/trash.svg" />
+    </button>
+  </header>
+
+  <!-- Sub layers -->
+  <div class="${((this.layer as GroupLayer).isExpanded && this.layer.isVisible ? 'children' : 'hidden')}">
+    <!-- prettier-ignore -->
+    ${this.sortedChildren().filter(layer => layer.isVisible).map(layer => (layer instanceof GroupLayer) ? uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>
+    ` : uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>
+    `)}
+  </div>
+</div>

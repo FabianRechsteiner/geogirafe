@@ -1,0 +1,140 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.hidden {
+  display: none;
+}
+
+#searchbox {
+  background-color: var(--bkg-color);
+  height: 2.25rem;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #cfd6dd;
+  border-radius: 4px;
+
+  slot[name='search-tooltip'] {
+    display: none;
+  }
+}
+
+#search {
+  font-size: 1rem;
+  outline: none;
+  margin: 0 0 0 0.5rem;
+  padding-left: 0.8rem;
+  border: 0;
+  height: 2.25rem;
+  width: auto;
+  flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  -webkit-appearance: none;
+  background: transparent;
+  color: var(--text-color);
+}
+
+.search-icon,
+.close-icon,
+.select-color-icon {
+  width: 14px;
+  color: var(--text-color);
+  padding: 0 1rem;
+}
+
+.close-button,
+.select-color-button {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+#results {
+  z-index: 1000;
+  margin-top: 0.1rem;
+  margin-bottom: 0.5rem;
+  position: absolute;
+  top: 3.5rem;
+  width: 36rem;
+  max-height: 31rem;
+  background-color: var(--bkg-color);
+  overflow-x: hidden;
+  scrollbar-width: thin;
+}
+
+.result,
+.title {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  width: Calc(36rem - 2rem);
+  line-height: 1.3rem;
+}
+
+.title {
+  color: var(--text-color);
+  font-weight: 600;
+  line-height: 2.5rem;
+  font-size: 1.3rem;
+  padding-top: 1.5rem;
+}
+
+.result {
+  cursor: pointer;
+  border: none;
+  border-top: solid 1px #ccc;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  color: var(--text-color);
+}
+
+.title img {
+  margin-right: 1rem;
+  width: 14px;
+}
+
+.title span {
+  text-transform: uppercase;
+}
+
+.result.selected {
+  background-color: #aaa !important;
+  color: var(--text-color);
+}
+
+#no-result {
+  position: absolute;
+  background: var(--warning-color);
+  top: 3.5rem;
+  padding: 0.5rem 0;
+  border-radius: 6px;
+  opacity: 0.75;
+  font-size: 1rem;
+  width: fit-content;
+  left: 0;
+  right: 0;
+  margin: auto;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#no-result > span {
+  padding: 1.3rem;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.shown-then-fadeout {
+  visibility: visible !important;
+  animation: fadeOut 2s ease-in-out forwards;
+}

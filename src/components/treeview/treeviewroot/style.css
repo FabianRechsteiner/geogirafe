@@ -1,0 +1,94 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  background: var(--bkg-color);
+}
+
+.menu {
+  border-top: solid 1px #bbb;
+  z-index: 1;
+  display: flex;
+}
+
+.treeview-list,
+.treeview-no-data {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1;
+}
+
+.treeview-search {
+  flex-grow: 1;
+  align-self: center;
+  background-color: var(--bkg-color);
+  width: auto;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #cfd6dd;
+  border-radius: 4px;
+  margin-right: 2px;
+}
+
+#treeview-search-field {
+  font-size: 1rem;
+  outline: none;
+  border: 0;
+  flex: 1 1 auto;
+  width: 90%;
+  background: transparent;
+  color: var(--text-color);
+  padding: 0;
+}
+
+.filter-icon,
+.delete-icon {
+  width: 16px;
+  color: var(--text-color);
+  padding: 0 0.5rem;
+}
+
+.delete-button {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.treeview-no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.treeview-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+img:-moz-loading {
+  visibility: hidden;
+}
+
+.no-data {
+  color: #999;
+  text-align: center;
+  display: flex;
+  align-items: anchor-center;
+  font-variant: small-caps;
+  font-size: 1rem;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.no-data span {
+  display: block;
+  flex-grow: 1;
+}

@@ -1,0 +1,210 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+:host,
+#panel {
+  min-height: 10rem;
+  height: 16rem;
+  background: var(--bkg-color);
+}
+
+#panel {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+#gutter {
+  height: 0.4rem;
+  width: 100%;
+  background: var(--bkg-color);
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: row-resize;
+}
+#gutter:hover {
+  background: var(--bkg-color-grad1);
+}
+#gutter:after {
+  content: ' ';
+  background: var(--bkg-color-grad1);
+  width: 4rem;
+  height: 0.4rem;
+  display: block;
+  position: relative;
+  left: calc(50% - 2rem);
+  border-radius: 1rem;
+}
+
+#close {
+  border: none;
+  color: #777;
+  padding: 0;
+  margin: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  line-height: 1rem;
+  position: absolute;
+  top: 6px;
+  right: 0;
+  background-color: var(--bkg-color);
+  cursor: pointer;
+}
+
+#close i:before {
+  content: '\f00d';
+}
+
+#close:hover {
+  border-color: #000;
+  color: #000;
+}
+
+#content {
+  position: absolute;
+  background: var(--bkg-color);
+  padding: 0;
+  margin: 0 0.5rem 0.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  inset: 0.5rem 0 0;
+}
+
+#header {
+  flex: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.selection-panel {
+  margin-right: 0.5rem;
+  display: flex;
+
+  .gg-icon-button[disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .gg-icon-button[disabled]:hover {
+    background-color: transparent;
+  }
+
+  .label {
+    align-self: center;
+    padding-left: 1rem;
+  }
+}
+
+.gg-tabs {
+  margin: 0;
+}
+
+#grid {
+  overflow: hidden;
+  flex: 1;
+}
+
+.geo-type {
+  margin-right: 0.5rem;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #999;
+}
+
+.tiny-margin {
+  margin: 0.1rem;
+}
+
+/* Define the style when the column is not sorted */
+.tabulator-col[aria-sort='none'] .tabulator-col-sorter i {
+  color: #999;
+}
+
+/* Define the style when the column is sorted in ascending order */
+.tabulator-col[aria-sort='asc'] .tabulator-col-sorter i {
+  color: #f00;
+}
+
+/* Define the style when the column is sorted in descending order */
+.tabulator-col[aria-sort='desc'] .tabulator-col-sorter i {
+  color: #f00;
+  transform: scaleY(-1); /* flip the icon vertically so the arrow points down */
+}
+
+/*Theme the Tabulator element*/
+#tabulator {
+  background-color: var(--bkg-color);
+}
+
+/*Theme the header*/
+#tabulator .tabulator-header .tabulator-col-content {
+  background-color: var(--bkg-color);
+  color: var(--text-color);
+}
+
+/*Allow column header names to wrap lines*/
+#tabulator .tabulator-header .tabulator-col,
+#tabulator .tabulator-header .tabulator-col-row-handle {
+  white-space: normal;
+}
+
+/*Color the table rows*/
+#tabulator .tabulator-tableholder .tabulator-table .tabulator-row {
+  background-color: var(--bkg-color);
+  color: var(--text-color);
+}
+
+/*Color even rows*/
+#tabulator .tabulator-tableholder .tabulator-table .tabulator-row:nth-child(even) {
+  background-color: var(--bkg-color-grad1);
+}
+
+/*Color selected rows*/
+#tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-selected {
+  background-color: #9abcea;
+}
+
+/*Size of span and images in table*/
+.tabulator-cell img {
+  height: 1.5rem;
+  float: left;
+  margin-right: 0.5rem;
+}
+.tabulator-cell span {
+  line-height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+.tabulator-cell span sup {
+  position: absolute;
+  right: -0.5rem;
+  top: -0.3rem;
+}
+
+/*Hover effect for rows*/
+@media (hover: hover) and (pointer: fine) {
+  #tabulator .tabulator-tableholder .tabulator-table .tabulator-row:hover {
+    cursor: pointer;
+    background-color: var(--bkg-color-grad2);
+  }
+}
+
+img.sort-icon {
+  width: 1rem;
+  height: 1rem;
+
+  &.default {
+    opacity: 0.5;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}

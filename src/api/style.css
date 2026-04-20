@@ -1,0 +1,35 @@
+:host {
+  position: relative;
+}
+
+girafe-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+girafe-basemap {
+  display: block;
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+}
+
+girafe-search {
+  display: block;
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  width: 50%;
+  height: 2.25rem;
+  box-shadow: 0 1px 4px #0000004d;
+}
+
+girafe-selection-window {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 100;
+  width: 400px;
+  height: 240px;
+}

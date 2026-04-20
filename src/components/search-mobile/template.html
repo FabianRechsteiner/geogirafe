@@ -1,0 +1,41 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<link rel="stylesheet" href="lib/vanilla-picker/vanilla-picker.csp.css" />
+
+<div id="searchbox">
+  <input
+    id="search"
+    class="gg-input"
+    length="20"
+    maxlength="1000"
+    autocomplete="off"
+    autocorrect="off"
+    i18n="Search"
+    placeholder="Search..."
+    oninput="${(e:Event) => this.doSearchDebounced(e)}"
+    onkeydown="${(e:KeyboardEvent) => this.onKeyDown(e)}" />
+
+  <img class="${this.allResults.length > 0 ? 'hidden' : 'search-icon'}" alt="search-icon" src="${this.searchIcon}" />
+  <button class="${this.allResults.length > 0 ? 'close-button' : 'hidden'}" onclick="${() => this.clearSearch(true)}">
+    <img class="close-icon" alt="close-icon" src="icons/close.svg" />
+  </button>
+</div>
+
+<div id="results" class="${Object.keys(this.groupedResults).length === 0 || this.forceHide ? 'hidden' : ''}">
+  ${Object.keys(this.groupedResults).map(group => uHtml`
+  <div class="title">
+    <img alt="result icon" src="${this.getIcon(group)}" />
+    <span i18n="${group}"></span>
+  </div>
+  ${this.groupedResults[group].map(result => uHtml`
+  <button
+    class="${result.get('selected') ? 'result selected': 'result'}"
+    onmousedown="${() => this.onMouseDown()}"
+    onclick="${() => this.onSelect(result)}">
+    ${result.get('label')}
+  </button>
+  `)} `)}
+</div>
+
+<div id="no-result" class="${this.showNoResultWarning ? 'shown-then-fadeout' : ''}">
+  <span i18n="${'No match found'}"></span>
+</div>

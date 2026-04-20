@@ -1,0 +1,106 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div id="draggable" class="${this.visible ? 'girafe-draggable-window' : 'hidden'}">
+  <button tabindex="-1" class="girafe-resizer tl corner"></button>
+  <button tabindex="-1" class="girafe-resizer t top-bottom"></button>
+  <button tabindex="-1" class="girafe-resizer tr corner"></button>
+  <button tabindex="-1" class="girafe-resizer r left-right"></button>
+  <button tabindex="-1" class="girafe-resizer br corner"></button>
+  <button tabindex="-1" class="girafe-resizer b top-bottom"></button>
+  <button tabindex="-1" class="girafe-resizer bl corner"></button>
+  <button tabindex="-1" class="girafe-resizer l left-right"></button>
+  <div id="header">
+    <span i18n="Results" class="title"></span>
+    <div id="layers-download-wrapper">
+      <button
+        class="${this.showDropdown ? 'gg-icon-button gg-medium showing-dropdown' : 'gg-icon-button gg-medium'}"
+        onclick="${() => this.openDropdown()}"
+        tip="Generate CSV">
+        <img alt="download csv icon" src="icons/arrow-download.svg" />
+      </button>
+      <div ?hidden="${!this.showDropdown}">
+        <div id="layers-dropdown">
+          ${this.getLayersList().map( (layer) => uHtml`
+          <option
+            class="layers-dropdown-item"
+            value="${layer.id}"
+            onclick="${() => this.generateCSV(layer.id)}"
+            onkeydown="${() => this.generateCSV(layer.id)}"
+            tabindex="0"
+            i18n="${layer.label}"></option>
+          `)}
+        </div>
+      </div>
+    </div>
+    <girafe-get-directions></girafe-get-directions>
+    <button class="gg-icon-button gg-medium" onclick="${() => this.recenter()}" tip="Zoom to">
+      <img alt="zoom to selection icon" src="icons/zoom-to-selection.svg" />
+    </button>
+    <button class="gg-icon-button gg-medium" onclick="${() => this.closeWindow()}" tip="Clear results and close Panel">
+      <img alt="close-icon" src="icons/close.svg" />
+    </button>
+  </div>
+  <div class="hr"></div>
+  <div id="content">
+    <div>
+      <table>
+        <tr class="hidden">
+          <th i18n="Label">Label</th>
+          <th i18n="Value">Value</th>
+        </tr>
+        <tr>
+          <td class="feature-id" colspan="2" i18n="${this.getWindowFeature()?.id}"></td>
+        </tr>
+        ${this.displayedProperties.map((keyValue) => uHtml`
+        <tr class="key-value">
+          <td class="label" i18n="${keyValue[0]}"></td>
+          <td class="value">${this.htmlUnsafe(keyValue[1] as string)}</td>
+        </tr>
+        `)}
+      </table>
+    </div>
+  </div>
+  <div class="hr"></div>
+  <div id="footer">
+    <button
+      id="beginning"
+      class="gg-icon-button gg-medium"
+      ?disabled="${this.maxIndex == 0 || this.focusedIndex == 0}"
+      onclick="${() => this.onFocusWindowFeature(0)}">
+      <img alt="beginning-icon" src="icons/skip-to-beginning.svg" />
+    </button>
+    <button
+      id="previous"
+      class="gg-icon-button gg-medium"
+      ?disabled="${this.maxIndex == 0 || this.focusedIndex == 0}"
+      onclick="${() => this.onFocusWindowFeature(this.focusedIndex - 1)}">
+      <img alt="previous-icon" src="icons/to-previous.svg" />
+    </button>
+    <div id="counter" class="${this.maxIndex > 0 ? '' : 'hidden'}">
+      <span class="${this.maxIndex > 0 ? '' : 'hidden'}">
+        <input
+          class="gg-input"
+          type="number"
+          min="1"
+          max="${this.maxIndex + 1}"
+          value="${this.focusedIndex + 1}"
+          onchange="${(e: Event) => this.onFocusWindowFeatureChecked(e)}" />
+        <span>/</span>
+        <span>${this.maxIndex + 1}</span>
+      </span>
+    </div>
+    <button
+      id="next"
+      class="gg-icon-button gg-medium"
+      ?disabled="${this.maxIndex == 0 || this.focusedIndex == this.maxIndex}"
+      onclick="${() => this.onFocusWindowFeature(this.focusedIndex + 1)}">
+      <img alt="next-icon" src="icons/to-next.svg" />
+    </button>
+    <button
+      id="end"
+      class="gg-icon-button gg-medium"
+      ?disabled="${this.maxIndex == 0 || this.focusedIndex == this.maxIndex}"
+      onclick="${() => this.onFocusWindowFeature(this.maxIndex)}">
+      <img alt="end-icon" src="icons/skip-to-end.svg" />
+    </button>
+  </div>
+</div>

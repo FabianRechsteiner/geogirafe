@@ -1,0 +1,27 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#content {
+  background: var(--bkg-color);
+  color: var(--text-color);
+  padding: 1rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+label,
+input,
+select,
+textarea {
+  font-size: 0.9rem;
+  flex-grow: 1;
+}
+
+.gg-input,
+.gg-select {
+  margin-bottom: 1rem;
+}
+
+.mail-contact {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}

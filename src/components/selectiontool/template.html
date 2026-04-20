@@ -1,0 +1,50 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div id="panel">
+  <div>
+    <div id="toolbar">
+      <button id="point" tip="Point" class="gg-icon-button gg-medium">
+        <img alt="point icon" src="icons/point.svg" />
+      </button>
+      <button id="polygon" tip="Polygon" class="gg-icon-button gg-medium">
+        <img alt="polygon icon" src="icons/polygon.svg" />
+      </button>
+      <button id="rectangle" tip="Rectangle" class="gg-icon-button gg-medium">
+        <img alt="rectangle icon" src="icons/rectangle.svg" />
+      </button>
+      <button id="circle" tip="Circle" class="gg-icon-button gg-medium">
+        <img alt="circle icon" src="icons/circle.svg" />
+      </button>
+      <button id="freepolygon" tip="Freehand polygon" class="gg-icon-button gg-medium">
+        <img alt="polygon-free icon" src="icons/polygon-free.svg" />
+      </button>
+    </div>
+
+    <div class="toolParameters">
+      <div class="toolParameter">
+        <label for="selection-mode" class="gg-label" i18n="selection-mode">selection-mode</label>
+        ${uHtml`
+        <select
+          id="selection-mode"
+          class="gg-select"
+          onchange="${(event: Event) => this.onSelectionModeChanged(event)}">
+          <option
+            value="${SelectionMode.Replace}"
+            ?selected="${this.selectionMode === SelectionMode.Replace}"
+            i18n="replace">
+            replace
+          </option>
+          <option value="${SelectionMode.Add}" ?selected="${this.selectionMode === SelectionMode.Add}" i18n="add">
+            add
+          </option>
+          <option
+            value="${SelectionMode.Remove}"
+            ?selected="${this.selectionMode === SelectionMode.Remove}"
+            i18n="remove">
+            replace
+          </option>
+        </select>
+        `}
+      </div>
+    </div>
+  </div>
+</div>

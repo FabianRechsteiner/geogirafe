@@ -1,0 +1,68 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div class="map-info-contextmenu">
+  <button class="contextmenu-closer gg-icon-button gg-small" onclick="${() => this.closeMenu()}"></button>
+  <div>
+    <table class="custom-table">
+      <colgroup>
+        <col class="col-1" />
+        <col />
+        <col class="col-3" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${ this.mapContextMenuState.crs.map(f => uHtml`
+        <tr>
+          <td i18n="${f.translation}"></td>
+          <td>${ this.printCoordinate(f.coordinate, f.format, f.precision).join(', ') }</td>
+          <td>
+            <div class="justify-right">
+              <button
+                class="gg-icon-button gg-small"
+                onclick="${() => {navigator.clipboard.writeText(this.printCoordinate(f.coordinate, f.format,f.precision).join(', '))}}">
+                <img src="icons/content_copy.svg" alt="${this.context.i18nManager.getTranslation('Copy value')}" />
+              </button>
+            </div>
+          </td>
+        </tr>
+        `) } ${ this.mapContextMenuState.sources.map(f => uHtml`
+        <tr>
+          <td i18n="${f.translation}"></td>
+          <td>
+            <div class="center-vertically">
+              ${f.loading ? uHtml`<img
+                src="icons/progress.svg"
+                class="gg-spin gg-small"
+                alt="${this.context.i18nManager.getTranslation('Loading')}" />
+              ` : ''} ${f.content ? f.content : this.context.i18nManager.getTranslation('No data')}
+            </div>
+          </td>
+          <td>
+            <div class="justify-right">
+              <button
+                class="gg-icon-button gg-small"
+                onclick="${() => {navigator.clipboard.writeText(f.content ? f.content : '')}}">
+                <img src="icons/content_copy.svg" alt="${this.context.i18nManager.getTranslation('Copy value')}" />
+              </button>
+            </div>
+          </td>
+        </tr>
+        `) }
+      </tbody>
+    </table>
+
+    <div>
+      ${ this.mapContextMenuState.links.map(f => uHtml`
+      <div class="link-div">
+        <a href="${f.content}" target="_blank">${this.context.i18nManager.getTranslation(f.translation)}</a>
+        <img src="icons/open_in_new.svg" alt="" />
+      </div>
+      `) }
+    </div>
+  </div>
+</div>

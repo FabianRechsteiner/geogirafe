@@ -1,0 +1,15 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+${this.feature ? uHtml`
+<div class="attribute-form">
+  ${this.featureSchema?.formAttributes.map(([attrName, attr]) => uHtmlFor(attr, attrName)`
+  <label for="${'form-' + attrName}">${attr.title}</label>
+  <input
+    id="${'form-' + attrName}"
+    type="${this.getInputType(attrName)}"
+    class="gg-input"
+    disabled="${attr.readOnly}"
+    maxlength="${attr.maxLength}"
+    value="${this.getCurrentValue(attrName)}" />
+  `)}
+</div>
+`: uHtml``}

@@ -1,0 +1,169 @@
+{
+  "general": {
+    "locale": "fr-CH"
+  },
+  "gmfauth": {
+    "url": "https://sitn.ne.ch/",
+    "audience": ["sitn.ne.ch"],
+    "audienceExcludedPaths": [
+      "^/web_getcapabilities/",
+      "^/static/(.*)",
+      "^/pytree/",
+      "^/services/wms",
+      "^/geodata/",
+      "^/3dtiles/"
+    ]
+  },
+  "languages": {
+    "translations": {
+      "fr": ["i18n/fr.json", "https://sitn.ne.ch/static/dummy/fr.json"]
+    },
+    "defaultLanguage": "fr"
+  },
+  "interface": {
+    "defaultSelectionComponent": "grid"
+  },
+  "themes": {
+    "url": "https://sitn.ne.ch/themes?background=desktop_background&interface=desktop",
+    "defaultTheme": "main"
+  },
+  "basemaps": {
+    "show": false,
+    "defaultBasemap": "OpenStreetMap",
+    "OSM": false,
+    "SwissTopoVectorTiles": false
+  },
+  "search": {
+    "url": "https://sitn.ne.ch/search?limit=100&partitionlimit=40&interface=desktop&query=###SEARCHTERM###&lang=fr",
+    "objectPreview": true,
+    "layerPreview": true
+  },
+  "print": {
+    "url": "https://sitn.ne.ch/printproxy/",
+    "defaultLayout": "1 A4 paysage"
+  },
+  "lidar": {
+    "url": "https://sitn.ne.ch/pytree"
+  },
+  "news": {
+    "urls": ["https://geogirafe.org/feed/atom/"],
+    "autoDisplay": false
+  },
+  "share": {
+    "service": "geogirafe",
+    "createUrl": "https://sitn.ne.ch/short/create",
+    "getUrl": "https://sitn.ne.ch/short/get",
+    "preferNames": true
+  },
+  "projections": {
+    "EPSG:3857": "W-M",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "MN95"
+  },
+  "map": {
+    "srid": "EPSG:2056",
+    "startZoom": "1",
+    "startPosition": "2535300,1206630",
+    "maxExtent": "2420000,1030000,2900000,1360000",
+    "scales": [1000000, 400000, 200000, 80000, 40000, 20000, 10000, 8000, 6000, 4000, 2000, 1000, 500, 250, 100, 50]
+  },
+  "map3d": {
+    "terrainUrl": "https://3d.geo.admin.ch/ch.swisstopo.terrain.3d/v1/",
+    "terrainImagery": {
+      "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
+      "minLoD": 8,
+      "maxLoD": 17,
+      "coverageArea": [5.013926957923385, 45.35600133779394, 11.477436312994008, 48.27502358353741]
+    },
+    "tilesetsUrls": [
+      "https://sitn.ne.ch/3dtiles/chaux81123/Production_1_pro_tie_3d_cesium.json",
+      "https://sitn.ne.ch/3dtiles/le_locle_ouest/LeLocle_objmCesium3DTiles.json",
+      "https://sitn.ne.ch/3dtiles/vdt/P1_cesium/patch1_cesium.json",
+      "https://sitn.ne.ch/3dtiles/vdt/P2_cesium/patch2_cesium.json",
+      "https://sitn.ne.ch/3dtiles/vdt/P3_cesium/patch3_cesium.json",
+      "https://sitn.ne.ch/3dtiles/vdt/P4_cesium/patch4_cesium.json",
+      "https://sitn.ne.ch/3dtiles/vdt/P5_cesium/patch5_cesium.json",
+      "https://sitn.ne.ch/3dtiles/vdt/P6_Est_cesium/est_cesium.json",
+      "https://sitn.ne.ch/3dtiles/vdt/P6_Ouest_cesium/ouest_cesium.json",
+      "https://uzuflycesium.s3.amazonaws.com/LeLanderon/3Dtiles/LeLanderon_3DTiles_OUT/Scene/LeLanderon_3DTiles_OUT.json",
+      "https://uzuflycesium.s3.amazonaws.com/LeLanderon/3Dtiles/LeLanderon_3Dtiles_IN_Raw/Scene/LeLanderon_3Dtiles_IN_Raw.json"
+    ],
+    "maximumZoomDistance": 25000
+  },
+  "externalLayers": {
+    "predefinedSources": [
+      {
+        "label": "Swisstopo WMS",
+        "type": "WMS",
+        "url": "https://wms.geo.admin.ch"
+      },
+      {
+        "label": "Swisstopo WMTS",
+        "type": "WMTS",
+        "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr"
+      },
+      {
+        "label": "GMF background WMTS",
+        "type": "WMTS",
+        "url": "https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml"
+      }
+    ]
+  },
+  "contextmenu": {
+    "crs": [
+      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 1 },
+      { "code": "EPSG:21781", "translation": "EPSG:21781", "format": "decimal", "precision": 1 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
+    ],
+    "sources": [
+      {
+        "id": "altitude2022",
+        "translation": "Altitude",
+        "prefix": "",
+        "suffix": " m",
+        "precision": 1,
+        "crs": "EPSG:2056",
+        "nodata": 0.0,
+        "url": "https://sitn.ne.ch/geodata/pointclouds/Aeriallidar/Lidar2022/05_Grid/mnt/1m/sitn_lidar2022_mnt_1m_b128.cog.tif"
+      }
+    ],
+    "links": [
+      {
+        "translation": "Google Street View",
+        "crs": "EPSG:4326",
+        "url": "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "Google Earth",
+        "crs": "EPSG:4326",
+        "url": "https://earth.google.com/web/@###MAPY###,###MAPX###"
+      },
+      {
+        "translation": "OpenStreetMap",
+        "crs": "EPSG:4326",
+        "url": "https://www.openstreetmap.org/#map=13/###MAPY###/###MAPX###"
+      },
+      {
+        "translation": "map.geo.admin.ch",
+        "crs": "EPSG:2056",
+        "url": "https://map.geo.admin.ch/#/map?lang=en&center=###MAPX###,###MAPY###"
+      }
+    ]
+  },
+  "crs": [
+    {
+      "code": "EPSG:2056",
+      "definition": "+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs"
+    },
+    {
+      "code": "EPSG:21781",
+      "definition": "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs"
+    }
+  ],
+  "contact": {
+    "url": "https://sitn.ne.ch/feedback",
+    "reasons": ["Give feeback", "Ask a question", "Report an error"],
+    "email": "sitn@ne.ch"
+  }
+}

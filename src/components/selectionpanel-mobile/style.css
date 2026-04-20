@@ -1,0 +1,139 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.full-width-height {
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  width: 100%;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  gap: 10px;
+  height: calc(100% - 60px - env(safe-area-inset-bottom) / 2);
+}
+
+/* Hide scrollbar in Chrome/Safari */
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.single-feature {
+  position: relative;
+  background-color: #ffffff61;
+  padding: 15px;
+  scroll-snap-align: center;
+  box-sizing: border-box;
+  width: 100%;
+  border: solid 1px #277aff3f;
+  border-radius: 10px;
+  overflow-y: scroll;
+}
+
+.pagination {
+  width: 100%;
+  height: 60px;
+  border-radius: 20px;
+  position: relative;
+  margin-bottom: calc(env(safe-area-inset-bottom) / 2);
+}
+
+.nav-bt {
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  width: fit-content;
+  height: fit-content;
+}
+
+.nav-bt > img {
+  width: 40px;
+  height: 40px;
+}
+
+.previous-bt {
+  position: absolute;
+  left: 70px;
+}
+
+.next-bt {
+  position: absolute;
+  right: 70px;
+}
+
+.next-fast-bt {
+  position: absolute;
+  right: 0;
+}
+
+.previous-fast-bt {
+  position: absolute;
+  left: 0;
+}
+
+.next-fast-bt > img {
+  width: 50px;
+  height: 50px;
+}
+
+.previous-fast-bt > img {
+  width: 50px;
+  height: 50px;
+}
+
+.nav-indicator {
+  text-align: center;
+  font-size: 2em;
+  color: #606368;
+  font-weight: 600;
+}
+
+.nav-center-wrapper {
+  width: fit-content;
+  height: fit-content;
+  position: absolute;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  top: 0;
+  margin: auto;
+  display: flex;
+  align-items: center;
+}
+
+.feature-property-key-value {
+  margin-bottom: 1.5em;
+  font-size: 1.3em;
+}
+
+.feature-property-key {
+  font-weight: 900;
+  color: #a9a9a9;
+}
+
+.layer-name {
+  background-color: #277aff29;
+  margin-bottom: 1.5em;
+  font-size: 1.5em;
+  color: #277aff;
+  border-radius: 5px;
+  text-align: center;
+  padding: 0.5em 0px;
+  width: 100%;
+}
+
+.layer-icon {
+  height: 25px;
+  margin-bottom: -6px;
+  margin-right: 5px;
+  filter: brightness(10);
+}
+
+.feature-property-value {
+  text-overflow: ellipsis !important;
+  overflow-x: hidden;
+}

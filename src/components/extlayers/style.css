@@ -1,0 +1,159 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#panel {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  background: var(--bkg-color);
+  color: var(--text-color);
+  padding: 0 1rem;
+}
+
+#content {
+  margin: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  margin: 0;
+  position: sticky;
+  top: -5px;
+  background-color: var(--bkg-color);
+}
+
+h4 {
+  margin-bottom: 0.5rem;
+}
+
+ul {
+  margin-left: 0;
+  padding-left: 2rem;
+  list-style-type: disc;
+  line-height: 1.3rem;
+  margin-top: 0;
+}
+
+.clearable-input {
+  background-color: var(--bkg-color);
+  border: 1px solid #cfd6dd;
+  border-radius: 4px;
+  flex-direction: row;
+  margin-bottom: 0.1rem;
+  display: flex;
+}
+
+.scan-button {
+  float: right;
+}
+
+.layers {
+  border-top: 1px solid #ccc;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  display: flex;
+  overflow: hidden;
+}
+
+ul.results {
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  border: none;
+  margin-bottom: 0.5rem;
+}
+
+.result {
+  display: flex;
+  height: 1.6rem;
+}
+
+.result > button > span {
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#panel > div {
+  padding: 1rem;
+}
+
+#layers li {
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+#layers li button {
+  text-align: left;
+  overflow-wrap: anywhere;
+  text-wrap-style: balance;
+}
+
+#file-selector {
+  display: grid;
+}
+
+#file,
+#file-label {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+#file {
+  opacity: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
+#file::file-selector-button {
+  cursor: pointer;
+}
+
+#loading-icon {
+  width: 3rem;
+  flex-grow: 1;
+  align-self: center;
+}
+
+.title {
+  margin-top: 0;
+}
+
+.filter-buttons {
+  margin: 2px;
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-buttons span {
+  flex-grow: 1;
+  align-self: center;
+}
+
+.clearable-input-field {
+  font-size: 1rem;
+  outline: none;
+  border: 0;
+  flex: 1 1 auto;
+  width: 90%;
+  background: transparent;
+  color: var(--text-color);
+  padding: 0;
+}
+
+.filter-icon,
+.delete-icon {
+  width: 16px;
+  color: var(--text-color);
+  padding: 0 0.5rem;
+}
+
+.delete-button {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 24 24"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs1" />
+  <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+  <title
+     id="title1">ic_fluent_arrow_forward_24_regular</title>
+  <desc
+     id="desc1">Created with Sketch.</desc>
+  <g
+     id="🔍-System-Icons"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     transform="matrix(-1,0,0,1,23.996812,0)">
+    <g
+       id="ic_fluent_arrow_forward_24_regular"
+       fill="#212121"
+       fill-rule="nonzero">
+      <path
+         d="m 14.647098,6.303726 0.07263,-0.084111 c 0.266294,-0.266239 0.68296,-0.290402 0.976549,-0.072517 l 0.08411,0.072627 4.996613,4.9976453 c 0.26609,0.266146 0.290394,0.682533 0.07283,0.976123 l -0.07253,0.08412 -4.996613,5.003445 c -0.292693,0.293094 -0.767566,0.293418 -1.06066,7.25e-4 -0.266448,-0.266084 -0.290939,-0.682731 -0.07329,-0.976492 l 0.07256,-0.08417 3.710891,-3.717123 -14.6800001,9.46e-4 c -0.3796958,0 -0.693491,-0.282154 -0.7431534,-0.648229 l -0.00685,-0.101771 c 0,-0.379696 0.2821539,-0.693491 0.6482295,-0.743153 L 3.7501989,11.004946 18.443199,11.004 14.719615,7.2802753 C 14.453376,7.0139812 14.429213,6.597315 14.647098,6.303726 l 0.07263,-0.084111 z"
+         id="🎨-Color" />
+    </g>
+  </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>ic_fluent_arrow_forward_24_regular</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

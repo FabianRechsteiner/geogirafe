@@ -1,0 +1,56 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<link rel="stylesheet" href="lib/vanilla-picker/vanilla-picker.csp.css" />
+<link rel="stylesheet" href="styles/girafecolorpicker.css" />
+
+<div id="searchbox">
+  <slot name="search-tooltip"></slot>
+  <input
+    id="search"
+    class="gg-input"
+    length="20"
+    maxlength="1000"
+    autocomplete="off"
+    autocorrect="off"
+    i18n="Search..."
+    placeholder="Search..."
+    oninput="${(e:Event) => this.doSearchDebounced(e)}"
+    onfocusin="${() => this.onFocusIn()}"
+    onfocusout="${() => this.onFocusOut()}"
+    onkeydown="${(e:KeyboardEvent) => this.onKeyDown(e)}" />
+
+  <img class="${this.allResults.length > 0 ? 'hidden' : 'search-icon'}" alt="search-icon" src="${this.searchIcon}" />
+  <button class="${this.allResults.length > 0 ? 'close-button' : 'hidden'}" onclick="${() => this.clearSearch(true)}">
+    <img class="close-icon" alt="close-icon" src="icons/close.svg" />
+  </button>
+  <button
+    tip="change_search_result_color"
+    id="colorPickerBtn"
+    class="${this.paintSearchResults ? 'select-color-button' : 'hidden'}">
+    <img class="select-color-icon" alt="select-color-icon" src="${this.paintbrushIcon}" />
+  </button>
+
+  <div
+    id="results"
+    class="${Object.keys(this.groupedResults).length === 0 || this.forceHide ? 'hidden' : ''}"
+    onmousemove="${() => this.onMouseMove()}">
+    ${Object.keys(this.groupedResults).map(group => uHtml`
+    <div class="title">
+      <img alt="result icon" src="${this.getIcon(group)}" />
+      <span i18n="${group}"></span>
+    </div>
+    ${this.groupedResults[group].map(result => uHtml`
+    <button
+      class="${result.get('selected') ? 'result selected': 'result'}"
+      onmousedown="${() => this.onMouseDown()}"
+      onclick="${() => this.onSelect(result)}"
+      onmouseover="${() => this.onMouseOver(result)}"
+      onmouseleave="${() => this.onMouseLeave()}">
+      ${result.get('label')}
+    </button>
+    `)} `)}
+  </div>
+
+  <div id="no-result" class="${this.showNoResultWarning ? 'shown-then-fadeout' : ''}">
+    <span i18n="${'No match found'}"></span>
+  </div>
+</div>

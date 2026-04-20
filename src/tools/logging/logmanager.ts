@@ -1,0 +1,97 @@
+// SPDX-License-Identifier: Apache-2.0
+import GirafeSingleton from '../../base/GirafeSingleton';
+
+export default class LogManager extends GirafeSingleton {
+  private readonly defaultDebug: typeof console.debug = console.debug;
+  private readonly defaultLog: typeof console.log = console.log;
+  private readonly defaultInfo: typeof console.info = console.info;
+  private readonly defaultWarn: typeof console.warn = console.warn;
+  private readonly defaultError: typeof console.error = console.error;
+  private readonly defaultAssert: typeof console.assert = console.assert;
+
+  public initLogging() {
+    console.debug = this.debug.bind(this);
+    console.log = this.log.bind(this);
+    console.info = this.info.bind(this);
+    console.warn = this.warn.bind(this);
+    console.error = this.error.bind(this);
+    console.assert = this.assert.bind(this);
+  }
+
+  /**
+   * Write log to output if the current loglevel is debug, info, warn or error
+   * @returns true if the log was written, false instead
+   */
+  private debug(message: unknown, ...optionalParams: unknown[]) {
+    if (this.context.configManager.Config.general.logLevel === 'debug') {
+      this.defaultDebug(message, ...optionalParams);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Write log to output if the current loglevel is info, warn or error
+   * @returns true if the log was written, false instead
+   */
+  private log(message: unknown, ...optionalParams: unknown[]) {
+    if (
+      this.context.configManager.Config.general.logLevel === 'debug' ||
+      this.context.configManager.Config.general.logLevel === 'info'
+    ) {
+      this.defaultLog(message, ...optionalParams);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Write log to output if the current loglevel is info, warn or error
+   * @returns true if the log was written, false instead
+   */
+  private info(message: unknown, ...optionalParams: unknown[]) {
+    if (
+      this.context.configManager.Config.general.logLevel === 'debug' ||
+      this.context.configManager.Config.general.logLevel === 'info'
+    ) {
+      this.defaultInfo(message, ...optionalParams);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Write log to output if the current loglevel is warn or error
+   * @returns true if the log was written, false instead
+   */
+  private warn(message: unknown, ...optionalParams: unknown[]) {
+    if (
+      this.context.configManager.Config.general.logLevel === 'debug' ||
+      this.context.configManager.Config.general.logLevel === 'info' ||
+      this.context.configManager.Config.general.logLevel === 'warn'
+    ) {
+      this.defaultWarn(message, ...optionalParams);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Write log to output if the current loglevel is error
+   * @returns true if the log was written, false instead
+   */
+  private error(message: unknown, ...optionalParams: unknown[]) {
+    this.defaultError(message, ...optionalParams);
+    return true;
+  }
+
+  /**
+   * Write log to output if the current loglevel is error
+   * @returns true if the log was written, false instead
+   */
+  private assert(condition: boolean, ...optionalParams: unknown[]) {
+    // assert has the same log level as error
+    this.defaultAssert(condition, ...optionalParams);
+    return !condition;
+  }
+}

@@ -1,0 +1,234 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<link rel="stylesheet" href="lib/vanilla-picker/vanilla-picker.csp.css" />
+<link rel="stylesheet" href="styles/girafecolorpicker.css" />
+<div id="panel">
+  <div>
+    <div id="toolbar">
+      <button id="disable" tip="Disable drawing" class="gg-icon-button gg-medium">
+        <img alt="select icon" src="icons/arrow.svg" />
+      </button>
+      <button id="point" tip="Point" class="gg-icon-button gg-medium">
+        <img alt="point icon" src="icons/point.svg" />
+      </button>
+      <button id="line" tip="Line" class="gg-icon-button gg-medium">
+        <img alt="polyline icon" src="icons/polyline.svg" />
+      </button>
+      <button id="polygon" tip="Polygon" class="gg-icon-button gg-medium">
+        <img alt="polygon icon" src="icons/polygon.svg" />
+      </button>
+      <button id="square" tip="Square" class="gg-icon-button gg-medium">
+        <img alt="square icon" src="icons/square.svg" />
+      </button>
+      <button id="rectangle" tip="Rectangle" class="gg-icon-button gg-medium">
+        <img alt="rectangle icon" src="icons/rectangle.svg" />
+      </button>
+      <button id="circle" tip="Circle" class="gg-icon-button gg-medium">
+        <img alt="circle icon" src="icons/circle.svg" />
+      </button>
+      <button id="freeline" tip="Freehand line" class="gg-icon-button gg-medium">
+        <img alt="polyline-free icon" src="icons/polyline-free.svg" />
+      </button>
+      <button id="freepolygon" tip="Freehand polygon" class="gg-icon-button gg-medium">
+        <img alt="polygon-free icon" src="icons/polygon-free.svg" />
+      </button>
+    </div>
+
+    <div id="toolParametersContainer">
+      <span i18n="Settings" class="title"></span>
+      <div class="toolParameters" data-tool="Polyline,Polygon">
+        <girafe-fixed-dimension
+          dimensionName="length"
+          dimension="length"
+          id="fixedLineLength"
+          @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
+        </girafe-fixed-dimension>
+      </div>
+      <div class="toolParameters" data-tool="Square">
+        <girafe-fixed-dimension
+          dimensionName="side length"
+          dimension="side"
+          id="fixedSquareSide"
+          @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
+        </girafe-fixed-dimension>
+      </div>
+      <div class="toolParameters" data-tool="Rectangle">
+        <girafe-fixed-dimension
+          dimensionName="width"
+          dimension="width"
+          id="fixedRectangleWidth"
+          @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
+        </girafe-fixed-dimension>
+        <girafe-fixed-dimension
+          dimensionName="height"
+          dimension="height"
+          id="fixedRectangleHeight"
+          @fixed-dimension:value-changed="${(e: CustomEvent) => this.fixedDimensionValueChangedHandler(e)}">
+        </girafe-fixed-dimension>
+      </div>
+    </div>
+  </div>
+  <div id="drawingListContainer">
+    <div class="titleContainer">
+      <span i18n="Drawing List" class="title"></span>
+      <button
+        class="gg-icon-button icon"
+        tip="Delete all shapes"
+        onclick="${() => this.deleteAllFeatures()}"
+        ?disabled="${this.drawingState.features.length === 0}">
+        ${this.htmlUnsafe(this.trashIcon)}
+      </button>
+    </div>
+    <div id="drawingList">
+      ${this.drawingState.features.map(feature => uHtmlFor(feature, feature.id)`
+
+      <div id="${'f-' + feature.id}" class="girafe">
+        <button
+          id="${'f-select-' + feature.id}"
+          class="gg-icon-button gg-small"
+          tip="Select to change appearance"
+          onclick="${() => this.onToggleFeatureSelection(feature)}">
+          <div class="icon">${this.htmlUnsafe(feature.selected ? this.checkedIcon : this.noCheckedIcon)}</div>
+        </button>
+
+        <div class="label-container">
+          <button
+            class="${feature.selected ? 'selectable-label gg-icon-button gg-small gg-selected' : 'selectable-label gg-icon-button gg-small gg-opacity'}"
+            onclick="${() => this.onToggleFeatureSelection(feature)}">
+            <span id="${'f-name-' + feature.id}">${feature.name}</span>
+          </button>
+        </div>
+
+        <button
+          class="gg-icon-button icon"
+          tip="Center on shape"
+          onclick="${() => this.olDrawing.centerViewOnFeature(feature)}">
+          ${this.htmlUnsafe(this.locateIcon)}
+        </button>
+
+        <button class="gg-icon-button icon" tip="Delete shape" onclick="${() => this.deleteFeature(feature)}">
+          ${this.htmlUnsafe(this.trashIcon)}
+        </button>
+      </div>
+      `)}
+    </div>
+  </div>
+  <div id="options" class="${this.selectedFeatures.length > 0?'':'disabled'}">
+    <!-- Unformatted fieldset used to propagate "disabled atrribute to all children fields -->
+    <fieldset class="field-wrapper" disabled="${this.selectedFeatures.length <= 0}">
+      <input
+        id="optionsTitle"
+        type="text"
+        value="${this.getOptionsTitle()}"
+        class="gg-input"
+        disabled="${this.selectedFeatures.length > 1}" />
+      <div id="optionsText">
+        <div id="optionsTextLines">
+          <span i18n="Name">Name</span>
+          <button
+            class="gg-icon-button icon"
+            id="visibleIconName"
+            tip="Show or hide shape name"
+            onclick="${()=>this.toggleNameVisibility()}">
+            ${this.htmlUnsafe(this.isDisplayNameEnabled() ? this.visibleIcon: this.notVisibleIcon)}
+          </button>
+          <span i18n="Font">Font</span>
+          <input
+            id="optionsNameFontSize"
+            class="gg-input"
+            type="number"
+            min="1"
+            value="${this.selectedFeatures[0]?.nameFontSize}"
+            oninput="${()=>this.onOptionsChange()}" />
+          <span>pt</span>
+          <button class="icon colorPicker" id="nameColorPicker"></button>
+          <span i18n="Measures">Measures</span>
+          <button
+            class="gg-icon-button icon"
+            id="visibleIconMeasure"
+            tip="Show or hide measure information"
+            onclick="${()=>this.toggleMeasureVisibility()}">
+            ${this.htmlUnsafe(this.isDisplayMeasureEnabled() ? this.visibleIcon: this.notVisibleIcon)}
+          </button>
+          <span i18n="Font">Font</span>
+          <input
+            id="optionsMeasuresFontSize"
+            class="gg-input"
+            type="number"
+            min="1"
+            value="${this.selectedFeatures[0]?.measureFontSize}"
+            oninput="${()=>this.onOptionsChange()}" />
+          <span>pt</span>
+          <button class="icon colorPicker" id="measureColorPicker"></button>
+        </div>
+      </div>
+      <hr />
+      <div id="optionsColor">
+        <div id="optionsColorLine">
+          <div>
+            <span class="text-end" i18n="Stroke color">Stroke color</span>
+            <button class="icon colorPicker" id="strokePicker"></button>
+          </div>
+          <div>
+            <span
+              class="${this.isFillColorEnabled()?'text-end':'text-end disabled'}"
+              id="fillPickerSpan"
+              i18n="Fill color"
+              >Fill color</span
+            >
+            <button class="icon colorPicker" disabled="${!this.isFillColorEnabled()}" id="fillPicker"></button>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div id="optionsLine">
+        <div id="optionsLineLines">
+          <span i18n="Line width">Line width</span>
+          <input
+            id="optionsStrokeWidth"
+            type="number"
+            class="gg-input"
+            min="1"
+            value="${this.selectedFeatures[0]?.strokeWidth}"
+            oninput="${()=>this.onOptionsChange()}" />
+          <span>px</span>
+          <select id="line-style" class="gg-select" onchange="${() => this.onOptionsChange()}">
+            ${Object.entries(this.lineStyles).map((entry) => uHtml`
+            <option selected="${this.selectedFeatures[0]?.lineStroke === entry[0]}" value="${entry[0]}">
+              <span>${entry[1]}</span>
+            </option>
+            `)}
+          </select>
+        </div>
+      </div>
+      <hr />
+      <div id="optionsArrow">
+        <div class="${this.isLineStyleEnabled()?'':'disabled'}" id="optionsArrowStyles">
+          <span i18n="Arrows style">Arrows style</span>
+          <select id="arrow-style" class="gg-select" onchange="${() => this.onArrowsChange()}">
+            ${Object.entries(this.arrowStyles).map((entry) => uHtml`
+            <option selected="${this.selectedFeatures[0]?.arrowStyle === entry[0]}" value="${entry[0]}">
+              <span>${entry[1]}</span>
+            </option>
+            `)}
+          </select>
+          <select id="arrow-position" class="gg-select" onchange="${() => this.onArrowsChange()}">
+            ${Object.entries(this.arrowPositions).map((entry) => uHtml`
+            <option selected="${this.selectedFeatures[0]?.arrowPosition === entry[0]}" value="${entry[0]}">
+              <span>${entry[1]}</span>
+            </option>
+            `)}
+          </select>
+        </div>
+      </div>
+      <hr />
+      <div id="optionsExport">
+        <div id="optionsExportLine">
+          <label for="export" class="gg-label" i18n="Export">Export</label>
+          <button class="gg-button" onclick="${() =>this.exportSelectedFeatures('geojson')}">GeoJson</button>
+          <button class="gg-button" onclick="${() =>this.exportSelectedFeatures('kml')}">KML</button>
+          <button class="gg-button" onclick="${() =>this.exportSelectedFeatures('gpx')}">GPX</button>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>

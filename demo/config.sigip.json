@@ -1,0 +1,136 @@
+{
+  "general": {
+    "locale": "fr-CH"
+  },
+  "languages": {
+    "translations": {
+      "fr": ["i18n/fr.json", "https://www.sigip.ch/static/dummy/fr.json"]
+    },
+    "defaultLanguage": "fr"
+  },
+  "themes": {
+    "url": "https://www.sigip.ch/themes?background=background&interface=desktop",
+    "defaultTheme": "thm_cadastre",
+    "selectionMode": "add"
+  },
+  "basemaps": {
+    "defaultBasemap": "grp_background_asitvd.fond_couleur",
+    "OSM": true,
+    "SwissTopoVectorTiles": true,
+    "opacityBasemaps": ["grp_background_ch.swisstopo.swissimage-product"]
+  },
+  "search": {
+    "url": "https://www.sigip.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr",
+    "objectPreview": true,
+    "layerPreview": true
+  },
+  "print": {
+    "url": "https://www.sigip.ch/printproxy/",
+    "defaultLayout": "1 A4 portrait"
+  },
+  "share": {
+    "service": "gmf",
+    "createUrl": "https://www.sigip.ch/short/create"
+  },
+  "projections": {
+    "EPSG:3857": "W-M",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "MN95"
+  },
+  "map": {
+    "srid": "EPSG:2056",
+    "startZoom": "1",
+    "startPosition": "2539270,1154626",
+    "maxExtent": "2487222,1027732,2826766,1297682",
+    "scales": [200000, 80000, 40000, 20000, 10000, 5000, 2500, 1000, 500, 250, 100, 50, 25, 10]
+  },
+  "map3d": {
+    "terrainUrl": "https://uzuflycesium.s3.amazonaws.com/UzuTerrain/8m/20240110/",
+    "terrainImagery": {
+      "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
+      "minLoD": 8,
+      "maxLoD": 17,
+      "coverageArea": [5.013926957923385, 45.35600133779394, 11.477436312994008, 48.27502358353741]
+    },
+    "tilesetsUrls": [
+      "https://uzuflycesium.s3.amazonaws.com/Pully/3Dtiles/Pully_3Dtiles_update_kml/Scene/Pully_3Dtiles_update_kml.json",
+      "https://uzuflycesium.s3.amazonaws.com/Pully/3Dtiles/Pully-Nord_3Dtiles/Scene/PullymNord_3Dtiles.json"
+    ],
+    "maximumZoomDistance": 25000
+  },
+  "query": {
+    "legacy": true
+  },
+  "gmfauth": {
+    "url": "https://www.sigip.ch/",
+    "audience": ["www.sigip.ch"],
+    "audienceExcludedPaths": ["^/static/", "^/tiles/"]
+  },
+  "externalLayers": {
+    "predefinedSources": [
+      {
+        "label": "Swisstopo WMS",
+        "type": "WMS",
+        "url": "https://wms.geo.admin.ch"
+      },
+      {
+        "label": "Swisstopo WMTS",
+        "type": "WMTS",
+        "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr"
+      },
+      {
+        "label": "GMF background WMTS",
+        "type": "WMTS",
+        "url": "https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml"
+      }
+    ]
+  },
+  "contextmenu": {
+    "crs": [
+      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 3 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 }
+    ]
+  },
+  "crs": [
+    {
+      "code": "EPSG:2056",
+      "definition": "+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs"
+    },
+    {
+      "code": "EPSG:21781",
+      "definition": "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs"
+    }
+  ],
+  "Links": [
+    {
+      "translation": "Mapilary",
+      "crs": "EPSG:4326",
+      "url": "https://www.mapillary.com/app/?lat=###MAPY###&lng=###MAPX###"
+    },
+    {
+      "translation": "Google Street View",
+      "crs": "EPSG:4326",
+      "url": "https://maps.google.ch/?ie=UTF8&ll=###MAPY###,###MAPX###&layer=c&cbll=###MAPY###,###MAPX###&cbp=12,57.78,,0,8.1"
+    },
+    {
+      "translation": "Google Street View",
+      "crs": "EPSG:4326",
+      "url": "https://www.google.ch/maps/@###MAPY###,###MAPX###,212a,35y,357.21h,51.15t/data=!3m1!1e3?hl=fr"
+    },
+    {
+      "translation": "Vers la vue 3D Pully",
+      "crs": "EPSG:2056",
+      "url": "https://pully.uzuverse.com/?x=###MAPX###&y=###MAPX###&z=600"
+    },
+    {
+      "translation": "Vers la vue 3D Régionale",
+      "crs": "EPSG:2056",
+      "url": "https://est-lausannois.uzuverse.com/?x=###MAPX###&y=###MAPX###&z=600"
+    }
+  ],
+  "contact": {
+    "url": "https://www.sigip.ch/feedback",
+    "reasons": ["Give feeback", "Ask a question", "Report an error", "Request secure access"],
+    "email": "info@sigip.ch"
+  }
+}

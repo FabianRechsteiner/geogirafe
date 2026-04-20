@@ -1,0 +1,100 @@
+{
+  "general": {
+    "locale": "de-CH"
+  },
+  "languages": {
+    "translations": {
+      "de": ["i18n/de.json", "https://demo.georama.io/webgis/translations/de.json"]
+    },
+    "defaultLanguage": "de"
+  },
+  "interface": {
+    "defaultSelectionComponent": "grid"
+  },
+  "themes": {
+    "url": "https://demo.georama.io/webgis/themes.json",
+    "defaultTheme": "forest_fires"
+  },
+  "basemaps": {
+    "defaultBasemap": "OpenStreetMap",
+    "OSM": true,
+    "SwissTopoVectorTiles": true
+  },
+  "treeview": {
+    "hideLegendWhenLayerIsDeactivated": false
+  },
+  "search": null,
+  "print": null,
+  "projections": {
+    "EPSG:3857": "W-M",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "LV95"
+  },
+  "map": {
+    "srid": "EPSG:3857",
+    "startZoom": "9",
+    "startPosition": "1030515,5910919",
+    "scales": [
+      10000000, 5000000, 2000000, 1000000, 500000, 200000, 75000, 40000, 20000, 10000, 7500, 5000, 3500, 2000, 1000,
+      500, 200
+    ]
+  },
+  "map3d": {
+    "terrainUrl": "https://3d.geo.admin.ch/ch.swisstopo.terrain.3d/v1/",
+    "terrainImagery": {
+      "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
+      "minLoD": 8,
+      "maxLoD": 17,
+      "coverageArea": [5.013926957923385, 45.35600133779394, 11.477436312994008, 48.27502358353741]
+    },
+    "tilesetsUrls": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"],
+    "maximumZoomDistance": 25000
+  },
+  "externalLayers": {
+    "predefinedSources": [
+      {
+        "label": "Swisstopo WMS",
+        "type": "WMS",
+        "url": "https://wms.geo.admin.ch"
+      },
+      {
+        "label": "Swisstopo WMTS",
+        "type": "WMTS",
+        "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr"
+      },
+      {
+        "label": "GMF background WMTS",
+        "type": "WMTS",
+        "url": "https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml"
+      }
+    ]
+  },
+  "contextmenu": {
+    "crs": [
+      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 1 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
+    ]
+  },
+  "oauth": {
+    "issuer": {
+      "url": "https://demo-auth.georama.io/realms/ninjas",
+      "clientId": "georama-oidc",
+      "audience": ["demo.georama.io"],
+      "audienceExcludedPaths": ["^/static/", "^/tiles/"],
+      "scope": "openid profile email",
+      "checkSessionOnLoad": true,
+      "loginRequired": false
+    },
+    "geomapfish": {
+      "userInfoUrl": "https://demo-auth.georama.io/realms/ninjas/protocol/openid-connect/userinfo",
+      "authMode": "token"
+    }
+  },
+  "crs": [
+    {
+      "code": "EPSG:2056",
+      "definition": "+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs"
+    }
+  ]
+}

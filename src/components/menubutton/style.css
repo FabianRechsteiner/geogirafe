@@ -1,0 +1,57 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.container {
+  position: relative;
+}
+
+.menu-content {
+  position: absolute;
+  display: flex;
+  font-size: 0;
+  border: var(--app-standard-border);
+  background: var(--bkg-color);
+  border-radius: 4px;
+  border-width: 2px;
+  margin-right: 0.2rem;
+  z-index: 1000;
+  box-shadow: var(--bx-shdw);
+}
+
+.open-bottom {
+  flex-direction: column;
+  top: 100%;
+  left: 0;
+  height: max-content;
+  width: fit-content;
+}
+
+.open-bottom-left {
+  flex-direction: row;
+  top: 100%;
+  right: 0;
+  height: max-content;
+  width: fit-content;
+}
+
+.open-up {
+  flex-direction: column;
+  bottom: 100%;
+  right: 0;
+  height: max-content;
+  width: fit-content;
+}
+
+.open-up-right {
+  flex-direction: column;
+  bottom: 100%;
+  left: 0;
+  height: max-content;
+  width: fit-content;
+}
+
+.open-left {
+  flex-direction: row;
+  right: 100%;
+  top: 0;
+  width: max-content;
+  height: fit-content;
+}

@@ -1,0 +1,26 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div class="container">
+  <!-- Checkbox -->
+  <button
+    class="${this.layer?.active ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small'}"
+    tip="Activate / Deactivate"
+    onclick="${() => this.toggle()}">
+    <img
+      class="${this.layer?.active ? 'gg-checkbox' : 'hidden'}"
+      alt="Expand/Collapse button"
+      src="icons/checked-full.svg" />
+    <img
+      class="${!this.layer?.active ? 'gg-checkbox' : 'hidden'}"
+      alt="Expand/Collapse button"
+      src="icons/checked-no.svg" />
+  </button>
+
+  <!-- Label -->
+  <div class="label-container">
+    <button
+      class="${this.layer?.active ? 'gg-button gg-small gg-selected' : 'gg-button gg-small'}"
+      onclick="${() => this.toggle()}">
+      <span i18n="${this.layer?.name}" class="gg-tree-label"> ${this.layer?.name} </span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,50 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+:host {
+  /*
+     * Can be overridden in custom Stylesheet.
+     * Don't set it to '0' but to '0rem'. Otherwise it will mess up the calc-Function
+     */
+  --selection-window-header-height: 2.5rem;
+  --selection-window-footer-height: 2.5rem;
+  --selection-window-content-padding: 0.5rem;
+}
+
+#header {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--bkg-color) !important;
+  height: var(--selection-window-header-height) !important;
+
+  .title {
+    flex-grow: 1;
+    text-align: start;
+    padding: 0.25rem 0;
+    font-weight: 600;
+  }
+  button {
+    flex-grow: 0;
+  }
+}
+
+.hr {
+  background-color: var(--bkg-color-grad1);
+  height: 2px;
+  margin: 0.125rem 0.5rem;
+}
+
+#content {
+  height: calc(
+    100% - var(--selection-window-header-height) - var(--selection-window-footer-height) - 2 *
+      var(--selection-window-content-padding)
+  ) !important;
+  > :first-child {
+    height: calc(100% - var(--selection-window-footer-height) - 2 * var(--selection-window-content-padding)) !important;
+    width: calc(100% - 2 * var(--selection-window-content-padding)) !important;
+    padding: var(--selection-window-content-padding);
+  }
+}
+
+#footer {
+  height: var(--selection-window-footer-height) !important;
+  border-top: none !important;
+}

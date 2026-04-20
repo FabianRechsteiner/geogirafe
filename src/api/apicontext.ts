@@ -1,0 +1,145 @@
+// SPDX-License-Identifier: Apache-2.0
+import ApplicationLifeCycleManager from '../tools/app/lifecyclemanager';
+import AuthManager from '../tools/auth/authmanager';
+import DragManager from '../components/treeview/tools/dragmanager';
+import PluginManager from '../tools/auth/pluginmanager';
+import ConfigManager from '../tools/configuration/configmanager';
+import ErrorManager from '../tools/error/errormanager';
+import I18nManager from '../tools/i18n/i18nmanager';
+import LayerManager from '../tools/layers/layermanager';
+import SnapManager from '../tools/layers/snapmanager';
+import LocalFileManager from '../tools/localfile/localfilemanager';
+import LogManager from '../tools/logging/logmanager';
+import OfflineManager from '../tools/offline/offlinemanager';
+import OgcApiFeaturesManager from '../tools/ogcapi/ogcapifeaturesmanager';
+import OrderingManager from '../tools/ordering/orderingmanager';
+import ShareManager from '../tools/share/sharemanager';
+import StateSerializer from '../tools/share/stateserializer';
+import ComponentManager from '../tools/state/componentManager';
+import MapManager from '../tools/state/mapManager';
+import StateManager from '../tools/state/statemanager';
+import UserInteractionManager from '../tools/state/userInteractionManager';
+import CustomThemesManager from '../tools/themes/customthemesmanager';
+import ThemesHelper from '../tools/themes/themeshelper';
+import ThemesManager from '../tools/themes/themesmanager';
+import UserLayerManager from '../tools/themes/userlayermanager';
+import PermalinkManager from '../tools/url/permalinkmanager';
+import UrlManager from '../tools/url/urlmanager';
+import UserDataManager from '../tools/userdata/userdatamanager';
+import WfsManager from '../tools/wfs/wfsmanager';
+import WmsManager from '../tools/wms/wmsmanager';
+import IGirafeContext from '../tools/context/icontext';
+import ApiSessionManager from './apisessionmanager';
+import OnBoardingManager from '../tools/onboarding/onboardingmanager';
+import ThemeFavoritesManager from '../tools/themes/themefavoritesmanager';
+
+export default class GirafeApiContext implements IGirafeContext {
+  public readonly userDataManager: UserDataManager;
+  public readonly configManager: ConfigManager;
+  public readonly stateManager: StateManager;
+  public readonly componentManager: ComponentManager;
+  public readonly userInteractionManager: UserInteractionManager;
+  public readonly i18nManager: I18nManager;
+  public readonly pluginManager: PluginManager;
+  public readonly themesManager: ThemesManager;
+  public readonly themesHelper: ThemesHelper;
+  public readonly permalinkManager: PermalinkManager;
+  public readonly urlManager: UrlManager;
+  public readonly dragManager: DragManager;
+  public readonly layerManager: LayerManager;
+  public readonly sessionManager: ApiSessionManager;
+  public readonly stateSerializer: StateSerializer;
+  public readonly shareManager: ShareManager;
+  public readonly customThemesManager: CustomThemesManager;
+  public readonly errorManager: ErrorManager;
+  public readonly wfsManager: WfsManager;
+  public readonly authManager: AuthManager;
+  public readonly snapManager: SnapManager;
+  public readonly mapManager: MapManager;
+  public readonly logManager: LogManager;
+  public readonly offlineManager: OfflineManager;
+  public readonly applicationLifeCycleManager: ApplicationLifeCycleManager;
+  public readonly orderingManager: OrderingManager;
+  public readonly userLayerManager: UserLayerManager;
+  public readonly wmsManager: WmsManager;
+  public readonly ogcApiFeaturesManager: OgcApiFeaturesManager;
+  public readonly localFileManager: LocalFileManager;
+  public readonly onBoardingManager: OnBoardingManager;
+  public readonly themeFavoritesManager: ThemeFavoritesManager;
+
+  public constructor() {
+    this.componentManager = new ComponentManager(this);
+    this.userDataManager = new UserDataManager(this);
+    this.configManager = new ConfigManager(this);
+    this.logManager = new LogManager(this);
+    this.stateManager = new StateManager(this);
+    this.orderingManager = new OrderingManager(this);
+    this.applicationLifeCycleManager = new ApplicationLifeCycleManager(this);
+    this.mapManager = new MapManager(this);
+    this.offlineManager = new OfflineManager(this);
+    this.snapManager = new SnapManager(this);
+    this.authManager = new AuthManager(this);
+    this.pluginManager = new PluginManager(this);
+    this.i18nManager = new I18nManager(this);
+    this.userInteractionManager = new UserInteractionManager(this);
+    this.dragManager = new DragManager(this);
+    this.urlManager = new UrlManager(this);
+    this.permalinkManager = new PermalinkManager(this);
+    this.layerManager = new LayerManager(this);
+    this.userLayerManager = new UserLayerManager(this);
+    this.themesHelper = new ThemesHelper(this);
+    this.stateSerializer = new StateSerializer(this);
+    this.sessionManager = new ApiSessionManager(this);
+    this.shareManager = new ShareManager(this);
+    this.wfsManager = new WfsManager(this);
+    this.errorManager = new ErrorManager(this);
+    this.customThemesManager = new CustomThemesManager(this);
+    this.themesManager = new ThemesManager(this);
+    this.wmsManager = new WmsManager(this);
+    this.localFileManager = new LocalFileManager(this);
+    this.ogcApiFeaturesManager = new OgcApiFeaturesManager(this);
+    this.onBoardingManager = new OnBoardingManager(this);
+    this.themeFavoritesManager = new ThemeFavoritesManager(this);
+  }
+
+  public async initialize() {
+    // NOTE : This initialization order is important, because some singleton will need other ones !
+    this.componentManager.initializeSingleton();
+    this.userDataManager.initializeSingleton();
+
+    this.configManager.initializeSingleton();
+    await this.configManager.loadConfig();
+
+    this.logManager.initializeSingleton();
+    this.logManager.initLogging();
+
+    this.stateManager.initializeSingleton();
+    this.orderingManager.initializeSingleton();
+    this.applicationLifeCycleManager.initializeSingleton();
+    this.mapManager.initializeSingleton();
+    this.offlineManager.initializeSingleton();
+    this.snapManager.initializeSingleton();
+    this.authManager.initializeSingleton();
+    this.pluginManager.initializeSingleton();
+    this.i18nManager.initializeSingleton();
+    this.userInteractionManager.initializeSingleton();
+    this.dragManager.initializeSingleton();
+    this.urlManager.initializeSingleton();
+    this.permalinkManager.initializeSingleton();
+    this.layerManager.initializeSingleton();
+    this.userLayerManager.initializeSingleton();
+    this.themesHelper.initializeSingleton();
+    this.stateSerializer.initializeSingleton();
+    this.sessionManager.initializeSingleton();
+    this.shareManager.initializeSingleton();
+    this.wfsManager.initializeSingleton();
+    this.errorManager.initializeSingleton();
+    this.customThemesManager.initializeSingleton();
+    this.themesManager.initializeSingleton();
+    this.wmsManager.initializeSingleton();
+    this.localFileManager.initializeSingleton();
+    this.ogcApiFeaturesManager.initializeSingleton();
+    this.onBoardingManager.initializeSingleton();
+    this.themeFavoritesManager.initializeSingleton();
+  }
+}
