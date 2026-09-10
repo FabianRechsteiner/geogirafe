@@ -108,6 +108,7 @@ export default abstract class WmsClient {
 
     const source = new ImageWMS({
       url: url,
+      projection: this.ogcServer.projection,
       params: {
         LAYERS: orderedLayerNames,
         FORMAT: imageType
@@ -414,7 +415,7 @@ export default abstract class WmsClient {
 
   private handleGetFeatureInfoResponse(response: string, url: string, urlsAndLayerNames: Record<string, string>) {
     const gmlFeatures = new WMSGetFeatureInfo().readFeatures(response, {
-      dataProjection: this.state.projection,
+      dataProjection: this.ogcServer.projection ?? this.state.projection,
       featureProjection: this.state.projection
     });
     // Set the feature id with the layer name.

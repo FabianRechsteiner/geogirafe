@@ -51,6 +51,7 @@
         src="" />
       <img class="theme-icon" alt="${'Icon for ' + theme.name}" src="${theme.icon}" part="theme-icon" />
       <span i18n="${theme.name}" class="theme-name" part="theme-name">${theme.name}</span>
+      ${'category' in theme && theme.category ? uHtml`<small class="theme-category">${theme.category}</small>` : ''}
     </div>
     `)}
     <div

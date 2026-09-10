@@ -17,6 +17,15 @@ function assertDistFile(relativePath) {
 }
 
 assertDistFile('index.html');
+assertDistFile('winterthur.html');
+assertDistFile('winterthur.mobile.html');
+assertDistFile('winterthur/config.json');
+assertDistFile('winterthur/themes.json');
+assertDistFile('winterthur/logo.png');
+for (const page of ['index.html', 'mobile.html', 'winterthur.html', 'winterthur.mobile.html']) {
+  const html = fs.readFileSync(path.join(distRoot, page), 'utf8');
+  if (!html.includes('href="winterthur/config.json"')) fail(`${page} lost its Winterthur configuration.`);
+}
 assertDistFile('mobile.html');
 assertDistFile('config.json');
 assertDistFile('config.mobile.json');
@@ -31,11 +40,11 @@ assertDistFile('images/logo/vectormap-icon-512.png');
 const indexHtml = fs.readFileSync(path.join(distRoot, 'index.html'), 'utf8');
 const mobileHtml = fs.readFileSync(path.join(distRoot, 'mobile.html'), 'utf8');
 
-if (!indexHtml.includes('rel="config-main-url" href="config.json"')) {
-  fail('Built dist/app/index.html does not reference a relative config.json.');
+if (!indexHtml.includes('rel="config-main-url" href="winterthur/config.json"')) {
+  fail('Built dist/app/index.html does not reference the Winterthur configuration.');
 }
-if (!mobileHtml.includes('rel="config-mobile-url" href="config.mobile.json"')) {
-  fail('Built dist/app/mobile.html does not reference a relative config.mobile.json.');
+if (!mobileHtml.includes('rel="config-mobile-url" href="winterthur/config.mobile.json"')) {
+  fail('Built dist/app/mobile.html does not reference the Winterthur mobile configuration.');
 }
 
 console.log('Build artifact validation passed.');

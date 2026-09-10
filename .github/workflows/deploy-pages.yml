@@ -35,7 +35,10 @@ jobs:
       - name: Validate runtime config
         run: npm run check:runtime-config
 
-      - name: Build application
+      - name: Validate Winterthur catalog
+        run: npm run winterthur:check && npm run winterthur:test
+
+      - name: Build application artifact
         run: npm run build
 
       - name: Validate built artifact

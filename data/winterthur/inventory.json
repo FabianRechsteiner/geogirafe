@@ -1,0 +1,2040 @@
+{
+  "fetchedAt": "2026-09-08T11:46:04.363Z",
+  "sourceEntries": 132,
+  "uniqueTopics": 131,
+  "themes": 93,
+  "basemaps": 23,
+  "topics": [
+    {
+      "name": "FeuerverbotszoneFeuerwerkverbotszone",
+      "title": "Feuerverbotszone mit Feuerwerkverbotszone",
+      "categories": [
+        "Neue Karten"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Hintergrundkarte_LK_AV_Situationsplan",
+      "title": "Situationsplan",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 8,
+      "importedLayerCount": 8
+    },
+    {
+      "name": "Hintergrundkarte_LK_relief_UEP",
+      "title": "Übersichtsplan, Landeskarten Swisstopo Relief",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP_AV_STADTPLAN",
+      "title": "Amtl.Vermessung, Übersichtsplan, Landeskarten Swisstopo",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Stadtplan_poi",
+      "title": "Stadtplan mit interessanten Orten",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": "Hintergrundkarte_LK_AV_Situationsplan",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "StadtplanSelection",
+      "title": "Stadtplan Selektion",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP_AV",
+      "title": "Amtliche Vermessung, Übersichtsplan, Landeskarten in Farbe",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 7,
+      "importedLayerCount": 7
+    },
+    {
+      "name": "Stadtplan",
+      "title": "Stadtplan mit interessanten Orten",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": "Hintergrundkarte_LK_AV_Situationsplan",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 58,
+      "importedLayerCount": 58
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "title": "Amtliche Vermessung, Übersichtsplan, Landeskarten in schwarz/weiss",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 7,
+      "importedLayerCount": 7
+    },
+    {
+      "name": "Adressen_Overlay",
+      "title": "Adressen",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Grundkarte",
+      "title": "Grundkarte",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": "Hintergrundkarte_LK_AV_Situationsplan",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP",
+      "title": "Übersichtsplan, Landeskarten Swisstopo",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP_schwarz",
+      "title": "Übersichtsplan, Landeskarten Swisstopo schwarz/weiss",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2013",
+      "title": "Luftbild Stadt Winterthur 2013",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [
+        {
+          "subtopicname": "Luftbild2011",
+          "subtopictitle": "Luftbild SWISSIMAGE 2011",
+          "categories_topics_sort": 28
+        },
+        {
+          "subtopicname": "Luftbild2014",
+          "subtopictitle": "Luftbild SWISSIMAGE 2014",
+          "categories_topics_sort": 28
+        },
+        {
+          "subtopicname": "Luftbild2015",
+          "subtopictitle": "Luftbild Kanton Zürich 2015",
+          "categories_topics_sort": 26
+        },
+        {
+          "subtopicname": "Luftbild2018",
+          "subtopictitle": "Luftbild Kanton Zürich 2018",
+          "categories_topics_sort": 24
+        },
+        {
+          "subtopicname": "Luftbild2020",
+          "subtopictitle": "Luftbild Kanton Zürich 2020",
+          "categories_topics_sort": 23
+        },
+        {
+          "subtopicname": "Luftbild2019",
+          "subtopictitle": "Luftbild SWISSIMAGE 2019",
+          "categories_topics_sort": 23
+        },
+        {
+          "subtopicname": "Luftbild2021",
+          "subtopictitle": "Luftbild Kanton Zürich 2021",
+          "categories_topics_sort": 22
+        },
+        {
+          "subtopicname": "Luftbild2022",
+          "subtopictitle": "Luftbild SWISSIMAGE 2022",
+          "categories_topics_sort": 21
+        },
+        {
+          "subtopicname": "Luftbild2024",
+          "subtopictitle": "Luftbild Kanton Zürich 2024",
+          "categories_topics_sort": 19
+        },
+        {
+          "subtopicname": "Luftbild2025",
+          "subtopictitle": "Luftbild SWISSIMAGE 2025",
+          "categories_topics_sort": 18
+        }
+      ],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2025",
+      "title": "Luftbild SWISSIMAGE 2025",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2025Background",
+      "title": "Luftbild SWISSIMAGE 2025",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2024",
+      "title": "Luftbild Kanton Zürich 2024",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2024Background",
+      "title": "Luftbild Kanton Zürich 2024",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2022",
+      "title": "Luftbild SWISSIMAGE 2022",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2022Background",
+      "title": "Luftbild SWISSIMAGE 2022",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2021",
+      "title": "Luftbild Kanton Zürich 2021",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2021Background",
+      "title": "Luftbild Kanton Zürich 2021",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2019",
+      "title": "Luftbild SWISSIMAGE 2019",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2020",
+      "title": "Luftbild Kanton Zürich 2020",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2020Background",
+      "title": "Luftbild Kanton Zürich 2020",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2018",
+      "title": "Luftbild Kanton Zürich 2018",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2019Background",
+      "title": "Luftbild SWISSIMAGE 2019",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2018Background",
+      "title": "Luftbild Kanton Zürich 2018",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Overlay_LK_UEP_schwarz",
+      "title": "Übersichtsplan, Landeskarten Swisstopo",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2015",
+      "title": "Luftbild Kanton Zürich 2015",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2015Background",
+      "title": "Luftbild Kanton Zürich 2015",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2011",
+      "title": "Luftbild SWISSIMAGE 2011",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2014",
+      "title": "Luftbild SWISSIMAGE 2014",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2014Background",
+      "title": "Luftbild SWISSIMAGE 2014",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2013Background",
+      "title": "Luftbild Stadt Winterthur 2013",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Luftbild2011Background",
+      "title": "Luftbild SWISSIMAGE 2011",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "AVfarbig",
+      "title": "Amtliche Vermessung in Farbe",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV",
+      "subtopics": [
+        {
+          "subtopicname": "AV",
+          "subtopictitle": "Amtl. Vermessung in s/w (ab 1:2'500)",
+          "categories_topics_sort": 50
+        }
+      ],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 31,
+      "importedLayerCount": 31
+    },
+    {
+      "name": "AV",
+      "title": "Amtliche Vermessung in schwarz/weiss",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 32,
+      "importedLayerCount": 32
+    },
+    {
+      "name": "Reliefkarte",
+      "title": "Reliefkarte",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "AVLiegenschaften_Overlay",
+      "title": "AV Liegenschaften",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "AVBodenbedeckungsgrenzen_Overlay",
+      "title": "AV Bodenbedeckung Grenzen",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "AVEinzelobjektegrenzen_Overlay",
+      "title": "AV Einzelobjekte",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "AVFixpunkte_Overlay",
+      "title": "AV Fixpunkte",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 4,
+      "importedLayerCount": 4
+    },
+    {
+      "name": "Overlay_GrundstuecksgrenzenausPlanabgriff",
+      "title": "Grundstückgrenzen entstanden aus Planabgriff (Altstadtkern)",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "OrellFuessliPlan",
+      "title": "Orell Füssli Plan",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "OrellFuessliPlanGrau",
+      "title": "Orell Füssli Plan grau",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "OrellFuessliVeloplan",
+      "title": "Orell Füssli Veloplan",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Richtplan_BaseMap",
+      "title": "Richtplan BaseMap",
+      "categories": [
+        "Basiskarten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 4,
+      "importedLayerCount": 4
+    },
+    {
+      "name": "KommunalerEnergieplan",
+      "title": "Kommunaler Energieplan",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 6,
+      "importedLayerCount": 6
+    },
+    {
+      "name": "Typologieplan",
+      "title": "Typologieplan",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Richtplan_BaseMap",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 18,
+      "importedLayerCount": 18
+    },
+    {
+      "name": "Versickerungszonen",
+      "title": "Versickerungszonen",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Zonenplan_OEREB",
+      "title": "Zonenplan (ÖREB)",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 28,
+      "importedLayerCount": 28
+    },
+    {
+      "name": "InventarSchutzwuerdigerBauten",
+      "title": "Inventar schutzwürdiger Bauten",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Laermempfindlichkeitsstufen_OEREB",
+      "title": "Lärmempfindlichkeitsstufen (ÖREB)",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 4,
+      "importedLayerCount": 4
+    },
+    {
+      "name": "Zonenplan",
+      "title": "Zonenplan",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Empfindlichkeitsstufen_LSV",
+      "title": "Empfindlichkeitsstufen nach LSV",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "RichtplanSiedlungLandschaft",
+      "title": "Richtplan Siedlung Landschaft",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 10,
+      "importedLayerCount": 10
+    },
+    {
+      "name": "RichtplanOeffVerkehr",
+      "title": "Richtplan Öffentlicher Verkehr",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 7,
+      "importedLayerCount": 7
+    },
+    {
+      "name": "RichtplanStrassen",
+      "title": "Richtplan Strassen",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 5,
+      "importedLayerCount": 5
+    },
+    {
+      "name": "RichtplanRadrouten",
+      "title": "Richtplan Radrouten",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 5,
+      "importedLayerCount": 5
+    },
+    {
+      "name": "RichtplanFussWanderwege",
+      "title": "Richtplan Fuss- und Wanderwege",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 5,
+      "importedLayerCount": 5
+    },
+    {
+      "name": "Lageklassen",
+      "title": "Lageklassen",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [
+        "Fetch failed: https://web.wms.zh.ch/Lageklassen2026ZH?service=WMS&version=1.3.0&request=GetLegendGraphic&sld_version=1.1.0&layer=lageklassen-2026-einzelobjekte&format=image/png&STYLE=default: getaddrinfo ENOTFOUND web.wms.zh.ch",
+        "Fetch failed: https://web.wms.zh.ch/Lageklassen2026ZH?service=WMS&version=1.3.0&request=GetLegendGraphic&sld_version=1.1.0&layer=lageklassen-2026-flaechen&format=image/png&STYLE=default: getaddrinfo ENOTFOUND web.wms.zh.ch"
+      ],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Solarkataster",
+      "title": "Solarkataster",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Luftbild2015Background",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "BeratungBaubewilligungen",
+      "title": "Beratung Baubewilligungen",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Reduktionsplan",
+      "title": "Reduktionsplan",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "BeratungBaukontrolle",
+      "title": "Beratung Baukontrolle",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "BeratungBaukontrollen",
+      "title": "Beratung Baukontrollen",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "BeratungArchitektur",
+      "title": "Beratung und Begutachtung Architektur",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [
+        {
+          "subtopicname": "BeratungDenkmalpflege",
+          "subtopictitle": "Beratung Denkmalpflege",
+          "categories_topics_sort": 103
+        }
+      ],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "BeratungDenkmalpflege",
+      "title": "Beratung Denkmalpflege",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "BeratungBrandschutz",
+      "title": "Beratung Brandschutz",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [
+        {
+          "subtopicname": "BeratungReklamegesuche",
+          "subtopictitle": "Beratung Reklamegesuche",
+          "categories_topics_sort": 108
+        },
+        {
+          "subtopicname": "BeratungBaugesuche",
+          "subtopictitle": "Beratung Baugesuche",
+          "categories_topics_sort": 105
+        },
+        {
+          "subtopicname": "BeratungBaukontrolle",
+          "subtopictitle": "Beratung Baukontrolle",
+          "categories_topics_sort": 101
+        }
+      ],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "BeratungBaugesuche",
+      "title": "Beratung Baugesuche",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "BeratungReklamegesuche",
+      "title": "Beratung Reklamegesuche",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "StadtkreisverantwortlicheVermessung",
+      "title": "Stadtkreisverantwortliche Vermessung",
+      "categories": [
+        "Bauen und Planen"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Stadtklima_StadtstrukturenHitzeminderung",
+      "title": "Stadtstrukturen zur Hitzeminderung",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Stadtthermometer_August23",
+      "title": "Stadt-Thermometer August 2023",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Stadtthermometer_Juli23",
+      "title": "Stadt-Thermometer Juli 2023",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [
+        {
+          "subtopicname": "Stadtthermometer_August23",
+          "subtopictitle": "Stadt-Thermometer August 2023",
+          "categories_topics_sort": 0
+        },
+        {
+          "subtopicname": "Stadtthermometer_September23",
+          "subtopictitle": "Stadt-Thermometer September 2023",
+          "categories_topics_sort": 0
+        }
+      ],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Stadtthermometer_September23",
+      "title": "Stadt-Thermometer September 2023",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Klimaanalyse_PET_Tag",
+      "title": "Klimaanalyse Wärmebelastung (PET) Tag",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 4,
+      "importedLayerCount": 4
+    },
+    {
+      "name": "Klimaanalyse_Lufttemperatur_Tag",
+      "title": "Klimaanalyse Lufttemperatur Tag",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 4,
+      "importedLayerCount": 4
+    },
+    {
+      "name": "Klimaanalyse_Lufttemperatur_Nacht",
+      "title": "Klimaanalyse Nächtliche Lufttemperatur",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 4,
+      "importedLayerCount": 4
+    },
+    {
+      "name": "Klimaanalyse_Windfeld",
+      "title": "Klimaanalyse Nächtliches Windfeld",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 5,
+      "importedLayerCount": 5
+    },
+    {
+      "name": "Klimaanalyse_Kaltluftvolumenstrom",
+      "title": "Klimaanalyse Nächtlicher Kaltluftvolumenstrom",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 5,
+      "importedLayerCount": 5
+    },
+    {
+      "name": "Klimaanalyse_Kaltluftproduktionsrate",
+      "title": "Klimaanalyse Nächtliche Kaltluftproduktionsrate",
+      "categories": [
+        "Stadtklima"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 4,
+      "importedLayerCount": 4
+    },
+    {
+      "name": "Parkleitsystem",
+      "title": "Parkleitsystem",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Richtplan_BaseMap",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 3,
+      "importedLayerCount": 3
+    },
+    {
+      "name": "Schulwegplan",
+      "title": "Schulwegplan",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Luftbild2024Background",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 5,
+      "importedLayerCount": 5
+    },
+    {
+      "name": "StrassenbaustellenSelection",
+      "title": "Strassenbaustellen Selektion",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Parkkartenzonen",
+      "title": "Parkkartenzonen",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Velobelastungsplan",
+      "title": "Velobelastungsplan",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 3,
+      "importedLayerCount": 3
+    },
+    {
+      "name": "RundwegWinterthur",
+      "title": "Rundweg Winterthur",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 32,
+      "importedLayerCount": 32
+    },
+    {
+      "name": "Veloplan",
+      "title": "Veloplan",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Richtplan_BaseMap",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 17,
+      "importedLayerCount": 17
+    },
+    {
+      "name": "Strassenbaustellen",
+      "title": "Strassenbaustellen",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "VerkehrsberuhigteZonen",
+      "title": "Verkehrsberuhigte Zonen",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Buslinien",
+      "title": "Buslinien",
+      "categories": [
+        "Verkehr"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 5,
+      "importedLayerCount": 5
+    },
+    {
+      "name": "SitzbankWfs",
+      "title": "SitzbankWfs",
+      "categories": [
+        "Wald"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "BaumkatasterSelection",
+      "title": "Baumkataster Selektion",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Schwammstadt",
+      "title": "Schwammstadt",
+      "categories": [
+        "Stadtgrün",
+        "Neue Karten"
+      ],
+      "background": "Luftbild2025Background",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Spielplatzkataster",
+      "title": "Spielplatzkataster",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-protected",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Waldhuetten",
+      "title": "Waldhütten",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Gebaeudebrueter",
+      "title": "Gebäudebrüter",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_AV_Situationsplan",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 3,
+      "importedLayerCount": 3
+    },
+    {
+      "name": "Gruenflaechensponsoring",
+      "title": "Grünflächensponsoring",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [
+        {
+          "subtopicname": "Gruenflaechensponsoren",
+          "subtopictitle": "Grünflächensponsoren",
+          "categories_topics_sort": 7
+        },
+        {
+          "subtopicname": "GruenflaechensponsoringFrei",
+          "subtopictitle": "Freie Sponsoringgrünflächen",
+          "categories_topics_sort": 6
+        }
+      ],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "GruenflaechensponsoringFrei",
+      "title": "Freie Sponsoringgrünflächen",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Gruenflaechensponsoren",
+      "title": "Grünflächensponsoren",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Baumpatenschaft",
+      "title": "Baumpatenschaft",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [
+        {
+          "subtopicname": "BaumpatenschaftBesetzt",
+          "subtopictitle": "Besetzte Patenschaftsbäume",
+          "categories_topics_sort": 10
+        },
+        {
+          "subtopicname": "BaumpatenschaftFrei",
+          "subtopictitle": "Freie Patenschaftsbäume",
+          "categories_topics_sort": 9
+        }
+      ],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "BaumpatenschaftFrei",
+      "title": "Freie Patenschaftsbäume",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "BaumpatenschaftBesetzt",
+      "title": "Besetzte Patenschaftsbäume",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Sitzbankgoennerschaft",
+      "title": "Sitzbankgönnerschaft",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [
+        {
+          "subtopicname": "Sitzbankgoennerliste",
+          "subtopictitle": "Sitzbankgönnerliste",
+          "categories_topics_sort": 12
+        },
+        {
+          "subtopicname": "SitzbankgoennerschaftFrei",
+          "subtopictitle": "Freie Sitzbänke",
+          "categories_topics_sort": 11
+        }
+      ],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "SitzbankgoennerschaftFrei",
+      "title": "Freie Sitzbänke",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Sitzbankgoennerliste",
+      "title": "Sitzbankgönnerliste",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Feuerstellen",
+      "title": "Feuerstellen",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Baumkataster",
+      "title": "Baumkataster",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "NaturLandschaftsschutzinventar",
+      "title": "Natur- und Landschaftsschutzinventar",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 13,
+      "importedLayerCount": 13
+    },
+    {
+      "name": "Friedhofplan",
+      "title": "Online Grabsuche",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_AV",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 6,
+      "importedLayerCount": 6
+    },
+    {
+      "name": "FriedhofplanSelection",
+      "title": "Friedhofplan Selektion",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "ZustaendigkeitWald",
+      "title": "Zuständigkeit Wald",
+      "categories": [
+        "Stadtgrün"
+      ],
+      "background": "Hintergrundkarte_LK_UEP_schwarz",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Uebersichtsplan1932",
+      "title": "Übersichtsplan 1932",
+      "categories": [
+        "Historische Karten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Uebersichtsplan1904",
+      "title": "Übersichtsplan 1904",
+      "categories": [
+        "Historische Karten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Uebersichtsplan1885",
+      "title": "Übersichtsplan 1885",
+      "categories": [
+        "Historische Karten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Wildkarte1843",
+      "title": "Wildkarte ca. 1850",
+      "categories": [
+        "Historische Karten"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": false,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "FullSearch",
+      "title": "FullSearch",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "GebieteStrassenplanung",
+      "title": "Gebiete Strassenplanung und -koordination",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "StadtpolizeiQuartiereinteilung",
+      "title": "Stadtpolizei Quartiereinteilung",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "StrassenSelection",
+      "title": "Strasse Selektion",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": null,
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "Stadtgrenze",
+      "title": "Stadtgrenze",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 1,
+      "importedLayerCount": 1
+    },
+    {
+      "name": "Stadtkreise",
+      "title": "Stadtkreise",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Schulkreise",
+      "title": "Schulkreise",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "excluded-helper",
+      "issues": [],
+      "sessionFreeMap": null
+    },
+    {
+      "name": "ReformierteKirchgemeinde",
+      "title": "Reformierte Kirchgemeinde",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 4,
+      "importedLayerCount": 4
+    },
+    {
+      "name": "KatholischeKirchgemeinden",
+      "title": "Katholische Kirchgemeinde",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 3,
+      "importedLayerCount": 3
+    },
+    {
+      "name": "Postleitzahlkreise",
+      "title": "Postleitzahlkreise",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 3,
+      "importedLayerCount": 3
+    },
+    {
+      "name": "StatistischeQuartiere",
+      "title": "Statistische Quartiere",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    },
+    {
+      "name": "Notariatskreise",
+      "title": "Notariatskreise",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 3,
+      "importedLayerCount": 3
+    },
+    {
+      "name": "Betreibungskreise",
+      "title": "Betreibungskreise",
+      "categories": [
+        "Administrative Einteilung"
+      ],
+      "background": "Hintergrundkarte_LK_UEP",
+      "subtopics": [],
+      "status": "imported",
+      "issues": [],
+      "sessionFreeMap": true,
+      "layerCount": 2,
+      "importedLayerCount": 2
+    }
+  ],
+  "names": {
+    "Hintergrundkarte_LK_AV_Situationsplan": "Situationsplan",
+    "Hintergrundkarte_LK_UEP_AV": "Amtliche Vermessung, Übersichtsplan, Landeskarten in Farbe",
+    "Stadtplan": "Stadtplan mit interessanten Orten",
+    "Hintergrundkarte_LK_UEP_AV_schwarz": "Amtliche Vermessung, Übersichtsplan, Landeskarten in schwarz/weiss",
+    "Adressen_Overlay": "Adressen",
+    "Grundkarte": "Grundkarte",
+    "Hintergrundkarte_LK_UEP": "Übersichtsplan, Landeskarten Swisstopo (Hintergrundkarte_LK_UEP)",
+    "Hintergrundkarte_LK_UEP_schwarz": "Übersichtsplan, Landeskarten Swisstopo schwarz/weiss",
+    "Luftbild2013": "Luftbild Stadt Winterthur 2013 (Luftbild2013)",
+    "Luftbild2025": "Luftbild SWISSIMAGE 2025 (Luftbild2025)",
+    "Luftbild2025Background": "Luftbild SWISSIMAGE 2025 (Luftbild2025Background)",
+    "Luftbild2024": "Luftbild Kanton Zürich 2024 (Luftbild2024)",
+    "Luftbild2024Background": "Luftbild Kanton Zürich 2024 (Luftbild2024Background)",
+    "Luftbild2022": "Luftbild SWISSIMAGE 2022 (Luftbild2022)",
+    "Luftbild2022Background": "Luftbild SWISSIMAGE 2022 (Luftbild2022Background)",
+    "Luftbild2021": "Luftbild Kanton Zürich 2021 (Luftbild2021)",
+    "Luftbild2021Background": "Luftbild Kanton Zürich 2021 (Luftbild2021Background)",
+    "Luftbild2019": "Luftbild SWISSIMAGE 2019 (Luftbild2019)",
+    "Luftbild2020": "Luftbild Kanton Zürich 2020 (Luftbild2020)",
+    "Luftbild2020Background": "Luftbild Kanton Zürich 2020 (Luftbild2020Background)",
+    "Luftbild2018": "Luftbild Kanton Zürich 2018 (Luftbild2018)",
+    "Luftbild2019Background": "Luftbild SWISSIMAGE 2019 (Luftbild2019Background)",
+    "Luftbild2018Background": "Luftbild Kanton Zürich 2018 (Luftbild2018Background)",
+    "Overlay_LK_UEP_schwarz": "Übersichtsplan, Landeskarten Swisstopo (Overlay_LK_UEP_schwarz)",
+    "Luftbild2015": "Luftbild Kanton Zürich 2015 (Luftbild2015)",
+    "Luftbild2015Background": "Luftbild Kanton Zürich 2015 (Luftbild2015Background)",
+    "Luftbild2011": "Luftbild SWISSIMAGE 2011 (Luftbild2011)",
+    "Luftbild2014": "Luftbild SWISSIMAGE 2014 (Luftbild2014)",
+    "Luftbild2014Background": "Luftbild SWISSIMAGE 2014 (Luftbild2014Background)",
+    "Luftbild2013Background": "Luftbild Stadt Winterthur 2013 (Luftbild2013Background)",
+    "Luftbild2011Background": "Luftbild SWISSIMAGE 2011 (Luftbild2011Background)",
+    "AVfarbig": "Amtliche Vermessung in Farbe",
+    "AV": "Amtliche Vermessung in schwarz/weiss",
+    "Reliefkarte": "Reliefkarte",
+    "AVLiegenschaften_Overlay": "AV Liegenschaften",
+    "AVBodenbedeckungsgrenzen_Overlay": "AV Bodenbedeckung Grenzen",
+    "AVEinzelobjektegrenzen_Overlay": "AV Einzelobjekte",
+    "AVFixpunkte_Overlay": "AV Fixpunkte",
+    "Richtplan_BaseMap": "Richtplan BaseMap",
+    "KommunalerEnergieplan": "Kommunaler Energieplan",
+    "Typologieplan": "Typologieplan",
+    "Versickerungszonen": "Versickerungszonen",
+    "Zonenplan_OEREB": "Zonenplan (ÖREB)",
+    "InventarSchutzwuerdigerBauten": "Inventar schutzwürdiger Bauten",
+    "Laermempfindlichkeitsstufen_OEREB": "Lärmempfindlichkeitsstufen (ÖREB)",
+    "RichtplanSiedlungLandschaft": "Richtplan Siedlung Landschaft",
+    "RichtplanOeffVerkehr": "Richtplan Öffentlicher Verkehr",
+    "RichtplanStrassen": "Richtplan Strassen",
+    "RichtplanRadrouten": "Richtplan Radrouten",
+    "RichtplanFussWanderwege": "Richtplan Fuss- und Wanderwege",
+    "Lageklassen": "Lageklassen",
+    "Solarkataster": "Solarkataster",
+    "Reduktionsplan": "Reduktionsplan",
+    "BeratungBaukontrolle": "Beratung Baukontrolle",
+    "BeratungArchitektur": "Beratung und Begutachtung Architektur",
+    "BeratungDenkmalpflege": "Beratung Denkmalpflege",
+    "BeratungBrandschutz": "Beratung Brandschutz",
+    "BeratungBaugesuche": "Beratung Baugesuche",
+    "BeratungReklamegesuche": "Beratung Reklamegesuche",
+    "StadtkreisverantwortlicheVermessung": "Stadtkreisverantwortliche Vermessung",
+    "Stadtklima_StadtstrukturenHitzeminderung": "Stadtstrukturen zur Hitzeminderung",
+    "Stadtthermometer_August23": "Stadt-Thermometer August 2023",
+    "Stadtthermometer_Juli23": "Stadt-Thermometer Juli 2023",
+    "Stadtthermometer_September23": "Stadt-Thermometer September 2023",
+    "Klimaanalyse_PET_Tag": "Klimaanalyse Wärmebelastung (PET) Tag",
+    "Klimaanalyse_Lufttemperatur_Tag": "Klimaanalyse Lufttemperatur Tag",
+    "Klimaanalyse_Lufttemperatur_Nacht": "Klimaanalyse Nächtliche Lufttemperatur",
+    "Klimaanalyse_Windfeld": "Klimaanalyse Nächtliches Windfeld",
+    "Klimaanalyse_Kaltluftvolumenstrom": "Klimaanalyse Nächtlicher Kaltluftvolumenstrom",
+    "Klimaanalyse_Kaltluftproduktionsrate": "Klimaanalyse Nächtliche Kaltluftproduktionsrate",
+    "Parkleitsystem": "Parkleitsystem",
+    "Schulwegplan": "Schulwegplan",
+    "Parkkartenzonen": "Parkkartenzonen",
+    "Velobelastungsplan": "Velobelastungsplan",
+    "RundwegWinterthur": "Rundweg Winterthur",
+    "Veloplan": "Veloplan",
+    "Strassenbaustellen": "Strassenbaustellen",
+    "VerkehrsberuhigteZonen": "Verkehrsberuhigte Zonen",
+    "Buslinien": "Buslinien",
+    "Schwammstadt": "Schwammstadt",
+    "Waldhuetten": "Waldhütten",
+    "Gebaeudebrueter": "Gebäudebrüter",
+    "Gruenflaechensponsoring": "Grünflächensponsoring",
+    "GruenflaechensponsoringFrei": "Freie Sponsoringgrünflächen",
+    "Gruenflaechensponsoren": "Grünflächensponsoren",
+    "Baumpatenschaft": "Baumpatenschaft",
+    "BaumpatenschaftFrei": "Freie Patenschaftsbäume",
+    "BaumpatenschaftBesetzt": "Besetzte Patenschaftsbäume",
+    "Sitzbankgoennerschaft": "Sitzbankgönnerschaft",
+    "SitzbankgoennerschaftFrei": "Freie Sitzbänke",
+    "Sitzbankgoennerliste": "Sitzbankgönnerliste",
+    "Feuerstellen": "Feuerstellen",
+    "Baumkataster": "Baumkataster",
+    "NaturLandschaftsschutzinventar": "Natur- und Landschaftsschutzinventar",
+    "Friedhofplan": "Online Grabsuche",
+    "ZustaendigkeitWald": "Zuständigkeit Wald",
+    "Uebersichtsplan1932": "Übersichtsplan 1932",
+    "Uebersichtsplan1904": "Übersichtsplan 1904",
+    "Uebersichtsplan1885": "Übersichtsplan 1885",
+    "Wildkarte1843": "Wildkarte ca. 1850",
+    "GebieteStrassenplanung": "Gebiete Strassenplanung und -koordination",
+    "StadtpolizeiQuartiereinteilung": "Stadtpolizei Quartiereinteilung",
+    "Stadtgrenze": "Stadtgrenze",
+    "Stadtkreise": "Stadtkreise",
+    "ReformierteKirchgemeinde": "Reformierte Kirchgemeinde",
+    "KatholischeKirchgemeinden": "Katholische Kirchgemeinde",
+    "Postleitzahlkreise": "Postleitzahlkreise",
+    "StatistischeQuartiere": "Statistische Quartiere",
+    "Notariatskreise": "Notariatskreise",
+    "Betreibungskreise": "Betreibungskreise"
+  }
+}

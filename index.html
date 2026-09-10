@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Vectormap is a GeoGirafe-based WebGIS frontend for Swiss geodata." />
+    <meta name="description" content="Stadtplan Winterthur: Karten, Themen und Objektinformationen." />
 
     <!--
       If redirect-url meta tag is present, a redirect will happen when the detected device is an iPhone or Android.
@@ -12,14 +12,15 @@
     -->
     <meta name="redirect-url" content="mobile.html" />
     <meta name="configs" content="main" />
-    <link rel="config-main-url" href="config.json" />
+    <link rel="config-main-url" href="winterthur/config.json" />
 
     <link rel="apple-touch-icon" sizes="192x192" href="images/logo/vectormap-icon-192.png" />
     <link rel="icon" type="image/x-icon" href="images/logo/vectormap-favicon.ico" />
-    <link rel="manifest" href="site.webmanifest" />
+    <link rel="manifest" href="winterthur.webmanifest" />
 
     <link rel="stylesheet" media="screen" href="src/styles/splash.css" />
     <link rel="stylesheet" href="src/styles/variables.css" />
+    <link rel="stylesheet" href="winterthur/appearance.css" />
     <link rel="stylesheet" href="src/styles/common.css" />
     <link rel="stylesheet" href="src/styles/index.css" />
 
@@ -63,19 +64,19 @@
     </noscript>
 
     <script type="module" src="src/main.ts"></script>
-    <title>Vectormap</title>
+    <title>Stadtplan Winterthur</title>
   </head>
 
   <body>
     <div id="splash-screen">
-      <img class="splash-logo" alt="Vectormap" src="images/logo/vectormap-vertical.png" />
+      <img class="splash-logo" alt="Stadt Winterthur" src="winterthur/logo.png" />
       <div class="loader"></div>
       <span lang="de">Laden...</span>
     </div>
     <girafe-app>
       <header>
         <girafe-theme-select data-tour="theme-selection"></girafe-theme-select>
-        <img class="logo" alt="vectormap-logo" src="images/logo/vectormap-logo.png" />
+        <img class="logo" alt="Stadt Winterthur" src="winterthur/logo.png" />
         <girafe-search id="search">
           <!-- <div slot="search-tooltip">
             <p>
@@ -107,11 +108,12 @@
             </div>
             <footer>
               <girafe-scale></girafe-scale>
-              <girafe-coordinate></girafe-coordinate>
+              <girafe-coordinate projection="EPSG:2056"></girafe-coordinate>
               <span class="copyright">
                 <span i18n="Information without public faith">Information without public faith</span>
                 <span>
                   ©
+                  <a href="https://stadt.winterthur.ch/" target="_blank" rel="noopener">Stadt Winterthur</a>,
                   <a href="https://doc.geomapfish.dev" target="_blank">GeoGirafe</a>,
                   <a href="https://www.swisstopo.admin.ch/en/legal-basis" target="_blank">swisstopo</a>,
                   <a href="http://www.openstreetmap.org/copyright" target="_blank">OSM</a>

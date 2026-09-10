@@ -1,0 +1,23 @@
+{
+  "sourceUrl": "https://stadtplan.winterthur.ch",
+  "wmsBaseUrl": "https://stadtplan.winterthur.ch/wms",
+  "wmsOverrides": {},
+  "wmsProjections": {
+    "Luftbild2019": "EPSG:2056",
+    "Luftbild2019Background": "EPSG:2056",
+    "Luftbild2025": "EPSG:2056",
+    "Luftbild2025Background": "EPSG:2056"
+  },
+  "featuresUrl": "https://stadtplan.winterthur.ch/ogc/features",
+  "collectionMappings": [
+    { "collectionId": "baumkataster.baumkataster", "topic": "Baumkataster", "layers": ["BaumkatasterBaumstandort"], "note": "Tree locations; crowns are a separate cartographic layer. Field and identifier parity must be checked before enabling queries." },
+    { "collectionId": "solarkataster.solarkataster", "topic": "Solarkataster", "layers": ["SolarkatasterTeildachflaechen"], "note": "Roof sections and solar potential; retain the collection's 2019 data-date disclaimer." },
+    { "collectionId": "schwammstadt.schwammstadt_massnahme", "topic": "Schwammstadt", "layers": ["schwammstadt_massnahme"], "note": "Completed measures as polygons; the point representation is cartographic." },
+    { "collectionId": "administrative_einteilung.stadtkreis", "topic": "Stadtkreise", "layers": ["Stadtkreis"], "note": "City district polygons; label layer excluded." },
+    { "collectionId": "administrative_einteilung.betreibungskreis", "topic": "Betreibungskreise", "layers": ["Betreibungskreis"], "note": "Debt enforcement district polygons; label layer excluded." },
+    { "collectionId": "administrative_einteilung.beratungsgebiet_architektur", "topic": "BeratungArchitektur", "layers": ["ArchitekturBeratung"], "note": "Architecture advisory territories; compare current contacts before enabling." },
+    { "collectionId": "gebaeudebrueter.fledermaus", "topic": "Gebaeudebrueter", "layers": ["Fledermaus"], "note": "Bat locations; same thematic subset." },
+    { "collectionId": "gebaeudebrueter.schwalbe", "topic": "Gebaeudebrueter", "layers": ["Schwalbe"], "note": "Swallow locations; same thematic subset." },
+    { "collectionId": "gebaeudebrueter.segler", "topic": "Gebaeudebrueter", "layers": ["Segler"], "note": "Swift locations; same thematic subset." }
+  ]
+}

@@ -29,7 +29,11 @@ jobs:
       - name: Validate runtime config
         run: npm run check:runtime-config
 
-      - name: TypeScript
+      - name: Validate Winterthur catalog
+        # The Winterthur import is checked offline; CI never silently updates the catalog.
+        run: npm run winterthur:check && npm run winterthur:test
+
+      - name: TypeScript compilation
         run: npm run tsc
 
       - name: Lint

@@ -147,6 +147,11 @@
   ],
   "browser": "main.js",
   "scripts": {
+    "winterthur:import": "node buildtools/winterthur/import.mjs",
+    "winterthur:services": "node buildtools/winterthur/check-services.mjs",
+    "winterthur:generate": "node buildtools/winterthur/import.mjs --offline",
+    "winterthur:check": "node buildtools/winterthur/validate.mjs",
+    "winterthur:test": "node --test buildtools/winterthur/catalog.node-test.mjs",
     "check:runtime-config": "node buildtools/validate-runtime-config.mjs",
     "check:artifact": "node buildtools/validate-build-artifact.mjs",
     "start": "npm run tsc && vite serve",

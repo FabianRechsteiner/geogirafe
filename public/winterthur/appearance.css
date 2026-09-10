@@ -1,0 +1,3 @@
+/* Keep the city identity legible in GeoGirafe's existing layout. */
+header img.logo { max-width: 170px; width: auto; object-fit: contain; }
+#splash-screen .splash-logo { width: min(280px, 65vw); height: auto; }

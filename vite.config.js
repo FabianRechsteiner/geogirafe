@@ -77,6 +77,8 @@ export default defineConfig(({ command, mode }) => {
       rollupOptions: {
         input: {
           desktop: resolve(__dirname, 'index.html'),
+          winterthur: resolve(__dirname, 'winterthur.html'),
+          winterthurMobile: resolve(__dirname, 'winterthur.mobile.html'),
           mobile: resolve(__dirname, 'mobile.html'),
           iframe: resolve(__dirname, 'iframe.html'),
           api: resolve(__dirname, 'api.html')

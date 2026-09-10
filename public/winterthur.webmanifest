@@ -1,0 +1,11 @@
+{
+  "id": "./index.html",
+  "name": "Stadtplan Winterthur",
+  "short_name": "Stadtplan",
+  "lang": "de-CH",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}

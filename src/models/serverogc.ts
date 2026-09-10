@@ -4,6 +4,7 @@ import { GMFServerOgc } from './gmf';
 export default class ServerOgc {
   public name: string;
   public url: string;
+  public projection?: string;
   public wfsSupport: boolean;
   public urlWfs?: string;
   public oapifSupport: boolean;
@@ -15,6 +16,7 @@ export default class ServerOgc {
   public constructor(name: string, elem: GMFServerOgc) {
     this.name = name;
     this.url = elem.url;
+    this.projection = elem.projection;
     this.wfsSupport = elem.wfsSupport;
     this.urlWfs = elem.urlWfs;
     this.oapifSupport = elem.oapifSupport ?? false;

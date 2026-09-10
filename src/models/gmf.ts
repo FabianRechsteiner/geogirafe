@@ -6,6 +6,7 @@ import ISnappingConfig from '../tools/snap/isnapconfig';
  */
 
 export interface GMFMetadata {
+  category?: string;
   isLegendExpanded: boolean;
   wasLegendExpanded: boolean;
   exclusiveGroup: boolean;
@@ -84,6 +85,7 @@ export interface GMFGroup extends GMFTreeItem {
 export type GMFBackgroundLayer = GMFTreeItem;
 
 export interface GMFServerOgc {
+  projection?: string;
   url: string;
   wfsSupport: boolean;
   urlWfs?: string;

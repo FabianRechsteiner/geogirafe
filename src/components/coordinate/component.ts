@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import GirafeHTMLElement from '../../base/GirafeHTMLElement';
 import { formatCoordinates } from '../../tools/geometrytools';
+import { transform } from 'ol/proj';
 
 class CoordinateComponent extends GirafeHTMLElement {
   templateUrl = './template.html';
@@ -33,7 +34,9 @@ class CoordinateComponent extends GirafeHTMLElement {
   }
 
   onChangeCoordinates(coord: number[]) {
-    [this.east, this.north] = formatCoordinates(coord, this.locale);
+    const projection = this.getAttribute('projection');
+    const displayCoordinates = projection ? transform(coord, this.state.projection, projection) : coord;
+    [this.east, this.north] = formatCoordinates(displayCoordinates, this.locale);
     this.render();
   }
 

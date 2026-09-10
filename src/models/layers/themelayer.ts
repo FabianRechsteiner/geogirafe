@@ -3,6 +3,7 @@ import BaseLayer from './baselayer';
 import { Coordinate } from 'ol/coordinate';
 
 export type ThemeLayerOptions = {
+  category?: string;
   isDefaultChecked?: boolean;
   disclaimer?: string;
   metadataUrl?: string;
@@ -23,6 +24,7 @@ class ThemeLayer extends BaseLayer {
   public isExpanded: boolean;
   public activeState: 'on' | 'off' | 'semi' = 'off';
   public icon?: string;
+  public category?: string;
   public location?: Coordinate;
   public zoom?: number;
 
@@ -33,10 +35,12 @@ class ThemeLayer extends BaseLayer {
     this.isExpanded = options?.isDefaultExpanded || true;
     this.isExclusiveTheme = options?.isExclusiveTheme ?? false;
     this.icon = icon;
+    this.category = options?.category;
   }
 
   public clone(): ThemeLayer {
     const options = {
+      category: this.category,
       disclaimer: this.disclaimer,
       isDefaultExpanded: this.isExpanded
     };

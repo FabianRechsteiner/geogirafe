@@ -42,6 +42,8 @@ This first version is intentionally basemap-centric. It gives you a branded GeoG
 
 It is therefore runnable, but still only a first milestone and not yet the final vectormap deployment.
 
+The repository also contains a tracked migration of the public Stadtplan Winterthur catalog. It is the default application at `index.html` and `mobile.html`; the explicit `winterthur.html` and `winterthur.mobile.html` entry points remain available as aliases. The migration keeps the source inventory and generated configuration reproducible and reuses the Vectormap basemap as its default background.
+
 ## Local development
 
 ### Requirements
@@ -89,12 +91,45 @@ Use the same checks locally that now run in GitHub Actions:
 
 ```bash
 npm run check:runtime-config
+npm run winterthur:check
+npm run winterthur:test
 npm run tsc
 npm run lint
 npm run test-without-coverage
 npm run build
 npm run check:artifact
 ```
+
+## Winterthur catalog migration
+
+The Winterthur integration is intentionally a generated customization layer rather than a hand-maintained fork of GeoGirafe's theme catalog.
+
+Tracked inputs and outputs:
+
+- `data/winterthur/source.json` is the last accepted source snapshot.
+- `data/winterthur/inventory.json`, `data/winterthur/collections.json`, and `data/winterthur/services.json` are review reports.
+- `buildtools/winterthur/settings.json` contains the explicit service and OGC API mappings.
+- `public/winterthur/themes.json` and the localized files below `public/winterthur/` are the deployable generated catalog.
+- `index.html` and `mobile.html` are the canonical desktop and mobile entry points; `winterthur.html` and `winterthur.mobile.html` are explicit aliases.
+
+To reproduce the accepted catalog without network access:
+
+```bash
+npm run winterthur:generate
+npm run winterthur:check
+npm run winterthur:test
+```
+
+To inspect the current upstream catalog and replace the snapshot and generated files:
+
+```bash
+npm run winterthur:import
+npm run winterthur:services
+```
+
+The online commands deliberately do not run in CI. Review the inventory, collection changes, service report, and generated diff before committing an update. Protected topics are excluded, missing WMS layers block a topic instead of disappearing silently, and OGC API collections remain inventory-only until their schema and feature parity have been accepted explicitly.
+
+The accepted snapshot currently generates 93 themes and 23 Winterthur background maps. The checked-in service report records 89 of 110 map requests and 58 of 74 queryable service checks as ready from the configured GitHub Pages origin; its remaining failures require review before production acceptance.
 
 ## Runtime configuration
 
@@ -110,6 +145,11 @@ Tracked vectormap-specific files are primarily:
 - `public/config.mobile.json`
 - `public/themes.json`
 - `public/styles/ch.vectormap.lightbasemap.json`
+- `public/winterthur/`
+- `data/winterthur/`
+- `buildtools/winterthur/`
+- `winterthur.html`
+- `winterthur.mobile.html`
 - `buildtools/validate-runtime-config.mjs`
 - `buildtools/validate-build-artifact.mjs`
 - `.github/workflows/deploy-pages.yml`

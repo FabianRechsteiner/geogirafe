@@ -3,7 +3,7 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Vectormap is a GeoGirafe-based WebGIS frontend for Swiss geodata." />
+    <meta name="description" content="Stadtplan Winterthur: Karten, Themen und Objektinformationen." />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -17,26 +17,27 @@
     -->
     <meta name="redirect-url" content="index.html" />
     <meta name="configs" content="main,mobile" />
-    <link rel="config-main-url" href="config.json" />
-    <link rel="config-mobile-url" href="config.mobile.json" />
+    <link rel="config-main-url" href="winterthur/config.json" />
+    <link rel="config-mobile-url" href="winterthur/config.mobile.json" />
 
     <link rel="apple-touch-icon" sizes="192x192" href="images/logo/vectormap-icon-192.png" />
     <link rel="icon" type="image/x-icon" href="images/logo/vectormap-favicon.ico" />
-    <link rel="manifest" href="site.webmanifest" />
+    <link rel="manifest" href="winterthur.webmanifest" />
 
     <link rel="stylesheet" media="screen" href="src/styles/splash.css" />
     <link rel="stylesheet" href="src/styles/variables.css" />
+    <link rel="stylesheet" href="winterthur/appearance.css" />
     <link rel="stylesheet" href="src/styles/common.mobile.css" />
     <link rel="stylesheet" href="src/styles/mobile.css" />
 
     <script type="module" src="src/main.mobile.ts"></script>
-    <title>Vectormap</title>
+    <title>Stadtplan Winterthur</title>
   </head>
 
   <body>
     <div id="color-picker-container"></div>
     <div id="splash-screen">
-      <img class="splash-logo" alt="Vectormap" src="images/logo/vectormap-vertical.png" />
+      <img class="splash-logo" alt="Stadt Winterthur" src="winterthur/logo.png" />
       <div class="loader"></div>
       <span lang="de">Laden...</span>
     </div>

@@ -25,6 +25,7 @@
       <button onclick="${() => this.changeTheme(theme)}" class="item">
         <img alt="Theme icon" src="${theme.icon}" />
         <span i18n="${theme.name}"></span>
+        ${theme.category ? uHtml`<small>${theme.category}</small>` : ''}
       </button>
       `)}
     </div>

@@ -1,4 +1,14 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+.theme-category {
+  font-size: 0.7rem;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.theme-card:has(.theme-category) {
+  height: auto;
+  min-height: 10rem;
+}
 .themes {
   display: flex;
   flex-wrap: nowrap;

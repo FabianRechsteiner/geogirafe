@@ -1,0 +1,1220 @@
+{
+  "source": "https://stadtplan.winterthur.ch/ogc/features",
+  "mode": "inventory-only",
+  "conformance": {
+    "conformsTo": [
+      "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core",
+      "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/oas3",
+      "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/geojson",
+      "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/html",
+      "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
+      "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/landing-page",
+      "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/json",
+      "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/html",
+      "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/oas30",
+      "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections",
+      "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/simple-query"
+    ]
+  },
+  "changes": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "mappings": [
+    {
+      "collectionId": "baumkataster.baumkataster",
+      "topic": "Baumkataster",
+      "layers": [
+        "BaumkatasterBaumstandort"
+      ],
+      "note": "Tree locations; crowns are a separate cartographic layer. Field and identifier parity must be checked before enabling queries."
+    },
+    {
+      "collectionId": "solarkataster.solarkataster",
+      "topic": "Solarkataster",
+      "layers": [
+        "SolarkatasterTeildachflaechen"
+      ],
+      "note": "Roof sections and solar potential; retain the collection's 2019 data-date disclaimer."
+    },
+    {
+      "collectionId": "schwammstadt.schwammstadt_massnahme",
+      "topic": "Schwammstadt",
+      "layers": [
+        "schwammstadt_massnahme"
+      ],
+      "note": "Completed measures as polygons; the point representation is cartographic."
+    },
+    {
+      "collectionId": "administrative_einteilung.stadtkreis",
+      "topic": "Stadtkreise",
+      "layers": [
+        "Stadtkreis"
+      ],
+      "note": "City district polygons; label layer excluded."
+    },
+    {
+      "collectionId": "administrative_einteilung.betreibungskreis",
+      "topic": "Betreibungskreise",
+      "layers": [
+        "Betreibungskreis"
+      ],
+      "note": "Debt enforcement district polygons; label layer excluded."
+    },
+    {
+      "collectionId": "administrative_einteilung.beratungsgebiet_architektur",
+      "topic": "BeratungArchitektur",
+      "layers": [
+        "ArchitekturBeratung"
+      ],
+      "note": "Architecture advisory territories; compare current contacts before enabling."
+    },
+    {
+      "collectionId": "gebaeudebrueter.fledermaus",
+      "topic": "Gebaeudebrueter",
+      "layers": [
+        "Fledermaus"
+      ],
+      "note": "Bat locations; same thematic subset."
+    },
+    {
+      "collectionId": "gebaeudebrueter.schwalbe",
+      "topic": "Gebaeudebrueter",
+      "layers": [
+        "Schwalbe"
+      ],
+      "note": "Swallow locations; same thematic subset."
+    },
+    {
+      "collectionId": "gebaeudebrueter.segler",
+      "topic": "Gebaeudebrueter",
+      "layers": [
+        "Segler"
+      ],
+      "note": "Swift locations; same thematic subset."
+    }
+  ],
+  "collections": [
+    {
+      "id": "administrative_einteilung.beratungsgebiet_architektur",
+      "title": "administrative_einteilung.beratungsgebiet_architektur",
+      "description": "Flächenhafte Darstellung der räumlichen Zuständigkeitsgebiete für die Architekturberatung der Stadt Winterthur mit den zuständigen Kontaktpersonen und deren Kontaktangaben.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_architektur",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_architektur.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_architektur/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    },
+    {
+      "id": "administrative_einteilung.beratungsgebiet_bauinspektorat",
+      "title": "administrative_einteilung.beratungsgebiet_bauinspektorat",
+      "description": "Flächenhafte Darstellung der räumlichen Zuständigkeitsgebiete des Bauinspektorats der Stadt Winterthur mit Angaben zu Kontaktpersonen oder Teams und Kontaktmöglichkeiten.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_bauinspektorat",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_bauinspektorat.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_bauinspektorat/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.beratungsgebiet_baukontrolle",
+      "title": "administrative_einteilung.beratungsgebiet_baukontrolle",
+      "description": "Flächenhafte Darstellung der räumlichen Zuständigkeitsgebiete der Baukontrolle der Stadt Winterthur mit Angaben zu den zuständigen Kontaktpersonen.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_baukontrolle",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_baukontrolle.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_baukontrolle/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.beratungsgebiet_brandschutz",
+      "title": "administrative_einteilung.beratungsgebiet_brandschutz",
+      "description": "Flächenhafte Darstellung der räumlichen Zuständigkeitsgebiete für die Brandschutzberatung der Stadt Winterthur mit den zuständigen Kontaktpersonen.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_brandschutz",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_brandschutz.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_brandschutz/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.beratungsgebiet_denkmalpflege",
+      "title": "administrative_einteilung.beratungsgebiet_denkmalpflege",
+      "description": "Flächenhafte Darstellung der räumlichen Zuständigkeitsgebiete der Denkmalpflege der Stadt Winterthur mit Angaben zur zuständigen Kontaktperson oder zum zuständigen Team.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_denkmalpflege",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_denkmalpflege.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_denkmalpflege/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.beratungsgebiet_reklame",
+      "title": "administrative_einteilung.beratungsgebiet_reklame",
+      "description": "Flächenhafte Darstellung der räumlichen Zuständigkeitsgebiete für Reklamegesuche in der Stadt Winterthur mit Angaben zur zuständigen Stelle und zu den Kontaktmöglichkeiten.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_reklame",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_reklame.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.beratungsgebiet_reklame/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.betreibungskreis",
+      "title": "administrative_einteilung.betreibungskreis",
+      "description": "Flächenhafte Darstellung der für das Stadtgebiet Winterthur geltenden Betreibungskreise mit Kontakt- und Adressangaben der Betreibungsämter.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.betreibungskreis",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.betreibungskreis.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.betreibungskreis/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    },
+    {
+      "id": "administrative_einteilung.kirchgemeinde_katholisch",
+      "title": "administrative_einteilung.kirchgemeinde_katholisch",
+      "description": "Flächenhafte Darstellung der katholischen Kirchgemeinden im Gebiet der Stadt Winterthur.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.kirchgemeinde_katholisch",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.kirchgemeinde_katholisch.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.kirchgemeinde_katholisch/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.kirchgemeinde_reformiert",
+      "title": "administrative_einteilung.kirchgemeinde_reformiert",
+      "description": "Flächenhafte Darstellung der reformierten Kirchgemeinden im Gebiet der Stadt Winterthur.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.kirchgemeinde_reformiert",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.kirchgemeinde_reformiert.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.kirchgemeinde_reformiert/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.notariatskreis",
+      "title": "administrative_einteilung.notariatskreis",
+      "description": "Flächenhafte Darstellung der für das Stadtgebiet Winterthur geltenden Notariatskreise.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.notariatskreis",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.notariatskreis.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.notariatskreis/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.schulkreis",
+      "title": "administrative_einteilung.schulkreis",
+      "description": "Flächenhafte Darstellung der offiziellen Schulkreise der Stadt Winterthur.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.schulkreis",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.schulkreis.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.schulkreis/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "administrative_einteilung.stadtkreis",
+      "title": "administrative_einteilung.stadtkreis",
+      "description": "Flächenhafte Darstellung der offiziellen Stadtkreise von Winterthur mit Angaben zur jeweils für Vermessungsaufträge zuständigen Person der Abteilung Vermessung.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.stadtkreis",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.stadtkreis.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.stadtkreis/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    },
+    {
+      "id": "administrative_einteilung.statistisches_quartier",
+      "title": "administrative_einteilung.statistisches_quartier",
+      "description": "Flächenhafte Darstellung der statistischen Quartiere der Stadt Winterthur mit den amtlichen Quartiernummern und Quartiernamen.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.statistisches_quartier",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.statistisches_quartier.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/administrative_einteilung.statistisches_quartier/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "baumkataster.baumkataster",
+      "title": "baumkataster.baumkataster",
+      "description": "Baumkataster mit den aktuell geführten bestehenden und geplanten Bäumen. Enthalten sind der Standort sowie fachliche Angaben wie Baumart, Kronendurchmesser, Baumhöhe, Pflanzjahr und Baumtyp. Gefällte Bäume werden aus dem Datensatz entfernt.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/baumkataster.baumkataster",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/baumkataster.baumkataster.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/baumkataster.baumkataster/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    },
+    {
+      "id": "baumpatenschaft.baumpatenschaft_vw",
+      "title": "baumpatenschaft.baumpatenschaft_vw",
+      "description": "Räumliche Gesamtsicht der angebotenen Patenschaftsbäume für pg_featureserv beziehungsweise OGC API - Features. Verknüpft die Baumpatenschaft über baumnummer mit baumkataster.baumkataster aus dem separaten Schema baumkataster und übernimmt von dort Geometrie und Baumattribute. Ergänzt die aktuelle Reservation, das Foto mit der höchsten photo_id, Koordinaten in EPSG:4326 und den Status frei oder besetzt.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/baumpatenschaft.baumpatenschaft_vw",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/baumpatenschaft.baumpatenschaft_vw.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/baumpatenschaft.baumpatenschaft_vw/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "gebaeudebrueter.fledermaus",
+      "title": "gebaeudebrueter.fledermaus",
+      "description": "Enthält punktförmig erfasste Standorte bekannter Fledermausvorkommen beziehungsweise Fledermausquartiere an Gebäuden im Stadtgebiet Winterthur. Die Daten dienen insbesondere dem Artenschutz und der Berücksichtigung von Fledermausvorkommen bei Bau- und Bewilligungsverfahren.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.fledermaus",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.fledermaus.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.fledermaus/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    },
+    {
+      "id": "gebaeudebrueter.schwalbe",
+      "title": "gebaeudebrueter.schwalbe",
+      "description": "Enthält punktförmig erfasste Standorte von Schwalben beziehungsweise deren Nist- und Brutplätzen an Gebäuden im Stadtgebiet Winterthur. Die Daten dienen insbesondere dem Artenschutz und der Berücksichtigung bestehender Nistplätze bei Bau- und Bewilligungsverfahren.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.schwalbe",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.schwalbe.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.schwalbe/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    },
+    {
+      "id": "gebaeudebrueter.segler",
+      "title": "gebaeudebrueter.segler",
+      "description": "Enthält punktförmig erfasste Standorte von Mauerseglern beziehungsweise deren Nist- und Brutplätzen an Gebäuden im Stadtgebiet Winterthur. Die Daten dienen insbesondere dem Artenschutz und der Berücksichtigung bestehender Nistplätze bei Bau- und Bewilligungsverfahren.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.segler",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.segler.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/gebaeudebrueter.segler/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    },
+    {
+      "id": "leitungskataster.wasser_hydrant",
+      "title": "leitungskataster.wasser_hydrant",
+      "description": "Data for table leitungskataster.wasser_hydrant",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/leitungskataster.wasser_hydrant",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/leitungskataster.wasser_hydrant.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/leitungskataster.wasser_hydrant/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "points_of_interest.points_of_interest",
+      "title": "points_of_interest.points_of_interest",
+      "description": "Vereinheitlichter Datensatz der Points of Interest. Enthält allgemeine Points of Interest, Behindertenparkplätze, öffentliche WC-Anlagen, öffentliche Spielplätze und aktive Bushaltestellen.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/points_of_interest.points_of_interest",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/points_of_interest.points_of_interest.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/points_of_interest.points_of_interest/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "rundweg_winterthur.rundweg_winterthur_hindernisfrei",
+      "title": "rundweg_winterthur.rundweg_winterthur_hindernisfrei",
+      "description": "Geodaten der hindernisfreien Abschnitte des Rundwegs Winterthur. Die Daten dienen der Darstellung geeigneter Wegabschnitte und Varianten im Zusammenhang mit dem Rundweg Winterthur.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_hindernisfrei",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_hindernisfrei.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_hindernisfrei/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "rundweg_winterthur.rundweg_winterthur_poi",
+      "title": "rundweg_winterthur.rundweg_winterthur_poi",
+      "description": "Geodaten der Points of Interest und Wegpunkte entlang des Rundwegs Winterthur. Die Daten enthalten Orte wie Aussichtspunkte, ÖV-Haltestellen, Rastplätze, Restaurants, Start- und Zielorte sowie weitere wichtige Punkte entlang der Etappen.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_poi",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_poi.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_poi/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "rundweg_winterthur.rundweg_winterthur_radweg",
+      "title": "rundweg_winterthur.rundweg_winterthur_radweg",
+      "description": "Geodaten der Radweg-Abschnitte zum Rundweg Winterthur. Die Daten enthalten die für Velos vorgesehenen Routen und Varianten im Zusammenhang mit den Etappen des Rundwegs.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_radweg",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_radweg.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_radweg/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "rundweg_winterthur.rundweg_winterthur_wanderweg",
+      "title": "rundweg_winterthur.rundweg_winterthur_wanderweg",
+      "description": "Geodaten der Wanderweg-Abschnitte des Rundwegs Winterthur. Die Daten bilden die Etappen des rund 70 Kilometer langen Rundwegs entlang der Stadtgrenze von Winterthur ab.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_wanderweg",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_wanderweg.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/rundweg_winterthur.rundweg_winterthur_wanderweg/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "schwammstadt.schwammstadt_massnahme",
+      "title": "schwammstadt.schwammstadt_massnahme",
+      "description": "Enthält räumlich abgegrenzte Flächen bereits umgesetzter Schwammstadtmassnahmen im Stadtgebiet Winterthur. Der Datensatz führt Informationen verschiedener Fachämter zusammen; die Hauptzuständigkeit liegt beim Tiefbauamt. Geplante Massnahmen sind nicht enthalten und werden separat geführt.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/schwammstadt.schwammstadt_massnahme",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/schwammstadt.schwammstadt_massnahme.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/schwammstadt.schwammstadt_massnahme/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    },
+    {
+      "id": "sitzbank.sitzbank",
+      "title": "sitzbank.sitzbank",
+      "description": "Data for table sitzbank.sitzbank",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/sitzbank.sitzbank",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/sitzbank.sitzbank.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/sitzbank.sitzbank/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "sitzbankpatenschaft.sitzbankpatenschaft_vw",
+      "title": "sitzbankpatenschaft.sitzbankpatenschaft_vw",
+      "description": "Data for table sitzbankpatenschaft.sitzbankpatenschaft_vw",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/sitzbankpatenschaft.sitzbankpatenschaft_vw",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/sitzbankpatenschaft.sitzbankpatenschaft_vw.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/sitzbankpatenschaft.sitzbankpatenschaft_vw/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "unmapped"
+    },
+    {
+      "id": "solarkataster.solarkataster",
+      "title": "solarkataster.solarkataster",
+      "description": "Enthält berechnete Angaben zum Solarpotenzial von Dachteilflächen in der Stadt Winterthur, unter anderem zu Ausrichtung, Neigung, Einstrahlung, Verschattung, Eignung sowie möglicher Strom- und Wärmeproduktion. Die ursprüngliche Solarpotenzialanalyse wurde 2015 erstellt und 2019 insbesondere hinsichtlich der Solarthermie-Berechnung aktualisiert. Der Datenstand ist seit 2019 unverändert. Die Angaben dienen als Potenzialabschätzung und ersetzen keine objektspezifische Planung. Historische Kosten- und Förderwerte sind nicht als aktuelle Preis- oder Förderauskunft zu verstehen.",
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/EPSG/0/4326",
+          "bbox": [
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/solarkataster.solarkataster",
+          "rel": "self",
+          "type": "application/json",
+          "title": "Metadata as JSON"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/solarkataster.solarkataster.html",
+          "rel": "alternate",
+          "type": "text/html",
+          "title": "Metadata as HTML"
+        },
+        {
+          "href": "https://stadtplan.winterthur.ch/ogc/features/collections/solarkataster.solarkataster/items",
+          "rel": "items",
+          "type": "application/geo+json",
+          "title": "Features as GeoJSON"
+        }
+      ],
+      "extentUsable": false,
+      "status": "mapped-not-enabled"
+    }
+  ]
+}
