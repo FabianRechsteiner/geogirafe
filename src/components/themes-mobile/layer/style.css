@@ -1,0 +1,7 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.container {
+  border-bottom: solid 1px #ddd;
+  display: flex;
+  align-items: center;
+  height: 3rem;
+}

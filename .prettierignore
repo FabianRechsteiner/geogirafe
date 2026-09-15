@@ -1,0 +1,9 @@
+public
+dist
+node_modules
+coverage
+demo/static
+.vscode
+.idea
+package-lock.json
+src/typings

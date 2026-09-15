@@ -1,0 +1,93 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: auto;
+}
+td.feature-id {
+  text-align: left;
+  color: var(--text-color);
+  font-weight: 600;
+  line-height: 2rem;
+}
+td.label {
+  text-align: left;
+  padding-right: 0.5rem;
+  padding-left: 0.25rem;
+  color: var(--text-color);
+  font-weight: 600;
+}
+tr.key-value {
+  line-height: 2rem;
+}
+tr.key-value:nth-child(odd) {
+  background-color: var(--bkg-color-grad1);
+}
+tr.key-value:nth-child(even) {
+  background-color: var(--bkg-color);
+}
+
+button {
+  flex-grow: 0.25;
+  border: none;
+  background-color: unset;
+  color: var(--text-color-grad1);
+  padding: 0.5rem;
+  cursor: pointer;
+}
+button.showing-dropdown {
+  background-color: var(--bkg-color-grad1);
+}
+button:disabled:hover {
+  background-color: var(--bkg-color);
+  cursor: default;
+}
+
+button > img {
+  max-height: calc(var(--selection-window-header-height) / 2);
+}
+
+#previous i {
+  float: left;
+}
+
+#next i {
+  float: right;
+}
+
+#tools {
+  display: flex;
+  justify-content: space-around;
+}
+
+#counter {
+  line-height: var(--selection-window-footer-height);
+  height: var(--selection-window-footer-height);
+  text-align: center;
+  margin-top: 0;
+  flex-grow: 1;
+}
+
+/** ==== Layers Dropdown ==== */
+#layers-dropdown {
+  background-color: var(--bkg-color);
+  border: solid 1px var(--bkg-color-grad2);
+  padding: 0.5rem 0;
+
+  position: absolute;
+  top: var(--selection-window-header-height);
+
+  display: flex;
+  flex-direction: column;
+}
+
+option.layers-dropdown-item {
+  cursor: pointer;
+  padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+  flex-grow: 1;
+  display: flex;
+}
+
+option.layers-dropdown-item:hover {
+  background-color: var(--bkg-color-grad1);
+}

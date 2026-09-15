@@ -1,0 +1,16 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.container {
+  background-color: var(--bkg-color);
+}
+
+.content {
+  display: flex;
+}
+
+.loading i {
+  margin: 0.8rem;
+}
+
+.deactivated i {
+  margin: 0.8rem;
+}

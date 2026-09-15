@@ -1,0 +1,7 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.5rem;
+}

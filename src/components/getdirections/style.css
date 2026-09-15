@@ -1,0 +1,68 @@
+#get-directions-wrapper {
+  .gg-icon-button[disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .gg-icon-button[disabled]:hover {
+    background-color: transparent;
+  }
+
+  .gg-mobile-aware-image {
+    width: calc(var(--app-standard-height) / 2.4);
+  }
+  @media (max-width: 767px) {
+    padding-left: 0.5rem;
+
+    .gg-mobile-aware-image {
+
+      width: calc(var(--app-standard-height) / 1.6);
+    }
+  }
+
+
+  #directions-provider-dropdown {
+    @media (max-width: 767px) {
+      transform: translateY(calc(-100% - 38.4px));
+    }
+    background-color: var(--bkg-color);
+    border: solid 1px var(--bkg-color-grad2);
+    padding: 0.25rem 0;
+
+    position: absolute;
+    top: var(--selection-window-header-height);
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 1;
+  }
+  .directions-provider-dropdown-item {
+    cursor: pointer;
+    padding: .25rem 1rem .25rem .25rem;
+    flex-grow: 1;
+    display: flex;
+
+    img {
+      height: 20px;
+      width: 30px;
+      @media (max-width: 767px) {
+        height: 28px;
+        width: 36px;
+      }
+      padding-right: 0.5rem;
+      align-self: center;
+      object-fit: contain;
+    }
+    span {
+      color: var(--text-color);
+      align-self: center;
+      @media (max-width: 767px) {
+        font-size: 1.3rem;
+      }
+    }
+
+    &:hover {
+      background-color: var(--bkg-color-grad1);
+    }
+  }
+}

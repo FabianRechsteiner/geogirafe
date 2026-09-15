@@ -1,0 +1,405 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div id="panel">
+  <div id="content">
+    <!-- DRAW/DELETE CROSS SECTION BUTTONS -->
+    <div class="btn-group-flex">
+      <button
+        id="draw-profile-btn"
+        class="${this.crossSectionState.drawProfile ? 'gg-button active' : 'gg-button'}"
+        tip="draw_profile_help"
+        onclick="${() => this.toggleLineDraw()}"
+        i18n="draw_profile">
+        Draw
+      </button>
+      <button
+        id="delete-profile-btn"
+        class="gg-button"
+        tip="delete_help"
+        onclick="${() => this.deleteProfile()}"
+        i18n="delete">
+        Delete
+      </button>
+    </div>
+
+    <!-- CROSS SECTION WIDTH BUTTON -->
+    <div class="btn-group-flex">
+      <label for="section-width-btn" i18n="profile_width" class="gg-label">Width [m]</label>
+      <input
+        id="section-width-btn"
+        class="gg-input"
+        type="number"
+        value="${this.crossSectionState.sectionWidthSettings.value}"
+        min="${this.crossSectionState.sectionWidthSettings.min}"
+        max="${this.crossSectionState.sectionWidthSettings.max}"
+        step="${this.crossSectionState.sectionWidthSettings.step}"
+        oninput="${(e: Event) => this.setSectionWidth(parseFloat((e.target! as HTMLInputElement).value))}" />
+    </div>
+
+    <!-- MAP/CROSS SECTION VIEW SYNC BUTTONS -->
+    <div class="btn-group-flex">
+      <button
+        id="reset-zoom-btn"
+        class="gg-button"
+        tip="profile_reset_view_help"
+        onclick="${() => this.resetZoom()}"
+        i18n="profile_reset_view">
+        Reset view
+      </button>
+      <button
+        id="sync-views-btn"
+        class="${this.crossSectionState.syncViews ? 'gg-button active' : 'gg-button'}"
+        tip="profile_sync_view_help"
+        onclick="${() => this.setViewSync(!this.crossSectionState.syncViews)}"
+        i18n="profile_sync_view">
+        Sync. views
+      </button>
+    </div>
+
+    <!-- TRANSLATE PROFILE BUTTONS -->
+    <div class="btn-group-flex">
+      <button
+        class="gg-icon-button gg-big"
+        tip="profile_shift_up_help"
+        onclick="${() => this.shiftLinestring([0.0, this.crossSectionState.linestringShift])}">
+        <img src="icons/arrow_up.svg" alt="${this.context.i18nManager.getTranslation('profile_shift_up_help')}" />
+      </button>
+      <button
+        class="gg-icon-button gg-big"
+        tip="profile_shift_down_help"
+        onclick="${() => this.shiftLinestring([0.0, -this.crossSectionState.linestringShift])}">
+        <img src="icons/arrow_down.svg" alt="${this.context.i18nManager.getTranslation('profile_shift_down_help')}" />
+      </button>
+      <button
+        class="gg-icon-button gg-big"
+        tip="profile_shift_left_help"
+        onclick="${() => this.shiftLinestring([-this.crossSectionState.linestringShift, 0.0])}">
+        <img src="icons/arrow_left.svg" alt="${this.context.i18nManager.getTranslation('profile_shift_left_help')}" />
+      </button>
+      <button
+        class="gg-icon-button gg-big"
+        tip="profile_shift_right_help"
+        onclick="${() => this.shiftLinestring([this.crossSectionState.linestringShift, 0.0])}">
+        <img src="icons/arrow_right.svg" alt="${this.context.i18nManager.getTranslation('profile_shift_right_help')}" />
+      </button>
+    </div>
+
+    <div class="btn-group-flex">
+      <div class="cell">
+        <label for="z-ratio-btn" class="gg-label">
+          ${this.context.i18nManager.getTranslation('profile_exaggeration')}
+          (${this.crossSectionState.verticalExaggerationSettings.value})</label
+        >
+        <div style="display: flex; align-items: center">
+          <input
+            id="z-ratio-btn"
+            type="range"
+            class="gg-range"
+            min="${this.crossSectionState.verticalExaggerationSettings.min}"
+            max="${this.crossSectionState.verticalExaggerationSettings.max}"
+            step="${this.crossSectionState.verticalExaggerationSettings.step}"
+            value="${this.crossSectionState.verticalExaggerationSettings.value}"
+            oninput="${(e: Event) => this.setVerticalExaggeration(parseFloat((e.target! as HTMLInputElement).value))}"
+            style="flex: 1; min-width: 0; box-sizing: border-box" />
+          <button
+            id="z-ratio-reset-btn"
+            class="reset-btn"
+            tip="profile_exaggeration_reset_help"
+            onclick="${() => this.setVerticalExaggeration(this.crossSectionState.verticalExaggerationSettings.default)}">
+            <img
+              src="icons/restart_alt.svg"
+              alt="${this.context.i18nManager.getTranslation('profile_exaggeration_reset_help')}" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group-flex">
+      <div class="cell">
+        <label for="point-size-label" class="gg-label">
+          ${this.context.i18nManager.getTranslation('profile_point_size')}
+          (${this.crossSectionState.pointSizeSettings.value})</label
+        >
+        <div style="display: flex; align-items: center">
+          <input
+            id="point-size-btn"
+            type="range"
+            class="gg-range"
+            min="${this.crossSectionState.pointSizeSettings.min}"
+            max="${this.crossSectionState.pointSizeSettings.max}"
+            step="${this.crossSectionState.pointSizeSettings.step}"
+            value="${this.crossSectionState.pointSizeSettings.value}"
+            oninput="${(e: Event) => this.setPointSize(parseFloat((e.target! as HTMLInputElement).value))}"
+            style="flex: 1; min-width: 0; box-sizing: border-box" />
+          <button
+            id="point-size-reset-btn"
+            class="reset-btn"
+            tip="profile_point_size_reset_help"
+            onclick="${() => this.setPointSize(this.crossSectionState.pointSizeSettings.default)}">
+            <img
+              src="icons/restart_alt.svg"
+              alt="${this.context.i18nManager.getTranslation('profile_point_size_reset_help')}" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SELECT BACKGROUND COLOR -->
+    <div class="btn-group-flex">
+      <label for="background-color-btn" i18n="profile_background_color" class="gg-label">Background color</label>
+      <input
+        id="background-color-btn"
+        class="gg-input"
+        type="color"
+        value="${this.crossSectionState.backgroundColor}"
+        oninput="${(e: Event) => this.setBackgroundColor((e.target! as HTMLInputElement).value)}" />
+    </div>
+
+    <!-- SELECT CONTINUOUS COLOR PALETTE  -->
+    <div class="btn-group-flex">
+      <label for="sequential-color-btn" i18n="profile_colormap" class="gg-label">Colorscale</label>
+      <select
+        id="sequential-color-btn"
+        class="gg-select"
+        oninput="${(e: Event) => this.setColorPalette((e.target! as HTMLSelectElement).value as ColorPalette)}">
+        <option
+          value="spectral"
+          ?selected="${this.crossSectionState.colorPalette === 'spectral'}"
+          i18n="palette_option_spectral">
+          Spectral
+        </option>
+        <option
+          value="greys"
+          ?selected="${this.crossSectionState.colorPalette === 'greys'}"
+          i18n="palette_option_greys">
+          Greys
+        </option>
+        <option
+          value="blues"
+          ?selected="${this.crossSectionState.colorPalette === 'blues'}"
+          i18n="palette_option_blues">
+          Blues
+        </option>
+        <option
+          value="viridis"
+          ?selected="${this.crossSectionState.colorPalette === 'viridis'}"
+          i18n="palette_option_viridis">
+          Viridis
+        </option>
+        <option
+          value="magma"
+          ?selected="${this.crossSectionState.colorPalette === 'magma'}"
+          i18n="palette_option_magma">
+          Magma
+        </option>
+      </select>
+    </div>
+
+    <!-- TOGGLE GRID VISIBILITY -->
+    <div class="option">
+      <label for="grid-btn" i18n="profile_toggle_grid" class="gg-label">Show grid</label>
+      <input
+        id="grid-btn"
+        class="gg-checkbox"
+        ?checked="${this.crossSectionState.gridVisible}"
+        type="checkbox"
+        onchange="${(e: Event) => this.setGridVisibility((e.target! as HTMLInputElement).checked)}" />
+    </div>
+
+    <h3 i18n="profile_pointcloud">Pointclouds</h3>
+
+    <!-- NUMBER OF POINTS DISPLAYED INDICATOR -->
+    <div class="btn-group-flex loader-progress">
+      <div class="progress-wrapper" tip="profile_load_indicator_help">
+        <progress
+          id="load-progress"
+          class="gg-progress"
+          value="${this.crossSectionState.numberOfPoints}"
+          max="${this.crossSectionState.maxNumberOfPoints}"></progress>
+        <span class="progress-label">
+          ${(this.crossSectionState.loading) ? uHtml`<img
+            src="icons/progress.svg"
+            alt="Loading"
+            class="gg-spin gg-small progress-icon" />` : uHtml`` } ${this.crossSectionState.numberOfPoints} /
+          ${this.crossSectionState.maxNumberOfPoints}
+        </span>
+      </div>
+    </div>
+
+    <!-- DATASET SELECTION -->
+    <div>
+      ${ this.crossSectionState.datasets.map(f => uHtml`
+      <div class="dataset-row">
+        <input
+          type="checkbox"
+          id="${f.id}"
+          class="gg-checkbox"
+          ?checked="${f.active}"
+          onchange="${() => this.toggleVisibility(f.id)}" />
+        <span class="dataset-name" i18n="${ f.id }">${ f.id }</span>
+        <select
+          class="gg-select"
+          oninput="${(e: Event) => this.setColorVariable(f.id, (e.target! as HTMLSelectElement).value as ColorVariable)}">
+          <option value="uniform" ?selected="${f.colorby === 'uniform'}" i18n="color_option_uniform">Uniform</option>
+          <option value="natural" ?selected="${f.colorby === 'natural'}" i18n="color_option_natural">Natural</option>
+          <option value="intensity" ?selected="${f.colorby === 'intensity'}" i18n="color_option_intensity">
+            Intensity
+          </option>
+          <option
+            value="classification"
+            ?selected="${f.colorby === 'classification'}"
+            i18n="color_option_classification">
+            Classification
+          </option>
+        </select>
+        <input
+          id="uniform-color-btn"
+          class=""
+          type="color"
+          value="${f.color}"
+          oninput="${(e: Event) => this.setColor(f.id, (e.target! as HTMLInputElement).value)}" />
+      </div>
+      `) }
+    </div>
+
+    <h3 i18n="profile_measure_and_annotate">Measurements and annotations</h3>
+
+    <!-- MEASUREMENTS BUTTONS -->
+    <div class="btn-group-flex">
+      <button
+        id="draw-measurements-btn"
+        class="${this.crossSectionState.drawMeasurement ? 'gg-button active' : 'gg-button'}"
+        tip="profile_measurement_help"
+        onclick="${() => this.toggleMeasureDraw()}"
+        i18n="profile_measurement"
+        ?disabled="${!this.crossSectionState.enableMeasurement}">
+        Measure
+      </button>
+      <button
+        id="delete-measurements-btn"
+        class="gg-button"
+        tip="profile_delete_measurements_help"
+        onclick="${() => this.deleteAllMeasurements()}"
+        i18n="profile_delete_measurements">
+        Delete all
+      </button>
+    </div>
+
+    <!-- MEASUREMENTS TABLE -->
+    <div class="scrollable-table-container">
+      <table id="measurements-table" class="scrollable-table">
+        <thead>
+          <tr>
+            <th class="table-cell sticky-header" style="text-align: center"></th>
+            <th class="table-cell sticky-header" style="text-align: right" i18n="profile_table_dist">DIST.</th>
+            <th class="table-cell sticky-header" style="text-align: right" i18n="profile_table_slope">SLOPE.</th>
+            <th class="table-cell sticky-header" style="text-align: center"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- DRAW/DELETE MARKERS SECTION -->
+    <div class="btn-group-flex">
+      <button
+        id="draw-markers-btn"
+        class="${this.crossSectionState.drawMarker ? 'gg-button active' : 'gg-button'}"
+        tip="profile_draw_markers_help"
+        onclick="${() => this.toggleMarkerDraw()}"
+        i18n="profile_draw_markers"
+        ?disabled="${!this.crossSectionState.enableAnnotation}">
+        Annotate
+      </button>
+      <button
+        id="delete-markers-btn"
+        class="gg-button"
+        tip="profile_delete_markers_help"
+        onclick="${() => this.deleteAllMarkers()}"
+        i18n="profile_delete_markers">
+        Delete all
+      </button>
+    </div>
+
+    <!-- ANNOTATIONS TABLE -->
+    <div class="scrollable-table-container">
+      <table id="markers-table" class="scrollable-table">
+        <thead>
+          <tr>
+            <th class="sticky-header" style="text-align: center" i18n="profile_table_id">ID</th>
+            <th class="sticky-header" style="text-align: right" i18n="profile_table_coord">COORD.</th>
+            <th class="sticky-header" style="text-align: center"></th>
+            <th class="sticky-header" style="text-align: center"></th>
+            <th class="sticky-header" style="text-align: center"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h3 i18n="profile_print_title">Print</h3>
+
+    <!-- PRINT BUTTON -->
+    <div class="btn-group-flex">
+      <select
+        id="print-profile-format-btn"
+        class="gg-select"
+        oninput="${(e: Event) => this.setPrintFileFormat((e.target! as HTMLSelectElement).value as PrintFileFormat)}">
+        <option value="svg" i18n="SVG">SVG</option>
+      </select>
+      <button
+        id="print-profile-btn"
+        class="gg-button"
+        tip="profile_print_help"
+        onclick="${() => this.printPlot(this.crossSectionState.printFileFormat)}"
+        i18n="profile_print">
+        Print
+      </button>
+    </div>
+
+    <h3 i18n="profile_download_title">Downloads</h3>
+
+    <!-- MARKERS DOWNLOAD BUTTON -->
+    <div class="text-label" i18n="profile_markers_download">Markers</div>
+    <div class="btn-group-flex">
+      <select
+        id="download-markers-format-btn"
+        class="gg-select"
+        oninput="${(e: Event) => this.setAnnotationsFileFormat((e.target! as HTMLSelectElement).value as VectorFeatureFileFormat)}">
+        <option value="kml" i18n="KML">KML</option>
+        <option value="geojson" i18n="GeoJSON">GeoJSON</option>
+        <option value="gpx" i18n="GPX">GPX</option>
+      </select>
+      <button
+        id="download-markers-btn"
+        class="gg-button"
+        tip="download_help"
+        onclick="${() => this.exportFeature(this.points, 'markers', this.crossSectionState.downloadAnnotationsFormat)}"
+        i18n="download"
+        ?disabled="${!this.crossSectionState.enableAnnotationsDownload}">
+        Download
+      </button>
+    </div>
+
+    <!-- LINESTRING DOWNLOAD BUTTON -->
+    <div class="text-label" i18n="profile_linestring_download">Profile line</div>
+    <div class="btn-group-flex">
+      <select
+        id="download-linestring-format-btn"
+        class="gg-select"
+        oninput="${(e: Event) => this.setLineFileFormat((e.target! as HTMLSelectElement).value as VectorFeatureFileFormat)}">
+        <option value="kml" i18n="KML">KML</option>
+        <option value="geojson" i18n="GeoJSON">GeoJSON</option>
+        <option value="gpx" i18n="GPX">GPX</option>
+      </select>
+      <button
+        id="download-linestring-btn"
+        class="gg-button"
+        tip="download_help"
+        onclick="${() => this.exportFeature([this.linestring], 'linestring', this.crossSectionState.downloadLinestringFormat)}"
+        i18n="download"
+        ?disabled="${!this.crossSectionState.enableLinestringDownload}">
+        Download
+      </button>
+    </div>
+  </div>
+</div>

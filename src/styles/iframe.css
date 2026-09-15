@@ -1,0 +1,64 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.9rem;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.logo {
+  position: absolute;
+  top: 0.2rem;
+  left: 1rem;
+  z-index: 10;
+  width: 8rem;
+  background-color: #fff;
+  opacity: 0.5;
+}
+
+#content {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#main {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: hidden;
+}
+
+girafe-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+girafe-basemap {
+  display: block;
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+}
+
+girafe-search {
+  display: block;
+  width: 25vw;
+  height: 2.25rem;
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+  box-shadow: 0 1px 4px #0000004d;
+}

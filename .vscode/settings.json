@@ -1,0 +1,6 @@
+{
+  "cSpell.enabled": false,
+  //"editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "vitest.configSearchPatternExclude": "{**/node_modules/**,**/.*/**,**/*.d.ts,dist/**}"
+}

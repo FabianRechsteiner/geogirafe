@@ -1,0 +1,36 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div id="panel">
+  <div id="content">
+    <label for="email" i18n="Your email (optional)" class="gg-label">Your email (optional)</label>
+    <input id="email" type="text" placeholder="you@example.com" class="gg-input" />
+
+    <label for="reason" i18n="Why are you contacting us?" class="gg-label">Why are you contacting us?</label>
+    <select id="reason" class="gg-select">
+      <option value="" disabled selected>-</option>
+      ${this.context.configManager.Config.contact?.reasons.map((reason) => uHtml`
+      <option i18n="${reason}" value="${reason}">${reason}</option>
+      `)}
+    </select>
+
+    <label for="message" i18n="Your message" class="gg-label">Your message</label>
+    <textarea id="message" class="gg-input gg-textarea"></textarea>
+
+    <label
+      for="shortlink"
+      i18n="The following link will be sent with your message. It contains your current configuration and will help us to understand your problem."
+      class="gg-label"
+      >The following link will be sent with your message. It contains your current configuration and will help us to
+      understand your problem.</label
+    >
+    <input id="shortlink" disabled type="text" value="${this.shortUrl}" class="gg-input" />
+
+    <div class="mail-contact">
+      <span i18n="You can also contact us directly by E-Mail at">You can also contact us directly by E-Mail at</span>
+      <a href="${'mailto:' + this.context.configManager.Config.contact?.email}"
+        >${this.context.configManager.Config.contact?.email}</a
+      >
+    </div>
+
+    <button class="gg-button" tip="Send message" i18n="Send" onclick="${() => this.sendMessage()}">Send</button>
+  </div>
+</div>

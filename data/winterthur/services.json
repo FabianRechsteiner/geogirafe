@@ -1,0 +1,1854 @@
+{
+  "checkedAt": "2026-09-08T11:43:31.362Z",
+  "origin": "https://fabianrechsteiner.github.io",
+  "services": [
+    {
+      "name": "Adressen_Overlay",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false,
+        "layer": "GebaeudeadressenBeschriftung",
+        "validGml": false
+      }
+    },
+    {
+      "name": "AV",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "hofbaulinien",
+        "validGml": true
+      }
+    },
+    {
+      "name": "AVBodenbedeckungsgrenzen_Overlay",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false,
+        "layer": "BodenbedeckungGrenzen",
+        "validGml": false
+      }
+    },
+    {
+      "name": "AVEinzelobjektegrenzen_Overlay",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false,
+        "layer": "EinzelobjekteFlaechenGrenzen",
+        "validGml": false
+      }
+    },
+    {
+      "name": "AVfarbig",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "ProjektierteBodenbedeckung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "AVFixpunkte_Overlay",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false,
+        "layer": "Lagefixpunkte",
+        "validGml": false
+      }
+    },
+    {
+      "name": "AVLiegenschaften_Overlay",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false,
+        "layer": "Liegenschaften",
+        "validGml": false
+      }
+    },
+    {
+      "name": "Baumkataster",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "BaumkatasterBaumstandort",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Baumpatenschaft",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "Baumpatenschaft",
+        "validGml": false
+      }
+    },
+    {
+      "name": "BaumpatenschaftBesetzt",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "BaumpatenschaftBesetzt",
+        "validGml": false
+      }
+    },
+    {
+      "name": "BaumpatenschaftFrei",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "BaumpatenschaftFrei",
+        "validGml": false
+      }
+    },
+    {
+      "name": "BeratungArchitektur",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "ArchitekturBeratung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "BeratungBaugesuche",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "BeratungBaugesuche",
+        "validGml": false
+      }
+    },
+    {
+      "name": "BeratungBaukontrolle",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "BeratungBaukontrolle",
+        "validGml": false
+      }
+    },
+    {
+      "name": "BeratungBrandschutz",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "BeratungBrandschutzLayer",
+        "validGml": true
+      }
+    },
+    {
+      "name": "BeratungDenkmalpflege",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "DenkmalpflegeBeratung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "BeratungReklamegesuche",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "BeratungReklamegesuche",
+        "validGml": false
+      }
+    },
+    {
+      "name": "Betreibungskreise",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Betreibungskreis",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Buslinien",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Feuerstellen",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Friedhofplan",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false,
+        "layer": "Verstorbene",
+        "validGml": false
+      }
+    },
+    {
+      "name": "Gebaeudebrueter",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Schwalbe",
+        "validGml": true
+      }
+    },
+    {
+      "name": "GebieteStrassenplanung",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "GebieteStrassenplanungLayer",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Gruenflaechensponsoren",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "GruenflaechensponsoringBesetzt",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Gruenflaechensponsoring",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "Gruenflaechensponsoring",
+        "validGml": false
+      }
+    },
+    {
+      "name": "GruenflaechensponsoringFrei",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "GruenflaechensponsoringFrei",
+        "validGml": false
+      }
+    },
+    {
+      "name": "Grundkarte",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false,
+        "layer": "Stadtgrenzen",
+        "validGml": false
+      }
+    },
+    {
+      "name": "Hintergrundkarte_LK_AV_Situationsplan",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP_AV",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP_AV_schwarz",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Hintergrundkarte_LK_UEP_schwarz",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "InventarSchutzwuerdigerBauten",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "InventarSchutzwuerdigerBauten",
+        "validGml": true
+      }
+    },
+    {
+      "name": "KatholischeKirchgemeinden",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "KatholischeKirchgemeinde",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Klimaanalyse_Kaltluftproduktionsrate",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Kaltluftproduktionsrate",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Klimaanalyse_Kaltluftvolumenstrom",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Kaltluftvolumenstrom",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Klimaanalyse_Lufttemperatur_Nacht",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Lufttemperatur_Nacht",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Klimaanalyse_Lufttemperatur_Tag",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Lufttemperatur_Tag",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Klimaanalyse_PET_Tag",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "PET",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Klimaanalyse_Windfeld",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Windfeld",
+        "validGml": true
+      }
+    },
+    {
+      "name": "KommunalerEnergieplan",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Gebiete",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Laermempfindlichkeitsstufen_OEREB",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Laermempfindlichkeitsstufen",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Lageklassen",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2011",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2011Background",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2013",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2013Background",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2014",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2014Background",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2015",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2015Background",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2018",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2018Background",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2019",
+      "map": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSLoadGetMapParams(): WMS server error. Invalid CRS given : CRS must be valid for all requested layers."
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2019Background",
+      "map": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSLoadGetMapParams(): WMS server error. Invalid CRS given : CRS must be valid for all requested layers."
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2020",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2020Background",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2021",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2021Background",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2022",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2022Background",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2024",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2024Background",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2025",
+      "map": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSLoadGetMapParams(): WMS server error. Invalid CRS given : CRS must be valid for all requested layers."
+      },
+      "query": null
+    },
+    {
+      "name": "Luftbild2025Background",
+      "map": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSLoadGetMapParams(): WMS server error. Invalid CRS given : CRS must be valid for all requested layers."
+      },
+      "query": null
+    },
+    {
+      "name": "NaturLandschaftsschutzinventar",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "LandschaftsschutzobjektGeomorphologischesSchutzgebiet",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Notariatskreise",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Notariatskreis",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Overlay_LK_UEP_schwarz",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Parkkartenzonen",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Parkkartenzone",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Parkleitsystem",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "ParkleitsystemLayer",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Postleitzahlkreise",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Postleitzahlkreis",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Reduktionsplan",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Reduktionsgebiete",
+        "validGml": true
+      }
+    },
+    {
+      "name": "ReformierteKirchgemeinde",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "ReformierteKirchgemeinden",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Reliefkarte",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Richtplan_BaseMap",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Bodenbedeckung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "RichtplanFussWanderwege",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Grundnutzung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "RichtplanOeffVerkehr",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Grundnutzung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "RichtplanRadrouten",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Grundnutzung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "RichtplanSiedlungLandschaft",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Grundnutzung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "RichtplanStrassen",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Grundnutzung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "RundwegWinterthur",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Stadtgrenzen",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Schulwegplan",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Schulhaus",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Schwammstadt",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "schwammstadt_massnahme",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Sitzbankgoennerliste",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "SitzbankBesetzt",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Sitzbankgoennerschaft",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Sitzbank",
+        "validGml": true
+      }
+    },
+    {
+      "name": "SitzbankgoennerschaftFrei",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "SitzbankFrei",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Solarkataster",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "SolarkatasterTeildachflaechen",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Stadtgrenze",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Stadtgrenzen",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Stadtklima_StadtstrukturenHitzeminderung",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Stadtstrukturen",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Stadtkreise",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Stadtkreis",
+        "validGml": true
+      }
+    },
+    {
+      "name": "StadtkreisverantwortlicheVermessung",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "text/xml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "exception": "msWMSFeatureInfo(): WMS server error. Requested layer(s) are not queryable.",
+        "layer": "StadtkreisverantwortlicheVermessung",
+        "validGml": false
+      }
+    },
+    {
+      "name": "Stadtplan",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Stadtverwaltung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "StadtpolizeiQuartiereinteilung",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Quartierpolizei",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Stadtthermometer_August23",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "SensordatenAugust23",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Stadtthermometer_Juli23",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "SensordatenJuli23",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Stadtthermometer_September23",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "SensordatenSeptember23",
+        "validGml": true
+      }
+    },
+    {
+      "name": "StatistischeQuartiere",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "StatistischesQuartier",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Strassenbaustellen",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Strassenbaustelle",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Typologieplan",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Siedlungsgebiet",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Uebersichtsplan1885",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Uebersichtsplan1904",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Uebersichtsplan1932",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": null
+    },
+    {
+      "name": "Velobelastungsplan",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "ModellhochrechnungVelobelastung2020",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Veloplan",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "VerkehrsberuhigteZone",
+        "validGml": true
+      }
+    },
+    {
+      "name": "VerkehrsberuhigteZonen",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "VerkehrsberuhigteZone",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Versickerungszonen",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Versickerungszonen",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Waldhuetten",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "Waldhuette",
+        "validGml": true
+      }
+    },
+    {
+      "name": "Wildkarte1843",
+      "map": {
+        "status": 401,
+        "contentType": "text/html; charset=iso-8859-1",
+        "cors": "*",
+        "browserReadable": false,
+        "image": false
+      },
+      "query": null
+    },
+    {
+      "name": "Zonenplan_OEREB",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "ZonenplanGrundnutzung",
+        "validGml": true
+      }
+    },
+    {
+      "name": "ZustaendigkeitWald",
+      "map": {
+        "status": 200,
+        "contentType": "image/png",
+        "cors": "*",
+        "browserReadable": true,
+        "image": true
+      },
+      "query": {
+        "status": 200,
+        "contentType": "application/vnd.ogc.gml",
+        "cors": "*",
+        "browserReadable": true,
+        "image": false,
+        "layer": "ZustaendigkeitWald",
+        "validGml": true
+      }
+    }
+  ],
+  "featureSamples": [
+    {
+      "topic": "Baumkataster",
+      "scenario": "object",
+      "status": 200,
+      "contentType": "application/vnd.ogc.gml",
+      "cors": "*",
+      "browserReadable": true,
+      "image": false,
+      "features": 1
+    },
+    {
+      "topic": "Baumkataster",
+      "scenario": "empty",
+      "status": 200,
+      "contentType": "application/vnd.ogc.gml",
+      "cors": "*",
+      "browserReadable": true,
+      "image": false,
+      "features": 0
+    },
+    {
+      "topic": "Solarkataster",
+      "error": "about:blank:16:19: disallowed character in attribute name."
+    }
+  ],
+  "browserAcceptance": "not-performed-no-browser-connected",
+  "summary": {
+    "total": 110,
+    "mapsReady": 89,
+    "queryable": 74,
+    "queriesReady": 58
+  }
+}

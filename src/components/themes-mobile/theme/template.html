@@ -1,0 +1,15 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<header>
+  <button onclick="${() => this.state.themes.lastSelectedTheme = null}" class="gg-icon-button gg-small">
+    <img alt="Back button" src="icons/arrow_left.svg" />
+  </button>
+  <img alt="Theme icon" src="${this.theme?.icon}" />
+  <span i18n="${this.theme?.name}"></span>
+</header>
+<div class="children">
+  ${(this.theme?.children ?? []).map(layer => (layer instanceof _GroupLayer) ? uHtmlFor(layer, layer.treeItemId)`
+  <girafe-group groupid="${layer.treeItemId}"></girafe-group>
+  ` : uHtmlFor(layer, layer.treeItemId)`
+  <girafe-layer layerid="${layer.treeItemId}"></girafe-layer>
+  `)}
+</div>

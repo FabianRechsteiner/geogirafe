@@ -1,0 +1,55 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--text-color);
+}
+#panel > div {
+  padding: 1rem;
+}
+
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.toolParameters {
+  display: grid;
+  justify-content: left;
+  grid-template-columns: auto auto 60px auto;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.toolParameters > .toolParameter {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+
+input {
+  border: 1px solid var(--bkg-color-grad1);
+  width: inherit;
+  padding-right: 0;
+  background-color: var(--bkg-color-input);
+}
+input:focus {
+  border: 1px solid var(--lt-color-gray-900);
+}
+
+button {
+  border: solid 1px var(--bkg-color);
+  color: var(--text-color);
+  padding: 0;
+  background-color: var(--bkg-color);
+  cursor: pointer;
+}
+button:hover {
+  border: solid 1px var(--text-color-grad2);
+}
+button.selected {
+  border: solid 1px var(--text-color-grad2);
+  background-color: var(--bkg-color-grad1);
+  color: var(--bkg-color);
+}

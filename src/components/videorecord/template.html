@@ -1,0 +1,19 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<button
+  tip="record_video"
+  class="${this.status === 'downloaded' ? 'gg-icon-button gg-big' : 'hidden'}"
+  onclick="${() => this.startRecording()}">
+  <img alt="help-icon" src="icons/video-record.svg" />
+</button>
+<button
+  tip="stop_video"
+  class="${this.status === 'recording' ? 'gg-icon-button gg-big' : 'hidden'}"
+  onclick="${() => this.stopRecording()}">
+  <img alt="help-icon" src="icons/video-stop.svg" />
+</button>
+<button
+  tip="download_video"
+  class="${this.status === 'recorded' ? 'gg-icon-button gg-big' : 'hidden'}"
+  onclick="${() => this.downloadRecord()}">
+  <img alt="help-icon" src="icons/video-download.svg" />
+</button>

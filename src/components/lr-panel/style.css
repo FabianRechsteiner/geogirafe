@@ -1,0 +1,58 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#panel {
+  height: 100%;
+}
+#gutter {
+  height: 100%;
+}
+.main {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#panel {
+  position: relative;
+  background: var(--bkg-color);
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  margin: 0.5rem;
+  display: flex;
+  align-items: center;
+  border-bottom: var(--app-standard-border);
+  padding-bottom: 0.5rem;
+}
+
+header span {
+  font-size: 1rem;
+  text-align: left;
+  flex-grow: 1;
+  color: var(--text-color);
+}
+
+#gutter {
+  position: absolute;
+  z-index: 100;
+  width: 6px;
+  height: 4rem;
+  background: var(--bkg-color);
+  top: calc(50% - 2rem);
+  cursor: col-resize;
+  border: var(--app-standard-border);
+  border-radius: 1rem;
+}
+
+#panel.left #gutter {
+  right: -1rem;
+}
+
+#panel.right #gutter {
+  left: -1rem;
+}
+
+#panel.left #hide {
+  display: none;
+}

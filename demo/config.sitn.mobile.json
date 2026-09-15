@@ -1,0 +1,15 @@
+{
+  "themes": {
+    "url": "https://sitn.ne.ch/themes?background=desktop_background&interface=mobile"
+  },
+  "search": {
+    "url": "https://sitn.ne.ch/search?limit=100&partitionlimit=40&interface=mobile&query=###SEARCHTERM###&lang=fr"
+  },
+  "map": {
+    "constrainScales": false
+  },
+  "offline": {
+    "downloadStartZoom": 9,
+    "downloadEndZoom": 13
+  }
+}

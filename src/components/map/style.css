@@ -1,0 +1,196 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#container,
+#ol-map {
+  position: relative;
+  background-color: var(--bkg-color);
+  height: 100%;
+  width: 100%;
+}
+
+#ol-map.darkmap canvas {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+.hidden {
+  display: none;
+}
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 10px;
+  text-align: center;
+}
+
+.loading span {
+  color: var(--text-color);
+  display: block;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+.loading span.quote {
+  font-style: italic;
+  font-weight: 300;
+}
+
+#cs-map {
+  background-color: var(--bkg-color);
+  position: absolute;
+  height: 100%;
+  overflow: hidden;
+  display: none;
+  border-left: solid 3px #444;
+}
+
+.ol-control {
+  right: 2rem !important;
+  left: unset !important;
+  border: none;
+  background-color: transparent;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ol-zoom {
+  top: 2rem !important;
+}
+
+.ol-rotate {
+  top: 9.3rem !important;
+}
+
+.ol-location {
+  top: 7rem !important;
+}
+
+.img-location,
+.img-disable-location {
+  width: 55%;
+  height: auto;
+}
+
+.ol-zoom-in,
+.ol-zoom-out,
+.btn-location,
+.btn-disable-location,
+.ol-rotate-reset {
+  width: 2rem !important;
+  height: 2rem !important;
+  cursor: pointer;
+  font-size: 1.2rem !important;
+  background-color: white;
+}
+
+.ol-scale-line {
+  right: 1rem !important;
+  bottom: 0.5rem !important;
+  left: unset !important;
+}
+
+#swiper {
+  display: none;
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  height: 0;
+  margin: 0;
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+}
+
+/* Webkit/Chrome specific */
+input[type='range']::-webkit-slider-runnable-track {
+  height: 0;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: 2px solid #444;
+  height: 0;
+  margin-top: -1000px;
+  padding-top: 1000px;
+  padding-bottom: 1000px;
+  width: 6px;
+  background: var(--bkg-color);
+  cursor: ew-resize;
+}
+
+/* Firefox specific */
+input[type='range']::-moz-range-thumb {
+  border: 2px solid #444;
+  height: 0;
+  padding-top: 1000px;
+  padding-bottom: 1000px;
+  width: 3px;
+  background: var(--bkg-color);
+  cursor: ew-resize;
+}
+
+.close-swiper {
+  --button-size: 2rem;
+  display: none;
+  position: absolute;
+  top: 0;
+  transform: translateX(calc(-1 * var(--button-size) / 2));
+  width: var(--button-size);
+  height: var(--button-size);
+  background-color: var(--bkg-color);
+  color: var(--text-color);
+  border-radius: 4px;
+  border-width: 1px;
+  cursor: pointer;
+}
+
+.close-swiper:hover,
+.close-swiper:focus {
+  outline: 1px solid var(--text-color);
+  color: var(--text-color-grad1);
+}
+
+.ol-viewport .tooltip {
+  position: relative;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 0;
+  color: white;
+  padding: 0.32rem 0.62rem;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+@media screen and (hover: none) {
+  .ol-zoom,
+  .ol-rotate,
+  .ol-location {
+    display: none !important;
+  }
+}
+
+/* Styles for map context menu in contextmenu.ts */
+
+.contextmenu {
+  background-color: var(--bkg-color);
+  color: var(--text-color);
+  box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.4);
+  border: 1px solid #cccccc;
+
+  .hidden {
+    display: none;
+  }
+
+  .menu-entry {
+    cursor: pointer;
+    padding: 10px;
+  }
+  .menu-entry:hover {
+    background-color: var(--bkg-color-grad1);
+  }
+  .menu-entry[aria-disabled='true'] {
+    pointer-events: none;
+    color: var(--text-color-grad1);
+  }
+}

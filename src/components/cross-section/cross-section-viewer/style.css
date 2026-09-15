@@ -1,0 +1,98 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+:host,
+#panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  min-height: 10rem;
+  background: var(--bkg-color);
+}
+
+#profile-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  background-color: none;
+  overflow: hidden;
+}
+
+#gutter {
+  border: none;
+  height: 6px;
+  width: 100%;
+  background: var(--bkg-color);
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: row-resize;
+}
+
+/* SCATTERPLOT */
+#glcanvas {
+  position: absolute;
+}
+
+#svg-outer {
+  position: absolute;
+  z-index: 1;
+}
+
+.svg-axis {
+  font-size: 12;
+  font-family: inherit, sans-serif;
+  user-select: none;
+}
+
+.ruler-text {
+  text-anchor: middle;
+}
+
+.point:hover {
+  stroke: blue;
+  fill: chartreuse;
+}
+
+/* Spinner */
+
+#spinner {
+  visibility: hidden;
+  background-color: #f7f7f7;
+  border-radius: 50%;
+}
+
+.spinner {
+  z-index: 99;
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  -webkit-animation: spin 2s linear infinite;
+  -moz-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}

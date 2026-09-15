@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="dev.geomapfish.geogirafe" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>GeoGirafe</name>
+    <description>GeoGirafe Application</description>
+    <author email="guillaume.remy@bs.ch" href="https://doc.geomapfish.dev">
+        Guillaume REMY
+    </author>
+    <preference name="Fullscreen" value="true" />
+    <preference name="scheme" value="https" />
+    <preference name="Hostname" value="app.localhost:8080" />
+    <icon src="app-icon.png" />
+    <content src="mobile.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+</widget>

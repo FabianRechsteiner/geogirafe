@@ -1,0 +1,70 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Custom table */
+table.custom-table {
+  width: 100%;
+  max-width: 100%;
+  min-width: var(--popup-min);
+  table-layout: auto;
+  border-collapse: collapse;
+  margin: 10px auto;
+}
+
+table.custom-table tr {
+  border-bottom: 1px solid #ccc;
+}
+
+table.custom-table th,
+table.custom-table td {
+  padding: 5px 5px 5px 0px;
+  vertical-align: middle;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+table.custom-table col.col-1 {
+  width: 125px;
+}
+
+table.custom-table col.col-3 {
+  width: 30px;
+}
+
+table.custom-table tr:last-child {
+  border-bottom: none;
+}
+
+tr {
+  border-bottom: 1px solid #000000;
+}
+
+.custom-div {
+  margin: 6px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.link-div {
+  display: flex;
+  align-items: center;
+  margin: 0.5em 0;
+  gap: 0.25em;
+}
+
+.link-div img {
+  width: 1em;
+  height: auto;
+}
+
+.center-vertically {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+}

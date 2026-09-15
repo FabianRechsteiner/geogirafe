@@ -1,0 +1,121 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div id="panel">
+  <!-- tabs -->
+  <header class="gg-tabs">
+    <button
+      class="${this.selectedTab === 'wms_wmts' ? 'gg-tab active' : 'gg-tab'}"
+      onclick="${() => this.setSelectedTab('wms_wmts')}"
+      i18n="wms_wmts"></button>
+    <button
+      class="${this.selectedTab === 'file' ? 'gg-tab active' : 'gg-tab'}"
+      onclick="${() => this.setSelectedTab('file')}"
+      i18n="local file"></button>
+  </header>
+
+  <!-- WMS/WMTS -->
+  <section class="${(this.selectedTab === 'wms_wmts') ? 'group' : 'hidden'}">
+    <h4 class="title" i18n="Suggestions" ?hidden="${!this.hasPredefinedWmsWmtsSources}">Suggestions</h4>
+    <ul class="suggestions" ?hidden="${!this.hasPredefinedWmsWmtsSources}">
+      ${this.predefinedWmsWmtsSources.map(source => uHtmlFor(source, source.label)`
+      <li>
+        <a href="javascript:void(0)" onclick="${() => this.scanSource(source.url, source.type)}">${source.label}</a>
+      </li>
+      `)}
+    </ul>
+    <h4 class="title" i18n="Custom service URL">Custom service URL</h4>
+    <div class="clearable-input">
+      <input type="text" id="url" class="gg-input clearable-input-field" oninput="${() => this.typeUrl()}" /><br />
+      <button id="clear-url" class="delete-button hidden" onclick="${() => this.clearUrl()}">
+        <img
+          class="delete-icon"
+          alt="delete-button-icon"
+          tip="Reset filter"
+          i18n="Reset filter"
+          src="icons/trash.svg" />
+      </button>
+    </div>
+    <button i18n="Scan Source" class="gg-button scan-button" onclick="${() => this.scanSource()}">Scan Source</button>
+  </section>
+
+  <!-- Local File -->
+  <section class="${(this.selectedTab === 'file') ? 'group' : 'hidden'}">
+    <h4 class="title" i18n="Choose local file">Choose local file</h4>
+    <div id="file-selector">
+      <label for="file" id="file-label">
+        <button class="gg-button" i18n="Select File"></button>
+        <span>${this.fileDescription}</span>
+      </label>
+      <input type="file" accept=".gpx,.kml,.geojson,.json" id="file" onchange="${() => this.render()}" /><br />
+    </div>
+    <button id="load" i18n="Load File" class="gg-button" onclick="${() => this.loadFile()}"></button>
+  </section>
+
+  <!-- WMS/WMTS Results -->
+  <section
+    class="${(this.selectedTab === 'wms_wmts' && this.externalLayers.length > 0) || this.loading ? 'layers' : 'hidden'}">
+    <h4 class="title" i18n="Layers (from Capabilities)">Layers (from Capabilities)</h4>
+    <div class="clearable-input">
+      <img class="filter-icon" alt="filter-button-icon" src="icons/filter.svg" />
+      <input
+        id="layer-search-field"
+        class="gg-input clearable-input-field"
+        type="text"
+        placeholder="${this.context.i18nManager.getTranslation('Filter external layers...')}"
+        i18n="Filter external layers..."
+        autocomplete="off"
+        autocorrect="off"
+        oninput="${(e: Event) => this.filterLayers((e.target! as HTMLInputElement).value)}" />
+      <button class="${this.isFiltered ? 'delete-button' : 'hidden'}" onclick="${() => this.clearFilter()}">
+        <img
+          class="delete-icon"
+          alt="delete-button-icon"
+          tip="Reset filter"
+          i18n="Reset filter"
+          src="icons/trash.svg" />
+      </button>
+    </div>
+    <div class="filter-buttons">
+      <span>
+        ${Object.values(this.externalLayers).filter(layer => layer.isSelected).length.toString()}
+        ${this.context.i18nManager.getTranslation('layers selected')}
+      </span>
+      <button class="gg-button" tip="Select all filtered layers" onclick="${() => this.selectVisible()}">+</button>
+      <button class="gg-button" tip="Unselect all filtered layers" onclick="${() => this.deselectVisible()}">-</button>
+      <button class="gg-button" tip="Select none" onclick="${() => this.deselectAll()}">--</button>
+    </div>
+    <img id="loading-icon" alt="loading-icon" src="icons/loading.svg" class="${this.loading ? 'gg-spin' : 'hidden'}" />
+    <ul class="results">
+      ${this.filteredLayers.map(layer => uHtmlFor(layer, layer.treeItemId)`
+      <li class="result">
+        <!-- Checkbox -->
+        <button
+          class="${layer.isSelected ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
+          tip="Activate / Deactivate"
+          onclick="${() => this.selectLayer(layer)}">
+          <img
+            class="${layer.isSelected ? 'gg-checkbox' : 'hidden'}"
+            alt="Expand/Collapse button"
+            src="icons/checked-full.svg" />
+          <img
+            class="${!layer.isSelected ? 'gg-checkbox' : 'hidden'}"
+            alt="Expand/Collapse button"
+            src="icons/checked-no.svg" />
+        </button>
+        <button
+          class="${layer.isSelected ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
+          onclick="${() => this.selectLayer(layer)}">
+          <span i18n="${layer.name}" class="gg-tree-label"> ${layer.name} </span>
+        </button>
+      </li>
+      `)}
+    </ul>
+    <button
+      id="add"
+      tip="Add selected"
+      i18n="Add selected"
+      class="gg-button"
+      onclick="${() => this.addSelectedLayers()}">
+      Add selected
+    </button>
+  </section>
+</div>

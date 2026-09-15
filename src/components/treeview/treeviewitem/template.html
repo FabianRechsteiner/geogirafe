@@ -1,0 +1,158 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<link rel="stylesheet" href="lib/tippy.js/tippy.css" />
+<link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
+<link rel="stylesheet" href="lib/tippy.js/border.css" />
+<link rel="stylesheet" href="lib/tippy.js/svg-arrow.css" />
+
+<div id="container">
+  <header>
+    <!-- Spacer / Restricted icon -->
+    <div class="gg-spacer gg-small">
+      <img
+        class="${this.layer.restricted ? 'gg-small gg-lock gg-opacity' : 'hidden'}"
+        alt="Protected layer"
+        src="icons/protected.svg" />
+    </div>
+
+    <!-- Checkbox -->
+    <button
+      class="${this.layer.active ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
+      tip="Activate / Deactivate"
+      onclick="${() => this.toggle()}">
+      <img
+        class="${this.layer.active ? 'gg-checkbox' : 'hidden'}"
+        alt="Expand/Collapse button"
+        src="icons/checked-full.svg" />
+      <img
+        class="${!this.layer.active ? 'gg-checkbox' : 'hidden'}"
+        alt="Expand/Collapse button"
+        src="icons/checked-no.svg" />
+    </button>
+
+    <!-- Error icon -->
+    <div
+      class="${this.layer.hasError ? 'gg-icon gg-small gg-opacity' : 'hidden'}"
+      tip="${this.layer.errorMessage ? this.layer.errorMessage : 'Error on layer'}">
+      <img alt="Error on layer" src="icons/error.svg" />
+    </div>
+
+    <!-- Label -->
+    <div class="${this.isVisibleInCurrentResolution() ? 'label-container' : 'label-container label-out-resolution'}">
+      <button
+        class="${this.layer.active ? 'gg-icon-button gg-small gg-selected' : 'gg-icon-button gg-small gg-opacity'}"
+        onclick="${() => this.toggle()}">
+        <span i18n="${this.layer.name}" class="gg-tree-label"> ${this.layer.name} </span>
+      </button>
+      <!-- zoom to resolution -->
+      <button
+        class="${this.layer.active && this.layer instanceof LayerWms && !this.isVisibleInCurrentResolution() ? 'gg-icon-button gg-small resolution-tool' : 'hidden'}"
+        tip="Zoom to visible resolution"
+        onclick="${() => this.zoomToVisibleResolution()}">
+        <img alt="Zoom to visible resolution" src="icons/zoom.svg" />
+      </button>
+      <!-- layer icon -->
+      <img
+        class="${this.layer.active && this.iconUrl ? 'legend-icon' : 'hidden'}"
+        alt="${'Icon for ' + this.layer.name}"
+        src="${this.iconUrl}"
+        crossorigin="${this.getCrossOrigin(this.iconUrl)}" />
+    </div>
+
+    <!-- zoom to full extent -->
+    <button
+      class="${this.layer.active && this.layer instanceof LayerLocalFile ? 'gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
+      tip="Zoom to full extent"
+      onclick="${() => this.zoomToFullExtent()}">
+      <img alt="Zoom to full extent" src="icons/zoom.svg" />
+    </button>
+
+    <!-- swipe icons -->
+    <button
+      class="${this.getButtonClass('swipedLeft')}"
+      tip="Swipe layer to the left"
+      onclick="${() => this.layer.swiped = (this.layer.swiped === 'left') ? 'no' : 'left'}">
+      <img alt="Swipe layer to the left" src="icons/swipe-left.svg" />
+    </button>
+    <button
+      class="${this.getButtonClass('swipedRight')}"
+      tip="Swipe layer to the right"
+      onclick="${() => this.layer.swiped = (this.layer.swiped === 'right') ? 'no' : 'right'}">
+      <img alt="Swipe layer to the right" src="icons/swipe-right.svg" />
+    </button>
+
+    <!-- opacity icon -->
+    <button id="opacity" class="${this.getButtonClass('opacity')}" tip="Control opacity">
+      <img alt="Control opacity" src="icons/opacity.svg" />
+    </button>
+
+    <!-- Filter -->
+    <button id="filter" class="${this.getButtonClass('filter')}" tip="Filter layer">
+      <img alt="Filter layer" src="icons/filter.svg" />
+    </button>
+
+    <!-- Time restriction -->
+    <button
+      id="timeRestriction"
+      class="${this.getButtonClass('timeRestriction')}"
+      tip="Define time restriction on layer">
+      <img alt="Define time restriction on layer" src="icons/clock.svg" />
+    </button>
+
+    <!-- Snap -->
+    <button
+      class="${this.getButtonClass('snappable')}"
+      onclick="${() => this.toggleSnap()}"
+      tip="Snap to layer features">
+      <img alt="Enable snapping" src="icons/snapping.svg" />
+    </button>
+
+    <!-- Legend icon -->
+    <button
+      class="${this.hasLegend ? (this.layer.isLegendExpanded ? 'gg-icon-button gg-small tool' : 'gg-icon-button gg-small gg-opacity tool') : 'hidden'}"
+      tip="Toggle legend"
+      onclick="${() => this.toggleLegend()}">
+      <img alt="Toggle legend" src="icons/legend.svg" loading="lazy" />
+    </button>
+
+    <!-- Metadata icon -->
+    <button
+      class="${this.layer.hasMetadata ? 'metadata gg-icon-button gg-small gg-opacity tool' : 'hidden'}"
+      onclick="${() => this.showMetadata()}">
+      <img alt="Metadata" src="icons/info.svg" />
+    </button>
+
+    <!-- Drag -->
+    <button id="drag-button" class="${this.getButtonClass('draggable')}" tip="Move">
+      <img alt="Move layer" src="icons/drag.svg" />
+    </button>
+
+    <!-- Remove icon -->
+    <button class="${this.getButtonClass('removable')}" tip="Remove layer" onclick="${() => this.deleteLayer()}">
+      <img alt="Remove layer" src="icons/trash.svg" />
+    </button>
+  </header>
+
+  ${Object.keys(this.legendUrls).map((l:string) => uHtml`
+  <div class="${this.isLegendExpanded ? 'legend' : 'hidden'}">
+    <div class="gg-spacer gg-small"></div>
+    <img
+      alt="${'Legend for ' + l}"
+      src="${this.legendUrls[l]}"
+      loading="lazy"
+      crossorigin="${this.getCrossOrigin(this.legendUrls[l])}" />
+  </div>
+  ` )}
+
+  <div class="${this.layer instanceof LayerLocalFile && this.isLegendExpanded ? 'legend-file' : 'legend-file hidden'}">
+    <div class="gg-spacer gg-small"></div>
+    <div class="gg-spacer gg-small"></div>
+    <div>
+      <span i18n="File from">File from</span>
+      <span>${(this.layer as LayerLocalFile).lastModifiedDate}</span>
+      <span>[</span>
+      <span>${(this.layer as LayerLocalFile)._features?.length}</span>
+      <span i18n="features">features</span>
+      <span>]</span>
+    </div>
+  </div>
+</div>

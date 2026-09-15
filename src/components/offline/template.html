@@ -1,0 +1,46 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- prettier-ignore -->
+<div
+  id="container"
+  style="${this.state.interface.swipeupPanelContent==='offline'?'': 'display: none;'}"
+>
+
+<div id="title" i18n="Offline mode"></div>
+
+<div class="${this.state.isOffline ? 'offline-status' : 'hidden'}" i18n="You are offline"></div>
+
+<button
+  id="download-button"
+  class="enabled-button rounded-brick"
+  onclick="${() => this.exportData()}"
+  >
+  <img alt="download-icon" src="icons/offline-download.svg" />
+  <div id="progress-bar" style="${this.downloadInProgress ? 'width: ' + this.downloadProgressValue.toFixed() + '%;': 'width: 0%;'}"></div>
+</button>
+
+<div
+  id="cleaning-section"
+>
+
+  <div
+    id="monitor-container"
+    class="rounded-brick"
+  >
+    <div id="offline-data-title" i18n="Offline data"></div>
+    <div id="offline-data-counter" >${this.totalOfflineDataSizeMB.toFixed(2) + " MB"}</div>
+  </div>
+
+  <button
+    id="remove-button"
+    onpointerup="${() => this.clearStores()}"
+    class="rounded-brick"
+  ><img alt="download-icon" src="icons/trash.svg" /></button>
+
+</div>
+
+<div class="wmts-warning" i18n="Only WMTS layers are saved"></div>
+
+
+
+
+</div>

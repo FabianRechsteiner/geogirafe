@@ -1,0 +1,52 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div id="panel">
+  <div id="content">
+    <div id="header">
+      <div class="gg-tabs">
+        ${this.getTabHeaders().map((th) => uHtml`
+        <button
+          id="${th.id}"
+          i18n="${th.text}"
+          class="${th.active ? 'gg-tab active' : 'gg-tab'}"
+          .active="${th.active}"
+          onclick="${() => this.displayGrid(th.id, true)}"></button>
+        `)}
+      </div>
+      <div class="selection-panel">
+        <span class="label" i18n="Selection"></span>
+        <button class="gg-icon-button gg-medium" onclick="${() => this.selectAll()}" tip="Select all">
+          <img alt="select all icon" src="icons/select-all-on.svg" />
+        </button>
+        <button class="gg-icon-button gg-medium" onclick="${() => this.selectNone()}" tip="Select none">
+          <img alt="select none icon" src="icons/select-all-off.svg" />
+        </button>
+        <button class="gg-icon-button gg-medium" onclick="${() => this.invertSelection()}" tip="Invert selection">
+          <img alt="invert selection icon" src="icons/select-invert.svg" />
+        </button>
+        <girafe-get-directions></girafe-get-directions>
+        <button
+          class="${this.resultsSelected ? 'gg-icon-button gg-medium' : 'gg-icon-button gg-medium disabled'}"
+          ?disabled="${!this.resultsSelected}"
+          onclick="${() => this.zoomToSelection()}"
+          tip="Zoom to">
+          <img alt="zoom to selection icon" src="icons/zoom-to-selection.svg" />
+        </button>
+        <button
+          class="${this.resultsSelected ? 'gg-icon-button gg-medium' : 'gg-icon-button gg-medium disabled'}"
+          ?disabled="${!this.resultsSelected}"
+          onclick="${() => this.generateCSV()}"
+          tip="Generate CSV">
+          <img alt="download csv icon" src="icons/arrow-download.svg" />
+        </button>
+        <button
+          class="gg-icon-button gg-medium"
+          onclick="${() => this.closePanel()}"
+          tip="Clear results and close Panel">
+          <img alt="close-icon" src="icons/close.svg" />
+        </button>
+      </div>
+    </div>
+    <div id="tabulator"></div>
+  </div>
+  <div id="gutter"></div>
+</div>

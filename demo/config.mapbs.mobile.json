@@ -1,0 +1,15 @@
+{
+  "themes": {
+    "url": "https://map.geo.bs.ch/themes?background=background&interface=mobile"
+  },
+  "search": {
+    "url": "https://map.geo.bs.ch/search?limit=90&partitionlimit=15&interface=mobile&query=###SEARCHTERM###&lang=###SEARCHLANG###"
+  },
+  "map": {
+    "constrainScales": false
+  },
+  "offline": {
+    "downloadStartZoom": 7,
+    "downloadEndZoom": 11
+  }
+}

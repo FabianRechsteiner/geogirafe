@@ -1,0 +1,204 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+input {
+  border: 1px solid var(--bkg-color-grad1);
+  width: inherit;
+  padding-right: 0;
+  background-color: var(--bkg-color-input);
+}
+input:focus {
+  border: 1px solid var(--lt-color-gray-900);
+}
+
+button {
+  border: solid 1px var(--bkg-color);
+  color: var(--text-color);
+  padding: 0;
+  background-color: var(--bkg-color);
+  cursor: pointer;
+}
+button:hover {
+  border: solid 1px var(--text-color-grad2);
+}
+button.selected {
+  border: solid 1px var(--text-color-grad2);
+  background-color: var(--bkg-color-grad1);
+  color: var(--bkg-color);
+}
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.label-container {
+  flex-grow: 1;
+}
+
+.text-end {
+  text-align: end;
+}
+
+.icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: var(--text-color);
+  margin: 3px;
+  flex-shrink: 0;
+}
+.icon:hover {
+  fill: var(--text-color-grad2);
+}
+.gg-icon-button:hover {
+  border: none;
+}
+.colorPicker {
+  border-radius: 5px;
+  border: 1px solid var(--text-color);
+}
+.picker_wrapper {
+  transform: translateX(-250px);
+}
+.picker_arrow {
+  transform: translateX(200px) rotate(90deg) scaleX(-1) !important;
+}
+.picker_wrapper,
+.picker_arrow::after,
+.picker_arrow::before {
+  background-color: var(--bkg-color) !important;
+}
+.picker_wrapper,
+.picker_arrow::before {
+  box-shadow: 0 0 10px 1px var(--text-color-grad1) !important;
+}
+button:disabled,
+input:disabled,
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+fieldset.field-wrapper {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+#panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--text-color);
+}
+#panel > div {
+  padding: 1rem;
+}
+#toolParametersContainer {
+  .title {
+    margin-top: 0.5rem;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.toolParameters {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.25rem;
+  justify-content: left;
+}
+
+.toolParameters > label {
+  padding: 0 5px;
+}
+
+#drawingListContainer {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1;
+  padding-top: 0 !important;
+
+  .titleContainer {
+    display: flex;
+    margin-bottom: 1rem;
+
+    .title {
+      display: flex;
+      flex-grow: 1;
+      align-items: center;
+    }
+  }
+}
+#drawingList {
+  display: flex;
+  flex-flow: column;
+  gap: 0.15rem;
+}
+
+#drawingList .girafe {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.3rem;
+  border: solid 1px var(--text-color);
+}
+#drawingList .girafe span {
+  flex-grow: 1;
+  padding-left: 5px;
+}
+
+#options {
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px -2px 3px -1px var(--text-color-grad1);
+  position: relative;
+  z-index: 100;
+}
+#optionsTitle {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+#options hr {
+  width: 100%;
+  margin: 8px 0;
+}
+#optionsTextLines,
+#optionsColorLine,
+#optionsLineLines {
+  display: grid;
+  align-items: center;
+}
+#optionsText {
+  margin: auto;
+}
+#optionsTextLines {
+  grid-template-columns: 2fr 2fr 1fr 4em 1fr 1fr;
+}
+#optionsTextLines button:hover {
+  border: none;
+}
+#optionsColor,
+#optionsLine,
+#optionsExport,
+#optionsArrow {
+  margin: auto;
+}
+#optionsColorLine {
+  display: flex;
+}
+#optionsColorLine > div {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+#optionsLineLines {
+  grid-template-columns: 3fr 4em 1fr auto;
+}
+#optionsArrowStyle {
+  grid-template-columns: 3fr 4em 1fr auto;
+}
+#optionsExportLine {
+  display: flex;
+  gap: 0.2rem;
+  grid-template-columns: 60px 60px 45px 45px;
+}

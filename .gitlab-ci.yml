@@ -1,0 +1,453 @@
+stages:
+  - test
+  - versioning
+  - build
+  - publish
+  - pages
+  - scan
+
+#################################
+# https://docs.gitlab.com/ee/ci/yaml/workflow.html#switch-between-branch-pipelines-and-merge-request-pipelines
+# The workflow is the following one:
+# Branch pipelines will be run when NO merge request is for the branch.
+# Otherwise, Merge-Request pipelines will run when a merge request IS open for the branch.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+#################################
+# Define pipeline variables
+variables:
+  SONAR_USER_HOME: '${CI_PROJECT_DIR}/.sonar' # Defines the location of the analysis task cache
+  GIT_DEPTH: '0' # Tells git to fetch all the branches of the project, required by the analysis task
+  MAIN_PROJECT: 'geogirafe/gg-viewer'
+  MAIN_BRANCH: 'main'
+  DOCKER_IMAGE: 'geogirafe/viewer'
+
+#################################
+# Audit NPM dependencies to find any known vulnerability
+npm-audit:
+  stage: test
+  image: node:20-slim
+  allow_failure: true
+
+  script:
+    - npm ci
+    - npm audit --omit=dev --audit-level high
+    - npm audit signatures
+
+#################################
+# Audit NPM dependencies to find any known vulnerability
+npm-outdated:
+  stage: test
+  image: node:20-slim
+  allow_failure: true
+
+  script:
+    - npm ci
+    # Fail if a non-dev dependency is outdated
+    - npm outdated --omit=dev
+    # Run npm outdated on all dependencies but do not fail
+    - npm outdated || true
+
+#################################
+# ESLint
+eslint:
+  stage: test
+  image: node:20-slim
+
+  script:
+    - npm ci
+    - npm run lint
+
+#################################
+# Unit-Tests
+unittests:
+  stage: test
+  image: node:20-slim
+
+  script:
+    - npm ci
+    - npm run test
+
+  artifacts:
+    paths:
+      - coverage/lcov.info
+
+#################################
+# Quality, readability, reliability and security checks with Sonarcloud
+sonarcloud-check:
+  stage: test
+  needs:
+    - job: unittests
+      artifacts: true
+
+  rules:
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+    - when: never
+
+  variables:
+    SONAR_VERSION: '11'
+
+  image:
+    name: sonarsource/sonar-scanner-cli:${SONAR_VERSION}
+    entrypoint: ['']
+  cache:
+    key: '${CI_JOB_NAME}_v${SONAR_VERSION}'
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner
+
+#################################
+# Static Application Security Testing with GitLab
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
+#################################
+# For dev: increment version number (X.Y.Z-PIPILINE-ID)
+# For tag: set version to the tag name
+versioning:
+  stage: versioning
+  image: debian:stable-slim
+
+  needs:
+    - job: eslint
+      artifacts: false
+    - job: unittests
+      artifacts: false
+
+  before_script:
+    - apt update && apt -y install jq
+  script:
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        VERSION="${CI_COMMIT_TAG#v}"
+        jq --arg version "$VERSION" '.version = $version' package.json > package-temp.json
+      else
+        jq --arg build "$CI_PIPELINE_ID" '.version = (.version | split(".") | .[0] + "." + .[1] + "." + .[2] + "-dev." + $build)' package.json > package-temp.json
+      fi
+    - rm package.json && mv package-temp.json package.json
+
+  artifacts:
+    paths:
+      - package.json
+
+#################################
+# Build the application for production
+build-app:
+  stage: build
+  image: node:20-slim
+  needs:
+    - job: versioning
+      artifacts: true
+  when: on_success
+
+  before_script:
+    - apt update && apt -y install jq
+  script:
+    - npm ci
+    - npm run build
+    # List all dependencies
+    - npm list --all --omit=dev
+    # Generate Version Number
+    - version=$(jq -r '.version' package.json)
+    - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > dist/app/about.json
+
+  artifacts:
+    paths:
+      - dist/app
+
+#################################
+# Build an Android APK Package
+build-apk:
+  stage: build
+  image: geogirafe/cordova-builder
+  needs:
+    - job: build-app
+      artifacts: true
+  when: on_success
+
+  before_script:
+    - ls
+  script:
+    - chmod +x ./buildtools/cordova/apk-build.sh && ./buildtools/cordova/apk-build.sh "ci"
+
+  artifacts:
+    paths:
+      - dist/apk
+
+#################################
+# Build the library for production
+build-lib:
+  stage: build
+  image: node:20-slim
+  needs:
+    - job: versioning
+      artifacts: true
+  when: on_success
+
+  before_script:
+    - apt update && apt -y install jq
+  script:
+    - npm ci
+    - npm run build-lib
+    # List all dependencies
+    - npm list --all --omit=dev
+    # Generate Version Number
+    - version=$(jq -r '.version' package.json)
+    - echo '{"version":"'$version'", "build":"'$CI_PIPELINE_ID'", "date":"'$(date +'%d/%m/%Y')'"}' > dist/lib/templates/public/about.json
+  artifacts:
+    paths:
+      - dist/lib
+
+#################################
+# Publish the library to npm
+build-sample-app:
+  stage: build
+  image: node:20-slim
+  needs:
+    - job: build-lib
+      artifacts: true
+  when: on_success
+
+  before_script:
+    - apt update && apt -y install git
+  script:
+    # Check if the sample application can be created
+    - npm create @geogirafe/template@latest sample-app ci ./dist/lib
+    - cd sample-app && npm run build
+  artifacts:
+    paths:
+      - sample-app/dist/app
+
+#################################
+# Optimize files with gzip and brotli before deploying
+optimize:
+  stage: publish
+  needs:
+    - job: build-app
+      artifacts: true
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH && $CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+    - if: '$CI_MERGE_REQUEST_ID && $CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+    - when: never
+
+  before_script:
+    - apt update && apt -y install brotli
+  script:
+    # Compress all files
+    - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec brotli -k -f {} \;
+    - find dist/app -type f -regex '.*\.\(html\|css\|js\|json\)' -exec gzip -k -f {} \;
+
+  artifacts:
+    paths:
+      - dist/app
+
+#################################
+# Create a docker image with the production build
+publish-docker:
+  stage: publish
+  image: docker:28
+  services:
+    - docker:28-dind
+  needs:
+    - job: optimize
+      artifacts: true
+
+  rules:
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT && $CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: on_success
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT && $CI_COMMIT_TAG'
+      when: on_success
+    - when: never
+
+  before_script:
+    - docker info
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+
+  script:
+    # Calculate docker tag
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        DOCKER_TAG="${CI_COMMIT_TAG#v}"
+      else
+        DOCKER_TAG="latest"
+      fi
+    # build
+    - docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f buildtools/Dockerfile dist
+    # push
+    - docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+
+#################################
+# Publish the library to npm
+publish-lib:
+  stage: publish
+  image: node:20-slim
+  needs:
+    - job: build-lib
+      artifacts: true
+
+  rules:
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT && $CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: on_success
+    - if: '$CI_PROJECT_PATH == $MAIN_PROJECT && $CI_COMMIT_TAG'
+      when: on_success
+    - when: never
+
+  before_script:
+    - apt update
+    - npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+  script:
+    - cd dist/lib && npm publish --access public
+
+#################################
+# Configure and optimize the demo
+# Compress everything with gzip and brotli
+.prepare_demo: &prepare_demo |
+  cp -R dist/app $demo && mv $demo release/
+  ./buildtools/configure-demo.sh "$demo" "release/$demo"
+  if [ -f "release/$demo/Mock/themes.json" ]; then gzip -k -f "release/$demo/Mock/themes.json"; brotli -k -f "release/$demo/Mock/themes.json"; fi
+  if [ -f "release/$demo/config.json" ]; then gzip -k -f "release/$demo/config.json"; brotli -k -f "release/$demo/config.json"; fi
+  if [ -f "release/$demo/Mock/fr.json" ]; then gzip -k -f "release/$demo/Mock/fr.json"; brotli -k -f "release/$demo/Mock/fr.json"; fi
+  if [ -f "release/$demo/Mock/de.json" ]; then gzip -k -f "release/$demo/Mock/de.json"; brotli -k -f "release/$demo/Mock/de.json"; fi
+  if [ -f "release/$demo/Mock/en.json" ]; then gzip -k -f "release/$demo/Mock/en.json"; brotli -k -f "release/$demo/Mock/en.json"; fi
+
+#################################
+# Publish demo applications to GitLab-Pages
+pages:
+  stage: pages
+  image: debian:stable-slim
+  needs:
+    - job: optimize
+      artifacts: true
+    - job: build-sample-app
+      artifacts: true
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH && $CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+      variables:
+        PATH_PREFIX: ''
+        EXPIRE_IN: never
+    - if: '$CI_MERGE_REQUEST_ID && $CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+      variables:
+        PATH_PREFIX: 'mr-$CI_MERGE_REQUEST_IID'
+        EXPIRE_IN: 2 week
+    - when: never
+
+  pages:
+    path_prefix: $PATH_PREFIX
+    expire_in: $EXPIRE_IN
+
+  before_script:
+    - echo "Deploying $PATH_PREFIX, expires in $EXPIRE_IN"
+    - apt update && apt install -y brotli curl
+    - mkdir -p dist/app/Mock
+    - mkdir release
+    - chmod a+x ./buildtools/configure-demo.sh
+  script:
+    # Prepare all demo environments
+    - demo='c2c'
+    - *prepare_demo
+    - demo='experimental'
+    - *prepare_demo
+    - demo='cartolacote'
+    - *prepare_demo
+    - demo='cartoriviera'
+    - *prepare_demo
+    - demo='cjl'
+    - *prepare_demo
+    - demo='geocommunes'
+    - *prepare_demo
+    - demo='geogr'
+    - *prepare_demo
+    - demo='jura'
+    - *prepare_demo
+    - demo='lausanne'
+    - *prepare_demo
+    - demo='lie'
+    - *prepare_demo
+    - demo='mapbs'
+    - *prepare_demo
+    - demo='mapnv'
+    - *prepare_demo
+    - demo='schwyz'
+    - *prepare_demo
+    - demo='sigip'
+    - *prepare_demo
+    - demo='sitn'
+    - *prepare_demo
+    - demo='ticino'
+    - *prepare_demo
+    - demo='georama'
+    - *prepare_demo
+    # Copy sample-app
+    - mv sample-app/dist/app release/sample-app
+    # Rename the release directory to public
+    - rm -Rf public && mv release public
+    # Copy demo index page
+    - cp demo/index.html public/
+    - cp -R demo/static public/
+
+  artifacts:
+    paths:
+      # Directory needs to be named 'public' for GitLab Pages
+      - public
+
+#################################
+# Create a docker image with the production build
+docker-scout:
+  stage: scan
+  image: docker:28
+  services:
+    - docker:28-dind
+  needs:
+    - job: publish-docker
+      artifacts: false
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+    - when: never
+
+  before_script:
+    - apk update && apk add curl
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+    - curl -sSfL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh -s --
+  script:
+    - docker scout quickview ${DOCKER_IMAGE}
+    - docker scout cves ${DOCKER_IMAGE}
+    - docker scout recommendations ${DOCKER_IMAGE}
+
+#################################
+# Perform a baseline security scan of the application using ZAP-Proxy
+zap-baseline-scan:
+  stage: scan
+  image: zaproxy/zap-stable
+  needs:
+    - job: pages
+      artifacts: false
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH  && $CI_PROJECT_PATH == $MAIN_PROJECT'
+      when: on_success
+    - when: never
+
+  script:
+    - mkdir /zap/wrk
+    # TODO REG: By default, all alerts are reported as warnings.
+    # TODO REG: Configure which ones should be reported as "fail"
+    - /zap/zap-baseline.py -j -I -t https://demo.geomapfish.dev/mapbs/ -r report.html -w report.md -x report.xml -J report.json
+  artifacts:
+    paths:
+      - /zap/wrk

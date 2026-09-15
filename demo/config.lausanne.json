@@ -1,0 +1,92 @@
+{
+  "general": {
+    "locale": "fr-CH"
+  },
+  "languages": {
+    "translations": {
+      "fr": ["i18n/fr.json", "https://map.lausanne.ch/static/dummy/fr.json"]
+    },
+    "defaultLanguage": "fr"
+  },
+  "themes": {
+    "url": "https://map.lausanne.ch/themes?background=background&interface=desktop",
+    "defaultTheme": "default_thm"
+  },
+  "basemaps": {
+    "defaultBasemap": "fonds_geo_osm_bdcad_couleur",
+    "OSM": true,
+    "SwissTopoVectorTiles": true
+  },
+  "search": {
+    "url": "https://map.lausanne.ch/search?limit=30&partitionlimit=5&interface=desktop&query=###SEARCHTERM###&lang=fr",
+    "objectPreview": true,
+    "layerPreview": true
+  },
+  "print": {
+    "url": "https://map.lausanne.ch/printproxy/",
+    "defaultLayout": "1) A4 portrait"
+  },
+  "share": {
+    "service": "gmf",
+    "createUrl": "https://map.lausanne.ch/short/create"
+  },
+  "projections": {
+    "EPSG:3857": "W-M",
+    "EPSG:4326": "WGS84",
+    "EPSG:2056": "MN95"
+  },
+  "map": {
+    "srid": "EPSG:2056",
+    "startZoom": "1",
+    "startPosition": "2537785,1155260",
+    "maxExtent": "2523000,1146400,2556000,1166000",
+    "scales": [100000, 50000, 25000, 10000, 5000, 2500, 1000, 500, 200, 100]
+  },
+  "map3d": {
+    "terrainUrl": "https://3d.geo.admin.ch/ch.swisstopo.terrain.3d/v1/",
+    "terrainImagery": {
+      "url": "https://wmts20.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/current/4326/{z}/{x}/{y}.jpeg",
+      "minLoD": 8,
+      "maxLoD": 17,
+      "coverageArea": [5.013926957923385, 45.35600133779394, 11.477436312994008, 48.27502358353741]
+    },
+    "tilesetsUrls": ["https://vectortiles100.geo.admin.ch/3d-tiles/ch.swisstopo.swisstlm3d.3d/20201020/tileset.json"],
+    "maximumZoomDistance": 25000
+  },
+  "externalLayers": {
+    "predefinedSources": [
+      {
+        "label": "Swisstopo WMS",
+        "type": "WMS",
+        "url": "https://wms.geo.admin.ch"
+      },
+      {
+        "label": "Swisstopo WMTS",
+        "type": "WMTS",
+        "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=fr"
+      },
+      {
+        "label": "GMF background WMTS",
+        "type": "WMTS",
+        "url": "https://geomapfish-demo-2-9.camptocamp.com/tiles/1.0.0/WMTSCapabilities.xml"
+      }
+    ]
+  },
+  "contextmenu": {
+    "crs": [
+      { "code": "EPSG:2056", "translation": "EPSG:2056", "format": "decimal", "precision": 1 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326", "format": "decimal", "precision": 7 },
+      { "code": "EPSG:4326", "translation": "EPSG:4326-DMS", "format": "dms", "precision": 2 }
+    ]
+  },
+  "crs": [
+    {
+      "code": "EPSG:2056",
+      "definition": "+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs"
+    },
+    {
+      "code": "EPSG:21781",
+      "definition": "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs"
+    }
+  ]
+}

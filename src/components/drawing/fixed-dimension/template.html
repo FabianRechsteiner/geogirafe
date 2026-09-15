@@ -1,0 +1,25 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<button class="gg-icon-button icon" onclick="${() => this.toggleFixedDimensionEnabled()}">
+  ${this.htmlUnsafe(this.fixedDimensionEnabled ? this.checkedIcon : this.notCheckedIcon)}
+</button>
+<!-- //NOSONAR(web:S6847) --><label
+  class="${this.fixedDimensionEnabled ? 'gg-label' : 'gg-label disabled'}"
+  onclick="${() => this.toggleFixedDimensionEnabled()}"
+  onKeyUp="${() => this.toggleFixedDimensionEnabled()}"
+  for="fixedValue"
+  i18n="${'Fix ' + this.dimensionName + ' to'}"></label>
+<input
+  class="gg-input"
+  disabled="${!this.fixedDimensionEnabled}"
+  oninput="${(e: InputEvent) => this.fixedValueChanged(e)}"
+  type="number"
+  id="fixedValue" />
+<select
+  id="dimensionUnits"
+  class="gg-select"
+  disabled="${!this.fixedDimensionEnabled}"
+  onchange=" ${(e: Event) => this.dimensionUnitChanged(e)}">
+  ${this.units.map((unit) => uHtml`
+  <option ?selected="${this.unit?.name === unit.name}" value="${unit.factor}">${unit.name}</option>
+  `)}
+</select>

@@ -1,0 +1,187 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#panel {
+  height: 100%;
+  overflow: auto;
+  min-width: 20rem; /* For and from parent panel */
+}
+
+#content {
+  background: var(--bkg-color);
+  color: var(--text-color);
+  padding: 1.5rem;
+  margin: 0;
+}
+
+#content .message {
+  text-align: center;
+  width: 100%;
+}
+
+#content .message * {
+  margin: 0.25rem;
+}
+
+/* Print options */
+.option {
+  margin-top: 0.5rem;
+  display: flex;
+}
+
+.option label {
+  width: 40%;
+}
+
+.option label:after {
+  content: ' :';
+}
+
+.option input,
+.option select,
+.option textarea {
+  flex-grow: 1;
+}
+
+.option input.gg-checkbox {
+  flex-grow: 0;
+}
+
+.rotation {
+  flex-grow: 1;
+  display: flex;
+  gap: 0.5rem;
+}
+
+#rotationSlider {
+  width: 0;
+}
+
+#rotationNumber {
+  width: 4rem;
+  flex-grow: 0;
+}
+
+/* List of reports */
+#content #export-pdf {
+  float: right;
+  margin-top: 1rem;
+}
+
+#content button {
+  background-color: var(--bkg-color);
+  color: var(--text-color);
+  border-radius: 3px;
+  outline: 0;
+  border: solid 1px var(--text-color);
+  cursor: pointer;
+}
+
+#content button:hover {
+  background-color: var(--bkg-color-grad2);
+}
+
+#content #print-list {
+  margin-top: 5rem;
+}
+
+#print-list .print-item {
+  position: relative;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  border: solid 1px var(--text-color);
+  color: var(--text-color);
+}
+
+#print-list .print-item .container {
+  border: none;
+  display: inline;
+  text-align: unset;
+  width: 100%;
+}
+
+#print-list .print-item .cancel {
+  cursor: pointer;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: var(--text-color-grad1);
+  border: none;
+  background-color: transparent;
+}
+
+.print-item .cancel i:before {
+  content: '\f00d';
+}
+
+.print-item .cancel:hover {
+  border-color: var(--text-color);
+  color: var(--text-color);
+}
+
+.print-item i.status {
+  margin-right: 1rem;
+  float: left;
+  width: 3rem;
+  text-align: center;
+}
+
+.print-item:has(.success):hover {
+  background-color: var(--bkg-color-grad2);
+  cursor: pointer;
+}
+
+.print-item i.status::before {
+  line-height: 3rem;
+  display: block;
+}
+
+.print-item p {
+  line-height: 1.3rem;
+}
+
+.print-item p.time {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-right: 0.5rem;
+}
+
+#custom-scale {
+  color: var(--text-color);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+#custom-scale .svg-info {
+  margin-left: 0.5rem;
+}
+
+#custom-scale > div {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.gg-custom-scale {
+  justify-content: flex-end;
+}
+
+.warning {
+  padding: 0.5rem;
+  border-top: solid 1px #333;
+  border-bottom: solid 1px #333;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.warning h3 {
+  margin: 0;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.warning span {
+  display: block;
+}

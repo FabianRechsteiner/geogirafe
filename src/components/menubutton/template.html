@@ -1,0 +1,11 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div class="container">
+  <slot
+    name="menu-button"
+    onclick="${() => this.toggleMenu()}"
+    onkeydown="${(e:KeyboardEvent) => this.simulateClick(e)}"></slot>
+
+  <div class="${this.getClass()}">
+    <slot name="menu-content"></slot>
+  </div>
+</div>

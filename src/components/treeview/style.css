@@ -1,0 +1,118 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+header {
+  border-top: solid 1px #ddd;
+  display: flex;
+  align-items: center;
+  height: 2rem;
+}
+
+.tool {
+  display: none !important;
+}
+
+header:hover .tool {
+  display: flex !important;
+}
+
+.tool.active {
+  display: flex !important;
+  opacity: 1 !important;
+  order: 100;
+}
+
+.label-container {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  overflow: auto;
+}
+
+.label-out-resolution span {
+  font-style: italic;
+}
+
+.resolution-tool {
+  margin-left: 0.5rem;
+}
+
+.legend {
+  display: flex;
+}
+
+.legend img {
+  height: fit-content;
+  background: var(--svg-legend-bkg);
+  filter: var(--svg-map-filter);
+}
+
+.legend-icon {
+  max-height: 1.5rem;
+  margin-left: 0.5rem;
+  background: var(--svg-legend-bkg);
+  filter: var(--svg-map-filter);
+}
+
+.children {
+  padding-left: 1.3rem;
+  flex-basis: 100%;
+  order: 10;
+}
+
+.dragAfter {
+  border-bottom: dashed 1rem #ccc;
+}
+
+.dragBefore {
+  border-top: dashed 1rem #ccc;
+}
+
+.gg-checkbox {
+  width: 1.2rem;
+}
+.gg-caret,
+.gg-spacer {
+  width: 1.5rem;
+  padding: 0;
+  text-align: center;
+}
+.gg-caret {
+  transform: scale(130%);
+}
+.gg-caret.gg-rotate90 {
+  transform: scale(130%) rotate(90deg);
+}
+.gg-small.gg-lock {
+  min-width: 1rem;
+}
+.gg-tree-label {
+  text-align: left;
+  padding-left: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.gg-grab:hover {
+  cursor: grab;
+}
+.gg-selected {
+  opacity: 1;
+}
+
+.legend-file {
+  display: flex;
+  font-style: italic;
+  color: var(--text-color);
+}
+
+@keyframes headerFade {
+  from {
+    background-color: var(--highlight-color);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.highlight {
+  animation: headerFade 3s ease-in-out forwards;
+}

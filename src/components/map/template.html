@@ -1,0 +1,25 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<link rel="stylesheet" href="lib/ol/ol.css" />
+
+<div id="container">
+  <div id="ol-map"></div>
+  <div class="ol-location ol-unselectable ol-control">
+    <button onclick="${()=>this.locateUser()}" class="btn-location">
+      <img class="img-location" alt="location-icon" src="icons/adjust.svg" />
+    </button>
+    <button id="disable-location" onclick="${()=>this.disableLocateUser()}" class="btn-disable-location hidden">
+      <img class="img-disable-location" alt="disable-location-icon" src="icons/adjust-disable.svg" />
+    </button>
+  </div>
+  <div id="cs-map">
+    <div class="${this.loading ? 'loading center' : 'loading hidden'}">
+      <img alt="loading-icon" src="icons/loading.svg" class="gg-spin" />
+      <span i18n="Loading cesium...">Loading cesium...</span>
+      <span class="quote" i18n="cesium-loading-quote"
+        >Please be patient, like a giraffe reaching for the tastiest leaves.</span
+      >
+    </div>
+  </div>
+  <input id="swiper" type="range" min="0" max="1000" step="1" />
+  <button tip="Hide Swiper" id="close-swiper" class="close-swiper">×</button>
+</div>

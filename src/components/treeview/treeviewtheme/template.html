@@ -1,0 +1,39 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<link rel="stylesheet" href="lib/tippy.js/tippy.css" />
+<link rel="stylesheet" href="lib/tippy.js/backdrop.css" />
+<link rel="stylesheet" href="lib/tippy.js/border.css" />
+<link rel="stylesheet" href="lib/tippy.js/svg-arrow.css" />
+
+<div id="container">
+  <header>
+    <!-- Label -->
+    <div class="label-container">
+      <button
+        class="gg-icon-button gg-small theme-button"
+        onclick="${() => (this.layer as ThemeLayer).isExpanded = !(this.layer as ThemeLayer).isExpanded}">
+        <img alt="theme-icon" src="icons/theme.svg" />
+        <span i18n="${this.layer.name}" class="gg-tree-label"> ${this.layer.name} </span>
+      </button>
+    </div>
+
+    <!-- Remove icon -->
+    <button class="${this.getButtonClass('removable')}" tip="Remove theme" onclick="${() => this.deleteTheme()}">
+      <img alt="Remove theme" src="icons/trash.svg" />
+    </button>
+
+    <!-- Drag -->
+    <button id="drag-button" class="${this.getButtonClass('draggable')}" tip="Move">
+      <img alt="Move layer" src="icons/drag.svg" />
+    </button>
+  </header>
+
+  <!-- Sub layers -->
+  <div class="${(((this.layer as ThemeLayer).isExpanded && this.layer.isVisible) ? 'children' : 'hidden')}">
+    <!-- prettier-ignore -->
+    ${this.sortedChildren().filter(layer => layer.isVisible).map(layer => (layer instanceof GroupLayer) ? uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-group groupid="${layer.treeItemId}"></girafe-tree-view-group>
+    ` : uHtmlFor(layer, layer.treeItemId)`
+    <girafe-tree-view-item layerid="${layer.treeItemId}"></girafe-tree-view-item>
+    `)}
+  </div>
+</div>

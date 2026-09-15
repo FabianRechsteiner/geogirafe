@@ -1,0 +1,350 @@
+// SPDX-License-Identifier: Apache-2.0
+import GirafeSingleton from '../../base/GirafeSingleton';
+import LayerWmts from '../../models/layers/layerwmts';
+import { Feature } from 'ol';
+import { Extent } from 'ol/extent';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import { fromExtent } from 'ol/geom/Polygon';
+import Style from 'ol/style/Style';
+import { Stroke } from 'ol/style';
+import { TileGrid } from 'ol/tilegrid';
+import { WMTS } from 'ol/source';
+import { Projection } from 'ol/proj';
+
+class OfflineManager extends GirafeSingleton {
+  private serviceWorker: ServiceWorker | null = null;
+
+  private database?: IDBDatabase;
+
+  private get map() {
+    return this.context.mapManager.getMap();
+  }
+
+  private get state() {
+    return this.context.stateManager.state;
+  }
+
+  private totalLength: number = 0;
+  private counter: number = 0;
+  private progressCallback?: CallableFunction;
+
+  private storeVersion?: number;
+  private dbCacheName?: string;
+  private readonly tilesStoreName = 'tiles';
+  private readonly bboxStoreName = 'bbox';
+
+  private readonly vectorLayer = new VectorLayer({
+    style: new Style({
+      stroke: new Stroke({
+        color: 'red',
+        width: 5
+      })
+    })
+  });
+
+  public override initializeSingleton() {
+    this.map.addLayer(this.vectorLayer);
+  }
+
+  public initializeOfflineState(isOffline: boolean) {
+    this.registerEvents();
+    this.context.stateManager.state.isOffline = isOffline;
+  }
+
+  private registerEvents() {
+    window.addEventListener('offline', () => {
+      this.state.isOffline = true;
+    });
+    window.addEventListener('online', () => {
+      this.state.isOffline = false;
+    });
+    this.context.stateManager.subscribe('isOffline', () => {
+      this.switchOffline();
+    });
+  }
+
+  /** Exports all the WMTS tiles for the layers in parameter and store them to local cache */
+  public async exportWMTSTiles(bbox: Extent, wmtsLayers: LayerWmts[], progressCallback?: CallableFunction) {
+    this.progressCallback = progressCallback;
+    await this.saveBoundingBox(bbox);
+    const tileUrls = this.getAllTileUrls(bbox, wmtsLayers);
+    await this.fetchAndSaveTiles(tileUrls);
+  }
+
+  private async openIndexedDB(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      console.debug('Opening IndexedDB');
+      const request = indexedDB.open(this.dbCacheName!, this.storeVersion);
+
+      let timedOut = false;
+      const timeoutId = setTimeout(() => {
+        timedOut = true;
+        console.debug('Timeout while opening IndexedDB');
+        reject(new Error('Timeout while opening IndexedDB'));
+      }, 3000);
+
+      request.onerror = (event) => {
+        if (!timedOut) {
+          clearTimeout(timeoutId);
+          const message = (event.target as IDBOpenDBRequest).error?.message;
+          console.debug(`IndexedDB could not be opened : ${message}`);
+          reject(new Error(message));
+        }
+      };
+
+      request.onsuccess = (event) => {
+        if (!timedOut) {
+          clearTimeout(timeoutId);
+          console.debug('IndexedDB is open');
+          resolve((event.target as IDBOpenDBRequest).result);
+        }
+      };
+
+      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+        // Version migration is necessary.
+        // open the indexedDB and create the new structure
+        console.debug('Upgrading IndexedDB');
+        const database = (event.target as IDBOpenDBRequest).result;
+        // First : a store for tiles
+        const tilesStore = database.createObjectStore('tiles', { autoIncrement: true });
+        tilesStore.createIndex('url', 'url', { unique: true });
+        // Second : A store for offline available bbox
+        database.createObjectStore('bbox', { autoIncrement: true });
+        console.debug('IndexedDB upgraded.');
+        resolve(database);
+      };
+    });
+  }
+
+  /** The offline manager works with a ServiceWorker in charge of intercepting
+   * the fetch requests and read the data from the local cache if the application
+   * is offline. This method defines the servicework object to use.
+   * Without this, the offline mode won't work.
+   */
+  public async setServiceWorker(sw: ServiceWorker | null, storeVersion: number, dbCacheName: string) {
+    if (!sw) {
+      console.warn("ServiceWorker cannot be initialized. Offline functionalities won't be available.");
+      return;
+    }
+    this.serviceWorker = sw;
+    this.storeVersion = storeVersion;
+    this.dbCacheName = dbCacheName;
+    this.database = await this.openIndexedDB();
+    this.serviceWorker.postMessage({
+      storeVersion: this.storeVersion,
+      dbCacheName: this.dbCacheName,
+      tilesStoreName: this.tilesStoreName
+    });
+  }
+
+  public switchOffline() {
+    if (this.context.stateManager.state.isOffline) {
+      this.displayBoundBoxes();
+    } else if (this.vectorLayer) {
+      this.vectorLayer.setSource(null);
+    }
+  }
+
+  private getAllTileUrls(bbox: Extent, wmtsLayers: LayerWmts[]) {
+    const tileUrls: string[] = [];
+    for (const wmtsLayer of wmtsLayers) {
+      const layerSource = wmtsLayer._olayer?.getSource();
+      if (layerSource) {
+        const tileGrid = layerSource.getTileGrid();
+        if (tileGrid) {
+          tileUrls.push(...this.getTileUrlsForWmtsLayer(tileGrid, bbox, layerSource));
+        }
+      }
+    }
+    return tileUrls;
+  }
+
+  private getTileUrlsForWmtsLayer(tileGrid: TileGrid, bbox: Extent, layerSource: WMTS): string[] {
+    const minZoom = tileGrid.getMinZoom();
+    const resolution = this.map.getView().getResolution() as number;
+    const currentZ = tileGrid.getZForResolution(resolution);
+
+    const maxZoom = currentZ;
+    if (!maxZoom) {
+      throw new Error('Offline configuration is missing. Cannot download maps for offline usage.');
+    }
+
+    const projection = layerSource.getProjection() as Projection;
+    const tileUrls: string[] = [];
+    for (let z = minZoom; z <= maxZoom; z++) {
+      const tileRange = tileGrid.getTileRangeForExtentAndZ(bbox, z);
+      for (let x = tileRange.minX; x <= tileRange.maxX; ++x) {
+        for (let y = tileRange.minY; y <= tileRange.maxY; ++y) {
+          const tileUrl = layerSource.getTileUrlFunction()([z, x, y], window.devicePixelRatio, projection);
+          if (tileUrl) {
+            tileUrls.push(tileUrl);
+          }
+        }
+      }
+    }
+    return tileUrls;
+  }
+
+  private async fetchAndSaveTiles(tileUrls: string[]) {
+    this.totalLength = tileUrls.length;
+    console.debug(`Number of Tile to load: ${this.totalLength}`);
+    const iterator = tileUrls.values();
+
+    // Use 4 parallel workers to download tiles
+    this.counter = 0;
+    const workers = Array(4)
+      .fill(iterator)
+      .map((iterator) => this.doWork(iterator));
+    Promise.allSettled(workers).then(() => {
+      console.debug('Everything downloaded.');
+      if (this.progressCallback) {
+        // Last info : 100% done
+        this.progressCallback(100);
+      }
+    });
+  }
+
+  private async doWork(iterator: IterableIterator<string>) {
+    for (const url of iterator) {
+      const response = await fetch(url);
+      if (response.ok) {
+        response.blob().then((blob) => {
+          const transaction = this.database!.transaction([this.tilesStoreName], 'readwrite');
+          const store = transaction.objectStore(this.tilesStoreName);
+          const index = store.index('url');
+          const dbRequest = index.getKey(url);
+          dbRequest.onsuccess = () => {
+            let request;
+            if (dbRequest.result) {
+              const key = dbRequest.result;
+              request = store.put({ url: url, data: blob }, key);
+            } else {
+              request = store.put({ url: url, data: blob });
+            }
+
+            request.onsuccess = () => {
+              if (this.progressCallback) {
+                this.progressCallback(Math.round((this.counter * 100) / this.totalLength));
+              }
+              console.debug(`${this.counter++}/${this.totalLength} Tile ${url} added.`);
+            };
+            request.onerror = () => {
+              console.error(`Error while saving tile ${url}`);
+            };
+          };
+        });
+      }
+    }
+  }
+
+  public async getTotalSizeMB(): Promise<number> {
+    return new Promise((resolve, reject) => {
+      if (!this.database) {
+        reject(new Error('Database is not initialized.'));
+        return;
+      }
+
+      const transaction = this.database.transaction([this.tilesStoreName], 'readonly');
+      const store = transaction.objectStore(this.tilesStoreName);
+      const request = store.openCursor();
+
+      let totalBytes = 0;
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          const value = cursor.value;
+          if (value && value.data instanceof Blob) {
+            totalBytes += value.data.size;
+          }
+          cursor.continue();
+        } else {
+          // No more entries
+          const totalMB = totalBytes / (1024 * 1024);
+          resolve(totalMB);
+        }
+      };
+
+      request.onerror = () => {
+        reject(new Error('Failed to iterate over store to compute size.'));
+      };
+    });
+  }
+
+  private async clearStore(storeName: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.database) {
+        reject(new Error('Database is not initialized.'));
+        return;
+      }
+
+      const transaction = this.database.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = store.clear();
+
+      request.onsuccess = () => {
+        console.debug(`Store "${storeName}" cleared successfully.`);
+        resolve();
+      };
+
+      request.onerror = () => {
+        reject(new Error(`Failed to clear store "${storeName}".`));
+      };
+    });
+  }
+
+  public async clearTileStore() {
+    this.clearStore(this.tilesStoreName);
+  }
+
+  public async clearBBoxStore() {
+    this.vectorLayer.setSource(null);
+    this.clearStore(this.bboxStoreName);
+  }
+
+  private async saveBoundingBox(bbox: Extent) {
+    if (this.database === undefined) {
+      this.database = await this.openIndexedDB();
+    }
+
+    // Save bbox to the store
+    const transaction = this.database.transaction([this.bboxStoreName], 'readwrite');
+    const store = transaction.objectStore(this.bboxStoreName);
+    const request = store.put(bbox);
+    request.onsuccess = () => {
+      console.debug('BBOX Added to store');
+    };
+    request.onerror = () => {
+      console.error('Error while saving bbox');
+    };
+  }
+
+  public async displayBoundBoxes() {
+    if (this.database === undefined) {
+      this.database = await this.openIndexedDB();
+    }
+
+    // Read bbox for offline tiles
+    const transaction = this.database.transaction([this.bboxStoreName], 'readonly');
+    const store = transaction.objectStore(this.bboxStoreName);
+    const request = store.getAll();
+    request.onsuccess = () => {
+      const vectorSource = new VectorSource();
+      if (request.result) {
+        for (const bbox of request.result) {
+          const feature = new Feature({
+            geometry: fromExtent(bbox)
+          });
+          vectorSource.addFeature(feature);
+        }
+      }
+      this.vectorLayer.setSource(vectorSource);
+    };
+    request.onerror = () => {
+      console.error('Error while saving bbox');
+    };
+  }
+}
+
+export default OfflineManager;

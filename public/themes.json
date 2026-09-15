@@ -1,0 +1,179 @@
+{
+  "ogcServers": {
+    "avShFarbig": {
+      "url": "https://wms.geo.sh.ch/av_wms_farbig_umfrage_2026",
+      "wfsSupport": false,
+      "type": "other",
+      "imageType": "image/png"
+    },
+    "avShGraustufen": {
+      "url": "https://wms.geo.sh.ch/av_wms_graustufen_umfrage_2026",
+      "wfsSupport": false,
+      "type": "other",
+      "imageType": "image/png"
+    },
+    "avShSchwarzweiss": {
+      "url": "https://wms.geo.sh.ch/av_wms_schwarzweiss_umfrage_2026",
+      "wfsSupport": false,
+      "type": "other",
+      "imageType": "image/png"
+    },
+    "avShDarkmode": {
+      "url": "https://wms.geo.sh.ch/av_wms_darkmode_umfrage_2026",
+      "wfsSupport": false,
+      "type": "other",
+      "imageType": "image/png"
+    }
+  },
+  "background_layers": [
+    {
+      "id": 1001,
+      "name": "Vectormap Lightbasemap",
+      "type": "VectorTiles",
+      "style": "styles/ch.vectormap.lightbasemap.json",
+      "metadata": {
+        "isLegendExpanded": false,
+        "wasLegendExpanded": false,
+        "exclusiveGroup": false,
+        "isExpanded": false,
+        "isChecked": true,
+        "thumbnail": "images/logo/vectormap-vertical.png"
+      }
+    },
+    {
+      "id": 1002,
+      "name": "Swissimage",
+      "type": "WMTS",
+      "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=de",
+      "layer": "ch.swisstopo.swissimage",
+      "imageType": "jpeg",
+      "style": "default",
+      "metadata": {
+        "isLegendExpanded": false,
+        "wasLegendExpanded": false,
+        "exclusiveGroup": false,
+        "isExpanded": false,
+        "isChecked": false,
+        "thumbnail": "images/logo/vectormap-vertical.png"
+      }
+    }
+  ],
+  "themes": [
+    {
+      "id": 1,
+      "name": "Vectormap",
+      "icon": "images/logo/vectormap-logo.png",
+      "functionalities": {},
+      "metadata": {
+        "isExpanded": true,
+        "isLegendExpanded": false,
+        "wasLegendExpanded": false,
+        "exclusiveGroup": false,
+        "isChecked": true
+      },
+      "children": [
+        {
+          "id": 11,
+          "name": "Referenzdaten",
+          "metadata": {
+            "isLegendExpanded": false,
+            "wasLegendExpanded": false,
+            "exclusiveGroup": false,
+            "isExpanded": true,
+            "isChecked": false
+          },
+          "children": [
+            {
+              "id": 111,
+              "name": "Swissimage 10 cm (WMTS)",
+              "type": "WMTS",
+              "url": "https://wmts.geo.admin.ch/1.0.0/WMTSCapabilities.xml?lang=de",
+              "layer": "ch.swisstopo.swissimage",
+              "imageType": "jpeg",
+              "style": "default",
+              "metadata": {
+                "isLegendExpanded": false,
+                "wasLegendExpanded": false,
+                "exclusiveGroup": false,
+                "isExpanded": false,
+                "isChecked": false,
+                "opacity": 0.85
+              }
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "AV WMS Schaffhausen",
+          "mixed": true,
+          "metadata": {
+            "isLegendExpanded": false,
+            "wasLegendExpanded": false,
+            "exclusiveGroup": false,
+            "isExpanded": true,
+            "isChecked": false
+          },
+          "children": [
+            {
+              "id": 121,
+              "name": "Farbig",
+              "type": "WMS",
+              "ogcServer": "avShFarbig",
+              "layers": "Farbig | couleur",
+              "metadata": {
+                "isLegendExpanded": false,
+                "wasLegendExpanded": false,
+                "exclusiveGroup": false,
+                "isExpanded": false,
+                "isChecked": false
+              }
+            },
+            {
+              "id": 122,
+              "name": "Graustufen",
+              "type": "WMS",
+              "ogcServer": "avShGraustufen",
+              "layers": "Graustufen | niveaux de gris",
+              "metadata": {
+                "isLegendExpanded": false,
+                "wasLegendExpanded": false,
+                "exclusiveGroup": false,
+                "isExpanded": false,
+                "isChecked": false
+              }
+            },
+            {
+              "id": 123,
+              "name": "Schwarz-Weiss",
+              "type": "WMS",
+              "ogcServer": "avShSchwarzweiss",
+              "layers": "Schwarz-Weiss | noir-blanc",
+              "metadata": {
+                "isLegendExpanded": false,
+                "wasLegendExpanded": false,
+                "exclusiveGroup": false,
+                "isExpanded": false,
+                "isChecked": false
+              }
+            },
+            {
+              "id": 124,
+              "name": "Dark Mode",
+              "type": "WMS",
+              "ogcServer": "avShDarkmode",
+              "layers": "Dark Mode | mode sombre",
+              "metadata": {
+                "isLegendExpanded": false,
+                "wasLegendExpanded": false,
+                "exclusiveGroup": false,
+                "isExpanded": false,
+                "isChecked": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

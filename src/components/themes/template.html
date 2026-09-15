@@ -1,0 +1,73 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<button
+  class="gg-icon-button gg-big-withtext"
+  tip="Theme selection"
+  onclick="${() => this.toggleThemesList()}"
+  part="themes-button">
+  <img
+    alt="menu-icon"
+    src="icons/themes.svg"
+    class="${(!this.state.loading ? (this.openedOnce ? '' : 'gg-spin-wait') : 'hidden')}" />
+  <img alt="loading-icon" src="icons/loading.svg" class="${(this.state.loading ? 'gg-spin' : 'hidden')}" />
+  <span i18n="Themes">Themes</span>
+</button>
+
+<div class="${(this.menuOpen ? 'themes' : 'hidden')}" part="themes-content">
+  <div id="themes-type-chooser">
+    <div class="gg-tabs">
+      ${Object.values(ThemeTypes).map((themeType) => uHtml`
+      <button
+        id="${'choose-themes-type-' + themeType}"
+        i18n="${'themes-type-' + themeType}"
+        class="${this.isThemeTypeActive(themeType) ? 'gg-tab active' : 'gg-tab'}"
+        .active="${this.isThemeTypeActive(themeType)}"
+        onclick="${() => this.activateThemeType(themeType)}"></button>
+      `)}
+    </div>
+  </div>
+  <div id="active-themes">
+    ${Object.values(this.activeThemes).map(theme => uHtmlFor(theme, theme.id)`
+    <div
+      role="button"
+      tabindex="0"
+      class="${this.isThemeActive(theme)? 'theme-card selected' : 'theme-card'}"
+      onkeyup="${() => this.onThemeChanged(theme)}"
+      onclick="${() => this.onThemeChanged(theme)}"
+      part="theme-card">
+      <img
+        class="${this.isThemeFavorite(theme)? 'theme-favorite yes' : 'theme-favorite'}"
+        part="theme-favorite"
+        tip="themes-add-remove-favorites"
+        alt="themes-add-remove-favorites"
+        src=""
+        onclick="${(e: Event) => this.onThemeFavoriteChanged(theme, e)}"
+        onkeyup="${(e: Event) => this.onThemeFavoriteChanged(theme, e)}" />
+      <img
+        class="${this.isCustomTheme(theme) ? 'delete-icon' : 'delete-icon placeholder'}"
+        part="theme-delete"
+        onclick="${(e: Event) => this.onDeleteCustomTheme(theme as CustomTheme, e)}"
+        onkeyup="${(e: Event) => this.onDeleteCustomTheme(theme as CustomTheme, e)}"
+        alt="delete-icon"
+        src="" />
+      <img class="theme-icon" alt="${'Icon for ' + theme.name}" src="${theme.icon}" part="theme-icon" />
+      <span i18n="${theme.name}" class="theme-name" part="theme-name">${theme.name}</span>
+      ${'category' in theme && theme.category ? uHtml`<small class="theme-category">${theme.category}</small>` : ''}
+    </div>
+    `)}
+    <div
+      role="button"
+      tabindex="0"
+      class="${this.isThemeTypeActive('custom') ? 'theme-card' : 'hidden'}"
+      onclick="${() => this.onAddCustomTheme()}"
+      onkeyup="${() => this.onAddCustomTheme()}">
+      <img class="theme-favorite placeholder" src="" alt="" disabled />
+      <img
+        class="theme-icon"
+        alt="Create custom theme"
+        src="${this.newIcon}"
+        tip="Save the current layer configuration as new theme" />
+      <span i18n="Create custom theme" class="theme-name">Create custom theme</span>
+    </div>
+  </div>
+</div>
+<div id="close-themes-menu" onclick="${() => this.onBlur()}"></div>

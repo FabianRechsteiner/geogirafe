@@ -1,0 +1,71 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#geolocation-button {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#geolocation-button:focus {
+  outline: none;
+}
+
+.black-to-red {
+  filter: invert(27%) sepia(50%) saturate(3000%) brightness(95%) contrast(100%);
+}
+
+.alpha {
+  opacity: 0.4;
+}
+
+.blink {
+  -webkit-animation: blink 2s infinite both;
+  animation: blink 2s infinite both;
+}
+
+@-webkit-keyframes blink {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0.1;
+  }
+}
+
+@keyframes blink {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0.1;
+  }
+}
+
+.black-to-blue {
+  filter: brightness(0) saturate(100%) invert(54%) sepia(97%) saturate(2988%) hue-rotate(187deg) brightness(123%)
+    contrast(101%);
+}
+
+#clock {
+  z-index: 2;
+  position: absolute;
+  background: transparent;
+  opacity: 0.5;
+  width: 200%;
+  height: 200%;
+  top: 0;
+  bottom: 0;
+  left: -50%;
+  right: 0;
+  margin: auto;
+  border-radius: 100%;
+  pointer-events: none;
+}

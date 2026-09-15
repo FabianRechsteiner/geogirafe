@@ -1,0 +1,10 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<select
+  class="gg-select"
+  onchange="${(e:Event) => { this.state.position.scale = parseInt((e.target as HTMLSelectElement).value)}}">
+  ${this.context.configManager.Config.map.scales.map((scale) => uHtml`
+  <option ?selected="${this.getFormatedScale() === this.getFormatedScale(scale)}" value="${scale}">
+    ${this.getFormatedScale(scale)}
+  </option>
+  `)}
+</select>

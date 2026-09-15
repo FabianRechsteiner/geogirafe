@@ -1,0 +1,21 @@
+<div id="get-directions-wrapper">
+  <button class="${this.directionsAvailable ? 'gg-icon-button gg-medium' : 'gg-icon-button gg-medium disabled'}"
+          ?disabled="${!this.directionsAvailable}"
+          onclick="${() => this.toggleDirectionsProviders()}" tip="Navigate to Selection">
+    <img alt="navigate to selection icon" src="icons/directions.svg" class="gg-mobile-aware-image" />
+  </button>
+  <div ?hidden="${!this.showDirectionsProvidersDropdown}">
+    <div id="directions-provider-dropdown">
+      ${this.getDirectionsProviders().map((provider) => uHtml`
+      <div
+        class="directions-provider-dropdown-item"
+        role="button"
+        onclick="${() => this.getDirectionsByUrl(provider.url)}"
+        onkeydown="${() => this.getDirectionsByUrl(provider.url)}">
+        <img src="${provider.icon}" alt="" />
+        <span i18n="${provider.label}" >${provider.label}</span>
+      </div>
+      `)}
+    </div>
+  </div>
+</div>

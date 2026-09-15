@@ -1,0 +1,100 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div id="panel">
+  <div id="content">
+    <div class="${!this.urlShortener ? '' : 'hidden'}">
+      <div class="message" i18n="Error, the shortener service is not defined.">
+        Error, the shortener service is not defined.
+      </div>
+    </div>
+
+    <!-- share tab -->
+    <div id="share-map" class="${this.urlShortener ? 'group' : 'hidden'}">
+      <h3 class="title" i18n="Share this map">Share this map</h3>
+
+      <div class="${this.awaitingShareLink ? 'disabled' : 'enabled'}">
+        <div class="link">
+          <input type="text" value="${this.shareLink}" class="gg-input" disabled />
+          <button id="btn-copy-short" class="gg-button" onclick="${() => this.generateAndCopyLink()}">
+            <img
+              alt="loading/copy"
+              src=""
+              class="${this.awaitingShareLink ? 'icon-loading' : 'icon-copy'}"
+              width="20"
+              height="20" />
+            <span
+              i18n="${this.awaitingShareLink ? 'Generating link' : (!this.shareLink ? 'Generate and copy link' : 'Copy to Clipboard')}"></span>
+          </button>
+        </div>
+
+        <img alt="share-qrcode" class="${(this.qrCode ? 'qrcode' : 'qrcode-placeholder')}" src="${this.qrCode}" />
+        <div class="${(this.success ? 'hidden' : 'qrcode error')}">
+          <img alt="error-icon" src="icons/error.svg" />
+          <span i18n="Error, can not fetch the shortener service. Please try again later.">
+            Error, can not fetch the shortener service. Please try again later.</span
+          >
+        </div>
+
+        <div class="social">
+          <button onclick="${() => this.shareFacebook()}">
+            <img alt="share-facebook" src="${this.facebookLogo}" />
+          </button>
+          <button onclick="${() => this.shareTwitter()}">
+            <img alt="share-twitter" src="${this.twitterLogo}" />
+          </button>
+          <button onclick="${() => this.shareLinkedIn()}">
+            <img alt="share-linkedin" src="${this.linkedInLogo}" />
+          </button>
+          <button onclick="${() => this.shareMail()}">
+            <img alt="share-mail" src="${this.mailLogo}" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- embed tab -->
+    <div id="embed-map" class="${this.urlShortener ? 'group' : 'hidden'}">
+      <h3 class="title" i18n="Embed this map">Embed this map</h3>
+
+      <div class="link">
+        <select class="gg-select" id="logLevel" onchange="${(evt: Event) => this.onSizeChanged(evt)}">
+          <option ?selected="${this.iframeSize === ''}" i18n="Select map size..." value="">Select map size...</option>
+          <option ?selected="${this.iframeSize === 'small'}" i18n="Small" value="small">Small</option>
+          <option ?selected="${this.iframeSize === 'medium'}" i18n="Medium" value="medium">Medium</option>
+          <option ?selected="${this.iframeSize === 'large'}" i18n="Large" value="large">Large</option>
+        </select>
+        <div class="checkbox-wrapper">
+          <label for="iframe-search-visible" i18n="Search visible">Search visible</label>
+          <input
+            type="checkbox"
+            class="gg-checkbox"
+            id="iframe-search-visible"
+            value="${this.shareState.searchComponentVisible}"
+            onchange="${(e: Event) => this.shareState.searchComponentVisible = (e.target! as HTMLInputElement).checked}" />
+        </div>
+        <div class="checkbox-wrapper">
+          <label for="iframe-basemap-visible" i18n="Basemap visible">Basemap visible</label>
+          <input
+            type="checkbox"
+            class="gg-checkbox"
+            id="iframe-basemap-visible"
+            value="${this.shareState.basemapComponentVisible}"
+            onchange="${(e: Event) => this.shareState.basemapComponentVisible = (e.target! as HTMLInputElement).checked}" />
+        </div>
+        <textarea value="${this.iframeCode}" class="gg-input gg-textarea textarea-for-code" disabled></textarea>
+        <button
+          id="btn-copy-iframe"
+          class="gg-button"
+          ?disabled="${this.iframeSize === ''}"
+          onclick="${() => this.generateAndCopyIframeCode()}">
+          <img
+            alt="loading/copy"
+            src=""
+            class="${this.awaitingIframeUrl ? 'icon-loading' : 'icon-copy'}"
+            width="20"
+            height="20" />
+          <span i18n="${this.awaitingIframeUrl ? 'Generating code' : 'Generate and copy code'}"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

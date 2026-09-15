@@ -1,0 +1,23 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<div class="${this.context.configManager.Config.oauth || this.context.configManager.Config.gmfauth ? '' : 'hidden'}">
+  <div class="${this.state.oauth.status === 'loggedIn' ? 'hidden' : 'container'}">
+    <button class="gg-icon-button gg-medium-withtext" onclick="${() => this.onLoginClick()}">
+      <img alt="menu-icon" src="icons/user.svg" />
+      <span i18n="Login">Login</span>
+    </button>
+  </div>
+  <div class="${this.state.oauth.status !== 'loggedIn' ? 'hidden' : 'container'}">
+    <button class="gg-icon-button gg-medium-withtext" onclick="${() => this.onLogoutClick()}">
+      <img
+        alt="menu-icon"
+        src="${this.userIconUrl ?? 'icons/user.svg'}"
+        class="${this.userIconUrl ? 'user-avatar' : ''}" />
+      <div class="name">
+        <span class="${this.state.oauth.userInfo?.given_name ? '' : 'hidden'}"
+          >${this.state.oauth.userInfo?.given_name + ' ' + this.state.oauth.userInfo?.family_name}</span
+        >
+        <span>${this.getDisplayName()}</span>
+      </div>
+    </button>
+  </div>
+</div>

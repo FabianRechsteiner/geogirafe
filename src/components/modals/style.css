@@ -1,0 +1,62 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#content {
+  z-index: 10000;
+  position: fixed;
+  display: flex;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--bkg-color);
+  border: var(--app-standard-border);
+  min-height: 400px;
+  width: 300px;
+  box-shadow: 5px 5px 10px rgb(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+header {
+  background: var(--app-color-grey);
+  display: flex;
+  height: 100px;
+  padding: 2rem;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  justify-content: center;
+}
+
+section {
+  padding: 30px 30px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+span {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.confirm-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.confirm-buttons button {
+  width: 7rem;
+}
+
+h2,
+span {
+  color: var(--text-color);
+}

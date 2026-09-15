@@ -1,0 +1,55 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.menu-title {
+  color: #3f68a7;
+  font-size: 1.8em;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: center;
+  margin: 0.5em 0;
+}
+
+.menu-item-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 0 25px;
+  box-sizing: border-box;
+  user-select: none;
+  margin-bottom: max(env(safe-area-inset-bottom), 20px);
+}
+
+.menu-item {
+  background-color: white;
+  border-radius: 8px;
+  filter: drop-shadow(0px 4px 7px #0004382c);
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+}
+
+.menu-item:active {
+  background-color: #c6ceda;
+}
+
+.menu-item-image-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 1em;
+}
+
+.menu-item-image-container > img {
+  width: 25%;
+  opacity: 0.7;
+}
+
+.menu-item-title-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #3f68a7;
+}
