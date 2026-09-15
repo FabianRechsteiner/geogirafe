@@ -129,7 +129,7 @@ npm run winterthur:services
 
 The online commands deliberately do not run in CI. Review the inventory, collection changes, service report, and generated diff before committing an update. Protected topics are excluded, missing WMS layers block a topic instead of disappearing silently, and OGC API collections remain inventory-only until their schema and feature parity have been accepted explicitly.
 
-The accepted snapshot currently generates 93 themes and 23 Winterthur background maps. The checked-in service report records 89 of 110 map requests and 58 of 74 queryable service checks as ready from the configured GitHub Pages origin; its remaining failures require review before production acceptance.
+The accepted snapshot currently generates 93 themes and 16 published background maps. Seven background maps that do not pass the session-free cross-origin check are explicitly excluded in `buildtools/winterthur/settings.json`; the required `Grundkarte` theme and WMS configuration remain part of the catalog. The checked-in service report records 89 of 110 map requests and 58 of 74 queryable service checks as ready from the configured GitHub Pages origin; its remaining failures require review before production acceptance.
 
 ## Runtime configuration
 

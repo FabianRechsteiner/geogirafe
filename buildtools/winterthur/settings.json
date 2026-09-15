@@ -2,6 +2,15 @@
   "sourceUrl": "https://stadtplan.winterthur.ch",
   "wmsBaseUrl": "https://stadtplan.winterthur.ch/wms",
   "wmsOverrides": {},
+  "excludedBackgrounds": [
+    "Hintergrundkarte_LK_UEP",
+    "Luftbild2014Background",
+    "Luftbild2013Background",
+    "Luftbild2011Background",
+    "Reliefkarte",
+    "Uebersichtsplan1904",
+    "Wildkarte1843"
+  ],
   "wmsProjections": {
     "Luftbild2019": "EPSG:2056",
     "Luftbild2019Background": "EPSG:2056",

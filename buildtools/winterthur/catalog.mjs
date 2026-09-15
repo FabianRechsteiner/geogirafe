@@ -40,6 +40,7 @@ export function collectionChanges(before = [], after = []) {
 }
 
 export function buildCatalog(snapshot, settings, vectormap) {
+  const excludedBackgrounds = new Set(settings.excludedBackgrounds ?? []);
   const unique = new Map();
   for (const t of snapshot.topics) {
     if (!unique.has(t.name)) unique.set(t.name, t);
@@ -109,7 +110,7 @@ export function buildCatalog(snapshot, settings, vectormap) {
         icon: resource.icon ?? 'images/logo/vectormap-logo.png', functionalities: {},
         metadata: { ...metadata(true), isExpanded: true, category: t.categorytitle }, children });
     }
-    if (t.background_layer || requiredBackground) {
+    if ((t.background_layer || requiredBackground) && !excludedBackgrounds.has(t.name)) {
       catalog.background_layers.push({ id: stableId(`background:${t.name}`), name: displayName,
         metadata: { ...metadata(), thumbnail: resource.icon ?? 'images/logo/vectormap-vertical.png' },
         children: cloneForBackground(children, t.name) });

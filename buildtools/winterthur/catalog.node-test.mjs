@@ -42,6 +42,12 @@ test('missing service layers are explicit blockers, not silently omitted', () =>
   assert.equal(r.inventory.find(t=>t.name==='trees').status,'blocked');
 });
 
+test('configured backgrounds are excluded without removing their themes', () => {
+  const r=buildCatalog(source(),{...settings,excludedBackgrounds:['trees']},{id:1,name:'Base'});
+  assert.deepEqual(r.catalog.background_layers.map((layer)=>layer.name),['Base']);
+  assert.deepEqual(r.catalog.themes.map((theme)=>theme.name),['Trees']);
+});
+
 test('collection changes distinguish additions, changes and removals without publishing', () => {
   assert.deepEqual(collectionChanges([{id:'a',title:'old'},{id:'b'}],[{id:'a',title:'new'},{id:'c'}]),{added:['c'],removed:['b'],changed:['a']});
   assert.deepEqual(collectionChanges([{id:'a'}],[{id:'a'}]),{added:[],removed:[],changed:[]});
