@@ -160,6 +160,16 @@ Tracked vectormap-specific files are primarily:
 
 The repository contains a GitHub Actions workflow for GitHub Pages deployment.
 
+To publish the application:
+
+1. Push the `agent` branch to the GitHub repository.
+2. In GitHub, open `Settings` -> `Pages` and select `GitHub Actions` as the source.
+3. Wait for the `Deploy GitHub Pages` workflow to finish under the `Actions` tab.
+
+The resulting project URL is:
+
+`https://fabianrechsteiner.github.io/geogirafe/`
+
 Deployment model:
 
 - install dependencies with `npm ci`
